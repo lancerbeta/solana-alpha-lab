@@ -1,0 +1,2605 @@
+{
+  "schema": "sal.forge-decision-link-native-qualification",
+  "schema_version": "1.0",
+  "task_id": "FORGE_DECISION_LINK_V1",
+  "baseline": "76993054cfaeeee7e9fb6e7b718add8cf27e404a",
+  "runs": [
+    {
+      "run": "entry-b01",
+      "retained_receipt": "local/forge_decision_link_v1/entry-b01/terminal.json",
+      "retained_receipt_sha256": "e4694216f98c24ea8954a2efe5dde729aa277a2b300b815dcbc698f0b34081eb",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "checks": {
+          "cold_context_original_advice": "PASS",
+          "cold_file_inventory_unchanged": "PASS",
+          "ignored_proposed_field_replay_no_values_no_extra_charge": "PASS",
+          "literal_result_oracle": "PASS",
+          "native_auto_bound_assessment_to_operation": "PASS",
+          "original_result_disposition_join": "PASS",
+          "science_keys_unchanged_by_assessment": "PASS",
+          "supported_textual_plan_persisted_and_cold_readable": "PASS",
+          "unsupported_proposed_field_ignored": "CHARACTERIZED_ONLY",
+          "unsupported_update_zero_writes": "PASS"
+        },
+        "choice_quality": "UNVERIFIED",
+        "gap": "NO_GAP",
+        "journal_scope": "edd955c0284d40868d3d2696e3d8e43f781512807eb2fd86056cb15772568418",
+        "live_use": "NOT_EXECUTED",
+        "market_alpha_oos_economics": "NOT_EVALUATED",
+        "operation_sha256": "24ec39e053eef223bc15a85916854e12ba1c7531851091023eeb5c68c0e05d5f",
+        "resource": {
+          "cpu_ram_peak": "UNKNOWN",
+          "cumulative_invocation_wall_seconds": 102.32796040000176,
+          "cumulative_measured_subprocess_wall_seconds": 46.850082599994494,
+          "current_helper_work_seconds_before_terminal": 12.248,
+          "elapsed_window_seconds": 342.271198,
+          "invocation_count": 3,
+          "model_calls": 0,
+          "owned_output_guard_bytes": 1073741824,
+          "preparation_outside_helper_seconds": "UNKNOWN",
+          "retained_bytes_before_terminal": 16179332,
+          "watchdog_seconds": 180
+        },
+        "status": "ENTRY_EXISTING_PATH_VERIFIED",
+        "technical_continuity": "NO_MATERIAL_DELTA_IN_TESTED_SCOPE",
+        "artifacts_vector": {
+          "count": 135,
+          "canonical_vector_sha256": "757ac38490f28b486ca13a5ffdd4e413cdc01b5c923702b22401e0e5636926de",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_vector": {
+          "count": 10,
+          "canonical_vector_sha256": "c62d52311e0e7899767192e9be441afb36f999958af85c29968dd5a08c4f49bc",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        }
+      }
+    },
+    {
+      "run": "multi-b01",
+      "retained_receipt": "local/forge_decision_link_v1/multi-b01/terminal.json",
+      "retained_receipt_sha256": "788228c477da5de70283eb830d7750f6c4124cdb5fd807c1aa93ce7706fbe808",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "status": "INCOMPLETE"
+      }
+    },
+    {
+      "run": "multi-b02",
+      "retained_receipt": "local/forge_decision_link_v1/multi-b02/terminal.json",
+      "retained_receipt_sha256": "c901f3ed7b40400045b9a0627d47848d95444a375bb4bd875e954453270c505f",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "status": "HARNESS_ERROR",
+        "artifacts_vector": {
+          "count": 28,
+          "canonical_vector_sha256": "af8ae35bc0eef72ad6aa5a379077601f5c79ea2c4f1382e5042cf0ce761fa4ca",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_vector": {
+          "count": 12,
+          "canonical_vector_sha256": "bb045459ac3d9ec38b89255e10324b2025555195dcf2728ade8919b27cebfd31",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        }
+      }
+    },
+    {
+      "run": "multi-b03",
+      "retained_receipt": "local/forge_decision_link_v1/multi-b03/terminal.json",
+      "retained_receipt_sha256": "d6e92beff79fb60ad099b20264f89df82f8245b0ab9f7beb48c29f2eef913d0c",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "status": "HARNESS_ERROR",
+        "artifacts_vector": {
+          "count": 54,
+          "canonical_vector_sha256": "7a7e660afd421b8360b469bb8b763a096ae4e94121e6c65c71a4651ceaef2e53",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_vector": {
+          "count": 12,
+          "canonical_vector_sha256": "26cce77226f2989664195847ccddebcebdabbabf242c94f5ad7e5f64c77adc99",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        }
+      }
+    },
+    {
+      "run": "multi-b04",
+      "retained_receipt": "local/forge_decision_link_v1/multi-b04/terminal.json",
+      "retained_receipt_sha256": "ba7e693f1c954460feaf09ee0d271e1a2a85aa4dff13f9508b98ec778eae7385",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "accounting_root": "c8e09b778e276fd7094951702b5a38a6eff38ce62819c6f5f5914ffbe6c61ab8",
+        "checks": {
+          "cold_read_zero_write": "PASS",
+          "common_accounting_lineage": "PASS",
+          "landed_original_source": "PASS",
+          "pending_conflict": "PASS",
+          "per_test_pre_value_plan": "PASS",
+          "public_cold_per_test_recovery": "PASS",
+          "result_ack_recovery": "PASS",
+          "two_literal_oracles": "PASS"
+        },
+        "choice_quality": "UNVERIFIED",
+        "gap": "REPAIRED_NATIVE_PENDING_AND_PUBLIC_READ",
+        "journal_scope": "c8e09b778e276fd7094951702b5a38a6eff38ce62819c6f5f5914ffbe6c61ab8",
+        "live_use": "NOT_EXECUTED",
+        "market_alpha_oos_economics": "NOT_EVALUATED",
+        "occupancy": {
+          "adaptive": {
+            "completed": 1,
+            "deficit": 0,
+            "limit": 2,
+            "occupied": 1,
+            "pending": 0,
+            "remaining": 1
+          },
+          "main": {
+            "completed": 1,
+            "deficit": 0,
+            "limit": 6,
+            "occupied": 1,
+            "pending": 0,
+            "remaining": 5
+          },
+          "preview": {
+            "completed": 0,
+            "deficit": 0,
+            "limit": 2,
+            "occupied": 0,
+            "pending": 0,
+            "remaining": 2
+          }
+        },
+        "operation_sha256": [
+          "3aae4036ad8513cbdf15d70539d417cf999b367746af34dcb1e7bcf1511fd224",
+          "192000e8209756029a29e67a53c141efff57b995474e6998a2e7b8ac4c015de9"
+        ],
+        "resource": {
+          "cold_only_this_invocation": true,
+          "cpu_ram_peak": "UNKNOWN",
+          "elapsed_window_seconds": 226.567919,
+          "invocation_count": 3,
+          "measured_subprocess_wall_seconds": 47.47569599999406,
+          "model_calls": 0,
+          "owned_output_guard_bytes": 1073741824,
+          "preparation_outside_helper_seconds": "UNKNOWN",
+          "watchdog_seconds": 180
+        },
+        "result_refs": [
+          "HFIC-ART-DISCOVERY-A9B3159E9B32A05BFADE8FA3C6CB60EEF3FCBD1A",
+          "HFIC-ART-DISCOVERY-0DCC9B6DE6B6343F31E02443C2B4498A331A6E3E"
+        ],
+        "status": "NATIVE_PARENT_CONTINUATION_VERIFIED",
+        "technical_continuity": "VERIFIED_IN_SYNTHETIC_SCOPE",
+        "artifacts_vector": {
+          "count": 188,
+          "canonical_vector_sha256": "618597ce2e13ceb15c77ea1ec0abdd449952441fbfe126f9ceda6cf851d75d44",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_vector": {
+          "count": 13,
+          "canonical_vector_sha256": "45efa52076df1e8ac78f8cb0e476a12a01734a5e96006752f176d61398067dcc",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        }
+      }
+    },
+    {
+      "run": "multi-b05",
+      "retained_receipt": "local/forge_decision_link_v1/multi-b05/terminal.json",
+      "retained_receipt_sha256": "2c9859ef3b10362bb03b4e11e0c1770ecaae7972e156d27bbaac476ca2c5e6f0",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "status": "HARNESS_ERROR",
+        "artifacts_vector": {
+          "count": 143,
+          "canonical_vector_sha256": "6461182ebf238138b54f96feec8eb53efec2df67ec225026780e3bb7d1823497",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_vector": {
+          "count": 15,
+          "canonical_vector_sha256": "7abe51f3d5da73514abb7bc6c8700295075c834dccf714ed365c70bdc1e903ae",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        }
+      }
+    },
+    {
+      "run": "multi-b06",
+      "retained_receipt": "local/forge_decision_link_v1/multi-b06/terminal.json",
+      "retained_receipt_sha256": "91bc326c53bca4b46d020075b0afdc6e3243a2183a1d3c101ef5d970b6f344cd",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "accounting_root": "c8e09b778e276fd7094951702b5a38a6eff38ce62819c6f5f5914ffbe6c61ab8",
+        "checks": {
+          "cold_read_zero_write": "PASS",
+          "common_accounting_lineage": "PASS",
+          "frozen_context_and_query_refs": "PASS",
+          "frozen_script_legacy_disposition_read": "PASS",
+          "landed_original_source": "PASS",
+          "pending_conflict": "PASS",
+          "per_test_pre_value_plan": "PASS",
+          "public_cold_per_test_recovery": "PASS",
+          "result_ack_recovery": "PASS",
+          "two_literal_oracles": "PASS"
+        },
+        "choice_quality": "UNVERIFIED",
+        "gap": "REPAIRED_NATIVE_PENDING_AND_PUBLIC_READ",
+        "journal_scope": "c8e09b778e276fd7094951702b5a38a6eff38ce62819c6f5f5914ffbe6c61ab8",
+        "live_use": "NOT_EXECUTED",
+        "market_alpha_oos_economics": "NOT_EVALUATED",
+        "occupancy": {
+          "adaptive": {
+            "completed": 1,
+            "deficit": 0,
+            "limit": 2,
+            "occupied": 1,
+            "pending": 0,
+            "remaining": 1
+          },
+          "main": {
+            "completed": 1,
+            "deficit": 0,
+            "limit": 6,
+            "occupied": 1,
+            "pending": 0,
+            "remaining": 5
+          },
+          "preview": {
+            "completed": 0,
+            "deficit": 0,
+            "limit": 2,
+            "occupied": 0,
+            "pending": 0,
+            "remaining": 2
+          }
+        },
+        "operation_sha256": [
+          "ad121d3bd3db7e7e94957bb8904d558fd09b2eff70bb6ed0efee828403ad3f9a",
+          "e2d0276a426cf1d97a4e81743b01a001067e7bf0e5801d14a523789afc504888"
+        ],
+        "resource": {
+          "cold_only_this_invocation": true,
+          "cpu_ram_peak": "UNKNOWN",
+          "elapsed_window_seconds": 3168.8548,
+          "invocation_count": 2,
+          "measured_subprocess_wall_seconds": 55.84429999999338,
+          "model_calls": 0,
+          "owned_output_guard_bytes": 1073741824,
+          "preparation_outside_helper_seconds": "UNKNOWN",
+          "watchdog_seconds": 180
+        },
+        "result_refs": [
+          "HFIC-ART-DISCOVERY-A9B3159E9B32A05BFADE8FA3C6CB60EEF3FCBD1A",
+          "HFIC-ART-DISCOVERY-0DCC9B6DE6B6343F31E02443C2B4498A331A6E3E"
+        ],
+        "status": "NATIVE_PARENT_CONTINUATION_VERIFIED",
+        "technical_continuity": "VERIFIED_IN_SYNTHETIC_SCOPE",
+        "artifacts_vector": {
+          "count": 211,
+          "canonical_vector_sha256": "afbfc07379860494011ef1f7c31bda2a6b07e7a552de2c482767944e3f9b8548",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_vector": {
+          "count": 17,
+          "canonical_vector_sha256": "59445843d0c2f2a75f3046b72522201f754b2b2072343283fe257bbbab800ed2",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        }
+      }
+    },
+    {
+      "run": "race-b01",
+      "retained_receipt": "local/forge_decision_link_v1/race-b01/terminal.json",
+      "retained_receipt_sha256": "90e2d8f7ea13f06af0cac762dd08fed82ca80c0cb74c7776d03fb06077ab2a5d",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "status": "HARNESS_ERROR",
+        "artifacts_vector": {
+          "count": 53,
+          "canonical_vector_sha256": "493905fdf7c4fadda97316226ba284f8846f2b29ee19cf2d4c15a9f14d43bc1f",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_vector": {
+          "count": 15,
+          "canonical_vector_sha256": "6831e69eaa28301138f481e4ea20d7d86f97185d36680e1646bdd7c96fde780b",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        }
+      }
+    },
+    {
+      "run": "race-b02",
+      "retained_receipt": "local/forge_decision_link_v1/race-b02/terminal.json",
+      "retained_receipt_sha256": "c16202d2c220b96f93b3b6610d4a72d63856a7f021f17a961350bc98d3d9a2eb",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "checks": {
+          "both_outer_gates_before_reserve": "PASS",
+          "cold_pending_zero_write": "PASS",
+          "single_durable_reservation": "PASS",
+          "typed_loser_original_locator": "PASS",
+          "unrelated_native_append": "PASS",
+          "zero_loader_and_evaluator": "PASS"
+        },
+        "choice_quality": "UNVERIFIED",
+        "gap": "REPAIRED_PRECOMMIT_PENDING_GUARD",
+        "journal_scope": "be7a112d61171db48f7942294171d6a54c334dd064efb02a76188d3761d87829",
+        "live_use": "NOT_EXECUTED",
+        "market_alpha_oos_economics": "NOT_EVALUATED",
+        "occupancy": {
+          "adaptive": {
+            "completed": 0,
+            "deficit": 0,
+            "limit": 2,
+            "occupied": 0,
+            "pending": 0,
+            "remaining": 2
+          },
+          "main": {
+            "completed": 0,
+            "deficit": 0,
+            "limit": 6,
+            "occupied": 1,
+            "pending": 1,
+            "remaining": 5
+          },
+          "preview": {
+            "completed": 0,
+            "deficit": 0,
+            "limit": 2,
+            "occupied": 0,
+            "pending": 0,
+            "remaining": 2
+          }
+        },
+        "operation_sha256": "c1868cf1739ca06b2aee8c3767c22494d67174056842157c60cf94feb2f7aa24",
+        "resource": {
+          "cold_only_this_invocation": false,
+          "cpu_ram_peak": "UNKNOWN",
+          "elapsed_window_seconds": 20.201495,
+          "invocation_count": 1,
+          "measured_subprocess_wall_seconds": 18.696898000001966,
+          "model_calls": 0,
+          "owned_output_guard_bytes": 1073741824,
+          "preparation_outside_helper_seconds": "UNKNOWN",
+          "watchdog_seconds": 180
+        },
+        "status": "NATIVE_TWO_AUTHOR_RACE_VERIFIED",
+        "technical_continuity": "VERIFIED_IN_SYNTHETIC_RACE_SCOPE",
+        "artifacts_vector": {
+          "count": 66,
+          "canonical_vector_sha256": "b2af146bd01d50b5fc963880c0b2bca45fa92604761119edab57da253f3b1527",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_vector": {
+          "count": 15,
+          "canonical_vector_sha256": "beaebb02e8297dba17e4a5f4e4f70fe428871a1a93ff43b114cb05586a60991b",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        }
+      }
+    },
+    {
+      "run": "qualification-c01",
+      "retained_receipt": "local/forge_decision_link_v1/qualification-c01/test-receipt.json",
+      "retained_receipt_sha256": "affd3a25f13c50fb6dc24187967682456f43c33d8b231cab8bb3b4ebc4ce4adb",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "choice_quality": "UNVERIFIED",
+        "cpu_ram_peak": "UNKNOWN",
+        "exit_code": 1,
+        "scope": "V10 exact native correction+successor+fresh discovery-show; V08+V09 compound scenario",
+        "stderr_sha256": "2711349d22dd1ca409eeeb67580846cae5ae55f5ca08ecdb46d830b238403cf3",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "unittest_subprocess_wall_seconds": 85.17178760000024,
+        "artifacts_vector": {
+          "count": 3,
+          "canonical_vector_sha256": "1fa2b8fbc1e6578ed88d82b6f15677b065d4048f8ea52d46252666e01287e13a",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        }
+      }
+    },
+    {
+      "run": "qualification-c02",
+      "retained_receipt": "local/forge_decision_link_v1/qualification-c02/test-receipt.json",
+      "retained_receipt_sha256": "d6613cd81f9bd9311e134dbba2c07cfe7c10c3f009eb15de996ed6c02b7267b7",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "choice_quality": "UNVERIFIED",
+        "cpu_ram_peak": "UNKNOWN",
+        "end_utc": "2026-10-10T19:07:34.733983+00:00",
+        "exit_code": 1,
+        "scope": "V10 exact native correction+successor+withdrawal+fresh discovery-show; V08+V09 compound scenario",
+        "source_unchanged": true,
+        "start_utc": "2026-10-10T19:06:53.694418+00:00",
+        "stderr_sha256": "b45fbe33e21750b3658011fcfe61a87ad2c20cbe9a0f6df3d6e079eaf9fc047c",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "unittest_subprocess_wall_seconds": 40.95640550000098,
+        "artifacts_vector": {
+          "count": 11,
+          "canonical_vector_sha256": "a7da1ff24238fd6b4ddae470ea2f72510edeb074611d4c2a677e20690cd612a3",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_before_vector": {
+          "count": 9,
+          "canonical_vector_sha256": "7b676e47886ffe53ce790fc4c67c3d2703563461d947cb2236c38a623c10e0ad",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_after_vector": {
+          "count": 9,
+          "canonical_vector_sha256": "7b676e47886ffe53ce790fc4c67c3d2703563461d947cb2236c38a623c10e0ad",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        }
+      }
+    },
+    {
+      "run": "qualification-c03",
+      "retained_receipt": "local/forge_decision_link_v1/qualification-c03/test-receipt.json",
+      "retained_receipt_sha256": "b12641e2bd48a3727c4bf6776832d80950f291ea8243d7d03a86f90cdf719231",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "choice_quality": "UNVERIFIED",
+        "cpu_ram_peak": "UNKNOWN",
+        "end_utc": "2026-10-10T19:19:30.268772+00:00",
+        "exit_code": 0,
+        "prior_attempts": [
+          {
+            "classification": "FIXTURE_ORDERING_ADMISSION_REFUSAL_EXACT_PRIOR_SCOPE_MATCH",
+            "ref": "qualification-c01"
+          },
+          {
+            "classification": "ROOT_CONFIG_REGRESSION_SEARCH_TERMS_CEILING_SCHEMA_INVALID_CAPABILITY_IDENTITY_UNAVAILABLE",
+            "ref": "qualification-c02"
+          }
+        ],
+        "scope": "V10 exact native correction+successor+withdrawal+fresh discovery-show; V08+V09 compound scenario",
+        "source_unchanged": true,
+        "start_utc": "2026-10-10T19:17:42.733174+00:00",
+        "stderr_sha256": "2a249d55b057db725e948804b30c53af792113077884f194b6b4e592275042bc",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "unittest_subprocess_wall_seconds": 107.39973150000151,
+        "artifacts_vector": {
+          "count": 15,
+          "canonical_vector_sha256": "053825003b606bf9b198bc6517f63d1acc788e1dea03b98fda191ead8a238079",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_before_vector": {
+          "count": 11,
+          "canonical_vector_sha256": "5db5de594b95eec0e3f6028f2a75e776b55c1b5f31a45678a1ffc2e18c008b44",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_after_vector": {
+          "count": 11,
+          "canonical_vector_sha256": "5db5de594b95eec0e3f6028f2a75e776b55c1b5f31a45678a1ffc2e18c008b44",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        }
+      }
+    },
+    {
+      "run": "impact-d01",
+      "retained_receipt": "local/forge_decision_link_v1/impact-d01/test-receipt.json",
+      "retained_receipt_sha256": "d878d47733b0e9233a2671ce55d81209feda43b6f72bba9032679da9d343275e",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "batch_watchdog_seconds": 900,
+        "batch_watchdog_triggered": true,
+        "cpu_ram_peak": "UNKNOWN",
+        "end_utc": "2026-10-10T19:45:37.167011+00:00",
+        "exit_code": 0,
+        "expected_tests": 44,
+        "owned_output_bytes_after": 393500736,
+        "owned_output_bytes_before": 337280822,
+        "owned_output_guard_bytes": 1073741824,
+        "scope": "PROPORTIONAL_UNCHANGED_OWNER_ENGINEERING_REGRESSION_V01_V03_V11_V12_V13_V14_V15_V17",
+        "source_unchanged": true,
+        "start_utc": "2026-10-10T19:30:11.460582+00:00",
+        "status": "FAIL_OR_HARNESS_ERROR",
+        "test_names": [
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_cap_zero_still_freezes_a_saved_candidate",
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_closed_repair_without_operation_artifact_still_reads",
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_compound_then_real_freeze_is_the_scientific_terminal",
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_foreign_journal_reservations_do_not_spend_this_journal",
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_gate_replay_does_not_require_a_second_reservation",
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_later_operation_wins_even_when_its_hash_sorts_first",
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_one_allowance_covers_two_specs_and_stops_the_third",
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_preview_cap_zero_refuses_before_values",
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_published_cap_two_runs_two_questions_without_a_second_grant",
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_published_negative_simple_pauses_on_one_corpus",
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_same_reservation_retries_without_a_second_unit",
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_search_terminal_conflict_refuses_before_values",
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_simple_cap_pauses_and_continuation_keeps_the_journal",
+          "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_zero_owner_cap_refuses_while_protocol_budget_remains",
+          "tests.test_hfic_ordinary_operation_acceptance_v1.OrdinaryAcceptanceTests.test_c_positive_candidate_reaches_scripted_classification_without_a_new_look",
+          "tests.test_hfic_ordinary_operation_acceptance_v1.OrdinaryAcceptanceTests.test_d_faults_resume_and_last_unit_do_not_double_spend",
+          "tests.test_hfic_ordinary_operation_acceptance_v1.OrdinaryAcceptanceTests.test_e_foreign_inputs_and_exhausted_caps_do_not_load",
+          "tests.test_hfic_ordinary_operation_acceptance_v1.OrdinaryAcceptanceTests.test_preview_spend_follows_feature_preview_and_preflight_journal",
+          "tests.test_hfic_ordinary_operation_acceptance_v1.OrdinaryAcceptanceTests.test_recorded_query_requires_operation_and_independent_market",
+          "tests.test_forge_evidence_guided_generation_v1.SelectionSafetyTests.test_archive_exceeds_packet_bound_and_mandatory_tail_remains_visible",
+          "tests.test_forge_evidence_guided_generation_v1.SelectionSafetyTests.test_both_research_clocks_and_own_session_control_eligibility",
+          "tests.test_forge_evidence_guided_generation_v1.SelectionSafetyTests.test_diversity_precedes_repeat_text_matches",
+          "tests.test_forge_evidence_guided_generation_v1.SelectionSafetyTests.test_mandatory_overflow_fails_without_history_write",
+          "tests.test_forge_evidence_guided_generation_v1.SelectionSafetyTests.test_parent_metadata_bytes_are_part_of_bound",
+          "tests.test_forge_evidence_guided_generation_v1.SelectionSafetyTests.test_revision_keeps_optional_tail_removable_near_parent_byte_bound",
+          "tests.test_forge_evidence_guided_generation_v1.SelectionSafetyTests.test_structural_relevance_precedes_narrative_and_outcome_sign",
+          "tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_65_distinct_eligible_heads_do_not_block_fresh_ordinary_freeze",
+          "tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_hidden_exact_prior_refuses_before_draft_persistence",
+          "tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_episode_preview_reads_prefix_only_and_replay_spends_no_second_look",
+          "tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_bound_detail_is_read_only_and_writer_invalidates_locator",
+          "tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_hidden_corrupt_archive_partition_blocks_public_context_without_writes",
+          "tests.test_hfic_scientific_disposition_continuity_v1.V3DriftAndLineageTests.test_consumer_isolation_when_reader_fails",
+          "tests.test_hfic_scientific_disposition_continuity_v1.V3DriftAndLineageTests.test_corrupt_relevant_and_unrelated_records_are_localized",
+          "tests.test_hfic_scientific_disposition_continuity_v1.V3DriftAndLineageTests.test_market_change_and_compound_scope_are_not_inherited",
+          "tests.test_hfic_scientific_disposition_continuity_v1.V3DriftAndLineageTests.test_supersession_withdrawal_stale_parent_and_fork",
+          "tests.test_hfic_scientific_disposition_continuity_v1.V3DriftAndLineageTests.test_unrelated_writes_keep_search_current_and_new_look_requires_review",
+          "tests.test_hfic_scientific_disposition_continuity_v1.ReviewRegressionTests.test_unknown_market_and_rotated_journal_are_never_current",
+          "tests.test_hfic_scientific_disposition_continuity_v1.ReviewRegressionTests.test_capsule_shrinks_first_under_packet_budget",
+          "tests.test_hfic_scientific_disposition_continuity_v1.ReviewRegressionTests.test_packets_without_assessment_history_keep_their_shape",
+          "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_trust_closure_new_evidence_preserves_pending_reservation_and_safe_stop_recovery",
+          "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_primary_revision_projects_authored_aliases_and_keeps_same_look",
+          "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_scripted_positive_boundary_runs_real_classify_final_runner_replay",
+          "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_base_saved_string_draft_recovers_without_rewrite_or_new_look",
+          "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_real_normalized_prefix_reader_does_not_access_future_values"
+        ],
+        "unittest_subprocess_wall_seconds": 925.5109843999999,
+        "artifacts_vector": {
+          "count": 28,
+          "canonical_vector_sha256": "691768de17fe069530769dfb993e08e3726b48a400b620c3805368519c825ff1",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_before_vector": {
+          "count": 21,
+          "canonical_vector_sha256": "6bb7f8b73b6d6ab79cc10201d2e40f3e2c2b64ff70775c705a7c6e11734210e3",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "source_sha256_after_vector": {
+          "count": 21,
+          "canonical_vector_sha256": "6bb7f8b73b6d6ab79cc10201d2e40f3e2c2b64ff70775c705a7c6e11734210e3",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        }
+      }
+    },
+    {
+      "run": "impact-d02",
+      "retained_receipt": "local/forge_decision_link_v1/impact-d02/receipt.json",
+      "retained_receipt_sha256": "70798b03f628045ead699af6458f7711ea748c7e9fb125bc1a2b2f9618b4a9c4",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "batch_process_wall_seconds": 74.44903239999985,
+        "children_cleanup": "OWNED_JOB_CLOSED_AFTER_JOIN",
+        "cpu_ram_peak": "UNKNOWN",
+        "preparation_wall_seconds": "UNKNOWN",
+        "returncode": 1,
+        "source_unchanged": true,
+        "status": "FAIL_OR_HARNESS_ERROR",
+        "test_summary": {
+          "cpu_ram_peak": "UNKNOWN",
+          "errors": 0,
+          "failures": 5,
+          "oracle": "ENGINEERING_REGRESSION_SCRIPTED_CRITIC_MECHANICAL",
+          "setup_teardown_and_framework_wall_seconds": 68.70133660000283,
+          "test_body_wall_seconds": 4.829530199996952,
+          "tests_run": 5,
+          "unittest_execution_wall_seconds": 73.53086679999979
+        },
+        "watchdog_fired": false,
+        "source_sha256_after_vector": {
+          "count": 29,
+          "canonical_vector_sha256": "e1983d65a1524e6b88b3fb458f55054c8f47938a7fe604d1ece6104dae93baa8",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "completed_assertions": [
+          {
+            "test_id": "tests.test_hfic_ordinary_operation_acceptance_v1.OrdinaryAcceptanceTests.test_c_positive_candidate_reaches_scripted_classification_without_a_new_look",
+            "status": "FAIL",
+            "test_body_wall_seconds": 0.9633567999990191
+          },
+          {
+            "test_id": "tests.test_hfic_cycle_two_normalized_vertical_v1.CycleTwoNormalizedVerticalTests.test_cycle_two_normalized_child_continues_the_representation_spend",
+            "status": "FAIL",
+            "test_body_wall_seconds": 0.07110850000026403
+          },
+          {
+            "test_id": "tests.test_hfic_cycle_two_normalized_vertical_v1.CycleTwoNormalizedVerticalTests.test_same_cycle_normalized_variants_share_the_representation_budget",
+            "status": "FAIL",
+            "test_body_wall_seconds": 0.06810739999855286
+          },
+          {
+            "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_base_saved_string_draft_recovers_without_rewrite_or_new_look",
+            "status": "FAIL",
+            "test_body_wall_seconds": 3.585674599999038
+          },
+          {
+            "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_real_normalized_prefix_reader_does_not_access_future_values",
+            "status": "FAIL",
+            "test_body_wall_seconds": 0.14128290000007837
+          }
+        ]
+      }
+    },
+    {
+      "run": "impact-d03",
+      "retained_receipt": "local/forge_decision_link_v1/impact-d03/receipt.json",
+      "retained_receipt_sha256": "c83390d10bcafc10e0f2e3e3e0c04390fe3142e1b801245799b7b34b1e270340",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "batch_process_wall_seconds": 600.0179322000004,
+        "children_cleanup": "OWNED_JOB_CLOSED_AFTER_JOIN",
+        "cpu_ram_peak": "UNKNOWN",
+        "preparation_wall_seconds": "UNKNOWN",
+        "returncode": 0,
+        "source_unchanged": true,
+        "status": "FAIL_OR_HARNESS_ERROR",
+        "test_summary": null,
+        "watchdog_fired": true,
+        "source_sha256_after_vector": {
+          "count": 30,
+          "canonical_vector_sha256": "d516e504011ffe5ba0a58e57131076b14902451111a6643f9ca4a3d7bcc5624e",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "completed_assertions": [
+          {
+            "test_id": "tests.test_hfic_ordinary_operation_acceptance_v1.OrdinaryAcceptanceTests.test_c_positive_candidate_reaches_scripted_classification_without_a_new_look",
+            "status": "PASS",
+            "test_body_wall_seconds": 43.01943750000282
+          },
+          {
+            "test_id": "tests.test_hfic_cycle_two_normalized_vertical_v1.CycleTwoNormalizedVerticalTests.test_cycle_two_normalized_child_continues_the_representation_spend",
+            "status": "PASS",
+            "test_body_wall_seconds": 418.6126133999969
+          }
+        ]
+      }
+    },
+    {
+      "run": "impact-d04",
+      "retained_receipt": "local/forge_decision_link_v1/impact-d04/receipt.json",
+      "retained_receipt_sha256": "21aa48761c6320a23cc95a2952b2cd492d4ff4f8bb2aefcd0fe6f4982622d3fa",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "batch_process_wall_seconds": 169.63306889999876,
+        "children_cleanup": "OWNED_JOB_CLOSED_AFTER_JOIN",
+        "cpu_ram_peak": "UNKNOWN",
+        "preparation_wall_seconds": "UNKNOWN",
+        "returncode": 0,
+        "source_unchanged": true,
+        "status": "PASS",
+        "test_summary": {
+          "cpu_ram_peak": "UNKNOWN",
+          "errors": 0,
+          "failures": 0,
+          "oracle": "ENGINEERING_REGRESSION_SCRIPTED_CRITIC_MECHANICAL",
+          "setup_teardown_and_framework_wall_seconds": 34.09117549999792,
+          "test_body_wall_seconds": 135.31503890000022,
+          "tests_run": 1,
+          "unittest_execution_wall_seconds": 169.40621439999813
+        },
+        "watchdog_fired": false,
+        "source_sha256_after_vector": {
+          "count": 30,
+          "canonical_vector_sha256": "3caffd430abe4664f2db4f397b19dd657b405d3047d0a15c7319249e51e750b8",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "completed_assertions": [
+          {
+            "test_id": "tests.test_hfic_cycle_two_normalized_vertical_v1.CycleTwoNormalizedVerticalTests.test_same_cycle_normalized_variants_share_the_representation_budget",
+            "status": "PASS",
+            "test_body_wall_seconds": 135.31503890000022
+          }
+        ]
+      }
+    },
+    {
+      "run": "impact-d05",
+      "retained_receipt": "local/forge_decision_link_v1/impact-d05/receipt.json",
+      "retained_receipt_sha256": "ba3f16acceaa229e4cb22502b1b355260699aab36fcb5b0651730fa3afab6764",
+      "projection": "BOUNDED_RECEIPT_SUMMARY_NOT_RAW_LOGS",
+      "receipt": {
+        "batch_process_wall_seconds": 133.8699102999999,
+        "children_cleanup": "OWNED_JOB_CLOSED_AFTER_JOIN",
+        "cpu_ram_peak": "UNKNOWN",
+        "preparation_wall_seconds": "UNKNOWN",
+        "returncode": 0,
+        "source_unchanged": true,
+        "status": "PASS",
+        "test_summary": {
+          "cpu_ram_peak": "UNKNOWN",
+          "errors": 0,
+          "failures": 0,
+          "oracle": "ENGINEERING_REGRESSION_SCRIPTED_CRITIC_MECHANICAL",
+          "setup_teardown_and_framework_wall_seconds": 32.495413700002246,
+          "test_body_wall_seconds": 100.81221579999692,
+          "tests_run": 2,
+          "unittest_execution_wall_seconds": 133.30762949999917
+        },
+        "watchdog_fired": false,
+        "source_sha256_after_vector": {
+          "count": 30,
+          "canonical_vector_sha256": "3caffd430abe4664f2db4f397b19dd657b405d3047d0a15c7319249e51e750b8",
+          "full_vector": "Original retained receipt, bound by its byte SHA256."
+        },
+        "completed_assertions": [
+          {
+            "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_base_saved_string_draft_recovers_without_rewrite_or_new_look",
+            "status": "PASS",
+            "test_body_wall_seconds": 56.7810490999982
+          },
+          {
+            "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_real_normalized_prefix_reader_does_not_access_future_values",
+            "status": "PASS",
+            "test_body_wall_seconds": 44.03116669999872
+          }
+        ]
+      }
+    },
+    {
+      "run": "multi-b06-original-producer",
+      "retained_receipt": "local/forge_decision_link_v1/multi-b06-producer-terminal.json",
+      "retained_receipt_sha256": "e2722e951b4a2d8366dc17e9f17b65c05fac3bdd9d7ea62a16b206da3f0a29ae",
+      "checks": {
+        "cold_read_zero_write": "PASS",
+        "common_accounting_lineage": "PASS",
+        "frozen_context_and_query_refs": "PASS",
+        "frozen_script_legacy_disposition_read": "PASS",
+        "landed_original_source": "PASS",
+        "pending_conflict": "PASS",
+        "per_test_pre_value_plan": "PASS",
+        "public_cold_per_test_recovery": "PASS",
+        "result_ack_recovery": "PASS",
+        "two_literal_oracles": "PASS"
+      },
+      "source_sha256": {
+        "configs/factory_semantic_operability_v1.yaml": "0ee76b9a73b21a8cad6eb0574580e1253773c57a3e67ce8246630a498d9ddcf9",
+        "scripts/hypothesis_forge.py": "ba27dd6fbac74772e58a3ffe65cd5e513e9071998f465f6a1d9dbc37c2981c97",
+        "src/solana_alpha_lab/factory/hfic_card_projection.py": "bba3769cecff9e4d5a489bf615bad52f48bf311e853c15aa8aa142a1389fb251",
+        "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "f2ce1f6f979f62de7e982f5fe23635fc7d940546df913b839cc9c6cfe635b42d",
+        "src/solana_alpha_lab/factory/hfic_generation_context.py": "d347b585770f6f81e19bc6f2ddbe27031059754878a73b022bd8b5c99acde719",
+        "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "9b1904f0439547f895a58a94989568273bcfd010a388f9900a5fbe4a64d8847e",
+        "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "67d5fc8da2207b93d2316e19b02186e4ab6ace543b41ee4485d60d4f61e26f22",
+        "src/solana_alpha_lab/factory/hfic_preflight.py": "a4b866b352249e124cba6bb83c07b23e624f43848a7037dfc77ca087203f2d23",
+        "src/solana_alpha_lab/factory/hfic_scientific_disposition.py": "d2b980f20cb7e703d4d61033ca4481d58de39d8ed149b16b5b64d013859aac75",
+        "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "b530aa119d81bac8eb49e3c818e0ed481e4ff02489254ddbe55a55236c4cb65e",
+        "tests/fixtures/forge_decision_link_v1/entry_probe.py": "275653deb5db29d48aecdbf9e94c0442b8e8fc73de1c6ddac8ac3ea3c88c0748",
+        "tests/fixtures/forge_decision_link_v1/multi_look_probe.py": "baa0f33abed11dbe68316e69c7ea77efcb293ba8f79c066a0d87463325db50fe",
+        "tests/fixtures/forge_decision_link_v1/verify_terminal.py": "80ad4ec015c386be8e7e406823b10a4fc9ce9534faed403b932c2751028d1831",
+        "tests/test_forge_decision_link_v1.py": "661a86cd07f9365891d2fbb110db14bd5407d4744628cac5434c55577f6b0b89",
+        "tests/test_forge_research_flow_reliability_v1.py": "817280ef9bf67644c088ea6f9a75f012f9fc1d875bf768fc6d80e97df7eeba2a",
+        "tests/test_hfic_list_aware_vertical_v1.py": "91c8b7ee89b54e1060b7f01c0662af5ff6d7681fb7cabd94152d8c9988190bc2",
+        "tests/test_hfic_ordinary_operation_acceptance_v1.py": "f3b459d0f5e63734992fda04ee066f7acbebf8744ddaf88c0f35e0264363d33d"
+      },
+      "resource": {
+        "cold_only_this_invocation": false,
+        "cpu_ram_peak": "UNKNOWN",
+        "elapsed_window_seconds": 66.576813,
+        "invocation_count": 1,
+        "measured_subprocess_wall_seconds": 46.823228199995356,
+        "model_calls": 0,
+        "owned_output_guard_bytes": 1073741824,
+        "preparation_outside_helper_seconds": "UNKNOWN",
+        "watchdog_seconds": 180
+      }
+    }
+  ],
+  "positive_source_links": {
+    "retained_capture": "local/forge_decision_link_v1/impact-d03/positive-source-link-proof.json",
+    "retained_capture_sha256": "5b14b2a2dd426aecba5ff832c8731ffac9498f9061252f118d18a1f6d20871cf",
+    "projection": "KEY_NATIVE_BINDINGS_NOT_FULL_MACHINE_DUMP",
+    "oracle": "SCRIPTED_CRITIC_MECHANICAL",
+    "non_claims": [
+      "NO_INDEPENDENT_SCIENTIFIC_CRITIC",
+      "NO_ALPHA",
+      "NO_CHOICE_QUALITY_PASS"
+    ],
+    "result_refs": [
+      "HFIC-ART-DISCOVERY-AE10F46A27C736F041D0FA8BAF9C0DB9CBE1A18E"
+    ],
+    "result_sha256": "48f9d1c3949b2821ef14218fd0d57ad12a8b77367fb8314077e0b1098d5b943a",
+    "persisted_sources": {
+      "HFIC-ART-CRITIC-INPUT-HFIC-SESS-7DFB13277E3C3BBB": {
+        "artifact_kind": "CRITIC_INPUT_PACKET",
+        "artifact_sha256": "359fb326a7bc6556ebbc3e5207e1abb4b3cbddddad7c4c9f79040fb1fbb29424",
+        "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+      },
+      "HFIC-ART-FORGE-DRAFT-GENERATED-FF4DFD06F06698F1": {
+        "artifact_kind": "FORGE_DRAFT",
+        "artifact_sha256": "ff4dfd06f06698f10fcb2fd7d115d89b517105bb92bda655ffef1311296d945b",
+        "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+      },
+      "HFIC-ART-FORGE-DRAFT-HFIC-SESS-7DFB13277E3C3BBB": {
+        "artifact_kind": "FORGE_DRAFT",
+        "artifact_sha256": "ff4dfd06f06698f10fcb2fd7d115d89b517105bb92bda655ffef1311296d945b",
+        "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+      }
+    },
+    "public_read": {
+      "total_results": 1,
+      "authority_granted": false,
+      "values_loaded": false,
+      "writes": {
+        "research_store": 0
+      },
+      "source_links": [
+        {
+          "artifact_kind": "CRITIC_INPUT_PACKET",
+          "artifact_ref": "HFIC-ART-CRITIC-INPUT-HFIC-SESS-7DFB13277E3C3BBB",
+          "artifact_sha256": "359fb326a7bc6556ebbc3e5207e1abb4b3cbddddad7c4c9f79040fb1fbb29424",
+          "look_confirms_selected": true,
+          "next_read": {
+            "command": "show-session",
+            "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+          },
+          "selected_candidate_id": "HFIC-CAND-223A16B04721",
+          "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+        },
+        {
+          "artifact_kind": "FORGE_DRAFT",
+          "artifact_ref": "HFIC-ART-FORGE-DRAFT-GENERATED-FF4DFD06F06698F1",
+          "artifact_sha256": "ff4dfd06f06698f10fcb2fd7d115d89b517105bb92bda655ffef1311296d945b",
+          "look_confirms_selected": null,
+          "next_read": {
+            "command": "show-session",
+            "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+          },
+          "selected_candidate_id": null,
+          "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+        },
+        {
+          "artifact_kind": "FORGE_DRAFT",
+          "artifact_ref": "HFIC-ART-FORGE-DRAFT-HFIC-SESS-7DFB13277E3C3BBB",
+          "artifact_sha256": "ff4dfd06f06698f10fcb2fd7d115d89b517105bb92bda655ffef1311296d945b",
+          "look_confirms_selected": null,
+          "next_read": {
+            "command": "show-session",
+            "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+          },
+          "selected_candidate_id": null,
+          "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+        }
+      ]
+    },
+    "own_critic_ref": "HFIC-ART-CRITIC-RESULT-HFIC-SESS-7DFB13277E3C3BBB-3C9D36CD28CB",
+    "show_session": {
+      "session_id": "HFIC-SESS-7DFB13277E3C3BBB",
+      "selected_candidate_id": "HFIC-CAND-223A16B04721",
+      "critic_result_sha256": "3c9d36cd28cbaee1d5595523df998fd7338e673eadff36e7896ffc3c10264e1b",
+      "primary_critic_terminal": "PASS_FAST_LANE_READY",
+      "final_session_terminal": "PASS_FAST_LANE_READY",
+      "lane_classifier_terminal": "FAST_LANE_READY",
+      "session_state": "SYNTHESIS_COMPLETE",
+      "identity_status": "BOUND",
+      "terminal_receipt_sha256": "5c729c4a4cedc5ffc33030cae8467e42c69dc283dff289ff9c85b079b0e8f091"
+    },
+    "main_looks": 1,
+    "inventory_before_after": "44e7d94b1231bd94c66298b25415d1ae0630e70071f2f58e8afa7551da4aa31e",
+    "native_file_count": 93,
+    "all_native_files_db_wal_unchanged": true,
+    "source_canaries": [
+      {
+        "altered_packet_refs": [
+          "HFIC-ART-CRITIC-INPUT-HFIC-SESS-7DFB13277E3C3BBB"
+        ],
+        "fault": "CONTEXT_ONLY_PACKET",
+        "native_alternate_outcome": false,
+        "oracle": "CONTROLLED_IN_MEMORY_READ_VIEW_SOURCE_CANARY",
+        "remaining_source_links": [
+          {
+            "artifact_kind": "FORGE_DRAFT",
+            "artifact_ref": "HFIC-ART-FORGE-DRAFT-GENERATED-FF4DFD06F06698F1",
+            "artifact_sha256": "ff4dfd06f06698f10fcb2fd7d115d89b517105bb92bda655ffef1311296d945b",
+            "look_confirms_selected": null,
+            "next_read": {
+              "command": "show-session",
+              "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+            },
+            "selected_candidate_id": null,
+            "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+          },
+          {
+            "artifact_kind": "FORGE_DRAFT",
+            "artifact_ref": "HFIC-ART-FORGE-DRAFT-HFIC-SESS-7DFB13277E3C3BBB",
+            "artifact_sha256": "ff4dfd06f06698f10fcb2fd7d115d89b517105bb92bda655ffef1311296d945b",
+            "look_confirms_selected": null,
+            "next_read": {
+              "command": "show-session",
+              "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+            },
+            "selected_candidate_id": null,
+            "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+          }
+        ],
+        "store_append": false
+      },
+      {
+        "altered_packet_refs": [
+          "HFIC-ART-CRITIC-INPUT-HFIC-SESS-7DFB13277E3C3BBB"
+        ],
+        "fault": "FOREIGN_PACKET_RESULT_REF_AND_SHA",
+        "native_alternate_outcome": false,
+        "oracle": "CONTROLLED_IN_MEMORY_READ_VIEW_SOURCE_CANARY",
+        "remaining_source_links": [
+          {
+            "artifact_kind": "FORGE_DRAFT",
+            "artifact_ref": "HFIC-ART-FORGE-DRAFT-GENERATED-FF4DFD06F06698F1",
+            "artifact_sha256": "ff4dfd06f06698f10fcb2fd7d115d89b517105bb92bda655ffef1311296d945b",
+            "look_confirms_selected": null,
+            "next_read": {
+              "command": "show-session",
+              "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+            },
+            "selected_candidate_id": null,
+            "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+          },
+          {
+            "artifact_kind": "FORGE_DRAFT",
+            "artifact_ref": "HFIC-ART-FORGE-DRAFT-HFIC-SESS-7DFB13277E3C3BBB",
+            "artifact_sha256": "ff4dfd06f06698f10fcb2fd7d115d89b517105bb92bda655ffef1311296d945b",
+            "look_confirms_selected": null,
+            "next_read": {
+              "command": "show-session",
+              "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+            },
+            "selected_candidate_id": null,
+            "session_id": "HFIC-SESS-7DFB13277E3C3BBB"
+          }
+        ],
+        "store_append": false
+      }
+    ]
+  },
+  "retained_canaries": {
+    "cases": [
+      {
+        "case": "original",
+        "exit_code": 0,
+        "measured_subprocess_wall_seconds": 0.2664358000001812,
+        "result": {
+          "artifact_count": 159,
+          "committed_inventory_sha256": "706d71491669ef2443eeb5b20d497795f469dadd742094ba123310ca5a061db9",
+          "native_file_count": 272,
+          "result_refs": [
+            "HFIC-ART-DISCOVERY-A9B3159E9B32A05BFADE8FA3C6CB60EEF3FCBD1A",
+            "HFIC-ART-DISCOVERY-0DCC9B6DE6B6343F31E02443C2B4498A331A6E3E"
+          ],
+          "scope": "RETAINED_B06_MANIFEST_SOURCE_LINKS_AND_FILE_SNAPSHOTS; no new scientific verdict",
+          "source_snapshot_count": 17,
+          "status": "RETAINED_NATIVE_PROOF_INTEGRITY_VERIFIED",
+          "terminal_sha256": "e2722e951b4a2d8366dc17e9f17b65c05fac3bdd9d7ea62a16b206da3f0a29ae",
+          "values_loaded": false,
+          "verifier_source_sha256": "d3bbbb5614356519ba8ad67c5a1fcb9e2cd415aa2f2450a61bf2eafef8a4bb35",
+          "writes": {
+            "research_store": 0
+          }
+        },
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "c85407fd745b662a27c9be14b1cfdf7612554e255ef2d377cdf1545174f91d0c"
+      },
+      {
+        "case": "wrong-link",
+        "exit_code": 2,
+        "measured_subprocess_wall_seconds": 1.2253906000005372,
+        "result": {
+          "reason_code": "RETAINED_RESULT_LINK_MISMATCH",
+          "status": "INVALID"
+        },
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "1c9be592f5bc1dffcfd50a10bac730407657bb1f6b1cb53fb2216e17978ca9d0"
+      },
+      {
+        "case": "missing-terminal",
+        "exit_code": 2,
+        "measured_subprocess_wall_seconds": 0.12454090000028373,
+        "result": {
+          "reason_code": "RETAINED_TERMINAL_MISSING",
+          "status": "INVALID"
+        },
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "9170ad7b9b9f05eca89f13dd3f2d498173ca35baa6b24d4897e26afe0d26d81c"
+      },
+      {
+        "case": "changed-artifact",
+        "exit_code": 2,
+        "measured_subprocess_wall_seconds": 0.1891366999989259,
+        "result": {
+          "reason_code": "RETAINED_ARTIFACT_HASH_MISMATCH",
+          "status": "INVALID"
+        },
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "8d54a811debe439ab6bf5d6ab3c8abe77c3c6d2aa3c0d860410d5583572df8d4"
+      }
+    ],
+    "original_attempt_bytes_before_after": "EXACT_EQUAL",
+    "original_attempt_file_count": 2063,
+    "original_terminal_sha256": "e2722e951b4a2d8366dc17e9f17b65c05fac3bdd9d7ea62a16b206da3f0a29ae",
+    "scope": "current narrow retained-proof verifier; no product APIs/loader/evaluator/writer",
+    "status": "B06_RETAINED_INTEGRITY_AND_THREE_CORRUPTION_CANARIES_VERIFIED",
+    "verifier_source_sha256": "d3bbbb5614356519ba8ad67c5a1fcb9e2cd415aa2f2450a61bf2eafef8a4bb35"
+  },
+  "resource_ledger": {
+    "named_retained_attempt_count": 39,
+    "process_measurements": [
+      {
+        "run": "entry-b01",
+        "reported_process_window_seconds": "UNKNOWN",
+        "elapsed_window_seconds": 342.271198
+      },
+      {
+        "run": "multi-b01",
+        "reported_process_window_seconds": "UNKNOWN",
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "multi-b02",
+        "reported_process_window_seconds": "UNKNOWN",
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "multi-b03",
+        "reported_process_window_seconds": "UNKNOWN",
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "multi-b04",
+        "reported_process_window_seconds": 47.47569599999406,
+        "elapsed_window_seconds": 226.567919
+      },
+      {
+        "run": "multi-b05",
+        "reported_process_window_seconds": "UNKNOWN",
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "multi-b06",
+        "reported_process_window_seconds": 55.84429999999338,
+        "elapsed_window_seconds": 3168.8548
+      },
+      {
+        "run": "race-b01",
+        "reported_process_window_seconds": "UNKNOWN",
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "race-b02",
+        "reported_process_window_seconds": 18.696898000001966,
+        "elapsed_window_seconds": 20.201495
+      },
+      {
+        "run": "qualification-c01",
+        "reported_process_window_seconds": 85.17178760000024,
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "qualification-c02",
+        "reported_process_window_seconds": 40.95640550000098,
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "qualification-c03",
+        "reported_process_window_seconds": 107.39973150000151,
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "impact-d01",
+        "reported_process_window_seconds": 925.5109843999999,
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "impact-d02",
+        "reported_process_window_seconds": 74.44903239999985,
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "impact-d03",
+        "reported_process_window_seconds": 600.0179322000004,
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "impact-d04",
+        "reported_process_window_seconds": 169.63306889999876,
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "impact-d05",
+        "reported_process_window_seconds": 133.8699102999999,
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "multi-b06-original-producer",
+        "reported_process_window_seconds": "UNKNOWN",
+        "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "land-race-qualification-c01",
+        "reported_process_window_seconds": 66.593644,
+        "elapsed_window_seconds": "NOT_SEPARATELY_MEASURED",
+        "product_and_unit_subprocesses": "Nested components reported separately in the retained proof; not counted twice."
+      },
+      {
+        "run": "land-race-qualification-c02",
+        "reported_process_window_seconds": 25.2376294,
+        "elapsed_window_seconds": "NOT_SEPARATELY_MEASURED",
+        "product_and_unit_subprocesses": "Nested components reported separately in the retained proof; not counted twice."
+      },
+      {
+        "run": "owner-copy-r03",
+        "reported_process_window_seconds": 3.081947800004855,
+        "elapsed_window_seconds": 3.2508109000009426,
+        "partial_r01_r02_process_measurements": "UNKNOWN; two failed helper attempts and four successful public outputs retained, not retroactively resource-qualified."
+      },
+      {
+        "run": "owner-store-r04",
+        "reported_process_window_seconds": 4.758069600004092,
+        "elapsed_window_seconds": 4.904792700002872
+      },
+      {
+        "run": "reader-refusal-red",
+        "reported_process_window_seconds": 20.30006659999708
+      },
+      {
+        "run": "reader-refusal-red2",
+        "reported_process_window_seconds": 21.162533099999564
+      },
+      {
+        "run": "reader-refusal-green",
+        "reported_process_window_seconds": 22.446424900001148
+      },
+      {
+        "run": "reader-refusal-green2",
+        "reported_process_window_seconds": 22.887255199999345
+      },
+      {
+        "run": "reader-cli-r06",
+        "reported_process_window_seconds": 13.67348640000273,
+        "elapsed_window_seconds": 13.887219500000356
+      },
+      {
+        "run": "reader-refusal-frontier-red",
+        "reported_process_window_seconds": 21.82383850000042
+      },
+      {
+        "run": "reader-refusal-frontier-green",
+        "reported_process_window_seconds": 22.53683000000092
+      },
+      {
+        "run": "reader-refusal-frontier-green2",
+        "reported_process_window_seconds": 21.91297879999911
+      },
+      {
+        "run": "reader-refusal-frontier-positive",
+        "reported_process_window_seconds": 43.29201530000137
+      },
+      {
+        "run": "frontier-cli-r08",
+        "reported_process_window_seconds": 4.034913600000436,
+        "elapsed_window_seconds": 4.212135600002512
+      },
+      {
+        "run": "ci-row-context-red",
+        "reported_process_window_seconds": 8.117981600000348
+      },
+      {
+        "run": "ci-row-context-green",
+        "reported_process_window_seconds": 100.14619739999762
+      },
+      {
+        "run": "ci-row-context-positive",
+        "reported_process_window_seconds": 41.783713799995894
+      },
+      {
+        "run": "ci-row-context-land-race",
+        "reported_process_window_seconds": 27.94435709998652,
+        "elapsed_window_seconds": 28.413922
+      }
+    ],
+    "known_reported_process_window_component_sum_seconds": 2750.7596298999824,
+    "interpretation": "Non-overlapping named campaign measurement components; CLI invocation windows and whole unittest subprocess windows have different measured boundaries. Not CPU time or complete compute. S0 is historical separately, copied producer snapshot not counted twice.",
+    "cpu_ram_preparation_model_cost": "UNKNOWN"
+  },
+  "raw_logs": "Retained locally in immutable per-invocation folders; not replaced by these summaries.",
+  "historical_s0": "Original evidence files retained unchanged. 935.136s versus 900s, incomplete raw cold history and stale command-log hash remain limitations.",
+  "fidelity": "NATIVE_SYNTHETIC_PER_TEST_VERTICAL_PLUS_IMPACT_SUBSETS",
+  "no_factory_wide_full_claim": true,
+  "final_reader_requalification": {
+    "all_11_tests": {
+      "seconds": 24.184,
+      "status": "PASS"
+    },
+    "choice_quality": "UNVERIFIED",
+    "cold_invocation_measured_subprocess_wall_seconds": 9.021071799998026,
+    "cold_invocation_wall_seconds": 14.455863600000157,
+    "cold_store_before_after": "EXACT_EQUAL",
+    "committed_inventory_sha256": "706d71491669ef2443eeb5b20d497795f469dadd742094ba123310ca5a061db9",
+    "consumer_label": "final-source read-only invocation0002; no setup/writer/value/evaluator rerun",
+    "consumer_source_links": [
+      {
+        "result_ref": "HFIC-ART-DISCOVERY-A9B3159E9B32A05BFADE8FA3C6CB60EEF3FCBD1A",
+        "source_link_status": "NOT_RECORDED",
+        "source_links": []
+      },
+      {
+        "result_ref": "HFIC-ART-DISCOVERY-0DCC9B6DE6B6343F31E02443C2B4498A331A6E3E",
+        "source_link_status": "NOT_RECORDED",
+        "source_links": []
+      }
+    ],
+    "cumulative_b06_resource": {
+      "cold_only_this_invocation": true,
+      "cpu_ram_peak": "UNKNOWN",
+      "elapsed_window_seconds": 3168.8548,
+      "invocation_count": 2,
+      "measured_subprocess_wall_seconds": 55.84429999999338,
+      "model_calls": 0,
+      "owned_output_guard_bytes": 1073741824,
+      "preparation_outside_helper_seconds": "UNKNOWN",
+      "watchdog_seconds": 180
+    },
+    "file_sha256": {
+      "local/forge_decision_link_v1/multi-b06-final-11-tests.json": "03996e86bad6668be0e0ec025a52665f1bc993c5c550802039b0375ef0f22dc4",
+      "local/forge_decision_link_v1/multi-b06-final-11-tests.txt": "b792742292ae7145951acfc9e0587caa4113d03b6092246aa543fbf809684e06",
+      "local/forge_decision_link_v1/multi-b06-final-retained-verify.json": "21ee4634bbedbbc112a02f4e1e62e2cdc4bf2800a9d71d008a8bcd9722dde7db",
+      "local/forge_decision_link_v1/multi-b06-producer-terminal.json": "e2722e951b4a2d8366dc17e9f17b65c05fac3bdd9d7ea62a16b206da3f0a29ae",
+      "local/forge_decision_link_v1/multi-b06/cold-result-1.json": "362d38d101a64c59a90d9fabac430d486a3f16633b3384fd1750dc693d17deba",
+      "local/forge_decision_link_v1/multi-b06/cold-result-2.json": "810977051785e5f503a4f3e4f0279673464c891598dbf73d2af451863b63b896",
+      "local/forge_decision_link_v1/multi-b06/cold-store-after.json": "007796ae4d31c9b0f5f1b957b824d057c26a5e68b05d395b0017fd87b77ea548",
+      "local/forge_decision_link_v1/multi-b06/cold-store-before.json": "007796ae4d31c9b0f5f1b957b824d057c26a5e68b05d395b0017fd87b77ea548",
+      "local/forge_decision_link_v1/multi-b06/invocations/0002/prior-terminal.json": "e2722e951b4a2d8366dc17e9f17b65c05fac3bdd9d7ea62a16b206da3f0a29ae",
+      "local/forge_decision_link_v1/multi-b06/invocations/0002/start.json": "90397c79f297eaa32a18082b77760f69afeb4e0439582e089775b8e89e109ec5",
+      "local/forge_decision_link_v1/multi-b06/invocations/0002/summary.json": "a3a1abde4ae39f800f8be8fe5fbeb7a00f61c1d69ddc904689010e143fd3a9f5",
+      "local/forge_decision_link_v1/multi-b06/terminal.json": "91bc326c53bca4b46d020075b0afdc6e3243a2183a1d3c101ef5d970b6f344cd"
+    },
+    "final_consumer_terminal_sha256": "91bc326c53bca4b46d020075b0afdc6e3243a2183a1d3c101ef5d970b6f344cd",
+    "final_helper_sha256": "d3bbbb5614356519ba8ad67c5a1fcb9e2cd415aa2f2450a61bf2eafef8a4bb35",
+    "final_reader_sha256": "b2582ca103222f7500a6eb4036769b13df6e3d969c85a7008fafd0688f1d7425",
+    "fresh_command_precondition": "fresh --output directory must not exist; fixture-source is the existing native synthetic entry-b01 fixture; cold/verify never invoke fixture setup",
+    "live_science_and_alpha": "NOT_EVALUATED",
+    "native_file_count": 272,
+    "original_producer_terminal_sha256": "e2722e951b4a2d8366dc17e9f17b65c05fac3bdd9d7ea62a16b206da3f0a29ae",
+    "producer_label": "historical full native producer invocation0001; separately retained original terminal",
+    "reproduce_commands": {
+      "cold": "uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1/multi_look_probe.py --output local/forge_decision_link_v1/multi-b06 --cold-only",
+      "fresh": "uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1/multi_look_probe.py --output local/forge_decision_link_v1/multi-reproduce-r01 --fixture-source local/forge_decision_link_v1/entry-b01/fixture",
+      "verify": "uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1/multi_look_probe.py --verify-retained local/forge_decision_link_v1/multi-b06"
+    },
+    "source_pin_count": 17,
+    "status": "FINAL_READER_COLD_AND_UNIT_REQUALIFICATION_VERIFIED"
+  },
+  "final_reader_unit_tests": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--managed-python",
+      "python",
+      "-B",
+      "-m",
+      "unittest",
+      "tests.test_forge_decision_link_v1"
+    ],
+    "exit_code": 0,
+    "output_file": "local/forge_decision_link_v1/multi-b06-final-11-tests.txt",
+    "output_sha256": "b792742292ae7145951acfc9e0587caa4113d03b6092246aa543fbf809684e06",
+    "scope": "cause-dependent reader/pending unit regression on disposable synthetic test stores; native b06 producer not rerun",
+    "source_current_after_tests": "EXACT_EQUAL_TO_FINAL_COLD_SOURCE_PINS",
+    "source_sha256": {
+      "configs/factory_semantic_operability_v1.yaml": "0ee76b9a73b21a8cad6eb0574580e1253773c57a3e67ce8246630a498d9ddcf9",
+      "scripts/hypothesis_forge.py": "ba27dd6fbac74772e58a3ffe65cd5e513e9071998f465f6a1d9dbc37c2981c97",
+      "src/solana_alpha_lab/factory/hfic_card_projection.py": "bba3769cecff9e4d5a489bf615bad52f48bf311e853c15aa8aa142a1389fb251",
+      "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "b2582ca103222f7500a6eb4036769b13df6e3d969c85a7008fafd0688f1d7425",
+      "src/solana_alpha_lab/factory/hfic_generation_context.py": "d347b585770f6f81e19bc6f2ddbe27031059754878a73b022bd8b5c99acde719",
+      "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "9b1904f0439547f895a58a94989568273bcfd010a388f9900a5fbe4a64d8847e",
+      "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "67d5fc8da2207b93d2316e19b02186e4ab6ace543b41ee4485d60d4f61e26f22",
+      "src/solana_alpha_lab/factory/hfic_preflight.py": "a4b866b352249e124cba6bb83c07b23e624f43848a7037dfc77ca087203f2d23",
+      "src/solana_alpha_lab/factory/hfic_scientific_disposition.py": "d2b980f20cb7e703d4d61033ca4481d58de39d8ed149b16b5b64d013859aac75",
+      "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "b530aa119d81bac8eb49e3c818e0ed481e4ff02489254ddbe55a55236c4cb65e",
+      "tests/fixtures/forge_decision_link_v1/entry_probe.py": "275653deb5db29d48aecdbf9e94c0442b8e8fc73de1c6ddac8ac3ea3c88c0748",
+      "tests/fixtures/forge_decision_link_v1/multi_look_probe.py": "d3bbbb5614356519ba8ad67c5a1fcb9e2cd415aa2f2450a61bf2eafef8a4bb35",
+      "tests/fixtures/forge_decision_link_v1/verify_terminal.py": "80ad4ec015c386be8e7e406823b10a4fc9ce9534faed403b932c2751028d1831",
+      "tests/test_forge_decision_link_v1.py": "661a86cd07f9365891d2fbb110db14bd5407d4744628cac5434c55577f6b0b89",
+      "tests/test_forge_research_flow_reliability_v1.py": "817280ef9bf67644c088ea6f9a75f012f9fc1d875bf768fc6d80e97df7eeba2a",
+      "tests/test_hfic_list_aware_vertical_v1.py": "91c8b7ee89b54e1060b7f01c0662af5ff6d7681fb7cabd94152d8c9988190bc2",
+      "tests/test_hfic_ordinary_operation_acceptance_v1.py": "c4b5f9873d31dc98f95ae9826ee05075a5211775de9ba0f93a4a9107b9b29741"
+    },
+    "status": "PASS",
+    "test_count": 11,
+    "unittest_seconds": 24.184
+  },
+  "final_retained_integrity": {
+    "status": "RETAINED_NATIVE_PROOF_INTEGRITY_VERIFIED",
+    "terminal_sha256": "91bc326c53bca4b46d020075b0afdc6e3243a2183a1d3c101ef5d970b6f344cd",
+    "artifact_count": 211,
+    "source_snapshot_count": 17,
+    "native_file_count": 272,
+    "committed_inventory_sha256": "706d71491669ef2443eeb5b20d497795f469dadd742094ba123310ca5a061db9",
+    "result_refs": [
+      "HFIC-ART-DISCOVERY-A9B3159E9B32A05BFADE8FA3C6CB60EEF3FCBD1A",
+      "HFIC-ART-DISCOVERY-0DCC9B6DE6B6343F31E02443C2B4498A331A6E3E"
+    ],
+    "values_loaded": false,
+    "writes": {
+      "research_store": 0
+    },
+    "verifier_source_sha256": "d3bbbb5614356519ba8ad67c5a1fcb9e2cd415aa2f2450a61bf2eafef8a4bb35",
+    "scope": "RETAINED_B06_MANIFEST_SOURCE_LINKS_AND_FILE_SNAPSHOTS; no new scientific verdict"
+  },
+  "impact_tail_qualification": {
+    "aggregate_campaign_verdict": "NOT_DEFINED_NO_FICTIONAL_AGGREGATE_PASS",
+    "qualification_status": "FIVE_UNIQUE_ASSERTIONS_PASS_ACROSS_SEPARATE_INVOCATIONS",
+    "unique_assertions": [
+      {
+        "receipt": "local/forge_decision_link_v1/impact-d03/receipt.json",
+        "status": "PASS",
+        "test_body_wall_seconds": 43.01943750000282,
+        "test_id": "tests.test_hfic_ordinary_operation_acceptance_v1.OrdinaryAcceptanceTests.test_c_positive_candidate_reaches_scripted_classification_without_a_new_look"
+      },
+      {
+        "receipt": "local/forge_decision_link_v1/impact-d03/receipt.json",
+        "status": "PASS",
+        "test_body_wall_seconds": 418.6126133999969,
+        "test_id": "tests.test_hfic_cycle_two_normalized_vertical_v1.CycleTwoNormalizedVerticalTests.test_cycle_two_normalized_child_continues_the_representation_spend"
+      },
+      {
+        "receipt": "local/forge_decision_link_v1/impact-d04/receipt.json",
+        "status": "PASS",
+        "test_body_wall_seconds": 135.31503890000022,
+        "test_id": "tests.test_hfic_cycle_two_normalized_vertical_v1.CycleTwoNormalizedVerticalTests.test_same_cycle_normalized_variants_share_the_representation_budget"
+      },
+      {
+        "receipt": "local/forge_decision_link_v1/impact-d05/receipt.json",
+        "status": "PASS",
+        "test_body_wall_seconds": 56.7810490999982,
+        "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_base_saved_string_draft_recovers_without_rewrite_or_new_look"
+      },
+      {
+        "receipt": "local/forge_decision_link_v1/impact-d05/receipt.json",
+        "status": "PASS",
+        "test_body_wall_seconds": 44.03116669999872,
+        "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_real_normalized_prefix_reader_does_not_access_future_values"
+      }
+    ],
+    "historical_resource_or_harness_failures_preserved": [
+      "impact-d01:44_ASSERTIONS_PASS_BUT_900_WATCHDOG_FIRED_925.5109844_SECONDS",
+      "impact-d02:CRLF_ADMISSION_GATE_HARNESS_ERROR",
+      "impact-d03:600_WATCHDOG_FIRED_PARTIAL_TWO_ASSERTIONS_PASS"
+    ],
+    "source_pin_changes_between_invocations": {
+      "impact-d03": [],
+      "impact-d04": [
+        "docs/tasks/FORGE_DECISION_LINK_V1.md"
+      ],
+      "impact-d05": [
+        "docs/tasks/FORGE_DECISION_LINK_V1.md"
+      ]
+    },
+    "source_difference_reason": "OWNER_RESOURCE_TAIL_PATCH_TASK_DOCUMENT_BEFORE_D04_D05_NO_PRODUCT_SOURCE_CHANGE",
+    "product_window": "RELEASED_ALL_OWNED_JOB_HANDLES_CLOSED_AFTER_JOIN",
+    "non_claims": [
+      "NO_INDEPENDENT_SCIENTIFIC_CRITIC",
+      "NO_ALPHA",
+      "NO_CHOICE_QUALITY_PASS",
+      "NO_MERGE_READINESS_CLAIM"
+    ],
+    "retained_audit": "local/forge_decision_link_v1/impact-tail-audit/receipt.json",
+    "retained_audit_sha256": "25b2f55b1fc30482df8ca167f2a6909a25b939d8871cd486e22c05a1ead6b6b6"
+  },
+  "compound_captures": [
+    {
+      "retained_capture": "local/forge_decision_link_v1/qualification-c03/correction-successor.json",
+      "retained_capture_sha256": "9d7c1bb9d795cb91ff672671dc5cc6efa0676d7a9cb00fc0e5ed56bfa0675920",
+      "projection": {
+        "history_unchanged": true,
+        "mode": "SYNTHETIC_NATIVE_CORRECTION_AND_FRESH_PUBLIC_READ",
+        "original_assessment_ref": "HFIC-ART-DISP-C1A10395A4F86F60781090FEB65EF86080BE1CA9",
+        "original_result_ref": "HFIC-ART-DISCOVERY-89F986BD6731954121AC4593153A7B724C49830B",
+        "reader_file_inventory_unchanged": true,
+        "revised_result_ref": "HFIC-ART-DISCOVERY-1760CE0495075C36B96E23C3852751998DA1F4F2",
+        "successor_assessment_ref": "HFIC-ART-DISP-587D503BE6EF8C8AE2CE4FD5732B4EA121A9399B",
+        "test": "V3CalculationRevisionTests.test_revision_requires_new_assessment_then_successor_is_current",
+        "withdrawal_ref": "HFIC-ART-DISP-52C1BFB282CF7993F44C15613C2F96463F65CCA5",
+        "fresh_read_statuses": [
+          {
+            "stage": "original",
+            "result_ref": "HFIC-ART-DISCOVERY-89F986BD6731954121AC4593153A7B724C49830B",
+            "scientific_disposition": {
+              "caveats": [
+                "cohort slices are descriptive",
+                "PRICE_RELATIVE_PROXY is not net return"
+              ],
+              "head_disposition_sha256": "587d503be6ef8c8ae2ce4fd5732b4ea121a9399b9760ca7478e1305fd69f3c7d",
+              "head_ref": "HFIC-ART-DISP-587D503BE6EF8C8AE2CE4FD5732B4EA121A9399B",
+              "history_refs": [
+                "HFIC-ART-DISP-C1A10395A4F86F60781090FEB65EF86080BE1CA9"
+              ],
+              "lineage_heads": [
+                "HFIC-ART-DISP-587D503BE6EF8C8AE2CE4FD5732B4EA121A9399B"
+              ],
+              "provenance_mode": "NEW",
+              "reasons": [],
+              "recommendation": "STOP_THIS_QUESTION",
+              "recommendation_active": true,
+              "record_count": 2,
+              "result_refs": [
+                "HFIC-ART-DISCOVERY-1760CE0495075C36B96E23C3852751998DA1F4F2"
+              ],
+              "status": "CURRENT_FOR_BOUND_BASIS",
+              "subject": {
+                "journal_scope": "951b66bee60f63937fbc428301b8aed8baf1a92066f00e0ddc52343b42c91dcd",
+                "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+                "owner_focus": "REVISION_FOCUS",
+                "question_spec_sha256": "8b809241b6245762b4d11e9c76035e0ec58d631715f82e122f3589ed97c231e0",
+                "question_text": "does the synthetic mark predict the proxy?",
+                "subject_kind": "QUESTION"
+              },
+              "subject_key": "7ececf1b0324c62e4d5c3eebfe03ad7a1d0ef882b8d8df74bbb1233920d3f423",
+              "verdict": "LIMITED_NON_CANDIDATE_FOR_THIS_QUESTION"
+            }
+          },
+          {
+            "stage": "revised",
+            "result_ref": "HFIC-ART-DISCOVERY-1760CE0495075C36B96E23C3852751998DA1F4F2",
+            "scientific_disposition": {
+              "caveats": [
+                "cohort slices are descriptive",
+                "PRICE_RELATIVE_PROXY is not net return"
+              ],
+              "head_disposition_sha256": "587d503be6ef8c8ae2ce4fd5732b4ea121a9399b9760ca7478e1305fd69f3c7d",
+              "head_ref": "HFIC-ART-DISP-587D503BE6EF8C8AE2CE4FD5732B4EA121A9399B",
+              "history_refs": [
+                "HFIC-ART-DISP-C1A10395A4F86F60781090FEB65EF86080BE1CA9"
+              ],
+              "lineage_heads": [
+                "HFIC-ART-DISP-587D503BE6EF8C8AE2CE4FD5732B4EA121A9399B"
+              ],
+              "provenance_mode": "NEW",
+              "reasons": [],
+              "recommendation": "STOP_THIS_QUESTION",
+              "recommendation_active": true,
+              "record_count": 2,
+              "result_refs": [
+                "HFIC-ART-DISCOVERY-1760CE0495075C36B96E23C3852751998DA1F4F2"
+              ],
+              "status": "CURRENT_FOR_BOUND_BASIS",
+              "subject": {
+                "journal_scope": "951b66bee60f63937fbc428301b8aed8baf1a92066f00e0ddc52343b42c91dcd",
+                "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+                "owner_focus": "REVISION_FOCUS",
+                "question_spec_sha256": "8b809241b6245762b4d11e9c76035e0ec58d631715f82e122f3589ed97c231e0",
+                "question_text": "does the synthetic mark predict the proxy?",
+                "subject_kind": "QUESTION"
+              },
+              "subject_key": "7ececf1b0324c62e4d5c3eebfe03ad7a1d0ef882b8d8df74bbb1233920d3f423",
+              "verdict": "LIMITED_NON_CANDIDATE_FOR_THIS_QUESTION"
+            }
+          },
+          {
+            "stage": "withdrawn",
+            "result_ref": "HFIC-ART-DISCOVERY-1760CE0495075C36B96E23C3852751998DA1F4F2",
+            "scientific_disposition": {
+              "head_disposition_sha256": "52c1bfb282cf7993f44c15613c2f96463f65cca54d1c298c5ca615919aded1fd",
+              "head_ref": "HFIC-ART-DISP-52C1BFB282CF7993F44C15613C2F96463F65CCA5",
+              "history_refs": [
+                "HFIC-ART-DISP-587D503BE6EF8C8AE2CE4FD5732B4EA121A9399B",
+                "HFIC-ART-DISP-C1A10395A4F86F60781090FEB65EF86080BE1CA9"
+              ],
+              "lineage_heads": [
+                "HFIC-ART-DISP-52C1BFB282CF7993F44C15613C2F96463F65CCA5"
+              ],
+              "provenance_mode": "NEW",
+              "reasons": [
+                "EXPLICIT_WITHDRAWAL"
+              ],
+              "recommendation_active": false,
+              "record_count": 3,
+              "status": "WITHDRAWN",
+              "subject": {
+                "journal_scope": "951b66bee60f63937fbc428301b8aed8baf1a92066f00e0ddc52343b42c91dcd",
+                "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+                "owner_focus": "REVISION_FOCUS",
+                "question_spec_sha256": "8b809241b6245762b4d11e9c76035e0ec58d631715f82e122f3589ed97c231e0",
+                "question_text": "does the synthetic mark predict the proxy?",
+                "subject_kind": "QUESTION"
+              },
+              "subject_key": "7ececf1b0324c62e4d5c3eebfe03ad7a1d0ef882b8d8df74bbb1233920d3f423",
+              "withdrawal_reason": "Synthetic successor assessment withdrawn after revision readback"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "retained_capture": "local/forge_decision_link_v1/qualification-c03/advisory-cutoff.json",
+      "retained_capture_sha256": "4fcb34671a5b53cc9cefc27f65748f6c1d787665c2a358ea6e812aafb82a9a3d",
+      "projection": {
+        "assessment_ref": "HFIC-ART-DISP-512A8415479B885F8D3BA5411A20BDD76B68F0EB",
+        "hidden_exact_ref": "HYP-DL-CUTOFF-00064",
+        "history_unchanged": true,
+        "late_only_ref": "HYP-DL-LATE-ONLY",
+        "late_source_effective_at": "2026-10-10T19:19:05+00:00",
+        "late_source_first_reliable_available_at": "2026-10-10T19:19:12.585644+00:00",
+        "mode": "ONE_SYNTHETIC_STORE_COMBINED_ADVISORY_CUTOFF_FULL_GUARD",
+        "old_detail_refusal": "GENERATION_CONTEXT_STALE_STORE_BINDING",
+        "persist_refusal": "EXACT_PRIOR_SCOPE_MATCH",
+        "read_inventory_unchanged": true,
+        "result_ref": "HFIC-ART-DISCOVERY-B1D52B458B4700534767FFB9BC7F3605E2D3616E",
+        "test": "EpisodeFlowTests.test_advisory_append_reissues_bound_detail_without_moving_cutoff_or_hidden_guard",
+        "occupancy_before": {
+          "adaptive": {
+            "completed": 0,
+            "deficit": 0,
+            "limit": 2,
+            "occupied": 0,
+            "pending": 0,
+            "remaining": 2
+          },
+          "main": {
+            "completed": 1,
+            "deficit": 0,
+            "limit": 6,
+            "occupied": 1,
+            "pending": 0,
+            "remaining": 5
+          },
+          "preview": {
+            "completed": 0,
+            "deficit": 0,
+            "limit": 2,
+            "occupied": 0,
+            "pending": 0,
+            "remaining": 2
+          }
+        },
+        "occupancy_after": {
+          "adaptive": {
+            "completed": 0,
+            "deficit": 0,
+            "limit": 2,
+            "occupied": 0,
+            "pending": 0,
+            "remaining": 2
+          },
+          "main": {
+            "completed": 1,
+            "deficit": 0,
+            "limit": 6,
+            "occupied": 1,
+            "pending": 0,
+            "remaining": 5
+          },
+          "preview": {
+            "completed": 0,
+            "deficit": 0,
+            "limit": 2,
+            "occupied": 0,
+            "pending": 0,
+            "remaining": 2
+          }
+        },
+        "original_memory": {
+          "archive_complete_in_packet": false,
+          "archive_eligible_count": 66,
+          "bytes": 10442,
+          "candidate_scope_ref": null,
+          "considered_count": 66,
+          "eligibility_policy_ref": "hfic_memory_policy.iter_search_memory_hypothesis_payloads",
+          "eligible_archive_sha256": "6fc84a925a214ee19b4aa0e6e78e08f07347b5cbdd540ad736d35ee2f27958ba",
+          "emitted_count": 8,
+          "mandatory_count": 0,
+          "max_bytes": 65536,
+          "max_records": 8,
+          "omitted_count": 58,
+          "research_log_cutoff": "2026-10-10T19:19:06+00:00",
+          "safety_check_receipt_ref": null,
+          "schema": "smial.hfic-prior-memory-snapshot",
+          "schema_version": "1.1",
+          "selection_complete": true,
+          "selection_policy_revision": "FORGE_EVIDENCE_GUIDED_GENERATION_V1",
+          "selection_query_sha256": "51ffbcd09530a37be7a48036a3cbd37a91fae32d54226aaa1dc16cd7b272f1e8",
+          "snapshot_sha256": "28e6908450bb2ba0c8c763f2ae2709724013b183b88dd23362d4de62ddf63d7a",
+          "source_store_inventory_digest": "8a18409bdcb77e5da1d4c5dfec4a6a13735fc406cfb77fe599be088bd477c3f8",
+          "view_kind": "BOUNDED_WORKING_SET",
+          "capsules_sha256": "78f61b4303e5939f5ddb270c95a0eb208f28dbca3d42b330b4590a02ac2771e1"
+        },
+        "reissued_memory": {
+          "archive_complete_in_packet": false,
+          "archive_eligible_count": 66,
+          "bytes": 10442,
+          "candidate_scope_ref": null,
+          "considered_count": 66,
+          "eligibility_policy_ref": "hfic_memory_policy.iter_search_memory_hypothesis_payloads",
+          "eligible_archive_sha256": "6fc84a925a214ee19b4aa0e6e78e08f07347b5cbdd540ad736d35ee2f27958ba",
+          "emitted_count": 8,
+          "mandatory_count": 0,
+          "max_bytes": 65536,
+          "max_records": 8,
+          "omitted_count": 58,
+          "research_log_cutoff": "2026-10-10T19:19:06+00:00",
+          "safety_check_receipt_ref": null,
+          "schema": "smial.hfic-prior-memory-snapshot",
+          "schema_version": "1.1",
+          "selection_complete": true,
+          "selection_policy_revision": "FORGE_EVIDENCE_GUIDED_GENERATION_V1",
+          "selection_query_sha256": "51ffbcd09530a37be7a48036a3cbd37a91fae32d54226aaa1dc16cd7b272f1e8",
+          "snapshot_sha256": "87d62560903fa7bc0bfe7598fd150f87ef64d059481fb72706a00ff72319613f",
+          "source_store_inventory_digest": "9e2c7780425a72c82fd2acbd74ec86487abbf6711654b47cf949d06bd756c415",
+          "view_kind": "BOUNDED_WORKING_SET",
+          "capsules_sha256": "78f61b4303e5939f5ddb270c95a0eb208f28dbca3d42b330b4590a02ac2771e1"
+        }
+      }
+    }
+  ],
+  "landed_before_other_lease_qualification": {
+    "c01": {
+      "parent": {
+        "exit_code": 1,
+        "measured_seconds": 66.593644,
+        "owned_process_tree_cleanup": "Kill(true) only if watchdog fires",
+        "parent_watchdog_seconds": 600,
+        "timed_out": false
+      },
+      "source_before_after_exact_equal": true,
+      "status": "HARNESS_ERROR",
+      "tests": {
+        "command": [
+          "<PYTHON>",
+          "-B",
+          "-m",
+          "unittest",
+          "tests.test_forge_decision_link_v1"
+        ],
+        "errors": 1,
+        "failures": 0,
+        "output_sha256": "db8b5309171b46a8e132e2da7e1c5178f4008ffbe830065c72886f0d3c844c64",
+        "seconds": 35.2755588,
+        "successful": false,
+        "tests_run": 14,
+        "transient_public_cli_timeout_seconds": 180
+      }
+    },
+    "c02": {
+      "parent": {
+        "exit_code": 0,
+        "measured_seconds": 25.2376294,
+        "owned_process_tree_cleanup": "Kill(true) only if watchdog fires",
+        "parent_watchdog_seconds": 600,
+        "timed_out": false
+      },
+      "source_before_after_exact_equal": true,
+      "status": "PASS",
+      "tests": {
+        "command": [
+          "<PYTHON>",
+          "-B",
+          "-m",
+          "unittest",
+          "tests.test_forge_decision_link_v1.NativeSavedSourceProjectionTests.test_real_policy_change_is_not_blanket_blocked_by_same_spec"
+        ],
+        "errors": 0,
+        "failures": 0,
+        "output_sha256": "5a4e64d95df72158815e5035db0a4f07c71b1b5e7d6047867f41bf963dabe514",
+        "seconds": 24.9212340999984,
+        "successful": true,
+        "tests_run": 1,
+        "transient_public_cli_timeout_seconds": 180
+      }
+    },
+    "checks": {
+      "a_literal_oracle": "PASS",
+      "a_real_reserve_loader_evaluator_result": "PASS",
+      "b_native_entry_pass_before_a": "PASS",
+      "b_original_writer_lease_refusal": "PASS",
+      "b_zero_reservation_loader_evaluator": "PASS",
+      "cold_original_replay_unchanged": "PASS",
+      "typed_original_result_locator": "PASS"
+    },
+    "choice_quality": "UNVERIFIED",
+    "cpu_ram_peak": "UNKNOWN",
+    "current_product_helper_exact_equal_native_snapshot": true,
+    "final_source_sha256": {
+      "configs/factory_semantic_operability_v1.yaml": "0ee76b9a73b21a8cad6eb0574580e1253773c57a3e67ce8246630a498d9ddcf9",
+      "scripts/hypothesis_forge.py": "ba27dd6fbac74772e58a3ffe65cd5e513e9071998f465f6a1d9dbc37c2981c97",
+      "src/solana_alpha_lab/factory/hfic_card_projection.py": "bba3769cecff9e4d5a489bf615bad52f48bf311e853c15aa8aa142a1389fb251",
+      "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "b2582ca103222f7500a6eb4036769b13df6e3d969c85a7008fafd0688f1d7425",
+      "src/solana_alpha_lab/factory/hfic_generation_context.py": "d347b585770f6f81e19bc6f2ddbe27031059754878a73b022bd8b5c99acde719",
+      "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "9b1904f0439547f895a58a94989568273bcfd010a388f9900a5fbe4a64d8847e",
+      "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "e645de68f43b8242acb387c493c0232cad0deecc0bf2efff00e4a4c74725bebd",
+      "src/solana_alpha_lab/factory/hfic_preflight.py": "a4b866b352249e124cba6bb83c07b23e624f43848a7037dfc77ca087203f2d23",
+      "src/solana_alpha_lab/factory/hfic_research_universe_policy.py": "a03082fd63d98d1f60124b9b07f89d8b06dacd03b8c89f198730cefa137e5c2e",
+      "src/solana_alpha_lab/factory/hfic_scientific_disposition.py": "d2b980f20cb7e703d4d61033ca4481d58de39d8ed149b16b5b64d013859aac75",
+      "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "b530aa119d81bac8eb49e3c818e0ed481e4ff02489254ddbe55a55236c4cb65e",
+      "src/solana_alpha_lab/factory/research_store.py": "38d6c17bea38a4388fa14509dfb401b1f4e6cdda74de7e41cf032debe080ef49",
+      "tests/fixtures/forge_decision_link_v1/entry_probe.py": "275653deb5db29d48aecdbf9e94c0442b8e8fc73de1c6ddac8ac3ea3c88c0748",
+      "tests/fixtures/forge_decision_link_v1/multi_look_probe.py": "689c7d5aabdfc4083abfb39ab248d533a95dabfebe35bdf3675cad72fd6597a5",
+      "tests/fixtures/forge_decision_link_v1/verify_terminal.py": "80ad4ec015c386be8e7e406823b10a4fc9ce9534faed403b932c2751028d1831",
+      "tests/test_forge_decision_link_v1.py": "a0723e96453a3a3f87f09b1ac8d74cf7025ac40b9772b8a4336fa8dae290ff69",
+      "tests/test_forge_research_flow_reliability_v1.py": "817280ef9bf67644c088ea6f9a75f012f9fc1d875bf768fc6d80e97df7eeba2a",
+      "tests/test_hfic_list_aware_vertical_v1.py": "91c8b7ee89b54e1060b7f01c0662af5ff6d7681fb7cabd94152d8c9988190bc2",
+      "tests/test_hfic_ordinary_operation_acceptance_v1.py": "c4b5f9873d31dc98f95ae9826ee05075a5211775de9ba0f93a4a9107b9b29741",
+      "tests/test_hfic_scientific_disposition_continuity_v1.py": "6debae314f3134b351d52a251d5beaa6342ed119f2f4cfb5e8cccc3fdeac7a32",
+      "tests/test_hfic_temporal_production_runner_v1.py": "2374ffaa6e0b62321ce71749c5b9af44b6ecda15a82da3be2ea185c7a1203992"
+    },
+    "live_use": "NOT_EXECUTED",
+    "market_alpha_oos_economics": "NOT_EVALUATED",
+    "model_calls": 0,
+    "native_cold_before_after_current_exact_equal": true,
+    "native_cold_file_count": 230,
+    "native_cold_inventory_sha256": "2342ec96e317277978a28687b0cc7d3066a76efc6f14521fccb6aa3eb1cd24ff",
+    "native_manifest_artifacts_verified": 84,
+    "native_resource": {
+      "cold_only_this_invocation": false,
+      "cpu_ram_peak": "UNKNOWN",
+      "elapsed_window_seconds": 30.391409,
+      "invocation_count": 1,
+      "measured_subprocess_wall_seconds": 29.892507200002,
+      "model_calls": 0,
+      "owned_output_guard_bytes": 1073741824,
+      "preparation_outside_helper_seconds": "UNKNOWN",
+      "watchdog_seconds": 180
+    },
+    "native_source_snapshots_verified": 19,
+    "native_status": "NATIVE_LANDED_BEFORE_OTHER_LEASE_VERIFIED",
+    "policy_corpus_counterparts": "NATIVE_RESERVATION_SEAM_UNIT_ONLY_NOT_FULL_PUBLIC_ADMISSION",
+    "reproduce": {
+      "native": "uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1/multi_look_probe.py --output local/forge_decision_link_v1/land-race-reproduce-r01 --fixture-source local/forge_decision_link_v1/entry-b01/fixture --land-race-only",
+      "policy_counterpart": "uv run --locked --managed-python python -B -m unittest tests.test_forge_decision_link_v1.NativeSavedSourceProjectionTests.test_real_policy_change_is_not_blanket_blocked_by_same_spec"
+    },
+    "resource_status": "PASS_EACH_DECLARED_COHORT_NO_WATCHDOG",
+    "retained_artifact_sha256": {
+      "land-race-c01/invocations/0001/003-land-race-author-a/native-trace.json": "5e5e77ad5a59f1399d15ff922e4c183487e835380a6218960ed08524489d0f4b",
+      "land-race-c01/invocations/0001/003-land-race-author-b/native-trace.json": "67d64e61c5d55decfb18bdf256ebe0488095210c269d63577194d77df16e6d55",
+      "land-race-c01/land-race-author-a.json": "62ad60b89fb52fb293e26b3a1527bcc0aa87d8587cdf99deb93ad4310b2b77ac",
+      "land-race-c01/land-race-author-b.json": "9c699c7986773f56f939d910860d8fee7488492c53703e615fe71ea34fac225c",
+      "land-race-c01/land-race-cold-replay-b.json": "48bfed3f2665966301c0d28bae9c4d24d0789839974e660867e327003729d694",
+      "land-race-c01/land-race-cold-store-after.json": "0a5a33310fcb23f7515f5935a884971cc4f3a53f7726053ca6b20d678b3cf778",
+      "land-race-c01/land-race-cold-store-before.json": "0a5a33310fcb23f7515f5935a884971cc4f3a53f7726053ca6b20d678b3cf778",
+      "land-race-c01/land-race-persisted-links.json": "fa0d45b8ba803a8571f6f6c6d7c640ff87bb9e0437e21beeda0b700a49e9ef26",
+      "land-race-c01/terminal.json": "88102d8f05d8f5eef5a4b298a5643e54692a4e93b0efc5461beef35c1bfabe42",
+      "land-race-cheap-api-shape.json": "abb14523075d9cb50900be0e4e4dc66f718b42367c0c6030aa461b3c1dbb28ae",
+      "land-race-qualification-c01/native-receipt.json": "f6b2cae21e62d107e1ef182af24e7e4e6c812d36ee5d792e41cf9baf84bc71d9",
+      "land-race-qualification-c01/parent-receipt.json": "623625bd965f054dd7f982dd7bfac2188e911829431dc85c166a8475ef196a93",
+      "land-race-qualification-c01/terminal.json": "a6ea0bcc1031deb1f8e973b5ed00eba5b0cbaa9d7890a352ae1f340d5ebf1ba6",
+      "land-race-qualification-c01/tests-output.txt": "db8b5309171b46a8e132e2da7e1c5178f4008ffbe830065c72886f0d3c844c64",
+      "land-race-qualification-c01/tests-receipt.json": "6127e13165d987ff26b1e00ca01d7bffe1871414ad99efb9c305da204314bdc5",
+      "land-race-qualification-c02/parent-receipt.json": "a410afd14c120493777ccdc5bde4bf8603c04529cedc16aa0aaf4a84b3d86635",
+      "land-race-qualification-c02/terminal.json": "d17ee3f14b6791c9138b810c25d490b555a24c3f2d4e2e02f5fbb863b91925a2",
+      "land-race-qualification-c02/test-only-source-delta.diff": "c60714c760746495d6d68110b72317f06f45d4043534fef56a4618221a8c4de1",
+      "land-race-qualification-c02/tests-output.txt": "5a4e64d95df72158815e5035db0a4f07c71b1b5e7d6047867f41bf963dabe514",
+      "land-race-qualification-c02/tests-receipt.json": "5bb5571513c3bbbf90ca33467c00492b08b70ad1932c7630df413b8a4613ebdb"
+    },
+    "source_delta_test_only": {
+      "tests/test_forge_decision_link_v1.py": {
+        "final": "a0723e96453a3a3f87f09b1ac8d74cf7025ac40b9772b8a4336fa8dae290ff69",
+        "prior": "21e5d89218537b1e70f77d486efb624980ab278e8ec70e1554b55aa8c48329ef"
+      }
+    },
+    "status": "QUALIFIED_DISTINCT_13_PLUS_1_ASSERTIONS",
+    "retained_receipt": "local/forge_decision_link_v1/land-race-final-qualification.json",
+    "retained_receipt_sha256": "611e3882da78d6fddc025db82692a4d3ad0372375093192f69ed3141e611b851",
+    "projection": "BOUNDED_NATIVE_PROOF_AND_COHORT_SUMMARY_NOT_RAW_PROCESS_LOG",
+    "source_epoch_note": "This snapshot describes the native landed-race qualification epoch. Subsequent CLI refusal copy and task/doc receipt changes do not retroactively update its source pins. Final cold success/refusal copy is separately qualified below; runtime guard and reader/helper bytes remain unchanged."
+  },
+  "first_independent_review": {
+    "projection": "NORMALIZED_CRITIC_FINDINGS_NOT_VERBATIM_OR_CRYPTOGRAPHIC_IDENTITY",
+    "observed_head": "59ddfc8a19ba8974d45f454529b5742b3298adcc",
+    "prior_verdict": "NOT_READY",
+    "findings": [
+      {
+        "role": "CODE_REVIEWER",
+        "severity": "MAJOR",
+        "finding": "The pending-only reservation recheck permits a second reservation and value loader when the first operation lands after the early gate but before the other writer lease; inner replay may prevent a second evaluator, so duplicate evaluation is not asserted for this schedule."
+      },
+      {
+        "role": "CODE_REVIEWER",
+        "severity": "MAJOR",
+        "finding": "Five immutable S0 archives were committed from an earlier LF index cache while their original worktree bytes and historical pins are CRLF."
+      },
+      {
+        "role": "GOAL_DOD_CRITIC",
+        "severity": "MAJOR",
+        "finding": "D10/D11 archival fidelity is not met while the five committed S0 JSON blobs differ from the original pinned worktree bytes."
+      },
+      {
+        "role": "ARCHITECTURE_CRITIC",
+        "severity": "MAJOR",
+        "finding": "The reservation-only race fixture does not falsify landing before the second writer lease; an extra reservation/exposure and orphan pending can survive the existing test despite eventual inner replay."
+      },
+      {
+        "role": "ARCHITECTURE_CRITIC",
+        "severity": "MAJOR",
+        "finding": "Worktree-derived historical evidence pins do not establish Git delivery fidelity when five committed archive blobs remain LF rather than their original CRLF bytes."
+      }
+    ],
+    "nonblocking": "Private read-projection imports couple existing owners and are a maintenance seam, not a general stable API guarantee."
+  },
+  "historical_archival_bytes": {
+    "checkpoint.json": "146de29faa18b34bc038d39e275465ed037abca5a94cb58c25741102f90af08b",
+    "entry-result.json": "9d8769b0aa0c625a1dfb878c97c420bc5b1530c7af7be059a3e81612ab166a92",
+    "obligations.json": "483fb69a3f745f47fb74cdc29486b2d151255e3a0497f073daeedfe2ba034f5a",
+    "repair-history.json": "34fc3fd2233753ebe5b9aee6a7427c2beb0a23dc45be7524e93900d2082714b5",
+    "stage-review.json": "d7daebc30919d60e76d369eb26e2427531e31d302e32ad8f8a875ddb7a4bc0b8"
+  },
+  "owner_refusal_copy_qualification": {
+    "schema": "sal.forge-decision-link-owner-refusal-copy",
+    "status": "PASS",
+    "cases": [
+      {
+        "case": "valid-before",
+        "exit_code": 0,
+        "expected_status": null,
+        "refusal_code": null,
+        "next_action": null,
+        "retained_output": "local/forge_decision_link_v1/owner-copy-r01/valid-before.stdout.json",
+        "stdout_sha256": "110beaf43bc7569466b3c1126dda21427592410c6713afa41fbe466937da4ee3",
+        "subprocess_wall_seconds": "UNKNOWN_PARTIAL_R01_HELPER_HISTORY",
+        "fidelity": "RETAINED_SUCCESSFUL_PUBLIC_CLI_FROM_FAILED_R01_COHORT"
+      },
+      {
+        "case": "locator-required",
+        "exit_code": 2,
+        "expected_status": "INPUT_ERROR",
+        "refusal_code": "DISCOVERY_DETAIL_LOCATOR_REQUIRED",
+        "next_action": "CORRECT_LOCATOR_OR_PAGE_AND_RETRY",
+        "retained_output": "local/forge_decision_link_v1/owner-copy-r01/locator-required.stdout.json",
+        "stdout_sha256": "115958f65e88e52b02c0721e038dd608b9bc7d030054f04951f0f4545512180c",
+        "subprocess_wall_seconds": "UNKNOWN_PARTIAL_R01_HELPER_HISTORY",
+        "fidelity": "RETAINED_SUCCESSFUL_PUBLIC_CLI_FROM_FAILED_R01_COHORT"
+      },
+      {
+        "case": "page-invalid",
+        "exit_code": 2,
+        "expected_status": "INPUT_ERROR",
+        "refusal_code": "DISCOVERY_DETAIL_PAGE_INVALID",
+        "next_action": "CORRECT_LOCATOR_OR_PAGE_AND_RETRY",
+        "retained_output": "local/forge_decision_link_v1/owner-copy-r01/page-invalid.stdout.json",
+        "stdout_sha256": "3400df6e1119e837103733166003a39caab886ac1dd78bc173503f0ed74e9b0f",
+        "subprocess_wall_seconds": "UNKNOWN_PARTIAL_R01_HELPER_HISTORY",
+        "fidelity": "RETAINED_SUCCESSFUL_PUBLIC_CLI_FROM_FAILED_R01_COHORT"
+      },
+      {
+        "case": "locator-absent",
+        "exit_code": 2,
+        "expected_status": "BLOCKED_LOCATOR_NOT_RESOLVED",
+        "refusal_code": "DISCOVERY_DETAIL_RESULT_NOT_FOUND",
+        "next_action": "VERIFY_LOCATOR_AND_STORE_OR_REQUEST_SOURCE_OWNER_REVIEW",
+        "retained_output": "local/forge_decision_link_v1/owner-copy-r01/locator-absent.stdout.json",
+        "stdout_sha256": "0a0f317513db0fbcae4bb1b33c245cd68bc7a6f6b999e27e352e059728f2b201",
+        "subprocess_wall_seconds": "UNKNOWN_PARTIAL_R01_HELPER_HISTORY",
+        "fidelity": "RETAINED_SUCCESSFUL_PUBLIC_CLI_FROM_FAILED_R01_COHORT"
+      },
+      {
+        "case": "source-unreadable",
+        "exit_code": 2,
+        "expected_status": "BLOCKED_SOURCE_REVIEW_REQUIRED",
+        "refusal_code": "DISCOVERY_DETAIL_SOURCE_UNREADABLE",
+        "next_action": "STOP_AND_REQUEST_SOURCE_OWNER_REVIEW",
+        "subprocess_wall_seconds": 1.5692876000030083,
+        "stdout_sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+        "stderr_sha256": "3aef8c5daa10cb1957eaf9b068a9c61bba7219daac982c7e4503e94f11ee7cc2",
+        "fidelity": "CONTROLLED_IN_MEMORY_PRODUCER_READ_VIEW_CANARY"
+      },
+      {
+        "case": "valid-after",
+        "exit_code": 0,
+        "expected_status": null,
+        "refusal_code": null,
+        "next_action": null,
+        "subprocess_wall_seconds": 1.5126602000018465,
+        "stdout_sha256": "110beaf43bc7569466b3c1126dda21427592410c6713afa41fbe466937da4ee3",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "fidelity": "FRESH_PUBLIC_CLI_ON_NATIVE_RETAINED_STORE"
+      }
+    ],
+    "source_sha256": {
+      "scripts/hypothesis_forge.py": "cd8297f9b414d925c59469e8287971bcfa9a20e6c3bab7285865c4a1eb92e418",
+      "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "b2582ca103222f7500a6eb4036769b13df6e3d969c85a7008fafd0688f1d7425",
+      "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "e645de68f43b8242acb387c493c0232cad0deecc0bf2efff00e4a4c74725bebd",
+      "docs/tasks/FORGE_DECISION_LINK_V1.md": "44afea662a5efbce82313c2018714d5af9aafcd0965bba7c2f029d8c5f380913",
+      "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "fe7e3ca81fce2e52e75b7710449258125658063bbc0a9c33f3c4d1a9db57267b"
+    },
+    "source_before_after_exact_equal": true,
+    "native_files_unchanged": 230,
+    "valid_before_after_original_exact_equal": true,
+    "parent_watchdog_seconds": 600,
+    "product_child_watchdog_seconds": 180,
+    "measured_process_components_seconds": 3.081947800004855,
+    "elapsed_window_seconds": 3.2508109000009426,
+    "cpu_ram_preparation_model_cost": "UNKNOWN",
+    "no_new_scientific_authority": true,
+    "prior_cohort": "R01 HARNESS_IMPORT_BOOTSTRAP_ERROR; four successful public outputs retained; partial process timing UNKNOWN. R02 HARNESS_CANARY_TARGET_DRIFT changed sys.argv before the read filter, so its supposed source fault was actually a valid read and was not qualified. R03 captures immutable target and runs only unfinished source fault and closing valid read.",
+    "raw_logs": "Retained per named case locally; source-unreadable is an explicitly controlled read-view fault, not a native alternate terminal.",
+    "retained_receipt": "local/forge_decision_link_v1/owner-copy-r03/qualification.json",
+    "retained_receipt_sha256": "237fbaaed4c4a770a0c524f2021ef8ae48f3ad56dc17a99a31fa2f51923f4f24",
+    "source_epoch_note": "Source-before/after equality is for the named public read invocation epoch; the later checkpoint/evidence text is not silently rebound into the producer snapshot."
+  },
+  "owner_ux_not_ready": {
+    "observed_head": "063c5872a1fa25ed6931e4c7624f8c3d029280b6",
+    "role": "OWNER_UX_CRITIC",
+    "prior_verdict": "NOT_READY",
+    "severity": "MAJOR",
+    "finding": "discovery-show source/input refusals provide a canonical error code but no safe Russian recovery action; operator cannot distinguish correctible input from integrity/unavailability requiring source-owner review."
+  },
+  "owner_store_refusal_qualification": {
+    "schema": "sal.forge-decision-link-store-refusal-copy",
+    "status": "PASS",
+    "problems": [],
+    "cases": [
+      {
+        "case": "absent-store",
+        "exit_code": 2,
+        "refusal_code": "RESEARCH_STORE_NOT_PRESENT",
+        "status": "BLOCKED_STORE_NOT_AVAILABLE",
+        "next_action": "VERIFY_EXISTING_DATA_ROOT_OR_REQUEST_SOURCE_OWNER_REVIEW",
+        "subprocess_wall_seconds": 1.4286377000025823,
+        "stdout_sha256": "612b09fad394a94ff515b6a55ec06fefba2d9c5e17f5a67ed7508dd30a726a1b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "fidelity": "FRESH_PUBLIC_CLI_REAL_ABSENT_OR_NON_DIRECTORY_INPUT"
+      },
+      {
+        "case": "non-directory-store",
+        "exit_code": 2,
+        "refusal_code": "RESEARCH_STORE_NOT_PRESENT",
+        "status": "BLOCKED_STORE_NOT_AVAILABLE",
+        "next_action": "VERIFY_EXISTING_DATA_ROOT_OR_REQUEST_SOURCE_OWNER_REVIEW",
+        "subprocess_wall_seconds": 0.7551213000006101,
+        "stdout_sha256": "612b09fad394a94ff515b6a55ec06fefba2d9c5e17f5a67ed7508dd30a726a1b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "fidelity": "FRESH_PUBLIC_CLI_REAL_ABSENT_OR_NON_DIRECTORY_INPUT"
+      },
+      {
+        "case": "valid-native-cold",
+        "exit_code": 0,
+        "refusal_code": null,
+        "status": null,
+        "next_action": null,
+        "subprocess_wall_seconds": 2.5743106000008993,
+        "stdout_sha256": "110beaf43bc7569466b3c1126dda21427592410c6713afa41fbe466937da4ee3",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "fidelity": "FRESH_PUBLIC_CLI_RETAINED_NATIVE_SOURCE"
+      }
+    ],
+    "source_sha256": {
+      "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+      "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "b2582ca103222f7500a6eb4036769b13df6e3d969c85a7008fafd0688f1d7425",
+      "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "e645de68f43b8242acb387c493c0232cad0deecc0bf2efff00e4a4c74725bebd",
+      "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a0e7680f98f23ab9a61ec5faf0c1c16676fc078c9e7f31532a461d8ad81c0f64",
+      "docs/tasks/FORGE_DECISION_LINK_V1.md": "35101897d997a8722446602aba939e55c8b8f69ea33273380f9ed208072672cb"
+    },
+    "source_before_after_exact_equal": true,
+    "native_files_unchanged": 230,
+    "native_files_before_after_exact_equal": true,
+    "absent_store_still_absent": true,
+    "non_directory_sentinel_sha256": "85f32ae0a31e6b99ef27251fc5adc9eeec2057de199a02543063cfd31c9979b7",
+    "non_directory_sentinel_unchanged": true,
+    "measured_process_components_seconds": 4.758069600004092,
+    "elapsed_window_seconds": 4.904792700002872,
+    "product_child_watchdog_seconds": 180,
+    "parent_watchdog_seconds": 600,
+    "owned_output_guard_bytes": 1073741824,
+    "cpu_ram_preparation_model_cost": "UNKNOWN",
+    "no_new_science_storage_acl_or_settings_authority": true,
+    "retained_receipt": "local/forge_decision_link_v1/owner-store-r04/qualification.json",
+    "retained_receipt_sha256": "b81c01ad640a01fc2d97e6a4ad1cb1ea0146cdcb5a7ece338c043f996dbe6d45",
+    "source_epoch_note": "Named current whole-command store-opening qualification; later checkpoint text does not silently rebind earlier producer pins."
+  },
+  "owner_ux_store_not_ready": {
+    "role": "OWNER_UX_CRITIC",
+    "prior_verdict": "NOT_READY",
+    "severity": "MAJOR",
+    "observed_head": "16fff80025cee60f619e566f2d1526fcce210e64",
+    "finding": "Existing data-root resolution and read-only ResearchStore opening occur before the discovery-show try, so unavailable store bypasses promised safe JSON recovery and exits through generic main stderr."
+  },
+  "reader_source_not_ready": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "observed_head": "f0efc30d8b6b067ef637ce24e3a39407cae9387a",
+      "finding": "P2: unreadable discovery wrapper is skipped and only result-ref locator refuses; operation-only or off-page read can return an empty/partial page and mislabel a landed reservation as pending."
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "observed_head": "f0efc30d8b6b067ef637ce24e3a39407cae9387a",
+      "finding": "G1: independently confirms operation-only unreadable result violates R6/R11/D3/D8/V04/V16; require typed refusal and valid landed/pending/empty-page counterparts."
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "observed_head": "e6109ee627d0cf639eedf385cb248d9b8027356c",
+      "finding": "P2: unreadable native reservation is omitted and genuine pending read emits pending_reservations=[]."
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "observed_head": "e6109ee627d0cf639eedf385cb248d9b8027356c",
+      "finding": "P2: unreadable unscoped disposition is omitted by by_subject; new reader loses owner missingness signal beside NOT_RECORDED/prior CURRENT."
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "observed_head": "e6109ee627d0cf639eedf385cb248d9b8027356c",
+      "finding": "Unreadable scientific disposition disappears from cold readout; R5/R6/R11/D7/D8/V10/V16 require an explicit integrity/missingness gap without guessing subject."
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "observed_head": "e6109ee627d0cf639eedf385cb248d9b8027356c",
+      "finding": "SEMANTIC_PREMISE FAIL IMPLEMENTATION_DEFECT: discarded native reservation/disposition breaks evidence admissibility, research truth, UNKNOWN and execution completeness. Existing owner unscoped marker must be retained; typed source refusal may limit only this read command, never scientific suppression."
+    }
+  ],
+  "reader_source_integrity_qualification": {
+    "scope": "CONTROLLED_READ_VIEW_FAULTS_AND_NATIVE_COLD_READS; NO_NEW_SCIENTIFIC_LOOK",
+    "policy": "Unreadable discovery artifact scope cannot be trusted. Any such artifact refuses the snapshot for both locators; all discovery result hashes verified before pagination/current/pending calculations. This conservatively limits read availability instead of hiding unknown evidence.",
+    "unit": {
+      "status": "PASS",
+      "exit_code": 0,
+      "tests": [
+        "tests.test_forge_decision_link_v1.NativeSavedSourceProjectionTests.test_unreadable_saved_result_view_is_typed_and_never_reconstructed",
+        "tests.test_forge_decision_link_v1.NativeSavedSourceProjectionTests.test_result_integrity_is_checked_before_pagination",
+        "tests.test_forge_decision_link_v1.NativeSavedSourceProjectionTests.test_real_saved_sources_have_single_scan_and_addressed_empty_page_is_read_only",
+        "tests.test_forge_decision_link_v1.PendingAuthoredBasisTests.test_public_projection_of_pending_request_has_one_archive_enumeration_and_no_values"
+      ],
+      "source_sha256": {
+        "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "ef70d37380ccc2a49f9611b8173fe8e5bb2dbae40fa923c2310ed70a8e4946f1",
+        "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+        "tests/test_forge_decision_link_v1.py": "807b3fa7b68fac65705a09b781f58cdd226f78ca2db1e5e5102f4c2a8f995dd2",
+        "docs/tasks/FORGE_DECISION_LINK_V1.md": "d2ae8fd8fe47a3ccd802f16a47252892baf665a3fa71d344b48c3d91633e364f"
+      },
+      "source_before_after_equal": true,
+      "child_watchdog_seconds": 180,
+      "parent_envelope_seconds": 600,
+      "elapsed_process_seconds": 22.887255199999345,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "4e1d3131a4beb7b3133ed00fd915af771c30a39b495fbb41241082d69fdae24e",
+      "cpu_ram_preparation_model_cost": "UNKNOWN",
+      "retained_receipt": "local/forge_decision_link_v1/reader-refusal-green2/qualification.json",
+      "retained_receipt_sha256": "88d3c7c8fd83ad912c449d732ef4433ec869b01942311e3a5a5ed186f745e88c"
+    },
+    "public_cli": {
+      "status": "PASS",
+      "problems": [],
+      "cases": [
+        {
+          "case": "valid-before",
+          "exit_code": 0,
+          "stdout_sha256": "110beaf43bc7569466b3c1126dda21427592410c6713afa41fbe466937da4ee3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "subprocess_wall_seconds": 1.4857881000025372,
+          "fidelity": "FRESH_PUBLIC_CLI_NATIVE_COLD_READ"
+        },
+        {
+          "case": "result-unreadable",
+          "exit_code": 2,
+          "stdout_sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "stderr_sha256": "3aef8c5daa10cb1957eaf9b068a9c61bba7219daac982c7e4503e94f11ee7cc2",
+          "subprocess_wall_seconds": 1.581883699996979,
+          "fidelity": "CONTROLLED_NATIVE_PRODUCER_READ_VIEW_FAULT"
+        },
+        {
+          "case": "operation-unreadable",
+          "exit_code": 2,
+          "stdout_sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "stderr_sha256": "3aef8c5daa10cb1957eaf9b068a9c61bba7219daac982c7e4503e94f11ee7cc2",
+          "subprocess_wall_seconds": 1.4979020999999193,
+          "fidelity": "CONTROLLED_NATIVE_PRODUCER_READ_VIEW_FAULT"
+        },
+        {
+          "case": "operation-off-page-unreadable",
+          "exit_code": 2,
+          "stdout_sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "stderr_sha256": "3aef8c5daa10cb1957eaf9b068a9c61bba7219daac982c7e4503e94f11ee7cc2",
+          "subprocess_wall_seconds": 1.5246011999988696,
+          "fidelity": "CONTROLLED_NATIVE_PRODUCER_READ_VIEW_FAULT"
+        },
+        {
+          "case": "result-off-page-hash",
+          "exit_code": 2,
+          "stdout_sha256": "dd5c84510f634bf81ea6ef645f11654fbe047aa298357c0cbcfabe2a33677daa",
+          "stderr_sha256": "3aef8c5daa10cb1957eaf9b068a9c61bba7219daac982c7e4503e94f11ee7cc2",
+          "subprocess_wall_seconds": 1.550682199998846,
+          "fidelity": "CONTROLLED_NATIVE_PRODUCER_READ_VIEW_FAULT"
+        },
+        {
+          "case": "operation-off-page-hash",
+          "exit_code": 2,
+          "stdout_sha256": "dd5c84510f634bf81ea6ef645f11654fbe047aa298357c0cbcfabe2a33677daa",
+          "stderr_sha256": "3aef8c5daa10cb1957eaf9b068a9c61bba7219daac982c7e4503e94f11ee7cc2",
+          "subprocess_wall_seconds": 1.5379949000016495,
+          "fidelity": "CONTROLLED_NATIVE_PRODUCER_READ_VIEW_FAULT"
+        },
+        {
+          "case": "valid-operation",
+          "exit_code": 0,
+          "stdout_sha256": "be98d54488fcdfc8a4d4ee9d7bf5ddc03287e570a977e60bffe22555a34f41ed",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "subprocess_wall_seconds": 1.5294820000017353,
+          "fidelity": "FRESH_PUBLIC_CLI_NATIVE_COLD_READ"
+        },
+        {
+          "case": "valid-empty-page",
+          "exit_code": 0,
+          "stdout_sha256": "4fdec37f2a0f193371d3aac266aeb70c08df03cc04cb23b2ffdf7838cb5d3c88",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "subprocess_wall_seconds": 1.4746764000010444,
+          "fidelity": "FRESH_PUBLIC_CLI_NATIVE_COLD_READ"
+        },
+        {
+          "case": "valid-after",
+          "exit_code": 0,
+          "stdout_sha256": "110beaf43bc7569466b3c1126dda21427592410c6713afa41fbe466937da4ee3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "subprocess_wall_seconds": 1.4904758000011498,
+          "fidelity": "FRESH_PUBLIC_CLI_NATIVE_COLD_READ"
+        }
+      ],
+      "source_sha256": {
+        "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "ef70d37380ccc2a49f9611b8173fe8e5bb2dbae40fa923c2310ed70a8e4946f1",
+        "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+        "tests/test_forge_decision_link_v1.py": "807b3fa7b68fac65705a09b781f58cdd226f78ca2db1e5e5102f4c2a8f995dd2",
+        "docs/tasks/FORGE_DECISION_LINK_V1.md": "d2ae8fd8fe47a3ccd802f16a47252892baf665a3fa71d344b48c3d91633e364f"
+      },
+      "source_before_after_exact_equal": true,
+      "native_files_unchanged": 230,
+      "native_files_before_after_exact_equal": true,
+      "original_valid_result_before_after_equal": true,
+      "child_watchdog_seconds": 180,
+      "parent_envelope_seconds": 600,
+      "owned_output_guard_bytes": 1073741824,
+      "elapsed_window_seconds": 13.887219500000356,
+      "process_component_sum_seconds": 13.67348640000273,
+      "cpu_ram_preparation_model_cost": "UNKNOWN",
+      "no_science_or_storage_mutation": true,
+      "retained_receipt": "local/forge_decision_link_v1/reader-cli-r06/qualification.json",
+      "retained_receipt_sha256": "b5c81e91969891ac6f2139bfc7c18f6462b71b6acffa265e729de1574b2c00ce"
+    },
+    "epochs": "All prior native qualifications retain their original source pins. These named current reader invocations qualify only the changed read seam; later checkpoint text is a separate source epoch.",
+    "retained_prior_attempts": [
+      {
+        "attempt": "reader-refusal-red",
+        "retained_receipt": "local/forge_decision_link_v1/reader-refusal-red/qualification.json",
+        "retained_receipt_sha256": "5d151dc28c2dbc564bb0160e1df10be34af46ba37bab351a494fd38e17b86d12",
+        "status": "EXPECTED_PRODUCT_REPRODUCTION_WITH_POST_ASSERT_HARNESS_ERROR",
+        "source_sha256": {
+          "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "b2582ca103222f7500a6eb4036769b13df6e3d969c85a7008fafd0688f1d7425",
+          "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+          "tests/test_forge_decision_link_v1.py": "0ccb93137e395a08304bb121249a4c32ea39688d3cf1641644baa63b5fac1391",
+          "docs/tasks/FORGE_DECISION_LINK_V1.md": "d2ae8fd8fe47a3ccd802f16a47252892baf665a3fa71d344b48c3d91633e364f"
+        },
+        "elapsed_process_seconds": 20.30006659999708
+      },
+      {
+        "attempt": "reader-refusal-red2",
+        "retained_receipt": "local/forge_decision_link_v1/reader-refusal-red2/qualification.json",
+        "retained_receipt_sha256": "804aa5f52d344a3a37c1132e8fb9dc81392c046abce5bef72e03c83b995975cc",
+        "status": "EXPECTED_RED_REPRODUCTION",
+        "source_sha256": {
+          "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "b2582ca103222f7500a6eb4036769b13df6e3d969c85a7008fafd0688f1d7425",
+          "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+          "tests/test_forge_decision_link_v1.py": "fe6ad80919aa7f6a9b3eb77c0a9b45c50beb5e650d21e770945fbc8cea359fa6",
+          "docs/tasks/FORGE_DECISION_LINK_V1.md": "d2ae8fd8fe47a3ccd802f16a47252892baf665a3fa71d344b48c3d91633e364f"
+        },
+        "elapsed_process_seconds": 21.162533099999564
+      },
+      {
+        "attempt": "reader-refusal-green",
+        "retained_receipt": "local/forge_decision_link_v1/reader-refusal-green/qualification.json",
+        "retained_receipt_sha256": "a1b58c945f9e6ae917817a3a93e5de538b6ea65b9e285087f2a61c55b0c75c20",
+        "status": "FAIL_OR_HARNESS_ERROR",
+        "source_sha256": {
+          "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "f3d34ceb82443fd9eaab4553efc6dc90afed3117cf67932edb7c0a2ff651c5ed",
+          "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+          "tests/test_forge_decision_link_v1.py": "807b3fa7b68fac65705a09b781f58cdd226f78ca2db1e5e5102f4c2a8f995dd2",
+          "docs/tasks/FORGE_DECISION_LINK_V1.md": "d2ae8fd8fe47a3ccd802f16a47252892baf665a3fa71d344b48c3d91633e364f"
+        },
+        "elapsed_process_seconds": 22.446424900001148
+      },
+      {
+        "attempt": "reader-cli-r05",
+        "status": "FAIL_PRODUCT_WRAPPER_BODY_KIND_ASSUMPTION_AND_PARTIAL_HELPER_KEYERROR",
+        "start_sha256": "2c01f57cf42a2dbafeb2bad351ebe4711c7969bb67ec9a9620459b9c5d7fc127",
+        "source_sha256": {
+          "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "f3d34ceb82443fd9eaab4553efc6dc90afed3117cf67932edb7c0a2ff651c5ed",
+          "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+          "tests/test_forge_decision_link_v1.py": "807b3fa7b68fac65705a09b781f58cdd226f78ca2db1e5e5102f4c2a8f995dd2",
+          "docs/tasks/FORGE_DECISION_LINK_V1.md": "d2ae8fd8fe47a3ccd802f16a47252892baf665a3fa71d344b48c3d91633e364f"
+        },
+        "outputs": {
+          "operation-off-page-hash.stdout.json": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "operation-off-page-unreadable.stdout.json": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "operation-unreadable.stdout.json": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "result-off-page-hash.stdout.json": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "result-unreadable.stdout.json": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "valid-before.stdout.json": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "valid-operation.stdout.json": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d"
+        },
+        "elapsed_process_seconds": "UNKNOWN_PARTIAL_HELPER_HISTORY"
+      }
+    ]
+  },
+  "native_source_frontier_qualification": {
+    "scope": "NATIVE_SOURCE_FRAME_FRONTIER_AND_EXISTING_DISPOSITION_UNSCOPED_MARKER; SCRIPTED_SYNTHETIC_ONLY",
+    "policy": "Relevant existing reserved refs/kinds identify request/reservation/look/disposition/draft/confirming-packet frames. Unreadable/hash-broken frames cause typed read-source refusal. Existing disposition owner unscoped unreadability also refuses; scoped UNREADABLE remains the owner semantics. Arbitrary unrelated artifacts are excluded. Only read availability is restricted, no scientific suppression or new truth owner.",
+    "retained_reviews": {
+      "path": "local/forge_decision_link_v1/review-v5-e6109ee/reviews-v5.json",
+      "sha256": "8e8d750f156b7021e2d0e3aad24ab74985c427d84dfd5faa555fd29a38a82571"
+    },
+    "current_unit": {
+      "status": "PASS",
+      "exit_code": 0,
+      "tests": [
+        "tests.test_forge_decision_link_v1.PendingAuthoredBasisTests.test_unreadable_native_request_or_reservation_is_not_empty_pending",
+        "tests.test_forge_decision_link_v1.NativeSavedSourceProjectionTests.test_unscoped_disposition_source_cannot_look_absent_or_leave_a_clean_prior_head"
+      ],
+      "source_sha256": {
+        "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "6c9b3a405a05cb8d27bc1ae76de1cea026ead388472d90fa66c9d624852638a8",
+        "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+        "tests/test_forge_decision_link_v1.py": "aacbc0cc51b90592448d0a507772d916d7ea5c571b037f53fc26a22af2b557fe",
+        "docs/tasks/FORGE_DECISION_LINK_V1.md": "1070887ddc0b8da637f82ca946ae98b8c17475311af17997b5e075acbec061d4"
+      },
+      "source_before_after_equal": true,
+      "child_watchdog_seconds": 180,
+      "parent_envelope_seconds": 600,
+      "elapsed_process_seconds": 21.91297879999911,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "71f18c64258f591cc9a221e54c318c0bc2480a90265c660e4bc93f303de57ddc",
+      "cpu_ram_preparation_model_cost": "UNKNOWN",
+      "retained_receipt": "local/forge_decision_link_v1/reader-refusal-frontier-green2/qualification.json",
+      "retained_receipt_sha256": "3899850f9adca85c60335e77a5979ab7e9fc9d94b9766074072554ecbac019e4"
+    },
+    "native_cli_tail": {
+      "status": "PASS_TAIL_AND_DISTINCT_RETAINED_ASSERTIONS",
+      "cases": [
+        {
+          "case": "request-fault",
+          "exit_code": 2,
+          "stdout_sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "stderr_sha256": "8a6aa62f08fa12380a9fed68289f8d412d3d1579cf0b3119a8f33ef3a0cf245a",
+          "process_seconds": 0.8389296000023023
+        },
+        {
+          "case": "reservation-fault",
+          "exit_code": 2,
+          "stdout_sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "stderr_sha256": "8a6aa62f08fa12380a9fed68289f8d412d3d1579cf0b3119a8f33ef3a0cf245a",
+          "process_seconds": 0.8258800000003248
+        },
+        {
+          "case": "pending-valid-after",
+          "exit_code": 0,
+          "stdout_sha256": "bc4c8f896ae851e7c694d7a8ce61ac69c781a7c937b5a7e66a25d05f7fa84762",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "process_seconds": 0.8898313999998209
+        },
+        {
+          "case": "withdrawal-valid-after",
+          "exit_code": 0,
+          "stdout_sha256": "699af9e0bc964a7829001b02865fbc12a4e02a207927d8a64422f86000c932b0",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "process_seconds": 1.4802725999979884
+        }
+      ],
+      "retained_successful_r07_outputs": {
+        "assessment-operation-fault.stdout.json": {
+          "sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "status": "BLOCKED_SOURCE_REVIEW_REQUIRED",
+          "refusal_code": "DISCOVERY_DETAIL_SOURCE_UNREADABLE",
+          "scientific_disposition": null
+        },
+        "assessment-result-fault.stdout.json": {
+          "sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "status": "BLOCKED_SOURCE_REVIEW_REQUIRED",
+          "refusal_code": "DISCOVERY_DETAIL_SOURCE_UNREADABLE",
+          "scientific_disposition": null
+        },
+        "assessment-valid.stdout.json": {
+          "sha256": "71cf3e60cd698aee7b8c82848332b18a80208bd6072865c3330e175b6eb30e06",
+          "status": null,
+          "refusal_code": null,
+          "scientific_disposition": "CURRENT_FOR_BOUND_BASIS"
+        },
+        "pending-valid.stdout.json": {
+          "sha256": "bc4c8f896ae851e7c694d7a8ce61ac69c781a7c937b5a7e66a25d05f7fa84762",
+          "status": null,
+          "refusal_code": null,
+          "scientific_disposition": null
+        },
+        "successor-operation-fault.stdout.json": {
+          "sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "status": "BLOCKED_SOURCE_REVIEW_REQUIRED",
+          "refusal_code": "DISCOVERY_DETAIL_SOURCE_UNREADABLE",
+          "scientific_disposition": null
+        },
+        "successor-result-fault.stdout.json": {
+          "sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "status": "BLOCKED_SOURCE_REVIEW_REQUIRED",
+          "refusal_code": "DISCOVERY_DETAIL_SOURCE_UNREADABLE",
+          "scientific_disposition": null
+        },
+        "successor-valid.stdout.json": {
+          "sha256": "6468082abcb09a7cb8f69952d27dd0c8e1a6cdd15481ec2841036ddabc5ccc1b",
+          "status": null,
+          "refusal_code": null,
+          "scientific_disposition": "CURRENT_FOR_BOUND_BASIS"
+        },
+        "unscoped-schema-operation-fault.stdout.json": {
+          "sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "status": "BLOCKED_SOURCE_REVIEW_REQUIRED",
+          "refusal_code": "DISCOVERY_DETAIL_SOURCE_UNREADABLE",
+          "scientific_disposition": null
+        },
+        "unscoped-schema-result-fault.stdout.json": {
+          "sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "status": "BLOCKED_SOURCE_REVIEW_REQUIRED",
+          "refusal_code": "DISCOVERY_DETAIL_SOURCE_UNREADABLE",
+          "scientific_disposition": null
+        },
+        "withdrawal-operation-fault.stdout.json": {
+          "sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "status": "BLOCKED_SOURCE_REVIEW_REQUIRED",
+          "refusal_code": "DISCOVERY_DETAIL_SOURCE_UNREADABLE",
+          "scientific_disposition": null
+        },
+        "withdrawal-result-fault.stdout.json": {
+          "sha256": "a16ee55df668b67cdcf7232b4b85b90e0f5b51d70e1012067354a9b4c821962d",
+          "status": "BLOCKED_SOURCE_REVIEW_REQUIRED",
+          "refusal_code": "DISCOVERY_DETAIL_SOURCE_UNREADABLE",
+          "scientific_disposition": null
+        },
+        "withdrawal-valid-after.stdout.json": {
+          "sha256": "699af9e0bc964a7829001b02865fbc12a4e02a207927d8a64422f86000c932b0",
+          "status": null,
+          "refusal_code": null,
+          "scientific_disposition": "WITHDRAWN"
+        },
+        "withdrawal-valid.stdout.json": {
+          "sha256": "699af9e0bc964a7829001b02865fbc12a4e02a207927d8a64422f86000c932b0",
+          "status": null,
+          "refusal_code": null,
+          "scientific_disposition": "WITHDRAWN"
+        }
+      },
+      "prior_failure": "R07 pending request canary targeted record_operation returned derived locator, not actual committed record; read remained valid and was NOT a qualified fault. R07 cohort remains partial/HARNESS_CANARY_TARGET_ERROR; partial process timings UNKNOWN. R08 uses get_operation actual native ref and reruns only unfinished request/reservation and closing native reads.",
+      "source_sha256": {
+        "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "6c9b3a405a05cb8d27bc1ae76de1cea026ead388472d90fa66c9d624852638a8",
+        "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+        "tests/test_forge_decision_link_v1.py": "aacbc0cc51b90592448d0a507772d916d7ea5c571b037f53fc26a22af2b557fe",
+        "src/solana_alpha_lab/factory/hfic_scientific_disposition.py": "d2b980f20cb7e703d4d61033ca4481d58de39d8ed149b16b5b64d013859aac75",
+        "docs/tasks/FORGE_DECISION_LINK_V1.md": "1070887ddc0b8da637f82ca946ae98b8c17475311af17997b5e075acbec061d4"
+      },
+      "source_before_after_exact_equal": true,
+      "source_epoch_only_test_target_correction": true,
+      "all_three_native_roots_files_before_after_exact_equal": true,
+      "native_root_file_counts": {
+        "local/forge_decision_link_v1/frontier-cli-r07/owned-pending-plane": 6,
+        "local/forge_decision_link_v1/frontier-cli-r07/owned-plane": 248,
+        "local/forge_decision_link_v1/land-race-c01/fixture/plane": 230
+      },
+      "parent_envelope_seconds": 600,
+      "child_watchdog_seconds": 180,
+      "owned_output_guard_bytes": 1073741824,
+      "elapsed_window_seconds": 4.212135600002512,
+      "process_component_sum_seconds": 4.034913600000436,
+      "scientific_look_delta": 0,
+      "cpu_ram_preparation_model_cost": "UNKNOWN",
+      "scope": "Owned scripted native disposition lineage and pending reservation, controlled read-view faults; no distinct full passing R07 batch or scientific acceptance.",
+      "retained_receipt": "local/forge_decision_link_v1/frontier-cli-r08/qualification.json",
+      "retained_receipt_sha256": "fbfe286da114eb86f8821d1967748f5a77642f0e45f3fad111fcacde063452ef"
+    },
+    "positive_consumer": {
+      "status": "PASS",
+      "exit_code": 0,
+      "tests": [
+        "tests.test_hfic_ordinary_operation_acceptance_v1.OrdinaryAcceptanceTests.test_c_positive_candidate_reaches_scripted_classification_without_a_new_look"
+      ],
+      "source_sha256": {
+        "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "6c9b3a405a05cb8d27bc1ae76de1cea026ead388472d90fa66c9d624852638a8",
+        "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+        "tests/test_forge_decision_link_v1.py": "aacbc0cc51b90592448d0a507772d916d7ea5c571b037f53fc26a22af2b557fe",
+        "docs/tasks/FORGE_DECISION_LINK_V1.md": "1070887ddc0b8da637f82ca946ae98b8c17475311af17997b5e075acbec061d4",
+        "tests/test_hfic_ordinary_operation_acceptance_v1.py": "c4b5f9873d31dc98f95ae9826ee05075a5211775de9ba0f93a4a9107b9b29741",
+        "src/solana_alpha_lab/factory/hfic_session.py": "c566a2a01ebca53acb79ab81f037ba991049e9b7cc05ebaff08d64467d7bbfa5",
+        "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "9b1904f0439547f895a58a94989568273bcfd010a388f9900a5fbe4a64d8847e",
+        "src/solana_alpha_lab/factory/hfic_scientific_disposition.py": "d2b980f20cb7e703d4d61033ca4481d58de39d8ed149b16b5b64d013859aac75"
+      },
+      "source_before_after_equal": true,
+      "child_watchdog_seconds": 180,
+      "parent_envelope_seconds": 600,
+      "elapsed_process_seconds": 43.29201530000137,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ab08447befedbf2ddbaf893667248c149736f1146dbc57d2d2dec874ea9a75c9",
+      "cpu_ram_preparation_model_cost": "UNKNOWN",
+      "retained_receipt": "local/forge_decision_link_v1/reader-refusal-frontier-positive/qualification.json",
+      "retained_receipt_sha256": "d37e42943692787d2b67f1e3b92e4a0297719fe3cdb8d5d07c167ddfeaf6cf2e",
+      "capture_sha256": "b70da58c351183815b1b87e4b789d14bfbb26c7109e9e8883dc948160324d57d",
+      "capture": "local/forge_decision_link_v1/reader-refusal-frontier-positive/positive-source-link-proof.json"
+    },
+    "producer_receipts": {
+      "assessment-produced.json": "892c5ac279ebc3d98ab83269399a567e725c75e09bf88fcf839a3cfae2f74aad",
+      "successor-produced.json": "9bca40b8410c8c238bf533b53b2c4723794c2327f9a948584b0165475647f889",
+      "withdrawal-produced.json": "0803830aaf01719eb49406df18094ddbe2e6c936b87a981ba19265847084f526"
+    },
+    "prior_attempts": [
+      {
+        "attempt": "reader-refusal-frontier-red",
+        "status": "EXPECTED_RED_REPRODUCTION",
+        "retained_receipt": "local/forge_decision_link_v1/reader-refusal-frontier-red/qualification.json",
+        "retained_receipt_sha256": "bc667c3d40cd93db4092db21f339713948906b88ae38a464a8d9f3cf567e08bf",
+        "source_sha256": {
+          "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "ef70d37380ccc2a49f9611b8173fe8e5bb2dbae40fa923c2310ed70a8e4946f1",
+          "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+          "tests/test_forge_decision_link_v1.py": "c2d8f2dcc4d3b7740b58c95206abdc5100a1d5fa3e243a07b2079586c73f1288",
+          "docs/tasks/FORGE_DECISION_LINK_V1.md": "1070887ddc0b8da637f82ca946ae98b8c17475311af17997b5e075acbec061d4"
+        }
+      },
+      {
+        "attempt": "reader-refusal-frontier-green",
+        "status": "FAIL_OR_HARNESS_ERROR",
+        "retained_receipt": "local/forge_decision_link_v1/reader-refusal-frontier-green/qualification.json",
+        "retained_receipt_sha256": "9df76b28f205a83038336183e683acf8bfc27e7ced143646a28c62b2ccc3f73e",
+        "source_sha256": {
+          "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "6c9b3a405a05cb8d27bc1ae76de1cea026ead388472d90fa66c9d624852638a8",
+          "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+          "tests/test_forge_decision_link_v1.py": "24ef20134a2493f665e377998e65ff1919d3e3c105d97e62ecbf3465f5ac997b",
+          "docs/tasks/FORGE_DECISION_LINK_V1.md": "1070887ddc0b8da637f82ca946ae98b8c17475311af17997b5e075acbec061d4"
+        }
+      },
+      {
+        "attempt": "frontier-cli-r07",
+        "status": "PARTIAL_HARNESS_CANARY_TARGET_ERROR_NOT_FULL_PASS",
+        "start_sha256": "8cd25cfc500e7c32537926c3521adad08f98fb69fc7943747d8e6d3ffaed78d6",
+        "unqualified_request_canary_stdout_sha256": "bc4c8f896ae851e7c694d7a8ce61ac69c781a7c937b5a7e66a25d05f7fa84762",
+        "elapsed_process_seconds": "UNKNOWN_PARTIAL_HISTORY",
+        "retained_successful_reads": 13,
+        "qualification": "Thirteen successful real public outputs retained separately; derived record_operation locator did not hit actual native request. Only unfinished source-target reads and closing current reads rerun in r08."
+      }
+    ],
+    "source_epoch_note": "Earlier claims/receipts retain original source pins. These named invocations qualify the changed read frontier; r07→r08 changes only test canary target to actual committed ref. Later checkpoint docs are a distinct epoch, never retrospective binding."
+  },
+  "ci_row_context_repair": {
+    "scope": "EXISTING_SYNTHETIC_PUBLIC_UNIVERSE_POLICY_AND_GENUINE_CHANGED_ROWS; EXACT_LEASE_RECHECK_REUSE",
+    "failure": {
+      "pr_number": 395,
+      "head": "0d2d223cc791555c56b51c21238fbb4fbbf3d23c",
+      "ci_run_id": 38091830268,
+      "ci_url": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/38091830268",
+      "failed_job": "validate-tests (5)",
+      "job_id": 114329650276,
+      "failed_test": "test_threshold_change_is_adaptation_not_a_second_main",
+      "canonical_error": "ORDINARY_LOOK_LANDED_DURING_RESERVATION",
+      "cases": 985,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 16,
+      "reported_test_elapsed_seconds": 681.59,
+      "raw_job_log": {
+        "path": "local/forge_decision_link_v1/ci-shard5-head-0d2d223c.log",
+        "sha256": "2f60e8a3ccf82c77752568c4dafba66978be9bc6d99b9ba003e90f3ad2133c23"
+      },
+      "initial_ci_readback": {
+        "path": "local/forge_decision_link_v1/ci-first-head-0d2d223c.json",
+        "sha256": "f6f7c1d6309af321ecab80295eca0c53b66c20a9dd7754ea51f95abb5c582ff7"
+      },
+      "readback_scope": "First known failed job; initial readback still has shard4 pending. No full first-run PASS."
+    },
+    "cause": "Outer existing same-active-profile matcher compared supplied rows/list masks; reservation recheck lost that context and matched only coarse published-corpus fingerprint. A genuinely changed row under the same published metadata was falsely refused.",
+    "repair": "Forward the identical existing census/observations/admitted/scope-mask context to the existing matcher at reservation entry, native writer lease and busy retry. Metadata-only callers retain fingerprint fallback. No new identity/algorithm/classification/schema/budget/evaluator.",
+    "red": {
+      "status": "EXPECTED_PRODUCT_REPRODUCTION",
+      "exit_code": 1,
+      "tests": [
+        "tests.test_forge_research_universe_policy_v1.UniversePolicyTests.test_threshold_change_is_adaptation_not_a_second_main"
+      ],
+      "source_sha256": {
+        "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "e645de68f43b8242acb387c493c0232cad0deecc0bf2efff00e4a4c74725bebd",
+        "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "9b1904f0439547f895a58a94989568273bcfd010a388f9900a5fbe4a64d8847e",
+        "src/solana_alpha_lab/factory/hfic_research_universe_policy.py": "a03082fd63d98d1f60124b9b07f89d8b06dacd03b8c89f198730cefa137e5c2e",
+        "tests/test_forge_research_universe_policy_v1.py": "426f54c731dde89543af8d716ceacebf1440df34231689a68ad63a9f408e2314",
+        "tests/test_forge_decision_link_v1.py": "aacbc0cc51b90592448d0a507772d916d7ea5c571b037f53fc26a22af2b557fe",
+        "docs/tasks/FORGE_DECISION_LINK_V1.md": "1070887ddc0b8da637f82ca946ae98b8c17475311af17997b5e075acbec061d4"
+      },
+      "source_before_after_equal": true,
+      "elapsed_process_seconds": 8.117981600000348,
+      "child_watchdog_seconds": 180,
+      "parent_envelope_seconds": 600,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "8ec3c11b4666f20b877fc467e5124fcd9746fb9316ed7c1adc6e4c3bbe5d6409",
+      "cpu_ram_preparation_model_cost": "UNKNOWN",
+      "retained_receipt": {
+        "path": "local/forge_decision_link_v1/ci-row-context-red/qualification.json",
+        "sha256": "32d3230ad895befc0d2c08e93a1032b40f0f44c36d6951b74cd2321609dfd53b"
+      }
+    },
+    "green": {
+      "status": "PASS",
+      "exit_code": 0,
+      "tests": [
+        "tests.test_forge_research_universe_policy_v1",
+        "tests.test_forge_decision_link_v1.NativeSavedSourceProjectionTests.test_landed_native_result_refuses_another_reservation_before_append",
+        "tests.test_forge_decision_link_v1.NativeSavedSourceProjectionTests.test_real_policy_change_is_not_blanket_blocked_by_same_spec",
+        "tests.test_forge_decision_link_v1.NativeSavedSourceProjectionTests.test_real_added_cohort_is_not_blanket_blocked_by_same_spec"
+      ],
+      "source_sha256": {
+        "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "056fb4981126166d23796b52d10c888349f0d92ab7a13164eaf8ef00aabeb1b9",
+        "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "9b1904f0439547f895a58a94989568273bcfd010a388f9900a5fbe4a64d8847e",
+        "src/solana_alpha_lab/factory/hfic_research_universe_policy.py": "a03082fd63d98d1f60124b9b07f89d8b06dacd03b8c89f198730cefa137e5c2e",
+        "tests/test_forge_research_universe_policy_v1.py": "426f54c731dde89543af8d716ceacebf1440df34231689a68ad63a9f408e2314",
+        "tests/test_forge_decision_link_v1.py": "aacbc0cc51b90592448d0a507772d916d7ea5c571b037f53fc26a22af2b557fe",
+        "docs/tasks/FORGE_DECISION_LINK_V1.md": "a2a657a9406ef5574df8596d84d4e2de91b4d6948398e65cfa88100d797c1ebb"
+      },
+      "source_before_after_equal": true,
+      "elapsed_process_seconds": 100.14619739999762,
+      "child_watchdog_seconds": 180,
+      "parent_envelope_seconds": 600,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "754dac3f46894eda4903277721a8b3870605d621648d2822583ad7d669107d46",
+      "cpu_ram_preparation_model_cost": "UNKNOWN",
+      "retained_receipt": {
+        "path": "local/forge_decision_link_v1/ci-row-context-green/qualification.json",
+        "sha256": "76b1afa754b89c46184932e5eea9ca1a8c59b2e0f876cfa3182fa5f97417cdd1"
+      }
+    },
+    "positive": {
+      "status": "PASS",
+      "exit_code": 0,
+      "tests": [
+        "tests.test_hfic_ordinary_operation_acceptance_v1.OrdinaryAcceptanceTests.test_c_positive_candidate_reaches_scripted_classification_without_a_new_look"
+      ],
+      "source_sha256": {
+        "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "056fb4981126166d23796b52d10c888349f0d92ab7a13164eaf8ef00aabeb1b9",
+        "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "9b1904f0439547f895a58a94989568273bcfd010a388f9900a5fbe4a64d8847e",
+        "src/solana_alpha_lab/factory/hfic_research_universe_policy.py": "a03082fd63d98d1f60124b9b07f89d8b06dacd03b8c89f198730cefa137e5c2e",
+        "tests/test_forge_research_universe_policy_v1.py": "426f54c731dde89543af8d716ceacebf1440df34231689a68ad63a9f408e2314",
+        "tests/test_forge_decision_link_v1.py": "aacbc0cc51b90592448d0a507772d916d7ea5c571b037f53fc26a22af2b557fe",
+        "docs/tasks/FORGE_DECISION_LINK_V1.md": "a2a657a9406ef5574df8596d84d4e2de91b4d6948398e65cfa88100d797c1ebb",
+        "tests/test_hfic_ordinary_operation_acceptance_v1.py": "c4b5f9873d31dc98f95ae9826ee05075a5211775de9ba0f93a4a9107b9b29741",
+        "src/solana_alpha_lab/factory/hfic_session.py": "c566a2a01ebca53acb79ab81f037ba991049e9b7cc05ebaff08d64467d7bbfa5",
+        "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "6c9b3a405a05cb8d27bc1ae76de1cea026ead388472d90fa66c9d624852638a8"
+      },
+      "source_before_after_equal": true,
+      "elapsed_process_seconds": 41.783713799995894,
+      "child_watchdog_seconds": 180,
+      "parent_envelope_seconds": 600,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d4de525952244995e69153ad8b358bf2c96ec36678ce263114232462706f3be6",
+      "cpu_ram_preparation_model_cost": "UNKNOWN",
+      "retained_receipt": {
+        "path": "local/forge_decision_link_v1/ci-row-context-positive/qualification.json",
+        "sha256": "0f6ad093f4b3ec25baa3e7fe1ee144fe20814fc6c8d4479c7b8633846fa8a097"
+      },
+      "capture": {
+        "path": "local/forge_decision_link_v1/ci-row-context-positive/positive-source-link-proof.json",
+        "sha256": "e3a56cfd3a2fc78cccfa393909a1aa0d9ff035798b181952584a1c9791c224a6"
+      },
+      "critic_scope": "SCRIPTED_CRITIC_MECHANICAL_NOT_INDEPENDENT_SCIENCE"
+    },
+    "native_landed_race": {
+      "checks": {
+        "a_literal_oracle": "PASS",
+        "a_real_reserve_loader_evaluator_result": "PASS",
+        "b_native_entry_pass_before_a": "PASS",
+        "b_original_writer_lease_refusal": "PASS",
+        "b_zero_reservation_loader_evaluator": "PASS",
+        "cold_original_replay_unchanged": "PASS",
+        "typed_original_result_locator": "PASS"
+      },
+      "resource": {
+        "cold_only_this_invocation": false,
+        "cpu_ram_peak": "UNKNOWN",
+        "elapsed_window_seconds": 28.413922,
+        "invocation_count": 1,
+        "measured_subprocess_wall_seconds": 27.94435709998652,
+        "model_calls": 0,
+        "owned_output_guard_bytes": 1073741824,
+        "preparation_outside_helper_seconds": "UNKNOWN",
+        "watchdog_seconds": 180
+      },
+      "retained_terminal": {
+        "path": "local/forge_decision_link_v1/ci-row-context-land-race/terminal.json",
+        "sha256": "1b72ab3fa38aa7baf7a8e015445f74c9e8f6ecd0c494644aba246af020223434"
+      },
+      "claim": "B native entry PASS -> A native durable result -> original B writer lease refusal; B reservation/loader/evaluator0/0/0; cold original unchanged."
+    },
+    "previous_four_review_pass": {
+      "path": "local/forge_decision_link_v1/review-v6-9f305c/reviews-final.json",
+      "sha256": "5e9bf74250194fdb1d76e7b282d066631c5b19cb1d81c3bbcd1a063ef16cf092"
+    },
+    "source_epoch_note": "Previous four reviews and all old proof pins remain scoped to their original content epoch. This failure is new exact-head CI evidence, not a retrospective NOT_READY rewrite. Fresh content review/binding/CI/readiness are required."
+  }
+}

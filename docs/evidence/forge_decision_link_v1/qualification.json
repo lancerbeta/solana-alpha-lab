@@ -1,0 +1,329 @@
+{
+  "schema": "sal.forge-decision-link-outcome-qualification",
+  "schema_version": "1.0",
+  "task_id": "FORGE_DECISION_LINK_V1",
+  "denominator": 18,
+  "original_denominator_preserved": true,
+  "technical_continuity": "VERIFIED_IN_SYNTHETIC_SCOPE",
+  "choice_quality": "NO_DISTINCT_TREATMENT",
+  "live_use": "NOT_EXECUTED",
+  "market_alpha_oos_realized_economics": "NOT_EVALUATED",
+  "qualification_scope": "Ordinary OPPORTUNITY_EPISODES/BASE per-test source vertical; named native compatibility and impact subsets. Not independent scientific acceptance or all Factory FULL.",
+  "obligations": [
+    {
+      "id": "V01",
+      "edge": "legacy request -> result",
+      "expected": "original scientific keys/counts/stops",
+      "forbidden": "historical rewrite",
+      "oracle": "same-path baseline/candidate snapshot",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "Legacy ordinary and acceptance suites; no changed scientific identity, schema writer, evaluator or limits. Exact-head CI found the missing row-context forwarding in the landed reservation guard; retained red reproduced it. Existing universe-policy suite and three native seam counterparts PASS8; genuine changed rows remain MAIN and policy-only adaptation remains ADAPTIVE. Native landed-before-lease race freshly PASS, B reservation/loader/evaluator0/0/0; positive own-scripted-Critic consumer freshly PASS."
+    },
+    {
+      "id": "V02",
+      "edge": "basis -> reservation -> result -> disposition -> cold reader",
+      "expected": "native producer-created exact joins",
+      "forbidden": "test-injected link",
+      "oracle": "literal synthetic result and persisted refs",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "b06 native pre-value P1/T1/R1 and P2/T2/R2 plus final cold read: original request, normalized query, reservation, result, computed applicability."
+    },
+    {
+      "id": "V03",
+      "edge": "result -> positive candidate / negative / insufficient",
+      "expected": "each actual terminal retains its original owner",
+      "forbidden": "coerced negative or manufactured candidate",
+      "oracle": "native positive and non-candidate counterparts",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "Native positive draft/freeze/finalize/classify plus exact source links and public session read. Scripted Critic is mechanical coverage, not independent scientific judgement. b06 honest insufficient and descriptive negative."
+    },
+    {
+      "id": "V04",
+      "edge": "public new note -> pre-value validation",
+      "expected": "typed malformed/version/ref refusal",
+      "forbidden": "reservation or values before refusal",
+      "oracle": "valid counterpart, effect inventories and loader witness",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "Real produced sources with wrong locator, missing/unreadable source and malformed saved query read-view faults; typed refusal and valid counterparts. New-field-only version cases inapplicable: no field/schema introduced. Six distinct public CLI reads qualify owner refusal copy: valid before/after equals original, malformed input/absent locator typed safe recovery, real producer record unreadable controlled in-memory view blocks for source-owner review.230 native files unchanged; R01/R02 helper failures retained separately. owner-store-r04 covers the whole read command: actual absent/non-directory data-root safe refusal retains original error code, no storage creation/sentinel change; valid current native cold read equals original and230files unchanged. Current reader-source-integrity repair:4 focused native projection tests PASS and9 fresh public reads PASS; both locator and off-page faults refuse, valid landed/empty/pending counterparts preserved,230 native files unchanged. Two-result snapshot ambiguity is tested across two native operations, not an invented same-operation producer. Native source frontier: genuine request/reservation and assessment→successor→withdrawal, both locators, unscoped schema marker, valid owner semantics and arbitrary unrelated-artifact counterpart. Two focused native tests PASS;13 successful r07 public outputs retained and4 r08 calls PASS, no invented full r07 batch. Positive native source-link/own scripted Critic consumer freshly PASS after frontier change. Exact-head CI found the missing row-context forwarding in the landed reservation guard; retained red reproduced it. Existing universe-policy suite and three native seam counterparts PASS8; genuine changed rows remain MAIN and policy-only adaptation remains ADAPTIVE. Native landed-before-lease race freshly PASS, B reservation/loader/evaluator0/0/0; positive own-scripted-Critic consumer freshly PASS."
+    },
+    {
+      "id": "V05",
+      "edge": "changed explanation -> same look",
+      "expected": "same query/market/slot/root/charge",
+      "forbidden": "fresh look from narrative",
+      "oracle": "metamorphic same-key snapshot",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "b06 changed question_text pending typed original locator and landed original-producer replay; no second reservation, evaluator or look. Truly changed immutable request has a distinct operation hash, as continuation authority section5 requires."
+    },
+    {
+      "id": "V06",
+      "edge": "reservation/result commit -> crash -> resume",
+      "expected": "original plan/result and one charge",
+      "forbidden": "regeneration or repeated evaluation",
+      "oracle": "child-process fault at exact commit/ACK boundary",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "b06 real child exits74 after committed reservation and75 after result before ACK; fresh resume/replay retains original plan and result. Exact-head CI found the missing row-context forwarding in the landed reservation guard; retained red reproduced it. Existing universe-policy suite and three native seam counterparts PASS8; genuine changed rows remain MAIN and policy-only adaptation remains ADAPTIVE. Native landed-before-lease race freshly PASS, B reservation/loader/evaluator0/0/0; positive own-scripted-Critic consumer freshly PASS."
+    },
+    {
+      "id": "V07",
+      "edge": "two plan writers and unrelated append",
+      "expected": "one binding with typed conflict",
+      "forbidden": "overwrite or unrelated global blockage",
+      "oracle": "barrier-based commit schedule",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "race-b02 two real writers pass outer gate, unrelated native append, one durable reservation, typed loser and loader/evaluator zero. Legacy duplicate pending refuses arbitration. land-race-c01 proves B entry PASS, A durable result, then original B writer-lease refusal before its reservation/loader/evaluator (0/0/0). Changed policy/corpus native reservation-seam unit counterparts remain allowed; full public changed-policy admission is not claimed. Distinct13+1 assertions from c01/c02; c01 HARNESS_ERROR13PASS/1ERROR fixture-order failure remains historical. Exact-head CI found the missing row-context forwarding in the landed reservation guard; retained red reproduced it. Existing universe-policy suite and three native seam counterparts PASS8; genuine changed rows remain MAIN and policy-only adaptation remains ADAPTIVE. Native landed-before-lease race freshly PASS, B reservation/loader/evaluator0/0/0; positive own-scripted-Critic consumer freshly PASS."
+    },
+    {
+      "id": "V08",
+      "edge": "advisory append -> preflight/detail -> full guard",
+      "expected": "visible stale or equivalent scoped reissue",
+      "forbidden": "new cutoff or ignored inventory",
+      "oracle": "original material source/cutoff/guard hashes",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "c03 same-fixture advisory append invalidates saved detail; reissue preserves initial cutoff, selection and capsules; hidden full-archive exact guard remains."
+    },
+    {
+      "id": "V09",
+      "edge": "late record -> original context / later applicability",
+      "expected": "original earlier choice immutable",
+      "forbidden": "retroactive prior exposure",
+      "oracle": "clock-bound original bytes and later reader",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "c03 same-fixture late-effective/early-available and late-available exclusions; b06 exposed R1 is labelled adaptive provenance before T2 values."
+    },
+    {
+      "id": "V10",
+      "edge": "result revision -> supersession -> next context",
+      "expected": "existing lifecycle and missing-source handling",
+      "forbidden": "stale active lesson or deleted history",
+      "oracle": "current disposition owner with three-way interaction",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "c03 same-fixture correction makes old assessment review-required, successor current and withdrawal explicit; old bytes retained. Produced-then-missing sources refuse instead of inference. Native source frontier: genuine request/reservation and assessment→successor→withdrawal, both locators, unscoped schema marker, valid owner semantics and arbitrary unrelated-artifact counterpart. Two focused native tests PASS;13 successful r07 public outputs retained and4 r08 calls PASS, no invented full r07 batch. Positive native source-link/own scripted Critic consumer freshly PASS after frontier change."
+    },
+    {
+      "id": "V11",
+      "edge": "foreign run/result -> linked view -> PROMOTE",
+      "expected": "exact subject/source match",
+      "forbidden": "weak title/ordinal join or authority lift",
+      "oracle": "valid counterpart plus exact foreign identity canary",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "Exact producer/request/reservation/result bindings, exact ref+SHA draft/packet source links; context-only runner excluded. Existing foreign inputs and guards unchanged."
+    },
+    {
+      "id": "V12",
+      "edge": "scope/measurement/technical fail -> prior guard",
+      "expected": "bounded lesson and full safety authority",
+      "forbidden": "false permanent close or automatic reopen",
+      "oracle": "existing scoped-close/rebase rules",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "Existing drift/lineage, trust closure/rebase recovery and scoped insufficient judgement; technical failure never family hard-close or automatic reopen."
+    },
+    {
+      "id": "V13",
+      "edge": "BASE -> representation/cycle",
+      "expected": "original accounting/pending lineage",
+      "forbidden": "new narrative budget pool",
+      "oracle": "existing continuation fixtures and root/count readback",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "b06 same accounting parent continuation plus real normalized/cycle-two compatibility tests; original lineage owner and pools retained. No new field creates allowance."
+    },
+    {
+      "id": "V14",
+      "edge": "result -> draft/freeze/revision/finalize",
+      "expected": "packet source integrity and selected-only Critic",
+      "forbidden": "persuasion packet or terminal conflation",
+      "oracle": "legacy packet bytes and current positive counterpart",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "Native positive/freeze/revision/finalize and scripted classification impact tests; existing selected-only packet and own Critic owner preserved. No new scientific actor comparison."
+    },
+    {
+      "id": "V15",
+      "edge": "archive/near-cap -> bounded context",
+      "expected": "cap unchanged and optional omission explicit",
+      "forbidden": "mandatory truncation or per-link full rescan",
+      "oracle": "existing near-cap fixture and measured reads/bytes",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "Existing bounded selection overflow, near-cap mandatory/optional handling,65-head ordinary freeze and capsule shrinking; new reader one archive enumeration and explicit pagination."
+    },
+    {
+      "id": "V16",
+      "edge": "cold read-only CLI -> owner consumer",
+      "expected": "same state and no business/DB/WAL writes",
+      "forbidden": "implicit repair/commissioning",
+      "oracle": "before/after file and committed inventories",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "b06 fresh public result/operation read; DB/WAL/file hashes and committed inventory equal. Positive exact route also zero-write, no commissioning/value loader. Six distinct public CLI reads qualify owner refusal copy: valid before/after equals original, malformed input/absent locator typed safe recovery, real producer record unreadable controlled in-memory view blocks for source-owner review.230 native files unchanged; R01/R02 helper failures retained separately. owner-store-r04 covers the whole read command: actual absent/non-directory data-root safe refusal retains original error code, no storage creation/sentinel change; valid current native cold read equals original and230files unchanged. Current reader-source-integrity repair:4 focused native projection tests PASS and9 fresh public reads PASS; both locator and off-page faults refuse, valid landed/empty/pending counterparts preserved,230 native files unchanged. Two-result snapshot ambiguity is tested across two native operations, not an invented same-operation producer. Native source frontier: genuine request/reservation and assessment→successor→withdrawal, both locators, unscoped schema marker, valid owner semantics and arbitrary unrelated-artifact counterpart. Two focused native tests PASS;13 successful r07 public outputs retained and4 r08 calls PASS, no invented full r07 batch. Positive native source-link/own scripted Critic consumer freshly PASS after frontier change."
+    },
+    {
+      "id": "V17",
+      "edge": "legacy/new/pending -> new and rollback reader",
+      "expected": "typed compatibility without migration",
+      "forbidden": "lost evidence or extra science",
+      "oracle": "mixed native artifacts and actual rollback code",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "Native old-format/new-plan/pending mix; original disposition source unchanged; frozen BASE script on current source reads same semantics. This is script-reader rollback, not whole-program historical deployment. Native source frontier: genuine request/reservation and assessment→successor→withdrawal, both locators, unscoped schema marker, valid owner semantics and arbitrary unrelated-artifact counterpart. Two focused native tests PASS;13 successful r07 public outputs retained and4 r08 calls PASS, no invented full r07 batch. Positive native source-link/own scripted Critic consumer freshly PASS after frontier change. Exact-head CI found the missing row-context forwarding in the landed reservation guard; retained red reproduced it. Existing universe-policy suite and three native seam counterparts PASS8; genuine changed rows remain MAIN and policy-only adaptation remains ADAPTIVE. Native landed-before-lease race freshly PASS, B reservation/loader/evaluator0/0/0; positive own-scripted-Critic consumer freshly PASS."
+    },
+    {
+      "id": "V18",
+      "edge": "qualification -> terminal evidence",
+      "expected": "wrong link/missing terminal/changed artifact detected",
+      "forbidden": "integrity-only product/quality PASS",
+      "oracle": "independent corruption canaries with nonzero exits",
+      "status": "PASS_SCOPED",
+      "evidence": "native-qualification.json",
+      "qualification": "Current narrow retained proof verifier plus wrong result link/missing terminal/changed artifact copies exit2; original2063 files unchanged. Integrity alone never product or quality PASS."
+    }
+  ],
+  "requirements": {
+    "R1": [
+      "V01",
+      "V02"
+    ],
+    "R2": [
+      "V02",
+      "V05",
+      "V06"
+    ],
+    "R3": [
+      "V03",
+      "V11",
+      "V12"
+    ],
+    "R4": [
+      "V02",
+      "V03"
+    ],
+    "R5": [
+      "V02",
+      "V10",
+      "V12"
+    ],
+    "R6": [
+      "V02",
+      "V16",
+      "V17"
+    ],
+    "R7": [
+      "V05",
+      "V08",
+      "V09",
+      "V13"
+    ],
+    "R8": [
+      "V05",
+      "V06",
+      "V07"
+    ],
+    "R9": [
+      "V14",
+      "V15"
+    ],
+    "R10": [
+      "choice-quality.json"
+    ],
+    "R11": [
+      "V16",
+      "V17"
+    ],
+    "R12": [
+      "V01",
+      "V02",
+      "V18",
+      "DELIVERY_GATES_PENDING"
+    ]
+  },
+  "dod": {
+    "D1": [
+      "V01",
+      "V02"
+    ],
+    "D2": [
+      "V02",
+      "V04",
+      "V05"
+    ],
+    "D3": [
+      "V02",
+      "V03"
+    ],
+    "D4": [
+      "V03",
+      "V11",
+      "V12"
+    ],
+    "D5": [
+      "V05",
+      "V08",
+      "V09",
+      "V13"
+    ],
+    "D6": [
+      "V05",
+      "V06",
+      "V07"
+    ],
+    "D7": [
+      "V02",
+      "V10",
+      "V12"
+    ],
+    "D8": [
+      "V01",
+      "V16",
+      "V17"
+    ],
+    "D9": [
+      "V14",
+      "V15"
+    ],
+    "D10": [
+      "V18",
+      "native-qualification.json"
+    ],
+    "D11": [
+      "independent-review.json",
+      "completion.json",
+      "DELIVERY_GATES_PENDING"
+    ],
+    "D12": [
+      "OUTCOME.md",
+      "choice-quality.json"
+    ]
+  },
+  "R7_owner_clarification": "continuation-authority section5 requires immutable request hashing to remain unchanged: a truly changed question_text creates a distinct request operation, while the same occupied spec cannot reserve/evaluate/charge again or replace its original basis. Operation equality is not forced by breaking hashing.",
+  "delivery_state": "PREPARED_FOR_INDEPENDENT_REVIEW_CI_AND_MACHINE_READINESS; canonical DONE and merge not claimed",
+  "limits": [
+    "Historical S0 violations stay historical.",
+    "Raw T2 ingress bytes NOT_RECORDED; exact canonical normalized query is source-derived.",
+    "RECORDED_REQUEST means original saved text, not automatic scientific or per-query plan acceptance.",
+    "Native producer snapshots remain bound to original code; final read-only retest binds final reader separately.",
+    "A9/A10 policy unchanged; no quality uplift claim.",
+    "Positive Critic fixtures scripted mechanical; no independent scientific verdict claimed.",
+    "impact-d01 assertions44PASS but resource900watchdog failed; d02 pre-product CRLF launcher HARNESS_ERROR; new cause-dependent qualification kept separately.",
+    "CPU/RAM, preparation, total model usage and cost UNKNOWN.",
+    "First independent review NOT_READY for landed-before-other-lease gap and five LF Git index cache archives is retained; ordinary repairs and fresh inventory/review required.",
+    "land-race-qualification-c01 retains a fixture-order HARNESS_ERROR with13PASS/1ERROR; c02 reruns only the repaired policy test. No fabricated all14 passing batch.",
+    "Owner-UX NOT_READY063c5872 retained; copy-only refusal guidance and fresh read qualification require new final inventory/reviews. Two owner-copy helper failures remain historical; partial timing UNKNOWN, no science rerun.",
+    "Second owner-UX NOT_READY16fff800 for store-opening boundary retained. Current refusal copy covers whole discovery-show with existing typed owners; other commands unaffected. Interrupted code/architecture v3 reviews are not PASS evidence; final fresh reviews required.",
+    "f0efc30 code/goal NOT_READY retained. Reader repair initially rejected valid sources due to wrong wrapper/body kind assumption; failed green cohort and partial CLI helper history retained. Corrected reader proof is its own source epoch. Unreadable discovery sources conservatively block the snapshot even when their original operation may have been unrelated; no unverifiable exclusion or false pending is emitted.",
+    "e6109ee code/goal/architecture NOT_READY and semantic FAIL retained. Shared relevant-source frame frontier repaired; only exact read availability can be refused, existing scientific owners and scoped unknown semantics unchanged. Frontier first green/r07 canary used a derived operation locator instead of actual native ref; partial attempts remain not qualified. All earlier source epochs retained; no new real science/external/store authority.",
+    "PR395 first exact-head CI0d2d223c shard5 failed the existing public changed-row counterpart; prior four content PASS reviews did not establish full CI. Failure/log, old review epoch and local red are retained. Row-context forwarding repaired through the existing matcher; fresh final content reviews/binding/exact-head CI/readiness remain mandatory. No independent science or real changed-data deployment qualification."
+  ]
+}

@@ -32368,7 +32368,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: a26265f73a47c676b09c693e4705b9cc459c0d5f2a64bd2c6d3b246bfca7a480}
+  integrity: {kind: sha256, sha256: 0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32840,7 +32840,7 @@ records:
   as_of: '2026-09-30'
   truth_owner: FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_scientific_disposition_continuity_v1.py', repository_path: tests/test_hfic_scientific_disposition_continuity_v1.py}
-  integrity: {kind: sha256, sha256: 8d131e7c2a6fc752813694da4a3568027ef1ba52651e424c40b3a92f1ca9bddc}
+  integrity: {kind: sha256, sha256: 6debae314f3134b351d52a251d5beaa6342ed119f2f4cfb5e8cccc3fdeac7a32}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001}
@@ -34621,7 +34621,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: 1bb0e13919da35c8bf3835feef7755bb072d8e6ce10bd91ae69d604bac82413d}
+  integrity: {kind: sha256, sha256: 0ee76b9a73b21a8cad6eb0574580e1253773c57a3e67ce8246630a498d9ddcf9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34675,7 +34675,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: c5fec86a2bb78643436d8369694baf06524141fe2b9cf7832b5705b3deb66223}
+  integrity: {kind: sha256, sha256: a0e7680f98f23ab9a61ec5faf0c1c16676fc078c9e7f31532a461d8ad81c0f64}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001}
@@ -34696,7 +34696,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: cbdd3de9d5d4c24a08825250621de45074faca6c20e13533c49da9d6c8184bdf}
+  integrity: {kind: sha256, sha256: ca9ce588307e0d6fda2a96936b1936bbce2b7f6258e4e670ceb20ceca6a0c6c5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-NATIVE-LIFECYCLE-CLOSURE-001}
@@ -40595,7 +40595,7 @@ records:
   as_of: '2026-10-09'
   truth_owner: FORGE_EVIDENCE_GUIDED_GENERATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_evidence_guided_generation_v1.md', repository_path: docs/contracts/forge_evidence_guided_generation_v1.md}
-  integrity: {kind: sha256, sha256: 983b47190c9d0e967911279f5fbd7548a14608236e8444af31913eb8cdcc0334}
+  integrity: {kind: sha256, sha256: 6549a671f8352e7330132f452dd4b58f6679e06bee71e4af6381b654b1c40287}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}

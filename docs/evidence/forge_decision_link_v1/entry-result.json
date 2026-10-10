@@ -1,0 +1,137 @@
+{
+  "task_id": "FORGE_DECISION_LINK_V1",
+  "stage": "S0",
+  "status": "ENTRY_EXISTING_PATH_VERIFIED",
+  "baseline_commit": "76993054cfaeeee7e9fb6e7b718add8cf27e404a",
+  "gap": "NO_GAP",
+  "gap_scope": "exact single-test ordinary OPPORTUNITY_EPISODES BASE textual carrier",
+  "existing_capability": "question_text plan -> exact operation/spec -> reservation -> native result -> auto-bound disposition -> exact saved-result replay/detail/context",
+  "missing_capability": "NOT_ESTABLISHED in the tested exact single-test scope; multi-look per-attempt plan semantics remain untested",
+  "operation_sha256": "7004a6c5e61ea16f1c649994339cdc8b87c446471d94de53117450733769c993",
+  "reservation_ref": "HFIC-ART-OPRES-7B05B1B9560C2BC68F932AF14A619D8E22387480",
+  "result_ref": "HFIC-ART-DISCOVERY-3954D3B47491E104FA33607BBBCD54BA6A124054",
+  "result_sha256": "f42eeff1eed6699d198817fdcf723f0be65f20e5250fdef918e59e5462501b4d",
+  "assessment_ref": "HFIC-ART-DISP-D977C9E8C5CB5E10EAAE7450D831981763BE8375",
+  "journal_scope": "edd955c0284d40868d3d2696e3d8e43f781512807eb2fd86056cb15772568418",
+  "market_evidence_epoch_sha256": "33647fc0ce463fe473202b64cd152b28643e775d3627f758b56a14d7aa09e152",
+  "oracle": {
+    "contrast": 0.2,
+    "matched": 4,
+    "mean": 0.1,
+    "missing": 1,
+    "observed": 3
+  },
+  "checks": {
+    "cold_context_original_advice": "PASS",
+    "cold_file_inventory_unchanged": "PASS",
+    "ignored_proposed_field_replay_no_values_no_extra_charge": "PASS",
+    "literal_result_oracle": "PASS",
+    "native_auto_bound_assessment_to_operation": "PASS",
+    "original_result_disposition_join": "PASS",
+    "science_keys_unchanged_by_assessment": "PASS",
+    "supported_textual_plan_persisted_and_cold_readable": "PASS",
+    "unsupported_proposed_field_ignored": "CHARACTERIZED_ONLY",
+    "unsupported_update_zero_writes": "PASS"
+  },
+  "fidelity": "SEGMENT_PRODUCT_PATH",
+  "technical_continuity": "NO_MATERIAL_DELTA_IN_TESTED_SCOPE",
+  "choice_quality": "UNVERIFIED",
+  "live_use": "NOT_EXECUTED",
+  "market_alpha_oos_economics": "NOT_EVALUATED",
+  "candidate_and_critic": "NOT_EXECUTED",
+  "supported_text_edit_identity_and_v05": "NOT_RUN",
+  "zero_write_scope": [
+    "disposition-show",
+    "research-policy-status --for-operation (budget only)",
+    "saved discovery-execute replay by native operation ref and source-derived query/scope"
+  ],
+  "preflight_is_read_only": false,
+  "preflight_observed_writes": {
+    "forge_context": 1,
+    "research_store": 1,
+    "session": 0
+  },
+  "cold_recovery": {
+    "fixture_or_writer_rerun": false,
+    "resumed_existing_attempt": true
+  },
+  "source_sha256": {
+    "scripts/hypothesis_forge.py": "a26265f73a47c676b09c693e4705b9cc459c0d5f2a64bd2c6d3b246bfca7a480",
+    "src/solana_alpha_lab/factory/hfic_generation_context.py": "d347b585770f6f81e19bc6f2ddbe27031059754878a73b022bd8b5c99acde719",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "9b1904f0439547f895a58a94989568273bcfd010a388f9900a5fbe4a64d8847e",
+    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "d20cfcf47b3182b8b6a2ed26fa3ababe59b03593796460892c326cf598fd5d4e",
+    "src/solana_alpha_lab/factory/hfic_scientific_disposition.py": "d2b980f20cb7e703d4d61033ca4481d58de39d8ed149b16b5b64d013859aac75",
+    "tests/test_forge_research_flow_reliability_v1.py": "1aa77f0dac3c591aec8f292d247c2028e3d7fd0557f9ff1d6d5172988b04da07",
+    "tests/test_hfic_list_aware_vertical_v1.py": "91c8b7ee89b54e1060b7f01c0662af5ff6d7681fb7cabd94152d8c9988190bc2"
+  },
+  "stage_disposition": "S0_COMPLETE_WITH_LIMITATIONS",
+  "candidate_qualification": "V01-V18_NOT_RUN",
+  "atom_done": false,
+  "consumer_route": "Composite existing source-owner reads plus shipped operation-addressed saved-result replay; one-command navigation is not qualified.",
+  "raw_terminal": {
+    "path": "local/forge_decision_link_v1/entry-a03/terminal.json",
+    "sha256": "28bcfa38d92473f2d45bbd5d24c2f72073ea4fe99cba9a192b97e317e5d1edef",
+    "artifact_hash_status": "PARTIAL_KNOWN_BOOKKEEPING_MISMATCH",
+    "artifact_hashes_verified": 20,
+    "artifact_hashes_total": 21,
+    "mismatches": [
+      {
+        "artifact": "resume-commands.json",
+        "recorded_sha256": "b75d519fde6006254c763f29b3f6de6470b16e3e06850d76318f99f2e2d93321",
+        "current_sha256": "8d19345cfd9c00d914048c90beff00196e4bf9f5e23ff99537e59a8bde55065d"
+      }
+    ],
+    "current_command_list_equals_terminal_commands": true
+  },
+  "retained_artifacts": {
+    "local/forge_decision_link_v1/entry-a03/persisted-before-assessment.json": "fda193e983f86b7dac402795ffe13719269a6cd30cccf90bfbbdc2eab5b345d9",
+    "local/forge_decision_link_v1/entry-a03/cold-disposition.json": "ca0f55f952d0736f246fcfd5f4c9a29e4331eebeed5cfe66918f4bcc0b8d66f5",
+    "local/forge_decision_link_v1/entry-a03/cold-addressed-result.json": "f1bc9fef1b4b510c887b3eed680b0d7182baf26d7a6edf6ba4ec5e6a205ac75c",
+    "local/forge_decision_link_v1/entry-a03/source-derived-query.json": "44a82457e5a428d67e45925aa8bcf8cd0b09acb8769e4dcdc9e5a80aa2b1ba7b",
+    "local/forge_decision_link_v1/entry-a03/source-derived-scope.json": "f3ecc9539c7b427ac972e71a54b3bc04ee85815c4297fd43d996afdafe5b0e7e",
+    "local/forge_decision_link_v1/entry-a03/unsupported-update.json": "f47bb269142980ad97a534242730be7bfa30a003c13376772cd59306b8795b78"
+  },
+  "probe": {
+    "path": "tests/fixtures/forge_decision_link_v1/entry_probe.py",
+    "sha256": "96300c16bc775c89f6b216d05b1d593c9debfcb090a28227cc1ffc64c293402a",
+    "syntax": "PASS",
+    "post_success_change": "Retention and command-log hash bookkeeping only; product rerun NOT_RUN after the cap breach."
+  },
+  "attempt_accounting": {
+    "fixture_attempts": 3,
+    "cold_resume_invocations": 5,
+    "final_attempt_scientific_looks": "one synthetic MAIN",
+    "all_fixture_attempts_scientific_looks": "three synthetic MAIN looks across three separate disposable stores; no real-market look"
+  },
+  "resource": {
+    "clock_basis": "Owned attempt terminal file creation/last-write metadata, read back after completion; this measures elapsed campaign wall time including diagnosis, not summed process CPU/run time.",
+    "first_attempt_started_utc": "2026-10-10T17:32:27.5512594Z",
+    "terminal_completed_utc": "2026-10-10T17:48:02.6869183Z",
+    "campaign_wall_seconds": 935.136,
+    "declared_campaign_wall_cap_seconds": 900,
+    "wall_cap_result": "BREACHED_STOP_BEFORE_NEXT_PRODUCT_SCOPE",
+    "summed_process_execution_seconds": "UNKNOWN",
+    "last_cold_resume_seconds": 9.811,
+    "retained_attempt_bytes": {
+      "entry-a01": 14507500,
+      "entry-a02": 14543136,
+      "entry-a03": 14891063
+    },
+    "retained_attempt_bytes_total": 43941699,
+    "declared_storage_cap_bytes": 1073741824,
+    "cpu_ram_peak": "UNKNOWN",
+    "model_choice_comparison_calls": 0
+  },
+  "limitations": [
+    "Early cold output revisions were overwritten before archival was added; the observed refusals/corrections above are transcript-derived and are not exact raw replay artifacts.",
+    "Retention and command-log hash bookkeeping helper corrections postdate the successful native process; syntax checked, product rerun NOT_RUN.",
+    "The probe timer reports per-invocation time, so its cap check did not enforce aggregate S0 time across repairs. Aggregate cap PASS is not claimed.",
+    "No passing early fragments were combined into candidate implementation acceptance; V01-V18 candidate qualification remains NOT_RUN.",
+    "Raw terminal retains one stale command-log artifact hash; current command list matches terminal.commands exactly and all 20 other artifact hashes match.",
+    "Per-look authored basis within a multi-look operation is NOT_RUN.",
+    "Supported question_text edits and their identity/accounting effects are NOT_RUN.",
+    "Comparative model choice quality is UNVERIFIED; no treatment/control choice outputs exist.",
+    "Full candidate, Critic, crash/race, legacy/rollback and near-cap paths are NOT_RUN."
+  ],
+  "next_action": "After owner OK and a newly frozen budget, one native multi-look synthetic probe; choose a patch only if it establishes a material missing seam."
+}

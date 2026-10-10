@@ -1,0 +1,6 @@
+# Immutable S0 evidence: preserve the original bytes, including CRLF.
+checkpoint.json -text whitespace=trailing-space,space-before-tab,cr-at-eol
+entry-result.json -text whitespace=trailing-space,space-before-tab,cr-at-eol
+obligations.json -text whitespace=trailing-space,space-before-tab,cr-at-eol
+repair-history.json -text whitespace=trailing-space,space-before-tab,cr-at-eol
+stage-review.json -text whitespace=trailing-space,space-before-tab,cr-at-eol

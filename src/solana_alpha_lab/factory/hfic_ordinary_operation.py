@@ -47,8 +47,9 @@ NEXT_STOP = "STOP_OPERATION"
 
 
 class OrdinaryOperationError(ValueError):
-    def __init__(self, code: str) -> None:
+    def __init__(self, code: str, *, detail: Mapping[str, Any] | None = None) -> None:
         self.code = code
+        self.detail = dict(detail or {})
         super().__init__(code)
 
 
@@ -1427,7 +1428,12 @@ def gate_before_values(
         if stored.get("calculation_version") != target_version:
             stored = None
     if stored is not None:
+        producer = get_operation(store, str(stored.get("operation_sha256")))
         evidence: dict[str, Any] = {
+            "result_operation_sha256": producer.get("operation_sha256"),
+            "result_operation_ref": producer.get("record_id"),
+            "question_text": producer.get("question_text"),
+            "owner_request_text": producer.get("owner_request_text"),
             "replayed_without_evaluator": True,
             "calculation_version": stored.get("calculation_version"),
             "result_sha256": stored.get("result_sha256"),
@@ -1503,6 +1509,7 @@ def gate_before_values(
     # Saved results and owner corrections stay readable after a stop or
     # completion; a new or resumed evaluation does not start.
     _refuse_closed(store, operation)
+    _assert_no_foreign_pending(store, operation, validated["spec_sha256"])
     pending = [
         item
         for item in _reservations(store, operation_sha256)
@@ -1587,7 +1594,11 @@ def gate_before_values(
     if fingerprint and not stamped:
         operation = _stamp_fingerprint(store, operation_sha256, fingerprint)
     _require_published_logical_content(data_root)
-    _reserve(store, operation, spec_sha256=validated["spec_sha256"], look_class=kind)
+    _reserve(
+        store, operation, spec_sha256=validated["spec_sha256"], look_class=kind,
+        census=census, observations=observations, admitted=admitted,
+        scope_applied_sha256=scope_applied_sha256,
+    )
     return {
         "disposition": "RESERVED",
         "values_loaded": False,
@@ -1616,9 +1627,67 @@ def _require_published_logical_content(data_root: Any) -> None:
         raise OrdinaryOperationError(exc.code) from exc
 
 
-def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look_class: str = "main") -> None:
+def _assert_no_foreign_pending(store: Any, operation: Mapping[str, Any], spec_sha256: str) -> None:
+    """The original reservation owns a pending scientific question across requests."""
+    journal = str(operation.get("journal_scope") or "")
+    journals = set(lineage_journals(store, accounting_root_of(store, journal))) | {journal}
+    looks = _looks(store, journal)
+    landed = {(item.get("operation_sha256"), item.get("spec_sha256")) for item in looks
+              if isinstance(item.get("result"), Mapping)}
+    pending = [item for item in _iter_kind(store, RESERVATION_KIND)
+        if item.get("journal_scope") in journals and item.get("look_class") in {"MAIN", "ADAPTIVE"}
+        and item.get("spec_sha256") == spec_sha256
+        and (item.get("operation_sha256"), spec_sha256) not in landed]
+    foreign = [item for item in pending if item.get("operation_sha256") != operation.get("operation_sha256")]
+    if not foreign:
+        return
+    if len({item.get("operation_sha256") for item in pending}) > 1:
+        raise OrdinaryOperationError("ORDINARY_LOOK_PENDING_BINDING_CONFLICT", detail={
+            "pending_bindings": sorted(
+                [{"operation_sha256": item.get("operation_sha256"), "reservation_ref": item.get("record_id")}
+                 for item in pending], key=lambda row: str(row["reservation_ref"])),
+            "spec_sha256": spec_sha256, "next_action": "RESOLVE_PENDING_BINDING_CONFLICT"})
+    item = foreign[0]
+    raise OrdinaryOperationError("ORDINARY_LOOK_PENDING_IN_OTHER_OPERATION", detail={
+        "original_operation_sha256": item.get("operation_sha256"),
+        "original_reservation_ref": item.get("record_id"),
+        "spec_sha256": spec_sha256, "next_action": "RESUME_ORIGINAL_OPERATION"})
+
+
+def _assert_no_landed_result(
+    store: Any, operation: Mapping[str, Any], spec_sha256: str, *,
+    census: Sequence[Mapping[str, Any]] | None = None,
+    observations: Sequence[Mapping[str, Any]] | None = None,
+    admitted: Mapping[str, Any] | None = None,
+    scope_applied_sha256: str | None = None,
+) -> None:
+    """An outer gate cannot authorize a reservation after an exact look lands."""
+    saved = _same_active_profile_look(store, _looks(store, str(operation.get("journal_scope") or "")),
+        spec_sha256, fingerprint=operation.get("corpus_fingerprint"),
+        census=census, observations=observations, admitted=admitted,
+        scope_applied_sha256=scope_applied_sha256)
+    if saved is not None:
+        raise OrdinaryOperationError("ORDINARY_LOOK_LANDED_DURING_RESERVATION", detail={
+            "original_operation_sha256": saved.get("operation_sha256"),
+            "original_result_ref": saved.get("record_id"), "result_sha256": saved.get("result_sha256"),
+            "spec_sha256": spec_sha256, "next_action": "REPLAY_SAVED_RESULT"})
+
+
+def _reserve(
+    store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look_class: str = "main",
+    census: Sequence[Mapping[str, Any]] | None = None,
+    observations: Sequence[Mapping[str, Any]] | None = None,
+    admitted: Mapping[str, Any] | None = None,
+    scope_applied_sha256: str | None = None,
+) -> None:
     digest = str(operation.get("operation_sha256") or "")
     stored_class = {"adaptive": "ADAPTIVE", "preview": "PREVIEW"}.get(look_class, "MAIN")
+    # Reuse the outer gate's exact rows/list-mask comparison when supplied;
+    # metadata-only callers keep the published-corpus fingerprint fallback.
+    row_context = dict(census=census, observations=observations, admitted=admitted,
+                       scope_applied_sha256=scope_applied_sha256)
+    if look_class in {"main", "adaptive"}:
+        _assert_no_landed_result(store, get_operation(store, digest), spec_sha256, **row_context)
     for item in _reservations(store, digest):
         if item.get("spec_sha256") == spec_sha256:
             return
@@ -1634,6 +1703,9 @@ def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look
 
     def _check() -> None:
         current = get_operation(store, digest)
+        if look_class in {"main", "adaptive"}:
+            _assert_no_foreign_pending(store, current, spec_sha256)
+            _assert_no_landed_result(store, current, spec_sha256, **row_context)
         if any(item.get("spec_sha256") == spec_sha256 for item in _reservations(store, digest)):
             return
         _refuse_closed(store, current)
@@ -1682,6 +1754,9 @@ def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look
             if any(item.get("spec_sha256") == spec_sha256 for item in _reservations(store, digest)):
                 return
             current = get_operation(store, digest)
+            if look_class in {"main", "adaptive"}:
+                _assert_no_foreign_pending(store, current, spec_sha256)
+                _assert_no_landed_result(store, current, spec_sha256, **row_context)
             if owner_allowance(store, current, look_class) < 1:
                 raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
             if attempt >= 39:

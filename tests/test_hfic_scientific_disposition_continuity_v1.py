@@ -730,9 +730,12 @@ class V3CalculationRevisionTests(unittest.TestCase):
             _member_rows("b", COHORT, RELEASE, mark=MATCH, exit_price=0.9),
         ]
         with tempfile.TemporaryDirectory() as raw:
-            root = Path(raw)
+            # Use a published synthetic market so the fresh public reader can
+            # derive applicability itself, rather than trust an injected hash.
+            focus = "REVISION_FOCUS"
+            root, preflight = _publish_focus(Path(raw), focus)
             census, observations = _rows(parts)
-            journal, market, focus = "44" * 32, "ab" * 32, "REVISION_FOCUS"
+            journal, market = preflight["search_key_sha256"], preflight["market_evidence_epoch_sha256"]
             spec = _query("disposition-revision")
             from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
 
@@ -769,6 +772,7 @@ class V3CalculationRevisionTests(unittest.TestCase):
             packet["subject"]["owner_focus"] = focus
             first = disp.record_disposition(store, packet, current_market=market)
             self.assertEqual(first["readback"]["status"], disp.STATUS_CURRENT)
+            originals = {record.record_id: record.payload_sha256 for record in store.iter_committed_records()}
             revised = run_recorded_discovery_query(
                 ResearchStore(root),
                 correction={"source_result_ref": v3["result_refs"][0], "source_result_sha256": v3["result_sha256"]},
@@ -799,6 +803,84 @@ class V3CalculationRevisionTests(unittest.TestCase):
             # A historical import on the old basis stays readable but not current.
             detail = disp.disposition_detail(store, owner_focus=focus, current_market=market)
             self.assertEqual(detail["entries"][0]["history_refs"], [first["record_id"]])
+            self.assertEqual({record.record_id: record.payload_sha256 for record in store.iter_committed_records()
+                              if record.record_id in originals}, originals)
+
+            # Cold processes receive only native locators. Both results remain
+            # addressable; history is evaluated separately from its current head.
+            before_reads = {path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                            for path in root.rglob("*") if path.is_file()}
+            reads = {}
+            for label, ref in (("original", v3["result_refs"][0]), ("revised", revised["result_refs"][0])):
+                fresh = run_cli("discovery-show", "--result-ref", ref, "--format", "json", data_root=root)
+                self.assertEqual(fresh.returncode, 0, fresh.stderr + fresh.stdout)
+                reads[label] = json.loads(fresh.stdout)
+                self.assertTrue(reads[label]["market_verified"])
+                self.assertFalse(reads[label]["values_loaded"])
+                self.assertEqual(reads[label]["writes"], {"research_store": 0})
+                row = reads[label]["entries"][0]
+                self.assertEqual(row["current_result_ref"], revised["result_refs"][0])
+                self.assertEqual(row["is_current_result"], label == "revised")
+                self.assertEqual(row["scientific_disposition"]["head_ref"], second["record_id"])
+                self.assertEqual(row["scientific_disposition"]["status"], disp.STATUS_CURRENT)
+                history = {item["record_id"]: item for item in row["assessment_history"]}
+                self.assertEqual(set(history), {first["record_id"], second["record_id"]})
+                self.assertEqual(history[first["record_id"]]["applicability"], disp.STATUS_REVIEW)
+                self.assertEqual(history[first["record_id"]]["applicability_reasons"],
+                                 [f"BASIS_RESULT_REVISED:{v3['result_refs'][0]}"])
+                self.assertEqual(history[second["record_id"]]["applicability"], disp.STATUS_CURRENT)
+                self.assertEqual(history[first["record_id"]]["body"]["basis"]["result_refs"][0]["result_ref"],
+                                 v3["result_refs"][0])
+                self.assertEqual(history[second["record_id"]]["body"]["basis"]["result_refs"][0]["result_ref"],
+                                 revised["result_refs"][0])
+            self.assertEqual({path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                              for path in root.rglob("*") if path.is_file()}, before_reads)
+
+            # Withdrawal has no result basis. The public history labels that
+            # fact separately while the existing resolver owns the withdrawn head.
+            before_withdrawal = {record.record_id: record.payload_sha256 for record in store.iter_committed_records()}
+            withdrawal = {
+                "entry": "WITHDRAWAL", "subject": successor["subject"],
+                "withdrawal": {"reason": "Synthetic successor assessment withdrawn after revision readback"},
+                "supersedes": {"record_id": second["record_id"], "disposition_sha256": second["disposition_sha256"]},
+                "provenance": {"author_role": "OPERATOR", "source_episode": "SYNTHETIC-REVISION-WITHDRAWAL", "source_refs": []},
+            }
+            withdrawn = disp.record_disposition(store, withdrawal, current_market=market)
+            self.assertEqual(withdrawn["readback"]["status"], disp.STATUS_WITHDRAWN)
+            withdrawal_files = {path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                                for path in root.rglob("*") if path.is_file()}
+            cold_withdrawal = run_cli("discovery-show", "--result-ref", revised["result_refs"][0],
+                                      "--format", "json", data_root=root)
+            self.assertEqual(cold_withdrawal.returncode, 0, cold_withdrawal.stderr + cold_withdrawal.stdout)
+            reads["withdrawn"] = json.loads(cold_withdrawal.stdout)
+            withdrawn_row = reads["withdrawn"]["entries"][0]
+            self.assertEqual(withdrawn_row["scientific_disposition"]["status"], disp.STATUS_WITHDRAWN)
+            self.assertFalse(withdrawn_row["scientific_disposition"]["recommendation_active"])
+            history = {item["record_id"]: item for item in withdrawn_row["assessment_history"]}
+            self.assertEqual(set(history), {first["record_id"], second["record_id"], withdrawn["record_id"]})
+            self.assertEqual(history[withdrawn["record_id"]]["applicability"], "NOT_APPLICABLE_WITHDRAWAL")
+            self.assertEqual(history[withdrawn["record_id"]]["applicability_reasons"], [])
+            self.assertEqual(history[withdrawn["record_id"]]["body"]["basis"]["result_refs"], [])
+            self.assertEqual(history[first["record_id"]]["applicability"], disp.STATUS_REVIEW)
+            self.assertEqual(history[second["record_id"]]["applicability"], disp.STATUS_CURRENT)
+            self.assertFalse(reads["withdrawn"]["values_loaded"])
+            self.assertEqual(reads["withdrawn"]["writes"], {"research_store": 0})
+            self.assertEqual({path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                              for path in root.rglob("*") if path.is_file()}, withdrawal_files)
+            self.assertEqual({record.record_id: record.payload_sha256 for record in store.iter_committed_records()
+                              if record.record_id in before_withdrawal}, before_withdrawal)
+            import os
+            capture = os.environ.get("FORGE_DECISION_LINK_V10_CAPTURE")
+            if capture:
+                proof = {"test": "V3CalculationRevisionTests.test_revision_requires_new_assessment_then_successor_is_current",
+                         "mode": "SYNTHETIC_NATIVE_CORRECTION_AND_FRESH_PUBLIC_READ",
+                         "original_result_ref": v3["result_refs"][0], "revised_result_ref": revised["result_refs"][0],
+                         "original_assessment_ref": first["record_id"], "successor_assessment_ref": second["record_id"],
+                         "withdrawal_ref": withdrawn["record_id"],
+                         "original_payload_hashes": originals, "history_unchanged": True,
+                         "fresh_reads": reads, "reader_file_inventory_unchanged": True,
+                         "non_claims": ["NO_ALPHA", "NO_REAL_MARKET_LOOK", "NO_CHOICE_QUALITY_PASS"]}
+                Path(capture).write_text(json.dumps(proof, sort_keys=True, indent=2) + "\n", encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------

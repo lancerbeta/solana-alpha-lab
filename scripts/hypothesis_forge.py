@@ -1314,6 +1314,52 @@ def cmd_disposition_show(
     return emit(payload)
 
 
+def cmd_discovery_show(
+    repo_root: Path, explicit_data_root: Path | None, *, result_ref: str | None = None,
+    operation_sha256: str | None = None, offset: int = 0, limit: int = 20,
+) -> int:
+    """Original request, saved query/result and applicable assessment; no value reads."""
+    from solana_alpha_lab.factory.hfic_discovery_detail import DiscoveryDetailError, discovery_detail
+
+    try:
+        data_root = _existing_data_root(repo_root, explicit_data_root)
+        store = ResearchStore(data_root, create_if_missing=False)
+        payload = discovery_detail(store, result_ref=result_ref, operation_sha256=operation_sha256,
+            current_market=_current_market(repo_root, data_root, store), offset=offset, limit=limit)
+        _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    except (DiscoveryDetailError, HficCliError, DataRootError, ResearchStoreError) as exc:
+        code = "DISCOVERY_DETAIL_PATH_LEAK" if exc.code == "PHYSICAL_PATH_LEAK" else exc.code
+        if code in {"DISCOVERY_DETAIL_LOCATOR_REQUIRED", "DISCOVERY_DETAIL_OPERATION_INVALID",
+                "DISCOVERY_DETAIL_RESULT_REF_INVALID", "DISCOVERY_DETAIL_PAGE_INVALID",
+                "DISCOVERY_DETAIL_LOCATOR_MISMATCH"}:
+            status = "INPUT_ERROR"
+            explanation = "Неверный locator или параметры страницы; evidence не изменён."
+            next_action = "CORRECT_LOCATOR_OR_PAGE_AND_RETRY"
+            recovery = "Укажи исходный result-ref или operation-sha256, согласованные между собой; offset >= 0, limit от 1 до 100. Повтори только чтение."
+        elif code in {"RESEARCH_STORE_NOT_PRESENT", "DATA_ROOT_INVALID", "DATA_ROOT_UNAVAILABLE",
+                "DATA_ROOT_MUST_BE_PATH", "DATA_ROOT_MUST_BE_ABSOLUTE", "DATA_ROOT_MUST_BE_DIRECTORY",
+                "DATA_ROOT_SYMLINK_FORBIDDEN", "DATA_ROOT_NON_GIT_CONTEXT", "DATA_ROOT_SPLIT_BRAIN"}:
+            status = "BLOCKED_STORE_NOT_AVAILABLE"
+            explanation = "Существующий store недоступен или data-root не разрешён; storage не создавался."
+            next_action = "VERIFY_EXISTING_DATA_ROOT_OR_REQUEST_SOURCE_OWNER_REVIEW"
+            recovery = "Проверь исходный data-root. Если он достоверен, остановись и запроси read-only проверку доступности у владельца ResearchStore; не создавай storage, не меняй права и не запускай новый look для восстановления evidence."
+        elif code in {"DISCOVERY_DETAIL_RESULT_NOT_FOUND", "DISCOVERY_DETAIL_OPERATION_NOT_FOUND"}:
+            status = "BLOCKED_LOCATOR_NOT_RESOLVED"
+            explanation = "Источник по этому locator не найден; это не научный отрицательный результат."
+            next_action = "VERIFY_LOCATOR_AND_STORE_OR_REQUEST_SOURCE_OWNER_REVIEW"
+            recovery = "Проверь исходный locator и выбранный data-root. Если они достоверны, остановись и передай отказ владельцу источника для read-only проверки сохранности; новый look не восстанавливает evidence."
+        else:
+            status = "BLOCKED_SOURCE_REVIEW_REQUIRED"
+            explanation = "Сохранённый источник недоступен или его identity/hash/binding противоречив; достоверный readout заблокирован."
+            next_action = "STOP_AND_REQUEST_SOURCE_OWNER_REVIEW"
+            recovery = "Сохрани refusal_code и исходный locator; запроси read-only проверку у владельца ResearchStore/operation/result. Не переписывай историю, не refreeze packet и не запускай новый look для восстановления evidence."
+        return emit({"refusal_code": code, "status": status, "explanation_ru": explanation,
+            "next_action": next_action, "next_action_ru": recovery,
+            "scientific_negative": False, "authority_granted": False, "values_loaded": False,
+            "writes": {"research_store": 0}}, exit_code=2)
+    return emit(payload)
+
+
 def cmd_discovery_binding(repo_root: Path, explicit_data_root: Path | None, *, collection: str | None = None) -> int:
     """No-write admission binding for the published discovery corpus."""
 
@@ -1647,6 +1693,7 @@ def _cmd_discovery_execute(
             return emit(
                 {
                     "reason_code": exc.code,
+                    "detail": exc.detail,
                     "values_loaded": False,
                     "writes": bool(service_writes) or gate.get("disposition") == "RESERVED",
                     "scientific_negative": False,
@@ -4558,6 +4605,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="Current journal (preflight search_key_sha256); rotated journals degrade search advice",
     )
     disposition_show.add_argument("--format", choices=("json",), default="json")
+    discovery_show = subparsers.add_parser(
+        "discovery-show", help="Read a saved result's original request, query and assessments; no outcome rows",
+    )
+    discovery_show.add_argument("--result-ref", default=None)
+    discovery_show.add_argument("--operation-sha256", default=None)
+    discovery_show.add_argument("--offset", type=int, default=0)
+    discovery_show.add_argument("--limit", type=int, default=20)
+    discovery_show.add_argument("--format", choices=("json",), default="json")
     discovery_coverage = subparsers.add_parser(
         "discovery-coverage",
         help="No-write state-only joint coverage. Never selects typed_value.",
@@ -5111,6 +5166,9 @@ def main(argv: list[str] | None = None) -> int:
                 limit=args.limit,
                 journal_scope=args.journal_scope,
             )
+        if args.command == "discovery-show":
+            return cmd_discovery_show(repo_root, args.data_root, result_ref=args.result_ref,
+                operation_sha256=args.operation_sha256, offset=args.offset, limit=args.limit)
         if args.command == "discovery-coverage":
             return cmd_discovery_coverage(repo_root, args.data_root, collection=args.collection)
         if args.command == "research-scope-resolve":

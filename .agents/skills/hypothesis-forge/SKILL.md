@@ -163,6 +163,21 @@ shows `scientific_context` as advice beside, never instead of, the machine
 statuses: `docs/contracts/hfic_scientific_disposition_continuity_v1.md`;
 detail: `disposition-show --owner-focus <FOCUS>`.
 
+For an ordinary test, retain the outward A9/A10 plan before values in existing
+`question_text`: alternatives, chosen discriminator/reason, honest rejected
+alternative, and outcome-specific actions/claim limits. Do not add a ranker or
+mandatory matrix schema. A supported adaptive continuation is a new immutable
+request with its own pre-value text, original parent and same journal, under
+the already authorized ceilings; its canonical query names `adaptation_of`.
+Resume the original operation named by a pending-conflict receipt. Historical
+ambiguous bindings require resolution; they grant no automatic new look.
+Cold `discovery-show --result-ref <ref>` (or `--operation-sha256 <sha>` with
+explicit pagination) reads the original request/reservation/query/result and
+existing assessment applicability without operation input files or writes.
+Saved public query and source-derived canonical reconstruction are labelled;
+missing legacy basis is NOT_RECORDED. Contract/example:
+`docs/contracts/forge_evidence_guided_generation_v1.md#per-test-authored-basis-and-cold-read`.
+
 Canonical entrypoint: `scripts/hypothesis_forge.py`.
 No-write state-only coverage, never selecting `typed_value` and never reserving a slot:
 

@@ -1,0 +1,189 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE_DECISION_LINK_V1-FINAL",
+  "as_of": "2026-10-11",
+  "task_id": "FORGE_DECISION_LINK_V1",
+  "reviewed_bindings_sha256": "c0abc8eeb7dd9a725e3a34360f42fb0498e1b9ac67f6f48d7ab8de16a60b77e3",
+  "reviewed_inventory_sha256": "435f3435238056bdc462aaf33240b6048e77ff6ab6e176f3e9915fac138228e8",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "No actionable P0-P2 correctness/security/contract findings. All30 raw Git/worktree bindings and exact scoped Git diff match; exactly3 delivery selfreceipts excluded from33 paths. Canonical bindings/inventory/packet fingerprints independently reproduced.",
+        "Identical outer census/observations/admitted/scope_applied_sha256 reaches the existing matcher at reservation entry, native writer lease and busy retry (ordinary_operation.py:1597,1687,1708,1759). Metadata-only fallback, durable reservation shape and classification owner stay unchanged.",
+        "Primary45/45 refs, current race84/84 artifacts and historical b06/race-b02 artifacts211/211 and66/66 verified. Raw logs prove local red1ERROR, green8PASS and separate positive1PASS. Current actual B entry PASS -> A durable result -> B native lease refusal with reservation/loader/evaluator0/0/0 and original locator; own scripted Critic links and unchanged cold files/inventory verified.",
+        "Prior failures/reviews preserve original epochs. Read-only isolated review without tests/product/store/CLI/network/mutations/delegation. PASS excludes independent science, choice-quality gain, live use, exact-head CI, machine readiness and merge authority."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "No material actionable consumer/DoD gap for the named synthetic per-test vertical and impact subsets. All30 raw Git/worktree bindings, exact scoped diff and canonical fingerprints match; exactly3 selfreceipts excluded.",
+        "Full R1-R12/D1-D12/V01-V18 denominator preserved. Primary receipts preserve pre-values P1/P2, shared accounting lineage, cold correct source pairs and original disposition applicability. CI red reproduces the actual regression; green8PASS, fresh native race B reservation/loader/evaluator0/0/0 and fresh positive own-scripted-Critic consumer verified.",
+        "BASE/current A9/A10 equality supports NO_DISTINCT_TREATMENT, not choice gain. History retains failures/partial orchestration/S0 breach/raw gaps/stale hash and distinct epochs, no invented aggregate PASS. Review is not full CI/readiness/merge/scientific/live/Factory acceptance; complete model usage/CPU/RAM/cost UNKNOWN. Read-only, no tests or product execution."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SEMANTIC_PREMISE=PASS; packet_fingerprint_sha256=b99c0e87e942db7cbbf12e425b337e4fd58d589bf73e63c22f3c4b4d9383be73. Scoped C1-C5 only, no blocking implementation/premise defect or authority widening. PACKET_INFORMATION_PATH only; launch_isolation=PROCESS_OBLIGATION, model_diversity=UNPROVEN.",
+        "Exact30 raw Git/worktree bindings, scoped diff and canonical fingerprints verified, excluding exactly3 selfreceipts. Fresh native race84 artifacts/19 source pins match; real B lease refusal0/0/0 and original result locator. Fresh positive own Critic/session/candidate/input SHA/source links and93 unchanged native files/inventory verified. No product or tests run in review.",
+        "Q1 accurate execution can preserve an invalid scientific formulation: descriptive price proxy is not executable return and a local negative may not transfer to another measurement. Source coherence cannot repair formulation (source-contract.md:294,719).",
+        "Q2 RECORDED_REQUEST as accepted preregistration, scripted Critic as independent science, Factory FULL or choice improvement would exceed evidence; packet forbids these. T2 original raw ingress absent, source-derived canonical query only (qualification.json:315).",
+        "Q3 exact QUESTION/applicability and accounting-lineage guard never gain family/global authority. Unreadable snapshot may block this readout, not scientifically suppress a subject (reader:114,165).",
+        "Q4 unreadable native/unscoped sources refuse before pagination/current/pending. Scoped unreadability stays with existing owner; unknown market remains REVIEW_REQUIRED/MARKET_UNVERIFIED, never CURRENT (reader:117,132; disposition:729).",
+        "Q5 SYNTHESIS_COMPLETE and scripted PASS_FAST_LANE_READY stay fixture-mechanical; locators navigate to existing show-session own chain, not new scientific authority (reader:193-207).",
+        "Q6 durable scientific schemas and verdict algebra unchanged; new detail output is a read projection and withdrawal history marker is not a new scientific terminal (reader:179,225).",
+        "Q7 query reconstruction/current evidence/applicability remain with domain owners. RECORDED_REQUEST is persisted text, not plan quality acceptance (reader:13-16,153,170,182).",
+        "Q8 falsifiers: reserve/values after landed winner, changed original plan on replay, false pending after unreadable landed result, CURRENT with unavailable basis, context-only packet confirms, or read changes DB/WAL. Existing guards and retained counterparts cover these.",
+        "Q9 future consumers may overread plan/status; query_provenance, original_query_bytes=NOT_RECORDED, authority_granted=false and explicit scope forbid stronger interpretation (reader:212-227; OUTCOME:31).",
+        "Q10 no further patch for C1-C5; retain values/limits and never upgrade recorded text/mechanical proof to accepted preregistration/science. Changed immutable request may change operation hash without new allowance (continuation-authority section5; qualification:310).",
+        "SCIENTIFIC_ESTIMAND=PASS_SCOPED: query/evaluator unchanged, canonical spec checked (reader:154-157). FALSIFIER_OR_ENDPOINT=PASS_SCOPED: BASE/current A9/A10 directly equal, chooser treatment absent (operator:1057).",
+        "EVIDENCE_ADMISSIBILITY=PASS_SCOPED: wrapper/result hashes plus request/reservation/query and exact result ref+SHA checked (reader:94,121,145,189). PIT_OR_AVAILABILITY_SEMANTICS=PASS_SCOPED: unknown market requires review; reconstruction creates no raw ingress or measurement-transfer proof (disposition:727-759).",
+        "RESEARCH_TRUTH_OWNERSHIP=PASS_SCOPED: no ledger writes/source-owner replacement (reader:13-16,225). HYPOTHESIS_OR_FAMILY_CLOSURE=PASS_SCOPED: exact QUESTION advice is not family close (disposition contract:20).",
+        "PROMOTION_OR_SUPPRESSION_AUTHORITY=PASS_SCOPED: no authority; source refusal limits read availability, session owns outcome (reader:195,225). UNKNOWN_VS_NEGATIVE_EVIDENCE=PASS_SCOPED: unreadability never becomes empty page/pending (reader:117,132,222).",
+        "EXECUTION_TRUTH_SEMANTICS=PASS_SCOPED: existing writer lease rechecks pending/landed with identical row/list-mask context at entry/lease/busy retry (ordinary:1687,1704,1757). DURABLE_SCIENCE_SCHEMA=PASS_SCOPED: no migration/backfill/RecordKind/scientific-verdict change;33-path diff preserves old evidence meanings.",
+        "OWNER_AUTHORITY_SEMANTICS=PASS_SCOPED: request text/author role not grants; existing cap/admission preserved. HARNESS_PREMISE_OR_MERGE_AUTHORITY=PASS_SCOPED: candidate fingerprints bound; packet flags neither prove actual live launch nor grant merge authority (fingerprint owner:230).",
+        "If DuckDB projection vanishes, verified immutable research/events Parquet and matching partition manifests retain authoritative requests/reservations/results/assessments; iter_committed_records rebuilds projection (research_store.py:1784,2017). Library absence may stop execution but does not destroy bytes or restore missing T2 ingress.",
+        "Private _View/_applicability/_public_query_from_recipe reuse of existing domain owners avoids duplicate truth semantics, not private foreign TASK orchestration. Source-pinned fixture wrappers diagnose actual native boundary. Internal coupling is nonblocking; no generic platform API justified.",
+        "Existing immutable carriers/result/disposition owners/writer lease plus narrow derived reader are the mature minimal alternative; no new ledger/lock service. Reader is reversible without migration; full-program rollback unproven and guard removal reopens known races.",
+        "Tests can PASS while consumers treat descriptive proxy as economics, local observation as measurement transfer, recorded plan as preregistration, ADAPTIVE as independent MAIN, CURRENT as truth or scripted terminal as scientific acceptance. Scope/nonclaims forbid those readings. Evidence insufficiency remains for raw T2/independent science/real runtime/transfer; no material ambiguity or authority widening found. History/source epochs remain distinct; no CI/readiness/merge claim."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "No actionable UX findings in named synthetic scope. Manual discovery-show by result/operation -> original request/query/reservation/result/applicability -> source_links.session_id -> existing show-session ownCritic/terminal is supported; pagination and genuine pending are distinct (operator:1116; CLI:1317).",
+        "Russian refusals explain safe recovery across unavailable store/source integrity. Primary output pins verified. Fresh race returns original locator with B reservation/loader/evaluator0/0/0; fresh positive reaches its own session. Last repair preserves legal changed-row MAIN and policy-only ADAPTIVE.",
+        "All30 raw Git/worktree bindings, exact scoped diff and stated fingerprints verified, excluding exactly3 selfreceipts. Isolated read-only review without product/tests execution. History/epochs, NO_DISTINCT_TREATMENT, scientific nonclaims and resource UNKNOWN retained; new exact-head CI/readiness/exact owner merge phrase remain pending gates."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_ALPHA_OOS_ECONOMICS",
+    "NO_LIVE_USE",
+    "NO_NEW_SCIENTIFIC_OR_MERGE_AUTHORITY",
+    "NO_CHOICE_QUALITY_GAIN",
+    "NO_FACTORY_WIDE_FULL_QUALIFICATION",
+    "HISTORICAL_S0_LIMITATIONS_PRESERVED",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR",
+      "finding": "The pending-only reservation recheck permits a second reservation and value loader when the first operation lands after the early gate but before the other writer lease; inner replay may prevent a second evaluator, so duplicate evaluation is not asserted for this schedule.",
+      "prior_verdict": "NOT_READY",
+      "observed_head": "59ddfc8a19ba8974d45f454529b5742b3298adcc",
+      "resolved_by_head": "ac0ebf5374a9aa8702d6b7b6dee1e34182f8c147"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR",
+      "finding": "Five immutable S0 archives were committed from an earlier LF index cache while their original worktree bytes and historical pins are CRLF.",
+      "prior_verdict": "NOT_READY",
+      "observed_head": "59ddfc8a19ba8974d45f454529b5742b3298adcc",
+      "resolved_by_head": "ac0ebf5374a9aa8702d6b7b6dee1e34182f8c147"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MAJOR",
+      "finding": "D10/D11 archival fidelity is not met while the five committed S0 JSON blobs differ from the original pinned worktree bytes.",
+      "prior_verdict": "NOT_READY",
+      "observed_head": "59ddfc8a19ba8974d45f454529b5742b3298adcc",
+      "resolved_by_head": "ac0ebf5374a9aa8702d6b7b6dee1e34182f8c147"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR",
+      "finding": "The reservation-only race fixture does not falsify landing before the second writer lease; an extra reservation/exposure and orphan pending can survive the existing test despite eventual inner replay.",
+      "prior_verdict": "NOT_READY",
+      "observed_head": "59ddfc8a19ba8974d45f454529b5742b3298adcc",
+      "resolved_by_head": "ac0ebf5374a9aa8702d6b7b6dee1e34182f8c147"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR",
+      "finding": "Worktree-derived historical evidence pins do not establish Git delivery fidelity when five committed archive blobs remain LF rather than their original CRLF bytes.",
+      "prior_verdict": "NOT_READY",
+      "observed_head": "59ddfc8a19ba8974d45f454529b5742b3298adcc",
+      "resolved_by_head": "ac0ebf5374a9aa8702d6b7b6dee1e34182f8c147"
+    },
+    {
+      "observed_head": "063c5872a1fa25ed6931e4c7624f8c3d029280b6",
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "discovery-show source/input refusals provide a canonical error code but no safe Russian recovery action; operator cannot distinguish correctible input from integrity/unavailability requiring source-owner review.",
+      "resolved_by_head": "ac0ebf5374a9aa8702d6b7b6dee1e34182f8c147"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "observed_head": "16fff80025cee60f619e566f2d1526fcce210e64",
+      "finding": "Existing data-root resolution and read-only ResearchStore opening occur before the discovery-show try, so unavailable store bypasses promised safe JSON recovery and exits through generic main stderr.",
+      "resolved_by_head": "ac0ebf5374a9aa8702d6b7b6dee1e34182f8c147"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "observed_head": "f0efc30d8b6b067ef637ce24e3a39407cae9387a",
+      "finding": "P2: unreadable discovery wrapper is skipped and only result-ref locator refuses; operation-only or off-page read can return an empty/partial page and mislabel a landed reservation as pending.",
+      "resolved_by_head": "ac0ebf5374a9aa8702d6b7b6dee1e34182f8c147"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "observed_head": "f0efc30d8b6b067ef637ce24e3a39407cae9387a",
+      "finding": "G1: independently confirms operation-only unreadable result violates R6/R11/D3/D8/V04/V16; require typed refusal and valid landed/pending/empty-page counterparts.",
+      "resolved_by_head": "ac0ebf5374a9aa8702d6b7b6dee1e34182f8c147"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "observed_head": "e6109ee627d0cf639eedf385cb248d9b8027356c",
+      "finding": "P2: unreadable native reservation is omitted and genuine pending read emits pending_reservations=[].",
+      "resolved_by_head": "ac0ebf5374a9aa8702d6b7b6dee1e34182f8c147"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "observed_head": "e6109ee627d0cf639eedf385cb248d9b8027356c",
+      "finding": "P2: unreadable unscoped disposition is omitted by by_subject; new reader loses owner missingness signal beside NOT_RECORDED/prior CURRENT.",
+      "resolved_by_head": "ac0ebf5374a9aa8702d6b7b6dee1e34182f8c147"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "observed_head": "e6109ee627d0cf639eedf385cb248d9b8027356c",
+      "finding": "Unreadable scientific disposition disappears from cold readout; R5/R6/R11/D7/D8/V10/V16 require an explicit integrity/missingness gap without guessing subject.",
+      "resolved_by_head": "ac0ebf5374a9aa8702d6b7b6dee1e34182f8c147"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "observed_head": "e6109ee627d0cf639eedf385cb248d9b8027356c",
+      "finding": "SEMANTIC_PREMISE FAIL IMPLEMENTATION_DEFECT: discarded native reservation/disposition breaks evidence admissibility, research truth, UNKNOWN and execution completeness. Existing owner unscoped marker must be retained; typed source refusal may limit only this read command, never scientific suppression.",
+      "resolved_by_head": "ac0ebf5374a9aa8702d6b7b6dee1e34182f8c147"
+    }
+  ]
+}

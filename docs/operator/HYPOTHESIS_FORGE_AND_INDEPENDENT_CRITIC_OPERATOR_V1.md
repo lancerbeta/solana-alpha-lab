@@ -1113,6 +1113,43 @@ mechanism coherence
 
 ## A11. Определи provisional lane, но не подменяй classifier
 
+Для положительного результата `discovery-show` возвращает точные `source_links`
+к saved draft и выбранному пакету Critic. Перейди по `session_id` через
+`show-session --session-id <ID>`: собственный Critic и итог остаются у владельца
+session. Контекстная ссылка runner-up не подтверждает его claim. Отсутствующая
+отдельная disposition — `NOT_RECORDED`, а не основание понизить positive outcome.
+
+Результат A9/A10 для ordinary test сохрани до чтения values в существующем
+`question_text` request: альтернативы, выбранный discriminator и причина выбора,
+честный strongest rejected alternative, действия и запрещённые выводы при
+PASS/FAIL/INCONCLUSIVE/technical failure. Это outward plan, а не скрытые
+рассуждения и не новый обязательный score или matrix schema. Для следующего
+разрешённого adaptive test используй существующий parent continuation request
+с собственным pre-value plan и тем же journal; `adaptation_of` связывает query
+с прежним spec. Подробный supported example и границы:
+`docs/contracts/forge_evidence_guided_generation_v1.md#per-test-authored-basis-and-cold-read`.
+
+После рестарта `discovery-show --result-ref <ref>` читает исходный request,
+reservation, canonical query, результат и применимость сохранённой оценки без
+файлов авторского ввода. `--operation-sha256 <sha> --offset 0 --limit 20` читает
+страницу результатов и pending reservations конкретного request. Новый текст
+при replay не становится прежним основанием. При чужом pending следуй original
+operation locator в отказе; ambiguous historical conflict не разрешает новый
+look. Команда только читает: она не обновляет preflight и не чинит историю.
+
+При отказе exit2 сохраняются `refusal_code`, zero writes/values и
+`scientific_negative=false`; `explanation_ru` и `next_action_ru` называют шаг:
+
+| Status | Безопасное действие |
+|---|---|
+| `INPUT_ERROR` | Исправь исходный locator/страницу и повтори только чтение: result-ref и operation-sha256 должны согласоваться, offset >= 0, limit 1–100. |
+| `BLOCKED_LOCATOR_NOT_RESOLVED` | Проверь исходный locator и data-root. Если они достоверны, остановись: отсутствие источника требует read-only проверки его владельцем. |
+| `BLOCKED_STORE_NOT_AVAILABLE` | Проверь исходный data-root; если он достоверен, остановись и передай исходный refusal_code владельцу ResearchStore для read-only проверки доступности. Storage не создавай, права не меняй. |
+| `BLOCKED_SOURCE_REVIEW_REQUIRED` | Остановись из-за unavailable/identity/hash/binding gap; передай refusal_code и locator владельцу ResearchStore/operation/result для read-only проверки. |
+
+Source refusal не разрешает новый look, переписывание истории или refreeze packet.
+Новый результат не может заменить утраченный источник прежнего результата.
+
 Сделай предварительную проверку:
 
 - существующие accepted data + features + query recipe + runner + parameter schema → `FAST_LANE_CANDIDATE`;

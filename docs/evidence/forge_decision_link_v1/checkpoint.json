@@ -1,0 +1,37 @@
+{
+  "task_id": "FORGE_DECISION_LINK_V1",
+  "stage": "S0",
+  "stage_disposition": "S0_COMPLETE_WITH_LIMITATIONS",
+  "branch": "codex/forge-decision-link-v1",
+  "head": "76993054cfaeeee7e9fb6e7b718add8cf27e404a",
+  "atom_status": "IN_PROGRESS",
+  "files_committed": false,
+  "product_sources_modified": false,
+  "pr_created": false,
+  "merge_readiness": "NOT_EVALUATED",
+  "next_scope_authorized": false,
+  "next": "Owner OK -> new frozen envelope and cumulative time control -> one native synthetic multi-look gap probe; patch only after a proven missing seam.",
+  "context": {
+    "path": "local/delivery_harness/context/forge_decision_link_v1-bfd9b50e2cd8.json",
+    "harness_receipt_sha256": "bfd9b50e2cd81c5dc62b9f9aab8d3e43e688d741af52f4015f39a446d15a34a0",
+    "file_sha256": "c0f630a893658376a96215c35e0f189b144ec2fe42dce9de380312c890a9df2f"
+  },
+  "stage_review": "docs/evidence/forge_decision_link_v1/stage-review.json",
+  "content_sha256": {
+    "docs/evidence/forge_decision_link_v1/entry-result.json": "9d8769b0aa0c625a1dfb878c97c420bc5b1530c7af7be059a3e81612ab166a92",
+    "docs/evidence/forge_decision_link_v1/obligations.json": "483fb69a3f745f47fb74cdc29486b2d151255e3a0497f073daeedfe2ba034f5a",
+    "docs/evidence/forge_decision_link_v1/READOUT.md": "b56ed6805497ffb93fb92f5dcd3a3d75029bcf721500f9a6a8a1b0f7c5527aad",
+    "docs/evidence/forge_decision_link_v1/repair-history.json": "34fc3fd2233753ebe5b9aee6a7427c2beb0a23dc45be7524e93900d2082714b5",
+    "docs/evidence/forge_decision_link_v1/source-contract.md": "d5e597d537f20f7046d031ce040acd50f6c2c32d0faf136b31d2628600a91d56",
+    "docs/evidence/forge_decision_link_v1/stage-review.json": "d7daebc30919d60e76d369eb26e2427531e31d302e32ad8f8a875ddb7a4bc0b8"
+  },
+  "checks": {
+    "json_parse": "PASS",
+    "stage_review_content_binding": "PASS",
+    "readout_links": "PASS",
+    "probe_syntax": "PASS",
+    "tracked_product_delta": "NONE",
+    "candidate_qualification": "NOT_RUN",
+    "product_reruns_after_cap": "NONE"
+  }
+}

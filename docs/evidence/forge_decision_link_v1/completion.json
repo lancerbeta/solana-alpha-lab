@@ -1,0 +1,97 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE_DECISION_LINK_V1-TECHNICAL-CANDIDATE",
+  "as_of": "2026-10-11",
+  "task_id": "FORGE_DECISION_LINK_V1",
+  "state_change": "Cold per-test original request/result/applicability and exact native candidate source links exposed; pending and already-landed same-policy/corpus reservations refused before values. Four isolated content reviews PASS; exact-head CI/readiness and owner merge authority remain gates.",
+  "base_main": "76993054cfaeeee7e9fb6e7b718add8cf27e404a",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "ca9ce588307e0d6fda2a96936b1936bbce2b7f6258e4e670ceb20ceca6a0c6c5",
+    "catalog/assets/core.yaml": "dc0cd89eff11f3edd83eeac6792f1ce3ed591a9407688f3ad4f92e61ff521a88",
+    "configs/factory_semantic_operability_v1.yaml": "0ee76b9a73b21a8cad6eb0574580e1253773c57a3e67ce8246630a498d9ddcf9",
+    "docs/contracts/forge_evidence_guided_generation_v1.md": "6549a671f8352e7330132f452dd4b58f6679e06bee71e4af6381b654b1c40287",
+    "docs/evidence/forge_decision_link_v1/.gitattributes": "8690196573b8bac68adcc8aa574bf7571c4ff737115755c9564263d2683e082d",
+    "docs/evidence/forge_decision_link_v1/OUTCOME.md": "8d120085281a5a16ee90ac455f2c8f943fe68577150e4ce13fda13b3850aecd4",
+    "docs/evidence/forge_decision_link_v1/READOUT.md": "b56ed6805497ffb93fb92f5dcd3a3d75029bcf721500f9a6a8a1b0f7c5527aad",
+    "docs/evidence/forge_decision_link_v1/checkpoint.json": "146de29faa18b34bc038d39e275465ed037abca5a94cb58c25741102f90af08b",
+    "docs/evidence/forge_decision_link_v1/choice-quality.json": "1db6615c0446828b87de0d940f811d1a692789d8624521db24a36fe695befcbc",
+    "docs/evidence/forge_decision_link_v1/continuation-authority.md": "ed4c49efbdd451dffd9b89082f2937b6344975d2ee5209cd6df333f8a2e84831",
+    "docs/evidence/forge_decision_link_v1/entry-result.json": "9d8769b0aa0c625a1dfb878c97c420bc5b1530c7af7be059a3e81612ab166a92",
+    "docs/evidence/forge_decision_link_v1/native-qualification.json": "0d451c3a2376001614633ee6267e537951f6dfaebd4ad883b39fb8f48c983874",
+    "docs/evidence/forge_decision_link_v1/obligations.json": "483fb69a3f745f47fb74cdc29486b2d151255e3a0497f073daeedfe2ba034f5a",
+    "docs/evidence/forge_decision_link_v1/qualification.json": "2cca4070b51abe19fb1c4e77596b36ad2ff8f00dffa0152a6570c5e1d96758fa",
+    "docs/evidence/forge_decision_link_v1/repair-history.json": "34fc3fd2233753ebe5b9aee6a7427c2beb0a23dc45be7524e93900d2082714b5",
+    "docs/evidence/forge_decision_link_v1/source-contract.md": "d5e597d537f20f7046d031ce040acd50f6c2c32d0faf136b31d2628600a91d56",
+    "docs/evidence/forge_decision_link_v1/stage-review.json": "d7daebc30919d60e76d369eb26e2427531e31d302e32ad8f8a875ddb7a4bc0b8",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a0e7680f98f23ab9a61ec5faf0c1c16676fc078c9e7f31532a461d8ad81c0f64",
+    "docs/tasks/FORGE_DECISION_LINK_V1.md": "44619ae019c6a589e2dada51ae34526d9c687d4edfdc5c446cefa789900c193c",
+    "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+    "src/solana_alpha_lab/factory/hfic_card_projection.py": "bba3769cecff9e4d5a489bf615bad52f48bf311e853c15aa8aa142a1389fb251",
+    "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "6c9b3a405a05cb8d27bc1ae76de1cea026ead388472d90fa66c9d624852638a8",
+    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "056fb4981126166d23796b52d10c888349f0d92ab7a13164eaf8ef00aabeb1b9",
+    "tests/fixtures/forge_decision_link_v1/entry_probe.py": "275653deb5db29d48aecdbf9e94c0442b8e8fc73de1c6ddac8ac3ea3c88c0748",
+    "tests/fixtures/forge_decision_link_v1/multi_look_probe.py": "689c7d5aabdfc4083abfb39ab248d533a95dabfebe35bdf3675cad72fd6597a5",
+    "tests/fixtures/forge_decision_link_v1/verify_terminal.py": "80ad4ec015c386be8e7e406823b10a4fc9ce9534faed403b932c2751028d1831",
+    "tests/test_forge_decision_link_v1.py": "aacbc0cc51b90592448d0a507772d916d7ea5c571b037f53fc26a22af2b557fe",
+    "tests/test_forge_research_flow_reliability_v1.py": "817280ef9bf67644c088ea6f9a75f012f9fc1d875bf768fc6d80e97df7eeba2a",
+    "tests/test_hfic_ordinary_operation_acceptance_v1.py": "c4b5f9873d31dc98f95ae9826ee05075a5211775de9ba0f93a4a9107b9b29741",
+    "tests/test_hfic_scientific_disposition_continuity_v1.py": "6debae314f3134b351d52a251d5beaa6342ed119f2f4cfb5e8cccc3fdeac7a32"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_decision_link_v1/factory-fit.json",
+    "sha256": "f12dc6b232c03dd146537b73d738981cea3469b89001f9960d1cd25b971141ee",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_NATIVE_SYNTHETIC_CONTINUITY_AND_IMPACT",
+    "independent_review": {
+      "path": "docs/evidence/forge_decision_link_v1/independent-review.json",
+      "sha256": "dec4ee64263ec890f4441348799e6f827a69875134bc562736a232d20a844ffe",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_RETENTION_CANARIES",
+      "PASS_COMPOUND_RECOVERY",
+      "PASS_PROPAGATION",
+      "PASS_NATIVE_LANDED_BEFORE_OTHER_LEASE_DISTINCT13_PLUS1",
+      "PASS_READER_LOCATOR_PAGE_INTEGRITY",
+      "PASS_RELEVANT_NATIVE_SOURCE_FRONTIER_SCOPED",
+      "PASS_FRESH_POSITIVE_OWN_SCRIPTED_CRITIC_CONSUMER",
+      "PASS_EXISTING_PUBLIC_CHANGED_ROWS_AND_POLICY_CLASSIFICATION",
+      "PASS_FRESH_LANDED_RACE_AFTER_ROW_CONTEXT_FORWARDING"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA_OOS_ECONOMICS",
+    "NO_LIVE_USE",
+    "NO_NEW_SCIENTIFIC_OR_MERGE_AUTHORITY",
+    "NO_CHOICE_QUALITY_GAIN",
+    "NO_FACTORY_WIDE_FULL_QUALIFICATION",
+    "HISTORICAL_S0_LIMITATIONS_PRESERVED",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ],
+  "side_effects": {
+    "real_store_writes": 0,
+    "provider_calls": 0,
+    "real_looks": 0,
+    "holdout_reads": 0,
+    "deployment": 0,
+    "cash_spend": 0,
+    "synthetic_fixture_writes": "NATIVE_EXPECTED"
+  },
+  "capability_radar_now": "Existing owner reuse; no new decision policy."
+}

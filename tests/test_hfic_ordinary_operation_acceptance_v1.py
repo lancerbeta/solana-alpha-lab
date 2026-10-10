@@ -7,14 +7,17 @@ It is not an independent scientific critic.
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import importlib.util
 import io
 import json
+import os
 import sys
 import tempfile
 import threading
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 SRC = Path(__file__).resolve().parents[1] / "src"
@@ -345,6 +348,170 @@ class OrdinaryAcceptanceTests(unittest.TestCase):
             operation = shown.get("ordinary_operation") or {}
             self.assertEqual(operation.get("result_refs"), evidence["result_refs"])
             self.assertEqual(len(_mains(data_root, journal)), 1)
+
+            # The public look links only persisted source artifacts. The session
+            # owner supplies its own Critic and final state in a separate read.
+            stored = ResearchStore(data_root, create_if_missing=False)
+            sources = {}
+            critic_sources = {}
+            for record in stored.iter_committed_records():
+                if getattr(record.record_kind, "value", record.record_kind) != "RESEARCH_ARTIFACT":
+                    continue
+                wrapper = json.loads(record.payload_json)
+                if wrapper.get("session_id") != frozen["session_id"]:
+                    continue
+                kind = wrapper.get("artifact_kind")
+                if kind not in {"FORGE_DRAFT", "CRITIC_INPUT_PACKET", "CRITIC_RESULT"}:
+                    continue
+                canonical = wrapper["payload_canonical"]
+                source_sha = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+                self.assertEqual(source_sha, wrapper["payload_sha256"])
+                body = json.loads(canonical)
+                if kind == "CRITIC_RESULT":
+                    critic_sources[source_sha] = {"artifact_ref": record.record_id, "body": body}
+                    continue
+                basis = body.get("grounded_evidence") or {}
+                if evidence["result_refs"][0] not in (basis.get("result_refs") or []):
+                    continue
+                self.assertEqual(basis.get("result_sha256"), evidence["result_sha256"])
+                if kind == "CRITIC_INPUT_PACKET":
+                    self.assertIs(basis.get("look_confirms_selected"), True)
+                sources[record.record_id] = {
+                    "artifact_kind": kind,
+                    "artifact_sha256": source_sha,
+                    "session_id": wrapper["session_id"],
+                }
+            self.assertEqual({item["artifact_kind"] for item in sources.values()},
+                             {"FORGE_DRAFT", "CRITIC_INPUT_PACKET"})
+            self.assertIn(draft_sha, {item["artifact_sha256"] for item in sources.values()
+                                     if item["artifact_kind"] == "FORGE_DRAFT"})
+            self.assertIn(frozen["critic_input_packet_sha256"],
+                          {item["artifact_sha256"] for item in sources.values()
+                           if item["artifact_kind"] == "CRITIC_INPUT_PACKET"})
+            inventory_before = _inventory(data_root)
+            files_before = {
+                path.relative_to(data_root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in data_root.rglob("*") if path.is_file()
+            }
+            detail_run = run_cli(
+                "discovery-show", "--result-ref", evidence["result_refs"][0],
+                "--format", "json", data_root=data_root,
+            )
+            self.assertEqual(detail_run.returncode, 0, detail_run.stderr + detail_run.stdout)
+            detail = json.loads(detail_run.stdout)
+            self.assertEqual(detail["total_results"], 1)
+            self.assertEqual(len(detail["entries"]), 1)
+            entry = detail["entries"][0]
+            self.assertEqual(entry["result_ref"], evidence["result_refs"][0])
+            self.assertEqual(entry["result_sha256"], evidence["result_sha256"])
+            self.assertEqual(entry["source_link_status"], "RECORDED")
+            links = {item["artifact_ref"]: item for item in entry["source_links"]}
+            self.assertEqual(set(links), set(sources))
+            for ref, expected in sources.items():
+                link = links[ref]
+                for key, value in expected.items():
+                    self.assertEqual(link[key], value)
+                self.assertEqual(link["next_read"],
+                                 {"command": "show-session", "session_id": frozen["session_id"]})
+                if link["artifact_kind"] == "CRITIC_INPUT_PACKET":
+                    self.assertIs(link["look_confirms_selected"], True)
+                    self.assertEqual(link["selected_candidate_id"], frozen["selected_candidate_id"])
+                else:
+                    self.assertIsNone(link["look_confirms_selected"])
+            self.assertFalse(detail["values_loaded"])
+            self.assertEqual(detail["writes"], {"research_store": 0})
+            from solana_alpha_lab.factory.hfic_discovery_detail import discovery_detail
+
+            original_records = tuple(stored.iter_committed_records())
+            valid_before = discovery_detail(stored, result_ref=evidence["result_refs"][0], current_market=market)
+            self.assertEqual(valid_before, detail)
+            source_canaries = []
+            for fault in ("CONTEXT_ONLY_PACKET", "FOREIGN_PACKET_RESULT_REF_AND_SHA"):
+                altered_records = []
+                altered_refs = []
+                for record in original_records:
+                    if record.record_id not in sources or sources[record.record_id]["artifact_kind"] != "CRITIC_INPUT_PACKET":
+                        altered_records.append(record)
+                        continue
+                    wrapper = json.loads(record.payload_json)
+                    body = json.loads(wrapper["payload_canonical"])
+                    basis = body["grounded_evidence"]
+                    if fault == "CONTEXT_ONLY_PACKET":
+                        basis["look_context_result_refs"] = basis.pop("result_refs")
+                        basis["look_confirms_selected"] = False
+                        basis.pop("result_sha256")
+                    else:
+                        basis["result_refs"] = ["HFIC-ART-DISCOVERY-CONTROLLED-READ-VIEW"]
+                        basis["result_sha256"] = "0" * 64
+                    canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+                    wrapper["payload_canonical"] = canonical
+                    wrapper["payload_sha256"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+                    payload = json.dumps(wrapper, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+                    altered_records.append(record.model_copy(update={"payload_json": payload,
+                        "payload_sha256": hashlib.sha256(payload.encode("utf-8")).hexdigest()}))
+                    altered_refs.append(record.record_id)
+                self.assertTrue(altered_refs)
+                # Controlled read-view source canary: these bytes never enter
+                # the store and do not represent a native alternate outcome.
+                altered = discovery_detail(SimpleNamespace(iter_committed_records=lambda: iter(altered_records)),
+                                           result_ref=evidence["result_refs"][0], current_market=market)
+                remaining = altered["entries"][0]["source_links"]
+                self.assertEqual({item["artifact_ref"] for item in remaining},
+                                 {ref for ref, item in sources.items() if item["artifact_kind"] == "FORGE_DRAFT"})
+                self.assertTrue(all(item["look_confirms_selected"] is None for item in remaining))
+                source_canaries.append({"fault": fault, "oracle": "CONTROLLED_IN_MEMORY_READ_VIEW_SOURCE_CANARY",
+                                        "altered_packet_refs": altered_refs, "remaining_source_links": remaining,
+                                        "native_alternate_outcome": False, "store_append": False})
+            self.assertEqual(discovery_detail(stored, result_ref=evidence["result_refs"][0], current_market=market),
+                             valid_before)
+            session_run = run_cli(
+                "show-session", "--session-id", frozen["session_id"],
+                "--format", "json", data_root=data_root,
+            )
+            self.assertEqual(session_run.returncode, 0, session_run.stderr + session_run.stdout)
+            session = json.loads(session_run.stdout)
+            self.assertEqual(session["session_id"], frozen["session_id"])
+            self.assertEqual(session["session_state"], "SYNTHESIS_COMPLETE")
+            self.assertEqual(session["selected_candidate_id"], frozen["selected_candidate_id"])
+            self.assertEqual(session["critic_input_packet_sha256"], frozen["critic_input_packet_sha256"])
+            self.assertEqual(session["critic_result_sha256"], done["critic_result_sha256"])
+            self.assertEqual(session["critic_terminal"], "PASS_FAST_LANE_READY")
+            self.assertEqual(session["lane_classifier_terminal"], "FAST_LANE_READY")
+            self.assertTrue(session["artifacts_retrievable"])
+            self.assertTrue(session["candidates_retrievable"])
+            own_critic = critic_sources[session["critic_result_sha256"]]
+            self.assertEqual(own_critic["body"]["session_id"], session["session_id"])
+            self.assertEqual(own_critic["body"]["selected_candidate_id"], frozen["selected_candidate_id"])
+            self.assertEqual(own_critic["body"]["critic_input_packet_sha256"], frozen["critic_input_packet_sha256"])
+            self.assertEqual(len(_mains(data_root, journal)), 1)
+            inventory_after = _inventory(data_root)
+            files_after = {
+                path.relative_to(data_root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in data_root.rglob("*") if path.is_file()
+            }
+            self.assertEqual(inventory_after, inventory_before)
+            self.assertEqual(files_after, files_before)
+            capture = os.environ.get("FORGE_DECISION_LINK_POSITIVE_CAPTURE")
+            if capture:
+                capture_path = ROOT / capture
+                capture_path.resolve().relative_to(ROOT)
+                capture_path.write_text(json.dumps({
+                    "oracle": "SCRIPTED_CRITIC_MECHANICAL",
+                    "non_claims": ["NO_INDEPENDENT_SCIENTIFIC_CRITIC", "NO_ALPHA", "NO_CHOICE_QUALITY_PASS"],
+                    "result_refs": evidence["result_refs"],
+                    "result_sha256": evidence["result_sha256"],
+                    "session_id": session["session_id"],
+                    "persisted_sources": sources,
+                    "source_canaries": source_canaries,
+                    "own_critic": own_critic,
+                    "discovery_show": detail,
+                    "show_session": session,
+                    "main_looks": 1,
+                    "inventory_before": inventory_before,
+                    "inventory_after": inventory_after,
+                    "files_before": files_before,
+                    "files_after": files_after,
+                }, ensure_ascii=False, sort_keys=True, indent=2), encoding="utf-8")
 
     def test_d_faults_resume_and_last_unit_do_not_double_spend(self) -> None:
         focus = "PUBLISHED_ORDINARY_RECOVERY"
