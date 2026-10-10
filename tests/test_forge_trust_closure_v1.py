@@ -146,6 +146,37 @@ class ExecutionIdentityTests(unittest.TestCase):
         self.assertEqual(dossier["planes"]["execution"], "UNKNOWN")
         self.assertFalse(dossier["science_guard"]["allowed"])
 
+    def test_quarantined_or_conflicting_trial_cannot_seed_weak_scientific_metric(self):
+        own = self.legacy(experiment_id=EXPERIMENT_ID)
+        trial_id = "TRIAL-FTC-SHARED-001"
+        for case in ("quarantined_run", "foreign_trial", "old_trial_version"):
+            with self.subTest(case=case):
+                trial = _event(record_id="TRIAL-FTC-OWN-001", record_kind="TRIAL",
+                               entity_id=trial_id, run_id=own.run_id,
+                               hypothesis_version_id=HYPOTHESIS_ID,
+                               payload={"experiment_id": EXPERIMENT_ID, "trial_id": trial_id},
+                               transaction_id="RESEARCH-TXN-FTC-TRIAL-001")
+                if case == "quarantined_run":
+                    conflict = self.legacy(experiment_id="EXP-FOREIGN-001")
+                else:
+                    payload = {"trial_id": trial_id, "experiment_id": EXPERIMENT_ID}
+                    payload.update({"experiment_id": "EXP-FOREIGN-001"} if case == "foreign_trial"
+                                   else {"experiment_spec_sha256": "f" * 64})
+                    conflict = _event(record_id="TRIAL-FTC-CONFLICT-001", record_kind="TRIAL",
+                                      entity_id=trial_id, run_id=own.run_id,
+                                      hypothesis_version_id=HYPOTHESIS_ID, payload=payload,
+                                      transaction_id="RESEARCH-TXN-FTC-TRIAL-CONFLICT-001")
+                metric = _event(record_id="METRIC-FTC-TRIAL-BORROW-001", record_kind="EXPERIMENT_METRIC",
+                                entity_id="METRIC-FTC-TRIAL-BORROW-001",
+                                hypothesis_version_id=HYPOTHESIS_ID,
+                                payload={**{k: v for k, v in _scientific_payload().items()
+                                           if k != "experiment_id"}, "trial_id": trial_id},
+                                transaction_id="RESEARCH-TXN-FTC-TRIAL-METRIC-001")
+                dossier = self.dossier((own, trial, conflict, metric))
+                self.assertNotIn(metric.record_id, {c["record_id"] for c in dossier["direct_evidence"]})
+                self.assertNotEqual(dossier["planes"]["evidence"], "GUARD_OPEN")
+                self.assertFalse(dossier["science_guard"]["allowed"])
+
     def test_unambiguous_foreign_run_is_not_an_unresolved_own_execution(self):
         dossier = self.dossier((self.legacy(experiment_id="EXP-FOREIGN-001"),))
         self.assertEqual(dossier["planes"]["execution"], "NO_RUN")
@@ -226,6 +257,26 @@ s.close()
 
 
 class GuardBoundaryTests(unittest.TestCase):
+    def test_replay_shell_success_requires_graded_pass(self):
+        from tests.fixtures.forge_trust_closure_v1.replay import terminal_exit_code, terminal_status
+        self.assertEqual(terminal_exit_code("PASS", 0), 0)
+        for status in ("HARNESS_ERROR", "HARNESS_ERROR_NO_TERMINAL_EVIDENCE", "INCOMPLETE"):
+            with self.subTest(status=status):
+                self.assertNotEqual(terminal_exit_code(status, 0), 0)
+        self.assertEqual(terminal_exit_code("PRODUCT_TEST_FAILURE", 1), 1)
+        self.assertEqual(terminal_exit_code("TIMEOUT", 143), 124)
+        self.assertEqual(terminal_exit_code("INTERRUPTED", 143), 130)
+        state = {"ExitCode": 0, "OOMKilled": False, "Running": False}
+        for start, safety, summary, expected in (
+            (0, True, True, "PASS"), (0, False, True, "HARNESS_ERROR"),
+            (0, True, False, "HARNESS_ERROR_NO_TERMINAL_EVIDENCE"),
+            (1, True, True, "HARNESS_ERROR"),
+        ):
+            with self.subTest(start=start, safety=safety, summary=summary):
+                status = terminal_status(state, start, None, safety, summary)
+                self.assertEqual(status, expected)
+                self.assertEqual(terminal_exit_code(status, 0) == 0, expected == "PASS")
+
     def test_native_classifier_terminals_reach_fresh_persisted_consumer(self):
         from tests.test_hfic_classification_outcome_integrity_v1 import (
             _freeze_bound, _awaiting_store, _fast_lane_packet, FORWARD_LABEL,

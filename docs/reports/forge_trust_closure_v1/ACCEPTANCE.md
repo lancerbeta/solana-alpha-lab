@@ -10,16 +10,16 @@
 | TC-04 | Foreign ID, shared run collision, changed canonical hash, malformed passport and scientific-version poisoning refused; scientific strength unchanged |
 | TC-05 | Unchanged native baseline records consumed through validated exact legacy resolver; no backfill/look/rewrite; unresolved legacy remains gap |
 | TC-06 | Existing readonly schema compatibility rerun; protected physical source, cold API/GET, no durable changes; source disappearance/refusal/recovery |
-| TC-07 | Linked positive engineering producer/consumer; negative SIMPLE + typed refusal branches; ordinary stage separation explicit; full positive science remains C |
-| TC-08 | Native lost reply/moved-root resume, STOP/late landing/profile, correction without MAIN, pending/new-epoch safe STOP, source restoration; exact effects/counters asserted |
-| TC-09 | Original 56 IDs/oracles/results preserved; every non-PASS receives obligation delta and exact unresolved boundary; no automatic regrading |
-| TC-10 | Three named interactions plus live WAL/native producer/current consumer; source-owned data/events or explicitly contract fixture, distinct fidelity retained |
+| TC-07 | Linked native positive producer→cold consumer; negative SIMPLE and typed refusal; lost reply/moved-root resume, STOP/late landing, correction without MAIN, source restoration assert identity/history/counters within their named native segments; no fabricated full positive science path |
+| TC-08 | Original 56 IDs/oracles/results preserved; every non-PASS receives obligation delta and exact unresolved boundary; no automatic regrading |
+| TC-09 | Three named interactions plus live WAL/native producer/current consumer; pending/new-epoch safe STOP asserts common reservation/counter state; source-owned data/events or explicitly contract fixture, distinct fidelity retained |
+| TC-10 | BAA-003 disposition C for selected List A recipe; SCIENTIFIC_DECISION.md names exact source owners, inputs and consumer, missing chronological/OOS contract and one proposed owner decision; no invented frozen protocol or granted scientific run |
 | TC-11 | Genuine actors NOT_RUN: inherited host tools, no enforced tool-less actor transport/budget; allowed precise UNVERIFIED disposition; no false actor/pixel claim |
 | TC-12 | New empty owned sandbox through reusable entry; real stale observer/identity/artifact/mount canaries; deadline control preserved TIMEOUT and stopped process |
 | TC-13 | Current source contract, Russian operator limits, Catalog task/report/evidence/test routes and generated navigation; no new scientific authority or unsupported accepted capability |
 | TC-14 | Four isolated roles, deterministic checks, exact-head CI and merge-readiness required; cleanup readback zero running containers, retained 14 owned volumes, 540555165 accounted bytes <2GiB |
 
-TC-09 is not 56 green full paths. Per-row original fidelity and new proof boundary
+TC-08 is not 56 green full paths. Per-row original fidelity and new proof boundary
 are in `docs/evidence/forge_trust_closure_v1/charter_ledger.json`. Actor/scientific/
 execution-net/monitoring gaps retain their precise consumer and next decision.
 No real holdout/data/provider/model/deploy calls. Runtime does not create source

@@ -39,6 +39,13 @@ NOT_RUN, HARNESS_ERROR, PRODUCT_TEST_FAILURE, TIMEOUT, INTERRUPTED и PASS
 Failed attempts сохраняются. Один неправильный joint oracle исправлен с exact
 reason; timeout canary не участвует в scientific grading.
 
+Успешный launcher exit возможен только при terminal `PASS`. Stdout показывает
+`status`, отдельные `process_exit_code` и `exit_code`, имя `terminal.json` и
+`next_safe_action`. `HARNESS_ERROR*` при нулевом process exit всё равно возвращает
+nonzero. При отказе прочитать retained `run.log`, summary и safety preflight,
+локализовать продуктовую assertion или ошибку стенда; после исправления создать
+новый attempt. Старые failed artifacts не перезаписывать и не считать PASS.
+
 Evidence root содержит `manifest.json`, `terminal.json`, `run.log`, source/kit
 hashes, compact summary, safety preflight и self-contained `receipt.json`.
 Проверка receipt требует внешнего expected hash:
@@ -50,6 +57,9 @@ uv run --locked --managed-python python -B tests/fixtures/forge_trust_closure_v1
 Изменение summary с прежним receipt даёт ARTIFACT_HASH_MISMATCH. Изменение receipt
 даёт RECEIPT_HASH_MISMATCH. Это integrity check по доверенному pin, а не подпись
 или защита от владельца host, который может переписать все независимые pins.
+`--verify` печатает отдельно `integrity=PASS` и исходный `replay_status`:
+целостный receipt с failed result остаётся failed result. Для принятия replay
+требуется `replay_status=PASS` в рамках указанной fidelity, а не только integrity.
 Stale observer canary получает настоящий RUNNING при committed COMPLETE;
 identity canaries меняют реальные row/spec inputs, не assert-False.
 

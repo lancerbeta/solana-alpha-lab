@@ -36305,7 +36305,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/experiment_evidence_decision_v1.md', repository_path: docs/contracts/experiment_evidence_decision_v1.md}
-  integrity: {kind: sha256, sha256: 19cdfa8a0ede9e1392d2c3ee6cffe496e7c5a145ae88378c539630046b0dc576}
+  integrity: {kind: sha256, sha256: e314bb69eb839c4bdac8ac497385a9f370de8e31288023f459b30bf22c723353}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -36324,7 +36324,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/experiment_evidence.py', repository_path: src/solana_alpha_lab/factory/experiment_evidence.py}
-  integrity: {kind: sha256, sha256: b262393a57d35f00f86b925d5489b7e97c9154efbb478a19d3929e9fecb3f39a}
+  integrity: {kind: sha256, sha256: 8cdc314f482297420c08f81523273439654aa42c0c8d915462d55c861d404eb5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -41154,7 +41154,7 @@ records:
     repository_path: docs/reports/forge_trust_closure_v1/READOUT.md
   integrity:
     kind: sha256
-    sha256: 17cc7a5be8ae7d8a32628d6d6705267be584a287248459863fe24c1d6876f83b
+    sha256: 458503377c15ae4f9d02436cda073bae8dbb83aec55d4b70499fb31bd35c4b18
   access:
     mode: read_only
     method: file
@@ -41232,7 +41232,7 @@ records:
     repository_path: docs/reports/forge_trust_closure_v1/REPRODUCE.md
   integrity:
     kind: sha256
-    sha256: cfcd12ea19115876471060a15b57afe6370e4bd5aa9e267ce349169348ec9526
+    sha256: 4dc9080b8866ce292a823c414c60283eb6dbb24458fc057d1c5aa3085ba04a46
   access:
     mode: read_only
     method: file
@@ -41351,7 +41351,7 @@ records:
     repository_path: tests/test_forge_trust_closure_v1.py
   integrity:
     kind: sha256
-    sha256: 247de69c861f955aa0130448c3184f3dbdb4cb18aa0d9e67a32e23f4f3fec1ee
+    sha256: 30bbd068fa91c45a60684d4f8a9aaac136748b1d9788ea043031b356bc448b5e
   access:
     mode: read_only
     method: file

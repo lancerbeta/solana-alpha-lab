@@ -174,6 +174,8 @@ def _legacy_exact_completed(record: Any, spec_digest: str | None) -> bool:
 
 def _collect_direct_ids(
     experiment_id: str, records: Sequence[Any], spec_digest: str | None = None,
+    *, conflicted_run_ids: set[str] | None = None,
+    conflicted_trial_ids: set[str] | None = None,
 ) -> tuple[set[str], set[str]]:
     run_ids: set[str] = set()
     trial_ids: set[str] = set()
@@ -187,6 +189,9 @@ def _collect_direct_ids(
         kind = _kind(record)
         run_id = _text(getattr(record, "run_id", None) or payload.get("run_id"))
         trial_id = _text(payload.get("trial_id"))
+        if (run_id and run_id in (conflicted_run_ids or set())
+                or trial_id and trial_id in (conflicted_trial_ids or set())):
+            continue
         if run_id and kind in EXECUTION_RECORD_KINDS:
             run_ids.add(run_id)
         if trial_id and kind == "TRIAL":
@@ -216,6 +221,24 @@ def _conflicted_execution_keys(
     return keys
 
 
+def _conflicted_trial_keys(
+    experiment_id: str, records: Sequence[Any], spec_digest: str | None,
+    conflicted_run_ids: set[str],
+) -> set[str]:
+    """A rejected trial must not seed indirect scientific evidence."""
+    keys: set[str] = set()
+    for record in records:
+        if _kind(record) != "TRIAL":
+            continue
+        payload = _payload(record)
+        trial_id = _text(payload.get("trial_id"))
+        run_id = _text(getattr(record, "run_id", None) or payload.get("run_id"))
+        if trial_id and (_identity_conflict(record, experiment_id, spec_digest)
+                         or run_id in conflicted_run_ids):
+            keys.add(trial_id)
+    return keys
+
+
 def classify_record(
     record: Any,
     *,
@@ -225,6 +248,7 @@ def classify_record(
     direct_trial_ids: set[str],
     spec_digest: str | None = None,
     conflicted_run_ids: set[str] | None = None,
+    conflicted_trial_ids: set[str] | None = None,
 ) -> str | None:
     payload = _payload(record)
     kind = _kind(record)
@@ -233,6 +257,8 @@ def classify_record(
     trial_id = _text(payload.get("trial_id"))
     hyp = _text(getattr(record, "hypothesis_version_id", None) or payload.get("hypothesis_version_id"))
     if run_id and run_id in (conflicted_run_ids or set()):
+        return None
+    if trial_id and trial_id in (conflicted_trial_ids or set()):
         return None
     # A contradictory explicit identity can never fall back to a weaker run join.
     if _identity_conflict(record, experiment_id, spec_digest):
@@ -798,13 +824,16 @@ def compose_experiment_dossier(
     hypothesis_version_id = _text(spec.get("hypothesis_version"))
     store_records = tuple(records or ())
     canonical_spec_digest = experiment_spec_sha256(spec) if spec else None
-    direct_run_ids, direct_trial_ids = _collect_direct_ids(
-        locator.entity_id, store_records, canonical_spec_digest,
-    )
     conflicted_run_ids = _conflicted_execution_keys(
         locator.entity_id, store_records, canonical_spec_digest,
     )
-    direct_run_ids.difference_update(conflicted_run_ids)
+    conflicted_trial_ids = _conflicted_trial_keys(
+        locator.entity_id, store_records, canonical_spec_digest, conflicted_run_ids,
+    )
+    direct_run_ids, direct_trial_ids = _collect_direct_ids(
+        locator.entity_id, store_records, canonical_spec_digest,
+        conflicted_run_ids=conflicted_run_ids, conflicted_trial_ids=conflicted_trial_ids,
+    )
     direct: list[dict[str, Any]] = []
     related: list[dict[str, Any]] = []
     history: list[dict[str, Any]] = []
@@ -818,6 +847,7 @@ def compose_experiment_dossier(
             direct_trial_ids=direct_trial_ids,
             spec_digest=canonical_spec_digest,
             conflicted_run_ids=conflicted_run_ids,
+            conflicted_trial_ids=conflicted_trial_ids,
         )
         if relation is None:
             payload = _payload(record)

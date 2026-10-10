@@ -20,7 +20,7 @@ history rewrite. Audit bytes сохранены; исторический PARTIA
 | BAA-001/D07 | writer уже commit COMPLETE; два current readers видят RUNNING | независимый mode=ro, OperationalStore и lifecycle видят COMPLETE до закрытия writer |
 | BAA-002/F08 | native exact-spec RUN_COMPLETED существует; dossier NO_RUN | native exact-spec records DIRECT, execution COMPLETED в новом процессе API и HTTP Workbench |
 | legacy | completion без experiment_id не связан с dossier | только validated passport с exact canonical spec hash; historical bytes сохранены |
-| конфликт identity | чужая/невалидная строка могла оставить общий run seed | противоречивый execution key quarantined; слабая scientific metric не наследует DIRECT |
+| конфликт identity | чужая/невалидная строка могла оставить общий run/trial seed | противоречивый execution или trial key quarantined до seeding; слабая scientific metric не наследует DIRECT |
 | science | proxy completion не закрывает научные obligations | PROMOTE_BLOCKED; execution COMPLETED не повышает scientific status |
 
 Canonical document hash отличается от hash YAML-файла. Он включает experiment ID

@@ -25,7 +25,7 @@ def git(*args):
     return call(["git", "-C", str(ROOT), *args], capture_output=True).stdout
 
 
-def verify_receipt(path: Path, expected: str) -> None:
+def verify_receipt(path: Path, expected: str) -> dict:
     raw = path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != expected:
         raise ValueError("RECEIPT_HASH_MISMATCH")
@@ -36,6 +36,35 @@ def verify_receipt(path: Path, expected: str) -> None:
             raise ValueError("ARTIFACT_PATH_REJECTED")
         if hashlib.sha256(candidate.read_bytes()).hexdigest() != digest:
             raise ValueError("ARTIFACT_HASH_MISMATCH")
+    return receipt
+
+
+def terminal_exit_code(status: str, process_exit_code: int) -> int:
+    """Only a graded PASS may report shell success."""
+    if status == "TIMEOUT":
+        return 124
+    if status == "INTERRUPTED":
+        return 130
+    if status == "PASS":
+        return process_exit_code
+    return process_exit_code or 2
+
+
+def terminal_status(state: dict, start_returncode: int | None, interrupted: str | None,
+                    safety_pass: bool, summary_present: bool) -> str:
+    if interrupted:
+        return interrupted
+    if state["OOMKilled"]:
+        return "INTERRUPTED_RESOURCE_OR_SIGNAL"
+    if start_returncode != 0 or state["Running"]:
+        return "HARNESS_ERROR"
+    if state["ExitCode"] in {137, 143}:
+        return "INTERRUPTED_RESOURCE_OR_SIGNAL"
+    if not safety_pass:
+        return "HARNESS_ERROR"
+    if not summary_present:
+        return "HARNESS_ERROR_NO_TERMINAL_EVIDENCE"
+    return "PASS" if state["ExitCode"] == 0 else "PRODUCT_TEST_FAILURE"
 
 
 def main():
@@ -54,8 +83,9 @@ def main():
     if a.verify:
         if not re.fullmatch(r"[0-9a-f]{64}", a.expected_receipt_sha256 or ""):
             p.error("EXACT_RECEIPT_HASH_REQUIRED")
-        verify_receipt(a.verify, a.expected_receipt_sha256)
-        print("RECEIPT_AND_ARTIFACTS_PASS")
+        receipt = verify_receipt(a.verify, a.expected_receipt_sha256)
+        print(json.dumps({"integrity": "PASS", "replay_status": receipt.get("status", "UNKNOWN"),
+                          "claim": "RECEIPT_AND_ARTIFACT_INTEGRITY_ONLY"}))
         return 0
     if not all((a.source_commit, a.phase, a.attempt, a.output_root)):
         p.error("SOURCE_PHASE_ATTEMPT_OUTPUT_REQUIRED")
@@ -177,6 +207,11 @@ def main():
         if interrupted:
             call([a.docker, "stop", "--time", "10", name], capture_output=True, timeout=30)
     state = json.loads(call([a.docker, "inspect", name], capture_output=True, text=True).stdout)[0]["State"]
+    if state["Running"]:
+        # A failed attach/transport must not leave our product process running.
+        call([a.docker, "stop", "--time", "10", name], capture_output=True, timeout=30)
+        state = json.loads(call([a.docker, "inspect", name], capture_output=True, text=True).stdout)[0]["State"]
+        start_returncode = start_returncode or 2
     terminal = dict(status="INCOMPLETE",
                     state=state, start_returncode=start_returncode)
     files = {"wal": "wal/probes-summary.json", "producer": "producer/producer-summary.json",
@@ -186,24 +221,23 @@ def main():
         subprocess.run([a.docker, "cp", name + ":/audit/" + native, str(out / local)],
                        capture_output=True, check=False)
     safety = json.loads((out / "safety-preflight.json").read_text()) if (out / "safety-preflight.json").exists() else {}
-    if interrupted:
-        terminal["status"] = interrupted
-    elif state["OOMKilled"] or state["ExitCode"] in {137, 143}:
-        terminal["status"] = "INTERRUPTED_RESOURCE_OR_SIGNAL"
-    elif not safety.get("pass"):
-        terminal["status"] = "HARNESS_ERROR"
-    elif not (out / "summary.json").exists():
-        terminal["status"] = "HARNESS_ERROR_NO_TERMINAL_EVIDENCE"
-    else:
-        terminal["status"] = "PASS" if state["ExitCode"] == 0 else "PRODUCT_TEST_FAILURE"
+    terminal["status"] = terminal_status(state, start_returncode, interrupted,
+                                         bool(safety.get("pass")), (out / "summary.json").exists())
+    terminal["next_safe_action"] = (
+        "INSPECT_DECLARED_PROOF_SCOPE" if terminal["status"] == "PASS"
+        else "INSPECT_RETAINED_LOG_SUMMARY_AND_SAFETY_BEFORE_NEW_ATTEMPT"
+    )
     (out / "terminal.json").write_text(json.dumps(terminal, indent=2), encoding="utf-8")
     receipt = {"source_commit": a.source_commit, "status": terminal["status"], "artifacts": {
         f.name: hashlib.sha256(f.read_bytes()).hexdigest() for f in out.iterdir()
         if f.is_file() and f.name != "receipt.json"}}
     (out / "receipt.json").write_text(json.dumps(receipt, indent=2), encoding="utf-8")
-    print(json.dumps(dict(container=name, volume=volume, exit_code=state["ExitCode"],
+    launcher_exit_code = terminal_exit_code(terminal["status"], state["ExitCode"])
+    print(json.dumps(dict(container=name, volume=volume, status=terminal["status"],
+                          process_exit_code=state["ExitCode"], exit_code=launcher_exit_code,
+                          terminal_artifact="terminal.json", next_safe_action=terminal["next_safe_action"],
                           receipt_sha256=hashlib.sha256((out / "receipt.json").read_bytes()).hexdigest())))
-    return 124 if interrupted == "TIMEOUT" else 130 if interrupted else state["ExitCode"]
+    return launcher_exit_code
 
 
 if __name__ == "__main__":
