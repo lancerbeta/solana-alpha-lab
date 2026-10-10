@@ -1,8 +1,8 @@
 {
   "candidate": {
     "base": "96eb087224f012ccb028ba468d4e0a7cd7ca1506",
-    "diff_sha256": "148eae65e6e3155f91a9c3b30df38a7e1f306adf2b6f4358979b5a89e0461b3f",
-    "head": "964b6cb37218d063ee51db76e21ef122eeec1787"
+    "diff_sha256": "8241146e52cf20811c575083a804b3928505a731a69dabbeff33e546fefedf5b",
+    "head": "7ca0b58633a152eac7b99be71810e9404cd7dc3d"
   },
   "evidence": [
     {
@@ -11,7 +11,7 @@
     },
     {
       "logical_ref": "repo://docs/reports/forge_trust_closure_v1/READOUT.md",
-      "sha256_or_fingerprint": "17cc7a5be8ae7d8a32628d6d6705267be584a287248459863fe24c1d6876f83b"
+      "sha256_or_fingerprint": "7e02c23c98a7e1aa57512aac74a7b4ff5dcf30fee2d3aab81c8d62efff585886"
     },
     {
       "logical_ref": "repo://docs/reports/forge_trust_closure_v1/SCIENTIFIC_DECISION.md",
@@ -19,15 +19,15 @@
     },
     {
       "logical_ref": "repo://docs/evidence/forge_trust_closure_v1/run_index.json",
-      "sha256_or_fingerprint": "39893e187f8438e4e9b32f7cc4edccc3c05d84eac97e784b5c6bf77898c564f7"
+      "sha256_or_fingerprint": "3dfa135e5a448030193a256d757f37140c7fdfadffb72fc745736441efce6c32"
     },
     {
       "logical_ref": "repo://docs/evidence/forge_trust_closure_v1/charter_ledger.json",
-      "sha256_or_fingerprint": "cffdc676181d7e64e94685f75799697836d9c2aa252a5e77d249572c7fe12ee4"
+      "sha256_or_fingerprint": "8a2119630509dd6f445f70c71ea1a81e8deab22ed8d8a9d84ca85f689f1dba15"
     },
     {
       "logical_ref": "repo://docs/evidence/forge_trust_closure_v1/dependency_closure.json",
-      "sha256_or_fingerprint": "bf511d895db458e2e6295b3c3764d0d30e461c135d1eedb254f4a6a0d1b08f1a"
+      "sha256_or_fingerprint": "d34be40b9834d90cb2d8fe2a2874ea47ca713791da4d01bf86393324cadd7006"
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/document_runner.py",
@@ -35,7 +35,7 @@
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/experiment_evidence.py",
-      "sha256_or_fingerprint": "b262393a57d35f00f86b925d5489b7e97c9154efbb478a19d3929e9fecb3f39a"
+      "sha256_or_fingerprint": "8cdc314f482297420c08f81523273439654aa42c0c8d915462d55c861d404eb5"
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/operational_store.py",
@@ -51,7 +51,7 @@
     },
     {
       "logical_ref": "repo://tests/test_forge_trust_closure_v1.py",
-      "sha256_or_fingerprint": "247de69c861f955aa0130448c3184f3dbdb4cb18aa0d9e67a32e23f4f3fec1ee"
+      "sha256_or_fingerprint": "30bbd068fa91c45a60684d4f8a9aaac136748b1d9788ea043031b356bc448b5e"
     },
     {
       "logical_ref": "repo://configs/experiment_capability_registry_v2.yaml",
@@ -59,7 +59,7 @@
     },
     {
       "logical_ref": "repo://docs/contracts/experiment_evidence_decision_v1.md",
-      "sha256_or_fingerprint": "19cdfa8a0ede9e1392d2c3ee6cffe496e7c5a145ae88378c539630046b0dc576"
+      "sha256_or_fingerprint": "bb661ae114d4cfd0f697ed6be10d41a10725bb358e1999abb92819b229d6e251"
     },
     {
       "logical_ref": "repo://scripts/precommit_diff_check.py",
@@ -72,6 +72,14 @@
     {
       "logical_ref": "repo://tests/test_precommit_diff_check_v1.py",
       "sha256_or_fingerprint": "ae3b9cd5181b1e690ead5e1c1e0978093b9f2dc4088106a859b7b2eefb7652e4"
+    },
+    {
+      "logical_ref": "repo://tests/fixtures/forge_trust_closure_v1/replay.py",
+      "sha256_or_fingerprint": "e9ef780532f790c2e537a94a3ebc8fa8832c0c462059e7b7b5f9b4dd1b79e292"
+    },
+    {
+      "logical_ref": "repo://docs/evidence/forge_trust_closure_v1/resource_readback.json",
+      "sha256_or_fingerprint": "2994f2243ff860e7c14faa94bc723f3c0b8ed0d3d4687cb5b08050e93ef8302f"
     }
   ],
   "independence": {
@@ -94,7 +102,7 @@
     "NO_MODEL_DIVERSITY_ATTESTATION",
     "NO_MERGE"
   ],
-  "packet_fingerprint_sha256": "b9a1a3a9186331acd4b57e64f2f4c21e065bdabec13c8dd6db3bd0f8df0755d6",
+  "packet_fingerprint_sha256": "3b495860d8f23dc03e0f41bf77c4b6a7bed320a8da17fd869cc19af58fe6b853",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
@@ -134,7 +142,7 @@
       "scope": "BOUNDED_SYNTHETIC_FORGE_TRUST_CLOSURE"
     },
     {
-      "claim": "Native execution events carry experiment identity; validated exact legacy passports can link without rewriting history; contradictory shared run keys quarantine weak joins.",
+      "claim": "Native execution events carry experiment identity; validated exact legacy passports can link without rewriting history; contradictory shared run/trial keys quarantine weak joins before seeding.",
       "claim_id": "C2",
       "scope": "BOUNDED_SYNTHETIC_FORGE_TRUST_CLOSURE"
     },
@@ -151,6 +159,11 @@
     {
       "claim": "Genuine actors remain NOT_RUN/AGENT_BEHAVIOR_UNVERIFIED; readonly reviewers and scripted native replay never become confined actors; original 56-charter baseline is not blanket regraded.",
       "claim_id": "C5",
+      "scope": "BOUNDED_SYNTHETIC_FORGE_TRUST_CLOSURE"
+    },
+    {
+      "claim": "Only a graded replay PASS returns shell success; receipt integrity is separate from replay status, and missing terminal evidence fails even when the real product process exits zero.",
+      "claim_id": "C8",
       "scope": "BOUNDED_SYNTHETIC_FORGE_TRUST_CLOSURE"
     },
     {
