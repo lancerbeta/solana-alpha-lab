@@ -34,5 +34,41 @@
     "status": "INTERRUPTED_NOT_USED_AS_PASS",
     "reason": "DUPLICATE_CANONICAL_CATALOG_SWEEP_AFTER_FOCUSED_VALIDATOR_PASS",
     "catalog_owner": "HARNESS_SYNC_AND_EXACT_HEAD_CI"
+  },
+  "test_shard_failure": {
+    "job_id": 114196952328,
+    "observed_result": "FAILURE",
+    "selected_cases": 1128,
+    "failures": 1,
+    "errors": 2,
+    "skipped": 9,
+    "raw_log_sha256": "77f3154938ccefb791612b603356fb0c33975a5cf4521576fbcf58338095925b",
+    "causes": [
+      "NO_COMMITTER_IDENTITY_FOR_NO_COMMIT_TEST_MERGE",
+      "WORKBENCH_CURRENT_BYTE_PIN_PRECEDES_AUTHORIZED_LINEAGE_READOUT"
+    ],
+    "repair_scope": [
+      "tests/test_precommit_diff_check_v1.py",
+      "tests/test_factory_ordinary_market_hypothesis.py"
+    ],
+    "git_config_mutated": false,
+    "per_command_synthetic_identity_and_explicit_lf": true,
+    "before_source_head": "c2b9671a1f4b785cd46967e66e0e6950f48d5e85",
+    "identity_free_before_merge_exit": 128,
+    "identity_free_before_tests": "FAIL_TWO_MERGE_ERRORS",
+    "identity_free_after_merge_exit": 0,
+    "identity_free_after_tests": "PASS_3_OF_3",
+    "before_output_sha256": "cdd18430f343bdff700ba5650d72c5f8a4c63425477915c642e78571b5f8f9bc",
+    "before_merge_output_sha256": "ab5f75ee622c307a17026aa43721de9d7a146035345b579b5145097ce2cc4882",
+    "after_output_sha256": "6f0224e9a0dda4f55c2fc81f13e1e3cde82482dbac5f05e4c93aa9d09533d488",
+    "proof_script_sha256": "65352f8254a27da9f41ffb530c3ed75972fd8c427684b95b5f25f2ddfa3d14af",
+    "ordinary_market_after_tests": "PASS_13_OF_13",
+    "ordinary_market_after_output_sha256": "68aca8ed99f89110ccf1727281a4c56b05364285fd48c84245a3ec079ad5e3b5",
+    "repair_source_sha256": {
+      "tests/test_precommit_diff_check_v1.py": "0df718884afb1a3a87a74141d661ec7f8e5917e1121970cf218b1fd5ea88044a",
+      "tests/test_factory_ordinary_market_hypothesis.py": "7c525abea77ff80f4633d802fb00b521525a275eb58e7ef4a4c9335ca79b71d3"
+    },
+    "behavioral_assertions_removed": false,
+    "workbench_sha256": "3a59bcf2bd4951784b401bcbd250b4e99ee7f68be423964832760f1649f0218e"
   }
 }

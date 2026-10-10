@@ -15,27 +15,30 @@ class PrecommitDiffTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
         self.git("init", "-q", "-b", "main")
-        (self.root / "base.txt").write_text("base\n")
+        (self.root / "base.txt").write_text("base\n", newline="\n")
         self.git("add", ".")
         self.commit("base")
         self.git("branch", "task")
-        (self.root / "historical.txt").write_text("accepted upstream whitespace \n")
+        (self.root / "historical.txt").write_text("accepted upstream whitespace \n", newline="\n")
         self.git("add", ".")
         self.commit("accepted upstream")
         self.main = self.git("rev-parse", "HEAD").stdout.strip()
         self.git("update-ref", "refs/remotes/origin/main", self.main)
         self.git("checkout", "-q", "task")
-        (self.root / "task.txt").write_text("new task\n")
+        (self.root / "task.txt").write_text("new task\n", newline="\n")
         self.git("add", ".")
         self.commit("task")
 
     def git(self, *args, check=True):
-        return subprocess.run(["git", *args], cwd=self.root, text=True,
+        # A no-commit merge still requires committer identity. Keep it local
+        # to each test command instead of depending on the host's Git config.
+        return subprocess.run(["git", "-c", "user.name=FtcTest",
+                               "-c", "user.email=ftc-test@example.invalid", *args],
+                              cwd=self.root, text=True,
                               capture_output=True, check=check)
 
     def commit(self, message):
-        self.git("-c", "user.name=FtcTest", "-c", "user.email=ftc-test@example.invalid",
-                 "commit", "-q", "-m", message)
+        self.git("commit", "-q", "-m", message)
 
     def check(self):
         result = subprocess.run([sys.executable, "-B", str(ENTRY)], cwd=self.root,
@@ -48,7 +51,7 @@ class PrecommitDiffTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(report["base"], self.main)
         self.assertEqual((self.root / "historical.txt").read_text(), "accepted upstream whitespace \n")
-        (self.root / "task.txt").write_text("new task defect \n")
+        (self.root / "task.txt").write_text("new task defect \n", newline="\n")
         self.git("add", "task.txt")
         self.assertNotEqual(self.check()[0], 0)
 
@@ -61,7 +64,7 @@ class PrecommitDiffTests(unittest.TestCase):
         self.assertEqual(report["scope"], "ORDINARY_STAGED_DIFF")
 
     def test_ordinary_staged_whitespace_remains_denied(self):
-        (self.root / "task.txt").write_text("ordinary defect \n")
+        (self.root / "task.txt").write_text("ordinary defect \n", newline="\n")
         self.git("add", "task.txt")
         code, report = self.check()
         self.assertNotEqual(code, 0)

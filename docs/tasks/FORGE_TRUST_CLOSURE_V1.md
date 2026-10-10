@@ -21,6 +21,7 @@ managed_write_set:
 - tests/fixtures/forge_trust_closure_v1/**
 - tests/test_forge_trust_closure_v1.py
 - tests/test_precommit_diff_check_v1.py
+- tests/test_factory_ordinary_market_hypothesis.py
 - scripts/precommit_diff_check.py
 - scripts/validate.ps1
 - scripts/validate_baton.py
@@ -113,6 +114,11 @@ preparatory-only output, second provider/route pivot, resource boundary.
 
 Reuse: WRAP the pinned audit kit and existing runtime; BUILD only bounded
 project-owned identity/reader repairs. CAPABILITY_RADAR_NOW=NONE.
+
+Engineering replan after exact PR CI: delegated whitespace validator boundary,
+host-independent synthetic Git test commands/LF fixtures and the ordinary-market
+Workbench current-byte pin belong to this causal repair. No behavior assertion,
+scientific boundary, historical audit pin or external authority is weakened.
 Engineering replan: reconcile merged PR393 at exact main 96eb087224f012ccb028ba468d4e0a7cd7ca1506.
 Preserve audit bytes. Repair precommit whitespace reference only for a pending
 merge of exact origin/main; all new task whitespace and ordinary/non-main merge

@@ -137,3 +137,11 @@ FAILURE: legacy validate_baton ожидал inline whitespace command в PowerSh
 boundary, ordinary staged Git command и nonzero propagation; focused validator
 и три реальные Git regressions PASS. Product source/science не изменены.
 Failure/retry сохранены в ci_repair.json; новый head требует fresh review/bind/CI.
+
+В том же первом CI test shard3 выявил два связанных test defects: pending
+no-commit merge требует committer identity даже без commit, а current-byte pin
+Workbench оставался до разрешённого lineage readout. Реальный replay с отключёнными
+global/system Git configs воспроизвёл два merge errors (exit128); явная synthetic
+identity только на test command и LF fixtures дают 3/3 PASS без изменения Git
+config. Workbench pin обновлён к actual source; все 13 ordinary-market behavior
+tests PASS, assertions не удалены. Product source/science остаются прежними.
