@@ -99,6 +99,72 @@ returned by research-scope-resolve. MAIN=1 requires an explicit valid spec.
 LIMITED_RESULT stops after the admitted bounded result; it does not claim a
 scientific terminal. Reuse the returned operation_sha256 for continuation.
 Changing code, prompt or process does not refund exposure or mint a new slot.
+
+### Per-test authored basis and cold read
+
+Use the existing `question_text` to retain the outward A9/A10 reasoning before
+values: the competing explanations, selected discriminator and selection reason,
+the strongest rejected alternative (or honest NONE), and the proposed actions
+and forbidden conclusions for PASS, FAIL, INCONCLUSIVE and technical failure.
+This is untrusted advisory text, not a new field schema, score or scientific
+authority. Do not invent numerical thresholds merely to complete a template.
+Keep private reasoning outside it. Example outward text for a bounded probe:
+
+```text
+Question: does the fixed membership comparison distinguish association from
+missingness/dependency? Alternatives: membership-associated contrast; no
+identifiable contrast under the admitted observations. Select the existing
+list contrast because it is the cheapest supported discriminator; rejected
+alternative NONE if no other admissible test exists. PASS: reconsider the
+bounded subclaim, never promote from a descriptive proxy. FAIL: retain the
+exact measurement-scoped negative, never close a family. INCONCLUSIVE: retain
+the unresolved alternatives, no fresh look grant. Technical failure: repair
+the same request, draw no market conclusion.
+```
+
+For a supported later adaptive test, author a **new immutable continuation
+request** before its values: retain the original focus/journal/market, set
+`parent_operation_sha256` to the original request, copy only the already granted
+remaining ceilings, and put its distinct conditional plan in `question_text`.
+The materially different canonical query names `adaptation_of` for the prior
+spec. Existing admission, accounting root and MAIN/ADAPTIVE classification
+remain authoritative. A generic operation-wide text for several tests is not
+automatically a per-test plan. Changing explanation alone never authorizes a
+second reservation for the same pending spec.
+
+`ORDINARY_LOOK_PENDING_IN_OTHER_OPERATION` names the original operation and
+reservation; resume that original request. An ambiguous historical duplicate
+binding is a typed conflict requiring resolution, never an automatic refund,
+overwrite or choice of a new plan. Saved replay attributes the result's
+`question_text` and `result_operation_sha256` to its original producer; a
+different requested `operation_sha256` remains explicitly distinct.
+
+Cold read from the existing store, without the operation/spec input files:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <existing-store> discovery-show --result-ref <saved-result-ref>
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <existing-store> discovery-show --operation-sha256 <original-operation-sha256> --offset 0 --limit 20
+```
+
+The projection joins original request, reservation, saved query/result, parent
+and the existing scientific-disposition resolver. `canonical_query` is either
+the saved public query or a source-derived canonical reconstruction from the
+native recipe; original author-file byte layout is NOT_RECORDED. Legacy absent
+basis remains NOT_RECORDED. Historical and revised results remain distinct;
+current applicability is computed, never backfilled into old assessments.
+This read loads no outcome rows and writes nothing. Pagination is explicit and
+one committed archive enumeration is shared across the returned links. It
+never refreshes preflight, repairs storage, commissions a lane or grants a look.
+
+For a positive candidate, `source_links` names hash-checked saved drafts and
+selected Critic packets containing both this exact result ref and result hash.
+Use its exact session locator with `show-session --session-id <session-id>`;
+that existing owner verifies the own-Critic chain and returns its outcome.
+The projection never assigns a session terminal to a primary or runner-up.
+`look_context_result_refs` is context only and cannot confirm the selected
+candidate. A missing separate scientific disposition stays NOT_RECORDED and
+does not downgrade a positive source terminal or force a negative assessment.
+
 For ordinary discovery, the saved look publishes `candidate_scope.evidence_surface_mode`.
 The ordinary scope owner fills an omitted route label with its existing
 `ORDINARY_GROUNDED_DISCOVERY_V1`; copy that emitted binding before persist.

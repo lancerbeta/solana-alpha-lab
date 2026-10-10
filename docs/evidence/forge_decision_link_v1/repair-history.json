@@ -1,0 +1,120 @@
+{
+  "task_id": "FORGE_DECISION_LINK_V1",
+  "stage": "S0",
+  "provenance": "Normalized observations reconstructed from retained execution-tool outputs in this chat; these are not preserved raw stderr or an exact per-revision replay trace.",
+  "new_fixture_attempts": 3,
+  "cold_resume_invocations": 5,
+  "records": [
+    {
+      "attempt": "entry-a01",
+      "phase": "producer characterization",
+      "status": "HARNESS_ERROR",
+      "cause": "The probe counted creation/fingerprint/PAUSED_CAP events as distinct logical operations.",
+      "observed": "3 events, 1 operation_sha256, 1 reservation; literal result oracle passed",
+      "retained": "local/forge_decision_link_v1/entry-a01",
+      "repair": "Compare distinct logical operation keys; preserve immutable event history."
+    },
+    {
+      "attempt": "entry-a02",
+      "phase": "disposition-record",
+      "status": "REFUSED",
+      "observed": "DISPOSITION_BASIS_SCOPE_MISMATCH; exit2; research_store writes0",
+      "retained": "local/forge_decision_link_v1/entry-a02/assessment.json",
+      "retained_sha256": "8d1a8e49e0ad0ef70c6308350d00fcd7905bbddf5404a2c30b7f53dd969e8006",
+      "repair": "Use the exact preflight.owner_focus including OPPORTUNITY_EPISODES prefix."
+    },
+    {
+      "attempt": "entry-a03",
+      "phase": "cold-operation",
+      "status": "HARNESS_ERROR",
+      "failed_operation": "research-policy-status --operation-sha256 <native operation hash>",
+      "observed": "argparse unrecognized arguments; exit2; stdout empty",
+      "repair": "Current flag is --for-operation; this surface reports budgets, not the plan."
+    },
+    {
+      "attempt": "entry-a03/cold-resume-1",
+      "phase": "preflight key comparison",
+      "status": "HARNESS_ERROR",
+      "observed": "scientific_slot_sha256 missing in this public preflight",
+      "repair": "Read slot/accounting identity from existing get_operation, its actual owner."
+    },
+    {
+      "attempt": "entry-a03/cold-resume-2",
+      "phase": "reader inventory check",
+      "status": "HARNESS_ERROR",
+      "observed": "Existing preflight context writer changed committed inventory; preflight reported research_store1/forge_context1.",
+      "repair": "Keep context writing outside the zero-write reader envelope."
+    },
+    {
+      "attempt": "entry-a03/cold-resume-3",
+      "phase": "plan reader assertion",
+      "status": "HARNESS_ERROR",
+      "observed": "research-policy-status does not expose question_text; saved replay does",
+      "repair": "Use actual saved discovery-execute replay as the plan reader."
+    },
+    {
+      "attempt": "entry-a03/cold-resume-4",
+      "phase": "source-addressed discovery replay",
+      "status": "REFUSED",
+      "failed_operation": "discovery-execute --operation-sha256 <native operation hash> --spec <normalized look.spec> --candidate-scope <saved scope>",
+      "observed": {
+        "reason_code": "QUERY_SPEC_INVALID",
+        "scientific_negative": false,
+        "values_loaded": false,
+        "writes": false
+      },
+      "repair": "Extract the exact public query from operation.spec_canonical; look.spec is a normalized envelope.",
+      "original_output_retained": false
+    },
+    {
+      "attempt": "entry-a03/cold-resume-5",
+      "phase": "source-addressed replay and cold read",
+      "status": "ENTRY_EXISTING_PATH_VERIFIED",
+      "retained": "local/forge_decision_link_v1/entry-a03/terminal.json",
+      "retained_sha256": "28bcfa38d92473f2d45bbd5d24c2f72073ea4fe99cba9a192b97e317e5d1edef",
+      "fixture_or_writer_rerun": false,
+      "new_values": false
+    }
+  ],
+  "resource": {
+    "clock_basis": "Owned attempt terminal file creation/last-write metadata, read back after completion; this measures elapsed campaign wall time including diagnosis, not summed process CPU/run time.",
+    "first_attempt_started_utc": "2026-10-10T17:32:27.5512594Z",
+    "terminal_completed_utc": "2026-10-10T17:48:02.6869183Z",
+    "campaign_wall_seconds": 935.136,
+    "declared_campaign_wall_cap_seconds": 900,
+    "wall_cap_result": "BREACHED_STOP_BEFORE_NEXT_PRODUCT_SCOPE",
+    "summed_process_execution_seconds": "UNKNOWN",
+    "last_cold_resume_seconds": 9.811,
+    "retained_attempt_bytes": {
+      "entry-a01": 14507500,
+      "entry-a02": 14543136,
+      "entry-a03": 14891063
+    },
+    "retained_attempt_bytes_total": 43941699,
+    "declared_storage_cap_bytes": 1073741824,
+    "cpu_ram_peak": "UNKNOWN",
+    "model_choice_comparison_calls": 0
+  },
+  "limitations": [
+    "Early cold output revisions were overwritten before archival was added; the observed refusals/corrections above are transcript-derived and are not exact raw replay artifacts.",
+    "Retention and command-log hash bookkeeping helper corrections postdate the successful native process; syntax checked, product rerun NOT_RUN.",
+    "The probe timer reports per-invocation time, so its cap check did not enforce aggregate S0 time across repairs. Aggregate cap PASS is not claimed.",
+    "No passing early fragments were combined into candidate implementation acceptance; V01-V18 candidate qualification remains NOT_RUN."
+  ],
+  "evidence_audit": {
+    "status": "PARTIAL_KNOWN_BOOKKEEPING_MISMATCH",
+    "raw_terminal_unchanged": true,
+    "artifact_hashes_verified": 20,
+    "source_hashes_verified": 7,
+    "mismatches": [
+      {
+        "artifact": "resume-commands.json",
+        "recorded_sha256": "b75d519fde6006254c763f29b3f6de6470b16e3e06850d76318f99f2e2d93321",
+        "current_sha256": "8d19345cfd9c00d914048c90beff00196e4bf9f5e23ff99537e59a8bde55065d"
+      }
+    ],
+    "current_command_list_equals_terminal_commands": true,
+    "cause": "Artifacts dictionary captured resume-commands.json before the cold invocation; CLI save updated its bytes but not its artifact hash.",
+    "correction": "Helper now stores the hash returned by save() for the command artifact; product rerun NOT_RUN after aggregate cap breach."
+  }
+}

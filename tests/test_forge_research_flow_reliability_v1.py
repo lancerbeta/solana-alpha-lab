@@ -893,21 +893,21 @@ class EpisodeFlowTests(unittest.TestCase):
     def preflight(self,focus):
         return self.cli('preflight','--discovery-contract','--collection','OPPORTUNITY_EPISODES','--owner-focus',focus,'--format','json')
 
-    def look(self,focus,query=None,*,cap=None):
+    def look(self,focus,query=None,*,cap=None,preflight_receipt=None):
         from tests.test_hfic_list_aware_vertical_v1 import draft,NUMERIC
         from tests.test_hfic_ordinary_operation_acceptance_v1 import _operation
         from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_target_label
         query=query or draft('LIST_CONTRAST',list_condition={'clauses':[{'all_of':['A']}]})
         resolved=self.cli('research-scope-resolve','--spec',self.write('query.json',query))['canonical_query']
-        pre=self.preflight(focus)
+        pre=preflight_receipt or self.preflight(focus)
         scope={'population':'OPPORTUNITY_EPISODES','decision_timestamp':'E1800','target':temporal_target_label(resolved),'estimand':'price_relative_proxy','explanatory_condition':resolved['hypothesis_kind'],'evidence_surface_mode':'ORDINARY_GROUNDED_DISCOVERY_V1'}
         operation=_operation(resolved,focus=pre['owner_focus'],journal=pre['search_key_sha256'],market=pre['market_evidence_epoch_sha256'],text='Research-flow synthetic '+focus,cap=cap or {'main':1,'adaptive':0,'preview':2},completion='LIMITED_RESULT')
         evidence=self.cli('discovery-execute','--store',str(self.plane),'--spec',self.write('canonical.json',resolved),'--candidate-scope',self.write('scope.json',scope),'--journal-scope',pre['search_key_sha256'],'--operation',self.write('operation.json',operation),'--format','json')
         return evidence,scope,resolved,pre
 
-    def authored_draft(self,evidence,scope,focus,*,n=1):
+    def authored_draft(self,evidence,scope,focus,*,n=1,preflight_receipt=None):
         from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_holder_claim_identity,TEMPORAL_CAPABILITY_ID
-        pre=self.preflight(focus)
+        pre=preflight_receipt or self.preflight(focus)
         exact=temporal_holder_claim_identity(evidence['result'])
         card={**scope,**exact,'display_ordinal':1,'label':'FLOW-1','claim':'List A membership separates the fixed E14400 price-relative proxy; synthetic engineering fixture only.',
               'novelty_class':'NEW_MEASUREMENT','claim_form':'PREDICTIVE','mundane_alternative':'Vendor selection and repeated template structure explain an apparent contrast.',
@@ -937,6 +937,135 @@ class EpisodeFlowTests(unittest.TestCase):
         resume=self.preflight(pre['owner_focus'])
         frozen=self.cli('freeze','--draft',draft_path,'--preflight-receipt',self.write('resume.json',resume),'--format','json')
         return generated,frozen
+
+    def test_advisory_append_reissues_bound_detail_without_moving_cutoff_or_hidden_guard(self):
+        from datetime import UTC, datetime, timedelta
+        from tests.test_hfic_critic_prior_memory_closure_v1 import _event
+        from tests.test_hfic_scientific_disposition_continuity_v1 import question_packet
+        from solana_alpha_lab.factory.hfic_card_projection import project_material_card
+        from solana_alpha_lab.factory.hfic_identity import candidate_identity
+        from solana_alpha_lab.factory.hfic_generation_context import collect_verified_priors, original_working_view
+        from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
+        from solana_alpha_lab.factory.hfic_ordinary_operation import journal_occupancy
+        from solana_alpha_lab.factory.research_store import RecordKind, ResearchStore
+
+        # Admit the saved look before the exact prior exists. Read-only preflight
+        # leaves generation unbound until the declared historical sources arrive.
+        focus = 'DL_ADVISORY_CUTOFF_GUARD'
+        self.preflight('DL_CUTOFF_BOOTSTRAP')  # native commissioning, distinct generation search key
+        initial = self.cli('preflight', '--no-auto-commission', '--discovery-contract',
+                           '--collection', 'OPPORTUNITY_EPISODES', '--owner-focus', focus, '--format', 'json')
+        evidence, scope, _query, initial = self.look(focus, preflight_receipt=initial)
+        initial_body, _ = self.authored_draft(evidence, scope, focus, preflight_receipt=initial)
+        exact = project_material_card(initial_body['candidates'][0])
+        store = ResearchStore(self.plane)
+        self.assertIsNone(original_working_view(store, search_key=initial['search_key_sha256']))
+        initial_archive_ids = {row['hypothesis_version_id']
+                               for row in collect_verified_priors(store, as_of=None)['capsules']}
+        records = []
+        for index in range(65):
+            hyp_id = f'HYP-DL-CUTOFF-{index:05d}'
+            payload = {
+                'hypothesis_version_id': hyp_id, 'definition_sha256': f'{index + 1:064x}',
+                'claim': f'Historical observable {index}', 'population': 'OPPORTUNITY_EPISODES',
+                'representation_scope': 'BASE', 'decision_timestamp': 'H900',
+                'primary_x_family': f'FIELD-DISTINCT-{index % 11}', 'primary_y': 'HISTORICAL_TARGET',
+                'horizon_notional': 'H900 / no execution', 'cheapest_falsifier': 'Fixed historical comparison',
+            }
+            if index == 64:
+                payload = {**exact, 'hypothesis_version_id': hyp_id, 'hfic_protocol': 'HFIC-V1.2'}
+                payload['definition_sha256'] = candidate_identity(payload).full_sha256
+            records.append(_event(record_id=hyp_id, kind=RecordKind.HYPOTHESIS_VERSION,
+                                  entity_id=hyp_id, hypothesis_version_id=hyp_id, payload=payload,
+                                  created=datetime(2026, 10, 8, tzinfo=UTC),
+                                  transaction_id='RESEARCH-TXN-DL-CUTOFF-HISTORY'))
+        store.append(records, transaction_id='RESEARCH-TXN-DL-CUTOFF-HISTORY')
+        original_hashes = {record.record_id: record.payload_sha256 for record in records}
+        hidden_exact = records[-1].hypothesis_version_id
+        _body, pre = self.authored_draft(evidence, scope, focus)
+        memory = pre['forge_context_packet']['prior_memory_working_view']
+        shown = {row['hypothesis_version_id'] for row in memory['capsules']}
+        self.assertNotIn(hidden_exact, shown)
+        self.assertEqual(memory['archive_eligible_count'], 65 + len(initial_archive_ids))
+        receipt = self.write('bound-detail-pre.json', pre)
+        source_ref = memory['capsules'][0]['hypothesis_version_id']
+        detail_args = ('prior', '--context-view', '--preflight-receipt', receipt,
+                       '--selection-query-sha256', memory['selection_query_sha256'], '--source-ref', source_ref)
+        before_detail = store.diagnostics().committed_inventory_sha256
+        old_detail = self.cli(*detail_args)
+        self.assertEqual(old_detail['status'], 'READ_ONLY')
+        self.assertFalse(old_detail['new_look'])
+        self.assertEqual(store.diagnostics().committed_inventory_sha256, before_detail)
+
+        look = next(row for row in list_discovery_looks(store, initial['search_key_sha256'])
+                    if row['record_id'] == evidence['result_refs'][0])
+        assessment = question_packet({'market': initial['market_evidence_epoch_sha256'],
+                                      'journal': initial['search_key_sha256']}, look)
+        assessment['subject']['owner_focus'] = initial['owner_focus']
+        assessment['judgement'].update(verdict='INSUFFICIENT_EVIDENCE', recommendation='REVIEW_BOUNDED_SCOPE')
+        budget = journal_occupancy(store, initial['search_key_sha256'])
+        written = self.cli('disposition-record', '--input', self.write('advisory.json', assessment), '--format', 'json')
+        stale = self.cli(*detail_args, ok=False)
+        self.assertEqual(stale['reason_code'], 'GENERATION_CONTEXT_STALE_STORE_BINDING')
+        self.assertEqual(stale['next_action'], 'RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK')
+        self.assertFalse(stale['new_look'])
+
+        # A fact with an earlier effective time but late reliable availability
+        # must not enter the original bound selection after the advisory append.
+        cutoff = datetime.fromisoformat(memory['research_log_cutoff'])
+        late_id = 'HYP-DL-LATE-ONLY'
+        late = _event(record_id=late_id, kind=RecordKind.HYPOTHESIS_VERSION,
+                      entity_id=late_id, hypothesis_version_id=late_id,
+                      payload={'hypothesis_version_id': late_id, 'claim': 'Late available synthetic fact'},
+                      created=datetime.now(UTC), transaction_id='RESEARCH-TXN-DL-LATE-ONLY')
+        late = late.model_copy(update={'effective_at': cutoff - timedelta(seconds=1),
+                                      'first_reliable_available_at': datetime.now(UTC)})
+        self.assertGreater(late.first_reliable_available_at, cutoff)
+        store.append([late], transaction_id=late.transaction_id)
+        resumed = self.preflight(focus)
+        refreshed = resumed['forge_context_packet']['prior_memory_working_view']
+        for key in ('research_log_cutoff', 'selection_query_sha256', 'capsules', 'eligible_archive_sha256',
+                    'archive_eligible_count', 'considered_count', 'selection_policy_revision'):
+            self.assertEqual(refreshed[key], memory[key], key)
+        self.assertEqual(resumed['search_key_sha256'], pre['search_key_sha256'])
+        self.assertEqual(resumed['market_evidence_epoch_sha256'], pre['market_evidence_epoch_sha256'])
+        eligible = collect_verified_priors(store, as_of=refreshed['research_log_cutoff'])
+        self.assertNotIn(late_id, {row['hypothesis_version_id'] for row in eligible['capsules']})
+        self.assertIn(hidden_exact, {row['hypothesis_version_id'] for row in eligible['capsules']})
+        self.assertNotIn(hidden_exact, {row['hypothesis_version_id'] for row in refreshed['capsules']})
+        self.assertTrue(any(row['ref'] == written['record_id'] for row in
+                            resumed['forge_context_packet']['scientific_disposition_context']['entries']))
+        before_reads = store.diagnostics().committed_inventory_sha256
+        new_detail = self.cli('prior', '--context-view', '--preflight-receipt', self.write('resumed-pre.json', resumed),
+                              '--selection-query-sha256', refreshed['selection_query_sha256'], '--source-ref', source_ref)
+        self.assertEqual(new_detail['status'], 'READ_ONLY')
+        self.assertEqual(new_detail['view']['capsules'], old_detail['view']['capsules'])
+        self.assertEqual(store.diagnostics().committed_inventory_sha256, before_reads)
+
+        current_body, current_pre = self.authored_draft(evidence, scope, focus)
+        before_refusal = store.diagnostics().committed_inventory_sha256
+        denied = self.cli('persist-draft', '--draft', self.write('hidden-exact.json', current_body),
+                          '--preflight-receipt', self.write('current-pre.json', current_pre), ok=False)
+        self.assertEqual(denied.get('reason_code'), 'EXACT_PRIOR_SCOPE_MATCH', denied)
+        self.assertEqual(store.diagnostics().committed_inventory_sha256, before_refusal)
+        self.assertEqual(journal_occupancy(store, initial['search_key_sha256']), budget)
+        self.assertEqual({record.record_id: record.payload_sha256 for record in store.iter_committed_records()
+                          if record.record_id in original_hashes}, original_hashes)
+        import os
+        capture = os.environ.get('FORGE_DECISION_LINK_V08_V09_CAPTURE')
+        if capture:
+            proof = {'test': 'EpisodeFlowTests.test_advisory_append_reissues_bound_detail_without_moving_cutoff_or_hidden_guard',
+                     'mode': 'ONE_SYNTHETIC_STORE_COMBINED_ADVISORY_CUTOFF_FULL_GUARD',
+                     'result_ref': evidence['result_refs'][0], 'assessment_ref': written['record_id'],
+                     'hidden_exact_ref': hidden_exact, 'late_only_ref': late_id,
+                     'old_detail_refusal': stale['reason_code'], 'persist_refusal': denied['reason_code'],
+                     'original_memory': memory, 'reissued_memory': refreshed, 'original_payload_hashes': original_hashes,
+                     'late_source_effective_at': late.effective_at.isoformat(),
+                     'late_source_first_reliable_available_at': late.first_reliable_available_at.isoformat(),
+                     'read_inventory_unchanged': True, 'history_unchanged': True, 'occupancy_before': budget,
+                     'occupancy_after': journal_occupancy(store, initial['search_key_sha256']),
+                     'non_claims': ['NO_ALPHA', 'NO_REAL_MARKET_LOOK', 'NO_CHOICE_QUALITY_PASS']}
+            Path(capture).write_text(json.dumps(proof, sort_keys=True, indent=2) + '\n', encoding='utf-8')
 
     def test_trust_closure_new_evidence_preserves_pending_reservation_and_safe_stop_recovery(self):
         from tests import test_hfic_list_aware_vertical_v1 as lav

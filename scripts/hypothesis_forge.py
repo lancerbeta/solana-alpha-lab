@@ -1314,6 +1314,28 @@ def cmd_disposition_show(
     return emit(payload)
 
 
+def cmd_discovery_show(
+    repo_root: Path, explicit_data_root: Path | None, *, result_ref: str | None = None,
+    operation_sha256: str | None = None, offset: int = 0, limit: int = 20,
+) -> int:
+    """Original request, saved query/result and applicable assessment; no value reads."""
+    from solana_alpha_lab.factory.hfic_discovery_detail import DiscoveryDetailError, discovery_detail
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    try:
+        payload = discovery_detail(store, result_ref=result_ref, operation_sha256=operation_sha256,
+            current_market=_current_market(repo_root, data_root, store), offset=offset, limit=limit)
+        _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    except DiscoveryDetailError as exc:
+        return emit({"refusal_code": exc.code, "values_loaded": False,
+            "writes": {"research_store": 0}}, exit_code=2)
+    except HficCliError:
+        return emit({"refusal_code": "DISCOVERY_DETAIL_PATH_LEAK", "values_loaded": False,
+            "writes": {"research_store": 0}}, exit_code=2)
+    return emit(payload)
+
+
 def cmd_discovery_binding(repo_root: Path, explicit_data_root: Path | None, *, collection: str | None = None) -> int:
     """No-write admission binding for the published discovery corpus."""
 
@@ -1647,6 +1669,7 @@ def _cmd_discovery_execute(
             return emit(
                 {
                     "reason_code": exc.code,
+                    "detail": exc.detail,
                     "values_loaded": False,
                     "writes": bool(service_writes) or gate.get("disposition") == "RESERVED",
                     "scientific_negative": False,
@@ -4558,6 +4581,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="Current journal (preflight search_key_sha256); rotated journals degrade search advice",
     )
     disposition_show.add_argument("--format", choices=("json",), default="json")
+    discovery_show = subparsers.add_parser(
+        "discovery-show", help="Read a saved result's original request, query and assessments; no outcome rows",
+    )
+    discovery_show.add_argument("--result-ref", default=None)
+    discovery_show.add_argument("--operation-sha256", default=None)
+    discovery_show.add_argument("--offset", type=int, default=0)
+    discovery_show.add_argument("--limit", type=int, default=20)
+    discovery_show.add_argument("--format", choices=("json",), default="json")
     discovery_coverage = subparsers.add_parser(
         "discovery-coverage",
         help="No-write state-only joint coverage. Never selects typed_value.",
@@ -5111,6 +5142,9 @@ def main(argv: list[str] | None = None) -> int:
                 limit=args.limit,
                 journal_scope=args.journal_scope,
             )
+        if args.command == "discovery-show":
+            return cmd_discovery_show(repo_root, args.data_root, result_ref=args.result_ref,
+                operation_sha256=args.operation_sha256, offset=args.offset, limit=args.limit)
         if args.command == "discovery-coverage":
             return cmd_discovery_coverage(repo_root, args.data_root, collection=args.collection)
         if args.command == "research-scope-resolve":

@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE_DECISION_LINK_V1-TECHNICAL-CANDIDATE",
+  "as_of": "2026-10-10",
+  "task_id": "FORGE_DECISION_LINK_V1",
+  "state_change": "Exact per-test original request/result/applicability and positive source links exposed; foreign pending retry prevented. Review and CI/owner authority remain delivery gates.",
+  "base_main": "76993054cfaeeee7e9fb6e7b718add8cf27e404a",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "docs/tasks/FORGE_DECISION_LINK_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_decision_link_v1/factory-fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_NATIVE_SYNTHETIC_CONTINUITY_AND_IMPACT",
+    "independent_review": {
+      "path": "docs/evidence/forge_decision_link_v1/independent-review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_RETENTION_CANARIES",
+      "PASS_COMPOUND_RECOVERY",
+      "PASS_PROPAGATION"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA_OOS_ECONOMICS",
+    "NO_LIVE_USE",
+    "NO_NEW_SCIENTIFIC_OR_MERGE_AUTHORITY",
+    "NO_CHOICE_QUALITY_GAIN",
+    "NO_FACTORY_WIDE_FULL_QUALIFICATION",
+    "HISTORICAL_S0_LIMITATIONS_PRESERVED",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ],
+  "side_effects": {
+    "real_store_writes": 0,
+    "provider_calls": 0,
+    "real_looks": 0,
+    "holdout_reads": 0,
+    "deployment": 0,
+    "cash_spend": 0,
+    "synthetic_fixture_writes": "NATIVE_EXPECTED"
+  },
+  "capability_radar_now": "Existing owner reuse; no new decision policy."
+}

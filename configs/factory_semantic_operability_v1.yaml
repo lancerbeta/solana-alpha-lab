@@ -52,9 +52,10 @@ routes:
       - What is the one-slash Forge workflow?
       - What can Forge currently see?
       - как сгенерировать или проверить гипотезу
+      - Где прочитать исходный план, запрос, результат и оценку теста Forge?
     search_terms:
       - hypothesis
-      - hypotheses
+      - discovery-show
       - forge
       - HFIC
       - critic

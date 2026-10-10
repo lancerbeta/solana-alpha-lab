@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE_DECISION_LINK_V1-FIT",
+  "as_of": "2026-10-10",
+  "task_id": "FORGE_DECISION_LINK_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "Exact per-test continuity and cold operator recovery.",
+    "flexibility_and_history": "Reuse native immutable requests, reservations, results and disposition lifecycle; original S0 and failed campaigns preserved.",
+    "context_efficiency": "One archive snapshot, addressed/paged output; proportional44+cause-dependent impact tests, no local full gate.",
+    "research_truth": "Computed applicability from existing owner; descriptive synthetic outcomes, UNKNOWN and scripted Critic limits explicit.",
+    "owner_operability": "Existing CLI discovery-show and exact show-session links, typed safe original-pending locator.",
+    "execution_to_cashflow": "NOT_EVALUATED; no real values/holdout/provider/run/transaction.",
+    "monitoring_and_recovery": "Durable interruption, ACK loss and writer lease race verified on native synthetic sources.",
+    "build_vs_buy": "Reuse existing owners and public query reconstruction; no dependency/service/new record or ledger.",
+    "security": "Read-only projection; no credentials, private endpoints or external authority.",
+    "red_team": "Pending conflicting text, legacy ambiguity, source faults, correction/supersession, hidden archive guard and retained-proof corruption."
+  },
+  "capability_radar": {
+    "now": "Minimal native pending guard plus source-linked cold read; this exact outcome.",
+    "watch": "Selection policy only after a separately measurable distinct treatment; no new execution authority."
+  },
+  "recovery": "Resume original pending operation; ambiguous predecessor state requires source-owner conflict resolution, never automatic refund/repair. Rollback reader leaves durable evidence intact.",
+  "limits": [
+    "NO_ALPHA_OOS_ECONOMICS",
+    "NO_LIVE_USE",
+    "NO_NEW_SCIENTIFIC_OR_MERGE_AUTHORITY",
+    "NO_CHOICE_QUALITY_GAIN",
+    "NO_FACTORY_WIDE_FULL_QUALIFICATION",
+    "HISTORICAL_S0_LIMITATIONS_PRESERVED",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}

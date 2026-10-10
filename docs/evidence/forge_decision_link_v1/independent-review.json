@@ -1,0 +1,55 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE_DECISION_LINK_V1-FINAL",
+  "as_of": "2026-10-10",
+  "task_id": "FORGE_DECISION_LINK_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY",
+      "findings": [
+        "Independent exact-candidate review pending."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "Independent exact-candidate review pending."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "Independent exact-candidate review pending."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "Independent exact-candidate review pending."
+      ]
+    }
+  ],
+  "verdict": "PENDING",
+  "non_claims": [
+    "NO_ALPHA_OOS_ECONOMICS",
+    "NO_LIVE_USE",
+    "NO_NEW_SCIENTIFIC_OR_MERGE_AUTHORITY",
+    "NO_CHOICE_QUALITY_GAIN",
+    "NO_FACTORY_WIDE_FULL_QUALIFICATION",
+    "HISTORICAL_S0_LIMITATIONS_PRESERVED",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}

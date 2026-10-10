@@ -1,0 +1,175 @@
+{
+  "task_id": "FORGE_DECISION_LINK_V1",
+  "stage": "S0",
+  "baseline_commit": "76993054cfaeeee7e9fb6e7b718add8cf27e404a",
+  "candidate_implementation_commit": null,
+  "source_contract_sha256": "d5e597d537f20f7046d031ce040acd50f6c2c32d0faf136b31d2628600a91d56",
+  "frozen_before_product_run": true,
+  "denominator": 18,
+  "default_state": "NOT_RUN",
+  "default_candidate_acceptance": "NOT_EVALUATED",
+  "full_product_path_claim": false,
+  "entry_probe": {
+    "producer": "public research-scope-resolve -> preflight -> discovery-execute -> disposition-record",
+    "consumer": "disposition-show -> existing source owners -> operation-addressed saved discovery-execute replay; preflight is a separate context writer",
+    "fixture": "tests.test_forge_research_flow_reliability_v1.create_episode_fixture; fixed TABLE/LITERAL_ORACLE",
+    "oracle": "literal A subset: n=4, observed=3, missing=1, mean=0.10; complement mean=-0.10; difference=0.20",
+    "fidelity": "SEGMENT_PRODUCT_PATH",
+    "fidelity_reason": "Existing published synthetic producers/stores and public cold reader; no decision-link implementation, candidate or independent scientific Critic executed.",
+    "outcome": "ENTRY_EXISTING_PATH_VERIFIED",
+    "evidence": "docs/evidence/forge_decision_link_v1/entry-result.json",
+    "frozen_planned_command": "uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1/entry_probe.py --output local/forge_decision_link_v1/entry-a01",
+    "executed_fixture_commands": [
+      "uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1/entry_probe.py --output local/forge_decision_link_v1/entry-a01",
+      "uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1/entry_probe.py --output local/forge_decision_link_v1/entry-a02",
+      "uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1/entry_probe.py --output local/forge_decision_link_v1/entry-a03"
+    ],
+    "final_cold_resume_command": "uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1/entry_probe.py --output local/forge_decision_link_v1/entry-a03 --resume-cold",
+    "gap": "NO_GAP",
+    "gap_scope": "exact single-test ordinary OPPORTUNITY_EPISODES BASE textual carrier",
+    "raw_terminal_sha256": "28bcfa38d92473f2d45bbd5d24c2f72073ea4fe99cba9a192b97e317e5d1edef",
+    "repair_history": "docs/evidence/forge_decision_link_v1/repair-history.json"
+  },
+  "obligations": [
+    {
+      "id": "V01",
+      "edge": "legacy request -> result",
+      "expected": "original scientific keys/counts/stops",
+      "forbidden": "historical rewrite",
+      "oracle": "same-path baseline/candidate snapshot"
+    },
+    {
+      "id": "V02",
+      "edge": "basis -> reservation -> result -> disposition -> cold reader",
+      "expected": "native producer-created exact joins",
+      "forbidden": "test-injected link",
+      "oracle": "literal synthetic result and persisted refs"
+    },
+    {
+      "id": "V03",
+      "edge": "result -> positive candidate / negative / insufficient",
+      "expected": "each actual terminal retains its original owner",
+      "forbidden": "coerced negative or manufactured candidate",
+      "oracle": "native positive and non-candidate counterparts"
+    },
+    {
+      "id": "V04",
+      "edge": "public new note -> pre-value validation",
+      "expected": "typed malformed/version/ref refusal",
+      "forbidden": "reservation or values before refusal",
+      "oracle": "valid counterpart, effect inventories and loader witness"
+    },
+    {
+      "id": "V05",
+      "edge": "changed explanation -> same look",
+      "expected": "same query/market/slot/root/charge",
+      "forbidden": "fresh look from narrative",
+      "oracle": "metamorphic same-key snapshot"
+    },
+    {
+      "id": "V06",
+      "edge": "reservation/result commit -> crash -> resume",
+      "expected": "original plan/result and one charge",
+      "forbidden": "regeneration or repeated evaluation",
+      "oracle": "child-process fault at exact commit/ACK boundary"
+    },
+    {
+      "id": "V07",
+      "edge": "two plan writers and unrelated append",
+      "expected": "one binding with typed conflict",
+      "forbidden": "overwrite or unrelated global blockage",
+      "oracle": "barrier-based commit schedule"
+    },
+    {
+      "id": "V08",
+      "edge": "advisory append -> preflight/detail -> full guard",
+      "expected": "visible stale or equivalent scoped reissue",
+      "forbidden": "new cutoff or ignored inventory",
+      "oracle": "original material source/cutoff/guard hashes"
+    },
+    {
+      "id": "V09",
+      "edge": "late record -> original context / later applicability",
+      "expected": "original earlier choice immutable",
+      "forbidden": "retroactive prior exposure",
+      "oracle": "clock-bound original bytes and later reader"
+    },
+    {
+      "id": "V10",
+      "edge": "result revision -> supersession -> next context",
+      "expected": "existing lifecycle and missing-source handling",
+      "forbidden": "stale active lesson or deleted history",
+      "oracle": "current disposition owner with three-way interaction"
+    },
+    {
+      "id": "V11",
+      "edge": "foreign run/result -> linked view -> PROMOTE",
+      "expected": "exact subject/source match",
+      "forbidden": "weak title/ordinal join or authority lift",
+      "oracle": "valid counterpart plus exact foreign identity canary"
+    },
+    {
+      "id": "V12",
+      "edge": "scope/measurement/technical fail -> prior guard",
+      "expected": "bounded lesson and full safety authority",
+      "forbidden": "false permanent close or automatic reopen",
+      "oracle": "existing scoped-close/rebase rules"
+    },
+    {
+      "id": "V13",
+      "edge": "BASE -> representation/cycle",
+      "expected": "original accounting/pending lineage",
+      "forbidden": "new narrative budget pool",
+      "oracle": "existing continuation fixtures and root/count readback"
+    },
+    {
+      "id": "V14",
+      "edge": "result -> draft/freeze/revision/finalize",
+      "expected": "packet source integrity and selected-only Critic",
+      "forbidden": "persuasion packet or terminal conflation",
+      "oracle": "legacy packet bytes and current positive counterpart"
+    },
+    {
+      "id": "V15",
+      "edge": "archive/near-cap -> bounded context",
+      "expected": "cap unchanged and optional omission explicit",
+      "forbidden": "mandatory truncation or per-link full rescan",
+      "oracle": "existing near-cap fixture and measured reads/bytes"
+    },
+    {
+      "id": "V16",
+      "edge": "cold read-only CLI -> owner consumer",
+      "expected": "same state and no business/DB/WAL writes",
+      "forbidden": "implicit repair/commissioning",
+      "oracle": "before/after file and committed inventories"
+    },
+    {
+      "id": "V17",
+      "edge": "legacy/new/pending -> new and rollback reader",
+      "expected": "typed compatibility without migration",
+      "forbidden": "lost evidence or extra science",
+      "oracle": "mixed native artifacts and actual rollback code"
+    },
+    {
+      "id": "V18",
+      "edge": "qualification -> terminal evidence",
+      "expected": "wrong link/missing terminal/changed artifact detected",
+      "forbidden": "integrity-only product/quality PASS",
+      "oracle": "independent corruption canaries with nonzero exits"
+    }
+  ],
+  "required_interactions": [
+    "pending reservation x changed explanation x resume",
+    "result revision x assessment supersession x next-context read",
+    "new advisory append x bound preflight x full-archive guard"
+  ],
+  "verdicts": {
+    "technical_continuity": "NO_MATERIAL_DELTA_IN_TESTED_SCOPE",
+    "choice_quality": "UNVERIFIED",
+    "live_use": "NOT_EXECUTED",
+    "market_alpha_oos_economics": "NOT_EVALUATED"
+  },
+  "frozen_scope": "V01-V18 acceptance denominator, expected/forbidden transitions, independent oracles and required interactions; execution observations are appended afterward.",
+  "stage_disposition": "S0_COMPLETE_WITH_LIMITATIONS",
+  "next_scope_authorized": false
+}

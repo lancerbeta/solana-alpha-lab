@@ -1,0 +1,28 @@
+{
+  "schema": "sal.forge-decision-link-choice-quality",
+  "schema_version": "1.0",
+  "verdict": "NO_DISTINCT_TREATMENT",
+  "baseline": "76993054cfaeeee7e9fb6e7b718add8cf27e404a",
+  "a9_a10_normalized_text_sha256": "16f08cc31751e799f8b806bcc335eddf5e41dc2837a43af3ea452d54fabadad7",
+  "semantic_diff": [
+    {
+      "dimension": "Alternatives, ordinal comparison, strongest rejected alternative",
+      "control": "Existing A9",
+      "candidate": "Unchanged A9"
+    },
+    {
+      "dimension": "Cheapest discriminator, endpoint, uncertainty, PASS/FAIL/INCONCLUSIVE and next",
+      "control": "Existing A10",
+      "candidate": "Unchanged A10"
+    },
+    {
+      "dimension": "Saved per-test carrier, cold source navigation and pending conflict",
+      "control": "Private/manual navigation and unsafe pending explanation retry",
+      "candidate": "Existing question_text plus native pending guard and read projection; no new selection policy"
+    }
+  ],
+  "decision_actor_runs": 0,
+  "model_only_comparison": "NOT_RUN_NO_DISTINCT_POLICY_TREATMENT",
+  "quality_gain": "NOT_ESTABLISHED",
+  "reliability_is_not_choice_quality": true
+}

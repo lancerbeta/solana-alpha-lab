@@ -133,5 +133,13 @@ def authoring_contract() -> dict[str, Any]:
             "missing": "unavailable emitted field stays unavailable; never infer identity or scope from outcomes",
             "authored_semantics": "question, estimand and condition fixed before MAIN; copy bindings without changing claim, alternative or verdict",
         },
+        "ordinary_test_basis": {
+            "carrier": "existing operation.question_text before values; untrusted outward A9/A10 plan, no new authority",
+            "content": "alternatives, selected discriminator/reason, honest strongest rejected alternative, outcome-specific actions and claim limits",
+            "continuation": "own pre-value text in existing immutable parent request, same journal and granted ceilings; materially different query adaptation_of names prior spec",
+            "pending": "follow original operation locator; ambiguous historical bindings require resolution, never a new look",
+            "cold_read": "discovery-show --result-ref <ref> or --operation-sha256 <sha> --offset 0 --limit 20; no values or writes",
+            "contract": "docs/contracts/forge_evidence_guided_generation_v1.md#per-test-authored-basis-and-cold-read",
+        },
         "non_equivalent": ["primary_y != target", "mundane_alternative != alternative_world", "data_already_available != available_data_bindings", "candidate_method_family != proposed_method"],
     }

@@ -1,0 +1,49 @@
+{
+  "task_id": "FORGE_DECISION_LINK_V1",
+  "stage": "S0",
+  "role": "CODE_REVIEWER",
+  "reviewer": "isolated_read_only_entry_review",
+  "parent_history": "NOT_INHERITED",
+  "scope": "Existing-first entry characterization and checkpoint reporting only; not final delivery acceptance.",
+  "verdict": "S0_READY_WITH_LIMITATIONS",
+  "stage_disposition": "S0_COMPLETE_WITH_LIMITATIONS",
+  "open_s0_checkpoint_blockers": [],
+  "resolved_reporting_findings": [
+    "Early overwritten cold outputs are represented explicitly as transcript-derived normalized observations, not raw trace.",
+    "Aggregate cap breach is measured and disclosed; no cap PASS is claimed.",
+    "One stale command-log artifact hash is retained and disclosed; its current command list equals terminal.commands."
+  ],
+  "independent_readback": {
+    "raw_terminal_unchanged": true,
+    "artifact_hashes_matched": 20,
+    "artifact_hashes_total": 21,
+    "source_hashes_matched": 7,
+    "campaign_wall_seconds": 935.136,
+    "retained_attempt_bytes": 43941699
+  },
+  "remaining_limitations": [
+    "Lost earlier raw cold revisions remain unavailable.",
+    "Current helper uses a per-invocation timer; cumulative timing must be enforced before its next use.",
+    "Bookkeeping helper corrections postdate successful native execution; product rerun NOT_RUN.",
+    "NO_GAP is restricted to the tested exact single-test composite route."
+  ],
+  "next_scope_requirements": [
+    "Owner next-stage OK",
+    "New frozen engineering envelope",
+    "Cumulative time control across resumes before any helper reuse"
+  ],
+  "full_atom": "IN_PROGRESS",
+  "candidate_qualification": "V01-V18_NOT_RUN",
+  "final_delivery_role_set": "NOT_RUN",
+  "merge_readiness": "NOT_EVALUATED",
+  "receipt_basis": "Read-only reviewer response in this chat; parent normalized its conclusions. Final explanatory text records the reviewer timing requirement.",
+  "checkpoint_content_sha256": {
+    "docs/tasks/FORGE_DECISION_LINK_V1.md": "9ab818e33dec598ad26bd7a01a07addc91107b284b7866f0517f2f6ba04358ca",
+    "docs/evidence/forge_decision_link_v1/source-contract.md": "d5e597d537f20f7046d031ce040acd50f6c2c32d0faf136b31d2628600a91d56",
+    "docs/evidence/forge_decision_link_v1/obligations.json": "483fb69a3f745f47fb74cdc29486b2d151255e3a0497f073daeedfe2ba034f5a",
+    "docs/evidence/forge_decision_link_v1/repair-history.json": "34fc3fd2233753ebe5b9aee6a7427c2beb0a23dc45be7524e93900d2082714b5",
+    "docs/evidence/forge_decision_link_v1/entry-result.json": "9d8769b0aa0c625a1dfb878c97c420bc5b1530c7af7be059a3e81612ab166a92",
+    "docs/evidence/forge_decision_link_v1/READOUT.md": "b56ed6805497ffb93fb92f5dcd3a3d75029bcf721500f9a6a8a1b0f7c5527aad",
+    "tests/fixtures/forge_decision_link_v1/entry_probe.py": "96300c16bc775c89f6b216d05b1d593c9debfcb090a28227cc1ffc64c293402a"
+  }
+}
