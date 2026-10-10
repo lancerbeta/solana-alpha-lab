@@ -1327,11 +1327,28 @@ def cmd_discovery_show(
         payload = discovery_detail(store, result_ref=result_ref, operation_sha256=operation_sha256,
             current_market=_current_market(repo_root, data_root, store), offset=offset, limit=limit)
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
-    except DiscoveryDetailError as exc:
-        return emit({"refusal_code": exc.code, "values_loaded": False,
-            "writes": {"research_store": 0}}, exit_code=2)
-    except HficCliError:
-        return emit({"refusal_code": "DISCOVERY_DETAIL_PATH_LEAK", "values_loaded": False,
+    except (DiscoveryDetailError, HficCliError) as exc:
+        code = exc.code if isinstance(exc, DiscoveryDetailError) else "DISCOVERY_DETAIL_PATH_LEAK"
+        if code in {"DISCOVERY_DETAIL_LOCATOR_REQUIRED", "DISCOVERY_DETAIL_OPERATION_INVALID",
+                "DISCOVERY_DETAIL_RESULT_REF_INVALID", "DISCOVERY_DETAIL_PAGE_INVALID",
+                "DISCOVERY_DETAIL_LOCATOR_MISMATCH"}:
+            status = "INPUT_ERROR"
+            explanation = "Неверный locator или параметры страницы; evidence не изменён."
+            next_action = "CORRECT_LOCATOR_OR_PAGE_AND_RETRY"
+            recovery = "Укажи исходный result-ref или operation-sha256, согласованные между собой; offset >= 0, limit от 1 до 100. Повтори только чтение."
+        elif code in {"DISCOVERY_DETAIL_RESULT_NOT_FOUND", "DISCOVERY_DETAIL_OPERATION_NOT_FOUND"}:
+            status = "BLOCKED_LOCATOR_NOT_RESOLVED"
+            explanation = "Источник по этому locator не найден; это не научный отрицательный результат."
+            next_action = "VERIFY_LOCATOR_AND_STORE_OR_REQUEST_SOURCE_OWNER_REVIEW"
+            recovery = "Проверь исходный locator и выбранный data-root. Если они достоверны, остановись и передай отказ владельцу источника для read-only проверки сохранности; новый look не восстанавливает evidence."
+        else:
+            status = "BLOCKED_SOURCE_REVIEW_REQUIRED"
+            explanation = "Сохранённый источник недоступен или его identity/hash/binding противоречив; достоверный readout заблокирован."
+            next_action = "STOP_AND_REQUEST_SOURCE_OWNER_REVIEW"
+            recovery = "Сохрани refusal_code и исходный locator; запроси read-only проверку у владельца ResearchStore/operation/result. Не переписывай историю, не refreeze packet и не запускай новый look для восстановления evidence."
+        return emit({"refusal_code": code, "status": status, "explanation_ru": explanation,
+            "next_action": next_action, "next_action_ru": recovery,
+            "scientific_negative": False, "authority_granted": False, "values_loaded": False,
             "writes": {"research_store": 0}}, exit_code=2)
     return emit(payload)
 

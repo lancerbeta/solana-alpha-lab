@@ -175,3 +175,25 @@ output нового run должен отсутствовать:
 ```text
 uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1/multi_look_probe.py --output local/forge_decision_link_v1/land-race-reproduce-r01 --fixture-source local/forge_decision_link_v1/entry-reproduce-r01/fixture --land-race-only
 ```
+
+## Owner refusal recovery
+
+Owner-UX review063c5872 — `NOT_READY`: canonical refusal code не объяснял
+безопасный следующий шаг. Existing discovery-show теперь добавляет короткое
+русское пояснение и next action: исправить ввод, проверить исходный locator/
+data-root или остановиться для read-only source-owner проверки integrity gap.
+Refusal codes/exit2 сохранены; scientific_negative/authority_granted=false,
+values/writes=0. Новый look, history rewrite или refreeze не являются recovery.
+
+Шесть distinct public reads: успешное чтение before/after равно прежнему
+native capture; invalid locator/page и absent locator дают безопасный шаг;
+повреждённый read view настоящего producer record блокируется с source-owner
+action. Это controlled in-memory canary, не новый native terminal;230 файлов
+store неизменны. R01 сохранил четыре успешных outputs, затем helper import
+bootstrap failure. R02 сначала ошибочно сравнивал target с изменённым sys.argv
+и фактически прочитал valid source; этот canary не qualified. R03 исправил
+immutable target и проверил только незавершённый fault и closing valid read:
+child components3.082s/elapsed3.251s,180s child/600s parent envelope.
+Частичные timingsR01/R02 UNKNOWN; failures сохранены, единого успешного batch
+не объявлено. Raw receiptSHA237fbaaed4c4a770a0c524f2021ef8ae48f3ad56dc17a99a31fa2f51923f4f24.
+Fresh content inventory и четыре reviews повторяются после этой copy-only правки.

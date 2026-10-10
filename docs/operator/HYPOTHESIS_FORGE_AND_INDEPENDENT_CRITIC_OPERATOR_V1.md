@@ -1137,6 +1137,18 @@ reservation, canonical query, результат и применимость с�
 operation locator в отказе; ambiguous historical conflict не разрешает новый
 look. Команда только читает: она не обновляет preflight и не чинит историю.
 
+При отказе exit2 сохраняются `refusal_code`, zero writes/values и
+`scientific_negative=false`; `explanation_ru` и `next_action_ru` называют шаг:
+
+| Status | Безопасное действие |
+|---|---|
+| `INPUT_ERROR` | Исправь исходный locator/страницу и повтори только чтение: result-ref и operation-sha256 должны согласоваться, offset >= 0, limit 1–100. |
+| `BLOCKED_LOCATOR_NOT_RESOLVED` | Проверь исходный locator и data-root. Если они достоверны, остановись: отсутствие источника требует read-only проверки его владельцем. |
+| `BLOCKED_SOURCE_REVIEW_REQUIRED` | Остановись из-за unavailable/identity/hash/binding gap; передай refusal_code и locator владельцу ResearchStore/operation/result для read-only проверки. |
+
+Source refusal не разрешает новый look, переписывание истории или refreeze packet.
+Новый результат не может заменить утраченный источник прежнего результата.
+
 Сделай предварительную проверку:
 
 - существующие accepted data + features + query recipe + runner + parameter schema → `FAST_LANE_CANDIDATE`;

@@ -48,7 +48,7 @@
       "oracle": "valid counterpart, effect inventories and loader witness",
       "status": "PASS_SCOPED",
       "evidence": "native-qualification.json",
-      "qualification": "Real produced sources with wrong locator, missing/unreadable source and malformed saved query read-view faults; typed refusal and valid counterparts. New-field-only version cases inapplicable: no field/schema introduced."
+      "qualification": "Real produced sources with wrong locator, missing/unreadable source and malformed saved query read-view faults; typed refusal and valid counterparts. New-field-only version cases inapplicable: no field/schema introduced. Six distinct public CLI reads qualify owner refusal copy: valid before/after equals original, malformed input/absent locator typed safe recovery, real producer record unreadable controlled in-memory view blocks for source-owner review.230 native files unchanged; R01/R02 helper failures retained separately."
     },
     {
       "id": "V05",
@@ -168,7 +168,7 @@
       "oracle": "before/after file and committed inventories",
       "status": "PASS_SCOPED",
       "evidence": "native-qualification.json",
-      "qualification": "b06 fresh public result/operation read; DB/WAL/file hashes and committed inventory equal. Positive exact route also zero-write, no commissioning/value loader."
+      "qualification": "b06 fresh public result/operation read; DB/WAL/file hashes and committed inventory equal. Positive exact route also zero-write, no commissioning/value loader. Six distinct public CLI reads qualify owner refusal copy: valid before/after equals original, malformed input/absent locator typed safe recovery, real producer record unreadable controlled in-memory view blocks for source-owner review.230 native files unchanged; R01/R02 helper failures retained separately."
     },
     {
       "id": "V17",
@@ -319,6 +319,7 @@
     "impact-d01 assertions44PASS but resource900watchdog failed; d02 pre-product CRLF launcher HARNESS_ERROR; new cause-dependent qualification kept separately.",
     "CPU/RAM, preparation, total model usage and cost UNKNOWN.",
     "First independent review NOT_READY for landed-before-other-lease gap and five LF Git index cache archives is retained; ordinary repairs and fresh inventory/review required.",
-    "land-race-qualification-c01 retains a fixture-order HARNESS_ERROR with13PASS/1ERROR; c02 reruns only the repaired policy test. No fabricated all14 passing batch."
+    "land-race-qualification-c01 retains a fixture-order HARNESS_ERROR with13PASS/1ERROR; c02 reruns only the repaired policy test. No fabricated all14 passing batch.",
+    "Owner-UX NOT_READY063c5872 retained; copy-only refusal guidance and fresh read qualification require new final inventory/reviews. Two owner-copy helper failures remain historical; partial timing UNKNOWN, no science rerun."
   ]
 }

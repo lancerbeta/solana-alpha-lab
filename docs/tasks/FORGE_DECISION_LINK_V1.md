@@ -320,3 +320,23 @@ children180s, owned output1GiB; unmeasured CPU/RAM/preparation/model cost UNKNOW
 Original source/raw receipts and first review NOT_READY are retained in
 native-qualification.json. New committed inventory and isolated four-role review
 must precede binding, preflight, PR, exact-head CI and machine readiness.
+
+OWNER_UX_REPAIR_PATCH: isolated owner-UX review of063c5872 returned NOT_READY
+because discovery-show refusals expose only a canonical code, leaving the
+operator to infer safe recovery. Add copy-only explanation/status/next-action
+fields to that existing CLI refusal and operator guidance. Separate malformed
+input, unresolved locator/store and source integrity/unavailability; unresolved
+or contradicted evidence requires read-only source-owner review, never a new
+look or historical rewrite. Existing refusal codes, exit2, zero writes/values
+and scientific authority stay unchanged. Qualify fresh cold success and named
+refusals without science rerun, retain NOT_READY, then refresh inventory/reviews.
+
+OWNER_UX_REPAIR_CHECKPOINT: six distinct public reads qualify new refusal copy;
+valid before/after equals original capture,230 native files unchanged. An actual
+producer-record corrupted read view is explicitly controlled in-memory and
+requires source-owner review; no native alternate terminal inferred. Four
+successful R01 outputs retained, R01 import-bootstrap failure and R02 target
+drift retained; R02 accidentally valid read not qualified as a source fault.
+R03 runs only unfinished fault and closing valid read:3.082s child components,
+3.251s elapsed,180s/600s envelopes. Partial R01/R02 timing UNKNOWN; no new look.
+Only operator refusal copy changed; fresh inventory and four-role review remain.
