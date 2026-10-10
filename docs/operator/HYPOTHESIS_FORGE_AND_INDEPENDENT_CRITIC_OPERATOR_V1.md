@@ -2117,3 +2117,22 @@ the current claim relies on the missing fact, claims unsupported novelty,
 or has an actually applicable close. Exact close, potentially applicable
 near-close, scientific quality and current binding defects remain blocking.
 The V2 matrix applies to new decisions; old packets/verdicts keep their epoch.
+
+### FORGE_TRUST_CLOSURE_V1 — проверенная техническая граница
+
+Current WAL readers видят committed state при открытом writer. Native exact-spec
+run виден в dossier/API/HTTP Workbench как execution COMPLETED. Это completion
+исполнения; научные obligations, PROMOTE и strategy authority проверяются отдельно.
+Legacy completion связывается только по validated passport + canonical spec hash;
+явный конфликт ID/version/run не разрешается слабым join. Противоречивый execution
+key блокирует зависимые метрики; unresolved lineage видна как UNKNOWN/gap.
+
+Для выбранного List A E1800→E14400 price-relative proxy accepted chronological/OOS
+successor не установлен: BLOCKED_SCIENTIFIC_PROTOCOL_C. Следующий безопасный шаг —
+один frozen scientific contract, описанный в
+`docs/reports/forge_trust_closure_v1/SCIENTIFIC_DECISION.md`; repair/merge approval
+не даёт look/holdout/strategy разрешения. Genuine actor behavior остаётся UNVERIFIED.
+
+Проверки, исходные 56 obligations и ограничения:
+`docs/reports/forge_trust_closure_v1/READOUT.md`. Повторяемый offline entry и
+exact prerequisites: `docs/reports/forge_trust_closure_v1/REPRODUCE.md`.

@@ -34659,7 +34659,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 24570ffc9f2cbd6968fbe7badf17e75f1e4299aae0295dca528f84726a9f25b4}
+  integrity: {kind: sha256, sha256: c5fec86a2bb78643436d8369694baf06524141fe2b9cf7832b5705b3deb66223}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001}
@@ -36289,7 +36289,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/experiment_evidence_decision_v1.md', repository_path: docs/contracts/experiment_evidence_decision_v1.md}
-  integrity: {kind: sha256, sha256: 94e88a39626793c5edda9955c5334ae7e64af10dd1e005ba1d533acb9e92302d}
+  integrity: {kind: sha256, sha256: 19cdfa8a0ede9e1392d2c3ee6cffe496e7c5a145ae88378c539630046b0dc576}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -41082,6 +41082,280 @@ records:
   - SEM-HYPOTHESIS-FORGE
   - native closure
   - recovery
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: TASK-FORGE-TRUST-CLOSURE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Bounded Forge trust closure contract; exact science and actor limits.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-10'
+  truth_owner: FORGE_TRUST_CLOSURE_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/tasks/FORGE_TRUST_CLOSURE_V1.md
+    repository_path: docs/tasks/FORGE_TRUST_CLOSURE_V1.md
+  integrity:
+    kind: sha256
+    sha256: 17e6473a6797070f840ba24ef73e48fcc91a9e241c9e153c9541d5fa79b7e3c6
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations: []
+  consumers:
+  - FACTORY-001
+  - TASK-FORGE-TRUST-CLOSURE-001
+  evidence: []
+  search_terms:
+  - TASK-FORGE-TRUST-CLOSURE-001
+  - BAA-001
+  - BAA-002
+  - BAA-003
+  - WAL
+  - DIRECT
+  - UNKNOWN
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: DOC-FORGE-TRUST-CLOSURE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Requalified synthetic Forge current-read and execution/guard/recovery verdict.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-10'
+  truth_owner: FORGE_TRUST_CLOSURE_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/reports/forge_trust_closure_v1/READOUT.md
+    repository_path: docs/reports/forge_trust_closure_v1/READOUT.md
+  integrity:
+    kind: sha256
+    sha256: ed12fc0e25b0a16844e0efd17dd9f0791ebb63664678a73829b9c5cdcdb3c1ed
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: TASK-FORGE-TRUST-CLOSURE-001
+  consumers:
+  - FACTORY-001
+  - TASK-FORGE-TRUST-CLOSURE-001
+  evidence: []
+  search_terms:
+  - TASK-FORGE-TRUST-CLOSURE-001
+  - BAA-001
+  - BAA-002
+  - BAA-003
+  - WAL
+  - DIRECT
+  - UNKNOWN
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: DOC-FORGE-TRUST-CLOSURE-SCIENCE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact BAA-003 scientific protocol C decision boundary for List A proxy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-10'
+  truth_owner: FORGE_TRUST_CLOSURE_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/reports/forge_trust_closure_v1/SCIENTIFIC_DECISION.md
+    repository_path: docs/reports/forge_trust_closure_v1/SCIENTIFIC_DECISION.md
+  integrity:
+    kind: sha256
+    sha256: 2931500249887f45bf7c9a1d56cd521b64d6a81e69141d369390e9dbd046933f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: TASK-FORGE-TRUST-CLOSURE-001
+  consumers:
+  - FACTORY-001
+  - TASK-FORGE-TRUST-CLOSURE-001
+  evidence: []
+  search_terms:
+  - TASK-FORGE-TRUST-CLOSURE-001
+  - BAA-001
+  - BAA-002
+  - BAA-003
+  - WAL
+  - DIRECT
+  - UNKNOWN
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: DOC-FORGE-TRUST-CLOSURE-REPLAY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Pinned reusable offline replay prerequisites and commands.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-10'
+  truth_owner: FORGE_TRUST_CLOSURE_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/reports/forge_trust_closure_v1/REPRODUCE.md
+    repository_path: docs/reports/forge_trust_closure_v1/REPRODUCE.md
+  integrity:
+    kind: sha256
+    sha256: cfcd12ea19115876471060a15b57afe6370e4bd5aa9e267ce349169348ec9526
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: TASK-FORGE-TRUST-CLOSURE-001
+  consumers:
+  - FACTORY-001
+  - TASK-FORGE-TRUST-CLOSURE-001
+  evidence: []
+  search_terms:
+  - TASK-FORGE-TRUST-CLOSURE-001
+  - BAA-001
+  - BAA-002
+  - BAA-003
+  - WAL
+  - DIRECT
+  - UNKNOWN
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-FORGE-TRUST-CLOSURE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Source-bound current campaign observations and retained logical raw locators.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-10'
+  truth_owner: FORGE_TRUST_CLOSURE_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/forge_trust_closure_v1/run_index.json
+    repository_path: docs/evidence/forge_trust_closure_v1/run_index.json
+  integrity:
+    kind: sha256
+    sha256: bb31230d58e8d4e8ff7e2a8bedee3955cd12e389b88b72db0a3299bd4f8d93c9
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: TASK-FORGE-TRUST-CLOSURE-001
+  consumers:
+  - FACTORY-001
+  - TASK-FORGE-TRUST-CLOSURE-001
+  evidence: []
+  search_terms:
+  - TASK-FORGE-TRUST-CLOSURE-001
+  - BAA-001
+  - BAA-002
+  - BAA-003
+  - WAL
+  - DIRECT
+  - UNKNOWN
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-FORGE-TRUST-CLOSURE-LEDGER-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Original immutable 56 charter denominator and precise candidate obligation
+    deltas.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-10'
+  truth_owner: FORGE_TRUST_CLOSURE_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/forge_trust_closure_v1/charter_ledger.json
+    repository_path: docs/evidence/forge_trust_closure_v1/charter_ledger.json
+  integrity:
+    kind: sha256
+    sha256: cffdc676181d7e64e94685f75799697836d9c2aa252a5e77d249572c7fe12ee4
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: TASK-FORGE-TRUST-CLOSURE-001
+  consumers:
+  - FACTORY-001
+  - TASK-FORGE-TRUST-CLOSURE-001
+  evidence: []
+  search_terms:
+  - TASK-FORGE-TRUST-CLOSURE-001
+  - BAA-001
+  - BAA-002
+  - BAA-003
+  - WAL
+  - DIRECT
+  - UNKNOWN
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-FORGE-TRUST-CLOSURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Native identity conflicts, current WAL, refusal, integrity and cold-consumer
+    regressions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-10'
+  truth_owner: FORGE_TRUST_CLOSURE_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_forge_trust_closure_v1.py
+    repository_path: tests/test_forge_trust_closure_v1.py
+  integrity:
+    kind: sha256
+    sha256: 247de69c861f955aa0130448c3184f3dbdb4cb18aa0d9e67a32e23f4f3fec1ee
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: TASK-FORGE-TRUST-CLOSURE-001
+  consumers:
+  - FACTORY-001
+  - TASK-FORGE-TRUST-CLOSURE-001
+  evidence: []
+  search_terms:
+  - TASK-FORGE-TRUST-CLOSURE-001
+  - BAA-001
+  - BAA-002
+  - BAA-003
+  - WAL
+  - DIRECT
+  - UNKNOWN
   classification:
     contains_secrets: false
     contains_raw_data: false

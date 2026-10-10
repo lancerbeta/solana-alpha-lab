@@ -85,6 +85,11 @@ The canonical document hash excludes `what_changed`; the dossier's original
 
 A matching legacy RUN_COMPLETED may establish a DIRECT run by its validated
 passport and exact canonical spec hash (which includes experiment identity).
+Contradictory execution rows sharing a run key quarantine that key for this
+dossier, including weak scientific joins. Malformed legacy completion cannot
+borrow an otherwise valid RUN_STARTED seed. Every legacy terminal is checked
+before classification, not only when collecting direct IDs. An unambiguously
+foreign experiment with a disjoint run is not an unresolved own execution.
 No backfill, latest-run selection or repeat scientific look is required.
 Explicit foreign/conflicting experiment or run identities, and an explicit
 execution hash for a different spec version, cannot fall back to weaker joins.

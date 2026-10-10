@@ -53,7 +53,7 @@ stop_conditions:
 - STOP_RESOURCE_ENVELOPE_WITH_RETAINED_INCOMPLETE_EVIDENCE
 context_requirements:
   catalog_asset_ids: []
-  l2_roles: [ARCHITECTURE_DECISIONS]
+  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
@@ -62,7 +62,10 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
     - docs/contracts/experiment_evidence_decision_v1.md
     - delivery-harness/policies/solana-alpha-lab.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/forge_trust_closure_v1/delivery_completion.json
+    - docs/evidence/forge_trust_closure_v1/independent_review.json
+    - docs/evidence/forge_trust_closure_v1/factory_fit.json
     HISTORICAL_CONTEXT: []
 ---
 

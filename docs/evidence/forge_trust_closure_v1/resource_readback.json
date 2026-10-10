@@ -1,0 +1,142 @@
+{
+  "schema": "ftc.cleanup-readback.v1",
+  "running_campaign_containers": 0,
+  "retained_containers": [
+    {
+      "name": "ftc-f64d275717cc-producer-timeout-canary",
+      "state": "exited",
+      "status": "Exited (143) 7 minutes ago"
+    },
+    {
+      "name": "ftc-f64d275717cc-wal-final-r1",
+      "state": "exited",
+      "status": "Exited (0) 7 minutes ago"
+    },
+    {
+      "name": "ftc-7a3361b3e1dc-joint-r2",
+      "state": "exited",
+      "status": "Exited (0) 10 minutes ago"
+    },
+    {
+      "name": "ftc-3c6180713e31-wal-r1",
+      "state": "exited",
+      "status": "Exited (0) 12 minutes ago"
+    },
+    {
+      "name": "ftc-3c6180713e31-joint-r1",
+      "state": "exited",
+      "status": "Exited (1) 12 minutes ago"
+    },
+    {
+      "name": "ftc-0fe35ffafa5e-producer-r1",
+      "state": "exited",
+      "status": "Exited (0) 16 minutes ago"
+    },
+    {
+      "name": "ftc-0fe35ffafa5e-bridge-legacy-r1",
+      "state": "exited",
+      "status": "Exited (0) 17 minutes ago"
+    },
+    {
+      "name": "ftc-0fe35ffafa5e-residual-r1",
+      "state": "exited",
+      "status": "Exited (0) 15 minutes ago"
+    },
+    {
+      "name": "ftc-19ffd3e87775-residual-r1",
+      "state": "exited",
+      "status": "Exited (0) 18 minutes ago"
+    },
+    {
+      "name": "ftc-19ffd3e87775-producer-r1",
+      "state": "exited",
+      "status": "Exited (0) 33 minutes ago"
+    },
+    {
+      "name": "ftc-19ffd3e87775-wal-r1",
+      "state": "exited",
+      "status": "Exited (0) 35 minutes ago"
+    },
+    {
+      "name": "ftc-baseline-bridge-r1",
+      "state": "exited",
+      "status": "Exited (1) 45 minutes ago"
+    },
+    {
+      "name": "ftc-baseline-producer-r1",
+      "state": "exited",
+      "status": "Exited (0) 47 minutes ago"
+    },
+    {
+      "name": "ftc-baseline-wal-r1",
+      "state": "exited",
+      "status": "Exited (1) 48 minutes ago"
+    }
+  ],
+  "retained_volumes": [
+    {
+      "volume": "ftc-0fe35ffafa5e-bridge-legacy-r1-evidence",
+      "kib": 5532
+    },
+    {
+      "volume": "ftc-0fe35ffafa5e-producer-r1-evidence",
+      "kib": 25332
+    },
+    {
+      "volume": "ftc-0fe35ffafa5e-residual-r1-evidence",
+      "kib": 28660
+    },
+    {
+      "volume": "ftc-3c6180713e31-joint-r1-evidence",
+      "kib": 5564
+    },
+    {
+      "volume": "ftc-3c6180713e31-wal-r1-evidence",
+      "kib": 1316
+    },
+    {
+      "volume": "ftc-7a3361b3e1dc-joint-r2-evidence",
+      "kib": 5576
+    },
+    {
+      "volume": "ftc-19ffd3e87775-producer-r1-evidence",
+      "kib": 25284
+    },
+    {
+      "volume": "ftc-19ffd3e87775-residual-r1-evidence",
+      "kib": 393864
+    },
+    {
+      "volume": "ftc-19ffd3e87775-wal-r1-evidence",
+      "kib": 1316
+    },
+    {
+      "volume": "ftc-baseline-bridge-r1-evidence",
+      "kib": 5532
+    },
+    {
+      "volume": "ftc-baseline-producer-r1-evidence",
+      "kib": 25276
+    },
+    {
+      "volume": "ftc-baseline-wal-r1-evidence",
+      "kib": 1284
+    },
+    {
+      "volume": "ftc-f64d275717cc-producer-timeout-canary-evidence",
+      "kib": 20
+    },
+    {
+      "volume": "ftc-f64d275717cc-wal-final-r1-evidence",
+      "kib": 1316
+    }
+  ],
+  "host_ignored_bytes": 2062237,
+  "total_evidence_bytes_upper_accounted": 540555165,
+  "bound_bytes": 2147483648,
+  "unrelated_resources_touched": false,
+  "deleted_evidence": false,
+  "new_generated_state_sequences": 0,
+  "scope": "LABELED_FTC_CAMPAIGN_ONLY_NO_BAA_PRUNE",
+  "status": "PASS"
+}

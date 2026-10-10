@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-TRUST-CLOSURE-COMPLETION-001",
+  "as_of": "2026-10-10",
+  "task_id": "FORGE_TRUST_CLOSURE_V1",
+  "state_change": "REQUALIFIED_SYNTHETIC_CURRENT_READ_NATIVE_EXECUTION_AND_FAIL_CLOSED_RECOVERY_WITH_EXACT_SCIENCE_C_ACTOR_LIMITS",
+  "base_main": "90ba76e37515b3d521478a6d05a149fb0f1d2b75",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_trust_closure_v1/factory_fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_NATIVE_CURRENT_READ_LEGACY_LINKAGE_IDENTITY_REFUSAL_RECOVERY_SELECTED_SEGMENTS",
+    "independent_review": {
+      "path": "docs/evidence/forge_trust_closure_v1/independent_review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_LOCKED_OFFLINE_RUNTIME",
+      "PASS_NATIVE_PRODUCER_AND_COLD_CONSUMER",
+      "PASS_ORACLE_CONTROLS",
+      "PASS_CANDIDATE_SCOPE_LIMITS"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_OOS_VALIDATION",
+    "NO_FULL_POSITIVE_SCIENCE_TO_STRATEGY",
+    "AGENT_BEHAVIOR_UNVERIFIED",
+    "NO_REAL_DATA",
+    "NO_DEPLOY",
+    "NO_PIXEL_BROWSER_UX",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "provider_calls": 0,
+    "real_value_exposures": 0,
+    "external_model_calls": 0,
+    "cash_spend": 0,
+    "network_calls": "AUTHORIZED_GIT_DELIVERY_ONLY",
+    "local_writes": "BOUNDED_PRODUCT_AND_OWNED_SYNTHETIC_ROOTS"
+  }
+}
