@@ -11,7 +11,7 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "3fae0c87446f7a5de84f29049fb3750517c0299cbb39c8c7c39fc4f21aa3075e",
+    "catalog/assets/core.yaml": "16e3281f17279172574e78b2c677915816ed39133300c3929e98521116433cd9",
     "catalog/assets/lifecycle.yaml": "49235b0bca276c5de37ac6b1575ae6a150018a28e9be2703d82c183cb8ec097c",
     "catalog/catalog_manifest.yaml": "8762899dcd7bef39196d3f844c0c6e778f4876454dfe11ba8880812fcc3cb58c",
     "catalog/generated/asset_edges.json": "e9179a3093b926254298489e1d5d2135df87c3257e3a7541c13c4b72ca558667",
@@ -19,18 +19,20 @@
     "docs/PROJECT_MAP.md": "3729b0df33313d42bb96c04219fec444dd206e44aa770db082bd80350df0eba8",
     "docs/contracts/experiment_evidence_decision_v1.md": "bb661ae114d4cfd0f697ed6be10d41a10725bb358e1999abb92819b229d6e251",
     "docs/evidence/forge_trust_closure_v1/charter_ledger.json": "8a2119630509dd6f445f70c71ea1a81e8deab22ed8d8a9d84ca85f689f1dba15",
+    "docs/evidence/forge_trust_closure_v1/ci_repair.json": "3b93689dbfbf997c364a79fbb24ec77f61fe8a07788cdd9c7da9fb634c288481",
     "docs/evidence/forge_trust_closure_v1/dependency_closure.json": "d34be40b9834d90cb2d8fe2a2874ea47ca713791da4d01bf86393324cadd7006",
     "docs/evidence/forge_trust_closure_v1/resource_readback.json": "2994f2243ff860e7c14faa94bc723f3c0b8ed0d3d4687cb5b08050e93ef8302f",
     "docs/evidence/forge_trust_closure_v1/run_index.json": "3dfa135e5a448030193a256d757f37140c7fdfadffb72fc745736441efce6c32",
-    "docs/evidence/forge_trust_closure_v1/semantic_packet.json": "938745069d67afb15d054e9202b2d1d8b6449c2553ee26a34f5d362c9ca321c8",
+    "docs/evidence/forge_trust_closure_v1/semantic_packet.json": "20903ade8203702743c4bbe6b2ef63a6af3964a5645afb0ac2b84a42c3fb8ba3",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "c5fec86a2bb78643436d8369694baf06524141fe2b9cf7832b5705b3deb66223",
     "docs/reports/forge_trust_closure_v1/ACCEPTANCE.md": "1e2fb8cf8266a79d766ce5ad2529bcbc91ce6194a0c138596891fe87d2eae8b2",
-    "docs/reports/forge_trust_closure_v1/READOUT.md": "7e02c23c98a7e1aa57512aac74a7b4ff5dcf30fee2d3aab81c8d62efff585886",
+    "docs/reports/forge_trust_closure_v1/READOUT.md": "01a3afb616b79692be337238d3596b980fcd6e2841fb9ba7bdb5bb47c896fde8",
     "docs/reports/forge_trust_closure_v1/REPRODUCE.md": "4dc9080b8866ce292a823c414c60283eb6dbb24458fc057d1c5aa3085ba04a46",
     "docs/reports/forge_trust_closure_v1/SCIENTIFIC_DECISION.md": "2931500249887f45bf7c9a1d56cd521b64d6a81e69141d369390e9dbd046933f",
-    "docs/tasks/FORGE_TRUST_CLOSURE_V1.md": "81b4ae75d010cad4b19add23cabdf83c744b7ddc88382b8973f4093952544a16",
+    "docs/tasks/FORGE_TRUST_CLOSURE_V1.md": "17249ec707a8f17df26997f779619ea7561c14df761d2514a589597558a62178",
     "scripts/precommit_diff_check.py": "d78f5e878c83da53e9e003c95d0e8e3bd134c90ae6d56d61ec7cb3b207e05520",
     "scripts/validate.ps1": "67255a82c800cf6bcbebac02d805b272fdddc8793e6b589a609ff768abb8534b",
+    "scripts/validate_baton.py": "baafd69db4f8b874f6794222e911f250d015e57a3009adde993be5bb8a71e343",
     "src/solana_alpha_lab/factory/document_runner.py": "56c6bf0ba1932c175b5f9c18414a50c8ad138269eb34bdcf2ec4a73e2ce159fb",
     "src/solana_alpha_lab/factory/experiment_evidence.py": "8cdc314f482297420c08f81523273439654aa42c0c8d915462d55c861d404eb5",
     "src/solana_alpha_lab/factory/lifecycle_projection.py": "b5be044c88194c8ad3e5a984ca3170a28b0fda0ee4a704466a2e6d2cc4f97f04",
@@ -39,9 +41,10 @@
     "tests/fixtures/forge_trust_closure_v1/joint.py": "0976cb2839a638973c769e135bf3a8985332d41e8712b3cefcc2f6de5d5ac6a5",
     "tests/fixtures/forge_trust_closure_v1/replay.py": "e9ef780532f790c2e537a94a3ebc8fa8832c0c462059e7b7b5f9b4dd1b79e292",
     "tests/fixtures/forge_trust_closure_v1/residual.py": "ca4bcf1c048350b8b3b6d17431bac370dc1affcbd9c23e3a2ed6bc7a431ba0ba",
+    "tests/test_factory_ordinary_market_hypothesis.py": "7c525abea77ff80f4633d802fb00b521525a275eb58e7ef4a4c9335ca79b71d3",
     "tests/test_forge_research_flow_reliability_v1.py": "1aa77f0dac3c591aec8f292d247c2028e3d7fd0557f9ff1d6d5172988b04da07",
     "tests/test_forge_trust_closure_v1.py": "30bbd068fa91c45a60684d4f8a9aaac136748b1d9788ea043031b356bc448b5e",
-    "tests/test_precommit_diff_check_v1.py": "ae3b9cd5181b1e690ead5e1c1e0978093b9f2dc4088106a859b7b2eefb7652e4"
+    "tests/test_precommit_diff_check_v1.py": "0df718884afb1a3a87a74141d661ec7f8e5917e1121970cf218b1fd5ea88044a"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -53,14 +56,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_trust_closure_v1/factory_fit.json",
-    "sha256": "d952c5ebeca5fe4c78aae7cc06d87a775ae02fc778688749a72063a75e6287c0",
+    "sha256": "647441ad0df0612810053b3b3083c9fcd050d2ff1b76d81660dc2899a3559b4c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_NATIVE_CURRENT_READ_LEGACY_LINKAGE_IDENTITY_REFUSAL_RECOVERY_SELECTED_SEGMENTS",
     "independent_review": {
       "path": "docs/evidence/forge_trust_closure_v1/independent_review.json",
-      "sha256": "6f68cdc0efea17866ea26e14a6627dd7dc194c15731f556adf4dc297c57de8be",
+      "sha256": "8b670c1791049e7e7fe4a8647200bd99bf2df7692f4fcce720aa0a4e9654d06a",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
