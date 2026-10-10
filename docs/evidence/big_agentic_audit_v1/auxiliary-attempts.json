@@ -1,0 +1,72 @@
+{
+  "schema": "baa.auxiliary-attempts.v1",
+  "retained_root_logical": "AUX_EVIDENCE_ROOT",
+  "smoke": [
+    {
+      "attempt": "smoke-a1",
+      "refs": [
+        {
+          "ref": "smoke-a1/smoke-readback-97d870dc21975eb3.json",
+          "bytes": 1118,
+          "sha256": "4aefcc4047c53d4c6271c46dbffab0b3b818f2bb723ac3828434c36210ec329b"
+        },
+        {
+          "ref": "smoke-a1/smoke-readback-b83208a3ac95a2bd.json",
+          "bytes": 180,
+          "sha256": "816f987d4523716682b2211f86322f6e88e7a2c568e6981095abb22eb15abbcf"
+        },
+        {
+          "ref": "smoke-a1/smoke-summary.json",
+          "bytes": 1182,
+          "sha256": "1d6116186566bda1165282a6498b9c154e0d4278d14abcd62e12ebb826fbb97d"
+        },
+        {
+          "ref": "smoke-a1/smoke-trace.jsonl",
+          "bytes": 25325,
+          "sha256": "c8be2abdd28148f3815d2ae7887d098ed2b7d4815266f72f701b740a27241971"
+        }
+      ],
+      "status": "HARNESS_READBACK_LOCATOR_INVALID",
+      "closure_claim": false
+    },
+    {
+      "attempt": "smoke-a2",
+      "refs": [
+        {
+          "ref": "smoke-a2/smoke-readback-97d870dc21975eb3.json",
+          "bytes": 7329,
+          "sha256": "2772411db5eb7223797041b4431688ff192656cb745f44eb09ab0acdad6c6bd4"
+        },
+        {
+          "ref": "smoke-a2/smoke-readback-b83208a3ac95a2bd.json",
+          "bytes": 180,
+          "sha256": "e55182a63a402023d673397b8aaf3095f509311839e959f95b5ebd5075bf940a"
+        },
+        {
+          "ref": "smoke-a2/smoke-summary.json",
+          "bytes": 1182,
+          "sha256": "0b48bf9a93333cdfacf6c37107684d0ca9cd90e6b7e6e9dceaaa5bcb35075454"
+        },
+        {
+          "ref": "smoke-a2/smoke-trace.jsonl",
+          "bytes": 25325,
+          "sha256": "89929c02b9981fb4c9fb08d32798f5e5ea5f1f078db4a99587c61cfe713a7213"
+        }
+      ],
+      "status": "PASS_TWO_CONTROLS",
+      "closure_claim": true
+    }
+  ],
+  "preflight_attempts": [
+    {
+      "id": "preflight-a1",
+      "result": "HARNESS_DEFECT_PERMISSION_PROBE_HANDLING",
+      "retained_in": "owned Docker logs; no product reached"
+    },
+    {
+      "id": "preflight-a2",
+      "result": "PASS",
+      "ref": "AUX_EVIDENCE_ROOT/safety-preflight.json"
+    }
+  ]
+}

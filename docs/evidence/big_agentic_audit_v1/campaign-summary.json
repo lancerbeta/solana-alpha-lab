@@ -1,0 +1,45 @@
+{
+  "schema": "baa.campaign-summary.v1",
+  "task_id": "BIG_AGENTIC_AUDIT_V1",
+  "base_commit": "90ba76e37515b3d521478a6d05a149fb0f1d2b75",
+  "audit_completion": "PARTIAL_BLOCKED",
+  "inventory_denominator": 56,
+  "accounted_charters": 56,
+  "visited_charters": 54,
+  "charter_result_counts": {
+    "PASS": 35,
+    "UNKNOWN": 17,
+    "BLOCKED": 2,
+    "FAIL": 2
+  },
+  "unique_test_ids": 442,
+  "unique_test_ids_ever_passed": 441,
+  "test_attempt_counts": {
+    "PASS": 477,
+    "SKIP": 1,
+    "ERROR": 2
+  },
+  "product_defects": [
+    "BAA-001",
+    "BAA-002"
+  ],
+  "product_route_gaps": [
+    "BAA-003"
+  ],
+  "completed_native_runs": 15,
+  "full_product_path_proven": false,
+  "genuine_actor": "AGENT_BEHAVIOR_UNVERIFIED",
+  "recommended_now": "BAA-002 source-bound native run-to-dossier linkage; scientific promotion refusal preserved",
+  "production_mutations": 0,
+  "product_source_repairs": 0,
+  "owned_background_processes": 0,
+  "external_product_calls": 0,
+  "synthetic_alpha_claim": false,
+  "non_claims": [
+    "AUDIT_FULL_DOD_INCOMPLETE",
+    "NO_SCIENCE_ACCEPTANCE",
+    "NO_STRATEGY_ACTIVATION",
+    "NO_PRODUCTION_HEALTH",
+    "NO_MERGE"
+  ]
+}

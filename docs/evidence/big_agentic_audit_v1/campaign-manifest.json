@@ -1,0 +1,150 @@
+{
+  "schema": "baa.campaign-manifest.v1",
+  "campaign_id": "BAA-2026-10-10-V1",
+  "base_commit": "90ba76e37515b3d521478a6d05a149fb0f1d2b75",
+  "base_tree": "46c7f35c1d57a8f2491cfc3cf44af51bb14d5097",
+  "attachment_research_base": "d2cd1fdf6fb10b5efc3e3b7f7b752bcee574f8dc",
+  "attachment_sha256": "cae0400ae48b79bec7c980c260c121a390363d3fd566f285aa86ab2c58524ace",
+  "source_bindings": {
+    "AGENTS.md": "eaa6bdd038ef7f265fbbb7d2daeb2e84a34455e330be35c7f9366a283e99dc0c",
+    "delivery-harness/harness.yaml": "11930b776e578ab1c0dcd5545b203a7b57b32d0e3f71edcd46ad243d50684da3",
+    "delivery-harness/project-profile.yaml": "311c76061dcf41e29ac5942b9fc421076f22e10300dc9cbf976c16ecc564af02",
+    "delivery-harness/context-map.yaml": "9bfd7b35b4e5836f64e918eff5b8495ebb1f5e515e19841f35b44c55b44fe949",
+    "delivery-harness/policies/solana-alpha-lab.md": "3621bb2e2f3a27de8c10b904da14b9397789496ca5866674e15873026e017d89",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "998d7fc58b3a92e0a2a6a164d329ef2c64735b488348bf5125ad9494b6c3f18c",
+    "control/owner_attention_gate_v2.yaml": "06b5279eb4c0555de7c3cf8e2c30aaa6f37cdaad847f03b511f8fef8c1ad2b90",
+    "control/active_time_gates.json": "d66c73a25515a2be16d0923e604634c3d1243230b1e050533445c65953679522",
+    "configs/experiment_capability_registry_v2.yaml": "49edf7b770d37db38edb89a49dcb66f73b6212d62642cda2faa14880456e4430",
+    "configs/factory_semantic_operability_v1.yaml": "1bb0e13919da35c8bf3835feef7755bb072d8e6ce10bd91ae69d604bac82413d",
+    "docs/contracts/forge_native_lifecycle_closure_v1.md": "0476c250bdd4cbf803bf564ec6fc923b2cffeb81db6915ee63e4c5e0038807f0",
+    "docs/contracts/forge_ordinary_operation_lifecycle_v1.md": "954edb404504be15fb871bb10b08b81c034b850f5d53dd8ed7c546f5537bab2a",
+    "docs/contracts/experiment_evidence_decision_v1.md": "155cee013011939295e3b0a16396d95dc8663a6ab511133c7b109d3c54b9e861",
+    "docs/contracts/science_to_strategy_handoff_v1.md": "e0d063385564b41986eca07cb9a32e04a124f526d4f294e54797d639aa63c9ff",
+    "src/solana_alpha_lab/factory/document_runner.py": "1f9bb9e90f792a5feebcac47cb25979960db77c8b437e5125b00d6a27a0e1a6d",
+    "src/solana_alpha_lab/factory/experiment_evidence.py": "ce040faa3b58ec2b4242a8721ffb0de059c53ff0b0d78d2c70ddd93374f00d43",
+    "src/solana_alpha_lab/factory/operational_store.py": "509477535d82e1d3471014d0da59f25e48e4dd3a594f2e011c0ed4ab727500b1",
+    "src/solana_alpha_lab/factory/lifecycle_projection.py": "73e1eae462536f07c0a8ff597ebbea37925eae11864b13fe67c43daca7457820",
+    "src/solana_alpha_lab/factory/promotion_handoff.py": "58421dc22d6391c15725a8df4b5d374fd02de3008d837eb621ca2ee249c92a12",
+    "uv.lock": "3b75cc1c5a2c0c83560beaf1a57c4543b885e0909c75db6d1939e90d09eefedb",
+    "pyproject.toml": "647a6a2d4f3c45c88872cc7d07fbdfdb035db0ee5aa6e27371bd1a235d6db0c2",
+    ".python-version": "f8faecf2505680716c6279bf2cdec3d5a5ba2ba852f0d7df45d51ac1ce8d9ade"
+  },
+  "route": "DIRECT_CODEX_DELIVERY",
+  "actor": "CODEX",
+  "entry": "START_WITH_PATCH",
+  "source_migration": "Paused audit restarted from current main including FORGE_NATIVE_LIFECYCLE_CLOSURE_V1; old conclusions not carried as acceptance",
+  "evidence_roots": [
+    "EVIDENCE_ROOT",
+    "AUX_EVIDENCE_ROOT"
+  ],
+  "bootstrap": {
+    "owner_approved": true,
+    "sources": [
+      "official python image",
+      "official astral uv image",
+      "managed CPython distribution via pinned uv",
+      "existing uv.lock distributions"
+    ],
+    "python_image": "python:3.13.14-bookworm@sha256:8b9a8b28d9cc221c6ab5d40e9cfcd99429959f6a8f5171612a99147975ab043f",
+    "uv_image": "ghcr.io/astral-sh/uv:0.11.29@sha256:eb2843a1e56fd9e30c7276ce1a52cba86e64c7b385f5e3279a0e08e02dd058fc",
+    "dependency_changes": 0,
+    "network_during_product_runs": "NONE"
+  },
+  "budget": {
+    "product_run_wall_cap_seconds": 7200,
+    "memory_per_container": 2147483648,
+    "cpu_per_container": 2,
+    "pids_per_container": 128,
+    "evidence_cap_bytes": 2147483648,
+    "generated_sequences_cap": 200,
+    "generated_sequences_actual": 24,
+    "external_model_calls": 0,
+    "native_evidence_bytes": 663709305.0,
+    "archives_bytes": 129209815,
+    "observed_campaign_wall_seconds": 2771.419596,
+    "sum_product_container_seconds": 3541.210246,
+    "enforcement": "Docker RAM/CPU/PID and network/rootfs limits enforced; campaign time/storage monitored by builder, not a disk quota or deterministic scheduler"
+  },
+  "worlds": [
+    {
+      "id": "EPISODE_LIST_INPUT",
+      "source": "tests.test_forge_research_flow_reliability_v1.create_episode_fixture",
+      "input": "controlled external market/collector transport; actual consumer-facing admitted corpus",
+      "claim": "Fixture provisioning before audit input boundary; collection not audited"
+    },
+    {
+      "id": "MINIMAL_SESSION_INPUT",
+      "source": "tests.test_hfic_session helpers",
+      "input": "authored intermediate session/preflight",
+      "claim": "CONTRACT_ONLY unless exact persistence segment separately demonstrated"
+    },
+    {
+      "id": "DOWNSTREAM_SCIENCE_INPUT",
+      "source": "tests.test_experiment_evidence_decision_v1._eligible_records",
+      "input": "authored eligible scientific records/binding",
+      "claim": "SEGMENT_PRODUCT_PATH from downstream input, skips scientific producer; never FULL_PRODUCT_PATH"
+    },
+    {
+      "id": "WAL_AND_CRASH",
+      "source": "product_probes.py",
+      "input": "fresh synthetic owned stores; actual OS child exits",
+      "claim": "SEGMENT_PRODUCT_PATH"
+    },
+    {
+      "id": "PAIRED_METRIC",
+      "source": "metric_probe.py",
+      "input": "declared row/binding inputs for actual mean metric",
+      "claim": "CONTRACT_ONLY"
+    }
+  ],
+  "boundary_graph": [
+    {
+      "edge": "Forge-ready scope -> real grounded look -> frozen candidates",
+      "status": "TESTED_SEGMENT",
+      "evidence": "spine/producer/branches"
+    },
+    {
+      "edge": "freeze -> Critic -> revision/runner-up -> classifier",
+      "status": "TESTED_SCRIPTED_TRANSPORT",
+      "evidence": "spine/critic/interactions"
+    },
+    {
+      "edge": "candidate -> operator-authored frozen ExperimentSpec -> real fixed-time runner",
+      "status": "TESTED_SEGMENT",
+      "evidence": "producer/spine"
+    },
+    {
+      "edge": "real completed runner -> owner dossier",
+      "status": "FAIL",
+      "evidence": "BAA-002"
+    },
+    {
+      "edge": "fixed-time proxy -> chronological/OOS successor",
+      "status": "BLOCKED_PRODUCT_ROUTE",
+      "evidence": "BAA-003"
+    },
+    {
+      "edge": "authored downstream scientific records -> owner decision -> frozen handoff -> CHECK/RENDER/VERIFY",
+      "status": "TESTED_SEGMENT",
+      "evidence": "core/science_to_strategy_handoff tests"
+    },
+    {
+      "edge": "new agent discovers and executes routes",
+      "status": "BLOCKED_ENVIRONMENT",
+      "evidence": "actor_missions.json"
+    }
+  ],
+  "exclusions": [
+    "collector/release internals",
+    "real providers/RPC/WSS",
+    "production databases",
+    "real holdout",
+    "real science trials",
+    "strategy activation/execution",
+    "wallet/signer/money",
+    "runtime health/alpha claims"
+  ],
+  "clock_model": "Product synthetic UTC clocks are fixed in selected fixtures; host wall clock controls bounded run time. No deterministic OS scheduling claim.",
+  "fidelity_policy": "Existing mocked/hand-bound unit assertions are CONTRACT_ONLY. Product-path and downstream-fixture segments never sum to FULL_PRODUCT_PATH.",
+  "genuine_actor": "BLOCKED_ENVIRONMENT; all tool lanes must be confined before invoking actors"
+}
