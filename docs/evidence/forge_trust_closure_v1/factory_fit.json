@@ -4,8 +4,8 @@
   "review_id": "FORGE-TRUST-CLOSURE-FACTORY-FIT-001",
   "as_of": "2026-10-10",
   "task_id": "FORGE_TRUST_CLOSURE_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "d2d46d0e21e02d62b8bb2851d5e8233be0a87c7ad291f4b711b765cb9eb3c17b",
+  "reviewed_inventory_sha256": "71b2fe65fa0669253f6be2cab505f43e9a2f78872d17541d86aeb803ead5a8e3",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
