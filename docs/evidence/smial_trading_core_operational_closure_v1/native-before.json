@@ -1,0 +1,11 @@
+{
+  "status": "REPRODUCED",
+  "base_sha": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "working_script_sha_unchanged_from_base": true,
+  "command": "trading_continuity.py run --data-root local/closure-native-probe",
+  "exit_code": 2,
+  "reason": "argument command: invalid choice: run",
+  "source_mutated": false,
+  "provider_called": false,
+  "runtime_created": false
+}

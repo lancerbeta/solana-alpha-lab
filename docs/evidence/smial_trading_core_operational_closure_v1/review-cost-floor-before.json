@@ -1,0 +1,29 @@
+{
+  "accepted_original_observations": [
+    {"chargeable_cost_usd": "0.25", "observed_at": "2026-10-05T12:40:10Z", "outcome": "UNKNOWN_REQUIRES_RECONCILIATION", "result_id": "REVIEW-ORIGINAL-KNOWN-FLOOR"},
+    {"chargeable_cost_usd": null, "observed_at": "2026-10-05T12:40:20Z", "outcome": "UNKNOWN_REQUIRES_RECONCILIATION", "result_id": "REVIEW-LATER-UNKNOWN-TOTAL"}
+  ],
+  "backup_cut": "BEFORE_ATTEMPT",
+  "base_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "cut_as_of": "2026-10-05T12:41:00Z",
+  "cut_effects_n": 1,
+  "execution": {"credential_reads": 0, "elapsed_seconds": 3.804496, "exit_code": 0, "owned_temp_cleanup": true, "product_edits": 0, "provider_calls": 0},
+  "exported_effect": "EXACT_LATEST_RECEIPT",
+  "finding_id": "CODE-C20-RECOVERY-COST-FLOOR-LOSS",
+  "limitation": "Synthetic accepted observations; proves software cumulative-floor loss, no live financial or provider claim",
+  "mode": "SHADOW",
+  "native_results_before": 2,
+  "native_route": "TradingCoordinator.tick -> AFTER_ATTEMPT_COMMIT fault -> TradingContinuityRunner.result x2 -> export_recovery_cut -> fresh restore_native_backup -> reconcile_cut -> TradingContinuityRunner.readback",
+  "oracle": {"original_additional_cost_status": "UNKNOWN", "original_known_additional_cost_usd": "0.25", "restored_additional_cost_status": "UNKNOWN", "restored_known_additional_cost_usd": "0"},
+  "receipt_sha256": "b897d68b6d425c4a4775737021063a4dcda5538218118dc81947baa5bd84017a",
+  "review_role": "CODE_REVIEWER",
+  "schema": "smial.independent-code-review-native-before",
+  "schema_version": "1.0",
+  "severity": "P2",
+  "source_sha256": {
+    "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "454124e1c6a103f48b2604e589252683fb719f7469c3a590d4d60526fb181695"
+  },
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "verdict": "FAIL"
+}

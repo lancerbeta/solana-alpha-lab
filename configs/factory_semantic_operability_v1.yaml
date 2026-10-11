@@ -446,7 +446,7 @@ routes:
       - DOC-EXPERIMENT-EVIDENCE-DECISION-001
     query_recipe_ids: []
     status_plane: MIXED
-    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    runtime_resolution: {mode: NONE, operator_asset_ids: [DOC-TRADING-CONTINUITY-OFFLINE-001]}
     forge_visibility: EXCLUDE
     related_route_ids: [SEM-PRIOR-WORK, SEM-EXPERIMENT-CAPABILITIES, SEM-PRODUCT-STATE, SEM-OWNER-DAILY-ATTENTION]
 

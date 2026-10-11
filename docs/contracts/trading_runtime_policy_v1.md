@@ -12,7 +12,8 @@ The ordinary offline runner uses the same policy/admission owner and frozen
 revision/notional/fee bindings: `docs/contracts/episode_decision_continuity_v1.md`.
 Entry-admission count, possible inventory, operator-settled and drain-clear
 remain distinct. Correcting a consumer count does not add EXIT_*/UNRESOLVED to
-entry veto. A pending entry is rechecked for pause/stop/stale/invalid policy
+the historical entry-risk basis. The ordinary operating profile additionally
+checks the versioned outstanding-obligation basis below. A pending entry is rechecked for pause/stop/stale/invalid policy
 before a modeled attempt. Exit reconciliation remains available during drain.
 
 ```text
@@ -134,6 +135,49 @@ minimum as canonical capacity.
 
 Relevant OPEN_RISK unknown required notional → `RUNTIME_EXPOSURE_UNKNOWN`
 → BLOCK. Historical CLOSED/RECONCILED missing notional does not block.
+
+## 6.1 Ordinary operating envelope: outstanding obligations V1
+
+The optional ordinary profile stores an append-only, hash-linked
+`smial.ordinary-operating-envelope` v1.0 event in the same PaperPlane database.
+It requires two explicit positive bounds: `max_outstanding_positions` and
+`max_outstanding_cost_basis_usd`. Missing configuration is
+`CONFIGURATION_REQUIRED` for an ordinary caller; legacy APIs retain their
+StrategyVersion/runtime-policy entry-risk semantics and original hashes.
+These bounds are operating cost basis, never wallet cash, equity, VaR or a
+scientific risk estimate. Configuration takes authority from its enclosing
+explicit operator/profile command; the storage helper grants none.
+
+`OUTSTANDING_OBLIGATIONS_V1` counts all identities and activation epochs in
+one mode: unattempted reservations, possible entries, known inventory,
+partial remainder, `EXIT_REQUIRED`, `EXITING`, and unreconciled inventory.
+PAPER and SHADOW stay independent. Unattempted cancellation, definitive entry
+non-fill, or a proved complete exit releases the physical obligation.
+`CLOSED` alone does not. Missing identity/exposure or an unresolved attempt
+is `OUTSTANDING_OBLIGATIONS_UNKNOWN` and vetoes new entries. A possible entry
+retains at least its admitted cost basis; an uncertain exit retains the last
+proved remaining inventory. Unknown fees/costs are shown separately and do
+not invent inventory after a proved complete exit.
+
+The admission check and frozen reservation share `BEGIN IMMEDIATE` with the
+existing risk owner. It may only deny, never enlarge or auto-shrink the
+accepted amount. A predecessor using the full mode bound still consumes it
+after switching the entry-active identity. A confirmed partial exit reduces
+capacity by its proved residual cost basis; a new request above headroom is
+denied unchanged. Before ENTRY attempt the same check excludes that attempt's
+existing reservation, includes every other obligation, and rechecks current
+envelope/control. Exit/reconciliation remains available during safety veto.
+
+Existing owner API: `normalize_operating_envelope`,
+`configure_operating_envelope` (compare-and-swap plus command idempotency),
+`read_operating_envelope`, `obligation_summary`, `enforce_operating_envelope`.
+`accept_signal_decision_outcome(..., ordinary_operating=True)` adds the atomic
+ordinary check. `begin_modeled_attempt` repeats it for the frozen ordinary
+reservation. No competing inventory table or risk engine is introduced.
+Indexed event-type/position queries read only the envelope revision chain and
+the events of current obligation candidates. A partial index removes proved
+flat historical positions from the ordinary candidate scan. Legacy readonly
+stores without the additive columns retain their compatible read fallback.
 
 ## 7. Operator path
 

@@ -1,0 +1,54 @@
+[
+  {
+    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/source-contract.md",
+    "sha256_or_fingerprint": "addc05071197efb3462771b52f5699170d54061656efeda0b7f48e52bdb0f0b7"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/coverage.json",
+    "sha256_or_fingerprint": "8e7fb9c019d71aeea65830ee8ebc83d391b9309372ea7c4aebe8bc9ebecc9413"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/executed-tests.json",
+    "sha256_or_fingerprint": "2899d525617851033c62149e4bf0be5d4e4df389ae971a7790ec17c3169ef297"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/direct-consumer-proof.json",
+    "sha256_or_fingerprint": "c8df261e81cefb63788dbfe4f6d108e5072c89e70a4650be8f4987498fc18bf1"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/operator-proof.json",
+    "sha256_or_fingerprint": "b11acd8db40927d16bde857e9581317116d4952fed8f2f7e29aff8cea2515d0c"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/clock-proof.json",
+    "sha256_or_fingerprint": "346a016b59d1541b18d5b4752ba4c015aa7dd24d2b692832fa049242350cf32b"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/cleanup.json",
+    "sha256_or_fingerprint": "632d4e4fed687c72d11078e310319d45db2e488f7375357e84de839535e52dc1"
+  },
+  {
+    "logical_ref": "docs/reports/smial_trading_core_operational_closure_v1/REPORT.md",
+    "sha256_or_fingerprint": "8dd25897610987bb3e3ce79ea3b0fa279cfb7695fc6865e8c2450d8af943f6b1"
+  },
+  {
+    "logical_ref": "docs/reports/smial_trading_continuity_v1/REPORT.md",
+    "sha256_or_fingerprint": "16221e8db75ecc1cf17fd349800083d7751f14779a673f2e6b8e96c625211df5"
+  },
+  {
+    "logical_ref": "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md",
+    "sha256_or_fingerprint": "b96dba7f18d134c251b17b02d33334206598613a84d64bbc928e56979ee08404"
+  },
+  {
+    "logical_ref": "configs/provider_route_capability_registry_v11.yaml",
+    "sha256_or_fingerprint": "527baaad75de6c35d04b4f97ad528cacdac03981e2ec05a9da96b9becf039b34"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/eof-normalization-proof.json",
+    "sha256_or_fingerprint": "67794cb24f7cfa69dc63451a2ac1e8d321489e528316f65d2c12abc78ae8c232"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/canary-rename-proof.json",
+    "sha256_or_fingerprint": "e2449ad9084c695b74c50dbc1249db839f525547e4bd516024b50bad83ec056b"
+  }
+]

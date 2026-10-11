@@ -104,6 +104,11 @@ def load_bound_recipe(root: Path, *, strategy, manifest, execution_binding):
     if spec_sha256(root, relative.as_posix()) != manifest["experiment_spec_sha256"]:
         raise PaperPlaneError("EXPERIMENT_SPEC_HASH_CONFLICT")
     document = yaml.safe_load((root / relative).read_text(encoding="utf-8"))
+    return bound_recipe_body(document, strategy=strategy)
+
+
+def bound_recipe_body(document, *, strategy):
+    """Derive the runtime recipe only from the exact promoted spec bytes."""
     query = (document.get("parameters") or {}).get("episode_query")
     if not isinstance(query, Mapping) or query.get("schema_version") != "1.2":
         raise PaperPlaneError("BOUND_EPISODE_RECIPE_REQUIRED")
@@ -116,13 +121,17 @@ def load_bound_recipe(root: Path, *, strategy, manifest, execution_binding):
     if not isinstance(shas, list) or len(shas) > 32 or any(not isinstance(item, str) or len(item) != 64 or any(ch not in "0123456789abcdef" for ch in item) for item in shas):
         raise PaperPlaneError("RECIPE_MEMBERSHIP_DEPENDENCIES_INVALID")
     body["membership_snapshot_shas"] = sorted(set(shas))
+    # Evaluation targets alone do not authorize unattended exits. This explicit
+    # spec field is frozen by the same scientific spec hash, never inferred.
+    body["executable_exit"] = (document.get("parameters") or {}).get("runtime_execution")
     return body
 
 
 def produce_episode_decision(root: Path, *, source_path: Path, strategy: Mapping[str, Any],
                              manifest: Mapping[str, Any], execution_binding: Mapping[str, Any],
-                             epoch_id: str, episode_id: str, as_of: str) -> dict[str, Any]:
-    body = load_bound_recipe(root, strategy=strategy, manifest=manifest, execution_binding=execution_binding)
+                             epoch_id: str, episode_id: str, as_of: str,
+                             frozen_recipe=None) -> dict[str, Any]:
+    body = frozen_recipe if frozen_recipe is not None else load_bound_recipe(root, strategy=strategy, manifest=manifest, execution_binding=execution_binding)
     source = ObservationScheduleStore(source_path, readonly=True, immutable=False)
     try:
         with source.read_snapshot():
@@ -172,6 +181,7 @@ def produce_episode_decision(root: Path, *, source_path: Path, strategy: Mapping
                 "promotion_handoff_manifest_sha256": manifest["manifest_sha256"],
                 "experiment_spec_sha256": manifest["experiment_spec_sha256"],
                 "admission_content_sha256": stored["content_sha256"], "frame_sha256": admission["frame_sha256"],
+                "origin_admission": admission,
                 "schedule_binding": binding, "membership": evidence.episode_states(episode_id),
                 "decision_cutoff": render_utc(cutoff), "numeric": numeric,
                 "read_set": sorted(prefix.read_set, key=lambda item: (item["point_id"], item["field_id"]))})
@@ -187,6 +197,33 @@ def produce_episode_decision(root: Path, *, source_path: Path, strategy: Mapping
             return {"decision": decision, "provenance": provenance, "provenance_sha256": digest}
     finally:
         source.close()
+
+
+def produce_frozen_time_exit(root: Path, *, strategy, position, origin_packet, frozen_recipe, as_of):
+    """A due obligation survives missing quotes, retired feeds and old science."""
+    rule = frozen_recipe.get("executable_exit")
+    if not isinstance(rule, dict) or rule != {"kind": "FROZEN_TIME_EXIT", "exit_point": frozen_recipe["target"]["exit_point"]}:
+        raise PaperPlaneError("EXECUTABLE_EXIT_BINDING_REQUIRED")
+    provenance = origin_packet["provenance"]
+    admission = provenance.get("origin_admission")
+    if not isinstance(admission, dict) or admission_content_sha256(admission) != provenance["admission_content_sha256"]:
+        raise PaperPlaneError("EXIT_ORIGIN_SOURCE_CONFLICT")
+    cutoff = resolve_point(provenance["schedule_binding"], parse_utc(admission["t0"]), rule["exit_point"]).availability_deadline
+    if parse_utc(as_of) < cutoff:
+        raise PaperPlaneError("EPISODE_EXIT_NOT_DUE")
+    identity = "EXITDEC-" + scope.sha256_of({"position_id": position["position_id"], "slot": rule["exit_point"]}).upper()
+    proof = {"origin_signal_decision_id": position["signal_decision_id"],
+             "recipe_sha256": provenance["logical_key"]["recipe_sha256"],
+             "origin_admission_sha256": provenance["admission_content_sha256"],
+             "cutoff": render_utc(cutoff), "executable_exit": rule, "price_status": "NOT_REQUIRED_FOR_OBLIGATION"}
+    digest = scope.sha256_of(proof)
+    decision = validate_exit_decision(root, {"schema": "smial.exit-decision", "schema_version": "1.0",
+        "exit_decision_id": identity, "position_id": position["position_id"],
+        "strategy_id": strategy["strategy_id"], "strategy_version": strategy["strategy_version"],
+        "activation_epoch_id": position["activation_epoch_id"], "decision_at": render_utc(cutoff),
+        "first_reliable_available_at": render_utc(cutoff), "action": "EXIT", "reason_code": "FROZEN_TIME_EXIT_DUE",
+        "evidence_refs": ["execution-event:SRC-" + identity + ":sha256:" + digest]})
+    return {"decision": decision, "provenance": proof, "provenance_sha256": digest}
 
 
 def produce_originating_exit(root: Path, *, source_path: Path, strategy, manifest, execution_binding,

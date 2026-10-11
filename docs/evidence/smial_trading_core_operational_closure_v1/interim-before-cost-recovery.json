@@ -1,0 +1,30 @@
+{
+  "code_unchanged_during_execution": true,
+  "disposition": "SUPERSEDED_ONLY_FOR_ACCEPTED_RESULT_HISTORY_RECOVERY",
+  "elapsed_seconds": 414.881325,
+  "explanation": "115 stable tests PASS; independent native C20 then reproduced loss of earlier known cost floor on restore. New native regression and updated stable run required.",
+  "peak_rss_bytes": 122683392,
+  "receipt_sha256": "5786485a74c1839b609c26818bfe770fba13b9982044111eeded18699d82fc7c",
+  "schema": "smial.operating-software-proof",
+  "schema_version": "1.0",
+  "source_pins": {
+    "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+    "scripts/trading_continuity.py": "1d87130bea4f9fdd85eda0569f2d607e5f30d07d420466191c69008736ba294e",
+    "src/solana_alpha_lab/factory/episode_decision.py": "7bb12ff16952de23535cb926fbd65a7b7e2a8de6e879b16bac449ee35674af3e",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+    "src/solana_alpha_lab/factory/paper_plane.py": "75f2aa8e10fd40e1c2dd4ad1519bcf2826c3cbc80988461349d158f32d97b4cd",
+    "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+    "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+    "src/solana_alpha_lab/factory/trading_adapters.py": "595b4c1b0910ca5cdddca0a247158713ecac27208fab0701933506185a1683f3",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "454124e1c6a103f48b2604e589252683fb719f7469c3a590d4d60526fb181695",
+    "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8690e7fd4b1412dc5462e614b84ea8cc57f90f6451d6568fce2273023faf0e1d",
+    "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+    "tests/test_trading_core_operational_closure_v1.py": "2cff642ad42d5b2216831f7a5298e2218d9bf8dd9ea3a9dad48e3a1c7b5e36c4",
+    "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+    "tests/test_trading_operational_obligations_v1.py": "063ae541e5d3fc30d4926fe5bf03eeaef2deb8160866b70558a7bae11692ef83",
+    "tests/test_trading_operational_recovery_v1.py": "7495ff335860b535ceddf730fcac92167bccc686e5d9504c11302626c68850aa"
+  },
+  "status": "PASS",
+  "tests_run": 115
+}

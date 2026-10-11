@@ -13,7 +13,7 @@ from typing import Any, Mapping
 
 import yaml
 
-from solana_alpha_lab.factory.paper_plane import OPEN_RISK_STATES, PaperPlaneStore
+from solana_alpha_lab.factory.paper_plane import OPEN_RISK_STATES, PRE_ATTEMPT_STATES, PaperPlaneStore
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 
 SCHEMA = "smial.trading-runtime-policy"
@@ -78,7 +78,7 @@ def _money(value: Any, *, field: str) -> str | None:
         amount = Decimal(str(value))
     except (InvalidOperation, ValueError) as exc:
         raise TradingRuntimePolicyError(f"POLICY_FIELD_INVALID:{field}") from exc
-    if amount <= 0 or not amount.is_finite():
+    if not amount.is_finite() or amount <= 0:
         raise TradingRuntimePolicyError(f"POLICY_FIELD_INVALID:{field}")
     return format(amount, "f")
 
@@ -541,6 +541,206 @@ def _as_decimal(value: Any) -> Decimal | None:
     return amount
 
 
+OPERATING_ENVELOPE_SCHEMA = "smial.ordinary-operating-envelope"
+OPERATING_ENVELOPE_BASIS = "OUTSTANDING_OBLIGATIONS_V1"
+OPERATING_ENVELOPE_EVENT = "ORDINARY_OPERATING_ENVELOPE_CONFIGURED"
+
+
+def normalize_operating_envelope(raw: Mapping[str, Any], *, mode: str) -> dict[str, Any]:
+    """An explicit, additional safety bound; legacy entry-risk basis is untouched."""
+    if mode not in SUPPORTED_MODES:
+        raise TradingRuntimePolicyError("OPERATING_ENVELOPE_MODE_INVALID")
+    allowed = {"schema", "schema_version", "basis", "mode", "max_outstanding_positions",
+               "max_outstanding_cost_basis_usd"}
+    if set(raw) - allowed or raw.get("schema", OPERATING_ENVELOPE_SCHEMA) != OPERATING_ENVELOPE_SCHEMA:
+        raise TradingRuntimePolicyError("OPERATING_ENVELOPE_INVALID")
+    if raw.get("schema_version", "1.0") != "1.0" or raw.get("basis", OPERATING_ENVELOPE_BASIS) != OPERATING_ENVELOPE_BASIS:
+        raise TradingRuntimePolicyError("OPERATING_ENVELOPE_INVALID")
+    if raw.get("mode", mode) != mode:
+        raise TradingRuntimePolicyError("OPERATING_ENVELOPE_MODE_INVALID")
+    count = _count(raw.get("max_outstanding_positions"), field="max_outstanding_positions")
+    money = _money(raw.get("max_outstanding_cost_basis_usd"), field="max_outstanding_cost_basis_usd")
+    if count is None or money is None:
+        raise TradingRuntimePolicyError("CONFIGURATION_REQUIRED")
+    return {"schema": OPERATING_ENVELOPE_SCHEMA, "schema_version": "1.0", "mode": mode,
+            "basis": OPERATING_ENVELOPE_BASIS, "max_outstanding_positions": count,
+            "max_outstanding_cost_basis_usd": money}
+
+
+def read_operating_envelope(store: PaperPlaneStore, mode: str) -> dict[str, Any]:
+    if mode not in SUPPORTED_MODES:
+        raise TradingRuntimePolicyError("OPERATING_ENVELOPE_MODE_INVALID")
+    previous = GENESIS_POLICY_SHA256
+    current = None
+    try:
+        for event in store.filtered_execution_events(event_type=OPERATING_ENVELOPE_EVENT):
+            if event["event_type"] != OPERATING_ENVELOPE_EVENT:
+                continue
+            payload = event["payload"]
+            if not isinstance(payload, Mapping) or payload.get("mode") not in SUPPORTED_MODES:
+                raise TradingRuntimePolicyError("OPERATING_ENVELOPE_INVALID")
+            if payload["mode"] != mode:
+                continue
+            body = normalize_operating_envelope(payload["envelope"], mode=mode)
+            revision = 1 if current is None else current["revision"] + 1
+            identity = {"envelope": body, "revision": revision, "previous_sha256": previous}
+            fingerprint = canonical_sha256(identity)
+            if payload.get("revision") != revision or payload.get("previous_sha256") != previous or payload.get("envelope_sha256") != fingerprint:
+                raise TradingRuntimePolicyError("OPERATING_ENVELOPE_INVALID")
+            current = {**identity, "envelope_sha256": fingerprint, "configured_at": event["created_at"]}
+            previous = fingerprint
+    except (TradingRuntimePolicyError, TypeError, ValueError, KeyError):
+        return {"status": "OPERATING_ENVELOPE_INVALID", "mode": mode, "envelope": None,
+                "revision": None, "envelope_sha256": previous}
+    return ({"status": "CONFIGURATION_REQUIRED", "mode": mode, "envelope": None,
+             "revision": None, "envelope_sha256": previous} if current is None
+            else {"status": "VALID", "mode": mode, **current})
+
+
+def configure_operating_envelope(store: PaperPlaneStore, *, mode: str,
+                                 candidate_raw: Mapping[str, Any], expected_current_sha256: str,
+                                 idempotency_key: str, as_of: str) -> dict[str, Any]:
+    """Persist the caller's authorized profile in the same DB/transaction."""
+    if not idempotency_key or not as_of:
+        raise TradingRuntimePolicyError("OPERATING_ENVELOPE_IDENTITY_REQUIRED")
+    body = normalize_operating_envelope(candidate_raw, mode=mode)
+    request = {"mode": mode, "candidate": body, "expected_current_sha256": expected_current_sha256,
+               "as_of": as_of}
+    with store.immediate_write():
+        replay = _replay_or_conflict(store, idempotency_key=idempotency_key,
+            command_type=OPERATING_ENVELOPE_EVENT, request=request)
+        if replay is not None:
+            return replay
+        current = read_operating_envelope(store, mode)
+        if current["status"] == "OPERATING_ENVELOPE_INVALID":
+            raise TradingRuntimePolicyError("OPERATING_ENVELOPE_INVALID")
+        if expected_current_sha256 != current["envelope_sha256"]:
+            raise TradingRuntimePolicyError("OPERATING_ENVELOPE_STALE_WRITE")
+        revision = 1 if current["revision"] is None else current["revision"] + 1
+        identity = {"envelope": body, "revision": revision, "previous_sha256": expected_current_sha256}
+        fingerprint = canonical_sha256(identity)
+        store.append_execution_event(event_type=OPERATING_ENVELOPE_EVENT,
+            event_id=f"OPERATING-ENVELOPE-{mode}-{revision}", bot_instance_id=None, position_id=None,
+            payload={"mode": mode, **identity, "envelope_sha256": fingerprint}, created_at=as_of)
+        result = read_operating_envelope(store, mode)
+        store.record_operator_command(idempotency_key=idempotency_key, command_type=OPERATING_ENVELOPE_EVENT,
+                                      request=request, result=result)
+        return {**result, "idempotent": False}
+
+
+def obligation_summary(store: PaperPlaneStore, *, mode: str,
+                       exclude_position_id: str | None = None) -> dict[str, Any]:
+    """Shared cost-basis obligations, including predecessors and unknown outcomes."""
+    if mode not in SUPPORTED_MODES:
+        raise TradingRuntimePolicyError("OPERATING_ENVELOPE_MODE_INVALID")
+    positions = [position for position in store.obligation_positions(mode) if position["position_id"] != exclude_position_id]
+    events = store.filtered_execution_events(position_ids=[position["position_id"] for position in positions])
+    attempts_by_position: dict[str, list[dict[str, Any]]] = {}
+    for event in events:
+        if event["event_type"] == "MODELED_ATTEMPT_STARTED":
+            attempts_by_position.setdefault(event["position_id"], []).append(event)
+    results = {event["event_id"]: event for event in events if event["event_type"] == "MODELED_RESULT_ACCEPTED"}
+    finals = {}
+    for event in events:
+        if event["event_type"] != "MODELED_ATTEMPT_FINAL":
+            continue
+        payload = event["payload"]
+        if not isinstance(payload, Mapping) or payload.get("outcome") not in {
+            "NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED", "LANDED_SUCCESS", "PARTIAL"}:
+            continue
+        result = results.get(payload.get("result_event_id"))
+        if result is not None and (result["payload"].get("result") or {}).get("attempt_id") == event["event_id"].removeprefix("FINAL-"):
+            finals[event["event_id"]] = event
+    rows = []
+    total = Decimal("0")
+    unknown = False
+    pending = 0
+    for position in positions:
+        pid = position["position_id"]
+        if pid == exclude_position_id:
+            continue
+        position_mode = position.get("obligation_mode")
+        if position_mode is not None and position_mode != mode:
+            continue
+        attempts = attempts_by_position.get(pid, [])
+        unresolved_attempts = [e for e in attempts if "FINAL-" + e["event_id"] not in finals]
+        has_remainder = position.get("remaining_qty_dec") is not None
+        quantity = _as_decimal(position.get("remaining_qty_dec") if has_remainder else position.get("qty_dec"))
+        state = str(position.get("state"))
+        entry_finals = [finals["FINAL-" + e["event_id"]]["payload"].get("outcome") for e in attempts
+                        if e["payload"].get("side") == "ENTRY" and "FINAL-" + e["event_id"] in finals]
+        definitive_nonfill = any(value in {"NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED"}
+                                 for value in entry_finals)
+        flat = state == "RECONCILED" and position.get("exit_notional_usd_dec") not in {None, ""} and position.get("pnl_evidence_class") in {
+            "PAPER_RECONCILED_MODEL", "SHADOW_RECONCILED_QUOTE_MODEL"} and (_as_decimal(position.get("qty_dec")) or Decimal("0")) > 0 and (
+                not has_remainder or quantity == 0 and _as_decimal(position.get("remaining_cost_basis_usd_dec")) == 0
+                and _as_decimal(position.get("remaining_entry_fee_usd_dec")) == 0)
+        unattempted_cancel = state == "CANCELLED" and not attempts and quantity is None
+        if not unresolved_attempts and (flat or definitive_nonfill and quantity is None or unattempted_cancel):
+            continue
+        row_unknown = position_mode is None or bool(unresolved_attempts) or state in {"UNKNOWN", "ATTEMPTING"}
+        if state not in PRE_ATTEMPT_STATES and (quantity is None or quantity <= 0):
+            row_unknown = True
+        if state == "UNRESOLVED" and (not attempts or unresolved_attempts):
+            row_unknown = True
+        has_remaining_cost = position.get("remaining_cost_basis_usd_dec") is not None
+        exposure = _as_decimal(position.get("remaining_cost_basis_usd_dec") if has_remaining_cost else position.get("entered_notional_usd_dec"))
+        admitted = _as_decimal(position.get("admitted_entry_notional_usd_dec"))
+        if exposure is None and not has_remaining_cost:
+            exposure = admitted
+        if quantity is not None and (not quantity.is_finite() or quantity < 0):
+            row_unknown = True
+        original_quantity = _as_decimal(position.get("qty_dec"))
+        entered_cost = _as_decimal(position.get("entered_notional_usd_dec"))
+        invalid_remainder = has_remainder and (quantity is None or original_quantity is None
+            or original_quantity <= 0 or quantity <= 0 or quantity > original_quantity
+            or entered_cost is None or entered_cost <= 0)
+        if has_remainder and not invalid_remainder and entered_cost is not None and exposure is not None:
+            invalid_remainder = exposure != entered_cost * quantity / original_quantity
+        row_unknown = row_unknown or invalid_remainder
+        if exposure is None or exposure < 0:
+            row_unknown = True
+            exposure = None
+        # A possible entry must retain its admission bound. A possible exit
+        # retains the last proved inventory, never a hypothesized sold quantity.
+        if row_unknown and (not has_remainder or invalid_remainder or exposure is None) and admitted is not None:
+            exposure = max(exposure or Decimal("0"), admitted)
+        pending += len(unresolved_attempts)
+        unknown = unknown or row_unknown or exposure is None
+        if exposure is not None:
+            total += exposure
+        rows.append({"position_id": pid, "bot_instance_id": position.get("bot_instance_id"),
+                     "strategy_id": position.get("strategy_id"), "activation_epoch_id": position.get("activation_epoch_id"),
+                     "state": state, "remaining_quantity": None if quantity is None else format(quantity, "f"),
+                     "cost_basis_usd": None if exposure is None else format(exposure, "f"),
+                     "inventory_status": "UNKNOWN" if row_unknown or exposure is None else "KNOWN"})
+    return {"basis": OPERATING_ENVELOPE_BASIS, "mode": mode, "position_count": len(rows),
+            "known_cost_basis_floor_usd": format(total, "f"),
+            "outstanding_cost_basis_usd": None if unknown else format(total, "f"),
+            "inventory_status": "UNKNOWN" if unknown else "KNOWN", "pending_attempt_count": pending,
+            "positions": rows}
+
+
+def enforce_operating_envelope(store: PaperPlaneStore, *, mode: str,
+                               admitted_notional_usd: Any, exclude_position_id: str | None = None) -> dict[str, Any]:
+    current = read_operating_envelope(store, mode)
+    summary = obligation_summary(store, mode=mode, exclude_position_id=exclude_position_id)
+    reason = None
+    amount = _as_decimal(admitted_notional_usd)
+    if amount is None or amount <= 0:
+        raise TradingRuntimePolicyError("OPERATING_ADMISSION_AMOUNT_INVALID")
+    if current["status"] != "VALID":
+        reason = current["status"]
+    elif summary["inventory_status"] == "UNKNOWN":
+        reason = "OUTSTANDING_OBLIGATIONS_UNKNOWN"
+    elif summary["position_count"] + 1 > current["envelope"]["max_outstanding_positions"]:
+        reason = "OUTSTANDING_POSITION_LIMIT"
+    elif Decimal(summary["outstanding_cost_basis_usd"]) + amount > Decimal(current["envelope"]["max_outstanding_cost_basis_usd"]):
+        reason = "OUTSTANDING_COST_BASIS_LIMIT"
+    return {"decision": "ALLOW" if reason is None else "DENIED", "reason_code": reason or "WITHIN_LIMIT",
+            "envelope": current, "obligations": summary, "admitted_notional_usd": format(amount, "f")}
+
+
 def position_exposure(position: Mapping[str, Any]) -> tuple[Decimal | None, bool]:
     """Return (notional, unknown_required).
 
@@ -766,6 +966,8 @@ def compose_runtime_envelope(store: PaperPlaneStore, git_strategies: list[Mappin
                 None if inventory["global_unknown"] else format(inventory["global_notional"], "f")
             ),
             "open_risk_notional_unknown": inventory["global_unknown"],
+            "ordinary_operating_envelope": read_operating_envelope(store, mode),
+            "outstanding_obligations": obligation_summary(store, mode=mode),
         }
     by_strategy: list[dict[str, Any]] = []
     for spec in git_strategies:

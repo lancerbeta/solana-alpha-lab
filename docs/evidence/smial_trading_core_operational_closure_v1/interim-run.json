@@ -1,0 +1,19 @@
+{
+  "disposition": "NOT_FINAL_EVIDENCE_CODE_CHANGED_DURING_RUN",
+  "elapsed_seconds": 338.040236,
+  "explanation": "Old in-memory risk consumer loaded before corrective file edits; 8 malformed remainder subcases failed. Exact stable rerun required.",
+  "failed_test_ids": [
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_quantity_preserves_identity_bound_unknown_economics_readback (marked=True, residual='NaN')",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_quantity_preserves_identity_bound_unknown_economics_readback (marked=True, residual='Infinity')",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_quantity_preserves_identity_bound_unknown_economics_readback (marked=True, residual='not-a-decimal')",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_quantity_preserves_identity_bound_unknown_economics_readback (marked=True, residual='-1')",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_quantity_preserves_identity_bound_unknown_economics_readback (marked=False, residual='NaN')",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_quantity_preserves_identity_bound_unknown_economics_readback (marked=False, residual='Infinity')",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_quantity_preserves_identity_bound_unknown_economics_readback (marked=False, residual='not-a-decimal')",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_quantity_preserves_identity_bound_unknown_economics_readback (marked=False, residual='-1')"
+  ],
+  "peak_rss_bytes": 122757120,
+  "receipt_sha256": "f439ced07b274fa8d9024022077419c0971eca37f7b178ed281482581525a4c9",
+  "status": "FAIL",
+  "tests_run": 99
+}

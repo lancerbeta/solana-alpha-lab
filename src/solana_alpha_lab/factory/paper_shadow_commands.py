@@ -70,6 +70,8 @@ def _apply_operator_command_locked(
 ) -> dict[str, Any]:
     existing = store.get_operator_command(idempotency_key)
     if existing is not None:
+        if json.loads(existing["request_json"]) != dict(command):
+            raise PaperPlaneError("COMMAND_IDEMPOTENCY_CONTENT_CONFLICT")
         payload = json.loads(existing["result_json"])
         payload["idempotent"] = True
         payload["idempotency_key"] = idempotency_key

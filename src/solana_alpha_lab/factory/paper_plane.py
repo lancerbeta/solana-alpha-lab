@@ -132,12 +132,29 @@ CANCEL_REASONS = frozenset(
         "BOT_DRAINING",
         "BOT_STOPPED",
         "SIGNAL_EXPIRED",
+        "OPERATING_SAFETY_VETO",
     }
 ) | DEFINITIVE_NON_FILL_REASONS
 FORBIDDEN_SIGNAL_KINDS = frozenset({"REAL_FILL"})
 OPEN_RISK_STATES = frozenset(
     {"WATCHED", "SIGNALLED", "INTENT_CREATED", "ATTEMPTING", "OPEN", "PARTIAL", "UNKNOWN"}
 )
+# A query/index prefilter only. The policy owner still validates each candidate.
+# Exact zero strings are intentionally conservative; unusual representations
+# remain candidates rather than acquiring a guessed release proof.
+_KNOWN_FLAT_SQL = """state='RECONCILED' AND exit_notional_usd_dec IS NOT NULL
+    AND pnl_evidence_class IS NOT NULL
+    AND pnl_evidence_class IN ('PAPER_RECONCILED_MODEL','SHADOW_RECONCILED_QUOTE_MODEL')
+    AND qty_dec IS NOT NULL AND json_valid(qty_dec) AND CAST(qty_dec AS REAL)>0
+    AND (remaining_qty_dec IS NULL OR (
+        remaining_qty_dec IN ('0','0.0','0.00')
+        AND remaining_cost_basis_usd_dec IS NOT NULL AND remaining_cost_basis_usd_dec IN ('0','0.0','0.00')
+        AND remaining_entry_fee_usd_dec IS NOT NULL AND remaining_entry_fee_usd_dec IN ('0','0.0','0.00')))"""
+_KNOWN_RELEASED_SQL = f"""({_KNOWN_FLAT_SQL}) OR (state='CANCELLED'
+    AND qty_dec IS NULL AND entry_price_dec IS NULL AND remaining_qty_dec IS NOT NULL AND remaining_qty_dec IN ('0','0.0','0.00')
+    AND remaining_cost_basis_usd_dec IS NOT NULL AND remaining_cost_basis_usd_dec IN ('0','0.0','0.00')
+    AND remaining_entry_fee_usd_dec IS NOT NULL AND remaining_entry_fee_usd_dec IN ('0','0.0','0.00'))"""
+_OBLIGATION_CANDIDATE_SQL = f"NOT ({_KNOWN_RELEASED_SQL})"
 
 
 def _now() -> str:
@@ -146,6 +163,16 @@ def _now() -> str:
 
 def _parse_utc(value: str) -> datetime:
     return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+
+
+def _positive_model_decimal(value: Any, code: str, *, allow_zero: bool = False) -> Decimal:
+    try:
+        amount = Decimal(str(value))
+        if not amount.is_finite() or amount < 0 or not allow_zero and amount == 0:
+            raise ValueError()
+    except (ValueError, ArithmeticError):
+        raise PaperPlaneError(code) from None
+    return amount
 
 
 def modeled_unrealized_mark(
@@ -289,6 +316,7 @@ class PaperPlaneStore:
         self._migrate_trading_runtime_policy_v1()
         self._migrate_entry_intent_integrity_v1()
         self._migrate_decision_identity_v1()
+        self._migrate_operational_accounting_v1()
         self._commit()
 
     @contextmanager
@@ -435,6 +463,21 @@ class PaperPlaneStore:
         _ensure_column(self._conn, "positions", "strategy_spec_sha256", "TEXT")
         _ensure_column(self._conn, "positions", "exit_reason_code", "TEXT")
         _ensure_column(self._conn, "bot_instances", "strategy_spec_sha256", "TEXT")
+
+    def _migrate_operational_accounting_v1(self) -> None:
+        """Additive remaining inventory; legacy fill/event bytes are untouched."""
+        for column, kind in (
+            ("ordinary_operating", "INTEGER"),
+            ("ordinary_envelope_sha256", "TEXT"),
+            ("entry_fee_semantics", "TEXT"),
+            ("remaining_qty_dec", "TEXT"),
+            ("remaining_cost_basis_usd_dec", "TEXT"),
+            ("remaining_entry_fee_usd_dec", "TEXT"),
+        ):
+            _ensure_column(self._conn, "positions", column, kind)
+        self._conn.execute("CREATE INDEX IF NOT EXISTS idx_execution_events_type ON execution_events(event_type)")
+        self._conn.execute("CREATE INDEX IF NOT EXISTS idx_execution_events_position_type ON execution_events(position_id,event_type)")
+        self._conn.execute(f"CREATE INDEX IF NOT EXISTS idx_positions_outstanding_candidates_v1 ON positions(bot_instance_id) WHERE {_OBLIGATION_CANDIDATE_SQL}")
 
     def _commit(self) -> None:
         # Writable connections use isolation_level=None. Statements persist
@@ -674,6 +717,15 @@ class PaperPlaneStore:
         rows = self._conn.execute("SELECT * FROM positions ORDER BY opened_at").fetchall()
         return [dict(row) for row in rows]
 
+    def obligation_positions(self, mode: str) -> list[dict[str, Any]]:
+        """Indexed candidates; no scan/parse of completed history on ordinary ticks."""
+        predicate = (_OBLIGATION_CANDIDATE_SQL if "remaining_qty_dec" in _table_columns(self._conn, "positions")
+                     else "1=1")  # Pre-migration readonly legacy compatibility.
+        rows = self._conn.execute(f"""SELECT positions.*, bot_instances.mode AS obligation_mode
+            FROM positions LEFT JOIN bot_instances USING(bot_instance_id)
+            WHERE ({predicate}) AND (bot_instances.mode=? OR bot_instances.mode IS NULL)""", (mode,)).fetchall()
+        return [dict(row) for row in rows]
+
     def open_risk_count(self, bot_instance_id: str) -> int:
         rows = self._conn.execute(
             "SELECT state FROM positions WHERE bot_instance_id = ?",
@@ -758,12 +810,30 @@ class PaperPlaneStore:
         return eid
 
     def execution_events(self) -> list[dict[str, Any]]:
-        rows = self._conn.execute(
-            "SELECT * FROM execution_events ORDER BY rowid"
-        ).fetchall()
+        return self.filtered_execution_events()
+
+    def filtered_execution_events(self, *, event_type: str | None = None,
+                                  position_ids: list[str] | None = None) -> list[dict[str, Any]]:
+        if position_ids == []:
+            return []
+        groups = [None] if position_ids is None else [position_ids[i:i + 500] for i in range(0, len(position_ids), 500)]
+        rows = []
+        for group in groups:
+            conditions = []
+            parameters: list[Any] = []
+            if event_type is not None:
+                conditions.append("event_type=?")
+                parameters.append(event_type)
+            if group is not None:
+                conditions.append("position_id IN (" + ",".join("?" for _ in group) + ")")
+                parameters.extend(group)
+            where = " WHERE " + " AND ".join(conditions) if conditions else ""
+            rows.extend(self._conn.execute("SELECT rowid AS event_sequence,* FROM execution_events" + where + " ORDER BY rowid", parameters).fetchall())
+        rows.sort(key=lambda row: row["event_sequence"])
         out: list[dict[str, Any]] = []
         for row in rows:
             item = dict(row)
+            item.pop("event_sequence")
             raw = item.pop("payload_json")
             try:
                 item["payload"] = json.loads(raw)
@@ -903,7 +973,7 @@ class PaperPlaneStore:
                 raise PaperPlaneError("CANCEL_AFTER_FILL_FORBIDDEN")
             self.transition(position_id, "CANCELLED")
             self._conn.execute(
-                "UPDATE positions SET cancel_reason_code = ? WHERE position_id = ?",
+                "UPDATE positions SET cancel_reason_code = ?, remaining_qty_dec='0', remaining_cost_basis_usd_dec='0', remaining_entry_fee_usd_dec='0' WHERE position_id = ?",
                 (reason_code, position_id),
             )
             self.append_execution_event(
@@ -1089,10 +1159,10 @@ class PaperPlaneStore:
                 and position.get("qty_dec")
                 and position.get("entered_notional_usd_dec") is not None
             ):
-                qty = Decimal(str(position["qty_dec"]))
+                qty = Decimal(str(position.get("remaining_qty_dec") if position.get("remaining_qty_dec") is not None else position["qty_dec"]))
                 mark = Decimal(str(mark_price_dec))
-                entry_notional = Decimal(str(position["entered_notional_usd_dec"]))
-                entry_fee_raw = position.get("entry_fee_usd_dec")
+                entry_notional = Decimal(str(position.get("remaining_cost_basis_usd_dec") if position.get("remaining_cost_basis_usd_dec") is not None else position["entered_notional_usd_dec"]))
+                entry_fee_raw = position.get("remaining_entry_fee_usd_dec") if position.get("remaining_entry_fee_usd_dec") is not None else position.get("entry_fee_usd_dec")
                 fee_bps_raw = position.get("fee_bps")
                 if entry_fee_raw not in {None, ""} and fee_bps_raw is not None:
                     derived = modeled_unrealized_mark(
@@ -1144,6 +1214,8 @@ class PaperPlaneStore:
         fee_bps: int | None = None,
         mode: str,
         reconcile_pending_close: bool = False,
+        entry_quantity_units: str | None = None,
+        fee_semantics: str | None = None,
     ) -> dict[str, Any]:
         if mode not in {"PAPER", "SHADOW"}:
             raise PaperPlaneError("BOT_MODE_INVALID")
@@ -1164,6 +1236,15 @@ class PaperPlaneStore:
             if not price.is_finite() or not notional.is_finite() or price <= 0 or notional <= 0:
                 raise PaperPlaneError("ENTRY_FILL_INVALID")
             fee_bps = _bound_entry_fee_bps(position, fee_bps)
+            if fee_semantics not in {None, "SEPARATE_MODELED_FEE", "INCLUDED_IN_UNIT_PRICE"}:
+                raise PaperPlaneError("MODELED_FEE_SEMANTICS_UNSUPPORTED")
+            quantity = (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP)
+            if entry_quantity_units is not None:
+                quantity = _positive_model_decimal(entry_quantity_units, "MODELED_QUANTITY_INVALID")
+                if (price * quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP) != notional.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP):
+                    raise PaperPlaneError("MODELED_ENTRY_QUANTITY_PRICE_CONFLICT")
+            entry_fee = (Decimal("0") if fee_semantics == "INCLUDED_IN_UNIT_PRICE" else
+                         (notional * Decimal(fee_bps) / Decimal(10000)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
             bot = self.get_bot(str(position["bot_instance_id"]))
             if bot is None or str(bot.get("mode")) != mode:
                 raise PaperPlaneError("ENTRY_FILL_MODE_MISMATCH")
@@ -1174,8 +1255,8 @@ class PaperPlaneStore:
                     or int(position["fee_bps"]) != fee_bps
                 ):
                     raise PaperPlaneError("ENTRY_FILL_CONTENT_CONFLICT")
-                quantity = (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP)
-                entry_fee = (notional * Decimal(fee_bps) / Decimal(10000)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+                if position.get("entry_fee_semantics") != fee_semantics:
+                    raise PaperPlaneError("ENTRY_FILL_CONTENT_CONFLICT")
                 for field, expected in (("qty_dec", quantity), ("entry_fee_usd_dec", entry_fee)):
                     if position.get(field) not in {None, ""} and Decimal(str(position[field])) != expected:
                         raise PaperPlaneError("ENTRY_ACCOUNTING_CONTENT_CONFLICT")
@@ -1195,10 +1276,6 @@ class PaperPlaneStore:
                 self.transition(position_id, "PARTIAL" if admitted not in {None, ""} and notional < Decimal(str(admitted)) else "OPEN")
                 position = self.get_position(position_id)
                 assert position is not None
-            quantity = (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP)
-            entry_fee = (notional * Decimal(fee_bps) / Decimal(10000)).quantize(
-                Decimal("0.01"), rounding=ROUND_HALF_UP
-            )
             evidence = (
                 "PAPER_RECONCILED_MODEL" if mode == "PAPER" else "SHADOW_RECONCILED_QUOTE_MODEL"
             )
@@ -1227,6 +1304,9 @@ class PaperPlaneStore:
                     position_id,
                 ),
             )
+            if fee_semantics is not None:
+                self._conn.execute("UPDATE positions SET entry_fee_semantics=?, remaining_qty_dec=?, remaining_cost_basis_usd_dec=?, remaining_entry_fee_usd_dec=? WHERE position_id=?",
+                    (fee_semantics, format(quantity, "f"), format(notional, "f"), format(entry_fee, "f"), position_id))
             event_type = (
                 "PAPER_SIMULATION_OBSERVED" if mode == "PAPER" else "SHADOW_EXECUTABLE_OBSERVED"
             )
@@ -1263,6 +1343,11 @@ class PaperPlaneStore:
             position = self.get_position(position_id)
             if position is None:
                 raise PaperPlaneError("POSITION_NOT_FOUND")
+            if not unresolved and exit_unit_price_usd is not None and position.get("remaining_qty_dec") is not None:
+                return self.apply_quantity_exit_fill(position_id=position_id, mode=mode,
+                    quantity_sold=str(position["remaining_qty_dec"]), remaining_quantity="0",
+                    exit_unit_price_usd=exit_unit_price_usd, fee_semantics="SEPARATE_MODELED_FEE",
+                    observed_at=_now(), leg_id="LEG-" + uuid4().hex.upper())
             state0 = str(position["state"])
             if state0 == "RECONCILED":
                 raise PaperPlaneError(f"EXIT_FILL_STATE_INVALID:{state0}")
@@ -1295,8 +1380,8 @@ class PaperPlaneStore:
                     """
                     UPDATE positions
                     SET pnl_evidence_class = NULL,
-                        realized_gross_pnl_usd_dec = NULL,
-                        realized_net_pnl_usd_dec = NULL
+                        realized_gross_pnl_usd_dec = CASE WHEN remaining_qty_dec IS NULL THEN NULL ELSE realized_gross_pnl_usd_dec END,
+                        realized_net_pnl_usd_dec = CASE WHEN remaining_qty_dec IS NULL THEN NULL ELSE realized_net_pnl_usd_dec END
                     WHERE position_id = ?
                     """,
                     (position_id,),
@@ -1403,6 +1488,82 @@ class PaperPlaneStore:
                     "mode": mode,
                 },
             )
+            updated = self.get_position(position_id)
+            assert updated is not None
+            return updated
+
+    def apply_quantity_exit_fill(self, *, position_id: str, mode: str,
+                                 quantity_sold: str, remaining_quantity: str,
+                                 exit_unit_price_usd: str, fee_semantics: str,
+                                 observed_at: str, leg_id: str) -> dict[str, Any]:
+        """A definitive v1.1 leg finalizes one attempt, conserving its remainder."""
+        sold = _positive_model_decimal(quantity_sold, "MODELED_QUANTITY_INVALID")
+        remaining = _positive_model_decimal(remaining_quantity, "MODELED_QUANTITY_INVALID", allow_zero=True)
+        price = _positive_model_decimal(exit_unit_price_usd, "MODELED_FILL_DETAILS_INVALID")
+        if fee_semantics not in {"SEPARATE_MODELED_FEE", "INCLUDED_IN_UNIT_PRICE"}:
+            raise PaperPlaneError("MODELED_FEE_SEMANTICS_UNSUPPORTED")
+        with self.immediate_write():
+            position = self.get_position(position_id)
+            if position is None:
+                raise PaperPlaneError("POSITION_NOT_FOUND")
+            bot = self.get_bot(str(position["bot_instance_id"]))
+            if bot is None or bot["mode"] != mode:
+                raise PaperPlaneError("EXIT_FILL_MODE_MISMATCH")
+            request = {"quantity_sold": format(sold, "f"), "remaining_quantity": format(remaining, "f"),
+                       "unit_price_usd": format(price, "f"), "fee_semantics": fee_semantics,
+                       "observed_at": observed_at, "mode": mode}
+            previous = self.get_execution_event(leg_id)
+            if previous is not None:
+                if previous["position_id"] != position_id or previous["payload"].get("request") != request:
+                    raise PaperPlaneError("EXIT_LEG_CONTENT_CONFLICT")
+                return position
+            if position["state"] not in {"OPEN", "PARTIAL", "EXIT_REQUIRED", "EXITING", "UNRESOLVED"}:
+                raise PaperPlaneError("EXIT_QUANTITY_STATE_INVALID")
+            original = _positive_model_decimal(position.get("qty_dec"), "EXIT_FILL_REQUIRES_ENTRY")
+            prior_remaining = original if position.get("remaining_qty_dec") is None else _positive_model_decimal(
+                position["remaining_qty_dec"], "MODELED_QUANTITY_INVALID")
+            if sold > prior_remaining or sold + remaining != prior_remaining:
+                raise PaperPlaneError("MODELED_EXIT_QUANTITY_CONFLICT")
+            entry_notional = _positive_model_decimal(position.get("entered_notional_usd_dec"), "EXIT_FILL_REQUIRES_ENTRY_NOTIONAL")
+            entry_fee = _positive_model_decimal(position.get("entry_fee_usd_dec"), "EXIT_FILL_REQUIRES_ENTRY_FEE", allow_zero=True)
+            previous_exit = Decimal(str(position.get("exit_notional_usd_dec") or "0"))
+            previous_fee = Decimal(str(position.get("exit_fee_usd_dec") or "0"))
+            proceeds = (price * sold).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            leg_fee = (Decimal("0") if fee_semantics == "INCLUDED_IN_UNIT_PRICE" else
+                       (proceeds * Decimal(int(position["fee_bps"])) / Decimal("10000")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+            remaining_cost = entry_notional * remaining / original
+            allocated_cost = entry_notional - remaining_cost
+            allocated_fee = (entry_fee * (original - remaining) / original).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            remaining_fee = entry_fee - allocated_fee
+            prior_allocated_fee = entry_fee - Decimal(str(position.get("remaining_entry_fee_usd_dec")
+                if position.get("remaining_entry_fee_usd_dec") is not None else entry_fee))
+            exit_total = previous_exit + proceeds
+            exit_fee = previous_fee + leg_fee
+            gross = (exit_total - allocated_cost).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            net = (gross - allocated_fee - exit_fee).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            evidence = None if remaining else ("PAPER_RECONCILED_MODEL" if mode == "PAPER" else "SHADOW_RECONCILED_QUOTE_MODEL")
+            # A completed partial leg returns to the same originating exit;
+            # ordinary successor/control state cannot replace this obligation.
+            self._conn.execute("""UPDATE positions SET state=?, remaining_qty_dec=?, remaining_cost_basis_usd_dec=?,
+                remaining_entry_fee_usd_dec=?, exit_price_dec=?, exit_notional_usd=?, exit_notional_usd_dec=?,
+                exit_fee_usd_dec=?, realized_gross_pnl_usd_dec=?, realized_net_pnl_usd_dec=?, pnl_evidence_class=?,
+                closed_at=CASE WHEN ?=1 THEN COALESCE(closed_at,?) ELSE closed_at END,
+                mark_price_dec=NULL, mark_as_of=NULL, unrealized_gross_pnl_usd_dec=NULL,
+                unrealized_net_pnl_usd_dec=NULL, unrealized_evidence_class=NULL WHERE position_id=?""",
+                ("EXIT_REQUIRED" if remaining else "RECONCILED", format(remaining, "f"), format(remaining_cost, "f"),
+                 format(remaining_fee, "f"), format(exit_total / (original - remaining), "f"), float(exit_total),
+                 format(exit_total, "f"), format(exit_fee, "f"), format(gross, "f"), format(net, "f"), evidence,
+                 int(remaining == 0), observed_at, position_id))
+            self.append_execution_event(event_type="MODELED_EXIT_QUANTITY_LEG", event_id=leg_id,
+                bot_instance_id=bot["bot_instance_id"], position_id=position_id, created_at=observed_at,
+                payload={"schema_version": "1.1", "request": request, "quantity_unit": "TOKEN_UNITS",
+                         "proceeds_usd": format(proceeds, "f"), "exit_fee_usd": format(leg_fee, "f"),
+                         "allocated_entry_fee_total_usd": format(allocated_fee, "f"),
+                         "allocated_entry_fee_usd": format(allocated_fee - prior_allocated_fee, "f"),
+                         "realized_gross_pnl_usd": format(gross - Decimal(str(position.get("realized_gross_pnl_usd_dec") or "0")), "f"),
+                         "realized_trade_net_usd": format(net - Decimal(str(position.get("realized_net_pnl_usd_dec") or "0")), "f"),
+                         "remaining_cost_basis_usd": format(remaining_cost, "f"),
+                         "realized_trade_net_total_usd": format(net, "f"), "evidence_class": bot["mode"] + "_MODEL"})
             updated = self.get_position(position_id)
             assert updated is not None
             return updated
@@ -1671,11 +1832,12 @@ def accept_signal_decision(
     signal_decision: Mapping[str, Any],
     known_activation_epochs: Mapping[str, Any] | set[str] | frozenset[str],
     mode: str = "PAPER", as_of: str | None = None, skip_fill: bool = False,
+    ordinary_operating: bool = False,
 ) -> dict[str, Any]:
     """Legacy exception API; orchestration transactions use the outcome API."""
     outcome = accept_signal_decision_outcome(root, store, strategy=strategy,
         signal_decision=signal_decision, known_activation_epochs=known_activation_epochs,
-        mode=mode, as_of=as_of, skip_fill=skip_fill)
+        mode=mode, as_of=as_of, skip_fill=skip_fill, ordinary_operating=ordinary_operating)
     if outcome.get("outcome") == "DENIED":
         raise PaperPlaneError(outcome["reason_code"])
     return outcome
@@ -1691,6 +1853,7 @@ def accept_signal_decision_outcome(
     mode: str = "PAPER",
     as_of: str | None = None,
     skip_fill: bool = False,
+    ordinary_operating: bool = False,
 ) -> dict[str, Any]:
     """Return a normal refusal without aborting the caller's atomic transaction.
 
@@ -1875,6 +2038,14 @@ def accept_signal_decision_outcome(
                 policy=current_policy.get("policy"),
                 inventory=inventory,
             )
+            if ordinary_operating and risk["decision"] == "ALLOW":
+                from solana_alpha_lab.factory.trading_runtime_policy import enforce_operating_envelope
+                operating_risk = enforce_operating_envelope(store, mode=mode,
+                    admitted_notional_usd=risk["effective_entry_notional_usd_dec"])
+                risk["ordinary_operating_envelope"] = operating_risk
+                if operating_risk["decision"] != "ALLOW":
+                    risk["decision"] = operating_risk["reason_code"]
+                    risk["reason_codes"] = [operating_risk["reason_code"]]
             risk["signal_decision_id"] = decision["signal_decision_id"]
             risk_event_id, _ = _append_exact_admission_event(store,
                 event_type="PRE_TRADE_RISK_SNAPSHOT",
@@ -1922,6 +2093,9 @@ def accept_signal_decision_outcome(
                         else current_policy["policy"].get("policy_sha256")
                     ),
                 )
+                if ordinary_operating:
+                    store._conn.execute("UPDATE positions SET ordinary_operating=1, ordinary_envelope_sha256=? WHERE position_id=?",
+                        (operating_risk["envelope"]["envelope_sha256"], position_id))
                 store.append_execution_event(
                     event_type="SIGNAL_DECISION_ACCEPTED",
                     bot_instance_id=bot["bot_instance_id"],
@@ -2064,7 +2238,8 @@ def accept_exit_decision(
 
 def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str,
                          mode: str, attempt_key: str, decision_at: str,
-                         max_age_seconds: int, as_of: str) -> dict[str, Any]:
+                         max_age_seconds: int, as_of: str,
+                         ordinary_operating: bool = False) -> dict[str, Any]:
     """Persist before the external boundary. Replays never authorize another send."""
     if side not in {"ENTRY", "EXIT"} or mode not in {"PAPER", "SHADOW"}:
         raise PaperPlaneError("MODELED_ATTEMPT_SCOPE_INVALID")
@@ -2082,14 +2257,17 @@ def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str
         bot = store.get_bot(str(position["bot_instance_id"]))
         if bot is None or bot["mode"] != mode:
             raise PaperPlaneError("MODELED_ATTEMPT_MODE_MISMATCH")
-        prior = [event for event in store.execution_events()
+        prior = [event for event in store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED",position_ids=[position_id])
                  if event["event_type"] == "MODELED_ATTEMPT_STARTED" and event["position_id"] == position_id
                  and event["payload"].get("side") == side]
         if prior:
             if side == "ENTRY":
                 raise PaperPlaneError("ENTRY_ATTEMPT_ALREADY_EXISTS")
             last = store.get_execution_event("FINAL-" + prior[-1]["event_id"])
-            if last is None or last["payload"]["outcome"] not in {"NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED"}:
+            permitted = last is not None and last["payload"]["outcome"] in {"NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED"}
+            if last is not None and last["payload"]["outcome"] == "PARTIAL" and last["payload"].get("schema_version") == "1.1":
+                permitted = position.get("remaining_qty_dec") is not None and Decimal(str(position["remaining_qty_dec"])) > 0
+            if not permitted:
                 raise PaperPlaneError("ATTEMPT_RECONCILIATION_REQUIRED")
         state = str(position["state"])
         if side == "ENTRY":
@@ -2103,6 +2281,15 @@ def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str
                 store.cancel_entry_intent(position_id, reason_code=str(cancel))
                 return {"send_permitted": False, "action": "BLOCKED", "reason_code": block,
                         "position_id": position_id, "state": "CANCELLED"}
+            if ordinary_operating or position.get("ordinary_operating") == 1:
+                from solana_alpha_lab.factory.trading_runtime_policy import enforce_operating_envelope
+                safety = enforce_operating_envelope(store, mode=mode,
+                    admitted_notional_usd=position.get("admitted_entry_notional_usd_dec"),
+                    exclude_position_id=position_id)
+                if safety["decision"] != "ALLOW":
+                    store.cancel_entry_intent(position_id, reason_code="OPERATING_SAFETY_VETO")
+                    return {"send_permitted": False, "action": "BLOCKED", "reason_code": safety["reason_code"],
+                            "position_id": position_id, "state": "CANCELLED", "ordinary_operating_envelope": safety}
             if state == "WATCHED":
                 store.transition(position_id, "SIGNALLED")
             if state in {"WATCHED", "SIGNALLED"}:
@@ -2114,7 +2301,7 @@ def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str
             if position.get("entry_price_dec") is None:
                 raise PaperPlaneError("EXIT_ATTEMPT_REQUIRES_ENTRY_RECONCILIATION")
             clocks = [decision_at]
-            for event in store.execution_events():
+            for event in store.filtered_execution_events(event_type="MODELED_RESULT_ACCEPTED",position_ids=[position_id]):
                 if event["position_id"] == position_id and event["event_type"] == "MODELED_RESULT_ACCEPTED":
                     clocks.append(event["payload"]["result"]["observed_at"])
             if _parse_utc(as_of) < max(_parse_utc(clock) for clock in clocks):
@@ -2123,6 +2310,8 @@ def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str
             store.transition(position_id, "EXITING")
         payload = {**identity, "attempt_id": attempt_id, "as_of": as_of,
                    "evidence_class": "PAPER_MODEL" if mode == "PAPER" else "SHADOW_QUOTE_MODEL"}
+        if side == "EXIT" and position.get("remaining_qty_dec") is not None:
+            payload.update(remaining_quantity=position["remaining_qty_dec"], quantity_unit="TOKEN_UNITS")
         store.append_execution_event(event_type="MODELED_ATTEMPT_STARTED", event_id=attempt_id,
                                      bot_instance_id=bot["bot_instance_id"], position_id=position_id,
                                      payload=payload, created_at=as_of)
@@ -2136,7 +2325,12 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
     immutable. Chargeable failure costs are retained separately from trade PnL.
     This boundary cannot claim an on-chain fill or accept signing material.
     """
+    version = result.get("schema_version", "1.0")
+    if version not in {"1.0", "1.1"}:
+        raise PaperPlaneError("MODELED_RESULT_VERSION_UNSUPPORTED")
     allowed = {"attempt_id", "result_id", "outcome", "observed_at", "unit_price_usd", "filled_notional_usd", "chargeable_cost_usd"}
+    if version == "1.1":
+        allowed |= {"schema_version", "quantity_sold", "quantity_filled", "quantity_unit", "remaining_quantity", "fee_semantics"}
     if set(result) - allowed or not {"attempt_id", "result_id", "outcome", "observed_at"} <= set(result):
         raise PaperPlaneError("MODELED_RESULT_INVALID")
     outcome = result["outcome"]
@@ -2145,6 +2339,13 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
     if not isinstance(result["result_id"], str) or not result["result_id"] or len(result["result_id"]) > 120:
         raise PaperPlaneError("MODELED_RESULT_ID_INVALID")
     positive = outcome in {"LANDED_SUCCESS", "PARTIAL"}
+    if version == "1.1" and positive:
+        if result.get("quantity_unit") != "TOKEN_UNITS":
+            raise PaperPlaneError("MODELED_QUANTITY_UNIT_UNSUPPORTED")
+        if result.get("fee_semantics") not in {"SEPARATE_MODELED_FEE", "INCLUDED_IN_UNIT_PRICE"}:
+            raise PaperPlaneError("MODELED_FEE_SEMANTICS_UNSUPPORTED")
+    if not positive and any(result.get(field) is not None for field in ("quantity_sold", "quantity_filled", "remaining_quantity")):
+        raise PaperPlaneError("NON_FILL_RESULT_HAS_FILL")
     if positive:
         for field in ("unit_price_usd", "filled_notional_usd"):
             if result.get(field) is not None:
@@ -2184,7 +2385,7 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
         # Observations describe a cumulative cost, never a replaceable estimate.
         # A later unknown total may retain uncertainty, but cannot erase known costs.
         prior_known_cost = Decimal("0")
-        for event in store.execution_events():
+        for event in store.filtered_execution_events(event_type="MODELED_RESULT_ACCEPTED",position_ids=[bound["position_id"]]):
             if event["event_type"] != "MODELED_RESULT_ACCEPTED":
                 continue
             prior = event["payload"].get("result") or {}
@@ -2213,21 +2414,39 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
                 admitted = Decimal(str(position["admitted_entry_notional_usd_dec"]))
                 if (outcome == "PARTIAL") != (Decimal(str(filled)) < admitted):
                     raise PaperPlaneError("MODELED_FILL_AMOUNT_CLASS_CONFLICT")
+                if version == "1.1":
+                    if "quantity_sold" in result or "remaining_quantity" in result:
+                        raise PaperPlaneError("MODELED_ENTRY_QUANTITY_FIELDS_INVALID")
+                    _positive_model_decimal(result.get("quantity_filled"), "MODELED_QUANTITY_INVALID")
                 store.apply_paper_entry_fill(position_id=bound["position_id"],
                     entry_unit_price_usd=str(result["unit_price_usd"]), entry_gross_notional_usd=str(filled),
-                    fee_bps=int(position["admitted_fee_bps"]), mode=bound["mode"], reconcile_pending_close=True)
+                    fee_bps=int(position["admitted_fee_bps"]), mode=bound["mode"], reconcile_pending_close=True,
+                    entry_quantity_units=str(result["quantity_filled"]) if version == "1.1" else None,
+                    fee_semantics=str(result["fee_semantics"]) if version == "1.1" else None)
             elif outcome == "UNKNOWN_REQUIRES_RECONCILIATION":
                 if position["state"] == "ATTEMPTING":
                     store.transition(bound["position_id"], "UNKNOWN")
             else:
                 store.transition(bound["position_id"], "CANCELLED")
+                store._conn.execute("UPDATE positions SET remaining_qty_dec='0', remaining_cost_basis_usd_dec='0', remaining_entry_fee_usd_dec='0' WHERE position_id=?", (bound["position_id"],))
         elif positive:
-            if outcome == "PARTIAL" or result.get("filled_notional_usd") is not None:
-                raise PaperPlaneError("PARTIAL_EXIT_MODEL_UNSUPPORTED")
-            if result.get("unit_price_usd") is None:
-                raise PaperPlaneError("MODELED_FILL_DETAILS_REQUIRED")
-            store.apply_paper_exit_fill(position_id=bound["position_id"],
-                exit_unit_price_usd=str(result["unit_price_usd"]), mode=bound["mode"])
+            if version == "1.0":
+                if outcome == "PARTIAL" or result.get("filled_notional_usd") is not None:
+                    raise PaperPlaneError("PARTIAL_EXIT_MODEL_UNSUPPORTED")
+                if result.get("unit_price_usd") is None:
+                    raise PaperPlaneError("MODELED_FILL_DETAILS_REQUIRED")
+                store.apply_paper_exit_fill(position_id=bound["position_id"],
+                    exit_unit_price_usd=str(result["unit_price_usd"]), mode=bound["mode"])
+            else:
+                if "filled_notional_usd" in result or "quantity_filled" in result:
+                    raise PaperPlaneError("MODELED_EXIT_QUANTITY_FIELDS_INVALID")
+                remaining = _positive_model_decimal(result.get("remaining_quantity"), "MODELED_QUANTITY_INVALID", allow_zero=True)
+                if (outcome == "PARTIAL") != (remaining > 0):
+                    raise PaperPlaneError("MODELED_EXIT_AMOUNT_CLASS_CONFLICT")
+                store.apply_quantity_exit_fill(position_id=bound["position_id"], mode=bound["mode"],
+                    quantity_sold=str(result.get("quantity_sold")), remaining_quantity=str(remaining),
+                    exit_unit_price_usd=str(result.get("unit_price_usd")), fee_semantics=str(result["fee_semantics"]),
+                    observed_at=str(result["observed_at"]), leg_id="LEG-" + rid)
         else:
             store.apply_paper_exit_fill(position_id=bound["position_id"], exit_unit_price_usd=None,
                                        mode=bound["mode"], unresolved=True)
@@ -2239,7 +2458,8 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
         if outcome != "UNKNOWN_REQUIRES_RECONCILIATION":
             store.append_execution_event(event_type="MODELED_ATTEMPT_FINAL", event_id=final_id,
                 bot_instance_id=attempt["bot_instance_id"], position_id=bound["position_id"],
-                payload={"outcome": outcome, "result_event_id": rid}, created_at=str(result["observed_at"]))
+                payload={"outcome": outcome, "result_event_id": rid,
+                         **({"schema_version": "1.1"} if version == "1.1" else {})}, created_at=str(result["observed_at"]))
         return {"idempotent": False, "attempt_id": result["attempt_id"],
                 "position": store.get_position(bound["position_id"])}
 

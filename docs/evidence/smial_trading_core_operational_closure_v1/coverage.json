@@ -1,0 +1,297 @@
+{
+  "case_count": 24,
+  "cases": {
+    "C01": {
+      "additional_evidence": [],
+      "direct_consumer_test_ids": [
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_activation_epoch_separates_bots",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_closed_enter_returns_real_state",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_decision_schemas_validate",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_enter_opens_through_canonical_signal",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_enter_rejects_epoch_mismatch_on_existing_signal",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_exit_decision_advances_without_fill_claim",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_exit_rejects_epoch_mismatch",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_future_available_enter_forbidden",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_legacy_v1_0_loads_and_behaves",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_missing_activation_fails_closed",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_non_enter_actions_do_not_open",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_resume_incomplete_enter_lifecycle",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_same_mint_distinct_signal_ids",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_same_signal_idempotent",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_shadow_mode_uses_shadow_executable",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_sqlite_migration_idempotent_on_legacy_reopen",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_stale_signal_and_max_open_enforced",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_two_structurally_different_producers_same_interface",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_v1_1_path_does_not_call_signal_kind_for",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_v1_1_rejects_feature_fields",
+        "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_v1_1_schema_accepts_candidates_without_feature_names"
+      ],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_C02_C03_C05_C06_native_loop_full_money_oracle",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer"
+      ],
+      "status": "PASS"
+    },
+    "C02": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_C02_C03_C05_C06_native_loop_full_money_oracle"
+      ],
+      "status": "PASS"
+    },
+    "C03": {
+      "additional_evidence": [
+        "clock-proof.json: probes/physical boundary and backward no-mutation oracle"
+      ],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_list_only_same_driver",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_late_input_unknown_is_not_healed_by_publication",
+        "test_trading_continuity_v1.OrdinarySourceTests.test_missing_decision_price_refuses_list_only",
+        "test_trading_continuity_v1.OrdinarySourceTests.test_late_decision_price_refuses_list_only_without_future_healing",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_C04_deadline_and_stale_do_not_backdate"
+      ],
+      "status": "PASS"
+    },
+    "C04": {
+      "additional_evidence": [
+        "clock-proof.json: probes/physical boundary and backward no-mutation oracle"
+      ],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C04_exact_stream_sets_equal_timestamps_pagination",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C04_late_physical_source_insert_survives_restart",
+        "test_trading_continuity_v1.OrdinarySourceTests.test_source_publication_preserves_first_visibility_and_replay",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_native_source_stream_over_virtual_two_weeks"
+      ],
+      "status": "PASS"
+    },
+    "C05": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_denied_admission_is_durable_and_idempotent",
+        "test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_admission_real_errors_rollback_source_reservation_and_risk",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_real_loss_after_claim_paper_reconciles",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_real_loss_after_capture_no_duplicate_effect"
+      ],
+      "status": "PASS"
+    },
+    "C06": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_C02_C03_C05_C06_native_loop_full_money_oracle",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_C15_real_loss_after_admission",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_0_result_event_payload_and_replay_remain_exact"
+      ],
+      "status": "PASS"
+    },
+    "C07": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_C08_C09_positive_successor_and_old_exit",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer"
+      ],
+      "status": "PASS"
+    },
+    "C08": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_shared_predecessor_reservation_and_no_auto_shrink",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_modes_independent_and_concurrent_reservations_serialized",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_unknown_exit_retains_inventory_and_blocks_overlapping_attempt",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_corrupt_remainder_or_final_never_frees_capacity"
+      ],
+      "status": "PASS"
+    },
+    "C09": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C15_C16_pause_during_live_lock_survives_restart",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_sqlite_writer_wait_cannot_authorize_entry_after_ttl",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_cached_tick_clock_cannot_authorize_expired_entry",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_post_restore_stop_survives_older_complete_cut",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_post_restore_drain_with_inventory_survives_older_complete_cut"
+      ],
+      "status": "PASS"
+    },
+    "C10": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C10_C14_C15_C17_frozen_controls_and_observer_without_research",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_active_successor_profile_failure_does_not_starve_predecessor_exit",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_active_successor_binding_failure_does_not_starve_predecessor_exit",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_readback_cost_is_bounded_by_outstanding_scope_not_historical_journal"
+      ],
+      "status": "PASS"
+    },
+    "C11": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_literal_partial_accounting_oracle_replay_and_cold_readback",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_quantity_overfill_units_and_crash_are_atomic",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_fee_allocation_and_leg_pnl_conserve_on_three_exits",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C11_C12_shadow_failure_unknown_partial_remainder_drain"
+      ],
+      "status": "PASS"
+    },
+    "C12": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_operational_adapters_v1.AdapterTests.test_C12_timeout_unknown_rejection_definitive_not_flat",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C12_real_loss_after_quote_effect_no_resend",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C11_C12_shadow_failure_unknown_partial_remainder_drain"
+      ],
+      "status": "PASS"
+    },
+    "C13": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C13_captured_body_corruption_retains_unknown_no_effect",
+        "test_trading_continuity_v1.OrdinarySourceTests.test_origin_decision_clock_corruption_refuses_without_effect",
+        "test_trading_continuity_v1.OrdinarySourceTests.test_origin_exit_clock_corruption_refuses_without_effect",
+        "test_trading_continuity_v1.OrdinarySourceTests.test_origin_exit_source_admission_corruption_refuses_without_effect",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_hash_conflict_denies_before_quote_effect"
+      ],
+      "status": "PASS"
+    },
+    "C14": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_operational_adapters_v1.AdapterTests.test_C04_C14_fee_in_quote_raw_units_literal_oracle",
+        "test_trading_operational_adapters_v1.AdapterTests.test_C14_C23_negative_wire_shapes_before_persistence",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C14_nondivisible_raw_funding_adapter_accepts_partial",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_authored_vendor_witness_boolean_decimals_denied_before_quote_effect"
+      ],
+      "status": "PASS"
+    },
+    "C15": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C15_C16_pause_during_live_lock_survives_restart",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_corrupt_predecessor_binding_does_not_starve_other_due_exit",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_C15_real_loss_after_admission"
+      ],
+      "status": "PASS"
+    },
+    "C16": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C15_C16_pause_during_live_lock_survives_restart",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_virtual_two_weeks_history_sizes_and_incident_bound",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_active_successor_profile_failure_does_not_starve_predecessor_exit"
+      ],
+      "status": "PASS"
+    },
+    "C17": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C17_readonly_current_wal_snapshot_writes_nothing",
+        "test_trading_continuity_v1.OrdinarySourceTests.test_native_corrupt_and_missing_store_readback_is_typed_no_bootstrap",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C10_C14_C15_C17_frozen_controls_and_observer_without_research"
+      ],
+      "status": "PASS"
+    },
+    "C18": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_C19_native_restore_before_effect_independent_ledger",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_backup_before_due_exit_imports_original_exit_no_repeat",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_pre_admission_snapshot_complete_cut_no_duplicate",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_without_effects_imports_successor_binding_and_generation_paused",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_consumed_quote_grant_and_exit_cannot_resend",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_later_paper_cut_preserves_original_pending_model_result_clock",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_later_shadow_pending_cut_accepts_original_earlier_definitive_receipt",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_export_cut_denies_known_after_backup_result_omission_or_conflict",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_pending_quote_claim_restores_unknown_without_manufacturing_result_or_resend"
+      ],
+      "status": "PASS"
+    },
+    "C19": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_metadata_survives_source_deletion_for_due_exit",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_C19_native_restore_before_effect_independent_ledger",
+        "test_trading_continuity_v1.OrdinarySourceTests.test_version_V2_handoff_boundary_is_explicit_and_V1_exit_survives_list_removal",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_0_result_event_payload_and_replay_remain_exact"
+      ],
+      "status": "PASS"
+    },
+    "C20": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_full_chain_decimal_oracle",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_literal_partial_accounting_oracle_replay_and_cold_readback",
+        "test_trading_operational_adapters_v1.AdapterTests.test_C04_C14_fee_in_quote_raw_units_literal_oracle",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_money_preserves_identity_bound_unknown_economics_readback",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_retains_known_cost_floor_before_later_unknown_total",
+        "test_trading_continuity_v1.ConfirmedBaselineDefects.test_mixed_mode_projection_has_no_combined_money_headline"
+      ],
+      "status": "PASS"
+    },
+    "C21": {
+      "additional_evidence": [],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_native_source_stream_over_virtual_two_weeks",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_virtual_two_weeks_history_sizes_and_incident_bound",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_readback_cost_is_bounded_by_outstanding_scope_not_historical_journal"
+      ],
+      "status": "PASS"
+    },
+    "C22": {
+      "additional_evidence": [
+        "operator-proof.json: journey_status/final_state/semantic_navigation/source_pins/cleanup"
+      ],
+      "executed_test_ids": [],
+      "status": "PASS"
+    },
+    "C23": {
+      "additional_evidence": [
+        "cleanup.json: canaries/immutable_bindings/proof_fixture_roots",
+        "canary-rename-proof.json: same C23 actually repeated after local-variable rename"
+      ],
+      "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C23_actual_egress_secret_and_non_target_canaries",
+        "test_trading_continuity_v1.OrdinarySourceTests.test_store_hardlink_canary_refused_before_writable_effect",
+        "test_trading_continuity_v1.OrdinarySourceTests.test_cli_live_and_unowned_root_fail_before_effect",
+        "test_trading_continuity_v1.OrdinarySourceTests.test_windows_rooted_and_drive_relative_source_paths_refused"
+      ],
+      "status": "PASS"
+    },
+    "C24": {
+      "additional_evidence": [
+        "source-contract.md: owner accepted D1-D4 via exact task",
+        "cleanup.json: unchanged historical report/source and registry",
+        "docs/reports/smial_trading_core_operational_closure_v1/REPORT.md: historical mapping/residuals/LIVE component ledger"
+      ],
+      "executed_test_ids": [
+        "test_trading_continuity_v1.OrdinarySourceTests.test_version_V2_handoff_boundary_is_explicit_and_V1_exit_survives_list_removal"
+      ],
+      "status": "PASS"
+    }
+  },
+  "claims_scope": "Exact explicit PAPER/SHADOW operating profile, OPPORTUNITY_EPISODES accepted V1 and FROZEN_TIME_EXIT; synthetic software proof only",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "non_claims": [
+    "NO_CANONICAL_DONE_OR_OWNER_SEMANTIC_ACCEPTANCE",
+    "NO_REAL_RUNTIME_OR_PROVIDER_ACTIVATION",
+    "NO_SIGNER_TRANSACTION_MONEY",
+    "NO_ALPHA_NETRETURN_OR_FCF"
+  ],
+  "receipt_files": {
+    "canary-rename-proof.json": "e2449ad9084c695b74c50dbc1249db839f525547e4bd516024b50bad83ec056b",
+    "cleanup.json": "632d4e4fed687c72d11078e310319d45db2e488f7375357e84de839535e52dc1",
+    "clock-proof.json": "346a016b59d1541b18d5b4752ba4c015aa7dd24d2b692832fa049242350cf32b",
+    "direct-consumer-proof.json": "c8df261e81cefb63788dbfe4f6d108e5072c89e70a4650be8f4987498fc18bf1",
+    "eof-normalization-proof.json": "67794cb24f7cfa69dc63451a2ac1e8d321489e528316f65d2c12abc78ae8c232",
+    "executed-tests.json": "2899d525617851033c62149e4bf0be5d4e4df389ae971a7790ec17c3169ef297",
+    "operator-proof.json": "b11acd8db40927d16bde857e9581317116d4952fed8f2f7e29aff8cea2515d0c",
+    "source-contract.md": "addc05071197efb3462771b52f5699170d54061656efeda0b7f48e52bdb0f0b7"
+  },
+  "receipt_sha256": "15b737e3ae9bf06d1623385918dda57f4f7a53f5d599d07fb44d461b3c86a00e",
+  "schema": "smial.operating-closure-coverage",
+  "schema_version": "1.0",
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "tested_to_candidate_byte_equivalence": [
+    "eof-normalization-proof.json",
+    "canary-rename-proof.json"
+  ],
+  "verdict": "PASS"
+}

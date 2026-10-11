@@ -397,6 +397,12 @@ class ObservationScheduleStore:
                 payload_json TEXT NOT NULL,
                 created_at TEXT NOT NULL
             );
+            CREATE INDEX IF NOT EXISTS idx_episode_rounds_freshness
+                ON episode_rounds(schedule_sha256, activation_id, created_at);
+            CREATE INDEX IF NOT EXISTS idx_episode_outbox_freshness
+                ON episode_outbox(schedule_sha256, activation_id, created_at);
+            CREATE INDEX IF NOT EXISTS idx_episode_publications_freshness
+                ON episode_publications(schedule_sha256, activation_id, created_at);
             CREATE TABLE IF NOT EXISTS episode_publication_cohorts (
                 content_sha256 TEXT NOT NULL,
                 schedule_sha256 TEXT NOT NULL,

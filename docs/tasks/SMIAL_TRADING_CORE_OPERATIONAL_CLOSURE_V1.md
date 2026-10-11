@@ -1,7 +1,7 @@
 ---
 task_id: SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1
 task_version: '1.0'
-status: IN_PROGRESS
+status: IMPLEMENTED_UNVERIFIED
 as_of: '2026-10-11'
 owner: GOAL_OWNER
 allowed_routes: [DIRECT_CODEX_DELIVERY]
@@ -46,6 +46,7 @@ managed_write_set:
 - tests/test_trading_core_operational_closure_v1.py
 - tests/test_trading_operational_adapters_v1.py
 - tests/test_trading_operational_obligations_v1.py
+- tests/test_trading_operational_recovery_v1.py
 - tests/test_trading_continuity_v1.py
 - tests/fixtures/trading_core_operational_closure_v1/**
 - catalog/assets/**
