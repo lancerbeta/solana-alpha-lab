@@ -30,14 +30,15 @@
     "independent_review": {
       "path": "docs/evidence/smial_trading_continuity_v1/independent-review.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "verdict": "PENDING"
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
       "PASS_OWNED_CLEANUP_AND_FRESH_REPRODUCTION",
       "PASS_LITERAL_MONEY_AND_FULL_IDENTITY_SETS",
-      "PASS_V1_GUARD_PRESERVED"
+      "PASS_V1_GUARD_PRESERVED",
+      "PASS_SHARED_SCIENTIFIC_PRICE_ELIGIBILITY_AND_TYPED_REFUSAL"
     ]
   },
   "non_claims": [

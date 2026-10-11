@@ -4,8 +4,8 @@
   "review_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1-REVIEW",
   "as_of": "2026-10-11",
   "task_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
-  "reviewed_bindings_sha256": "01fd039df3794de39c5f4e10299a3bc6919d281a725a78838dd3514400fcd790",
-  "reviewed_inventory_sha256": "f9f210a22faf3fc1e9b14661ae59107342748dbee69d1ea3afc01fbe9376b2ae",
+  "reviewed_bindings_sha256": "5b3ffdaee3af8d8b8231c6315c04ff4bb39d94891770e6ea4ae2f32d6b356f0b",
+  "reviewed_inventory_sha256": "ad46d56a8a6e51384b525cca6e4909d8d0fc88d767bd7c21525409f0addeace3",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -15,35 +15,60 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "FINAL_FROZEN_INVENTORY_REVIEW_PENDING"
+        "EXACT_CONTENT_HEAD=4f66ec3fb8756ccf22517dcf6fc450df7ff0a83e",
+        "All 45 canonical bindings matched committed/worktree bytes; only three permitted binding receipts excluded. No remaining material correctness/security findings.",
+        "Shared research/runtime PRICE cell guards entry after membership; originating exit arithmetic separate. Cost/clock floor, durable recovery and refusal semantics preserved.",
+        "Existing final fresh 41/41 PASS; regression 198 PASS plus one explicit Windows symlink skip; inputs match; three price-before FAILs on frozen 5db1b820; CLEAN actual readback.",
+        "PASS is partial-repair correctness; S08/S13 V2 authority remains blocked, no full closure or merge approval."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "FINAL_FROZEN_INVENTORY_REVIEW_PENDING"
+        "EXACT_CONTENT_HEAD=4f66ec3fb8756ccf22517dcf6fc450df7ff0a83e",
+        "PASS for honest REPAIR_PARTIAL_BLOCKED only. Source denominator retained; S08/S13 mandatory and unclosed. No OFFLINE_CHAIN_VERIFIED or canonical DONE.",
+        "F14 three actual frozen-before FAILs to three fresh PASS probes; final 41/41 and 198 PASS plus explicit skip; final input hashes and CLEAN match.",
+        "Prior cost/clock, partial EXIT dynamic refusal, literal money and complete identity sets remain evidenced; no new evidence-backed gaps."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "FROZEN_SEMANTIC_PACKET={\"schema\":\"smial.semantic-premise-review-packet\",\"schema_version\":\"1.0\",\"task\":{\"task_id\":\"SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1\",\"task_contract_sha256\":\"63be5b5c7f49479b1081d1b8f1b90f895aa9089f563c030c5962986b81734685\"},\"candidate\":{\"base\":\"d244af69bfd7ddc2850b9e5e5823323956e325c4\",\"head\":\"160866d6b92e724b48e4c9dceb7b511043d22cb4\",\"diff_sha256\":\"57d877076c3cc11392053c48cc5a86da5591ed0e4580993e384db81d54a608c2\"},\"review\":{\"profile\":\"SEMANTIC_PREMISE\",\"risk_dimensions\":[\"SCIENTIFIC_ESTIMAND\",\"FALSIFIER_OR_ENDPOINT\",\"EVIDENCE_ADMISSIBILITY\",\"PIT_OR_AVAILABILITY_SEMANTICS\",\"RESEARCH_TRUTH_OWNERSHIP\",\"HYPOTHESIS_OR_FAMILY_CLOSURE\",\"PROMOTION_OR_SUPPRESSION_AUTHORITY\",\"UNKNOWN_VS_NEGATIVE_EVIDENCE\",\"EXECUTION_TRUTH_SEMANTICS\",\"DURABLE_SCIENCE_SCHEMA\",\"OWNER_AUTHORITY_SEMANTICS\",\"HARNESS_PREMISE_OR_MERGE_AUTHORITY\"],\"architecture_owner\":\"ARCHITECTURE_CRITIC\"},\"semantic_claims\":[{\"claim_id\":\"C1\",\"claim\":\"Supported V1 PAPER mixed/list-only and SHADOW mixed traverse real handoff, separately activated runner, canonical source/membership/recipe, durable attempts/results and originating exits to reconciled modeled state.\",\"scope\":\"Synthetic offline V1 only, fixed execution regime.\"},{\"claim_id\":\"C2\",\"claim\":\"UNKNOWN/late inputs, exact replay/conflict, negative results/costs, pre- and post-commit recovery, literal money and complete source/action/admission/terminal sets have direct probes.\",\"scope\":\"Declared supported modeled classes; no external effect.\"},{\"claim_id\":\"C3\",\"claim\":\"CAPABILITY_OUTCOME=REPAIR_PARTIAL_BLOCKED: required active V2 with open V1 is not established; canonical V1 scientific handoff guard retained and V2 rejected. Original S08/S13 remain partial.\",\"scope\":\"Full source-contract denominator is retained; no DONE or OFFLINE_CHAIN_VERIFIED.\"},{\"claim_id\":\"C4\",\"claim\":\"Campaign disposable roots deleted, fresh proof reconstructed without prior DB, owned process exited/absent and five non-target fingerprints equal.\",\"scope\":\"Campaign-owned paths only; observed sizes lower bound, Windows symlink variant skipped.\"}],\"non_claims\":[\"NO_ALPHA_OOS_PROFITABILITY_OR_FCF\",\"NO_LIVE_PROVIDER_DEPLOY_WALLET_OR_REAL_ACTIVATION\",\"NO_V2_POSITIVE_MATERIALIZATION_OR_FULL_SCOPE_CHAIN\",\"NO_NEW_ADMISSION_INVENTORY_OR_DEACTIVATED_EXIT_POLICY\",\"NO_REVIEW_MODEL_DIVERSITY_PROOF\"],\"evidence\":[{\"logical_ref\":\"docs/reports/smial_trading_continuity_v1/REPORT.md\",\"sha256_or_fingerprint\":\"e04380e9ff808f38d8ca466134aded7df42dc41a186f3b75826ab7e2c26fa0a9\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/source-contract.md\",\"sha256_or_fingerprint\":\"fa27010cd06336d7e962798ce29cf04427ba8a3a23b420a3878357094fc6274c\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/baseline-replay.json\",\"sha256_or_fingerprint\":\"b3a4b75147151161cac104df355da4fa081bf153bc2adafea6ff2ab3aa90b7d1\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/fresh.json\",\"sha256_or_fingerprint\":\"401c682394636b633f4c0bb658141432e3b65e0d682331a3e0c45485bd58f597\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/regression.json\",\"sha256_or_fingerprint\":\"099542bc5820300ba953d164e97bc15a3d7ed57fcd6255d5b6b7733e95a1a557\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/cleanup.json\",\"sha256_or_fingerprint\":\"ec57c2425ed7d9f241278d6c71cb611e61bd486f2dd2fb198d64ff2eb43aa456\"},{\"logical_ref\":\"tests/test_trading_continuity_v1.py\",\"sha256_or_fingerprint\":\"e64a3ed2372e0f98d6136ea97323598adffc3776134a1ac0ca501cb3e21397c2\"}],\"questions\":[\"HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG\",\"WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE\",\"IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL\",\"IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE\",\"DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY\",\"DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING\",\"IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER\",\"WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE\",\"WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM\",\"WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS\"],\"independence\":{\"claim_scope\":\"PACKET_INFORMATION_PATH\",\"context_isolated\":true,\"implementation_transcript_seen\":false,\"packet_bound\":true,\"readonly\":true,\"launch_isolation\":\"PROCESS_OBLIGATION\",\"model_diversity\":\"UNPROVEN\",\"model_diversity_identity\":null},\"packet_fingerprint_sha256\":\"694a807679652845d91cecb41ff2816d2ae1bcd3901a0d902821c2645ce75f8f\"}",
-        "VALIDATE_LAUNCH={\"ok\":true,\"profile\":\"SEMANTIC_PREMISE\",\"packet_fingerprint_sha256\":\"694a807679652845d91cecb41ff2816d2ae1bcd3901a0d902821c2645ce75f8f\",\"independence_claim_scope\":\"PACKET_INFORMATION_PATH\",\"launch_isolation\":\"PROCESS_OBLIGATION\",\"model_diversity\":\"UNPROVEN\",\"packet_required\":true,\"authority_granted\":false}"
+        "FROZEN_SEMANTIC_PACKET={\"schema\":\"smial.semantic-premise-review-packet\",\"schema_version\":\"1.0\",\"task\":{\"task_id\":\"SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1\",\"task_contract_sha256\":\"63be5b5c7f49479b1081d1b8f1b90f895aa9089f563c030c5962986b81734685\"},\"candidate\":{\"base\":\"d244af69bfd7ddc2850b9e5e5823323956e325c4\",\"head\":\"4f66ec3fb8756ccf22517dcf6fc450df7ff0a83e\",\"diff_sha256\":\"ae264e0646d05528a71e7d28cf2d1e47727a98e0f47e650865fdd1e1534eadc0\"},\"review\":{\"profile\":\"SEMANTIC_PREMISE\",\"risk_dimensions\":[\"SCIENTIFIC_ESTIMAND\",\"FALSIFIER_OR_ENDPOINT\",\"EVIDENCE_ADMISSIBILITY\",\"PIT_OR_AVAILABILITY_SEMANTICS\",\"RESEARCH_TRUTH_OWNERSHIP\",\"HYPOTHESIS_OR_FAMILY_CLOSURE\",\"PROMOTION_OR_SUPPRESSION_AUTHORITY\",\"UNKNOWN_VS_NEGATIVE_EVIDENCE\",\"EXECUTION_TRUTH_SEMANTICS\",\"DURABLE_SCIENCE_SCHEMA\",\"OWNER_AUTHORITY_SEMANTICS\",\"HARNESS_PREMISE_OR_MERGE_AUTHORITY\"],\"architecture_owner\":\"ARCHITECTURE_CRITIC\"},\"semantic_claims\":[{\"claim_id\":\"C1\",\"claim\":\"Supported V1 PAPER mixed/list-only and SHADOW mixed traverse real handoff, separately activated runner, canonical source/membership/recipe, durable attempts/results and originating exits to reconciled modeled state.\",\"scope\":\"Synthetic offline V1 only, fixed execution regime.\"},{\"claim_id\":\"C2\",\"claim\":\"Enumerated offline probes verify UNKNOWN/late input refusal, exact replay/conflict, declared result classes and costs, pre-/post-commit recovery, literal money, complete source/action/admission/terminal sets, cumulative .01 cost preservation through UNKNOWN, .02 definitive reconciliation, nondecreasing observation clock, and typed partial EXIT refusal. Shared research/runtime observed decision PRICE eligibility rejects missing/late PRICE before features/admission, including list-only; membership UNKNOWN reads zero values.\",\"scope\":\"Declared supported modeled classes; no external effect.\"},{\"claim_id\":\"C3\",\"claim\":\"CAPABILITY_OUTCOME=REPAIR_PARTIAL_BLOCKED: required active V2 with open V1 is not established; canonical V1 scientific handoff guard retained and V2 rejected. Original S08/S13 remain partial.\",\"scope\":\"Full source-contract denominator is retained; no DONE or OFFLINE_CHAIN_VERIFIED.\"},{\"claim_id\":\"C4\",\"claim\":\"Campaign disposable roots deleted, fresh proof reconstructed without prior DB, owned process exited/absent and five non-target fingerprints equal.\",\"scope\":\"Campaign-owned paths only; observed sizes lower bound, Windows symlink variant skipped.\"}],\"non_claims\":[\"NO_ALPHA_OOS_PROFITABILITY_OR_FCF\",\"NO_LIVE_PROVIDER_DEPLOY_WALLET_OR_REAL_ACTIVATION\",\"NO_V2_POSITIVE_MATERIALIZATION_OR_FULL_SCOPE_CHAIN\",\"NO_NEW_ADMISSION_INVENTORY_OR_DEACTIVATED_EXIT_POLICY\",\"NO_REVIEW_MODEL_DIVERSITY_PROOF\"],\"evidence\":[{\"logical_ref\":\"docs/reports/smial_trading_continuity_v1/REPORT.md\",\"sha256_or_fingerprint\":\"0b77392ded6e807fef8ef675ce314836edf89c2b7bd9408e48574827b00ecd7f\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/source-contract.md\",\"sha256_or_fingerprint\":\"fa27010cd06336d7e962798ce29cf04427ba8a3a23b420a3878357094fc6274c\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/baseline-replay.json\",\"sha256_or_fingerprint\":\"b3a4b75147151161cac104df355da4fa081bf153bc2adafea6ff2ab3aa90b7d1\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/fresh.json\",\"sha256_or_fingerprint\":\"b9e1414313f2a423d5e74304994e7113d4ff78bf8bd06cedef009b08bbd044cd\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/regression.json\",\"sha256_or_fingerprint\":\"a4faac9af2b88dca3918d2d08a44b477c767d828c4a410e9530616078292fb4f\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/cleanup.json\",\"sha256_or_fingerprint\":\"d95dc814654b8aaec1c808ba59943744657149ebce8dab892c04913c40bceb5e\"},{\"logical_ref\":\"tests/test_trading_continuity_v1.py\",\"sha256_or_fingerprint\":\"3d63b1986b465eda4e8b58cd6b0a826f821f9458b76e1d3ed3ba19c0d62cab5f\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/price-before.json\",\"sha256_or_fingerprint\":\"3a953f5e10bb7aa5b2985a1656d64bde98e9496757d64e1a5935bd0c288e0fcd\"}],\"questions\":[\"HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG\",\"WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE\",\"IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL\",\"IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE\",\"DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY\",\"DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING\",\"IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER\",\"WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE\",\"WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM\",\"WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS\"],\"independence\":{\"claim_scope\":\"PACKET_INFORMATION_PATH\",\"context_isolated\":true,\"implementation_transcript_seen\":false,\"packet_bound\":true,\"readonly\":true,\"launch_isolation\":\"PROCESS_OBLIGATION\",\"model_diversity\":\"UNPROVEN\",\"model_diversity_identity\":null},\"packet_fingerprint_sha256\":\"5ce8e5140dd49e01c178435bedc79a7a92a66d920ca84b555aeff8038915467a\"}",
+        "VALIDATE_LAUNCH={\"ok\":true,\"profile\":\"SEMANTIC_PREMISE\",\"packet_fingerprint_sha256\":\"5ce8e5140dd49e01c178435bedc79a7a92a66d920ca84b555aeff8038915467a\",\"independence_claim_scope\":\"PACKET_INFORMATION_PATH\",\"launch_isolation\":\"PROCESS_OBLIGATION\",\"model_diversity\":\"UNPROVEN\",\"packet_required\":true,\"authority_granted\":false}",
+        "EXACT_CONTENT_HEAD=4f66ec3fb8756ccf22517dcf6fc450df7ff0a83e",
+        "SEMANTIC_PREMISE=PASS; ARCHITECTURE_CRITIC=PASS; packet_fingerprint_sha256=5ce8e5140dd49e01c178435bedc79a7a92a66d920ca84b555aeff8038915467a",
+        "Q1 Exact implementation can be wrong through missing PRICE eligibility; shared episode_decision_price now rejects missing/late PRICE before features in research/runtime.",
+        "Q2 V2/full closure would exceed evidence; packet explicitly excludes them and original S08/S13 remain partial.",
+        "Q3 No local-to-global widening: C1 is synthetic offline V1 at fixed execution regime; no alpha/OOS/all-version claim.",
+        "Q4 UNKNOWN membership refuses before values; PRICE UNKNOWN refuses; uncertain results reconcile; missing costs preserve confirmed lower bound.",
+        "Q5 Lifecycle execution states gain no scientific authority; PROMOTE remains separate and V2 guard retained.",
+        "Q6 Historical manifest/schema meaning preserved; current data does not fill old evidence; originating exit uses its frozen target arithmetic.",
+        "Q7 Existing owners retain truth: Git definitions, committed manifest-bound research Parquet, source and PaperPlane SQLite; DuckDB reconstructible; public production seams.",
+        "Q8 Falsifiers are missing/late PRICE ENTER, future reads, duplicate effects, lost no-route inventory, decreasing costs and lost origin on recovery. Supplemental independent PRICE differential now gives research eligible=0/matched=0 and runtime UNKNOWN; valid neighbor ENTER.",
+        "Q9 REPORT/runbook explicitly preserve V1-only/V2 blocker and partial closure; PASS applies to packet C1-C4 only.",
+        "Q10 Smallest correction completed: shared entry eligibility, separate originating-target arithmetic, three adversarial probes; no platform/dependency.",
+        "Tests can pass while research validity fails if availability moves to latest/publication time, PRICE guard disappears, or modern membership replaces frozen frame. Current diff preserves owners, deadlines and refusal probes.",
+        "Exact binary diff and all eight packet evidence refs match Git blobs; no open material semantic finding for C1-C4.",
+        "independence_claim_scope=PACKET_INFORMATION_PATH; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "FINAL_FROZEN_INVENTORY_REVIEW_PENDING"
+        "EXACT_CONTENT_HEAD=4f66ec3fb8756ccf22517dcf6fc450df7ff0a83e",
+        "Cold SEM-OWNER-LIFECYCLE route resolves root document to runbook. V1-only support, V2 BLOCKED and REPAIR_PARTIAL_BLOCKED visible with exact report link.",
+        "Manual commands, IDs, JSON, drain/reconciliation and recovery coherent. UNKNOWN PRICE/cost and mixed scopes do not present permitted entry or confirmed money.",
+        "No remaining material owner-operability gaps; PASS grants no scientific/live/full-chain acceptance."
       ]
     }
   ],
-  "verdict": "PENDING",
+  "verdict": "PASS",
   "non_claims": [
     "NO_FULL_OFFLINE_CHAIN_VERIFIED_V2_BLOCKED",
     "NO_ALPHA_OOS_PROFITABILITY",
@@ -52,5 +77,47 @@
     "NO_TOTAL_RISK_EQUITY_FCF",
     "NO_NEW_ADMISSION_OR_VERSION_AUTHORITY",
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "Cumulative confirmed costs could be erased by later zero or missing callback; cost/clock floor repaired and literal probe added.",
+      "observed_head": "160866d6b92e724b48e4c9dceb7b511043d22cb4",
+      "resolved_by_head": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "Cumulative costs and accepted observation chronology could regress; bounded existing-owner repairs and dynamic probes added.",
+      "observed_head": "160866d6b92e724b48e4c9dceb7b511043d22cb4",
+      "resolved_by_head": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "Partial EXIT refusal was claimed executed but only statically guarded; now actual dynamic refusal preserves positions/results.",
+      "observed_head": "160866d6b92e724b48e4c9dceb7b511043d22cb4",
+      "resolved_by_head": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "Runtime omitted canonical decision PRICE eligibility and widened admitted population; shared scientific cell and missing/late PRICE before/after probes repair it.",
+      "observed_head": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7",
+      "resolved_by_head": "4f66ec3fb8756ccf22517dcf6fc450df7ff0a83e"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Runbook implied supported new version; now states V1-only guard, V2 block and exact report link.",
+      "observed_head": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7",
+      "resolved_by_head": "4f66ec3fb8756ccf22517dcf6fc450df7ff0a83e"
+    }
   ]
 }
