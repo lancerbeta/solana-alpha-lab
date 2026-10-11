@@ -127,3 +127,16 @@ Adding EXIT_* / UNRESOLVED to the admission veto needs an owner risk-policy
 decision. The operator count now uses the actual OPEN_RISK_STATES owner.
 Readonly readback never creates/migrates/checkpoints state. Missing/corrupt/native
 read failure gives typed unavailable, not healthy zero.
+
+Originating EXIT integrity uses the existing execution-event owner. In the same
+transaction as SOURCE_EXIT_PRODUCED and accepted exit state, the runner stores
+one SOURCE_EXIT_ADMISSION_BOUND event (EXITBIND-<exit_decision_id>) with the
+canonical complete packet hash, source event ID, position ID, exit decision ID
+and admitted SignalDecision hash. Identical replay retains the same binding;
+any actual binding failure rolls the entire source/exit transaction back.
+Before source-originated EXIT attempt/result, event types, position/bot scope
+and exact binding must match. Missing or changed binding is typed provenance
+refusal before effects. Operator exits without source exit decisions retain
+the existing route. A source exit accepted after operator close still creates
+this binding although the generic owner needs no second EXIT_DECISION_ACCEPTED
+transition. No schema, stale threshold or admission/exit risk policy changes.

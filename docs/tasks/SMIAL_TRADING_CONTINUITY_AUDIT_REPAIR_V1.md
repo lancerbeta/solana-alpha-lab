@@ -188,3 +188,11 @@ canonical originating SignalDecision hash with the existing admitted-position
 hash before consuming its body/clock. This is an identity repair within the
 existing corruption scope, without risk-policy, schema or V2 lifecycle change.
 Refresh native/frozen before, focused after, current proofs and four reviews.
+
+EXIT_IDENTITY_REPAIR: architecture P1 on aa8d5379 was reproduced via ordinary
+episode, entry result and originating exit; decision-only backdating permitted
+an EXIT attempt before the original cutoff. Bind the complete accepted exit
+packet atomically in the existing event store; verify exact scope/hash before
+source EXIT attempt/result. Preserve operator-close compatibility and replay;
+real binding errors roll back source and exit state. No risk policy, database
+schema or V2/successor lifecycle change. Rebind all evidence and reviews.

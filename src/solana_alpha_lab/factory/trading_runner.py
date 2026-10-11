@@ -154,6 +154,29 @@ class TradingContinuityRunner:
             raise PaperPlaneError("SOURCE_DECISION_PROVENANCE_CONFLICT")
         return packet
 
+    def _exit_origin(self, store, position):
+        eid = position["exit_decision_id"]
+        record = store.get_execution_event("SRC-" + eid)
+        binding = store.get_execution_event("EXITBIND-" + eid)
+        if record is None or binding is None:
+            raise PaperPlaneError("SOURCE_EXIT_PROVENANCE_MISSING")
+        packet = record["payload"]
+        if not isinstance(packet, dict):
+            raise PaperPlaneError("SOURCE_EXIT_PROVENANCE_CONFLICT")
+        expected = {"source_event_id": "SRC-" + eid, "exit_decision_id": eid,
+                    "position_id": position["position_id"],
+                    "signal_decision_sha256": position["signal_decision_sha256"],
+                    "packet_sha256": canonical_spec_sha256(packet)}
+        if (record["event_type"] != "SOURCE_EXIT_PRODUCED"
+            or binding["event_type"] != "SOURCE_EXIT_ADMISSION_BOUND"
+            or record["position_id"] != position["position_id"]
+            or binding["position_id"] != position["position_id"]
+            or record["bot_instance_id"] != position["bot_instance_id"]
+            or binding["bot_instance_id"] != position["bot_instance_id"]
+            or binding["payload"] != expected):
+            raise PaperPlaneError("SOURCE_EXIT_PROVENANCE_CONFLICT")
+        return packet
+
     def episode(self, *, source_relative: str, episode_id: str, epoch_id: str, mode: str, as_of: str):
         source = Path(source_relative)
         if source.anchor or PureWindowsPath(source_relative).anchor or ".." in source.parts:
@@ -194,10 +217,7 @@ class TradingContinuityRunner:
             packet = self._origin(store, position)
             decision_at = packet["decision"]["decision_at"]
             if side == "EXIT" and position.get("exit_decision_id"):
-                exit_packet = store.get_execution_event("SRC-" + position["exit_decision_id"])
-                if exit_packet is None:
-                    raise PaperPlaneError("SOURCE_EXIT_PROVENANCE_MISSING")
-                decision_at = exit_packet["payload"]["decision"]["decision_at"]
+                decision_at = self._exit_origin(store, position)["decision"]["decision_at"]
             return begin_modeled_attempt(store, position_id=position_id, side=side, mode=bot["mode"],
                 attempt_key=attempt_key, decision_at=decision_at,
                 max_age_seconds=self.strategy["signal_input"]["max_age_seconds"], as_of=as_of)
@@ -218,6 +238,8 @@ class TradingContinuityRunner:
             bot = store.get_bot(position["bot_instance_id"])
             self._epoch(store, position["activation_epoch_id"], bot["mode"])
             self._origin(store, position)
+            if attempt["payload"]["side"] == "EXIT" and position.get("exit_decision_id"):
+                self._exit_origin(store, position)
             accepted = accept_modeled_result(store, result=result)
             accepted["drain"] = maybe_finish_drain(store, accepted["position"]["bot_instance_id"])
             return accepted
@@ -253,6 +275,24 @@ class TradingContinuityRunner:
                         bot_instance_id=bot["bot_instance_id"], position_id=position_id, payload=packet, created_at=as_of)
                 applied = accept_exit_decision(self.root, store, strategy=self.strategy,
                                               exit_decision=packet["decision"], known_activation_epochs=known)
+                if applied["applied"]:
+                    binding = {"source_event_id": sid,
+                               "exit_decision_id": packet["decision"]["exit_decision_id"],
+                               "position_id": position_id,
+                               "signal_decision_sha256": position["signal_decision_sha256"],
+                               "packet_sha256": canonical_spec_sha256(packet)}
+                    binding_id = "EXITBIND-" + packet["decision"]["exit_decision_id"]
+                    prior_binding = store.get_execution_event(binding_id)
+                    if prior_binding is not None and (
+                        prior_binding["payload"] != binding
+                        or prior_binding["event_type"] != "SOURCE_EXIT_ADMISSION_BOUND"
+                        or prior_binding["position_id"] != position_id
+                        or prior_binding["bot_instance_id"] != bot["bot_instance_id"]):
+                        raise PaperPlaneError("SOURCE_EXIT_PROVENANCE_CONFLICT")
+                    if prior_binding is None:
+                        store.append_execution_event(event_type="SOURCE_EXIT_ADMISSION_BOUND", event_id=binding_id,
+                            bot_instance_id=bot["bot_instance_id"], position_id=position_id,
+                            payload=binding, created_at=as_of)
             return {**packet, "exit": applied}
         finally:
             store.close()

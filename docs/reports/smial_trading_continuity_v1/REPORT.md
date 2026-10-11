@@ -69,6 +69,7 @@ commissioning. `failure_boundaries` preserves compact actual assertions.
 | F14 decision eligibility | Semantic review found missing/late decision PRICE could ENTER outside scientific eligibility; three frozen 5db1b820 probes reproduce ENTER instead of UNKNOWN | Shared scientific PRICE cell precedes entry features, including list-only; typed UNKNOWN and no admission; originating exit retains its own target arithmetic | Dynamic price-before 3 FAIL → fresh 3 PASS with valid neighbors; membership UNKNOWN still reads no values |
 | F15 transaction/outcome | Native ordinary episode on content head 3f619f92: disabled-policy refusal loses source packet (0 instead of 1); stale WATCHED replay rolls cancellation back to WATCHED | Existing admission owner returns normal DENIED; source, risk refusal and unattempted cancellation commit together; actual errors retain rollback | transaction-before.json: two actual FAILs; transaction-after.json: eight PASS probes A–D; no risk-policy or successor lifecycle change |
 | F16 originating decision fingerprint | Code review at 2bc4684f found that decision-only clock corruption bypassed the stale check; native ordinary episode reproduced missing refusal | Runner compares the complete canonical SignalDecision fingerprint with the existing admitted-position fingerprint before using the decision; admission and risk policy unchanged | origin-fingerprint-before-native.json and repeatable frozen origin-fingerprint-before.json: one actual FAIL each; focused after PASS and fresh50 PASS; no policy/schema/lifecycle change |
+| F17 originating EXIT integrity | Architecture P1 at aa8d5379: decision-only exit backdating bypasses original cutoff; native ordinary episode/entry-result/exit actually FAILs refusal | Existing event owner atomically binds complete accepted exit packet; attempts/results verify binding before body/clock use; operator-close route retained | Native and frozen before actual FAIL; focused 3 PASS, fresh52 PASS and direct regressions PASS; fresh exact reviews/CI required |
 | F12 version gap | Existing _science_lineage_matches requires V1 although schema admits Vn | Preserved guard; V2 VERIFY refuses, V1 originating exit still works after list removal | Dynamic denial, **unrepaired owner boundary**; no automatic V2 materialization claim |
 
 Compatibility: historical manifests 1.0 are not filled from current data;
@@ -126,8 +127,8 @@ PAPER list-only, SHADOW mixed), plus operator-drain recovery; this does not
 erase the separate required version journey. ARC attacks cover 24/24 named
 scenario hypotheses, with S21/S22 review/machine final binding. PEF 24 planned,
 24 attempted, 22 fully executed at most and 2 partial; static-before missing
-callers remain explicit. DER 16/16 finding conclusions have direct evidence:
-14 behavioral before/after or post-review probes, two missing base callers
+callers remain explicit. DER 17/17 finding conclusions have direct evidence:
+15 behavioral before/after or post-review probes, two missing base callers
 established statically and exercised dynamically after repair. FR baseline
 five deterministic frozen-base failures → five current passes; other repairs
 are review/static-discovered with dynamic after-probes, not invented historical
@@ -240,9 +241,9 @@ CODE_REVIEWER at content head 2bc4684f5b7307757c37662b62c65f68aac447f8 returned 
 
 Reproduce before with `scripts/prove_trading_continuity.py --phase origin-fingerprint-before` (expected exit 1, runner frozen to 2bc4684f); after with `--phase origin-fingerprint` (expected exit 0).
 
-## Final bounded proof inputs after origin repair
+## Historical proof inputs before EXIT identity repair
 
-All five current receipts are PASS with identical 13 current input hashes and candidate_inputs_unchanged=true. Older 2bc4684f PASS above is historical and does not validate the later identity repair.
+The following aa8d5379 proof outputs validated the entry identity repair; they are historical and do not validate the later EXIT identity repair. Current five proof receipts are repeated below after that repair.
 
 | Receipt | Actual result | Output SHA256 |
 |---|---|---|
@@ -253,3 +254,25 @@ All five current receipts are PASS with identical 13 current input hashes and ca
 | regression.json | 198 PASS + 1 skip | 7d17292b182c5ca4e0c51c5d971bebb6b0f6f760d5c496d55f47201d83a0bc41 |
 
 The frozen before probe reproduces one FAIL on runner 2bc4684f with current test bytes; the native before receipt retains its actual earlier input hashes. Final cleanup is CLEAN, owned root/manifest absent, five process IDs EXITED/ABSENT, five non-target fingerprints equal and remaining owned bytes 0. No containers/services/volumes were created. Exact-head CI and readiness remain unexecuted for the next pushed head; no local targeted PASS substitutes for them. REPAIR_PARTIAL_BLOCKED and S08/S13 remain open.
+
+## Originating EXIT identity review repair
+
+ARCHITECTURE_CRITIC on aa8d53795db8d60430aeddc5594a6b348ad89e60 returned NOT_READY/P1: source exit body/clock was consumed without acceptance integrity. Native ordinary episode -> entry result -> originating exit accepted the real cutoff 16:10:00Z, then decision-only backdating to 12:40:02Z allowed an EXIT attempt after the entry result but before the exit data cutoff. The unchanged EXIT_DECISION_ACCEPTED clock and unchanged provenance did not protect that consumer. Native/frozen before each actual FAIL; no static counterexample is presented as an executed probe.
+
+The runner now stores SOURCE_EXIT_ADMISSION_BOUND atomically in the existing SQLite execution journal, alongside source exit and exit acceptance. It binds the complete canonical packet, source ID, exit ID, position and original admitted signal hash; attempt/result verify exact event type/scope/hash before consuming a source exit. This reuses the existing event store and canonical hash owner without schema or risk-policy change. Replay adds no duplicate binding. A native exception while appending the binding rolls source and exit state back. The ordinary exit after operator close remains valid even when the generic state owner did not emit a second EXIT_DECISION_ACCEPTED transition. Missing legacy binding remains a typed provenance gap; no fabricated historical binding. Operator exits without source decisions retain the existing path. REPAIR_PARTIAL_BLOCKED and S08/S13 remain open.
+
+Reproduce the frozen before with `scripts/prove_trading_continuity.py --phase exit-origin-before` (expected exit 1, runner frozen to aa8d5379); `--phase origin-fingerprint` executes entry-clock corruption, exit-clock corruption and atomic/replay/operator-close probes (expected exit 0).
+
+## Current bounded proofs after EXIT identity repair
+
+All five current receipts below are PASS with identical 13 current input hashes and candidate_inputs_unchanged=true; prior tables are historical outputs only. No old PASS is carried forward.
+
+| Receipt | Actual result | Output SHA256 |
+|---|---|---|
+| fresh.json | 52 PASS + 0 skip | 27b1536bc89d7cbdcbca94298157b1c6ab6ba317213bcc20b66247223335c24b |
+| transaction-after.json | 8 PASS + 0 skip | ce74dab15ec5b78b05aac53701a3ab913173234f62781070e231b9e839c4c338 |
+| source-visibility.json | 16 PASS + 0 skip | 3edb030e36fc21eb97610986d9704a2a83a3e32a3f3f5e2a138478ac3c640ceb |
+| origin-fingerprint.json | 3 PASS + 0 skip | 34f0cb37a47cd72f85ff18790024d4b78a993c84db01ef7d137fc15710c7d708 |
+| regression.json | 198 PASS + 1 skip | 804ecfccaa433f419977f0790c7a5e7051a6540360803be14b5d070c14ff6391 |
+
+Current cleanup: CLEAN, 0 scoped owned bytes, absent campaign root/manifest, five process IDs EXITED/ABSENT and five equal non-target fingerprints. Native/frozen entry and exit before probes retain actual FAIL boundaries. Current entry/exit integrity, rollback/replay and ordinary operator-close probes pass. No providers, real stores, protected science/holdout, deployment, credentials, money or settings changed. REPAIR_PARTIAL_BLOCKED and original S08/S13 remain open. Exact-head CI and readiness remain mandatory for the pushed candidate.

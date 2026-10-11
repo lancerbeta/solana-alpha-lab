@@ -822,6 +822,82 @@ class OrdinarySourceTests(unittest.TestCase):
                          {k: v for k, v in before.items() if k != "as_of"})
         self.assertEqual(before["modeled_attempts"], [])
 
+    def test_origin_exit_clock_corruption_refuses_without_effect(self):
+        self.prepare()
+        pid, entry_attempt = self._attempt()
+        self.runner.result(self._result(entry_attempt, "LANDED_SUCCESS", unit_price_usd="0.000003",
+                                       filled_notional_usd="30", chargeable_cost_usd="0"))
+        self.source.tick(datetime(2026, 10, 5, 16, 5, tzinfo=UTC))
+        packet = self.runner.exit(position_id=pid, source_relative="source/observation_schedule_state.sqlite",
+                                  as_of="2026-10-05T16:10:00Z")
+        self.assertEqual(packet["decision"]["decision_at"], "2026-10-05T16:10:00Z")
+        with self.assertRaisesRegex(PaperPlaneError, "MODELED_ATTEMPT_CAUSAL_CLOCK_INVALID"):
+            self.runner.attempt(position_id=pid, side="EXIT", attempt_key="EARLY-EXIT",
+                                as_of="2026-10-05T12:40:02Z")
+        store = PaperPlaneStore(self.runner.store_path)
+        try:
+            sid = "SRC-" + packet["decision"]["exit_decision_id"]
+            accepted = [e for e in store.execution_events() if e["event_type"] == "EXIT_DECISION_ACCEPTED"]
+            self.assertEqual([e["payload"]["exit_decision_at"] for e in accepted], ["2026-10-05T16:10:00Z"])
+            stored = store.get_execution_event(sid)["payload"]
+            stored["decision"]["decision_at"] = "2026-10-05T12:40:02Z"
+            self.assertEqual(stored["provenance"], packet["provenance"])
+            self.assertEqual(stored["provenance_sha256"], packet["provenance_sha256"])
+            store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(stored), sid))
+            store._conn.commit()
+        finally:
+            store.close()
+        before = self.runner.readback()
+        with self.assertRaisesRegex(PaperPlaneError, "SOURCE_EXIT_PROVENANCE_CONFLICT"):
+            self.runner.attempt(position_id=pid, side="EXIT", attempt_key="CORRUPT-EXIT-CLOCK",
+                                as_of="2026-10-05T12:40:02Z")
+        after = self.runner.readback()
+        self.assertEqual({k: v for k, v in after.items() if k != "as_of"},
+                         {k: v for k, v in before.items() if k != "as_of"})
+        self.assertEqual([e["payload"]["side"] for e in before["modeled_attempts"]], ["ENTRY"])
+
+    def test_origin_exit_binding_atomic_replay_and_operator_close(self):
+        self.prepare()
+        pid, entry_attempt = self._attempt()
+        self.runner.result(self._result(entry_attempt, "LANDED_SUCCESS", unit_price_usd="0.000003",
+                                       filled_notional_usd="30", chargeable_cost_usd="0"))
+        self.runner.command({"command_type": "REQUEST_CLOSE_POSITION", "idempotency_key": "BOUND-OPERATOR-CLOSE", "position_id": pid})
+        self.source.tick(datetime(2026, 10, 5, 16, 5, tzinfo=UTC))
+        before = self.runner.readback()
+        append = PaperPlaneStore.append_execution_event
+        def fail_binding(store, **kwargs):
+            if kwargs["event_type"] == "SOURCE_EXIT_ADMISSION_BOUND":
+                raise RuntimeError("EXIT_BINDING_FAULT")
+            return append(store, **kwargs)
+        with patch.object(PaperPlaneStore, "append_execution_event", fail_binding):
+            with self.assertRaisesRegex(RuntimeError, "EXIT_BINDING_FAULT"):
+                self.runner.exit(position_id=pid, source_relative="source/observation_schedule_state.sqlite",
+                                 as_of="2026-10-05T16:10:00Z")
+        after = self.runner.readback()
+        self.assertEqual({k: v for k, v in after.items() if k != "as_of"},
+                         {k: v for k, v in before.items() if k != "as_of"})
+        packet = self.runner.exit(position_id=pid, source_relative="source/observation_schedule_state.sqlite",
+                                  as_of="2026-10-05T16:10:00Z")
+        stable = self.runner.readback()
+        self.runner.exit(position_id=pid, source_relative="source/observation_schedule_state.sqlite",
+                         as_of="2026-10-05T16:10:00Z")
+        replay = self.runner.readback()
+        self.assertEqual({k: v for k, v in replay.items() if k != "as_of"},
+                         {k: v for k, v in stable.items() if k != "as_of"})
+        store = PaperPlaneStore(self.runner.store_path, readonly=True)
+        try:
+            eid = packet["decision"]["exit_decision_id"]
+            source = store.get_execution_event("SRC-" + eid)
+            binding = store.get_execution_event("EXITBIND-" + eid)
+            self.assertEqual(binding["event_type"], "SOURCE_EXIT_ADMISSION_BOUND")
+            self.assertEqual(binding["payload"]["packet_sha256"], canonical_spec_sha256(source["payload"]))
+            self.assertEqual([e for e in store.execution_events() if e["event_type"] == "EXIT_DECISION_ACCEPTED"], [])
+        finally:
+            store.close()
+        attempt = self.runner.attempt(position_id=pid, side="EXIT", attempt_key="BOUND-OPERATOR-EXIT",
+                                      as_of="2026-10-05T16:10:00Z")
+        self.assertTrue(attempt["send_permitted"])
+
     def test_origin_packet_corruption_and_missing_research_refuse_without_effect(self):
         self.prepare()
         packet = self.decision()

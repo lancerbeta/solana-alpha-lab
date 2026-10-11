@@ -104,6 +104,14 @@
       "result": "49_PASS_1_VOLATILE_PROJECTION_CLOCK_ASSERTION_FAIL",
       "output_sha256": "07d76db2904aaa5ccd249fe594b820bd7c5cb1e594a65886ce6a35d0df0ca554",
       "correction": "Origin hash refusal already occurred; newly written no-effect oracle compared live projection as_of. Exclude only projection read time, compare every persisted field exactly; production unchanged."
+    },
+    {
+      "phase": "pre-exit-origin-identity-review-repair",
+      "head": "aa8d53795db8d60430aeddc5594a6b348ad89e60",
+      "result": "ARCHITECTURE_NOT_READY_P1_EXIT_DECISION_BODY_UNBOUND",
+      "native_before": "exit-origin-before-native.json",
+      "repeatable_frozen_before": "exit-origin-before.json",
+      "correction": "Full accepted exit packet atomically bound in existing event store; scope/hash check before attempt/result; operator-close compatibility and genuine rollback preserved. New exact proofs/review required."
     }
   ]
 }
