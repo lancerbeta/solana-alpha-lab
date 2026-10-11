@@ -1,0 +1,270 @@
+{
+  "schema": "list-a-local-metadata-probe",
+  "root_resolution": {
+    "status": "PRESENT",
+    "selection_reason": "DEFAULT_EXISTING",
+    "error": null,
+    "present": true
+  },
+  "root_resolver_owner": "src/solana_alpha_lab/factory/data_root.py:resolve_existing_data_root",
+  "read_scope": "CANONICAL_LOCAL_LINEAGE_LABEL_PROJECTION_AND_PARAMETER_ONLY_SCHEDULE",
+  "metadata_fields_read": [
+    "/anchor_kind",
+    "/cohorts[]/admissions_n",
+    "/cohorts[]/census_rel",
+    "/cohorts[]/census_sha256",
+    "/cohorts[]/closure_receipt_sha256",
+    "/cohorts[]/cohort_id",
+    "/cohorts[]/collection",
+    "/cohorts[]/corpus_version",
+    "/cohorts[]/distinct_mint_n",
+    "/cohorts[]/evidence_role",
+    "/cohorts[]/imported_at",
+    "/cohorts[]/obs_rel",
+    "/cohorts[]/observations_sha256",
+    "/cohorts[]/release_dir_rel",
+    "/cohorts[]/release_id",
+    "/cohorts[]/schedule_binding/availability_grace_seconds",
+    "/cohorts[]/schedule_binding/dense_step_seconds",
+    "/cohorts[]/schedule_binding/dense_until_seconds",
+    "/cohorts[]/schedule_binding/dispatch_window_seconds",
+    "/cohorts[]/schedule_binding/horizon_seconds",
+    "/cohorts[]/schedule_binding/hourly_step_seconds",
+    "/cohorts[]/schedule_binding/schedule_contract",
+    "/cohorts[]/schedule_binding/witness_max_age_seconds",
+    "/cohorts[]/schedule_sha256",
+    "/cohorts[]/sealed_at",
+    "/cohorts[]/source_sha256",
+    "/collection",
+    "/confirmatory_reuse_forbidden",
+    "/corpus_dataset_id",
+    "/corpus_version",
+    "/current_corpus_version",
+    "/current_dataset_manifest_id",
+    "/dataset_version",
+    "/evidence_role",
+    "/holdout",
+    "/is_current_corpus_version",
+    "/logical_dataset_id",
+    "/outcome_previously_consumed",
+    "/population",
+    "/population_contract",
+    "/yield_semantics",
+    "PARAMETER_ONLY_OBSERVATION_SCHEDULE_DOCUMENT"
+  ],
+  "opaque_bytes_hashed": 11786,
+  "market_value_fields_deserialized": 0,
+  "scientific_looks_created": 0,
+  "research_store_writes": 0,
+  "provider_calls": 0,
+  "source_contents_read": "METADATA_ONLY_SELECTIVE_TOKEN_PROJECTION",
+  "metadata_paths": [
+    {
+      "relative": "datasets/opportunity_episodes_corpus/lineage.json",
+      "status": "PRESENT",
+      "kind": "FILE",
+      "size": 2084,
+      "mtime_ns": 1791704898007666500
+    },
+    {
+      "relative": "research_lists",
+      "status": "ABSENT",
+      "kind": null,
+      "size": null,
+      "mtime_ns": null
+    },
+    {
+      "relative": "datasets/manifests",
+      "status": "PRESENT",
+      "kind": "DIRECTORY",
+      "size": null,
+      "mtime_ns": 1791704898006665900
+    },
+    {
+      "relative": "research/events",
+      "status": "PRESENT",
+      "kind": "DIRECTORY",
+      "size": null,
+      "mtime_ns": 1791116684727991100
+    }
+  ],
+  "non_target_stat_inventory_unchanged": true,
+  "metadata_path_inventory_sha256": "cc305420ae9021f2010d56ede7f1bb646e74d1b3f4e0f3f832ae75d37c6c3ccd",
+  "first_blocker": "CONFIRMATORY_REUSE_FORBIDDEN",
+  "terminal": "BOUND_CONTRACT_NOT_READY",
+  "lineage_metadata": {
+    "cohorts": [
+      {
+        "admissions_n": 24,
+        "census_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261007T000000Z-20261008T000000Z/1128cbcad55e4f11/census.parquet",
+        "census_sha256": "219ba157dcc50080cbb9f0edf0fc1e6bfaae29dc8bbbccc131a5fdb2a9e47cef",
+        "closure_receipt_sha256": "77f3ac000ffc3344a90a1d63c93bbc6b80ef3305347711b107193fd77101164a",
+        "cohort_id": "REL-20261007T000000Z-20261008T000000Z",
+        "collection": "OPPORTUNITY_EPISODES",
+        "corpus_version": 1,
+        "distinct_mint_n": 24,
+        "evidence_role": "EXPLORATORY_REUSE",
+        "imported_at": "2026-10-11T07:38:39.701372Z",
+        "obs_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261007T000000Z-20261008T000000Z/1128cbcad55e4f11/observations.parquet",
+        "observations_sha256": "7c94cf80e77f4a2359e0e18f4130867db70aa568b0373f2d2d6b523b0e95d1bd",
+        "release_dir_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261007T000000Z-20261008T000000Z/1128cbcad55e4f11",
+        "release_id": "1128cbcad55e4f11f666722d5b967b1aa5b3c8624ca3dfb9d02981c5651fe47c",
+        "schedule_binding": {
+          "availability_grace_seconds": 300,
+          "dense_step_seconds": 300,
+          "dense_until_seconds": 21600,
+          "dispatch_window_seconds": 60,
+          "horizon_seconds": 259200,
+          "hourly_step_seconds": 3600,
+          "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+          "witness_max_age_seconds": 120
+        },
+        "schedule_sha256": "2bfb07b6862365df825220811b63d20e045e085b9a51ffd24e1a935456df1be0",
+        "sealed_at": "2026-10-11T07:38:39.701372Z",
+        "source_sha256": "6c2816ed89fbce7ecc2e187d389a9905e4cad6a2715aff4a610e3cc2716eaff9"
+      }
+    ],
+    "collection": "OPPORTUNITY_EPISODES",
+    "corpus_dataset_id": "DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001",
+    "current_corpus_version": 1,
+    "current_dataset_manifest_id": "dataset-d61e989fdce991a0065ca96d2c1823c592f2e08b39e6473b153841954613fdef",
+    "population": "OPPORTUNITY_EPISODES"
+  },
+  "source_labels": {
+    "anchor_kind": "NOMINATION_T0",
+    "collection": "OPPORTUNITY_EPISODES",
+    "confirmatory_reuse_forbidden": true,
+    "corpus_version": 1,
+    "dataset_version": "opportunity-episodes-v1-REL-20261007T000000Z-20261008T000000Z",
+    "evidence_role": "EXPLORATORY_REUSE",
+    "holdout": false,
+    "is_current_corpus_version": true,
+    "logical_dataset_id": "DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001",
+    "outcome_previously_consumed": false,
+    "population": "OPPORTUNITY_EPISODES",
+    "population_contract": "OPPORTUNITY_EPISODES_V1",
+    "yield_semantics": "ADMISSIONS_DENOMINATOR_NOT_OBSERVED_YIELD"
+  },
+  "metadata_readset": [
+    {
+      "relative": "datasets/opportunity_episodes_corpus/lineage.json",
+      "sha256": "e6b4ad6d731d249e4ada852670b0a166943240ab3e1d3fc317af166a0b509ce8",
+      "opaque_bytes_read": 2084,
+      "selected_fields": [
+        "/cohorts[]/admissions_n",
+        "/cohorts[]/census_rel",
+        "/cohorts[]/census_sha256",
+        "/cohorts[]/closure_receipt_sha256",
+        "/cohorts[]/cohort_id",
+        "/cohorts[]/collection",
+        "/cohorts[]/corpus_version",
+        "/cohorts[]/distinct_mint_n",
+        "/cohorts[]/evidence_role",
+        "/cohorts[]/imported_at",
+        "/cohorts[]/obs_rel",
+        "/cohorts[]/observations_sha256",
+        "/cohorts[]/release_dir_rel",
+        "/cohorts[]/release_id",
+        "/cohorts[]/schedule_binding/availability_grace_seconds",
+        "/cohorts[]/schedule_binding/dense_step_seconds",
+        "/cohorts[]/schedule_binding/dense_until_seconds",
+        "/cohorts[]/schedule_binding/dispatch_window_seconds",
+        "/cohorts[]/schedule_binding/horizon_seconds",
+        "/cohorts[]/schedule_binding/hourly_step_seconds",
+        "/cohorts[]/schedule_binding/schedule_contract",
+        "/cohorts[]/schedule_binding/witness_max_age_seconds",
+        "/cohorts[]/schedule_sha256",
+        "/cohorts[]/sealed_at",
+        "/cohorts[]/source_sha256",
+        "/collection",
+        "/corpus_dataset_id",
+        "/current_corpus_version",
+        "/current_dataset_manifest_id",
+        "/population"
+      ],
+      "unchanged_after": true
+    },
+    {
+      "relative": "datasets/manifests/dataset-d61e989fdce991a0065ca96d2c1823c592f2e08b39e6473b153841954613fdef.labels.json",
+      "sha256": "817f4afa535495e6ba62adfb5987e933550f75fd92b97da4be5f561ff65ee7e7",
+      "opaque_bytes_read": 1012,
+      "selected_fields": [
+        "/anchor_kind",
+        "/collection",
+        "/confirmatory_reuse_forbidden",
+        "/corpus_version",
+        "/dataset_version",
+        "/evidence_role",
+        "/holdout",
+        "/is_current_corpus_version",
+        "/logical_dataset_id",
+        "/outcome_previously_consumed",
+        "/population",
+        "/population_contract",
+        "/yield_semantics"
+      ],
+      "unchanged_after": true
+    },
+    {
+      "relative": "datasets/opportunity_episodes_corpus/cohorts/REL-20261007T000000Z-20261008T000000Z/1128cbcad55e4f11/observation_schedule.json",
+      "sha256": "64b19347225911c71fa850adc29369c50645f8f55412e0be3e5a90e476de079e",
+      "opaque_bytes_read": 2797,
+      "selected_fields": [
+        "PARAMETER_ONLY_OBSERVATION_SCHEDULE_DOCUMENT"
+      ],
+      "unchanged_after": true
+    }
+  ],
+  "source_witnesses": [
+    {
+      "cohort_id": "REL-20261007T000000Z-20261008T000000Z",
+      "schedule_sha256": "2bfb07b6862365df825220811b63d20e045e085b9a51ffd24e1a935456df1be0",
+      "list_a_definition": {
+        "list_id": "JUPITER:toporganicscore:5m",
+        "definition_version": "1",
+        "provider_or_owner": "JUPITER",
+        "kind": "RANKED_CATEGORY_LIST",
+        "semantics": {
+          "category": "toporganicscore",
+          "interval": "5m",
+          "requested_limit": 100,
+          "nomination_primitive": "PRIM-JUPITER-TOKENS-V2-CATEGORY-NOMINATION-001"
+        },
+        "adapter": "ADMISSION_FRAME_V1",
+        "aliases": [
+          "toporganicscore_5m"
+        ],
+        "source_id": "toporganicscore_5m",
+        "definition_sha256": "8a35ad6835c5cd2a6c7fe772002f3c2a4d616d53479297130f88f25e978b48c0"
+      },
+      "cohort_interval_start": "2026-10-07T00:00:00Z",
+      "cohort_interval_end_exclusive": "2026-10-08T00:00:00Z",
+      "start_anchor_clock_witness": {
+        "E1800": {
+          "nominal_due": "2026-10-07T00:30:00Z",
+          "availability_deadline": "2026-10-07T00:35:00Z"
+        },
+        "E14400": {
+          "nominal_due": "2026-10-07T04:00:00Z",
+          "availability_deadline": "2026-10-07T04:05:00Z"
+        }
+      },
+      "frozen_protection_source_refs": [
+        {
+          "assignment_id": "BOOTSTRAP-EXPLORATORY-REUSE-INVENTORY-20261006",
+          "sha256": "f70a7f2d82b27bd39b1affbb72be339401bb0d223275965ce68df795112ec3ef"
+        }
+      ],
+      "potential_mints_upper_bound": 24,
+      "potential_time_blocks_upper_bound": {
+        "86400": 2,
+        "172800": 2
+      },
+      "actual_target_support": "NOT_READ_NOT_PROVEN",
+      "structural_feasibility": "INSUFFICIENT_POTENTIAL_SUPPORT"
+    }
+  ],
+  "exposure_status": "UNRESOLVED_COMPLETE_PROVENANCE_NOT_ESTABLISHED",
+  "protection_status": "FROZEN_SOURCE_REFS_ONLY_CURRENT_ASSIGNMENTS_NOT_VALIDATED",
+  "non_target_metadata_hashes_unchanged": true
+}

@@ -1,0 +1,446 @@
+{
+  "scope": "CONTRACT_MODEL_AND_NAMED_SAFE_NATIVE_METADATA_PARSER_SEAMS",
+  "cases": [
+    {
+      "id": "NATIVE_MEMBERSHIP_A",
+      "expected": "TRUE",
+      "actual": "TRUE",
+      "status": "PASS",
+      "fidelity": "SEGMENT_PRODUCT_PATH_SYNTHETIC"
+    },
+    {
+      "id": "NATIVE_MEMBERSHIP_AB",
+      "expected": "TRUE",
+      "actual": "TRUE",
+      "status": "PASS",
+      "fidelity": "SEGMENT_PRODUCT_PATH_SYNTHETIC"
+    },
+    {
+      "id": "NATIVE_MEMBERSHIP_B",
+      "expected": "FALSE",
+      "actual": "FALSE",
+      "status": "PASS",
+      "fidelity": "SEGMENT_PRODUCT_PATH_SYNTHETIC"
+    },
+    {
+      "id": "NATIVE_MEMBERSHIP_UNKNOWN",
+      "expected": "UNKNOWN",
+      "actual": "UNKNOWN",
+      "status": "PASS",
+      "fidelity": "SEGMENT_PRODUCT_PATH_SYNTHETIC"
+    },
+    {
+      "id": "ALLOWLIST_IGNORES_VALUE_TOKENS",
+      "expected": {
+        "cohort_id": "W-VALID"
+      },
+      "actual": {
+        "cohort_id": "W-VALID"
+      },
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "VALUE_TOKEN_ACCESS_LOG",
+      "expected": [
+        "/cohort_id"
+      ],
+      "actual": [
+        "/cohort_id"
+      ],
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "POSITIVE_GUARD_NON_VACUOUS",
+      "expected": "FROZEN_FOR_SEPARATE_AUTHORIZED_CONFIRMATION",
+      "actual": "FROZEN_FOR_SEPARATE_AUTHORIZED_CONFIRMATION",
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "GUARD_exposure",
+      "expected": [
+        "BOUND_CONTRACT_NOT_READY",
+        "EXPOSURE_UNRESOLVED_OR_PENDING"
+      ],
+      "actual": [
+        "BOUND_CONTRACT_NOT_READY",
+        "EXPOSURE_UNRESOLVED_OR_PENDING"
+      ],
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "GUARD_pending",
+      "expected": [
+        "BOUND_CONTRACT_NOT_READY",
+        "EXPOSURE_UNRESOLVED_OR_PENDING"
+      ],
+      "actual": [
+        "BOUND_CONTRACT_NOT_READY",
+        "EXPOSURE_UNRESOLVED_OR_PENDING"
+      ],
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "GUARD_current_protection",
+      "expected": [
+        "BOUND_CONTRACT_NOT_READY",
+        "CURRENT_PROTECTION_UNRESOLVED"
+      ],
+      "actual": [
+        "BOUND_CONTRACT_NOT_READY",
+        "CURRENT_PROTECTION_UNRESOLVED"
+      ],
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "GUARD_confirmatory_reuse_forbidden",
+      "expected": [
+        "BOUND_CONTRACT_NOT_READY",
+        "CONFIRMATORY_REUSE_FORBIDDEN_OR_UNKNOWN"
+      ],
+      "actual": [
+        "BOUND_CONTRACT_NOT_READY",
+        "CONFIRMATORY_REUSE_FORBIDDEN_OR_UNKNOWN"
+      ],
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "GUARD_potential_mints",
+      "expected": [
+        "BOUND_CONTRACT_NOT_READY",
+        "INSUFFICIENT_POTENTIAL_SUPPORT"
+      ],
+      "actual": [
+        "BOUND_CONTRACT_NOT_READY",
+        "INSUFFICIENT_POTENTIAL_SUPPORT"
+      ],
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "FALSE_HOLDOUT_NOT_UNTOUCHED",
+      "expected": [
+        "BOUND_CONTRACT_NOT_READY",
+        "EXPOSURE_UNRESOLVED_OR_PENDING"
+      ],
+      "actual": [
+        "BOUND_CONTRACT_NOT_READY",
+        "EXPOSURE_UNRESOLVED_OR_PENDING"
+      ],
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "STRICTER_CURRENT_PROTECTION_REFUSED",
+      "expected": [
+        "BOUND_CONTRACT_NOT_READY",
+        "CURRENT_PROTECTION_UNRESOLVED"
+      ],
+      "actual": [
+        "BOUND_CONTRACT_NOT_READY",
+        "CURRENT_PROTECTION_UNRESOLVED"
+      ],
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "POTENTIAL_BLOCK_SCREEN_REFUSED",
+      "expected": [
+        "BOUND_CONTRACT_NOT_READY",
+        "INSUFFICIENT_POTENTIAL_SUPPORT"
+      ],
+      "actual": [
+        "BOUND_CONTRACT_NOT_READY",
+        "INSUFFICIENT_POTENTIAL_SUPPORT"
+      ],
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "CORE_REORDER_SAME",
+      "expected": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+      "actual": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "MEANING_CHANGE_DIFFERENT_CORE",
+      "expected": true,
+      "actual": true,
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "BLOCK_CHANGE_DIFFERENT_CORE",
+      "expected": true,
+      "actual": true,
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "BOOL_NOT_INTEGER",
+      "expected": true,
+      "actual": true,
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "NEW_UNRELATED_SOURCE_NO_FROZEN_SET_CHANGE",
+      "expected": {
+        "cohort_id": "SYNTHETIC-OLD",
+        "release_id": "r1",
+        "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "actual": {
+        "cohort_id": "SYNTHETIC-OLD",
+        "release_id": "r1",
+        "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "EXACT_SOURCE_CHANGED_HASH_REFUSED",
+      "expected": true,
+      "actual": true,
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "IDENTICAL_EPISODE_COPY_DEDUP",
+      "expected": [
+        {
+          "episode_id": "SYNTHETIC-1",
+          "mint": "SYNTHETIC-MINT",
+          "membership": "TRUE"
+        }
+      ],
+      "actual": [
+        {
+          "episode_id": "SYNTHETIC-1",
+          "mint": "SYNTHETIC-MINT",
+          "membership": "TRUE"
+        }
+      ],
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "CONFLICTING_EPISODE_COPY_REFUSED",
+      "expected": true,
+      "actual": true,
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "SOURCE_CHANGE_DIFFERENT_SAMPLE",
+      "expected": true,
+      "actual": true,
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "SEED_INDEPENDENT_BYTES_86400",
+      "expected": 2055296707731192101,
+      "actual": 2055296707731192101,
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "SEED_INDEPENDENT_BYTES_172800",
+      "expected": 3449030900544075880,
+      "actual": 3449030900544075880,
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "NEAREST_RANK_1/40",
+      "expected": 103,
+      "actual": 103,
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY"
+    },
+    {
+      "id": "NEAREST_RANK_39/40",
+      "expected": 3994,
+      "actual": 3994,
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY"
+    },
+    {
+      "id": "POSITIVE_MEAN",
+      "expected": "1/5",
+      "actual": "1/5",
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY"
+    },
+    {
+      "id": "NEGATIVE_MEAN",
+      "expected": "-1/5",
+      "actual": "-1/5",
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY"
+    },
+    {
+      "id": "EPISODE_NOT_CLUSTER_WEIGHT",
+      "expected": "3/10",
+      "actual": "3/10",
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY"
+    },
+    {
+      "id": "CROSSED_CHOICES",
+      "expected": [
+        8,
+        8
+      ],
+      "actual": [
+        8,
+        8
+      ],
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY"
+    },
+    {
+      "id": "SHARED_GROUP_WEIGHT_MEANS",
+      "expected": true,
+      "actual": true,
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY"
+    },
+    {
+      "id": "BOUNDARY_ANCHOR",
+      "expected": "2026-01-01T04:35:00+00:00",
+      "actual": "2026-01-01T04:35:00+00:00",
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY"
+    },
+    {
+      "id": "STRICT_EQUALITY_REFUSED",
+      "expected": false,
+      "actual": false,
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "OVERLAP_REFUSED",
+      "expected": false,
+      "actual": false,
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "NATIVE_NAIVE_TIME_REFUSED",
+      "expected": true,
+      "actual": true,
+      "status": "PASS",
+      "fidelity": "SEGMENT_PRODUCT_PATH_SYNTHETIC"
+    },
+    {
+      "id": "NATIVE_TARGET_DEADLINE",
+      "expected": "2026-01-01T04:05:00+00:00",
+      "actual": "2026-01-01T04:05:00+00:00",
+      "status": "PASS",
+      "fidelity": "SEGMENT_PRODUCT_PATH_SYNTHETIC"
+    },
+    {
+      "id": "NOMINAL_HOLDING",
+      "expected": 12600,
+      "actual": 12600,
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY"
+    },
+    {
+      "id": "14_DAY_BLOCK_UPPER_ALIGNED",
+      "expected": 7,
+      "actual": 7,
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY"
+    },
+    {
+      "id": "KNOWN_ACTUAL_UPPER_BELOW_SUPPORT",
+      "expected": true,
+      "actual": true,
+      "status": "PASS",
+      "fidelity": "SEGMENT_PRODUCT_PATH_METADATA"
+    },
+    {
+      "id": "COVERAGE_EXACT_190",
+      "expected": true,
+      "actual": true,
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY"
+    },
+    {
+      "id": "COVERAGE_EXACT_189",
+      "expected": false,
+      "actual": false,
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY"
+    },
+    {
+      "id": "RULE_SUPPORTED",
+      "expected": "ASSOCIATION_SUPPORTED_CONDITIONAL",
+      "actual": "ASSOCIATION_SUPPORTED_CONDITIONAL",
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "RULE_NEGATIVE",
+      "expected": "ASSOCIATION_NOT_SUPPORTED_AT_FROZEN_BOUNDARY",
+      "actual": "ASSOCIATION_NOT_SUPPORTED_AT_FROZEN_BOUNDARY",
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "RULE_48H_CROSS",
+      "expected": "INCONCLUSIVE_DEPENDENCE_OR_CONCENTRATION",
+      "actual": "INCONCLUSIVE_DEPENDENCE_OR_CONCENTRATION",
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "RULE_LEAVE_ONE_ZERO",
+      "expected": "INCONCLUSIVE_DEPENDENCE_OR_CONCENTRATION",
+      "actual": "INCONCLUSIVE_DEPENDENCE_OR_CONCENTRATION",
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "RULE_TINY",
+      "expected": "INSUFFICIENT",
+      "actual": "INSUFFICIENT",
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "RULE_INVALID",
+      "expected": "INVALID_OR_BLOCKED",
+      "actual": "INVALID_OR_BLOCKED",
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "RULE_UNBOUND_PRECEDENCE",
+      "expected": "BOUND_CONTRACT_NOT_READY",
+      "actual": "BOUND_CONTRACT_NOT_READY",
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    },
+    {
+      "id": "RULE_EMPTY",
+      "expected": "INSUFFICIENT",
+      "actual": "INSUFFICIENT",
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY"
+    }
+  ],
+  "product_confirmer_tests": "NOT_IMPLEMENTED_NOT_EXECUTED",
+  "scientific_looks": 0
+}

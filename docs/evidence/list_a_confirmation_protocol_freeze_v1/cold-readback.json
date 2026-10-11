@@ -1,0 +1,42 @@
+{
+  "consumer": {
+    "status": "PASS_COLD_ARTIFACT_CONSUMER",
+    "result": "BOUND_CONTRACT_NOT_READY",
+    "binding_gaps": [
+      "CONFIRMATORY_REUSE_FORBIDDEN",
+      "INSUFFICIENT_POTENTIAL_SUPPORT",
+      "EXACT_APPROVED_SAMPLE_SCOPE_AND_END_NOT_BOUND",
+      "COMPLETE_EXPOSURE_PROVENANCE_NOT_ESTABLISHED",
+      "CURRENT_PROTECTION_NOT_VALIDATED"
+    ],
+    "protocol_core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+    "sample_binding_sha256": "9ce82941a13f4fc415f57d5a79a33ea34ce5b21600a0beff9c57afaee791baf1",
+    "non_claims": [
+      "NO_EMPIRICAL_EFFECT_ESTABLISHED_BY_FREEZE",
+      "NO_GENERAL_95_PERCENT_COVERAGE_GUARANTEE",
+      "NO_CAUSAL_OR_UNCONDITIONAL_POPULATION_CLAIM",
+      "NO_EXECUTABLE_POLICY_QUALIFICATION",
+      "NO_PROMOTE_NO_STRATEGY_NO_ACTIVATION"
+    ],
+    "market_values_read": 0,
+    "scientific_looks": 0
+  },
+  "adversarial_canaries": [
+    {
+      "canary": "SAME_SHAPE_DELTA_TAMPER",
+      "returncode": 1,
+      "detected_by": "QUESTION_DRIFT:delta"
+    },
+    {
+      "canary": "RAW_CONFIG_HASH_AS_PROTOCOL_CORE",
+      "returncode": 1,
+      "detected_by": "CORE_HASH_MISMATCH"
+    },
+    {
+      "canary": "TRUNCATED_PERSISTED_CONFIG",
+      "returncode": 1
+    }
+  ],
+  "owned_temp_root_removed": true,
+  "future_confirmer_reservation_tests": "NOT_EXECUTED_OUT_OF_SCOPE"
+}

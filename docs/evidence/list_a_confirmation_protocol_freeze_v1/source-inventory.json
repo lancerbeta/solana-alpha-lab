@@ -1,0 +1,43 @@
+{
+  "base_main": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "accepted_spec": {
+    "logical_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md",
+    "sha256": "4931c4c569fb2630e9b403b33185bd86b9ffe9ff0df06dd9bb0bec41f5040510"
+  },
+  "native_owners": [
+    {
+      "path": "src/solana_alpha_lab/factory/hfic_research_scope.py",
+      "immutable_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+      "git_blob_sha256": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
+      "immutable_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+      "git_blob_sha256": "af898471e64d5beecdb4e6f56caeca7d7cde0ec14fd5e7559634c7b241f0c383"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/opportunity_episodes.py",
+      "immutable_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+      "git_blob_sha256": "3565d1dff50b3b4be630ec1ee737c81e4259b247dde702c2327f976cfae837cc"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/observation_schedule.py",
+      "immutable_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+      "git_blob_sha256": "dff14477838de0d06b5c145650e203d988edd63f84c983d898d2e03be344c6a2"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/live_cohort_schedule_artifact.py",
+      "immutable_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+      "git_blob_sha256": "b6bd6099d0a12c61fa04960868b888d096038c3db70eabe38585b905d6434dde"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/data_root.py",
+      "immutable_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+      "git_blob_sha256": "594c98c33acbc9b43ad3a45c29b58063f94946a73113d81fdc6967382c13e2b6"
+    }
+  ],
+  "actual_local_metadata_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/metadata-bindings.json",
+  "actual_local_metadata_sha256": "c01d47e84443335101e686494321dccf071d3298cddc05ed36cee64a687c889f",
+  "live_vps_or_market_probe": "NONE",
+  "git_and_github_access": "Existing remote fetch and gh authenticated repo readback; no auth settings changed"
+}

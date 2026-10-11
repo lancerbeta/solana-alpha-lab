@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1-LIMITED-DESIGN",
+  "as_of": "2026-10-12",
+  "task_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1",
+  "state_change": "Materialized accepted protocol/config and safe real metadata evidence; DESIGN_VALIDATED with BOUND_CONTRACT_NOT_READY; no scientific semantic DONE",
+  "base_main": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": [],
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\factory-fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_51_CONTRACT_MODEL_NATIVE_SEAM_CHECKS_AND_COLD_CONSUMER_3_REFUSALS",
+    "independent_review": {
+      "path": "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\independent-review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "NOT_READY"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_HARNESS_STRUCTURE",
+      "PASS_51_FOCUSED_CONTRACT_CASES",
+      "PASS_COLD_ARTIFACT_CONSUMER_3_REFUSALS",
+      "PASS_CATALOG_1969_ASSETS_SCHEMA_RELATIONS_INTEGRITY",
+      "PASS_INCREMENTAL_GENERATED_CLOSURE_NOOP",
+      "PASS_ZERO_PRODUCTION_PATH_DIFF"
+    ]
+  },
+  "non_claims": [
+    "NO_FULL_DATA_BOUND_FREEZE",
+    "NO_SCIENTIFIC_LOOK",
+    "NO_ALPHA_OR_METRIC_OR_SCIENTIFIC_DECISION",
+    "NO_TRADING_CLOSURE_OR_CONFIRMER_IMPLEMENTATION",
+    "NO_ACTIVATION_DEPLOY_OR_SPEND",
+    "NO_BOOTSTRAP_COVERAGE_THEOREM"
+  ],
+  "side_effects": {
+    "market_value_fields_deserialized": 0,
+    "scientific_looks": 0,
+    "provider_calls": 0,
+    "real_data_root_writes": 0,
+    "research_or_exposure_writes": 0,
+    "activation": 0,
+    "spend": 0
+  },
+  "capability_radar_now": "NONE"
+}

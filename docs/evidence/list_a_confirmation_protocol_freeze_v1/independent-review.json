@@ -1,0 +1,43 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1-INDEPENDENT",
+  "as_of": "2026-10-12",
+  "task_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_ISOLATED_EXACT_INVENTORY_REVIEW"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_ISOLATED_EXACT_INVENTORY_REVIEW"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_ISOLATED_EXACT_INVENTORY_REVIEW"
+      ]
+    }
+  ],
+  "verdict": "NOT_READY",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_EMPIRICAL_ACCEPTANCE"
+  ]
+}
