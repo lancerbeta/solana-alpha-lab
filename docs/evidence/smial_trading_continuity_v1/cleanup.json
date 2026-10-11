@@ -1,0 +1,82 @@
+{
+  "campaign": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
+  "campaign_root_absent": true,
+  "created_containers_services_volumes": [],
+  "manifest_absent": true,
+  "non_target_fingerprints_after": {
+    ".venv/pyvenv.cfg": {
+      "exists": true,
+      "sha256": "981d7567d42ebb8219e69d7618d8c3b9017d2f959959c0793fa59311b9c4f9e0"
+    },
+    "AGENTS.md": {
+      "exists": true,
+      "sha256": "eaa6bdd038ef7f265fbbb7d2daeb2e84a34455e330be35c7f9366a283e99dc0c"
+    },
+    "configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml": {
+      "exists": true,
+      "sha256": "b3ee621f429bda46b0e351af8ba7f96df91f82d69610f3946fd7511d1c719d15"
+    },
+    "configs/provider_route_capability_registry_v1.yaml": {
+      "exists": true,
+      "sha256": "ea44843f7ee7e8116a5599e7e38a8802e416f963ed6e0020448e33db898b7598"
+    },
+    "uv.lock": {
+      "exists": true,
+      "sha256": "3b75cc1c5a2c0c83560beaf1a57c4543b885e0909c75db6d1939e90d09eefedb"
+    }
+  },
+  "non_target_fingerprints_before": {
+    ".venv/pyvenv.cfg": {
+      "exists": true,
+      "sha256": "981d7567d42ebb8219e69d7618d8c3b9017d2f959959c0793fa59311b9c4f9e0"
+    },
+    "AGENTS.md": {
+      "exists": true,
+      "sha256": "eaa6bdd038ef7f265fbbb7d2daeb2e84a34455e330be35c7f9366a283e99dc0c"
+    },
+    "configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml": {
+      "exists": true,
+      "sha256": "b3ee621f429bda46b0e351af8ba7f96df91f82d69610f3946fd7511d1c719d15"
+    },
+    "configs/provider_route_capability_registry_v1.yaml": {
+      "exists": true,
+      "sha256": "ea44843f7ee7e8116a5599e7e38a8802e416f963ed6e0020448e33db898b7598"
+    },
+    "uv.lock": {
+      "exists": true,
+      "sha256": "3b75cc1c5a2c0c83560beaf1a57c4543b885e0909c75db6d1939e90d09eefedb"
+    }
+  },
+  "non_target_preservation": "PASS",
+  "process_readback": {
+    "43068": "EXITED"
+  },
+  "remaining_owned_bytes_after": 0,
+  "remaining_owned_bytes_before": 40,
+  "resources": [
+    {
+      "baseline_existed": false,
+      "cleanup": "DELETE_AFTER_HASHED_SUMMARY",
+      "created_by_this_run": true,
+      "estimated_bytes": 10485760,
+      "kind": "DISPOSABLE_CAMPAIGN_ROOT",
+      "marker": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
+      "path": "local/smial_trading_continuity_v1"
+    },
+    {
+      "actual_bytes_before_cleanup": 42084,
+      "baseline_existed": false,
+      "cleanup": "DELETE_AFTER_HASHED_SUMMARY",
+      "created_by_this_run": true,
+      "deleted": true,
+      "estimated_bytes": 10485760,
+      "kind": "DISPOSABLE_CASE_ROOT",
+      "marker": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
+      "observed_peak_bytes": 9416140,
+      "path": "local/smial_trading_continuity_v1/regression-f71f752c96f74264b7dd3b0f1f390e85",
+      "pid": 43068
+    }
+  ],
+  "retained_dependencies": "PREEXISTING_LOCKED_ENVIRONMENT_AND_SHARED_CACHE",
+  "status": "CLEAN"
+}

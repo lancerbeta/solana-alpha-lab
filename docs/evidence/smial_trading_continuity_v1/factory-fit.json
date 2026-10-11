@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1-FIT",
+  "as_of": "2026-10-11",
+  "task_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "Source-shaped V1 offline trading continuity repaired, with explicit partial outcome for V2 scientific identity.",
+    "flexibility_and_history": "Existing scientific manifest, append-only events, release hash semantics and legacy v1.0 preserved.",
+    "context_efficiency": "One checkout, exact contract, compact fixtures and receipts, focused impact checks; no pre-PR local full gate.",
+    "research_truth": "Canonical membership/recipe/source clocks; UNKNOWN and unsupported cohort/partial exit remain typed; no scientific promotion from engineering evidence.",
+    "owner_operability": "Russian next action, exact origin references, canonical root document links to CLI sequence and JSON inputs.",
+    "execution_to_cashflow": "Modeled fee/extra-cost/readback only; total-risk/equity/live/FCF NOT_ESTABLISHED.",
+    "monitoring_and_recovery": "Native fault/after-commit replay, delayed callback, no-route retention, snapshot readback and backup restore; inactive automatic exit remains operator path.",
+    "build_vs_buy": "ADOPT existing owners, WRAP ordinary offline CLI; BUILD only missing source/result caller and minimal confirmed defects; no dependency/service.",
+    "security": "Owned root strict paths/hardlink guard, no provider/wallet adapter, environment allowlist and egress canary, no credentials.",
+    "red_team": "O1-O8, conflicting replay, real connections, WAL/missing/corrupt state, delayed publication, unknown close, half-cent and complete identity sets; one symlink skip explicit."
+  },
+  "capability_radar": {
+    "now": "NONE: installed Git/gh, locked Python, existing SQLite/Catalog/recipes.",
+    "watch": "Separate version/PROMOTE identity decision, inventory/admission policy decision, then exact commissioning gate."
+  },
+  "recovery": "Preserve durable accepted events and inventory; resume exact uncertain attempt identity; source-owner conflict requires reconciliation. Ordinary revert for code/docs only; never delete retained science/runtime history.",
+  "limits": [
+    "NO_FULL_OFFLINE_CHAIN_VERIFIED_V2_BLOCKED",
+    "NO_ALPHA_OOS_PROFITABILITY",
+    "NO_LIVE_PROVIDER_DEPLOY_TRANSACTION",
+    "NO_REAL_SCIENCE_OR_ACTIVATION",
+    "NO_TOTAL_RISK_EQUITY_FCF",
+    "NO_NEW_ADMISSION_OR_VERSION_AUTHORITY",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}

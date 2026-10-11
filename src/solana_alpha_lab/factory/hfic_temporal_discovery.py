@@ -1029,6 +1029,33 @@ def _cell(
     return _select_cell(rows, deadline, exact_numeric=exact_numeric)
 
 
+def evaluate_episode_prefix(
+    body: Mapping[str, Any], *, grouped: Mapping[Any, Sequence[Mapping[str, Any]]],
+    cohort: str, episode_id: str, t0: datetime, decision_deadline: datetime,
+    point_window: Any,
+) -> dict[str, Any]:
+    """Use the scientific feature/predicate owner on a lazy, timely source prefix.
+
+    Membership coverage must be resolved by the caller before this is invoked.
+    No outcome point, population statistic or research trial is evaluated here.
+    """
+    values, details = {}, {}
+    for feature in body["features"]:
+        detail: dict[str, Any] = {}
+        value, blocker = _feature_value_with_lineage(
+            grouped, cohort=cohort, release="TIMELY_PREFIX", mint=episode_id,
+            anchor=t0, feature=feature, lateness=0,
+            decision_deadline=decision_deadline, point_window=point_window,
+            snapshot_policy=body["observation_clock_policy"],
+            time_clock=body["time_contract"]["time_feature_clock"], detail=detail,
+        )
+        values[feature["name"]] = value
+        details[feature["name"]] = {**detail, "lineage_blocker": blocker}
+    predicates = [_predicate_holds(values[p["feature"]], p) for p in body["predicates"]]
+    return {"action": "UNKNOWN" if None in predicates else "ENTER" if all(predicates) else "NO_ENTER",
+            "values": values, "details": details}
+
+
 def _predicate_holds(value: float | Fraction | None, predicate: Mapping[str, Any]) -> bool | None:
     if value is None:
         return None

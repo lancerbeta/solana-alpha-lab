@@ -1,0 +1,87 @@
+{
+  "baseline_binding": {
+    "base": "d244af69bfd7ddc2850b9e5e5823323956e325c4",
+    "frozen_modules": [
+      "paper_plane",
+      "trading_operations",
+      "paper_shadow_operations"
+    ],
+    "method": "FROZEN_BASE_MODULES_WITH_CURRENT_INDEPENDENT_BASELINE_PROBES",
+    "remaining_dependencies": "UNCHANGED_BASE_OWNERS"
+  },
+  "candidate_input_bindings": {
+    "scripts/prove_trading_continuity.py": "47760b71c6395b89e7d68741b9946f1af428692a6a2a4be23220f9283fad87d3",
+    "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
+    "src/solana_alpha_lab/factory/episode_decision.py": "cf91487ee2284e5bf476066b065658c45d6954a4005938dc264dfdf53a52fc93",
+    "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "cfa659476d2ca93592f0d5ff92c29c85d0ec31a5552f015dda001edb74c284ed",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "361522572d7ec2ef325d58f10c8a804ab020a14e1348406f864b968d8a388060",
+    "src/solana_alpha_lab/factory/opportunity_episode_release.py": "97c2a604f4b10523cb876f6a0a561b291d04ea46e5fb45c0d0917db5f911a0e7",
+    "src/solana_alpha_lab/factory/paper_plane.py": "645bd776dcb871584f23c28869043539a2a759e66f1c073ae41c6bddb9fe1662",
+    "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d97de9a333f6648f94208d8ffb2c1b2fd57e12bf4e04eee1acabc6696f4da0b1",
+    "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
+    "src/solana_alpha_lab/factory/trading_runner.py": "7bc1bb7af298b176356345443ec10cf12b00a39a3d333713fc378fbdbb7abd6e",
+    "tests/test_trading_continuity_v1.py": "e64a3ed2372e0f98d6136ea97323598adffc3776134a1ac0ca501cb3e21397c2"
+  },
+  "candidate_inputs_unchanged": true,
+  "candidate_test_sha256": "e64a3ed2372e0f98d6136ea97323598adffc3776134a1ac0ca501cb3e21397c2",
+  "egress_canary": "PASS",
+  "elapsed_seconds": 1.119,
+  "environment": "ALLOWLIST",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "executed_cases": [
+    {
+      "status": "FAIL",
+      "test": "test_conflicting_entry_result_cannot_rewrite_inventory (baseline_probe.ConfirmedBaselineDefects.test_conflicting_entry_result_cannot_rewrite_inventory)"
+    },
+    {
+      "status": "FAIL",
+      "test": "test_duplicate_entry_result_has_one_accounting_effect (baseline_probe.ConfirmedBaselineDefects.test_duplicate_entry_result_has_one_accounting_effect)"
+    },
+    {
+      "status": "FAIL",
+      "test": "test_mixed_mode_projection_has_no_combined_money_headline (baseline_probe.ConfirmedBaselineDefects.test_mixed_mode_projection_has_no_combined_money_headline)"
+    },
+    {
+      "status": "FAIL",
+      "test": "test_pause_after_admission_before_fill_dominates (baseline_probe.ConfirmedBaselineDefects.test_pause_after_admission_before_fill_dominates)"
+    },
+    {
+      "status": "FAIL",
+      "test": "test_reserved_admission_is_in_operator_entry_count (baseline_probe.ConfirmedBaselineDefects.test_reserved_admission_is_in_operator_entry_count)"
+    }
+  ],
+  "exit_code": 1,
+  "failure_boundaries": [
+    [
+      "test_conflicting_entry_result_cannot_rewrite_inventory (baseline_probe.ConfirmedBaselineDefects.test_conflicting_entry_result_cannot_rewrite_inventory)",
+      "AssertionError: PaperPlaneError not raised"
+    ],
+    [
+      "test_duplicate_entry_result_has_one_accounting_effect (baseline_probe.ConfirmedBaselineDefects.test_duplicate_entry_result_has_one_accounting_effect)",
+      "AssertionError: Lists differ: [{'ev[4607 chars]V1'}}, {'event_id': 'EVT-5A039B6B1EB44D88', 'e[723 chars]1'}}] != [{'ev[4607 chars]V1'}}]"
+    ],
+    [
+      "test_mixed_mode_projection_has_no_combined_money_headline (baseline_probe.ConfirmedBaselineDefects.test_mixed_mode_projection_has_no_combined_money_headline)",
+      "AssertionError: '-0.40' is not None"
+    ],
+    [
+      "test_pause_after_admission_before_fill_dominates (baseline_probe.ConfirmedBaselineDefects.test_pause_after_admission_before_fill_dominates)",
+      "AssertionError: 'OPEN' != 'CANCELLED'"
+    ],
+    [
+      "test_reserved_admission_is_in_operator_entry_count (baseline_probe.ConfirmedBaselineDefects.test_reserved_admission_is_in_operator_entry_count)",
+      "AssertionError: 0 != 1"
+    ]
+  ],
+  "observed_peak_bytes": 86016,
+  "output_sha256": "39c6a6850be984377410a06600b0992b0a1a08f32353e0a8c263e6e57c6f161f",
+  "owned_process_exit_code": 1,
+  "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
+  "phase": "baseline-replay",
+  "resource_measurement_n": 5,
+  "status": "FAIL",
+  "test_modules": [
+    "baseline_probe"
+  ]
+}

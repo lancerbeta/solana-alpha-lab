@@ -3109,6 +3109,10 @@ class ObservationScheduleStore:
             raise ObservationScheduleStoreError("EPISODE_ADMISSION_NOT_PLANNED")
 
     def _insert_episode_outbox(self, row: Mapping[str, Any], *, now: str) -> None:
+        payload = dict(row["row"])
+        if row["kind"] == "OBSERVATION":
+            # Source-owned first visibility survives canonical publication.
+            payload["ingested_visible_at"] = now
         self._conn.execute(
             """
             INSERT INTO episode_outbox(
@@ -3125,7 +3129,7 @@ class ObservationScheduleStore:
                 str(row["episode_id"]),
                 row.get("point_id"),
                 str(row["cohort_id"]),
-                json.dumps(dict(row["row"]), sort_keys=True),
+                json.dumps(payload, sort_keys=True),
                 now,
                 now,
             ),
@@ -3135,6 +3139,17 @@ class ObservationScheduleStore:
         payload = dict(row)
         payload["record"] = json.loads(payload.pop("record_json"))
         return payload
+
+    @contextmanager
+    def read_snapshot(self) -> Iterator["ObservationScheduleStore"]:
+        """One WAL-aware prefix read; never writes, checkpoints or shares handles."""
+        if self._conn.in_transaction:
+            raise ObservationScheduleStoreError("SNAPSHOT_ALREADY_ACTIVE")
+        self._conn.execute("BEGIN")
+        try:
+            yield self
+        finally:
+            self._conn.rollback()
 
     def get_episode_admission(self, episode_id: str) -> dict[str, Any] | None:
         row = self._conn.execute(
@@ -3445,8 +3460,35 @@ class ObservationScheduleStore:
         for row in rows:
             payload = dict(row)
             payload["row"] = json.loads(payload.pop("row_json"))
+            if payload["kind"] == "OBSERVATION":
+                payload["row"].setdefault("ingested_visible_at", payload["created_at"])
             decoded.append(payload)
         return decoded
+
+    def read_episode_observations(
+        self, *, schedule_sha256: str, activation_id: str, episode_id: str,
+        point_ids: Sequence[str], visible_by: datetime,
+    ) -> list[dict[str, Any]]:
+        """Read the bounded committed unpublished prefix.
+
+        Published rows live in the canonical publication, not this outbox.
+        This is source readback, not a mature research release. The caller
+        supplies exact points and its frozen cutoff; no future rows are read.
+        """
+        if visible_by.tzinfo is None or not point_ids or len(set(point_ids)) > 32:
+            raise ObservationScheduleStoreError("EPISODE_PREFIX_INPUT_INVALID")
+        points = sorted(set(str(point) for point in point_ids))
+        if any(not point.startswith("E") or not point[1:].isdigit() for point in points):
+            raise ObservationScheduleStoreError("EPISODE_PREFIX_INPUT_INVALID")
+        placeholders = ",".join("?" for _ in points)
+        rows = self._conn.execute(
+            "SELECT row_json, created_at FROM episode_outbox "
+            "WHERE schedule_sha256=? AND activation_id=? AND episode_id=? "
+            "AND kind='OBSERVATION' AND point_id IN (" + placeholders + ") "
+            "AND created_at<=? ORDER BY point_id, outbox_id",
+            [schedule_sha256, activation_id, episode_id, *points, render_utc(visible_by)],
+        ).fetchall()
+        return [{"row": json.loads(row["row_json"]), "visible_at": row["created_at"]} for row in rows]
 
     def mark_episode_outbox_published(
         self,

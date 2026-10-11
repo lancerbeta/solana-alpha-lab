@@ -11,6 +11,7 @@ from typing import Any
 from solana_alpha_lab.factory.paper_plane import (
     OPEN_RISK_STATES,
     OPERATOR_SETTLED_STATES,
+    PaperPlaneError,
     PaperPlaneStore,
 )
 
@@ -141,6 +142,45 @@ def compute_max_drawdown_usd(reconciled_rows: list[dict[str, Any]]) -> str | Non
         if dd > max_dd:
             max_dd = dd
     return format(max_dd, "f")
+
+
+def _modeled_attempt_costs(store: PaperPlaneStore, bot_ids: set[str]) -> dict[str, Any]:
+    """One cost per attempt's newest accepted observation, not per callback.
+
+    These additional modeled costs exclude entry/exit price-leg fees, which
+    already belong to trade PnL. Missing costs are unknown, including failures.
+    """
+    attempts, latest, final = {}, {}, set()
+    for event in store.execution_events():
+        if event.get("bot_instance_id") not in bot_ids:
+            continue
+        payload = event.get("payload") or {}
+        if event["event_type"] == "MODELED_ATTEMPT_STARTED":
+            attempts[event["event_id"]] = payload
+        elif event["event_type"] == "MODELED_RESULT_ACCEPTED":
+            result = payload.get("result")
+            if not isinstance(result, dict) or not result.get("attempt_id"):
+                raise PaperPlaneError("MODELED_RESULT_SOURCE_CORRUPT")
+            latest[result["attempt_id"]] = result
+        elif event["event_type"] == "MODELED_ATTEMPT_FINAL":
+            final.add(event["event_id"].removeprefix("FINAL-"))
+    known = Decimal("0")
+    unknown = 0
+    for identity in attempts:
+        result = latest.get(identity, {})
+        cost = result.get("chargeable_cost_usd")
+        if cost is None:
+            unknown += 1
+        else:
+            value = Decimal(str(cost))
+            if not value.is_finite() or value < 0:
+                raise PaperPlaneError("MODELED_RESULT_SOURCE_CORRUPT")
+            known += value
+    return {"attempt_n": len(attempts), "final_attempt_n": len(final),
+            "pending_attempt_n": len(set(attempts) - final), "unknown_cost_attempt_n": unknown,
+            "known_additional_cost_usd": format(known, "f") if attempts else None,
+            "additional_cost_status": "EMPTY" if not attempts else "UNKNOWN" if unknown else "KNOWN",
+            "basis": "ADDITIONAL_MODELED_COST_EXCLUDING_PRICE_LEG_FEES", "real_fill_claimed": False}
 
 
 def build_operations_projection(
@@ -319,10 +359,10 @@ def build_operations_projection(
             attention.append(
                 {
                     "code": "BOT_DRAINING",
-                    "WHY_NOW": "Bot stop requested with remaining inventory",
-                    "IMPACT": "Entries blocked; exits continue",
+                    "WHY_NOW": "Остановка запрошена; inventory ещё не reconciled",
+                    "IMPACT": "Новые входы запрещены; закрытие требует close/result evidence",
                     "EVIDENCE": f"bot.status=DRAINING:{b['bot_instance_id']}",
-                    "NEXT_SAFE_ACTION": "WAIT_DRAIN",
+                    "NEXT_SAFE_ACTION": "REQUEST_CLOSE_OR_RECONCILE_ATTEMPT",
                 }
             )
         if int(b.get("entries_paused") or 0) == 1:
@@ -368,7 +408,7 @@ def build_operations_projection(
             }
         )
 
-    return {
+    projection = {
         "as_of": as_of_value,
         "strategy": bot.get("strategy_id") if bot else None,
         "strategy_version": bot.get("strategy_version") if bot else None,
@@ -415,6 +455,48 @@ def build_operations_projection(
             1 for p in positions if str(p["state"]) in OPEN_RISK_STATES
         ),
     }
+    bindings = {(b.get("strategy_id"), b.get("strategy_version"), b.get("activation_epoch_id"), b.get("mode")) for b in bots}
+    classes = {p.get("pnl_evidence_class") for p in reconciled_raw if p.get("pnl_evidence_class")}
+    mixed = len(bindings) > 1 or len(classes) > 1
+    projection["aggregation_status"] = "MIXED_SCOPE" if mixed else "EXACT_SCOPE" if bots else "EMPTY"
+    projection["reconciled_trade_net_pnl_usd"] = projection["reconciled_net_pnl_usd"]
+    projection["reconciled_net_pnl_basis"] = "RECONCILED_TRADE_PRICE_LEG_FEES_ONLY"
+    costs = _modeled_attempt_costs(store, {b["bot_instance_id"] for b in bots})
+    projection["modeled_attempt_costs"] = costs
+    net_after = None
+    if not mixed and costs["attempt_n"] and costs["additional_cost_status"] == "KNOWN" and not costs["pending_attempt_n"]:
+        if all(p["state"] in {"RECONCILED", "CANCELLED"} for p in positions) and not unknown_reconciled:
+            net_after = (reconciled_net or Decimal("0")) - Decimal(costs["known_additional_cost_usd"])
+    projection["modeled_net_after_additional_costs_usd"] = None if net_after is None else format(net_after, "f")
+    if costs["attempt_n"] and (costs["unknown_cost_attempt_n"] or Decimal(costs["known_additional_cost_usd"]) != 0):
+        projection["reconciled_net_pnl_usd"] = None
+        projection["reconciled_net_pnl_status"] = "UNKNOWN"
+        projection["attention"].append({"code": "MODELED_COST_COMPONENTS_SEPARATE",
+            "WHY_NOW": "Затраты попыток учитываются отдельно от торгового PnL",
+            "IMPACT": "Общий денежный показатель не подтверждён одним trade PnL",
+            "EVIDENCE": "modeled_attempt_costs",
+            "NEXT_SAFE_ACTION": "READ_MODELED_COSTS_AND_SCOPE"})
+    if mixed:
+        for field in ("reconciled_net_pnl_usd", "current_loss_streak_count", "max_drawdown_usd", "known_open_exposure_usd"):
+            projection[field] = None
+        for field in ("reconciled_net_pnl_status", "current_loss_streak_status", "max_drawdown_status", "known_open_exposure_status"):
+            projection[field] = "UNKNOWN"
+        projection["reconciled_trade_net_pnl_usd"] = None
+        costs["known_additional_cost_usd"] = None
+        costs["additional_cost_status"] = "UNKNOWN"
+    fields = ("strategy", "strategy_version", "activation_epoch", "bot", "mode", "aggregation_status",
+              "reconciled_net_pnl_usd", "reconciled_net_pnl_status", "current_loss_streak_count",
+              "current_loss_streak_status", "max_drawdown_usd", "max_drawdown_status",
+              "known_open_exposure_usd", "known_open_exposure_status", "pnl_known_count", "pnl_unknown_count",
+              "modeled_attempt_costs", "modeled_net_after_additional_costs_usd", "reconciled_trade_net_pnl_usd")
+    if len(bots) > 1:
+        projection["economics_scopes"] = [
+            {key: value for key, value in build_operations_projection(store, as_of=as_of_value, bot_instance_id=b["bot_instance_id"]).items() if key in fields}
+            for b in sorted(bots, key=lambda item: item["bot_instance_id"])
+        ]
+    else:
+        projection["economics_scopes"] = [{key: projection[key] for key in fields}] if bots else []
+    return projection
 
 
 def build_economics_projection(

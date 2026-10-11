@@ -8,6 +8,13 @@ Catalog document: `DOC-TRADING-RUNTIME-POLICY-001`
 Semantic route: `SEM-OWNER-LIFECYCLE` (existing; no new route)
 Storage owner: PaperPlaneStore (`paper_plane_state.sqlite`)
 
+The ordinary offline runner uses the same policy/admission owner and frozen
+revision/notional/fee bindings: `docs/contracts/episode_decision_continuity_v1.md`.
+Entry-admission count, possible inventory, operator-settled and drain-clear
+remain distinct. Correcting a consumer count does not add EXIT_*/UNRESOLVED to
+entry veto. A pending entry is rechecked for pause/stop/stale/invalid policy
+before a modeled attempt. Exit reconciliation remains available during drain.
+
 ```text
 authority_granted = false
 LIVE = NOT_SUPPORTED

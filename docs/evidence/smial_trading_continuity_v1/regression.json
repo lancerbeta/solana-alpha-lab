@@ -1,0 +1,842 @@
+{
+  "candidate_input_bindings": {
+    "scripts/prove_trading_continuity.py": "47760b71c6395b89e7d68741b9946f1af428692a6a2a4be23220f9283fad87d3",
+    "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
+    "src/solana_alpha_lab/factory/episode_decision.py": "cf91487ee2284e5bf476066b065658c45d6954a4005938dc264dfdf53a52fc93",
+    "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "cfa659476d2ca93592f0d5ff92c29c85d0ec31a5552f015dda001edb74c284ed",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "361522572d7ec2ef325d58f10c8a804ab020a14e1348406f864b968d8a388060",
+    "src/solana_alpha_lab/factory/opportunity_episode_release.py": "97c2a604f4b10523cb876f6a0a561b291d04ea46e5fb45c0d0917db5f911a0e7",
+    "src/solana_alpha_lab/factory/paper_plane.py": "645bd776dcb871584f23c28869043539a2a759e66f1c073ae41c6bddb9fe1662",
+    "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d97de9a333f6648f94208d8ffb2c1b2fd57e12bf4e04eee1acabc6696f4da0b1",
+    "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
+    "src/solana_alpha_lab/factory/trading_runner.py": "7bc1bb7af298b176356345443ec10cf12b00a39a3d333713fc378fbdbb7abd6e",
+    "tests/test_trading_continuity_v1.py": "e64a3ed2372e0f98d6136ea97323598adffc3776134a1ac0ca501cb3e21397c2"
+  },
+  "candidate_inputs_unchanged": true,
+  "candidate_test_sha256": "e64a3ed2372e0f98d6136ea97323598adffc3776134a1ac0ca501cb3e21397c2",
+  "egress_canary": "PASS",
+  "elapsed_seconds": 42.724,
+  "environment": "ALLOWLIST",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "executed_cases": [
+    {
+      "status": "ok",
+      "test": "test_activation_epoch_separates_bots (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_activation_epoch_separates_bots)"
+    },
+    {
+      "status": "ok",
+      "test": "test_closed_enter_returns_real_state (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_closed_enter_returns_real_state)"
+    },
+    {
+      "status": "ok",
+      "test": "test_decision_schemas_validate (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_decision_schemas_validate)"
+    },
+    {
+      "status": "ok",
+      "test": "test_enter_opens_through_canonical_signal (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_enter_opens_through_canonical_signal)"
+    },
+    {
+      "status": "ok",
+      "test": "test_enter_rejects_epoch_mismatch_on_existing_signal (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_enter_rejects_epoch_mismatch_on_existing_signal)"
+    },
+    {
+      "status": "ok",
+      "test": "test_exit_decision_advances_without_fill_claim (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_exit_decision_advances_without_fill_claim)"
+    },
+    {
+      "status": "ok",
+      "test": "test_exit_rejects_epoch_mismatch (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_exit_rejects_epoch_mismatch)"
+    },
+    {
+      "status": "ok",
+      "test": "test_future_available_enter_forbidden (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_future_available_enter_forbidden)"
+    },
+    {
+      "status": "ok",
+      "test": "test_legacy_v1_0_loads_and_behaves (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_legacy_v1_0_loads_and_behaves)"
+    },
+    {
+      "status": "ok",
+      "test": "test_missing_activation_fails_closed (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_missing_activation_fails_closed)"
+    },
+    {
+      "status": "ok",
+      "test": "test_non_enter_actions_do_not_open (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_non_enter_actions_do_not_open)"
+    },
+    {
+      "status": "ok",
+      "test": "test_resume_incomplete_enter_lifecycle (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_resume_incomplete_enter_lifecycle)"
+    },
+    {
+      "status": "ok",
+      "test": "test_same_mint_distinct_signal_ids (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_same_mint_distinct_signal_ids)"
+    },
+    {
+      "status": "ok",
+      "test": "test_same_signal_idempotent (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_same_signal_idempotent)"
+    },
+    {
+      "status": "ok",
+      "test": "test_shadow_mode_uses_shadow_executable (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_shadow_mode_uses_shadow_executable)"
+    },
+    {
+      "status": "ok",
+      "test": "test_sqlite_migration_idempotent_on_legacy_reopen (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_sqlite_migration_idempotent_on_legacy_reopen)"
+    },
+    {
+      "status": "ok",
+      "test": "test_stale_signal_and_max_open_enforced (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_stale_signal_and_max_open_enforced)"
+    },
+    {
+      "status": "ok",
+      "test": "test_v1_1_path_does_not_call_signal_kind_for (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_v1_1_path_does_not_call_signal_kind_for)"
+    },
+    {
+      "status": "ok",
+      "test": "test_v1_1_rejects_feature_fields (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_v1_1_rejects_feature_fields)"
+    },
+    {
+      "status": "ok",
+      "test": "test_v1_1_schema_accepts_candidates_without_feature_names (tests.test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_v1_1_schema_accepts_candidates_without_feature_names)"
+    },
+    {
+      "status": "ok",
+      "test": "test_decimal_fixture_pnl_streak_drawdown (tests.test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_decimal_fixture_pnl_streak_drawdown)"
+    },
+    {
+      "status": "ok",
+      "test": "test_entry_fee_required_and_no_terminal_resurrect (tests.test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_entry_fee_required_and_no_terminal_resurrect)"
+    },
+    {
+      "status": "ok",
+      "test": "test_loss_streak_unknown_when_latest_unknown (tests.test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_loss_streak_unknown_when_latest_unknown)"
+    },
+    {
+      "status": "ok",
+      "test": "test_pause_close_all_stop_drain_idempotent (tests.test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_pause_close_all_stop_drain_idempotent)"
+    },
+    {
+      "status": "ok",
+      "test": "test_pause_resume_happy_path (tests.test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_pause_resume_happy_path)"
+    },
+    {
+      "status": "ok",
+      "test": "test_shadow_evidence_class_separate (tests.test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_shadow_evidence_class_separate)"
+    },
+    {
+      "status": "ok",
+      "test": "test_smoke_script_pass (tests.test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_smoke_script_pass)"
+    },
+    {
+      "status": "ok",
+      "test": "test_as_of_is_required (tests.test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_as_of_is_required)"
+    },
+    {
+      "status": "ok",
+      "test": "test_exit_decision_version_must_match_the_position (tests.test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_exit_decision_version_must_match_the_position)"
+    },
+    {
+      "status": "ok",
+      "test": "test_future_decision_is_rejected_beyond_skew (tests.test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_future_decision_is_rejected_beyond_skew)"
+    },
+    {
+      "status": "ok",
+      "test": "test_one_id_binds_one_body (tests.test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_one_id_binds_one_body)"
+    },
+    {
+      "status": "ok",
+      "test": "test_position_lineage_is_queryable_from_the_store (tests.test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_position_lineage_is_queryable_from_the_store)"
+    },
+    {
+      "status": "ok",
+      "test": "test_strategy_spec_drift_fails_closed (tests.test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_strategy_spec_drift_fails_closed)"
+    },
+    {
+      "status": "ok",
+      "test": "test_cancel_rules (tests.test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_cancel_rules)"
+    },
+    {
+      "status": "ok",
+      "test": "test_cancelled_intent_releases_its_entry_slot (tests.test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_cancelled_intent_releases_its_entry_slot)"
+    },
+    {
+      "status": "ok",
+      "test": "test_close_all_cancels_pre_attempt_and_skips_in_flight (tests.test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_close_all_cancels_pre_attempt_and_skips_in_flight)"
+    },
+    {
+      "status": "ok",
+      "test": "test_close_position_cancels_a_pre_attempt_intent (tests.test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_close_position_cancels_a_pre_attempt_intent)"
+    },
+    {
+      "status": "ok",
+      "test": "test_consumers_treat_cancelled_as_settled_without_pnl (tests.test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_consumers_treat_cancelled_as_settled_without_pnl)"
+    },
+    {
+      "status": "ok",
+      "test": "test_entry_fill_is_bound_to_the_admission (tests.test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_entry_fill_is_bound_to_the_admission)"
+    },
+    {
+      "status": "ok",
+      "test": "test_retry_never_fills_an_in_flight_attempt (tests.test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_retry_never_fills_an_in_flight_attempt)"
+    },
+    {
+      "status": "ok",
+      "test": "test_stale_resume_cancels_the_reserved_intent (tests.test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_stale_resume_cancels_the_reserved_intent)"
+    },
+    {
+      "status": "ok",
+      "test": "test_stop_bot_cancels_pre_attempt_intents_and_reaches_stopped (tests.test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_stop_bot_cancels_pre_attempt_intents_and_reaches_stopped)"
+    },
+    {
+      "status": "ok",
+      "test": "test_stops_cancel_reserved_intents_instead_of_opening_them (tests.test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_stops_cancel_reserved_intents_instead_of_opening_them)"
+    },
+    {
+      "status": "ok",
+      "test": "test_lifecycle_and_http_read_the_same_live_position_owner (tests.test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_lifecycle_and_http_read_the_same_live_position_owner)"
+    },
+    {
+      "status": "ok",
+      "test": "test_missing_and_corrupt_source_never_bootstraps_or_all_clears (tests.test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_missing_and_corrupt_source_never_bootstraps_or_all_clears)"
+    },
+    {
+      "status": "ok",
+      "test": "test_non_wal_compatibility_is_readonly_without_business_writes (tests.test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_non_wal_compatibility_is_readonly_without_business_writes)"
+    },
+    {
+      "status": "ok",
+      "test": "test_one_projection_snapshot_and_next_request_freshness (tests.test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_one_projection_snapshot_and_next_request_freshness)"
+    },
+    {
+      "status": "ok",
+      "test": "test_os_denies_source_access_without_bootstrap_or_stale_fallback (tests.test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_os_denies_source_access_without_bootstrap_or_stale_fallback)"
+    },
+    {
+      "status": "ok",
+      "test": "test_overlapping_http_gets_do_not_close_each_others_reader (tests.test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_overlapping_http_gets_do_not_close_each_others_reader)"
+    },
+    {
+      "status": "ok",
+      "test": "test_public_live_wal_position_policy_and_next_read_two_repetitions (tests.test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_public_live_wal_position_policy_and_next_read_two_repetitions)"
+    },
+    {
+      "status": "ok",
+      "test": "test_read_failure_does_not_reuse_success_or_infer_empty_runtime (tests.test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_read_failure_does_not_reuse_success_or_infer_empty_runtime)"
+    },
+    {
+      "status": "ok",
+      "test": "test_accept_fill_is_atomic_with_intent_events (tests.test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_accept_fill_is_atomic_with_intent_events)"
+    },
+    {
+      "status": "ok",
+      "test": "test_close_request_serializes_with_concurrent_exit_fill (tests.test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_close_request_serializes_with_concurrent_exit_fill)"
+    },
+    {
+      "status": "ok",
+      "test": "test_close_vs_exit_race_never_regresses_or_duplicates (tests.test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_close_vs_exit_race_never_regresses_or_duplicates)"
+    },
+    {
+      "status": "ok",
+      "test": "test_concurrent_same_signal_accept_writes_intent_events_once (tests.test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_concurrent_same_signal_accept_writes_intent_events_once)"
+    },
+    {
+      "status": "ok",
+      "test": "test_entry_fill_is_atomic_with_its_event (tests.test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_entry_fill_is_atomic_with_its_event)"
+    },
+    {
+      "status": "ok",
+      "test": "test_execution_events_are_returned_in_causal_order (tests.test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_execution_events_are_returned_in_causal_order)"
+    },
+    {
+      "status": "ok",
+      "test": "test_exit_fill_is_atomic_with_its_events (tests.test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_exit_fill_is_atomic_with_its_events)"
+    },
+    {
+      "status": "ok",
+      "test": "test_operator_command_is_atomic_with_its_record (tests.test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_operator_command_is_atomic_with_its_record)"
+    },
+    {
+      "status": "ok",
+      "test": "test_unresolved_exit_is_atomic_with_its_reconciliation_event (tests.test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_unresolved_exit_is_atomic_with_its_reconciliation_event)"
+    },
+    {
+      "status": "ok",
+      "test": "test_crash_after_allow_retry_keeps_binding (tests.test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_crash_after_allow_retry_keeps_binding)"
+    },
+    {
+      "status": "ok",
+      "test": "test_policy_apply_and_enter_do_not_mix_revisions (tests.test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_policy_apply_and_enter_do_not_mix_revisions)"
+    },
+    {
+      "status": "ok",
+      "test": "test_same_signal_retry_one_position (tests.test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_same_signal_retry_one_position)"
+    },
+    {
+      "status": "ok",
+      "test": "test_shared_store_two_threads_one_remaining_slot (tests.test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_shared_store_two_threads_one_remaining_slot)"
+    },
+    {
+      "status": "ok",
+      "test": "test_two_distinct_enters_one_remaining_slot (tests.test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_two_distinct_enters_one_remaining_slot)"
+    },
+    {
+      "status": "ok",
+      "test": "test_paper_plane_sqlite_is_a_mutable_backup_source (tests.test_trading_runtime_policy_backup_restore_v1.TradingRuntimePolicyBackupRestoreTests.test_paper_plane_sqlite_is_a_mutable_backup_source)"
+    },
+    {
+      "status": "ok",
+      "test": "test_policy_revision_survives_file_copy_restore (tests.test_trading_runtime_policy_backup_restore_v1.TradingRuntimePolicyBackupRestoreTests.test_policy_revision_survives_file_copy_restore)"
+    },
+    {
+      "status": "ok",
+      "test": "test_absent_policy_keeps_bot_local_strategy_version_max_open (tests.test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_absent_policy_keeps_bot_local_strategy_version_max_open)"
+    },
+    {
+      "status": "ok",
+      "test": "test_absent_policy_preserves_strategy_only_paper_and_shadow (tests.test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_absent_policy_preserves_strategy_only_paper_and_shadow)"
+    },
+    {
+      "status": "ok",
+      "test": "test_capability_phrase_is_not_a_runtime_value (tests.test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_capability_phrase_is_not_a_runtime_value)"
+    },
+    {
+      "status": "ok",
+      "test": "test_check_classifies_tightening (tests.test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_check_classifies_tightening)"
+    },
+    {
+      "status": "ok",
+      "test": "test_entry_stop_and_revision_semantics (tests.test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_entry_stop_and_revision_semantics)"
+    },
+    {
+      "status": "ok",
+      "test": "test_invalid_policy_blocks_new_entry_exit_continues (tests.test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_invalid_policy_blocks_new_entry_exit_continues)"
+    },
+    {
+      "status": "ok",
+      "test": "test_missing_strategy_id_fail_closes_family_notional_cap (tests.test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_missing_strategy_id_fail_closes_family_notional_cap)"
+    },
+    {
+      "status": "ok",
+      "test": "test_paper_shadow_isolation_and_live_denied (tests.test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_paper_shadow_isolation_and_live_denied)"
+    },
+    {
+      "status": "ok",
+      "test": "test_position_and_notional_caps (tests.test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_position_and_notional_caps)"
+    },
+    {
+      "status": "ok",
+      "test": "test_readonly_get_does_not_create_or_apply (tests.test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_readonly_get_does_not_create_or_apply)"
+    },
+    {
+      "status": "ok",
+      "test": "test_sizing_min_and_no_headroom_shrink (tests.test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_sizing_min_and_no_headroom_shrink)"
+    },
+    {
+      "status": "ok",
+      "test": "test_unknown_open_risk_blocks_historical_does_not (tests.test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_unknown_open_risk_blocks_historical_does_not)"
+    },
+    {
+      "status": "ok",
+      "test": "test_valid_policy_resume_without_frozen_binding_fails_closed (tests.test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_valid_policy_resume_without_frozen_binding_fails_closed)"
+    },
+    {
+      "status": "ok",
+      "test": "test_scope_is_part_of_identity_and_legacy_cards_are_unchanged (tests.test_hfic_research_scope_v1.CandidateIdentityTests.test_scope_is_part_of_identity_and_legacy_cards_are_unchanged)"
+    },
+    {
+      "status": "ok",
+      "test": "test_prompt_and_skill_point_at_the_list_context (tests.test_hfic_research_scope_v1.FormulationVisibilityTests.test_prompt_and_skill_point_at_the_list_context)"
+    },
+    {
+      "status": "ok",
+      "test": "test_membership_at_t0_unknown_before_availability (tests.test_hfic_research_scope_v1.LocalSnapshotTests.test_membership_at_t0_unknown_before_availability)"
+    },
+    {
+      "status": "ok",
+      "test": "test_registration_exact_repeat_conflict_and_no_backdating (tests.test_hfic_research_scope_v1.LocalSnapshotTests.test_registration_exact_repeat_conflict_and_no_backdating)"
+    },
+    {
+      "status": "ok",
+      "test": "test_edited_availability_is_store_corruption (tests.test_hfic_research_scope_v1.RegistrationIntegrityTests.test_edited_availability_is_store_corruption)"
+    },
+    {
+      "status": "ok",
+      "test": "test_capsules_carry_the_rule_and_stay_distinct (tests.test_hfic_research_scope_v1.ScopedPriorMemoryTests.test_capsules_carry_the_rule_and_stay_distinct)"
+    },
+    {
+      "status": "ok",
+      "test": "test_look_scope_relation_separates_scopes (tests.test_hfic_research_scope_v1.ScopedPriorMemoryTests.test_look_scope_relation_separates_scopes)"
+    },
+    {
+      "status": "ok",
+      "test": "test_aliases_ambiguity_refused (tests.test_hfic_research_scope_v1.SelectorTests.test_aliases_ambiguity_refused)"
+    },
+    {
+      "status": "ok",
+      "test": "test_coverage_is_part_of_semantics (tests.test_hfic_research_scope_v1.SelectorTests.test_coverage_is_part_of_semantics)"
+    },
+    {
+      "status": "ok",
+      "test": "test_five_lists_truth_table_without_enumerating_in_production (tests.test_hfic_research_scope_v1.SelectorTests.test_five_lists_truth_table_without_enumerating_in_production)"
+    },
+    {
+      "status": "ok",
+      "test": "test_hash_invariance_and_alias_dedup (tests.test_hfic_research_scope_v1.SelectorTests.test_hash_invariance_and_alias_dedup)"
+    },
+    {
+      "status": "ok",
+      "test": "test_literal_sets (tests.test_hfic_research_scope_v1.SelectorTests.test_literal_sets)"
+    },
+    {
+      "status": "ok",
+      "test": "test_strict_errors (tests.test_hfic_research_scope_v1.SelectorTests.test_strict_errors)"
+    },
+    {
+      "status": "ok",
+      "test": "test_statement_is_rendered_from_the_machine_body (tests.test_hfic_research_scope_v1.StatementTests.test_statement_is_rendered_from_the_machine_body)"
+    },
+    {
+      "status": "ok",
+      "test": "test_gap_never_becomes_zero_and_stays_in_base (tests.test_opportunity_episodes_contract_v1.EvaluatorLiteralTests.test_gap_never_becomes_zero_and_stays_in_base)"
+    },
+    {
+      "status": "ok",
+      "test": "test_late_feature_value_is_not_timely (tests.test_opportunity_episodes_contract_v1.EvaluatorLiteralTests.test_late_feature_value_is_not_timely)"
+    },
+    {
+      "status": "ok",
+      "test": "test_prd_numeric_witness (tests.test_opportunity_episodes_contract_v1.EvaluatorLiteralTests.test_prd_numeric_witness)"
+    },
+    {
+      "status": "ok",
+      "test": "test_witness_e0_and_long_points_through_reader (tests.test_opportunity_episodes_contract_v1.EvaluatorLiteralTests.test_witness_e0_and_long_points_through_reader)"
+    },
+    {
+      "status": "ok",
+      "test": "test_exact_pin_loads_its_exact_bytes (tests.test_opportunity_episodes_contract_v1.FrozenProtectionPinTests.test_exact_pin_loads_its_exact_bytes)"
+    },
+    {
+      "status": "ok",
+      "test": "test_export_cli_gives_an_actionable_next_only_on_the_episode_path (tests.test_opportunity_episodes_contract_v1.FrozenProtectionPinTests.test_export_cli_gives_an_actionable_next_only_on_the_episode_path)"
+    },
+    {
+      "status": "ok",
+      "test": "test_incomplete_assignment_is_refused_even_when_pinned (tests.test_opportunity_episodes_contract_v1.FrozenProtectionPinTests.test_incomplete_assignment_is_refused_even_when_pinned)"
+    },
+    {
+      "status": "ok",
+      "test": "test_missing_is_refused (tests.test_opportunity_episodes_contract_v1.FrozenProtectionPinTests.test_missing_is_refused)"
+    },
+    {
+      "status": "ok",
+      "test": "test_pins_must_be_non_empty_unique_and_well_formed (tests.test_opportunity_episodes_contract_v1.FrozenProtectionPinTests.test_pins_must_be_non_empty_unique_and_well_formed)"
+    },
+    {
+      "status": "ok",
+      "test": "test_substituted_valid_assignment_is_refused (tests.test_opportunity_episodes_contract_v1.FrozenProtectionPinTests.test_substituted_valid_assignment_is_refused)"
+    },
+    {
+      "status": "skipped 'symlinks unavailable'",
+      "test": "test_symlink_is_refused (tests.test_opportunity_episodes_contract_v1.FrozenProtectionPinTests.test_symlink_is_refused)"
+    },
+    {
+      "status": "ok",
+      "test": "test_unreadable_is_refused (tests.test_opportunity_episodes_contract_v1.FrozenProtectionPinTests.test_unreadable_is_refused)"
+    },
+    {
+      "status": "ok",
+      "test": "test_wrong_identity_is_refused (tests.test_opportunity_episodes_contract_v1.FrozenProtectionPinTests.test_wrong_identity_is_refused)"
+    },
+    {
+      "status": "ok",
+      "test": "test_episode_schedule_is_not_a_legacy_document (tests.test_opportunity_episodes_contract_v1.LegacyInvariantTests.test_episode_schedule_is_not_a_legacy_document)"
+    },
+    {
+      "status": "ok",
+      "test": "test_grounded_base_x_refuses_episode_points_and_episode_binding (tests.test_opportunity_episodes_contract_v1.LegacyInvariantTests.test_grounded_base_x_refuses_episode_points_and_episode_binding)"
+    },
+    {
+      "status": "ok",
+      "test": "test_legacy_query_identity_and_point_grid_unchanged (tests.test_opportunity_episodes_contract_v1.LegacyInvariantTests.test_legacy_query_identity_and_point_grid_unchanged)"
+    },
+    {
+      "status": "ok",
+      "test": "test_legacy_schedule_identity_unchanged (tests.test_opportunity_episodes_contract_v1.LegacyInvariantTests.test_legacy_schedule_identity_unchanged)"
+    },
+    {
+      "status": "ok",
+      "test": "test_template_is_not_activatable_without_commissioning (tests.test_opportunity_episodes_contract_v1.LegacyInvariantTests.test_template_is_not_activatable_without_commissioning)"
+    },
+    {
+      "status": "ok",
+      "test": "test_capture_floor_and_asset_exclusion (tests.test_opportunity_episodes_contract_v1.ProtectionAndFrameTests.test_capture_floor_and_asset_exclusion)"
+    },
+    {
+      "status": "ok",
+      "test": "test_decisions_per_identity_and_interval (tests.test_opportunity_episodes_contract_v1.ProtectionAndFrameTests.test_decisions_per_identity_and_interval)"
+    },
+    {
+      "status": "ok",
+      "test": "test_dedupe_fresh_fail_and_incomplete_round (tests.test_opportunity_episodes_contract_v1.ProtectionAndFrameTests.test_dedupe_fresh_fail_and_incomplete_round)"
+    },
+    {
+      "status": "ok",
+      "test": "test_inventory_fail_closed (tests.test_opportunity_episodes_contract_v1.ProtectionAndFrameTests.test_inventory_fail_closed)"
+    },
+    {
+      "status": "ok",
+      "test": "test_protected_values_never_reach_value_projection (tests.test_opportunity_episodes_contract_v1.ProtectionAndFrameTests.test_protected_values_never_reach_value_projection)"
+    },
+    {
+      "status": "ok",
+      "test": "test_exit_must_follow_decision_cutoff_and_features_precede (tests.test_opportunity_episodes_contract_v1.QueryGuardTests.test_exit_must_follow_decision_cutoff_and_features_precede)"
+    },
+    {
+      "status": "ok",
+      "test": "test_focus_population_guard_both_directions (tests.test_opportunity_episodes_contract_v1.QueryGuardTests.test_focus_population_guard_both_directions)"
+    },
+    {
+      "status": "ok",
+      "test": "test_mixed_schedule_clocks_refused_in_evaluator (tests.test_opportunity_episodes_contract_v1.QueryGuardTests.test_mixed_schedule_clocks_refused_in_evaluator)"
+    },
+    {
+      "status": "ok",
+      "test": "test_more_than_eight_points_refused (tests.test_opportunity_episodes_contract_v1.QueryGuardTests.test_more_than_eight_points_refused)"
+    },
+    {
+      "status": "ok",
+      "test": "test_population_anchor_and_namespace_refusals (tests.test_opportunity_episodes_contract_v1.QueryGuardTests.test_population_anchor_and_namespace_refusals)"
+    },
+    {
+      "status": "ok",
+      "test": "test_wrong_binding_population_refused_before_values (tests.test_opportunity_episodes_contract_v1.QueryGuardTests.test_wrong_binding_population_refused_before_values)"
+    },
+    {
+      "status": "ok",
+      "test": "test_grid_shape_and_on_grid_instant (tests.test_opportunity_episodes_contract_v1.ResolverLiteralTests.test_grid_shape_and_on_grid_instant)"
+    },
+    {
+      "status": "ok",
+      "test": "test_prd_vector_clocks_are_literal (tests.test_opportunity_episodes_contract_v1.ResolverLiteralTests.test_prd_vector_clocks_are_literal)"
+    },
+    {
+      "status": "ok",
+      "test": "test_unknown_binding_is_refused_before_values (tests.test_opportunity_episodes_contract_v1.ResolverLiteralTests.test_unknown_binding_is_refused_before_values)"
+    },
+    {
+      "status": "ok",
+      "test": "test_round_quota_sums_without_carry (tests.test_opportunity_episodes_contract_v1.TicketAndQuotaTests.test_round_quota_sums_without_carry)"
+    },
+    {
+      "status": "ok",
+      "test": "test_selection_invariant_to_source_order_and_blocks (tests.test_opportunity_episodes_contract_v1.TicketAndQuotaTests.test_selection_invariant_to_source_order_and_blocks)"
+    },
+    {
+      "status": "ok",
+      "test": "test_tickets_stable_and_cycle_scoped (tests.test_opportunity_episodes_contract_v1.TicketAndQuotaTests.test_tickets_stable_and_cycle_scoped)"
+    },
+    {
+      "status": "ok",
+      "test": "test_duplicate_manifest_paths_fail_closed (tests.test_execution_domain_modularity_and_fast_ci_v1.ExecutionDomainModularityTests.test_duplicate_manifest_paths_fail_closed)"
+    },
+    {
+      "status": "ok",
+      "test": "test_execution_runner_rejects_missing_reserved_module (tests.test_execution_domain_modularity_and_fast_ci_v1.ExecutionDomainModularityTests.test_execution_runner_rejects_missing_reserved_module)"
+    },
+    {
+      "status": "ok",
+      "test": "test_general_shards_exclude_reserved_modules (tests.test_execution_domain_modularity_and_fast_ci_v1.ExecutionDomainModularityTests.test_general_shards_exclude_reserved_modules)"
+    },
+    {
+      "status": "ok",
+      "test": "test_live_manifest_passes_boundary (tests.test_execution_domain_modularity_and_fast_ci_v1.ExecutionDomainModularityTests.test_live_manifest_passes_boundary)"
+    },
+    {
+      "status": "ok",
+      "test": "test_missing_contract_path_fails_closed (tests.test_execution_domain_modularity_and_fast_ci_v1.ExecutionDomainModularityTests.test_missing_contract_path_fails_closed)"
+    },
+    {
+      "status": "ok",
+      "test": "test_paper_plane_to_application_is_rejected_in_fixture (tests.test_execution_domain_modularity_and_fast_ci_v1.ExecutionDomainModularityTests.test_paper_plane_to_application_is_rejected_in_fixture)"
+    },
+    {
+      "status": "ok",
+      "test": "test_parent_traversal_path_rejected (tests.test_execution_domain_modularity_and_fast_ci_v1.ExecutionDomainModularityTests.test_parent_traversal_path_rejected)"
+    },
+    {
+      "status": "ok",
+      "test": "test_relative_import_to_application_is_rejected (tests.test_execution_domain_modularity_and_fast_ci_v1.ExecutionDomainModularityTests.test_relative_import_to_application_is_rejected)"
+    },
+    {
+      "status": "ok",
+      "test": "test_subtract_reserved_modules_fails_on_stale_manifest_entry (tests.test_execution_domain_modularity_and_fast_ci_v1.ExecutionDomainModularityTests.test_subtract_reserved_modules_fails_on_stale_manifest_entry)"
+    },
+    {
+      "status": "ok",
+      "test": "test_subtract_reserved_modules_removes_only_declared_modules (tests.test_execution_domain_modularity_and_fast_ci_v1.ExecutionDomainModularityTests.test_subtract_reserved_modules_removes_only_declared_modules)"
+    },
+    {
+      "status": "ok",
+      "test": "test_undeclared_test_importer_fails_closed (tests.test_execution_domain_modularity_and_fast_ci_v1.ExecutionDomainModularityTests.test_undeclared_test_importer_fails_closed)"
+    },
+    {
+      "status": "ok",
+      "test": "test_check_mismatch_does_not_report_materialized (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_check_mismatch_does_not_report_materialized)"
+    },
+    {
+      "status": "ok",
+      "test": "test_check_rejects_tampered_manifest (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_check_rejects_tampered_manifest)"
+    },
+    {
+      "status": "ok",
+      "test": "test_coerced_execution_inputs_are_gaps (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_coerced_execution_inputs_are_gaps)"
+    },
+    {
+      "status": "ok",
+      "test": "test_deterministic_render_and_snapshot_meaning (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_deterministic_render_and_snapshot_meaning)"
+    },
+    {
+      "status": "ok",
+      "test": "test_handoff_contract_names_manifest_1_1_when_binding_is_present (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_handoff_contract_names_manifest_1_1_when_binding_is_present)"
+    },
+    {
+      "status": "ok",
+      "test": "test_materialized_keeps_evidence_hash_conflict (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_materialized_keeps_evidence_hash_conflict)"
+    },
+    {
+      "status": "ok",
+      "test": "test_mismatched_decision_event_or_clock_is_invalid (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_mismatched_decision_event_or_clock_is_invalid)"
+    },
+    {
+      "status": "ok",
+      "test": "test_overview_ready_is_not_available (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_overview_ready_is_not_available)"
+    },
+    {
+      "status": "ok",
+      "test": "test_scenario_a_happy_path_vertical (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_a_happy_path_vertical)"
+    },
+    {
+      "status": "ok",
+      "test": "test_scenario_b_later_evidence_does_not_rewrite_manifest (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_b_later_evidence_does_not_rewrite_manifest)"
+    },
+    {
+      "status": "ok",
+      "test": "test_scenario_c_legacy_promote_is_explicit_gap (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_c_legacy_promote_is_explicit_gap)"
+    },
+    {
+      "status": "ok",
+      "test": "test_scenario_d_execution_input_gap (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_d_execution_input_gap)"
+    },
+    {
+      "status": "ok",
+      "test": "test_scenario_e_and_f_collision_and_replay (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_e_and_f_collision_and_replay)"
+    },
+    {
+      "status": "ok",
+      "test": "test_scenario_g_get_is_non_mutating (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_g_get_is_non_mutating)"
+    },
+    {
+      "status": "ok",
+      "test": "test_scenario_h_no_activation (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_h_no_activation)"
+    },
+    {
+      "status": "ok",
+      "test": "test_semantic_gold_query (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_semantic_gold_query)"
+    },
+    {
+      "status": "ok",
+      "test": "test_unreadable_strategy_file_is_conflict (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_unreadable_strategy_file_is_conflict)"
+    },
+    {
+      "status": "ok",
+      "test": "test_verify_rejects_lineage_or_clock_mismatch (tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_verify_rejects_lineage_or_clock_mismatch)"
+    },
+    {
+      "status": "ok",
+      "test": "test_binding_identity_must_match_manifest_science (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_binding_identity_must_match_manifest_science)"
+    },
+    {
+      "status": "ok",
+      "test": "test_freeze_v1_1_requires_direct_evidence_coverage (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_freeze_v1_1_requires_direct_evidence_coverage)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t10_tested_100_requested_10_mismatch (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t10_tested_100_requested_10_mismatch)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t11_entry_only_retained (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t11_entry_only_retained)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t12_provider_failure_unknown_count (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t12_provider_failure_unknown_count)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t13_missing_fee_assumption_gap (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t13_missing_fee_assumption_gap)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t14_fee_assumption_mismatch (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t14_fee_assumption_mismatch)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t15_no_friction_field_in_binding (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t15_no_friction_field_in_binding)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t16_t17_strategy_schema_unchanged (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t16_t17_strategy_schema_unchanged)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t18_promote_requires_binding (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t18_promote_requires_binding)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t18b_promote_blocked_without_binding_obligation (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t18b_promote_blocked_without_binding_obligation)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t19_check_render_verify_agree (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t19_check_render_verify_agree)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t1_old_manifest_v1_0_still_valid (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t1_old_manifest_v1_0_still_valid)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t20_deterministic_hashing (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t20_deterministic_hashing)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t21_zero_population_regime_invalid (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t21_zero_population_regime_invalid)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t22_freeze_hash_mismatch_fails_closed (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t22_freeze_hash_mismatch_fails_closed)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t2_manifest_v1_1_requires_binding_ref (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t2_manifest_v1_1_requires_binding_ref)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t3_binding_hash_tamper_fails (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t3_binding_hash_tamper_fails)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t4_manifest_binding_identity_mismatch (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t4_manifest_binding_identity_mismatch)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t5_denominator_closure_valid (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t5_denominator_closure_valid)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t6_denominator_closure_invalid (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t6_denominator_closure_invalid)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t7_two_regimes_different_counts (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t7_two_regimes_different_counts)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t8_exact_notional_compatible (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t8_exact_notional_compatible)"
+    },
+    {
+      "status": "ok",
+      "test": "test_t9_tested_10_requested_100_mismatch (tests.test_execution_evidence_seam_v1.ExecutionEvidenceSeamTests.test_t9_tested_10_requested_100_mismatch)"
+    },
+    {
+      "status": "ok",
+      "test": "test_a1_absent_source (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a1_absent_source)"
+    },
+    {
+      "status": "ok",
+      "test": "test_a2_paper_reconciliation (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a2_paper_reconciliation)"
+    },
+    {
+      "status": "ok",
+      "test": "test_a3_a4_paper_and_shadow_separate (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a3_a4_paper_and_shadow_separate)"
+    },
+    {
+      "status": "ok",
+      "test": "test_a5_different_strategy_versions (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a5_different_strategy_versions)"
+    },
+    {
+      "status": "ok",
+      "test": "test_a6_accounting_conflict_excludes_row (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a6_accounting_conflict_excludes_row)"
+    },
+    {
+      "status": "ok",
+      "test": "test_a7_known_exact_zero (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a7_known_exact_zero)"
+    },
+    {
+      "status": "ok",
+      "test": "test_home_has_no_fourth_economics_domain (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_home_has_no_fourth_economics_domain)"
+    },
+    {
+      "status": "ok",
+      "test": "test_i1_exit_required_not_all_risk_clear (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_i1_exit_required_not_all_risk_clear)"
+    },
+    {
+      "status": "ok",
+      "test": "test_m1_m2_open_mark_fees (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_m1_m2_open_mark_fees)"
+    },
+    {
+      "status": "ok",
+      "test": "test_m4_missing_mark_as_of (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_m4_missing_mark_as_of)"
+    },
+    {
+      "status": "ok",
+      "test": "test_m5_m6_legacy_mark_components (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_m5_m6_legacy_mark_components)"
+    },
+    {
+      "status": "ok",
+      "test": "test_o_owner_nonclaims_and_get_purity (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_o_owner_nonclaims_and_get_purity)"
+    },
+    {
+      "status": "ok",
+      "test": "test_p_path_metrics (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_p_path_metrics)"
+    },
+    {
+      "status": "ok",
+      "test": "test_r2_r3_at_and_over_limit (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_r2_r3_at_and_over_limit)"
+    },
+    {
+      "status": "ok",
+      "test": "test_r_declared_entry_limit (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_r_declared_entry_limit)"
+    },
+    {
+      "status": "ok",
+      "test": "test_semantic_route_reused (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_semantic_route_reused)"
+    },
+    {
+      "status": "ok",
+      "test": "test_x_exposure_named_and_separate (tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_x_exposure_named_and_separate)"
+    }
+  ],
+  "exit_code": 0,
+  "observed_peak_bytes": 9416140,
+  "output_sha256": "eb82c133070bf1b85c15272bcc036165bf047caeb405da37cd760d49aaab5b72",
+  "owned_process_exit_code": 0,
+  "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
+  "phase": "regression",
+  "resource_measurement_n": 159,
+  "status": "PASS",
+  "test_modules": [
+    "tests.test_factory_strategy_execution_boundary_v1",
+    "tests.test_paper_shadow_accounting_and_control_v1",
+    "tests.test_paper_shadow_execution_integrity_vertical_v1",
+    "tests.test_trading_runtime_admission_concurrency_v1",
+    "tests.test_trading_runtime_policy_backup_restore_v1",
+    "tests.test_trading_runtime_policy_v1",
+    "tests.test_hfic_research_scope_v1",
+    "tests.test_opportunity_episodes_contract_v1",
+    "tests.test_execution_domain_modularity_and_fast_ci_v1",
+    "tests.test_science_to_strategy_handoff_v1",
+    "tests.test_execution_evidence_seam_v1",
+    "tests.test_risk_and_economics_v1"
+  ]
+}

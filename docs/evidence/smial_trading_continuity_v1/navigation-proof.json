@@ -1,0 +1,10 @@
+{
+  "semantic_route": "SEM-OWNER-LIFECYCLE",
+  "route_result": "PASS",
+  "root_asset": "DOC-OWNER-LIFECYCLE-PROJECTION-001",
+  "root_path": "docs/contracts/owner_lifecycle_projection_spine_v1.md",
+  "runbook": "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md",
+  "root_sha256": "6267f66cc673fef21acadb927902680bbb12f6b5c50221e9bbe82c8d193f33f5",
+  "generator": "PASS_IMPACTED_CLOSURE_NOOP",
+  "independent_review": "SEPARATE_HASH_BOUND_RECEIPT"
+}

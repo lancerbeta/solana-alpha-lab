@@ -1,0 +1,14 @@
+{
+  "egress_canary": "PASS",
+  "elapsed_seconds": 16.902,
+  "environment": "ALLOWLIST",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "exit_code": 0,
+  "output_sha256": "1511e3de65ab9c36ff81aac61ed763227abe2aecebd7a5bfb626e19d9b8c1d37",
+  "phase": "baseline-neighbors",
+  "status": "PASS",
+  "test_modules": [
+    "tests.test_science_to_strategy_handoff_v1",
+    "tests.test_execution_evidence_seam_v1"
+  ]
+}

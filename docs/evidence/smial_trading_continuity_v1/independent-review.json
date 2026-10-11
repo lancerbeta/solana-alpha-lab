@@ -1,0 +1,55 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1-REVIEW",
+  "as_of": "2026-10-11",
+  "task_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY",
+      "findings": [
+        "FINAL_FROZEN_INVENTORY_REVIEW_PENDING"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "FINAL_FROZEN_INVENTORY_REVIEW_PENDING"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "FINAL_FROZEN_INVENTORY_REVIEW_PENDING"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "FINAL_FROZEN_INVENTORY_REVIEW_PENDING"
+      ]
+    }
+  ],
+  "verdict": "PENDING",
+  "non_claims": [
+    "NO_FULL_OFFLINE_CHAIN_VERIFIED_V2_BLOCKED",
+    "NO_ALPHA_OOS_PROFITABILITY",
+    "NO_LIVE_PROVIDER_DEPLOY_TRANSACTION",
+    "NO_REAL_SCIENCE_OR_ACTIVATION",
+    "NO_TOTAL_RISK_EQUITY_FCF",
+    "NO_NEW_ADMISSION_OR_VERSION_AUTHORITY",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}

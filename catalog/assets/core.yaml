@@ -29686,7 +29686,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: 65ef55800b857659445cb6478cd5406eed70a0b4e6227f5672bd3a4f65c84804}
+  integrity: {kind: sha256, sha256: 645bd776dcb871584f23c28869043539a2a759e66f1c073ae41c6bddb9fe1662}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -35008,7 +35008,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_shadow_operations.py', repository_path: src/solana_alpha_lab/factory/paper_shadow_operations.py}
-  integrity: {kind: sha256, sha256: 9649fa8fe6103787ac25af8ad7379ef816d9f85dca1cfbfa0e2ff0d1e2569e82}
+  integrity: {kind: sha256, sha256: d97de9a333f6648f94208d8ffb2c1b2fd57e12bf4e04eee1acabc6696f4da0b1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
@@ -36134,12 +36134,13 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/owner_lifecycle_projection_spine_v1.md', repository_path: docs/contracts/owner_lifecycle_projection_spine_v1.md}
-  integrity: {kind: sha256, sha256: e8ac3786b8caa1e3a8e8e585e0de86c4272c1d2611b4a8a96380080cd2d80387}
+  integrity: {kind: sha256, sha256: 6267f66cc673fef21acadb927902680bbb12f6b5c50221e9bbe82c8d193f33f5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
   - {relation_type: depends_on, target_asset_id: CONFIG-OWNER-LIFECYCLE-PROJECTION-001}
   - {relation_type: consumes, target_asset_id: DOC-RISK-AND-ECONOMICS-001}
+  - {relation_type: depends_on, target_asset_id: DOC-TRADING-CONTINUITY-OFFLINE-001}
   consumers: [FACTORY-001, GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
   evidence: []
   search_terms: [LIFECYCLE_PROJECTION, lineage, lifecycle-объекты, карта lifecycle]
@@ -36399,7 +36400,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/science_to_strategy_handoff_v1.md', repository_path: docs/contracts/science_to_strategy_handoff_v1.md}
-  integrity: {kind: sha256, sha256: e0d063385564b41986eca07cb9a32e04a124f526d4f294e54797d639aa63c9ff}
+  integrity: {kind: sha256, sha256: 80b8b11daac890f20b0500c8a6be1eb7027587d4fed61bf2386daf81815d0549}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
@@ -36610,7 +36611,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: TRADING_OPERATIONS_WORKBENCH_V2
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/trading_operations.py', repository_path: src/solana_alpha_lab/factory/trading_operations.py}
-  integrity: {kind: sha256, sha256: 5411aca4daa1fd03ca0a2101856ddc3cedd4bc454bf11777b16aac5de9d2e642}
+  integrity: {kind: sha256, sha256: 51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-OPERATIONS-WORKBENCH-001}
@@ -36870,7 +36871,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: RISK_AND_ECONOMICS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/risk_and_economics_v1.md', repository_path: docs/contracts/risk_and_economics_v1.md}
-  integrity: {kind: sha256, sha256: b637d2438d88595c9d2789d8fa54637aaafdb698a2159ee1fe8ad2e44dced109}
+  integrity: {kind: sha256, sha256: 9cb47c2103178015d7a32f01f262bae45cbd212598ade2a6e44f2bb5d5dc5990}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RISK-AND-ECONOMICS-001}
@@ -37228,7 +37229,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: OWNER_TRADING_OPERABILITY_FOUNDATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/trading_runtime_policy_v1.md', repository_path: docs/contracts/trading_runtime_policy_v1.md}
-  integrity: {kind: sha256, sha256: e563665d195ed7fb6454e1a62ea5e71a1c89d2b021b8062235aa435e8e8657e8}
+  integrity: {kind: sha256, sha256: 3d3850544323bec160ab073c4f25713bd10ad93b976d2ab320164b6bab7bc749}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-RUNTIME-POLICY-001}
@@ -38012,7 +38013,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: b530aa119d81bac8eb49e3c818e0ed481e4ff02489254ddbe55a55236c4cb65e}
+  integrity: {kind: sha256, sha256: cfa659476d2ca93592f0d5ff92c29c85d0ec31a5552f015dda001edb74c284ed}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -40109,7 +40110,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/opportunity_episodes_jupiter_v1.md', repository_path: docs/contracts/opportunity_episodes_jupiter_v1.md}
-  integrity: {kind: sha256, sha256: 0ad14c1e311159708826e205465d5e969407491d2bc60a3f1037a067913ef926}
+  integrity: {kind: sha256, sha256: 98dc220ab796003cee38ddb83b6e1c14bf935b0cf1c56fd78523c7453e5ade19}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
@@ -40185,7 +40186,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/opportunity_episode_release.py', repository_path: src/solana_alpha_lab/factory/opportunity_episode_release.py}
-  integrity: {kind: sha256, sha256: c764d5a138a4359ba60b1e9333576c92524ae6ebc7a21541fd67f9abd61f9039}
+  integrity: {kind: sha256, sha256: 97c2a604f4b10523cb876f6a0a561b291d04ea46e5fb45c0d0917db5f911a0e7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
@@ -40432,7 +40433,7 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_LIST_AWARE_RESEARCH_SCOPE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_research_scope.py', repository_path: src/solana_alpha_lab/factory/hfic_research_scope.py}
-  integrity: {kind: sha256, sha256: 83941e8cfe93159ae2405eb0399354118d3681a6fbbc450a8d0d327e537aa895}
+  integrity: {kind: sha256, sha256: 2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-TEMPORAL-DISCOVERY-001}
@@ -41376,3 +41377,238 @@ records:
     contains_secrets: false
     contains_raw_data: false
     sensitivity: INTERNAL_NON_SECRET
+- asset_id: DOC-TRADING-CONTINUITY-OFFLINE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Ordinary offline PAPER/SHADOW commands, supported scope, result/recovery/readback and owned cleanup
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-11'
+  truth_owner: SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md
+    repository_path: docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md
+  integrity:
+    kind: sha256
+    sha256: 3ab14e2ee533b44e7eb65054620a2b1a45408e8c49ba216c0d729d1629eb8b7d
+  access: &id001
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-PAPER-PLANE-ENGINE-001
+  consumers: &id002
+  - FACTORY-001
+  - GOAL-OWNER
+  - DIRECT-CURSOR-DELIVERY
+  - DIRECT-CODEX-DELIVERY
+  evidence: &id003 []
+  search_terms:
+  - ordinary trading continuity
+  - timely episode decision
+  - trading_continuity.py
+  classification: &id004
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: DOC-EPISODE-DECISION-CONTINUITY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Source-bound timely recipe, provenance, modeled attempt/result and state/economics contract
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-11'
+  truth_owner: SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/episode_decision_continuity_v1.md
+    repository_path: docs/contracts/episode_decision_continuity_v1.md
+  integrity:
+    kind: sha256
+    sha256: a5308da47cafe9cbb255396dd0d630f18216aa622af0ca74ad80cb4ec50335c1
+  access: *id001
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-PAPER-PLANE-ENGINE-001
+  consumers: *id002
+  evidence: *id003
+  search_terms:
+  - ordinary trading continuity
+  - timely episode decision
+  - trading_continuity.py
+  classification: *id004
+- asset_id: MODULE-EPISODE-DECISION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Upstream producer reusing frozen HFIC scope/features and source prefix
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-11'
+  truth_owner: SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/factory/episode_decision.py
+    repository_path: src/solana_alpha_lab/factory/episode_decision.py
+  integrity:
+    kind: sha256
+    sha256: cf91487ee2284e5bf476066b065658c45d6954a4005938dc264dfdf53a52fc93
+  access: *id001
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-PAPER-PLANE-ENGINE-001
+  consumers: *id002
+  evidence: *id003
+  search_terms:
+  - ordinary trading continuity
+  - timely episode decision
+  - trading_continuity.py
+  classification: *id004
+- asset_id: MODULE-TRADING-CONTINUITY-RUNNER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Explicit offline activation and ordinary producer/engine/result/recovery wiring
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-11'
+  truth_owner: SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/factory/trading_runner.py
+    repository_path: src/solana_alpha_lab/factory/trading_runner.py
+  integrity:
+    kind: sha256
+    sha256: 7bc1bb7af298b176356345443ec10cf12b00a39a3d333713fc378fbdbb7abd6e
+  access: *id001
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-PAPER-PLANE-ENGINE-001
+  consumers: *id002
+  evidence: *id003
+  search_terms:
+  - ordinary trading continuity
+  - timely episode decision
+  - trading_continuity.py
+  classification: *id004
+- asset_id: SCRIPT-TRADING-CONTINUITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Ordinary synthetic offline entry; no provider/live execution
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-11'
+  truth_owner: SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/trading_continuity.py
+    repository_path: scripts/trading_continuity.py
+  integrity:
+    kind: sha256
+    sha256: fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92
+  access: *id001
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-PAPER-PLANE-ENGINE-001
+  consumers: *id002
+  evidence: *id003
+  search_terms:
+  - ordinary trading continuity
+  - timely episode decision
+  - trading_continuity.py
+  classification: *id004
+- asset_id: SCRIPT-PROVE-TRADING-CONTINUITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Owned offline reproduction and exact campaign cleanup
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-11'
+  truth_owner: SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/prove_trading_continuity.py
+    repository_path: scripts/prove_trading_continuity.py
+  integrity:
+    kind: sha256
+    sha256: 47760b71c6395b89e7d68741b9946f1af428692a6a2a4be23220f9283fad87d3
+  access: *id001
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-PAPER-PLANE-ENGINE-001
+  consumers: *id002
+  evidence: *id003
+  search_terms:
+  - ordinary trading continuity
+  - timely episode decision
+  - trading_continuity.py
+  classification: *id004
+- asset_id: TEST-TRADING-CONTINUITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Literal source-to-result, replay, negative/recovery and isolation probes
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-11'
+  truth_owner: SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_trading_continuity_v1.py
+    repository_path: tests/test_trading_continuity_v1.py
+  integrity:
+    kind: sha256
+    sha256: e64a3ed2372e0f98d6136ea97323598adffc3776134a1ac0ca501cb3e21397c2
+  access: *id001
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-PAPER-PLANE-ENGINE-001
+  consumers: *id002
+  evidence: *id003
+  search_terms:
+  - ordinary trading continuity
+  - timely episode decision
+  - trading_continuity.py
+  classification: *id004
+- asset_id: TASK-SMIAL-TRADING-CONTINUITY-AUDIT-REPAIR-V1
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact owner-authorized bounded trading continuity audit and repair contract
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-11'
+  truth_owner: SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/tasks/SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1.md
+    repository_path: docs/tasks/SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1.md
+  integrity:
+    kind: sha256
+    sha256: 63be5b5c7f49479b1081d1b8f1b90f895aa9089f563c030c5962986b81734685
+  access: *id001
+  relations:
+  - relation_type: depends_on
+    target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-PAPER-PLANE-ENGINE-001
+  consumers: *id002
+  evidence: *id003
+  search_terms:
+  - ordinary trading continuity
+  - timely episode decision
+  - trading_continuity.py
+  classification: *id004

@@ -1,0 +1,37 @@
+{
+  "historical_receipts_not_final": [
+    {
+      "phase": "baseline",
+      "result": "FAIL_4_INITIAL_PROBES",
+      "output_sha256": "cb9606e2a2f6546ad3c9d0428c59294097e25f38f510384bc3632ccc2622b5ff"
+    },
+    {
+      "phase": "expanded-regression",
+      "result": "FAIL_3_TEST_CONFIGURATION_ERRORS",
+      "correction": "Catalog schema relation/asset types and nonexistent test module; no suite suppression"
+    },
+    {
+      "phase": "active-resource-sampling",
+      "result": "FAIL_NATIVE_WINDOWS_ATOMIC_REPLACE",
+      "evidence": "instrumentation-failure.json",
+      "causality": "SAMPLER_CAUSE_INFERRED_NOT_PROVEN"
+    },
+    {
+      "phase": "typed-missing-store-fixture",
+      "result": "FAIL_EXPECTED_CODE",
+      "correction": "Canonical SOURCE_NOT_PRESENT retained, fixture expectation corrected"
+    },
+    {
+      "phase": "37-case-conservation-fixture",
+      "result": "FAIL_TIMESTAMP_INVALID",
+      "output_sha256": "72113821c9449526b411319eb926876056c7a793d6224b62b942bc44e33c08c6",
+      "correction": "Fixture +00:00 changed to required Z; not product repair; run invalidated by concurrent candidate edits"
+    },
+    {
+      "phase": "baseline-replay-initial",
+      "result": "EXPECTED_FAIL_5",
+      "output_sha256": "7511c0e56629d8699f6c7d0f8120521349e3e515586da8862f5ee1414ccc54e5",
+      "correction": "Added MULTILINE to compact failure-boundary extraction, repeated before-state once"
+    }
+  ]
+}

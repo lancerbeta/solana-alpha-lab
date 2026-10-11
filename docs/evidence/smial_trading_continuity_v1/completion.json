@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1-PARTIAL-ENGINEERING-CANDIDATE",
+  "as_of": "2026-10-11",
+  "task_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
+  "state_change": "Confirmed offline V1 continuity repairs and truthful readback; ordinary PAPER mixed/list-only and SHADOW mixed reconcile. CAPABILITY_OUTCOME=REPAIR_PARTIAL_BLOCKED: required active V2 alongside V1 remains blocked by preserved scientific handoff V1 guard; original S08/S13 denominator retained. No canonical DONE or full-scope acceptance.",
+  "base_main": "d244af69bfd7ddc2850b9e5e5823323956e325c4",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "docs/tasks/SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/smial_trading_continuity_v1/factory-fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_V1_ORDINARY_AND_ADVERSARIAL_WITH_V2_BLOCKED",
+    "independent_review": {
+      "path": "docs/evidence/smial_trading_continuity_v1/independent-review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_OWNED_CLEANUP_AND_FRESH_REPRODUCTION",
+      "PASS_LITERAL_MONEY_AND_FULL_IDENTITY_SETS",
+      "PASS_V1_GUARD_PRESERVED"
+    ]
+  },
+  "non_claims": [
+    "NO_FULL_OFFLINE_CHAIN_VERIFIED_V2_BLOCKED",
+    "NO_ALPHA_OOS_PROFITABILITY",
+    "NO_LIVE_PROVIDER_DEPLOY_TRANSACTION",
+    "NO_REAL_SCIENCE_OR_ACTIVATION",
+    "NO_TOTAL_RISK_EQUITY_FCF",
+    "NO_NEW_ADMISSION_OR_VERSION_AUTHORITY",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ],
+  "side_effects": {
+    "real_store_writes": 0,
+    "provider_calls": 0,
+    "real_looks": 0,
+    "holdout_reads": 0,
+    "deployment": 0,
+    "cash_spend": 0,
+    "synthetic_fixture_writes": "NATIVE_EXPECTED_DISPOSABLE"
+  },
+  "capability_radar_now": "NONE: reuse existing owners, deterministic CLI and locked environment; no plugin/package/provider."
+}

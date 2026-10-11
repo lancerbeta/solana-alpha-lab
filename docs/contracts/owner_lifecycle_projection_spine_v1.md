@@ -7,6 +7,11 @@ authority, or economics.
 
 Catalog current binding: `ACTIVE-OWNER-LIFECYCLE-PROJECTION`
 Semantic route: `SEM-OWNER-LIFECYCLE`
+Ordinary eligible episode strategy downstream (offline):
+`docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md`, with exact source/recipe,
+attempt/result and recovery contract in
+`docs/contracts/episode_decision_continuity_v1.md`. Definition, activation and
+modeled reconciliation remain separate; this link grants no runtime authority.
 Schema: `smial.owner-lifecycle-projection` / `1.0`
 
 ## 1. Job

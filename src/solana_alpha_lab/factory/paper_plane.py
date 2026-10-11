@@ -104,8 +104,8 @@ TRANSITIONS: dict[str, set[str]] = {
     "ATTEMPTING": {"OPEN", "PARTIAL", "UNKNOWN", "UNRESOLVED", "CANCELLED"},
     "OPEN": {"EXIT_REQUIRED", "EXITING"},
     "PARTIAL": {"EXIT_REQUIRED", "EXITING"},
-    "UNKNOWN": {"EXIT_REQUIRED", "EXITING", "UNRESOLVED", "RECONCILED"},
-    "EXIT_REQUIRED": {"EXITING"},
+    "UNKNOWN": {"OPEN", "PARTIAL", "CANCELLED", "EXIT_REQUIRED", "EXITING", "UNRESOLVED", "RECONCILED"},
+    "EXIT_REQUIRED": {"EXITING", "CANCELLED"},
     "EXITING": {"CLOSED", "UNRESOLVED"},
     "CLOSED": {"RECONCILED"},
     "UNRESOLVED": {"RECONCILED"},
@@ -771,6 +771,17 @@ class PaperPlaneStore:
             out.append(item)
         return out
 
+    def get_execution_event(self, event_id: str) -> dict[str, Any] | None:
+        row = self._conn.execute("SELECT * FROM execution_events WHERE event_id = ?", (event_id,)).fetchone()
+        if row is None:
+            return None
+        item = dict(row)
+        try:
+            item["payload"] = json.loads(item.pop("payload_json"))
+        except (TypeError, ValueError):
+            raise PaperPlaneError("EXECUTION_EVENT_CORRUPT") from None
+        return item
+
     def get_operator_command(self, idempotency_key: str) -> dict[str, Any] | None:
         row = self._conn.execute(
             "SELECT * FROM operator_commands WHERE idempotency_key = ?",
@@ -1131,6 +1142,7 @@ class PaperPlaneStore:
         entry_gross_notional_usd: str,
         fee_bps: int | None = None,
         mode: str,
+        reconcile_pending_close: bool = False,
     ) -> dict[str, Any]:
         if mode not in {"PAPER", "SHADOW"}:
             raise PaperPlaneError("BOT_MODE_INVALID")
@@ -1139,22 +1151,47 @@ class PaperPlaneStore:
             if position is None:
                 raise PaperPlaneError("POSITION_NOT_FOUND")
             state = str(position["state"])
-            if state in {"CLOSED", "RECONCILED", "UNRESOLVED", "EXIT_REQUIRED", "EXITING"}:
+            pending_close = reconcile_pending_close and state == "EXIT_REQUIRED" and position.get("entry_price_dec") is None
+            if state in {"CLOSED", "RECONCILED", "UNRESOLVED", "EXIT_REQUIRED", "EXITING"} and not pending_close:
                 raise PaperPlaneError(f"ENTRY_FILL_STATE_INVALID:{state}")
             if state in {"WATCHED", "SIGNALLED", "INTENT_CREATED"}:
                 raise PaperPlaneError(f"ENTRY_FILL_STATE_INVALID:{state}")
-            if state not in {"ATTEMPTING", "OPEN", "PARTIAL", "UNKNOWN"}:
+            if state not in {"ATTEMPTING", "OPEN", "PARTIAL", "UNKNOWN"} and not pending_close:
                 raise PaperPlaneError(f"ENTRY_FILL_STATE_INVALID:{state}")
             price = Decimal(str(entry_unit_price_usd))
             notional = Decimal(str(entry_gross_notional_usd))
-            if price <= 0 or notional <= 0:
+            if not price.is_finite() or not notional.is_finite() or price <= 0 or notional <= 0:
                 raise PaperPlaneError("ENTRY_FILL_INVALID")
             fee_bps = _bound_entry_fee_bps(position, fee_bps)
+            bot = self.get_bot(str(position["bot_instance_id"]))
+            if bot is None or str(bot.get("mode")) != mode:
+                raise PaperPlaneError("ENTRY_FILL_MODE_MISMATCH")
+            if position.get("entry_price_dec") not in {None, ""}:
+                if (
+                    Decimal(str(position["entry_price_dec"])) != price
+                    or Decimal(str(position["entered_notional_usd_dec"])) != notional
+                    or int(position["fee_bps"]) != fee_bps
+                ):
+                    raise PaperPlaneError("ENTRY_FILL_CONTENT_CONFLICT")
+                quantity = (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP)
+                entry_fee = (notional * Decimal(fee_bps) / Decimal(10000)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+                for field, expected in (("qty_dec", quantity), ("entry_fee_usd_dec", entry_fee)):
+                    if position.get(field) not in {None, ""} and Decimal(str(position[field])) != expected:
+                        raise PaperPlaneError("ENTRY_ACCOUNTING_CONTENT_CONFLICT")
+                if position.get("qty_dec") in {None, ""} or position.get("entry_fee_usd_dec") in {None, ""}:
+                    self._conn.execute("UPDATE positions SET qty_dec=?, entry_fee_usd_dec=? WHERE position_id=?",
+                                       (format(quantity, "f"), format(entry_fee, "f"), position_id))
+                    self.append_execution_event(event_type="ENTRY_ACCOUNTING_RECOVERED", bot_instance_id=bot["bot_instance_id"],
+                        position_id=position_id, payload={**_identity_fields(position), "basis": "EXACT_ORIGINATING_ENTRY_BINDING"})
+                    recovered = self.get_position(position_id)
+                    assert recovered is not None
+                    return recovered
+                return position
             admitted = position.get("admitted_entry_notional_usd_dec")
             if admitted not in {None, ""} and notional > Decimal(str(admitted)):
                 raise PaperPlaneError("ENTRY_FILL_NOTIONAL_EXCEEDS_ADMISSION")
-            if state == "ATTEMPTING":
-                self.transition(position_id, "OPEN")
+            if state in {"ATTEMPTING", "UNKNOWN"}:
+                self.transition(position_id, "PARTIAL" if admitted not in {None, ""} and notional < Decimal(str(admitted)) else "OPEN")
                 position = self.get_position(position_id)
                 assert position is not None
             quantity = (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP)
@@ -1649,12 +1686,21 @@ def accept_signal_decision(
     position_id = position_id_for_signal_decision(str(decision["signal_decision_id"]))
     action = str(decision["action"])
     if action != "ENTER":
-        if store.get_position(position_id) is not None:
-            raise PaperPlaneError("SIGNAL_DECISION_IDEMPOTENCY_MISMATCH")
-        store.append_execution_event(
+        with store.immediate_write():
+            if store.get_position(position_id) is not None:
+                raise PaperPlaneError("SIGNAL_DECISION_IDEMPOTENCY_MISMATCH")
+            event_id = "DECISION-" + str(decision["signal_decision_id"])
+            previous = store.get_execution_event(event_id)
+            if previous is not None:
+                if previous["payload"].get("signal_decision_sha256") != decision_sha256:
+                    raise PaperPlaneError("SIGNAL_DECISION_IDEMPOTENCY_MISMATCH")
+                return {"opened": False, "action": action, "reason_code": decision["reason_code"],
+                        "signal_decision_id": decision["signal_decision_id"], "position_id": None, "idempotent": True}
+            store.append_execution_event(
             event_type="SIGNAL_DECISION_ACCEPTED",
             bot_instance_id=None,
             position_id=None,
+            event_id=event_id,
             payload={
                 **_identity_fields(decision),
                 "strategy_id": strategy["strategy_id"],
@@ -1854,6 +1900,18 @@ def accept_signal_decision(
     signal_kind = "SHADOW_EXECUTABLE" if mode == "SHADOW" else "SIMULATED_FILL"
     with store.immediate_write():
         before = store.get_position(position_id)
+        if before is not None and str(before["state"]) in PRE_ATTEMPT_STATES:
+            current_bot = store.get_bot(bot_instance_id)
+            assert current_bot is not None
+            final_block, cancel_reason = _resume_block(store, current_bot, mode, stale=stale)
+            if final_block is not None:
+                cancelled = store.cancel_entry_intent(position_id, reason_code=str(cancel_reason))
+                return {
+                    "opened": False, "action": "BLOCKED", "reason_code": final_block,
+                    "signal_decision_id": decision["signal_decision_id"],
+                    "position_id": position_id, "state": cancelled["state"],
+                    "bot_instance_id": bot_instance_id, "idempotent": was_existing,
+                }
         filled_now = before is None or str(before["state"]) != "OPEN"
         opened_id, realized = store.fill_paper_from_signal(
             bot_instance_id=bot_instance_id,
@@ -1942,6 +2000,167 @@ def accept_exit_decision(
     result["exit_decision_id"] = decision["exit_decision_id"]
     result["fill_claimed"] = False
     return result
+
+
+def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str,
+                         mode: str, attempt_key: str, decision_at: str,
+                         max_age_seconds: int, as_of: str) -> dict[str, Any]:
+    """Persist before the external boundary. Replays never authorize another send."""
+    if side not in {"ENTRY", "EXIT"} or mode not in {"PAPER", "SHADOW"}:
+        raise PaperPlaneError("MODELED_ATTEMPT_SCOPE_INVALID")
+    if not attempt_key or len(attempt_key) > 120:
+        raise PaperPlaneError("MODELED_ATTEMPT_KEY_INVALID")
+    identity = {"position_id": position_id, "side": side, "mode": mode, "attempt_key": attempt_key}
+    attempt_id = "ATTEMPT-" + canonical_spec_sha256(identity).upper()
+    with store.immediate_write():
+        previous = store.get_execution_event(attempt_id)
+        if previous is not None:
+            return {**previous["payload"], "send_permitted": False, "idempotent": True}
+        position = store.get_position(position_id)
+        if position is None:
+            raise PaperPlaneError("POSITION_NOT_FOUND")
+        bot = store.get_bot(str(position["bot_instance_id"]))
+        if bot is None or bot["mode"] != mode:
+            raise PaperPlaneError("MODELED_ATTEMPT_MODE_MISMATCH")
+        prior = [event for event in store.execution_events()
+                 if event["event_type"] == "MODELED_ATTEMPT_STARTED" and event["position_id"] == position_id
+                 and event["payload"].get("side") == side]
+        if prior:
+            if side == "ENTRY":
+                raise PaperPlaneError("ENTRY_ATTEMPT_ALREADY_EXISTS")
+            last = store.get_execution_event("FINAL-" + prior[-1]["event_id"])
+            if last is None or last["payload"]["outcome"] not in {"NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED"}:
+                raise PaperPlaneError("ATTEMPT_RECONCILIATION_REQUIRED")
+        state = str(position["state"])
+        if side == "ENTRY":
+            if state not in PRE_ATTEMPT_STATES:
+                raise PaperPlaneError("ENTRY_ATTEMPT_STATE_INVALID")
+            stale = (_parse_utc(as_of) - _parse_utc(decision_at)).total_seconds() > max_age_seconds
+            if _parse_utc(as_of) < _parse_utc(decision_at):
+                raise PaperPlaneError("MODELED_ATTEMPT_FROM_FUTURE")
+            block, cancel = _resume_block(store, bot, mode, stale=stale)
+            if block:
+                store.cancel_entry_intent(position_id, reason_code=str(cancel))
+                return {"send_permitted": False, "action": "BLOCKED", "reason_code": block,
+                        "position_id": position_id, "state": "CANCELLED"}
+            if state == "WATCHED":
+                store.transition(position_id, "SIGNALLED")
+            if state in {"WATCHED", "SIGNALLED"}:
+                store.transition(position_id, "INTENT_CREATED")
+            store.transition(position_id, "ATTEMPTING")
+        elif state not in {"EXIT_REQUIRED", "EXITING", "UNRESOLVED"}:
+            raise PaperPlaneError("EXIT_ATTEMPT_REQUIRES_ORIGINATING_EXIT")
+        if side == "EXIT":
+            if position.get("entry_price_dec") is None:
+                raise PaperPlaneError("EXIT_ATTEMPT_REQUIRES_ENTRY_RECONCILIATION")
+            clocks = [decision_at]
+            for event in store.execution_events():
+                if event["position_id"] == position_id and event["event_type"] == "MODELED_RESULT_ACCEPTED":
+                    clocks.append(event["payload"]["result"]["observed_at"])
+            if _parse_utc(as_of) < max(_parse_utc(clock) for clock in clocks):
+                raise PaperPlaneError("MODELED_ATTEMPT_CAUSAL_CLOCK_INVALID")
+        if side == "EXIT" and state == "EXIT_REQUIRED":
+            store.transition(position_id, "EXITING")
+        payload = {**identity, "attempt_id": attempt_id, "as_of": as_of,
+                   "evidence_class": "PAPER_MODEL" if mode == "PAPER" else "SHADOW_QUOTE_MODEL"}
+        store.append_execution_event(event_type="MODELED_ATTEMPT_STARTED", event_id=attempt_id,
+                                     bot_instance_id=bot["bot_instance_id"], position_id=position_id,
+                                     payload=payload, created_at=as_of)
+        return {**payload, "send_permitted": True, "idempotent": False}
+
+
+def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) -> dict[str, Any]:
+    """Provider-neutral modeled result; append-only identity and atomic effect.
+
+    UNKNOWN can acquire one later definitive result. A definitive result is
+    immutable. Chargeable failure costs are retained separately from trade PnL.
+    This boundary cannot claim an on-chain fill or accept signing material.
+    """
+    allowed = {"attempt_id", "result_id", "outcome", "observed_at", "unit_price_usd", "filled_notional_usd", "chargeable_cost_usd"}
+    if set(result) - allowed or not {"attempt_id", "result_id", "outcome", "observed_at"} <= set(result):
+        raise PaperPlaneError("MODELED_RESULT_INVALID")
+    outcome = result["outcome"]
+    if outcome not in {"NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED", "LANDED_SUCCESS", "PARTIAL", "UNKNOWN_REQUIRES_RECONCILIATION"}:
+        raise PaperPlaneError("MODELED_RESULT_CLASS_UNSUPPORTED")
+    if not isinstance(result["result_id"], str) or not result["result_id"] or len(result["result_id"]) > 120:
+        raise PaperPlaneError("MODELED_RESULT_ID_INVALID")
+    positive = outcome in {"LANDED_SUCCESS", "PARTIAL"}
+    if positive:
+        for field in ("unit_price_usd", "filled_notional_usd"):
+            if result.get(field) is not None:
+                try:
+                    value = Decimal(str(result[field]))
+                    if not value.is_finite() or value <= 0:
+                        raise ValueError()
+                except (ValueError, ArithmeticError):
+                    raise PaperPlaneError("MODELED_FILL_DETAILS_INVALID") from None
+    if not positive and any(result.get(field) is not None for field in ("unit_price_usd", "filled_notional_usd")):
+        raise PaperPlaneError("NON_FILL_RESULT_HAS_FILL")
+    cost = result.get("chargeable_cost_usd")
+    if cost is not None:
+        try:
+            value = Decimal(str(cost))
+            if not value.is_finite() or value < 0:
+                raise ValueError()
+        except (ValueError, ArithmeticError):
+            raise PaperPlaneError("MODELED_RESULT_COST_INVALID") from None
+    with store.immediate_write():
+        attempt = store.get_execution_event(str(result["attempt_id"]))
+        if attempt is None or attempt["event_type"] != "MODELED_ATTEMPT_STARTED":
+            raise PaperPlaneError("MODELED_ATTEMPT_UNRESOLVED")
+        bound = attempt["payload"]
+        if _parse_utc(str(result["observed_at"])) < _parse_utc(bound["as_of"]):
+            raise PaperPlaneError("MODELED_RESULT_CLOCK_INVALID")
+        rid = "RESULT-" + canonical_spec_sha256({"result_id": result["result_id"]}).upper()
+        previous = store.get_execution_event(rid)
+        if previous is not None:
+            if previous["payload"].get("result") != dict(result):
+                raise PaperPlaneError("MODELED_RESULT_CONTENT_CONFLICT")
+            return {"idempotent": True, "attempt_id": result["attempt_id"],
+                    "position": store.get_position(bound["position_id"])}
+        final_id = "FINAL-" + str(result["attempt_id"])
+        if store.get_execution_event(final_id) is not None:
+            raise PaperPlaneError("MODELED_RESULT_ALREADY_FINAL")
+        position = store.get_position(bound["position_id"])
+        if position is None:
+            raise PaperPlaneError("POSITION_NOT_FOUND")
+        if bound["side"] == "ENTRY":
+            if positive:
+                filled = result.get("filled_notional_usd")
+                if filled is None or result.get("unit_price_usd") is None:
+                    raise PaperPlaneError("MODELED_FILL_DETAILS_REQUIRED")
+                admitted = Decimal(str(position["admitted_entry_notional_usd_dec"]))
+                if (outcome == "PARTIAL") != (Decimal(str(filled)) < admitted):
+                    raise PaperPlaneError("MODELED_FILL_AMOUNT_CLASS_CONFLICT")
+                store.apply_paper_entry_fill(position_id=bound["position_id"],
+                    entry_unit_price_usd=str(result["unit_price_usd"]), entry_gross_notional_usd=str(filled),
+                    fee_bps=int(position["admitted_fee_bps"]), mode=bound["mode"], reconcile_pending_close=True)
+            elif outcome == "UNKNOWN_REQUIRES_RECONCILIATION":
+                if position["state"] == "ATTEMPTING":
+                    store.transition(bound["position_id"], "UNKNOWN")
+            else:
+                store.transition(bound["position_id"], "CANCELLED")
+        elif positive:
+            if outcome == "PARTIAL" or result.get("filled_notional_usd") is not None:
+                raise PaperPlaneError("PARTIAL_EXIT_MODEL_UNSUPPORTED")
+            if result.get("unit_price_usd") is None:
+                raise PaperPlaneError("MODELED_FILL_DETAILS_REQUIRED")
+            store.apply_paper_exit_fill(position_id=bound["position_id"],
+                exit_unit_price_usd=str(result["unit_price_usd"]), mode=bound["mode"])
+        else:
+            store.apply_paper_exit_fill(position_id=bound["position_id"], exit_unit_price_usd=None,
+                                       mode=bound["mode"], unresolved=True)
+        payload = {"result": dict(result), "evidence_class": bound["evidence_class"],
+                   "chargeable_cost_status": "KNOWN" if cost is not None else "UNKNOWN"}
+        store.append_execution_event(event_type="MODELED_RESULT_ACCEPTED", event_id=rid,
+            bot_instance_id=attempt["bot_instance_id"], position_id=bound["position_id"],
+            payload=payload, created_at=str(result["observed_at"]))
+        if outcome != "UNKNOWN_REQUIRES_RECONCILIATION":
+            store.append_execution_event(event_type="MODELED_ATTEMPT_FINAL", event_id=final_id,
+                bot_instance_id=attempt["bot_instance_id"], position_id=bound["position_id"],
+                payload={"outcome": outcome, "result_event_id": rid}, created_at=str(result["observed_at"]))
+        return {"idempotent": False, "attempt_id": result["attempt_id"],
+                "position": store.get_position(bound["position_id"])}
 
 
 def run_commissioning(

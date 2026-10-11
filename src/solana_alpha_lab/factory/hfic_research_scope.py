@@ -384,6 +384,53 @@ def _frame_receipt_hash(frame: Mapping[str, Any]) -> str:
     return str(frame_receipt(frame).get("frame_sha256"))
 
 
+def add_admission_frame_membership(
+    evidence: MembershipEvidence, *, schedule_document: Mapping[str, Any],
+    census: Sequence[Mapping[str, Any]], frames: Mapping[str, Mapping[str, Any]],
+    bind_admissions: bool = True,
+) -> None:
+    """One ADMISSION_FRAME_V1 interpretation for released and timely inputs."""
+    definitions = jupiter_definitions(schedule_document)
+    for definition in definitions.values():
+        evidence.add_definition(definition)
+    by_source = {definition["source_id"]: list_id for list_id, definition in definitions.items()}
+    for row in census:
+        episode_id, mint = str(row["episode_id"]), str(row["mint"])
+        t0 = parse_utc(row["t0"])
+        evidence.t0[episode_id] = t0
+        evidence.mints[episode_id] = mint
+        evidence.cohort_of[episode_id] = str(row["cohort_id"])
+        states = {list_id: INVALID for list_id in definitions}
+        frame = frames.get(str(row["round_id"]))
+        valid = (
+            frame is not None and frame.get("complete") is True
+            and frame.get("terminal") == "FRAME_CLOSED"
+            and str(frame.get("frame_sha256")) == str(row["frame_sha256"])
+            and _frame_receipt_hash(frame) == str(row["frame_sha256"])
+        )
+        if valid:
+            sources = {str(s.get("source_id")): s for s in frame.get("sources") or []}
+            overlap = (frame.get("overlap") or {}).get(mint)
+            if isinstance(overlap, list) and overlap and set(by_source) <= set(sources):
+                for source_id, list_id in by_source.items():
+                    source = sources[source_id]
+                    received = source.get("response_received_at")
+                    if source.get("status") != "OBSERVED" or not isinstance(received, str):
+                        states[list_id] = UNKNOWN
+                    elif parse_utc(received) > t0:
+                        states[list_id] = INVALID
+                    else:
+                        states[list_id] = TRUE if source_id in overlap else FALSE
+        if episode_id in evidence.states:
+            _require(evidence.states[episode_id] == {**evidence.states[episode_id], **states}, "EPISODE_MEMBERSHIP_CONFLICT", episode_id=episode_id)
+        evidence.states.setdefault(episode_id, {}).update(states)
+        if bind_admissions:
+            binding = {"adapter": ADMISSION_ADAPTER, "episode_id": episode_id,
+                       "round_id": str(row["round_id"]), "frame_sha256": str(row["frame_sha256"])}
+            if binding not in evidence.bindings:
+                evidence.bindings.append(binding)
+
+
 def add_release_membership(evidence: MembershipEvidence, release_root: Path) -> None:
     """ADMISSION_FRAME_V1: membership of each episode = lists of its admission round.
 
@@ -405,10 +452,6 @@ def add_release_membership(evidence: MembershipEvidence, release_root: Path) -> 
     document = decode_schedule_artifact(
         (root / OBSERVATION_SCHEDULE_ARTIFACT_NAME).read_bytes(), wanted_sha=str(manifest["schedule_sha256"])
     )
-    definitions = jupiter_definitions(document)
-    for definition in definitions.values():
-        evidence.add_definition(definition)
-    by_source = {definition["source_id"]: list_id for list_id, definition in definitions.items()}
     # One parse of frames.json per release and pass.
     frames_doc = json.loads((root / FRAMES_NAME).read_text(encoding="utf-8"))
     frames: dict[str, Mapping[str, Any]] = {}
@@ -419,38 +462,11 @@ def add_release_membership(evidence: MembershipEvidence, release_root: Path) -> 
     census = pq.read_table(
         root / CENSUS_NAME, columns=["episode_id", "mint", "t0", "round_id", "frame_sha256"]
     ).to_pylist()
-    for row in census:
-        episode_id, mint = str(row["episode_id"]), str(row["mint"])
-        t0 = parse_utc(row["t0"])
-        evidence.t0[episode_id] = t0
-        evidence.mints[episode_id] = mint
-        evidence.cohort_of[episode_id] = str(manifest["cohort_id"])
-        states = {list_id: INVALID for list_id in definitions}
-        frame = frames.get(str(row["round_id"]))
-        valid = (
-            frame is not None
-            and frame.get("complete") is True
-            and frame.get("terminal") == "FRAME_CLOSED"
-            and str(frame.get("frame_sha256")) == str(row["frame_sha256"])
-            and _frame_receipt_hash(frame) == str(row["frame_sha256"])
-        )
-        if valid:
-            sources = {str(s.get("source_id")): s for s in frame.get("sources") or []}
-            overlap = (frame.get("overlap") or {}).get(mint)
-            # An admitted mint absent from every received list contradicts its own admission.
-            if isinstance(overlap, list) and overlap and set(by_source) <= set(sources):
-                for source_id, list_id in by_source.items():
-                    source = sources[source_id]
-                    received = source.get("response_received_at")
-                    if source.get("status") != "OBSERVED" or not isinstance(received, str):
-                        states[list_id] = UNKNOWN
-                    elif parse_utc(received) > t0:
-                        states[list_id] = INVALID
-                    else:
-                        states[list_id] = TRUE if source_id in overlap else FALSE
-        if episode_id in evidence.states:
-            _require(evidence.states[episode_id] == {**evidence.states[episode_id], **states}, "EPISODE_MEMBERSHIP_CONFLICT", episode_id=episode_id)
-        evidence.states.setdefault(episode_id, {}).update(states)
+    add_admission_frame_membership(
+        evidence, schedule_document=document,
+        census=[{**row, "cohort_id": str(manifest["cohort_id"])} for row in census],
+        frames=frames, bind_admissions=False,
+    )
     evidence.bindings.append(
         {
             "adapter": ADMISSION_ADAPTER,
