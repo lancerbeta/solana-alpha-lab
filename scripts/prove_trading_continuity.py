@@ -293,7 +293,7 @@ from solana_alpha_lab.factory.trading_operations import _bot_context
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--phase", choices=("baseline", "baseline-replay", "cost-before", "price-before", "baseline-projection", "verify", "regression", "clean", "fresh"), default="verify")
+    parser.add_argument("--phase", choices=("baseline", "baseline-replay", "cost-before", "price-before", "git-boundary", "baseline-projection", "verify", "regression", "clean", "fresh"), default="verify")
     args = parser.parse_args()
     if args.phase == "clean":
         result = clean()
@@ -305,6 +305,8 @@ def main() -> int:
     if args.phase == "fresh" and (SANDBOX.exists() or MANIFEST.exists()):
         raise RuntimeError("CLEAN_ROOM_REQUIRES_ABSENT_CAMPAIGN_RESOURCES")
     modules = ["tests.test_trading_continuity_v1"]
+    if args.phase == "git-boundary":
+        modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests.test_scientific_producer_requires_own_git_identity"]
     if args.phase == "baseline-projection":
         modules = ["tests.test_trading_continuity_v1.ConfirmedBaselineDefects.test_mixed_mode_projection_has_no_combined_money_headline"]
     if args.phase == "regression":

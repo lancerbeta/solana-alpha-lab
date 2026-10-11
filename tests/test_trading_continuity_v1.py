@@ -187,6 +187,15 @@ class OrdinarySourceTests(unittest.TestCase):
         spec_path.parent.mkdir(parents=True, exist_ok=True)
         spec_path.write_text(yaml.safe_dump(spec, allow_unicode=True, sort_keys=False), encoding="utf-8")
         raw_sha = hashlib.sha256(spec_path.read_bytes()).hexdigest()
+        # The real scientific owner requires a Git producer identity. A fixture
+        # must own that identity rather than discover the host checkout's HEAD.
+        subprocess.run(["git", "init", "--quiet"], cwd=self.root, check=True, capture_output=True)
+        subprocess.run(["git", "-c", "core.autocrlf=false", "add", "--", self.spec_rel],
+                       cwd=self.root, check=True, capture_output=True)
+        subprocess.run(["git", "-c", "user.name=Synthetic offline fixture",
+                        "-c", "user.email=offline-fixture@invalid.example", "-c", "commit.gpgSign=false",
+                        "commit", "--quiet", "-m", "Freeze synthetic experiment spec"],
+                       cwd=self.root, check=True, capture_output=True)
         run = _event(record_id="RUN-CONTINUITY-SYNTH-001", record_kind="RUN_COMPLETED", entity_id="RUN-CONTINUITY-SYNTH-001",
             run_id="RUN-CONTINUITY-SYNTH-001", hypothesis_version_id=self.hypothesis, transaction_id="RESEARCH-TXN-CONTINUITY-SYNTH-001",
             payload={"experiment_id": self.experiment_id, "run_id": "RUN-CONTINUITY-SYNTH-001", "availability_cutoff": "2026-09-01T00:00:00Z",
@@ -254,6 +263,18 @@ class OrdinarySourceTests(unittest.TestCase):
         self.assertEqual(packet["provenance"]["numeric"]["values"]["d_holders"], 6)
         self.assertEqual(len(self.runner.readback()["positions"]), 1)
         self.assertEqual(packet, self.decision() | {"admission": packet["admission"]})
+
+    def test_scientific_producer_requires_own_git_identity(self):
+        # Match CI's absence of an ambient parent repository without mocking Git.
+        with patch.dict(os.environ, {"GIT_CEILING_DIRECTORIES": str(self.root.parent)}):
+            self.prepare()
+            own_head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=self.root, text=True).strip()
+        research = ResearchStore(self.data / "research-data")
+        decision = next(record for record in research.iter_committed_records()
+                        if record.record_id == self.manifest["decision_event_id"])
+        self.assertEqual(decision.producer_git_sha, own_head)
+        committed_spec = subprocess.check_output(["git", "show", "HEAD:" + self.spec_rel], cwd=self.root)
+        self.assertEqual(committed_spec, (self.root / self.spec_rel).read_bytes())
 
     def test_O5_membership_unknown_refuses_before_loader(self):
         self.membership = "UNKNOWN"

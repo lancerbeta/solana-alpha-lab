@@ -50,6 +50,15 @@
       "result": "1_FAIL_25_PROVENANCE_SERIALIZATION_ERRORS",
       "output_sha256": "6058a35ed51ac709c3975df0577216e539743dcaf034959a7ca2840e650e0426",
       "correction": "Eligibility records canonical status; exact input lineage remains in readset, no raw datetime cell serialized"
+    },
+    {
+      "phase": "linux-CI-first-candidate",
+      "run_id": 38152447297,
+      "job_id": 114508799251,
+      "head": "37e1285ef7c5a9273f0fc16e7b0097305831ecd0",
+      "result": "EXECUTION_FAIL_34_GIT_IDENTITY_ERRORS_228_CASES_2_SKIPS",
+      "reason_code": "PRODUCER_GIT_SHA_UNAVAILABLE",
+      "correction": "Disposable fixture Git commit preserves exact spec bytes; producer identity guard unchanged; local Git ceiling counterfactual reproduces refusal"
     }
   ]
 }

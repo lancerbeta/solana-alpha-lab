@@ -24,6 +24,9 @@ uv run --locked --managed-python python -B scripts/prove_trading_continuity.py -
 `fresh` требует отсутствия прежнего campaign root и manifest. Скрипт записывает
 ownership до создания ресурсов, использует allowlist окружения и sacrificial
 egress canary, исполняет реальные owners в временном root, затем удаляет case.
+Synthetic spec получает собственный disposable Git commit: scientific producer
+не зависит от HEAD родительского checkout. Требуется уже установленный Git CLI;
+production identity guard остаётся действующим.
 `clean` проверяет exact root, marker и отсутствие ссылок/junctions, сохраняет
 компактный receipt и удаляет остаток campaign. Чужие roots/cache/env не затрагивает.
 При отказе realpath не обходить проверку; использовать разрешённый host executor.
