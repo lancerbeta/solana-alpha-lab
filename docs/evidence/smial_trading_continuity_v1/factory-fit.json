@@ -18,7 +18,7 @@
     "monitoring_and_recovery": "Native fault/after-commit replay, delayed callback, no-route retention, snapshot readback and backup restore; inactive automatic exit remains operator path.",
     "build_vs_buy": "ADOPT existing owners, WRAP ordinary offline CLI; BUILD only missing source/result caller and minimal confirmed defects; no dependency/service.",
     "security": "Owned root strict paths/hardlink guard, no provider/wallet adapter, environment allowlist and egress canary, no credentials.",
-    "red_team": "O1-O8, conflicting replay, real connections, WAL/missing/corrupt state, delayed publication, unknown close, half-cent and complete identity sets; one symlink skip explicit."
+    "red_team": "O1-O8, conflicting replay, real connections, WAL/missing/corrupt state, delayed publication, unknown close, half-cent and complete identity sets; one symlink skip explicit. Cumulative .01 cost floor, reverse observation clocks, .02 reconciliation and actual PARTIAL EXIT refusal checked after independent NOT_READY."
   },
   "capability_radar": {
     "now": "NONE: installed Git/gh, locked Python, existing SQLite/Catalog/recipes.",

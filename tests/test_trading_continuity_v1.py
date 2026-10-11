@@ -685,6 +685,41 @@ class OrdinarySourceTests(unittest.TestCase):
         self.assertEqual(position["realized_gross_pnl_usd_dec"], "2.50")
         self.assertEqual(position["realized_net_pnl_usd_dec"], "2.37")
 
+    def test_cumulative_cost_floor_clock_and_partial_exit_refusal(self):
+        self.prepare()
+        pid, attempt = self._attempt()
+        known = self._result(attempt, "UNKNOWN_REQUIRES_RECONCILIATION", chargeable_cost_usd="0.01")
+        self.runner.result(known)
+        before = self.runner.readback()["modeled_results"]
+        with self.assertRaisesRegex(PaperPlaneError, "MODELED_RESULT_COST_REGRESSION"):
+            self.runner.result({**known, "result_id": "COST-REGRESSION", "observed_at": "2026-10-05T12:40:02Z", "chargeable_cost_usd": "0"})
+        with self.assertRaisesRegex(PaperPlaneError, "MODELED_RESULT_CLOCK_REGRESSION"):
+            self.runner.result({**known, "result_id": "CLOCK-REGRESSION", "observed_at": "2026-10-05T12:40:00Z", "chargeable_cost_usd": "0.02"})
+        self.assertEqual(self.runner.readback()["modeled_results"], before)
+        unknown = {**known, "result_id": "COST-UNKNOWN", "observed_at": "2026-10-05T12:40:03Z", "chargeable_cost_usd": None}
+        self.runner.result(unknown)
+        view = self.runner.readback()
+        self.assertEqual(view["modeled_attempt_costs"]["known_additional_cost_usd"], "0.01")
+        self.assertEqual(view["modeled_attempt_costs"]["additional_cost_status"], "UNKNOWN")
+        self.assertIsNone(view["modeled_net_after_additional_costs_usd"])
+        self.runner.result({"attempt_id": attempt, "result_id": "COST-FINAL-ENTRY", "outcome": "LANDED_SUCCESS",
+            "observed_at": "2026-10-05T12:40:04Z", "unit_price_usd": "0.000003", "filled_notional_usd": "30", "chargeable_cost_usd": "0.02"})
+        self.runner.command({"command_type": "REQUEST_CLOSE_POSITION", "idempotency_key": "COST-CLOSE", "position_id": pid})
+        exited = self.runner.attempt(position_id=pid, side="EXIT", attempt_key="COST-EXIT", as_of="2026-10-05T12:40:05Z")
+        before = self.runner.readback()
+        result = {"attempt_id": exited["attempt_id"], "result_id": "COST-FINAL-EXIT", "outcome": "LANDED_SUCCESS",
+            "observed_at": "2026-10-05T12:40:06Z", "unit_price_usd": "0.0000033", "chargeable_cost_usd": "0"}
+        with self.assertRaisesRegex(PaperPlaneError, "PARTIAL_EXIT_MODEL_UNSUPPORTED"):
+            self.runner.result({**result, "outcome": "PARTIAL"})
+        after = self.runner.readback()
+        self.assertEqual(after["positions"], before["positions"])
+        self.assertEqual(after["modeled_results"], before["modeled_results"])
+        self.runner.result(result)
+        view = self.runner.readback()
+        self.assertEqual(view["modeled_attempt_costs"]["known_additional_cost_usd"], "0.02")
+        self.assertEqual(view["modeled_attempt_costs"]["additional_cost_status"], "KNOWN")
+        self.assertEqual(view["modeled_net_after_additional_costs_usd"], "2.85")
+
     def test_windows_rooted_and_drive_relative_source_paths_refused(self):
         self.prepare()
         for path in ("C:source/observation_schedule_state.sqlite", "\\source\\observation_schedule_state.sqlite"):

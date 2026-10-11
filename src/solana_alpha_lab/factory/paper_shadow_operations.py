@@ -150,7 +150,7 @@ def _modeled_attempt_costs(store: PaperPlaneStore, bot_ids: set[str]) -> dict[st
     These additional modeled costs exclude entry/exit price-leg fees, which
     already belong to trade PnL. Missing costs are unknown, including failures.
     """
-    attempts, latest, final = {}, {}, set()
+    attempts, latest, final, known_floor = {}, {}, set(), {}
     for event in store.execution_events():
         if event.get("bot_instance_id") not in bot_ids:
             continue
@@ -162,6 +162,15 @@ def _modeled_attempt_costs(store: PaperPlaneStore, bot_ids: set[str]) -> dict[st
             if not isinstance(result, dict) or not result.get("attempt_id"):
                 raise PaperPlaneError("MODELED_RESULT_SOURCE_CORRUPT")
             latest[result["attempt_id"]] = result
+            if result.get("chargeable_cost_usd") is not None:
+                try:
+                    value = Decimal(str(result["chargeable_cost_usd"]))
+                    if not value.is_finite() or value < 0:
+                        raise ValueError()
+                except (ValueError, ArithmeticError):
+                    raise PaperPlaneError("MODELED_RESULT_SOURCE_CORRUPT") from None
+                identity = result["attempt_id"]
+                known_floor[identity] = max(known_floor.get(identity, Decimal("0")), value)
         elif event["event_type"] == "MODELED_ATTEMPT_FINAL":
             final.add(event["event_id"].removeprefix("FINAL-"))
     known = Decimal("0")
@@ -171,11 +180,7 @@ def _modeled_attempt_costs(store: PaperPlaneStore, bot_ids: set[str]) -> dict[st
         cost = result.get("chargeable_cost_usd")
         if cost is None:
             unknown += 1
-        else:
-            value = Decimal(str(cost))
-            if not value.is_finite() or value < 0:
-                raise PaperPlaneError("MODELED_RESULT_SOURCE_CORRUPT")
-            known += value
+        known += known_floor.get(identity, Decimal("0"))
     return {"attempt_n": len(attempts), "final_attempt_n": len(final),
             "pending_attempt_n": len(set(attempts) - final), "unknown_cost_attempt_n": unknown,
             "known_additional_cost_usd": format(known, "f") if attempts else None,

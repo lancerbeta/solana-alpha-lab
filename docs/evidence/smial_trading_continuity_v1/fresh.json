@@ -1,22 +1,22 @@
 {
   "candidate_input_bindings": {
-    "scripts/prove_trading_continuity.py": "47760b71c6395b89e7d68741b9946f1af428692a6a2a4be23220f9283fad87d3",
+    "scripts/prove_trading_continuity.py": "f7e2215f80f589fe3df7236cfc284e7aeeacd4fc9b131d623d7eb138b256bf4d",
     "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
     "src/solana_alpha_lab/factory/episode_decision.py": "cf91487ee2284e5bf476066b065658c45d6954a4005938dc264dfdf53a52fc93",
     "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
     "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "cfa659476d2ca93592f0d5ff92c29c85d0ec31a5552f015dda001edb74c284ed",
     "src/solana_alpha_lab/factory/observation_schedule_store.py": "361522572d7ec2ef325d58f10c8a804ab020a14e1348406f864b968d8a388060",
     "src/solana_alpha_lab/factory/opportunity_episode_release.py": "97c2a604f4b10523cb876f6a0a561b291d04ea46e5fb45c0d0917db5f911a0e7",
-    "src/solana_alpha_lab/factory/paper_plane.py": "645bd776dcb871584f23c28869043539a2a759e66f1c073ae41c6bddb9fe1662",
-    "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d97de9a333f6648f94208d8ffb2c1b2fd57e12bf4e04eee1acabc6696f4da0b1",
+    "src/solana_alpha_lab/factory/paper_plane.py": "371753f07d2eb69d52feae08a8f4efb52f456e6327493933961c1af20eceea6f",
+    "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
     "src/solana_alpha_lab/factory/trading_runner.py": "7bc1bb7af298b176356345443ec10cf12b00a39a3d333713fc378fbdbb7abd6e",
-    "tests/test_trading_continuity_v1.py": "e64a3ed2372e0f98d6136ea97323598adffc3776134a1ac0ca501cb3e21397c2"
+    "tests/test_trading_continuity_v1.py": "028993639846bc04f5a42a2f75203e0bb51d0744fec570b50aff424f66223cd4"
   },
   "candidate_inputs_unchanged": true,
-  "candidate_test_sha256": "e64a3ed2372e0f98d6136ea97323598adffc3776134a1ac0ca501cb3e21397c2",
+  "candidate_test_sha256": "028993639846bc04f5a42a2f75203e0bb51d0744fec570b50aff424f66223cd4",
   "egress_canary": "PASS",
-  "elapsed_seconds": 78.34,
+  "elapsed_seconds": 79.453,
   "environment": "ALLOWLIST",
   "evidence_class": "SYNTHETIC_OFFLINE",
   "executed_cases": [
@@ -79,6 +79,10 @@
     {
       "status": "ok",
       "test": "test_cli_live_and_unowned_root_fail_before_effect (tests.test_trading_continuity_v1.OrdinarySourceTests.test_cli_live_and_unowned_root_fail_before_effect)"
+    },
+    {
+      "status": "ok",
+      "test": "test_cumulative_cost_floor_clock_and_partial_exit_refusal (tests.test_trading_continuity_v1.OrdinarySourceTests.test_cumulative_cost_floor_clock_and_partial_exit_refusal)"
     },
     {
       "status": "ok",
@@ -171,11 +175,11 @@
   ],
   "exit_code": 0,
   "observed_peak_bytes": 2396462,
-  "output_sha256": "c776a75f204a474fa5e095060699d90ef6ed3246147010feebd55f851d13f065",
+  "output_sha256": "a6d4cb030c746ada65389673c8ece8807f6e79fe368837748b8b6bed3c377769",
   "owned_process_exit_code": 0,
   "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
   "phase": "fresh",
-  "resource_measurement_n": 36,
+  "resource_measurement_n": 37,
   "status": "PASS",
   "test_modules": [
     "tests.test_trading_continuity_v1"

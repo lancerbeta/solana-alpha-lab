@@ -29686,7 +29686,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: 645bd776dcb871584f23c28869043539a2a759e66f1c073ae41c6bddb9fe1662}
+  integrity: {kind: sha256, sha256: 371753f07d2eb69d52feae08a8f4efb52f456e6327493933961c1af20eceea6f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -35008,7 +35008,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_shadow_operations.py', repository_path: src/solana_alpha_lab/factory/paper_shadow_operations.py}
-  integrity: {kind: sha256, sha256: d97de9a333f6648f94208d8ffb2c1b2fd57e12bf4e04eee1acabc6696f4da0b1}
+  integrity: {kind: sha256, sha256: d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
@@ -41430,7 +41430,7 @@ records:
     repository_path: docs/contracts/episode_decision_continuity_v1.md
   integrity:
     kind: sha256
-    sha256: a5308da47cafe9cbb255396dd0d630f18216aa622af0ca74ad80cb4ec50335c1
+    sha256: 39e32299bdf615d77cae9b72a4a55557afa19b9aaddd90977e830360db9f0837
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41542,7 +41542,7 @@ records:
     repository_path: scripts/prove_trading_continuity.py
   integrity:
     kind: sha256
-    sha256: 47760b71c6395b89e7d68741b9946f1af428692a6a2a4be23220f9283fad87d3
+    sha256: f7e2215f80f589fe3df7236cfc284e7aeeacd4fc9b131d623d7eb138b256bf4d
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41570,7 +41570,7 @@ records:
     repository_path: tests/test_trading_continuity_v1.py
   integrity:
     kind: sha256
-    sha256: e64a3ed2372e0f98d6136ea97323598adffc3776134a1ac0ca501cb3e21397c2
+    sha256: 028993639846bc04f5a42a2f75203e0bb51d0744fec570b50aff424f66223cd4
   access: *id001
   relations:
   - relation_type: depends_on

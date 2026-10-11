@@ -2121,6 +2121,27 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
         final_id = "FINAL-" + str(result["attempt_id"])
         if store.get_execution_event(final_id) is not None:
             raise PaperPlaneError("MODELED_RESULT_ALREADY_FINAL")
+        # Observations describe a cumulative cost, never a replaceable estimate.
+        # A later unknown total may retain uncertainty, but cannot erase known costs.
+        prior_known_cost = Decimal("0")
+        for event in store.execution_events():
+            if event["event_type"] != "MODELED_RESULT_ACCEPTED":
+                continue
+            prior = event["payload"].get("result") or {}
+            if prior.get("attempt_id") != result["attempt_id"]:
+                continue
+            if _parse_utc(str(result["observed_at"])) < _parse_utc(str(prior["observed_at"])):
+                raise PaperPlaneError("MODELED_RESULT_CLOCK_REGRESSION")
+            if prior.get("chargeable_cost_usd") is not None:
+                try:
+                    prior_value = Decimal(str(prior["chargeable_cost_usd"]))
+                    if not prior_value.is_finite() or prior_value < 0:
+                        raise ValueError()
+                except (ValueError, ArithmeticError):
+                    raise PaperPlaneError("MODELED_RESULT_SOURCE_CORRUPT") from None
+                prior_known_cost = max(prior_known_cost, prior_value)
+        if cost is not None and Decimal(str(cost)) < prior_known_cost:
+            raise PaperPlaneError("MODELED_RESULT_COST_REGRESSION")
         position = store.get_position(bound["position_id"])
         if position is None:
             raise PaperPlaneError("POSITION_NOT_FOUND")

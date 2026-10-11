@@ -68,7 +68,10 @@ Operator cancellation still cannot assert non-fill for UNKNOWN. PAPER evidence
 is PAPER_MODEL; SHADOW is SHADOW_QUOTE_MODEL, never REAL_FILL. An attempt's
 chargeable_cost_usd is its cumulative **additional modeled cost excluding**
 entry/exit price-leg fees. Unknown cost stays unknown. Costs are counted once
-per attempt's newest accepted observation. Trade PnL and additional costs are
+per attempt, preserving its confirmed lower bound even when a later total is
+UNKNOWN. A known cumulative total cannot decrease; observation clocks cannot
+move backwards. Unknown total never becomes zero or a fully known headline.
+Trade PnL and additional costs are
 separate; a combined modeled net is shown only for one compatible, terminal,
 fully known scope. Modes, strategy versions and epochs are never summed into a
 cashflow headline. NETRETURN_STATUS=NOT_ESTABLISHED; OWNER_FCF_STATUS=NOT_AVAILABLE.

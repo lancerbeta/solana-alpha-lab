@@ -177,10 +177,10 @@ def run(modules: list[str], *, phase: str) -> dict:
     (case / ".owner").write_text(CAMPAIGN, encoding="utf-8")
     (case / "tmp").mkdir()
     (case / "sitecustomize.py").write_text(EGRESS_GUARD, encoding="utf-8")
-    if phase == "baseline-replay":
+    if phase in {"baseline-replay", "cost-before"}:
         frozen = case / "base-modules"
         frozen.mkdir()
-        base = "d244af69bfd7ddc2850b9e5e5823323956e325c4"
+        base = "d244af69bfd7ddc2850b9e5e5823323956e325c4" if phase == "baseline-replay" else "160866d6b92e724b48e4c9dceb7b511043d22cb4"
         for name in ("paper_plane", "trading_operations", "paper_shadow_operations"):
             blob = subprocess.run(["git", "show", base + ":src/solana_alpha_lab/factory/" + name + ".py"],
                 cwd=ROOT, capture_output=True, check=True).stdout
@@ -199,7 +199,7 @@ from solana_alpha_lab.factory.paper_shadow_operations import build_operations_pr
 from solana_alpha_lab.factory.trading_operations import _bot_context
 '''
         (case / "baseline_probe.py").write_text(prelude + ast.unparse(probe) + "\n", encoding="utf-8")
-        modules = ["baseline_probe"]
+        modules = ["baseline_probe"] if phase == "baseline-replay" else ["tests.test_trading_continuity_v1.OrdinarySourceTests.test_cumulative_cost_floor_clock_and_partial_exit_refusal"]
     # Do not inherit provider keys, credentials, user profiles or arbitrary Python hooks.
     env = {key: os.environ[key] for key in ("SYSTEMROOT", "WINDIR", "PATH", "COMSPEC") if key in os.environ}
     env.update(TEMP=str(case / "tmp"), TMP=str(case / "tmp"),
@@ -248,7 +248,7 @@ from solana_alpha_lab.factory.trading_operations import _bot_context
         result["candidate_test_sha256"] = input_bindings["tests/test_trading_continuity_v1.py"]
         result["candidate_input_bindings"] = input_bindings
         result["candidate_inputs_unchanged"] = inputs_unchanged
-        if phase == "baseline-replay":
+        if phase in {"baseline-replay", "cost-before"}:
             result["baseline_binding"] = {"base": base, "frozen_modules": ["paper_plane", "trading_operations", "paper_shadow_operations"],
                 "method": "FROZEN_BASE_MODULES_WITH_CURRENT_INDEPENDENT_BASELINE_PROBES", "remaining_dependencies": "UNCHANGED_BASE_OWNERS"}
             result["failure_boundaries"] = re.findall(r"^(?:FAIL|ERROR): ([^\n]+)\n[\s\S]*?\n(AssertionError:[^\n]+)",
@@ -270,7 +270,7 @@ from solana_alpha_lab.factory.trading_operations import _bot_context
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--phase", choices=("baseline", "baseline-replay", "baseline-projection", "verify", "regression", "clean", "fresh"), default="verify")
+    parser.add_argument("--phase", choices=("baseline", "baseline-replay", "cost-before", "baseline-projection", "verify", "regression", "clean", "fresh"), default="verify")
     args = parser.parse_args()
     if args.phase == "clean":
         result = clean()
