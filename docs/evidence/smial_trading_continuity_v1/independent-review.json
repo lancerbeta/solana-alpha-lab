@@ -131,24 +131,24 @@
     {
       "role": "CODE_REVIEWER",
       "prior_verdict": "NOT_READY",
-      "severity": "P1",
-      "finding": "Full originating decision body unbound to admitted position; decision-only clock corruption bypassed stale refusal. Native and frozen before reproduced, existing canonical fingerprint owner reused; focused after preserves all persisted readback.",
+      "severity": "MAJOR",
+      "finding": "Original reviewer priority=P1. Full originating decision body unbound to admitted position; decision-only clock corruption bypassed stale refusal. Native and frozen before reproduced, existing canonical fingerprint owner reused; focused after preserves all persisted readback.",
       "observed_head": "2bc4684f5b7307757c37662b62c65f68aac447f8",
       "resolved_by_head": "aa8d53795db8d60430aeddc5594a6b348ad89e60"
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "prior_verdict": "NOT_READY",
-      "severity": "P1",
-      "finding": "Source ExitDecision body/clock lacked independent durable acceptance integrity, allowing decision-only backdating before originating cutoff. Native/frozen before actual FAIL. Complete accepted packet now atomically hash-bound in existing event owner; attempt/result exact scope/hash check, rollback/replay/operator-close probes added. No policy/database schema/V2 lifecycle change.",
+      "severity": "MAJOR",
+      "finding": "Original reviewer priority=P1. Source ExitDecision body/clock lacked independent durable acceptance integrity, allowing decision-only backdating before originating cutoff. Native/frozen before actual FAIL. Complete accepted packet now atomically hash-bound in existing event owner; attempt/result exact scope/hash check, rollback/replay/operator-close probes added. No policy/database schema/V2 lifecycle change.",
       "observed_head": "aa8d53795db8d60430aeddc5594a6b348ad89e60",
       "resolved_by_head": "5a7d0fc02852dd68cfb822daa09e5048a42e0d7c"
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "prior_verdict": "NOT_READY",
-      "severity": "P1",
-      "finding": "Originating EXIT trusted stored admission hash without recomputing mutable body before T0/cutoff. Native/frozen record-only corruption with unchanged stored hash actually FAIL; existing hash owner now enforces body/stored/origin equality before effects. No source schema, scientific recipe, risk policy or V2 lifecycle change.",
+      "severity": "MAJOR",
+      "finding": "Original reviewer priority=P1. Originating EXIT trusted stored admission hash without recomputing mutable body before T0/cutoff. Native/frozen record-only corruption with unchanged stored hash actually FAIL; existing hash owner now enforces body/stored/origin equality before effects. No source schema, scientific recipe, risk policy or V2 lifecycle change.",
       "observed_head": "5a7d0fc02852dd68cfb822daa09e5048a42e0d7c",
       "resolved_by_head": "f84eaadf8345addf7039175e688e225480a528d8"
     }
