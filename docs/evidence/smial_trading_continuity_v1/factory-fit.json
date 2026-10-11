@@ -4,8 +4,8 @@
   "review_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1-FIT",
   "as_of": "2026-10-11",
   "task_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "5b3ffdaee3af8d8b8231c6315c04ff4bb39d94891770e6ea4ae2f32d6b356f0b",
+  "reviewed_inventory_sha256": "ad46d56a8a6e51384b525cca6e4909d8d0fc88d767bd7c21525409f0addeace3",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
