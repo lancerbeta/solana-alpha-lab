@@ -49,7 +49,7 @@
   },
   "non_target_preservation": "PASS",
   "process_readback": {
-    "37528": "EXITED"
+    "35260": "EXITED"
   },
   "remaining_owned_bytes_after": 0,
   "remaining_owned_bytes_before": 40,
@@ -73,8 +73,8 @@
       "kind": "DISPOSABLE_CASE_ROOT",
       "marker": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
       "observed_peak_bytes": 3172233,
-      "path": "local/smial_trading_continuity_v1/fresh-b1bd4ad1a05c4bbcad7586751c44b6d4",
-      "pid": 37528
+      "path": "local/smial_trading_continuity_v1/fresh-1c7b88b97b8547d38d98896f8df3b71c",
+      "pid": 35260
     }
   ],
   "retained_dependencies": "PREEXISTING_LOCKED_ENVIRONMENT_AND_SHARED_CACHE",

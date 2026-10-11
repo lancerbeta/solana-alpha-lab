@@ -972,6 +972,26 @@ class OrdinarySourceTests(unittest.TestCase):
             self.assertEqual(len(attempts), 2)
             self.assertEqual(len(results), 2)
             self.assertEqual({e["position_id"] for e in attempts + results}, {pid})
+            expected_attempts = {
+                (self.admission["episode_id"], "ENTRY", "SET-ENTRY"): attempted["attempt_id"],
+                (self.admission["episode_id"], "EXIT", "SET-EXIT"): exited["attempt_id"],
+            }
+            actual_attempts = {
+                (signals[positions[0]["signal_decision_id"]], e["payload"]["side"], e["payload"]["attempt_key"]): e["event_id"]
+                for e in attempts
+            }
+            self.assertEqual(actual_attempts, expected_attempts)
+            self.assertEqual(len({e["event_id"] for e in attempts}), 2)
+            self.assertTrue(all(e["event_id"] == e["payload"]["attempt_id"] and
+                e["position_id"] == e["payload"]["position_id"] and e["payload"]["mode"] == "PAPER" for e in attempts))
+            expected_results = {
+                ("ENTRY-RESULT-1", attempted["attempt_id"], "LANDED_SUCCESS", pid, "PAPER_MODEL"),
+                ("SET-FINAL", exited["attempt_id"], "LANDED_SUCCESS", pid, "PAPER_MODEL"),
+            }
+            actual_results = {(e["payload"]["result"]["result_id"], e["payload"]["result"]["attempt_id"],
+                e["payload"]["result"]["outcome"], e["position_id"], e["payload"]["evidence_class"]) for e in results}
+            self.assertEqual(actual_results, expected_results)
+            self.assertEqual(len({e["event_id"] for e in results}), 2)
         finally:
             reader.close()
 

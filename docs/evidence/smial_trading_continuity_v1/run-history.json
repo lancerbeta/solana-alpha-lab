@@ -65,6 +65,14 @@
       "head": "3f619f9264dda4d70e41eb01c304280b15bae8f3",
       "result": "42_PASS_HISTORICAL_ONLY",
       "output_sha256": "5cdd55bf22266bcb9f35eaf45484c01a71ffe41282cfbff45da34f8a570f8af5"
+    },
+    {
+      "phase": "pre-strengthened-identity-oracle",
+      "head": "6aa402c1793cba992a714713face8c245845206a",
+      "result": "49_PASS_AND_8_A_D_PASS_COUNTS_ORACLE_HISTORICAL_ONLY",
+      "output_sha256": "67e56a5e52d05080c4d3ebf277f9991163f9fb906e3b21f2f2e87783febffbf1",
+      "review": "GOAL_DOD_NOT_READY_ATTEMPT_RESULT_IDENTITY_SETS_MISSING",
+      "correction": "Literal episode/side/key and result-id/attempt link sets; no production change; exact candidate proofs repeated"
     }
   ]
 }

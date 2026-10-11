@@ -41570,7 +41570,7 @@ records:
     repository_path: tests/test_trading_continuity_v1.py
   integrity:
     kind: sha256
-    sha256: 3cca081c54b0ba7833c556bce4ded333516835ef50473268f19ba5e7d7467758
+    sha256: 7ec09b855dcdfd49921541cd5a3efeecbcf16c5897448785d716654bf528a92a
   access: *id001
   relations:
   - relation_type: depends_on

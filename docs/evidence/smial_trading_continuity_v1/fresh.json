@@ -11,12 +11,12 @@
     "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
     "src/solana_alpha_lab/factory/trading_runner.py": "2b1a526bfebfa3b54545863d85c6f97ae31c2178e28b28157ebbecbbfcd36be2",
-    "tests/test_trading_continuity_v1.py": "3cca081c54b0ba7833c556bce4ded333516835ef50473268f19ba5e7d7467758"
+    "tests/test_trading_continuity_v1.py": "7ec09b855dcdfd49921541cd5a3efeecbcf16c5897448785d716654bf528a92a"
   },
   "candidate_inputs_unchanged": true,
-  "candidate_test_sha256": "3cca081c54b0ba7833c556bce4ded333516835ef50473268f19ba5e7d7467758",
+  "candidate_test_sha256": "7ec09b855dcdfd49921541cd5a3efeecbcf16c5897448785d716654bf528a92a",
   "egress_canary": "PASS",
-  "elapsed_seconds": 113.656,
+  "elapsed_seconds": 114.931,
   "environment": "ALLOWLIST",
   "evidence_class": "SYNTHETIC_OFFLINE",
   "executed_cases": [
@@ -219,7 +219,7 @@
   ],
   "exit_code": 0,
   "observed_peak_bytes": 3172233,
-  "output_sha256": "67e56a5e52d05080c4d3ebf277f9991163f9fb906e3b21f2f2e87783febffbf1",
+  "output_sha256": "750ea457837a0867f401698f748ed8ea0fbeb5c19e5d010eac1e8ebb0e79a8ce",
   "owned_process_exit_code": 0,
   "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
   "phase": "fresh",
