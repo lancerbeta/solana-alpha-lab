@@ -19,7 +19,14 @@ Absent query is `BOUND_EPISODE_RECIPE_REQUIRED`. No default trading hypothesis,
 new expression language, EMA or risk limit is invented.
 
 The prefix reader opens WAL-aware readonly SQLite in one snapshot. Membership
-coverage is checked before lazy numeric reads. Observations must satisfy their
+coverage is checked before lazy numeric reads.
+The shared scientific `episode_decision_price` owner then requires OBSERVED
+PRICE at the decision point before any entry features, including LIST_CONTRAST.
+Missing/late PRICE gives `EPISODE_DECISION_PRICE_<status>` and UNKNOWN without
+admission; it cannot be healed by a later point. List-only therefore reads the
+eligibility PRICE but no holder feature. Originating exits evaluate their frozen
+target through the arithmetic owner without re-admitting or re-checking lists.
+Observations must satisfy their
 own point deadline and the frozen decision cutoff. Pending outbox observations
 and canonical, hash-verified publications are read through the source owner;
 source-owned `ingested_visible_at` is carried unchanged from outbox into hashed

@@ -66,6 +66,7 @@ commissioning. `failure_boundaries` preserves compact actual assertions.
 | F10 path/origin | Writable store links, rooted paths or unavailable origin could escape/refabricate | Strict root/ancestor/file/hardlink guards, exact packet/hash lookup, typed unavailable | Real NTFS hardlink canary and actual corruption/missing-store probes; symlink variant explicit skip |
 | F11 honest failure/UX | Additional attempt costs omitted from headline; DRAINING implied a background exit | Cost components and UNKNOWN visible; explicit operator/reconcile next action | Dynamic modeled failure/mixed-cost/drain probes + independent owner navigation review |
 | F13 cumulative cost/clock | Review found .01→0/missing could erase confirmed cost; observation clock could regress | Known total regression and reverse clock refused; UNKNOWN total retains .01 lower bound; .02 final + dynamic partial EXIT refusal | Static review → frozen previous-head cost-before FAIL → current literal probe; no historical event rewrite |
+| F14 decision eligibility | Semantic review found missing/late decision PRICE could ENTER outside scientific eligibility; three frozen 5db1b820 probes reproduce ENTER instead of UNKNOWN | Shared scientific PRICE cell precedes entry features, including list-only; typed UNKNOWN and no admission; originating exit retains its own target arithmetic | Dynamic price-before 3 FAIL → fresh 3 PASS with valid neighbors; membership UNKNOWN still reads no values |
 | F12 version gap | Existing _science_lineage_matches requires V1 although schema admits Vn | Preserved guard; V2 VERIFY refuses, V1 originating exit still works after list removal | Dynamic denial, **unrepaired owner boundary**; no automatic V2 materialization claim |
 
 Compatibility: historical manifests 1.0 are not filled from current data;
@@ -123,8 +124,8 @@ PAPER list-only, SHADOW mixed), plus operator-drain recovery; this does not
 erase the separate required version journey. ARC attacks cover 24/24 named
 scenario hypotheses, with S21/S22 review/machine final binding. PEF 24 planned,
 24 attempted, 22 fully executed at most and 2 partial; static-before missing
-callers remain explicit. DER 13/13 finding conclusions have direct evidence:
-11 behavioral before/after or post-review probes, two missing base callers
+callers remain explicit. DER 14/14 finding conclusions have direct evidence:
+12 behavioral before/after or post-review probes, two missing base callers
 established statically and exercised dynamically after repair. FR baseline
 five deterministic frozen-base failures → five current passes; other repairs
 are review/static-discovered with dynamic after-probes, not invented historical
@@ -174,6 +175,6 @@ make S13 green. Admission veto for EXIT_*/UNRESOLVED versus residual inventory
 and automatic scientific exit after deactivation remain separate existing
 policy questions. Safe operator/reconciliation continues to work.
 
-Final proof is fresh.json after the cost/clock repair. pre-cost-verify.json and earlier 37-case receipts are historical only. cost-before.json repeats the new regression probe against previous candidate 160866d6 and records the missing cost-regression refusal; clocks were independently static-discovered and dynamically checked after repair. Canonical SEM-OWNER-LIFECYCLE resolve-route succeeded after incremental generator PASS_IMPACTED_CLOSURE_NOOP; root document links directly to the runbook. Final independent review is separately hash-bound.
+Final proof is fresh.json after cost/clock and shared PRICE eligibility repairs. pre-cost-verify.json and earlier 37/38-case receipts are historical only. cost-before.json repeats the new regression probe against previous candidate 160866d6 and records the missing cost-regression refusal; clocks were independently static-discovered and dynamically checked after repair. price-before.json freezes 5db1b820 and reproduces three actual ENTER/UNKNOWN mismatches. Two initial frozen-fixture dependency errors and a first-after provenance serialization error are recorded in run-history.json; they are not substituted for final evidence. Canonical SEM-OWNER-LIFECYCLE resolve-route succeeded after incremental generator PASS_IMPACTED_CLOSURE_NOOP; root document links directly to the runbook, which states V1-only support and links this report. Final independent review is separately hash-bound.
 
-Post-review cost/clock repair: final fresh 38/38 PASS, exact inputs unchanged; output SHA256 a6d4cb030c746ada65389673c8ece8807f6e79fe368837748b8b6bed3c377769. Literal cumulative .01→0 and reverse-clock observations are refused without events; .01→UNKNOWN preserves confirmed lower bound; definitive .02 plus exit produces modeled net 2.85. PARTIAL EXIT is dynamically refused with unchanged positions/results. Reported V2 partial boundary remains unchanged.
+Post-review final fresh 41/41 PASS, exact inputs unchanged; output SHA256 d0eb56e359e189ee5e626f80d5aabedbf69043b659bc51a491f7fa12461f90f7. Literal cumulative .01→0 and reverse-clock observations are refused without events; .01→UNKNOWN preserves confirmed lower bound; definitive .02 plus exit produces modeled net 2.85. PARTIAL EXIT is dynamically refused with unchanged positions/results. Missing PRICE for mixed/list-only and late PRICE for list-only refuse without future healing; research and runtime reuse the same eligibility cell. Reported V2 partial boundary remains unchanged.

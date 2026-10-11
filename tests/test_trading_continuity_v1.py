@@ -132,6 +132,7 @@ class OrdinarySourceTests(unittest.TestCase):
         self.holders_start, self.holders_end = 60, 66
         self.late = False
         self.future_price = 0.0000033
+        self.decision_price = 0.000003
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -141,7 +142,7 @@ class OrdinarySourceTests(unittest.TestCase):
         mapping = {"toptraded": [obj], "toptrending": [obj] if self.membership == "TRUE" else []}
         nominate(self.source.market, self.start, mapping)
         self.source.market.series[self.mint] = lambda now: token_object(self.mint,
-            price=self.future_price if now.hour >= 16 else 0.000003, liquidity=10000,
+            price=self.future_price if now.hour >= 16 else self.decision_price, liquidity=10000,
             holders=self.holders_end if now >= datetime(2026, 10, 5, 12, 35, tzinfo=UTC) else self.holders_start)
         if self.late:
             self.source.market.latency = lambda kind, now: 301 if kind == "search" and now.hour == 12 and now.minute == 35 else 1
@@ -289,7 +290,8 @@ class OrdinarySourceTests(unittest.TestCase):
         self.prepare(list_only=True)
         packet = self.decision()
         self.assertEqual(packet["decision"]["action"], "ENTER")
-        self.assertEqual(packet["provenance"]["read_set"], [])
+        self.assertEqual([(row["point_id"], row["field_id"]) for row in packet["provenance"]["read_set"]],
+                         [("E1800", "FIELD-USD-PRICE-001")])
         pid = packet["admission"]["position_id"]
         attempt = self.runner.attempt(position_id=pid, side="ENTRY", attempt_key="LIST-ENTRY", as_of="2026-10-05T12:40:00Z")
         self.runner.result(self._result(attempt["attempt_id"], "LANDED_SUCCESS", unit_price_usd="0.000003", filled_notional_usd="30", chargeable_cost_usd="0"))
@@ -298,6 +300,35 @@ class OrdinarySourceTests(unittest.TestCase):
         exit_attempt = self.runner.attempt(position_id=pid, side="EXIT", attempt_key="LIST-EXIT", as_of="2026-10-05T16:10:00Z")
         self.runner.result({"attempt_id": exit_attempt["attempt_id"], "result_id": "LIST-EXIT", "outcome": "LANDED_SUCCESS", "observed_at": "2026-10-05T16:10:01Z", "unit_price_usd": "0.0000033", "chargeable_cost_usd": "0"})
         self.assertEqual(self.runner.readback()["positions"][0]["realized_net_pnl_usd_dec"], "2.87")
+
+    def test_missing_decision_price_refuses_list_only(self):
+        self.decision_price = None
+        self.prepare(list_only=True)
+        packet = self.decision()
+        self.assertEqual(packet["decision"]["action"], "UNKNOWN")
+        self.assertTrue(packet["decision"]["reason_code"].startswith("EPISODE_DECISION_PRICE_"))
+        self.assertEqual(packet["provenance"]["numeric"]["values"], {})
+        self.assertEqual(self.runner.readback()["positions"], [])
+
+    def test_missing_decision_price_refuses_positive_holder_delta(self):
+        self.decision_price = None
+        self.prepare()
+        packet = self.decision()
+        self.assertEqual(packet["decision"]["action"], "UNKNOWN")
+        self.assertTrue(packet["decision"]["reason_code"].startswith("EPISODE_DECISION_PRICE_"))
+        self.assertEqual([(row["point_id"], row["field_id"]) for row in packet["provenance"]["read_set"]],
+                         [("E1800", "FIELD-USD-PRICE-001")])
+        self.assertEqual(self.runner.readback()["positions"], [])
+
+    def test_late_decision_price_refuses_list_only_without_future_healing(self):
+        self.late = True
+        self.prepare(list_only=True)
+        packet = self.decision()
+        self.assertEqual(packet["decision"]["action"], "UNKNOWN")
+        self.assertTrue(packet["decision"]["reason_code"].startswith("EPISODE_DECISION_PRICE_"))
+        self.source.tick(datetime(2026, 10, 5, 16, 5, tzinfo=UTC))
+        self.assertEqual(self.decision()["decision"], packet["decision"])
+        self.assertEqual(self.runner.readback()["positions"], [])
 
     def test_O7_O8_restart_and_future_do_not_change_decision(self):
         self.prepare()

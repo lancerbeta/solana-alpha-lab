@@ -5,6 +5,12 @@
 допустимость, materialization, activation и результат исполнения — разные шаги.
 Рабочий хост, provider, LIVE, кошелёк и деньги требуют отдельного разрешения.
 
+Поддержан только V1: действующий scientific handoff допускает
+`strategy_version=V1`. Загрузка и activation V2 заблокированы этим gate;
+совместная работа активной V2 с открытой V1 ещё не доказана. Итог аудита —
+`REPAIR_PARTIAL_BLOCKED`, точная граница и сценарии S08/S13 находятся в
+[отчёте](../reports/smial_trading_continuity_v1/REPORT.md).
+
 Самодостаточное воспроизведение acceptance на существующем locked toolchain:
 
 ```powershell
@@ -83,8 +89,8 @@ REQUEST_CLOSE_POSITION — position_id. Пример:
 payload под прежним idempotency_key. Код 2 + status=BLOCKED означает отказ;
 сначала устранить exact reason_code у его source owner, не повторять вслепую.
 Для UNRESOLVED после definitive NO_ROUTE можно открыть **новую** exit attempt
-с новым key. Для UNKNOWN сначала reconciliate ту же attempt. Новая версия
-обслуживается отдельно; старую позицию закрывает runner её originating version.
+с новым key. Для UNKNOWN сначала reconciliate ту же attempt. Существующую
+позицию V1 закрывает runner её originating V1; это не подтверждает поддержку V2.
 
 Отправлять fake modeled result можно только после `send_permitted=true`.
 Повтор attempt возвращает false: сначала выяснить outcome прежней identity.

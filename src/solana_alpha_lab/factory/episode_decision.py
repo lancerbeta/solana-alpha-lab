@@ -15,7 +15,7 @@ import yaml
 
 from solana_alpha_lab.factory import hfic_research_scope as scope
 from solana_alpha_lab.factory.experiment_spec import spec_sha256
-from solana_alpha_lab.factory.hfic_temporal_discovery import scientific_body, evaluate_episode_prefix
+from solana_alpha_lab.factory.hfic_temporal_discovery import scientific_body, evaluate_episode_prefix, evaluate_episode_features
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 from solana_alpha_lab.factory.opportunity_episodes import admission_content_sha256, resolve_point, schedule_binding
@@ -159,7 +159,7 @@ def produce_episode_decision(root: Path, *, source_path: Path, strategy: Mapping
                 numeric = evaluate_episode_prefix(body, grouped=prefix, cohort=admission["cohort_id"],
                     episode_id=episode_id, t0=parse_utc(admission["t0"]), decision_deadline=cutoff,
                     point_window=prefix.window) if member else {"action": "NO_ENTER"}
-                action, reason = numeric["action"], "EPISODE_RULE_" + numeric["action"]
+                action, reason = numeric["action"], numeric.get("reason_code", "EPISODE_RULE_" + numeric["action"])
             except scope.ResearchScopeError as exc:
                 action, reason = "BLOCKED" if "INVALID" in exc.code else "UNKNOWN", exc.code
             recipe_sha = scope.sha256_of(body)
@@ -210,7 +210,7 @@ def produce_originating_exit(root: Path, *, source_path: Path, strategy, manifes
             if parse_utc(as_of) < cutoff:
                 raise PaperPlaneError("EPISODE_EXIT_NOT_DUE")
             prefix = _Prefix(source, admission, binding, cutoff, source_path.parent)
-            target = evaluate_episode_prefix({**body,
+            target = evaluate_episode_features({**body,
                 "features": [{"name": "exit_price", "op": "point_value", "field_id": body["target"]["field_id"], "point": point}],
                 "predicates": [{"feature": "exit_price", "op": "gt", "value": 0}]},
                 grouped=prefix, cohort=admission["cohort_id"], episode_id=episode_id,

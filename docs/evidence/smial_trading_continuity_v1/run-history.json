@@ -32,6 +32,24 @@
       "result": "EXPECTED_FAIL_5",
       "output_sha256": "7511c0e56629d8699f6c7d0f8120521349e3e515586da8862f5ee1414ccc54e5",
       "correction": "Added MULTILINE to compact failure-boundary extraction, repeated before-state once"
+    },
+    {
+      "phase": "price-before-fixture-initial",
+      "result": "2_EXPECTED_FAIL_1_REGISTRY_LOCATION_ERROR",
+      "output_sha256": "bb2b629e9cd8d9acf15c89fa7ca116b0cf71d8214daedba0752f624d1377c755",
+      "correction": "Frozen module path must preserve repository dependency layout; no guard bypass"
+    },
+    {
+      "phase": "price-before-fixture-schema",
+      "result": "2_EXPECTED_FAIL_1_MISSING_REGISTRY_SCHEMA_ERROR",
+      "output_sha256": "2af53034dbc6cc98e93f27e1fb49c3d63e15496b206c8cde91b190a5821a17eb",
+      "correction": "Copy exact unchanged schemas with registry; failure block parsing bounded to each test"
+    },
+    {
+      "phase": "price-guard-first-after",
+      "result": "1_FAIL_25_PROVENANCE_SERIALIZATION_ERRORS",
+      "output_sha256": "6058a35ed51ac709c3975df0577216e539743dcaf034959a7ca2840e650e0426",
+      "correction": "Eligibility records canonical status; exact input lineage remains in readset, no raw datetime cell serialized"
     }
   ]
 }

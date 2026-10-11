@@ -1,22 +1,22 @@
 {
   "candidate_input_bindings": {
-    "scripts/prove_trading_continuity.py": "f7e2215f80f589fe3df7236cfc284e7aeeacd4fc9b131d623d7eb138b256bf4d",
+    "scripts/prove_trading_continuity.py": "2b2965221e4ce89f7df35468c81d73b2b50cae1190a14aad0810673c9f18291e",
     "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
-    "src/solana_alpha_lab/factory/episode_decision.py": "cf91487ee2284e5bf476066b065658c45d6954a4005938dc264dfdf53a52fc93",
+    "src/solana_alpha_lab/factory/episode_decision.py": "c08a55a5c512ca01bffe0e1c5888a76137359f118574bb7f27b9a337cbca0a63",
     "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
-    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "cfa659476d2ca93592f0d5ff92c29c85d0ec31a5552f015dda001edb74c284ed",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "af898471e64d5beecdb4e6f56caeca7d7cde0ec14fd5e7559634c7b241f0c383",
     "src/solana_alpha_lab/factory/observation_schedule_store.py": "361522572d7ec2ef325d58f10c8a804ab020a14e1348406f864b968d8a388060",
     "src/solana_alpha_lab/factory/opportunity_episode_release.py": "97c2a604f4b10523cb876f6a0a561b291d04ea46e5fb45c0d0917db5f911a0e7",
     "src/solana_alpha_lab/factory/paper_plane.py": "371753f07d2eb69d52feae08a8f4efb52f456e6327493933961c1af20eceea6f",
     "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
     "src/solana_alpha_lab/factory/trading_runner.py": "7bc1bb7af298b176356345443ec10cf12b00a39a3d333713fc378fbdbb7abd6e",
-    "tests/test_trading_continuity_v1.py": "028993639846bc04f5a42a2f75203e0bb51d0744fec570b50aff424f66223cd4"
+    "tests/test_trading_continuity_v1.py": "3d63b1986b465eda4e8b58cd6b0a826f821f9458b76e1d3ed3ba19c0d62cab5f"
   },
   "candidate_inputs_unchanged": true,
-  "candidate_test_sha256": "028993639846bc04f5a42a2f75203e0bb51d0744fec570b50aff424f66223cd4",
+  "candidate_test_sha256": "3d63b1986b465eda4e8b58cd6b0a826f821f9458b76e1d3ed3ba19c0d62cab5f",
   "egress_canary": "PASS",
-  "elapsed_seconds": 79.453,
+  "elapsed_seconds": 78.831,
   "environment": "ALLOWLIST",
   "evidence_class": "SYNTHETIC_OFFLINE",
   "executed_cases": [
@@ -102,7 +102,19 @@
     },
     {
       "status": "ok",
+      "test": "test_late_decision_price_refuses_list_only_without_future_healing (tests.test_trading_continuity_v1.OrdinarySourceTests.test_late_decision_price_refuses_list_only_without_future_healing)"
+    },
+    {
+      "status": "ok",
       "test": "test_list_only_uses_same_source_owner (tests.test_trading_continuity_v1.OrdinarySourceTests.test_list_only_uses_same_source_owner)"
+    },
+    {
+      "status": "ok",
+      "test": "test_missing_decision_price_refuses_list_only (tests.test_trading_continuity_v1.OrdinarySourceTests.test_missing_decision_price_refuses_list_only)"
+    },
+    {
+      "status": "ok",
+      "test": "test_missing_decision_price_refuses_positive_holder_delta (tests.test_trading_continuity_v1.OrdinarySourceTests.test_missing_decision_price_refuses_positive_holder_delta)"
     },
     {
       "status": "ok",
@@ -174,12 +186,12 @@
     }
   ],
   "exit_code": 0,
-  "observed_peak_bytes": 2396462,
-  "output_sha256": "a6d4cb030c746ada65389673c8ece8807f6e79fe368837748b8b6bed3c377769",
+  "observed_peak_bytes": 2392366,
+  "output_sha256": "d0eb56e359e189ee5e626f80d5aabedbf69043b659bc51a491f7fa12461f90f7",
   "owned_process_exit_code": 0,
   "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
   "phase": "fresh",
-  "resource_measurement_n": 37,
+  "resource_measurement_n": 40,
   "status": "PASS",
   "test_modules": [
     "tests.test_trading_continuity_v1"

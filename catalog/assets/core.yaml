@@ -38013,7 +38013,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: cfa659476d2ca93592f0d5ff92c29c85d0ec31a5552f015dda001edb74c284ed}
+  integrity: {kind: sha256, sha256: af898471e64d5beecdb4e6f56caeca7d7cde0ec14fd5e7559634c7b241f0c383}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -41391,7 +41391,7 @@ records:
     repository_path: docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md
   integrity:
     kind: sha256
-    sha256: 3ab14e2ee533b44e7eb65054620a2b1a45408e8c49ba216c0d729d1629eb8b7d
+    sha256: 91736e1b2bc5be6decee5a5103dee7a4d0dd658544c9d8cd77eaaa47c8a6c10f
   access: &id001
     mode: read_only
     method: file
@@ -41430,7 +41430,7 @@ records:
     repository_path: docs/contracts/episode_decision_continuity_v1.md
   integrity:
     kind: sha256
-    sha256: 39e32299bdf615d77cae9b72a4a55557afa19b9aaddd90977e830360db9f0837
+    sha256: 44aa6fb37990a80e0d48cd8c49842e298e9f503eaeb40ed0cd525ee9eb583a0f
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41458,7 +41458,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/episode_decision.py
   integrity:
     kind: sha256
-    sha256: cf91487ee2284e5bf476066b065658c45d6954a4005938dc264dfdf53a52fc93
+    sha256: c08a55a5c512ca01bffe0e1c5888a76137359f118574bb7f27b9a337cbca0a63
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41542,7 +41542,7 @@ records:
     repository_path: scripts/prove_trading_continuity.py
   integrity:
     kind: sha256
-    sha256: f7e2215f80f589fe3df7236cfc284e7aeeacd4fc9b131d623d7eb138b256bf4d
+    sha256: 2b2965221e4ce89f7df35468c81d73b2b50cae1190a14aad0810673c9f18291e
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41570,7 +41570,7 @@ records:
     repository_path: tests/test_trading_continuity_v1.py
   integrity:
     kind: sha256
-    sha256: 028993639846bc04f5a42a2f75203e0bb51d0744fec570b50aff424f66223cd4
+    sha256: 3d63b1986b465eda4e8b58cd6b0a826f821f9458b76e1d3ed3ba19c0d62cab5f
   access: *id001
   relations:
   - relation_type: depends_on
