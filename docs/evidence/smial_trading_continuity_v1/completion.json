@@ -4,7 +4,7 @@
   "acceptance_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1-PARTIAL-ENGINEERING-CANDIDATE",
   "as_of": "2026-10-11",
   "task_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
-  "state_change": "Confirmed offline V1 continuity and admission/outcome repairs: ordinary source ENTER with denied admission keeps its exact packet, reason/scope/policy; unattempted cancellation commits, actual errors roll back and successful reservation stays atomic. PAPER mixed/list-only and SHADOW mixed reconcile. CAPABILITY_OUTCOME=REPAIR_PARTIAL_BLOCKED: active V2 alongside V1 remains blocked by preserved scientific V1 handoff; original S08/S13 stay open. No canonical DONE or full-scope acceptance.",
+  "state_change": "Confirmed offline V1 continuity and admission/outcome repairs: ordinary source ENTER with denied admission keeps its exact packet, reason/scope/policy; unattempted cancellation commits, actual errors roll back and successful reservation stays atomic. PAPER mixed/list-only and SHADOW mixed reconcile. CAPABILITY_OUTCOME=REPAIR_PARTIAL_BLOCKED: active V2 alongside V1 remains blocked by preserved scientific V1 handoff; original S08/S13 stay open. No canonical DONE or full-scope acceptance. Originating full SignalDecision fingerprint is verified against existing admitted-position identity before its body/clock is consumed; decision-only stale-clock corruption refuses without effects. Accepted originating EXIT packet is atomically hash-bound in the existing event journal; attempt/result verify exact scope/body/clock integrity, genuine binding errors roll back and operator close remains compatible. Originating EXIT recomputes the canonical source admission body fingerprint before T0/cutoff; body-only corruption with unchanged stored hash refuses without persisted effects.",
   "base_main": "d244af69bfd7ddc2850b9e5e5823323956e325c4",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
@@ -90,7 +90,11 @@
       "PASS_SHARED_SCIENTIFIC_PRICE_ELIGIBILITY_AND_TYPED_REFUSAL",
       "PASS_NORMAL_REFUSAL_AND_UNATTEMPTED_CANCELLATION_DURABLE",
       "PASS_REAL_ERROR_ROLLBACK_AND_POLICY_REEVALUATION",
-      "PASS_INDEPENDENT_SOURCE_ADMISSION_ATTEMPT_RESULT_IDENTITY_SETS"
+      "PASS_INDEPENDENT_SOURCE_ADMISSION_ATTEMPT_RESULT_IDENTITY_SETS",
+      "PASS_SOURCE_RECOVERY_EXACT_VISIBILITY_AND_PUBLISHED_REPLAY_ORACLE",
+      "PASS_FULL_ORIGIN_DECISION_FINGERPRINT_AND_CORRUPTION_REFUSAL",
+      "PASS_EXIT_ORIGIN_PACKET_BINDING_ATOMIC_REPLAY_AND_OPERATOR_CLOSE",
+      "PASS_EXIT_SOURCE_ADMISSION_BODY_HASH_BEFORE_CLOCK_CONSUMPTION"
     ]
   },
   "non_claims": [
