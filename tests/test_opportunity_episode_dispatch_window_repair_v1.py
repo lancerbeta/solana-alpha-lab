@@ -210,8 +210,20 @@ class DispatchWindowTests(ScenarioCase):
                     for row in pq.read_table(path).to_pylist()
                     if row.get('point_id') == 'E300']
             self.assertEqual(len(rows), 1)
-            published.append(rows[0])
+            # Recovery commits this outbox row five seconds later. Preserve
+            # the reconstructed source gap, but never backdate its ingestion
+            # clock merely to make two different histories byte-identical.
+            expected_visible = assigned + timedelta(seconds=65 if crash else 60)
+            self.assertEqual(rows[0]['ingested_visible_at'],
+                             expected_visible.isoformat().replace('+00:00', 'Z'))
+            source_gap = dict(rows[0])
+            del source_gap['ingested_visible_at']
+            published.append(source_gap)
             self.assertEqual(search_calls(sc.tick(assigned + timedelta(seconds=80))), [])
+            replayed = [row for path in (sc.data_root/'datasets').rglob('*.parquet')
+                        for row in pq.read_table(path).to_pylist()
+                        if row.get('point_id') == 'E300']
+            self.assertEqual(replayed, rows)
         self.assertEqual(published[0], published[1])
 
     def test_same_assigned_slots_follow_configured_batching(self):

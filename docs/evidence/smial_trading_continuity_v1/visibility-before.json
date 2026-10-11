@@ -1,0 +1,51 @@
+{
+  "actual_production_head": "22bda7783c889894214e051cea106cca265b3e12",
+  "all_other_source_gap_fields_identical": true,
+  "candidate_input_bindings": {
+    "scripts/prove_trading_continuity.py": "90e54c5025e79da6a1c2a1e0e472886f1215af55b5754ad389e2fe08cbd4d461",
+    "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
+    "src/solana_alpha_lab/factory/episode_decision.py": "c08a55a5c512ca01bffe0e1c5888a76137359f118574bb7f27b9a337cbca0a63",
+    "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "af898471e64d5beecdb4e6f56caeca7d7cde0ec14fd5e7559634c7b241f0c383",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "361522572d7ec2ef325d58f10c8a804ab020a14e1348406f864b968d8a388060",
+    "src/solana_alpha_lab/factory/opportunity_episode_release.py": "97c2a604f4b10523cb876f6a0a561b291d04ea46e5fb45c0d0917db5f911a0e7",
+    "src/solana_alpha_lab/factory/paper_plane.py": "5f3582fc646d3927aa67f72561c95ae2130d0eb6e7aa5d881a139727090bc342",
+    "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
+    "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
+    "src/solana_alpha_lab/factory/trading_runner.py": "2b1a526bfebfa3b54545863d85c6f97ae31c2178e28b28157ebbecbbfcd36be2",
+    "tests/test_opportunity_episode_dispatch_window_repair_v1.py": "18e446b59dcecae81ce75cb528c3ba38f878ac1436e63aac34cf023defe508ef",
+    "tests/test_trading_continuity_v1.py": "7ec09b855dcdfd49921541cd5a3efeecbcf16c5897448785d716654bf528a92a"
+  },
+  "candidate_inputs_unchanged": true,
+  "candidate_test_sha256": "7ec09b855dcdfd49921541cd5a3efeecbcf16c5897448785d716654bf528a92a",
+  "egress_canary": "PASS",
+  "elapsed_seconds": 3.065,
+  "environment": "ALLOWLIST",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "executed_cases": [
+    {
+      "status": "FAIL",
+      "test": "test_no_request_completion_crash_preserves_published_gap_bytes (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_no_request_completion_crash_preserves_published_gap_bytes)"
+    }
+  ],
+  "exit_code": 1,
+  "method": "ACTUAL_ORDINARY_DISPATCH_TEST_WITH_ORIGINAL_ASSERTION_AND_READONLY_DIFF_DISPLAY",
+  "observed_peak_bytes": 581344,
+  "observed_publication_difference": {
+    "ingested_visible_at": [
+      "2026-10-05T00:11:00Z",
+      "2026-10-05T00:11:05Z"
+    ]
+  },
+  "output_sha256": "0fc35c1ff099f23f909af2f554c6e9e11a94637aaaa7225ee291c68af21dbe5e",
+  "owned_process_exit_code": 1,
+  "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
+  "phase": "visibility-before",
+  "reproduce_at_head": "22bda7783c889894214e051cea106cca265b3e12",
+  "reproduce_method": "Existing prove_trading_continuity.run with the single original DispatchWindowTests.test_no_request_completion_crash_preserves_published_gap_bytes; original assert delegates unchanged; read-only assert instrumentation prints differing dict fields.",
+  "resource_measurement_n": 2,
+  "status": "FAIL",
+  "test_modules": [
+    "tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_no_request_completion_crash_preserves_published_gap_bytes"
+  ]
+}

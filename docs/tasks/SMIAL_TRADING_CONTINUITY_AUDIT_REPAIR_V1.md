@@ -55,6 +55,7 @@ managed_write_set:
 - tests/test_execution_evidence_seam_v1.py
 - tests/test_hfic_research_scope_v1.py
 - tests/test_opportunity_episodes_contract_v1.py
+- tests/test_opportunity_episode_dispatch_window_repair_v1.py
 - tests/test_paper_shadow_execution_integrity_vertical_v1.py
 - tests/test_factory_strategy_execution_boundary_v1.py
 - tests/test_paper_shadow_accounting_and_control_v1.py
@@ -164,3 +165,19 @@ reviews and exact-head bindings. V2/successor lifecycle and risk-policy changes
 remain excluded; REPAIR_PARTIAL_BLOCKED and open S08/S13 are unchanged.
 STOP_PATCH: exact-head CI then merge-readiness PASS and its machine owner phrase;
 the PATCH instruction explicitly grants no merge authority.
+
+CI_ORACLE_ALIGNMENT: run 38158563737 at 22bda7783c889894214e051cea106cca265b3e12
+failed one existing dispatch recovery assertion, not a timeout. Native replay
+confirmed that only the newly source-owned ingested_visible_at differs: normal
+outbox commit at 11:00 versus recovered commit at 11:05. The one directly
+affected dispatch test is now in the managed write set. It independently checks
+both exact ingestion clocks, identical reconstructed source gap and complete
+published-row stability within each replay history. Production visibility,
+cutoffs, rollback and risk policy are unchanged; no clock is backdated.
+
+LATER_DIRECT_OWNER_AUTHORIZATION: after green PR CI and machine-rendered merge
+phrase, the owner explicitly authorized the agent to insert that phrase and
+perform the guarded merge. This records the later direct request; the original
+PATCH instruction above was non-merging. Machine readiness, unchanged exact
+head/base, v2 AUTONOMOUS and post-merge readback remain mandatory. No machine
+DENY can be overridden by this authorization.

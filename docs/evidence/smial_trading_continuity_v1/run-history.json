@@ -73,6 +73,22 @@
       "output_sha256": "67e56a5e52d05080c4d3ebf277f9991163f9fb906e3b21f2f2e87783febffbf1",
       "review": "GOAL_DOD_NOT_READY_ATTEMPT_RESULT_IDENTITY_SETS_MISSING",
       "correction": "Literal episode/side/key and result-id/attempt link sets; no production change; exact candidate proofs repeated"
+    },
+    {
+      "phase": "pre-CI-visibility-oracle-alignment",
+      "head": "22bda7783c889894214e051cea106cca265b3e12",
+      "result": "49_FRESH_AND_8_A_D_PASS_HISTORICAL_INPUT_BINDINGS",
+      "output_sha256": "750ea457837a0867f401698f748ed8ea0fbeb5c19e5d010eac1e8ebb0e79a8ce",
+      "correction": "Direct dispatch consumer added to proof inputs; bounded current proofs repeated without production changes."
+    },
+    {
+      "phase": "linux-CI-transaction-patch",
+      "run_id": 38158563737,
+      "job_id": 114526498074,
+      "head": "22bda7783c889894214e051cea106cca265b3e12",
+      "result": "DISPATCH_RECOVERY_ASSERTION_FAIL_1_1140_CASES_9_SKIPS",
+      "reason_code": "ONLY_NEW_INGESTED_VISIBILITY_CLOCK_DIFFERS_AFTER_RECOVERY",
+      "correction": "Affected legacy assertion now independently verifies exact first visibility per history, equal source gap and immutable same-history published replay. Production unchanged; not timeout and not fixed by a blind rerun."
     }
   ]
 }

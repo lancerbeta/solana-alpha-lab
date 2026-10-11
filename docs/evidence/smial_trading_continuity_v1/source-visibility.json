@@ -1,0 +1,100 @@
+{
+  "candidate_input_bindings": {
+    "scripts/prove_trading_continuity.py": "ccc6a4ed102130022ffd3cf527e8ffa70005ebd8681aefbe417c78e561078374",
+    "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
+    "src/solana_alpha_lab/factory/episode_decision.py": "c08a55a5c512ca01bffe0e1c5888a76137359f118574bb7f27b9a337cbca0a63",
+    "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "af898471e64d5beecdb4e6f56caeca7d7cde0ec14fd5e7559634c7b241f0c383",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "361522572d7ec2ef325d58f10c8a804ab020a14e1348406f864b968d8a388060",
+    "src/solana_alpha_lab/factory/opportunity_episode_release.py": "97c2a604f4b10523cb876f6a0a561b291d04ea46e5fb45c0d0917db5f911a0e7",
+    "src/solana_alpha_lab/factory/paper_plane.py": "5f3582fc646d3927aa67f72561c95ae2130d0eb6e7aa5d881a139727090bc342",
+    "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
+    "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
+    "src/solana_alpha_lab/factory/trading_runner.py": "2b1a526bfebfa3b54545863d85c6f97ae31c2178e28b28157ebbecbbfcd36be2",
+    "tests/test_opportunity_episode_dispatch_window_repair_v1.py": "dd0120612cfc76bf1bd15f4159582188234ad3590558d6bac2e1a6422990a674",
+    "tests/test_trading_continuity_v1.py": "7ec09b855dcdfd49921541cd5a3efeecbcf16c5897448785d716654bf528a92a"
+  },
+  "candidate_inputs_unchanged": true,
+  "candidate_test_sha256": "7ec09b855dcdfd49921541cd5a3efeecbcf16c5897448785d716654bf528a92a",
+  "egress_canary": "PASS",
+  "elapsed_seconds": 37.84,
+  "environment": "ALLOWLIST",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "executed_cases": [
+    {
+      "status": "ok",
+      "test": "test_canonical_timer_worst_phase_drives_real_claim_and_next_wake (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_canonical_timer_worst_phase_drives_real_claim_and_next_wake)"
+    },
+    {
+      "status": "ok",
+      "test": "test_conservative_capacity_estimate_never_closes_an_open_fast_batch (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_conservative_capacity_estimate_never_closes_an_open_fast_batch)"
+    },
+    {
+      "status": "ok",
+      "test": "test_deadline_equality_late_and_early_never_send_or_backfill (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_deadline_equality_late_and_early_never_send_or_backfill)"
+    },
+    {
+      "status": "ok",
+      "test": "test_four_real_admissions_worst_phase_slow_batches_get_four_fair_sends (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_four_real_admissions_worst_phase_slow_batches_get_four_fair_sends)"
+    },
+    {
+      "status": "ok",
+      "test": "test_initial_scan_before_due_then_normal_headroom_work_crosses_boundary (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_initial_scan_before_due_then_normal_headroom_work_crosses_boundary)"
+    },
+    {
+      "status": "ok",
+      "test": "test_inside_window_restart_after_recorded_intent_never_duplicates (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_inside_window_restart_after_recorded_intent_never_duplicates)"
+    },
+    {
+      "status": "ok",
+      "test": "test_no_request_completion_crash_preserves_published_gap_bytes (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_no_request_completion_crash_preserves_published_gap_bytes)"
+    },
+    {
+      "status": "ok",
+      "test": "test_nomination_call_crossing_due_gets_interleaved_dispatch (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_nomination_call_crossing_due_gets_interleaved_dispatch)"
+    },
+    {
+      "status": "ok",
+      "test": "test_pace_crossing_deadline_never_calls_transport (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_pace_crossing_deadline_never_calls_transport)"
+    },
+    {
+      "status": "ok",
+      "test": "test_production_pre_window_entry_crossing_then_late_wake (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_production_pre_window_entry_crossing_then_late_wake)"
+    },
+    {
+      "status": "ok",
+      "test": "test_runtime_exceeding_model_is_visible_typed_gap (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_runtime_exceeding_model_is_visible_typed_gap)"
+    },
+    {
+      "status": "ok",
+      "test": "test_same_assigned_slots_follow_configured_batching (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_same_assigned_slots_follow_configured_batching)"
+    },
+    {
+      "status": "ok",
+      "test": "test_search_budget_gate_is_explicit_no_request_gap (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_search_budget_gate_is_explicit_no_request_gap)"
+    },
+    {
+      "status": "ok",
+      "test": "test_transport_and_absent_mint_stay_typed (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_transport_and_absent_mint_stay_typed)"
+    },
+    {
+      "status": "ok",
+      "test": "test_worker_delayed_to_deadline_is_proven_no_request_not_unknown (tests.test_opportunity_episode_dispatch_window_repair_v1.DispatchWindowTests.test_worker_delayed_to_deadline_is_proven_no_request_not_unknown)"
+    },
+    {
+      "status": "ok",
+      "test": "test_canonical_effective_wake_and_blocking_model_strictly_covers_window (tests.test_opportunity_episode_dispatch_window_repair_v1.SchedulerModelTests.test_canonical_effective_wake_and_blocking_model_strictly_covers_window)"
+    }
+  ],
+  "exit_code": 0,
+  "observed_peak_bytes": 3433677,
+  "output_sha256": "9f732565cb5ed15f73d97cf40b3cea84d1ddeb6b0e63cce6629b595e8d8948ec",
+  "owned_process_exit_code": 0,
+  "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
+  "phase": "source-visibility",
+  "resource_measurement_n": 23,
+  "status": "PASS",
+  "test_modules": [
+    "tests.test_opportunity_episode_dispatch_window_repair_v1"
+  ]
+}

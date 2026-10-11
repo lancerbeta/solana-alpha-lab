@@ -41542,7 +41542,7 @@ records:
     repository_path: scripts/prove_trading_continuity.py
   integrity:
     kind: sha256
-    sha256: 90e54c5025e79da6a1c2a1e0e472886f1215af55b5754ad389e2fe08cbd4d461
+    sha256: ccc6a4ed102130022ffd3cf527e8ffa70005ebd8681aefbe417c78e561078374
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41598,7 +41598,7 @@ records:
     repository_path: docs/tasks/SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1.md
   integrity:
     kind: sha256
-    sha256: a0f095bf6b97cc45085e3686982fd59afa571504ce39e5db4e15da150a03b945
+    sha256: a7ffc90fcfbd9b57d34192d750699c3220392aa96d11f107d8ccc701e5dfb784
   access: *id001
   relations:
   - relation_type: depends_on

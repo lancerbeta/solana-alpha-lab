@@ -25,7 +25,8 @@ NON_TARGETS = ("uv.lock", ".venv/pyvenv.cfg", "AGENTS.md",
 PROOF_INPUTS = tuple("src/solana_alpha_lab/factory/" + name + ".py" for name in (
     "episode_decision", "trading_runner", "paper_plane", "trading_operations", "paper_shadow_operations",
     "hfic_research_scope", "hfic_temporal_discovery", "observation_schedule_store", "opportunity_episode_release")) + (
-    "scripts/trading_continuity.py", "scripts/prove_trading_continuity.py", "tests/test_trading_continuity_v1.py")
+    "scripts/trading_continuity.py", "scripts/prove_trading_continuity.py", "tests/test_trading_continuity_v1.py",
+    "tests/test_opportunity_episode_dispatch_window_repair_v1.py")
 EGRESS_GUARD = '''import socket
 _connect = socket.socket.connect
 _getaddrinfo = socket.getaddrinfo
@@ -299,7 +300,7 @@ from solana_alpha_lab.factory.trading_operations import _bot_context
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--phase", choices=("baseline", "baseline-replay", "cost-before", "price-before", "git-boundary", "transaction-before", "transaction-after", "baseline-projection", "verify", "regression", "clean", "fresh"), default="verify")
+    parser.add_argument("--phase", choices=("baseline", "baseline-replay", "cost-before", "price-before", "git-boundary", "transaction-before", "transaction-after", "source-visibility", "baseline-projection", "verify", "regression", "clean", "fresh"), default="verify")
     args = parser.parse_args()
     if args.phase == "clean":
         result = clean()
@@ -313,6 +314,8 @@ def main() -> int:
     modules = ["tests.test_trading_continuity_v1"]
     if args.phase == "git-boundary":
         modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests.test_scientific_producer_requires_own_git_identity"]
+    if args.phase == "source-visibility":
+        modules = ["tests.test_opportunity_episode_dispatch_window_repair_v1"]
     if args.phase == "transaction-after":
         modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests." + name for name in (
             "test_ordinary_denied_admission_is_durable_and_idempotent",

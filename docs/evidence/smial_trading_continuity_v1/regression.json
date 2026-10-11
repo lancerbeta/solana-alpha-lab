@@ -1,6 +1,6 @@
 {
   "candidate_input_bindings": {
-    "scripts/prove_trading_continuity.py": "90e54c5025e79da6a1c2a1e0e472886f1215af55b5754ad389e2fe08cbd4d461",
+    "scripts/prove_trading_continuity.py": "ccc6a4ed102130022ffd3cf527e8ffa70005ebd8681aefbe417c78e561078374",
     "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
     "src/solana_alpha_lab/factory/episode_decision.py": "c08a55a5c512ca01bffe0e1c5888a76137359f118574bb7f27b9a337cbca0a63",
     "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
@@ -11,12 +11,13 @@
     "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
     "src/solana_alpha_lab/factory/trading_runner.py": "2b1a526bfebfa3b54545863d85c6f97ae31c2178e28b28157ebbecbbfcd36be2",
+    "tests/test_opportunity_episode_dispatch_window_repair_v1.py": "dd0120612cfc76bf1bd15f4159582188234ad3590558d6bac2e1a6422990a674",
     "tests/test_trading_continuity_v1.py": "7ec09b855dcdfd49921541cd5a3efeecbcf16c5897448785d716654bf528a92a"
   },
   "candidate_inputs_unchanged": true,
   "candidate_test_sha256": "7ec09b855dcdfd49921541cd5a3efeecbcf16c5897448785d716654bf528a92a",
   "egress_canary": "PASS",
-  "elapsed_seconds": 43.546,
+  "elapsed_seconds": 46.646,
   "environment": "ALLOWLIST",
   "evidence_class": "SYNTHETIC_OFFLINE",
   "executed_cases": [
@@ -819,7 +820,7 @@
   ],
   "exit_code": 0,
   "observed_peak_bytes": 9423963,
-  "output_sha256": "1f4745d5ae76e97acf1d4b5482394e6c10de353312d2d5500db0f0e1c1ff997c",
+  "output_sha256": "7f562fd9341777f02ee5ef16c761b742d5be27d651d3f6ca8d9cecaa59a1596e",
   "owned_process_exit_code": 0,
   "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
   "phase": "regression",

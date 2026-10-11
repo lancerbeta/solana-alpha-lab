@@ -211,6 +211,24 @@ cleanup. Reproduction does not authorize operational policy mutation.
 The original S00–S23/O1–O8 denominator and REPAIR_PARTIAL_BLOCKED remain; S08/S13
 are still open. V2/successor lifecycle and risk-policy changes were excluded.
 
-Final PATCH fresh: 49/49 PASS, exact inputs unchanged; output SHA256 750ea457837a0867f401698f748ed8ea0fbeb5c19e5d010eac1e8ebb0e79a8ce. Eight A-D probes PASS; impacted regression 198 PASS plus one explicit Windows symlink skip. Cleanup CLEAN, zero remaining owned bytes, campaign root/manifest absent and five non-target fingerprints preserved. These receipts validate the transaction PATCH; prior 41/42-case PASS is not carried forward as current evidence.
+Pre-CI-oracle-alignment PATCH fresh: 49/49 PASS, then-exact inputs unchanged; historical output SHA256 750ea457837a0867f401698f748ed8ea0fbeb5c19e5d010eac1e8ebb0e79a8ce. Eight A-D probes PASS; impacted regression 198 PASS plus one explicit Windows symlink skip. Cleanup CLEAN, zero remaining owned bytes, campaign root/manifest absent and five non-target fingerprints preserved. Those receipts validated the then-current transaction PATCH and are now historical input bindings; no older PASS is carried forward after the CI oracle alignment.
 
 Goal/DoD review on content head 6aa402c1 returned NOT_READY for a verification gap: attempt/result counts and shared position ID did not exclude a missing-plus-duplicate pair. Production was unchanged; the oracle now checks independent literal episode/side/key sets, unique raw event/payload identities, exact result-id-to-attempt links, modeled class and origin. Current eight A-D probes and fresh49 were rerun with the strengthened test bytes; previous 49-case PASS remains historical.
+
+
+## Exact-head CI dispatch recovery oracle alignment
+
+Run 38158563737 at 22bda7783c889894214e051cea106cca265b3e12 passed core, execution, resources and five general shards. Shard 3 ran 1140 cases with one failure and nine skips; the final aggregator failed. This was an assertion failure, not the 60-minute job timeout. The native original dispatch test reproduced the failure with unchanged production (visibility-before.json, output SHA256 0fc35c1ff099f23f909af2f554c6e9e11a94637aaaa7225ee291c68af21dbe5e). Read-only assertion instrumentation confirmed the entire difference was ingested_visible_at: 2026-10-05T00:11:00Z in normal completion versus 2026-10-05T00:11:05Z after recovery.
+
+The row first enters the committed canonical outbox at different times in these two histories. The directly affected legacy test now independently asserts both exact first-ingestion clocks, compares every reconstructed source-gap field and requires the complete published row, including its ingestion clock, to remain unchanged on same-history replay. Production semantics are unchanged; no late row is backdated to satisfy byte equality. This is a verification-oracle alignment within the existing first-visibility contract, not a new scientific or lifecycle policy. The source-visibility phase runs all 16 existing dispatch-window tests under the same owned-root/egress controls and adds the affected test file to current proof input bindings. The original S00-S23/O1-O8 and DER denominator remain unchanged. New exact-head CI is still required; the failed run is retained as history.
+
+Current proofs after the CI oracle alignment all bind the same 13 unchanged code/test inputs:
+
+| Receipt | Executed result | Output SHA256 |
+|---|---|---|
+| fresh.json | 49/49 PASS | 9f8cd538d6280b0cab5da6af9a62ef237ac1ac87f0aecb95d14a5dd312915cb8 |
+| transaction-after.json | A-D 8/8 PASS | f118fd0fa8679d550fc4792d9b4aef43e51a56457e0fd4577ed25c314e9d31f1 |
+| source-visibility.json | Dispatch-window 16/16 PASS | 9f732565cb5ed15f73d97cf40b3cea84d1ddeb6b0e63cce6629b595e8d8948ec |
+| regression.json | 198 PASS plus one explicit Windows symlink skip | 7f562fd9341777f02ee5ef16c761b742d5be27d651d3f6ca8d9cecaa59a1596e |
+
+Run `scripts/prove_trading_continuity.py --phase source-visibility` for the directly affected consumer. CLEAN confirms zero scoped owned bytes, absent root/manifest, exited/absent processes and five preserved non-target fingerprints. REPAIR_PARTIAL_BLOCKED and open S08/S13 remain unchanged. The owner subsequently authorized machine-phrase substitution and one guarded merge after full exact-head CI and readiness; that direct request grants no scientific acceptance or machine-check override.
