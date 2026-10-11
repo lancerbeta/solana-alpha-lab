@@ -19,7 +19,7 @@ from solana_alpha_lab.factory.paper_shadow_commands import apply_operator_comman
 from solana_alpha_lab.factory.paper_shadow_operations import build_operations_projection
 from solana_alpha_lab.factory.promotion_handoff import compose_science_to_strategy_handoff
 from solana_alpha_lab.factory.research_store import ResearchStore
-from solana_alpha_lab.factory.strategy_runtime import PaperPlaneError, load_strategy_version
+from solana_alpha_lab.factory.strategy_runtime import PaperPlaneError, canonical_spec_sha256, load_strategy_version
 from solana_alpha_lab.factory.hfic_research_scope import sha256_of
 
 OFFLINE_MARKER = {"schema": "smial.offline-runtime", "schema_version": "1.0", "evidence_class": "SYNTHETIC_OFFLINE"}
@@ -143,6 +143,7 @@ class TradingContinuityRunner:
         decision = packet.get("decision") or {}
         digest = sha256_of(provenance)
         if (packet.get("provenance_sha256") != digest
+            or canonical_spec_sha256(decision) != position.get("signal_decision_sha256")
             or decision.get("evidence_refs") != ["execution-event:SRC-" + position["signal_decision_id"] + ":sha256:" + digest]
             or (decision.get("signal_decision_id"), decision.get("strategy_id"), decision.get("strategy_version"),
                 decision.get("activation_epoch_id"), decision.get("mint")) !=

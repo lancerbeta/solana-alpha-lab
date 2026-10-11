@@ -68,6 +68,7 @@ commissioning. `failure_boundaries` preserves compact actual assertions.
 | F13 cumulative cost/clock | Review found .01→0/missing could erase confirmed cost; observation clock could regress | Known total regression and reverse clock refused; UNKNOWN total retains .01 lower bound; .02 final + dynamic partial EXIT refusal | Static review → frozen previous-head cost-before FAIL → current literal probe; no historical event rewrite |
 | F14 decision eligibility | Semantic review found missing/late decision PRICE could ENTER outside scientific eligibility; three frozen 5db1b820 probes reproduce ENTER instead of UNKNOWN | Shared scientific PRICE cell precedes entry features, including list-only; typed UNKNOWN and no admission; originating exit retains its own target arithmetic | Dynamic price-before 3 FAIL → fresh 3 PASS with valid neighbors; membership UNKNOWN still reads no values |
 | F15 transaction/outcome | Native ordinary episode on content head 3f619f92: disabled-policy refusal loses source packet (0 instead of 1); stale WATCHED replay rolls cancellation back to WATCHED | Existing admission owner returns normal DENIED; source, risk refusal and unattempted cancellation commit together; actual errors retain rollback | transaction-before.json: two actual FAILs; transaction-after.json: eight PASS probes A–D; no risk-policy or successor lifecycle change |
+| F16 originating decision fingerprint | Code review at 2bc4684f found that decision-only clock corruption bypassed the stale check; native ordinary episode reproduced missing refusal | Runner compares the complete canonical SignalDecision fingerprint with the existing admitted-position fingerprint before using the decision; admission and risk policy unchanged | origin-fingerprint-before-native.json and repeatable frozen origin-fingerprint-before.json: one actual FAIL each; focused after PASS and fresh50 PASS; no policy/schema/lifecycle change |
 | F12 version gap | Existing _science_lineage_matches requires V1 although schema admits Vn | Preserved guard; V2 VERIFY refuses, V1 originating exit still works after list removal | Dynamic denial, **unrepaired owner boundary**; no automatic V2 materialization claim |
 
 Compatibility: historical manifests 1.0 are not filled from current data;
@@ -125,8 +126,8 @@ PAPER list-only, SHADOW mixed), plus operator-drain recovery; this does not
 erase the separate required version journey. ARC attacks cover 24/24 named
 scenario hypotheses, with S21/S22 review/machine final binding. PEF 24 planned,
 24 attempted, 22 fully executed at most and 2 partial; static-before missing
-callers remain explicit. DER 15/15 finding conclusions have direct evidence:
-13 behavioral before/after or post-review probes, two missing base callers
+callers remain explicit. DER 16/16 finding conclusions have direct evidence:
+14 behavioral before/after or post-review probes, two missing base callers
 established statically and exercised dynamically after repair. FR baseline
 five deterministic frozen-base failures → five current passes; other repairs
 are review/static-discovered with dynamic after-probes, not invented historical
@@ -222,13 +223,33 @@ Run 38158563737 at 22bda7783c889894214e051cea106cca265b3e12 passed core, executi
 
 The row first enters the committed canonical outbox at different times in these two histories. The directly affected legacy test now independently asserts both exact first-ingestion clocks, compares every reconstructed source-gap field and requires the complete published row, including its ingestion clock, to remain unchanged on same-history replay. Production semantics are unchanged; no late row is backdated to satisfy byte equality. This is a verification-oracle alignment within the existing first-visibility contract, not a new scientific or lifecycle policy. The source-visibility phase runs all 16 existing dispatch-window tests under the same owned-root/egress controls and adds the affected test file to current proof input bindings. The original S00-S23/O1-O8 and DER denominator remain unchanged. New exact-head CI is still required; the failed run is retained as history.
 
-Current proofs after the CI oracle alignment all bind the same 13 unchanged code/test inputs:
+Historical proofs at 2bc4684f after the CI oracle alignment bound the then-current 13 inputs; they are superseded by the origin-repair proofs below:
 
 | Receipt | Executed result | Output SHA256 |
 |---|---|---|
-| fresh.json | 49/49 PASS | 9f8cd538d6280b0cab5da6af9a62ef237ac1ac87f0aecb95d14a5dd312915cb8 |
-| transaction-after.json | A-D 8/8 PASS | f118fd0fa8679d550fc4792d9b4aef43e51a56457e0fd4577ed25c314e9d31f1 |
-| source-visibility.json | Dispatch-window 16/16 PASS | 9f732565cb5ed15f73d97cf40b3cea84d1ddeb6b0e63cce6629b595e8d8948ec |
-| regression.json | 198 PASS plus one explicit Windows symlink skip | 7f562fd9341777f02ee5ef16c761b742d5be27d651d3f6ca8d9cecaa59a1596e |
+| fresh at 2bc4684f (historical) | 49/49 PASS | 9f8cd538d6280b0cab5da6af9a62ef237ac1ac87f0aecb95d14a5dd312915cb8 |
+| transaction after at 2bc4684f (historical) | A-D 8/8 PASS | f118fd0fa8679d550fc4792d9b4aef43e51a56457e0fd4577ed25c314e9d31f1 |
+| dispatch at 2bc4684f (historical) | 16/16 PASS | 9f732565cb5ed15f73d97cf40b3cea84d1ddeb6b0e63cce6629b595e8d8948ec |
+| regression at 2bc4684f (historical) | 198 PASS plus one explicit Windows symlink skip | 7f562fd9341777f02ee5ef16c761b742d5be27d651d3f6ca8d9cecaa59a1596e |
 
 Run `scripts/prove_trading_continuity.py --phase source-visibility` for the directly affected consumer. CLEAN confirms zero scoped owned bytes, absent root/manifest, exited/absent processes and five preserved non-target fingerprints. REPAIR_PARTIAL_BLOCKED and open S08/S13 remain unchanged. The owner subsequently authorized machine-phrase substitution and one guarded merge after full exact-head CI and readiness; that direct request grants no scientific acceptance or machine-check override.
+
+## Originating decision identity review repair
+
+CODE_REVIEWER at content head 2bc4684f5b7307757c37662b62c65f68aac447f8 returned NOT_READY/P1: provenance and selected IDs were checked, but the complete saved SignalDecision fingerprint was omitted. The native ordinary episode fixture admitted an original decision at 12:40:00Z with max age 30 seconds. Changing only its stored decision_at to 12:41:00Z left provenance and its hash untouched; ENTRY at 12:41:00Z failed to refuse. The native before probe and frozen-runner repeat each produced one actual FAIL (PaperPlaneError not raised). The repair compares canonical_spec_sha256(decision) with the preexisting position.signal_decision_sha256 before any originating-decision consumer uses its clock or body. This adds no risk policy, transaction owner, successor lifecycle or schema. The focused after probe requires exact provenance conflict, unchanged readback and zero attempts. S08/S13 remain open; source scenario/O1-O8 denominators do not change.
+
+Reproduce before with `scripts/prove_trading_continuity.py --phase origin-fingerprint-before` (expected exit 1, runner frozen to 2bc4684f); after with `--phase origin-fingerprint` (expected exit 0).
+
+## Final bounded proof inputs after origin repair
+
+All five current receipts are PASS with identical 13 current input hashes and candidate_inputs_unchanged=true. Older 2bc4684f PASS above is historical and does not validate the later identity repair.
+
+| Receipt | Actual result | Output SHA256 |
+|---|---|---|
+| fresh.json | 50 PASS + 0 skip | b986a5112bccb2f8f94615b4b5ff0b02eb2e267e9f938bb21f492169a11dd906 |
+| transaction-after.json | 8 PASS + 0 skip | 2d5a1af90708c9f2825f78930b0fef5b34c123ccf14edda2f01a4e8e00307c74 |
+| source-visibility.json | 16 PASS + 0 skip | d40308aee0faf5544d71252c0b72117121a82585102514c5d4d74727dd6826d9 |
+| origin-fingerprint.json | 1 PASS + 0 skip | 73dcf6f1d66e068ae00e6daea7e0fa2c995f7309a87956f1669ae163ea27d120 |
+| regression.json | 198 PASS + 1 skip | 7d17292b182c5ca4e0c51c5d971bebb6b0f6f760d5c496d55f47201d83a0bc41 |
+
+The frozen before probe reproduces one FAIL on runner 2bc4684f with current test bytes; the native before receipt retains its actual earlier input hashes. Final cleanup is CLEAN, owned root/manifest absent, five process IDs EXITED/ABSENT, five non-target fingerprints equal and remaining owned bytes 0. No containers/services/volumes were created. Exact-head CI and readiness remain unexecuted for the next pushed head; no local targeted PASS substitutes for them. REPAIR_PARTIAL_BLOCKED and S08/S13 remain open.

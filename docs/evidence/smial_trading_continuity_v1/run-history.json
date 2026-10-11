@@ -89,6 +89,21 @@
       "result": "DISPATCH_RECOVERY_ASSERTION_FAIL_1_1140_CASES_9_SKIPS",
       "reason_code": "ONLY_NEW_INGESTED_VISIBILITY_CLOCK_DIFFERS_AFTER_RECOVERY",
       "correction": "Affected legacy assertion now independently verifies exact first visibility per history, equal source gap and immutable same-history published replay. Production unchanged; not timeout and not fixed by a blind rerun."
+    },
+    {
+      "phase": "pre-origin-fingerprint-review-repair",
+      "head": "2bc4684f5b7307757c37662b62c65f68aac447f8",
+      "result": "CODE_REVIEW_NOT_READY_P1_ORIGIN_DECISION_BODY_UNBOUND",
+      "reason_code": "DECISION_ONLY_CLOCK_CORRUPTION_CAN_BYPASS_STALE_GUARD",
+      "native_before": "origin-fingerprint-before-native.json",
+      "repeatable_frozen_before": "origin-fingerprint-before.json",
+      "correction": "Full canonical decision fingerprint compared with existing admitted position fingerprint; no policy/schema/lifecycle change. Before probes actual FAIL; current after proofs/review required."
+    },
+    {
+      "phase": "origin-fingerprint-after-first-oracle",
+      "result": "49_PASS_1_VOLATILE_PROJECTION_CLOCK_ASSERTION_FAIL",
+      "output_sha256": "07d76db2904aaa5ccd249fe594b820bd7c5cb1e594a65886ce6a35d0df0ca554",
+      "correction": "Origin hash refusal already occurred; newly written no-effect oracle compared live projection as_of. Exclude only projection read time, compare every persisted field exactly; production unchanged."
     }
   ]
 }

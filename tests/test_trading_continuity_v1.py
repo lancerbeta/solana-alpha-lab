@@ -792,6 +792,36 @@ class OrdinarySourceTests(unittest.TestCase):
         self.assertEqual(self.runner.result(negative)["position"]["state"], "CANCELLED")
         self.assertEqual(len(self.runner.readback()["modeled_attempts"]), 3)
 
+    def test_origin_decision_clock_corruption_refuses_without_effect(self):
+        self.prepare()
+        packet = self.decision()
+        pid = packet["admission"]["position_id"]
+        self.assertEqual(packet["decision"]["decision_at"], "2026-10-05T12:40:00Z")
+        self.assertEqual(self.runner.strategy["signal_input"]["max_age_seconds"], 30)
+        store = PaperPlaneStore(self.runner.store_path)
+        try:
+            position = store.get_position(pid)
+            self.assertEqual(position["state"], "WATCHED")
+            self.assertEqual(position["signal_decision_sha256"], canonical_spec_sha256(packet["decision"]))
+            sid = "SRC-" + packet["decision"]["signal_decision_id"]
+            stored = store.get_execution_event(sid)["payload"]
+            stored["decision"]["decision_at"] = "2026-10-05T12:41:00Z"
+            self.assertEqual(stored["provenance"], packet["provenance"])
+            self.assertEqual(stored["provenance_sha256"], packet["provenance_sha256"])
+            self.assertNotEqual(canonical_spec_sha256(stored["decision"]), position["signal_decision_sha256"])
+            store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(stored), sid))
+            store._conn.commit()
+        finally:
+            store.close()
+        before = self.runner.readback()
+        with self.assertRaisesRegex(PaperPlaneError, "SOURCE_DECISION_PROVENANCE_CONFLICT"):
+            self.runner.attempt(position_id=pid, side="ENTRY", attempt_key="CORRUPT-CLOCK", as_of="2026-10-05T12:41:00Z")
+        after = self.runner.readback()
+        # Projection time changes between reads; every persisted field must stay exact.
+        self.assertEqual({k: v for k, v in after.items() if k != "as_of"},
+                         {k: v for k, v in before.items() if k != "as_of"})
+        self.assertEqual(before["modeled_attempts"], [])
+
     def test_origin_packet_corruption_and_missing_research_refuse_without_effect(self):
         self.prepare()
         packet = self.decision()

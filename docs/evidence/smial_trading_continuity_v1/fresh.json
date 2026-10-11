@@ -1,6 +1,6 @@
 {
   "candidate_input_bindings": {
-    "scripts/prove_trading_continuity.py": "ccc6a4ed102130022ffd3cf527e8ffa70005ebd8681aefbe417c78e561078374",
+    "scripts/prove_trading_continuity.py": "73546d8925d8ab99b8f4eacafce7d75bc733f6ff0593173b8f94e79a46673355",
     "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
     "src/solana_alpha_lab/factory/episode_decision.py": "c08a55a5c512ca01bffe0e1c5888a76137359f118574bb7f27b9a337cbca0a63",
     "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
@@ -10,14 +10,14 @@
     "src/solana_alpha_lab/factory/paper_plane.py": "5f3582fc646d3927aa67f72561c95ae2130d0eb6e7aa5d881a139727090bc342",
     "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
-    "src/solana_alpha_lab/factory/trading_runner.py": "2b1a526bfebfa3b54545863d85c6f97ae31c2178e28b28157ebbecbbfcd36be2",
+    "src/solana_alpha_lab/factory/trading_runner.py": "6edb1b2109965b5309c2c48ea566401bf78a9b6875e6cd0e639399b437c92d59",
     "tests/test_opportunity_episode_dispatch_window_repair_v1.py": "dd0120612cfc76bf1bd15f4159582188234ad3590558d6bac2e1a6422990a674",
-    "tests/test_trading_continuity_v1.py": "7ec09b855dcdfd49921541cd5a3efeecbcf16c5897448785d716654bf528a92a"
+    "tests/test_trading_continuity_v1.py": "26774a6a25dcad262b6abdaff9b96da35f1d4399ff78c73467930c6df0470b0b"
   },
   "candidate_inputs_unchanged": true,
-  "candidate_test_sha256": "7ec09b855dcdfd49921541cd5a3efeecbcf16c5897448785d716654bf528a92a",
+  "candidate_test_sha256": "26774a6a25dcad262b6abdaff9b96da35f1d4399ff78c73467930c6df0470b0b",
   "egress_canary": "PASS",
-  "elapsed_seconds": 113.447,
+  "elapsed_seconds": 114.477,
   "environment": "ALLOWLIST",
   "evidence_class": "SYNTHETIC_OFFLINE",
   "executed_cases": [
@@ -167,6 +167,10 @@
     },
     {
       "status": "ok",
+      "test": "test_origin_decision_clock_corruption_refuses_without_effect (tests.test_trading_continuity_v1.OrdinarySourceTests.test_origin_decision_clock_corruption_refuses_without_effect)"
+    },
+    {
+      "status": "ok",
       "test": "test_origin_packet_corruption_and_missing_research_refuse_without_effect (tests.test_trading_continuity_v1.OrdinarySourceTests.test_origin_packet_corruption_and_missing_research_refuse_without_effect)"
     },
     {
@@ -220,11 +224,11 @@
   ],
   "exit_code": 0,
   "observed_peak_bytes": 3172233,
-  "output_sha256": "9f8cd538d6280b0cab5da6af9a62ef237ac1ac87f0aecb95d14a5dd312915cb8",
+  "output_sha256": "b986a5112bccb2f8f94615b4b5ff0b02eb2e267e9f938bb21f492169a11dd906",
   "owned_process_exit_code": 0,
   "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
   "phase": "fresh",
-  "resource_measurement_n": 48,
+  "resource_measurement_n": 49,
   "status": "PASS",
   "test_modules": [
     "tests.test_trading_continuity_v1"

@@ -178,15 +178,17 @@ def run(modules: list[str], *, phase: str) -> dict:
     (case / ".owner").write_text(CAMPAIGN, encoding="utf-8")
     (case / "tmp").mkdir()
     (case / "sitecustomize.py").write_text(EGRESS_GUARD, encoding="utf-8")
-    if phase in {"baseline-replay", "cost-before", "price-before", "transaction-before"}:
+    if phase in {"baseline-replay", "cost-before", "price-before", "transaction-before", "origin-fingerprint-before"}:
         frozen_root = case / "frozen-repo"
         frozen = frozen_root / "src" / "solana_alpha_lab" / "factory"
         frozen.mkdir(parents=True)
         base = {"baseline-replay": "d244af69bfd7ddc2850b9e5e5823323956e325c4",
                 "cost-before": "160866d6b92e724b48e4c9dceb7b511043d22cb4",
                 "price-before": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7",
-                "transaction-before": "3f619f9264dda4d70e41eb01c304280b15bae8f3"}[phase]
-        frozen_modules = (("paper_plane", "trading_runner") if phase == "transaction-before" else
+                "transaction-before": "3f619f9264dda4d70e41eb01c304280b15bae8f3",
+                "origin-fingerprint-before": "2bc4684f5b7307757c37662b62c65f68aac447f8"}[phase]
+        frozen_modules = (("trading_runner",) if phase == "origin-fingerprint-before" else
+            ("paper_plane", "trading_runner") if phase == "transaction-before" else
             ("hfic_temporal_discovery", "episode_decision") if phase == "price-before" else
             ("paper_plane", "trading_operations", "paper_shadow_operations"))
         for name in frozen_modules:
@@ -226,6 +228,8 @@ from solana_alpha_lab.factory.trading_operations import _bot_context
             modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests." + name for name in (
                 "test_ordinary_denied_admission_is_durable_and_idempotent",
                 "test_ordinary_stale_replay_cancellation_survives_new_connection")]
+        if phase == "origin-fingerprint-before":
+            modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests.test_origin_decision_clock_corruption_refuses_without_effect"]
     # Do not inherit provider keys, credentials, user profiles or arbitrary Python hooks.
     env = {key: os.environ[key] for key in ("SYSTEMROOT", "WINDIR", "PATH", "COMSPEC") if key in os.environ}
     env.update(TEMP=str(case / "tmp"), TMP=str(case / "tmp"),
@@ -274,7 +278,7 @@ from solana_alpha_lab.factory.trading_operations import _bot_context
         result["candidate_test_sha256"] = input_bindings["tests/test_trading_continuity_v1.py"]
         result["candidate_input_bindings"] = input_bindings
         result["candidate_inputs_unchanged"] = inputs_unchanged
-        if phase in {"baseline-replay", "cost-before", "price-before", "transaction-before"}:
+        if phase in {"baseline-replay", "cost-before", "price-before", "transaction-before", "origin-fingerprint-before"}:
             result["baseline_binding"] = {"base": base, "frozen_modules": list(frozen_modules),
                 "method": "FROZEN_BASE_MODULES_WITH_CURRENT_INDEPENDENT_BASELINE_PROBES", "remaining_dependencies": "UNCHANGED_BASE_OWNERS"}
             if phase == "price-before":
@@ -300,7 +304,7 @@ from solana_alpha_lab.factory.trading_operations import _bot_context
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--phase", choices=("baseline", "baseline-replay", "cost-before", "price-before", "git-boundary", "transaction-before", "transaction-after", "source-visibility", "baseline-projection", "verify", "regression", "clean", "fresh"), default="verify")
+    parser.add_argument("--phase", choices=("baseline", "baseline-replay", "cost-before", "price-before", "git-boundary", "transaction-before", "transaction-after", "source-visibility", "origin-fingerprint-before", "origin-fingerprint", "baseline-projection", "verify", "regression", "clean", "fresh"), default="verify")
     args = parser.parse_args()
     if args.phase == "clean":
         result = clean()
@@ -316,6 +320,8 @@ def main() -> int:
         modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests.test_scientific_producer_requires_own_git_identity"]
     if args.phase == "source-visibility":
         modules = ["tests.test_opportunity_episode_dispatch_window_repair_v1"]
+    if args.phase == "origin-fingerprint":
+        modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests.test_origin_decision_clock_corruption_refuses_without_effect"]
     if args.phase == "transaction-after":
         modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests." + name for name in (
             "test_ordinary_denied_admission_is_durable_and_idempotent",

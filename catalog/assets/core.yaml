@@ -41486,7 +41486,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/trading_runner.py
   integrity:
     kind: sha256
-    sha256: 2b1a526bfebfa3b54545863d85c6f97ae31c2178e28b28157ebbecbbfcd36be2
+    sha256: 6edb1b2109965b5309c2c48ea566401bf78a9b6875e6cd0e639399b437c92d59
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41542,7 +41542,7 @@ records:
     repository_path: scripts/prove_trading_continuity.py
   integrity:
     kind: sha256
-    sha256: ccc6a4ed102130022ffd3cf527e8ffa70005ebd8681aefbe417c78e561078374
+    sha256: 73546d8925d8ab99b8f4eacafce7d75bc733f6ff0593173b8f94e79a46673355
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41570,7 +41570,7 @@ records:
     repository_path: tests/test_trading_continuity_v1.py
   integrity:
     kind: sha256
-    sha256: 7ec09b855dcdfd49921541cd5a3efeecbcf16c5897448785d716654bf528a92a
+    sha256: 26774a6a25dcad262b6abdaff9b96da35f1d4399ff78c73467930c6df0470b0b
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41598,7 +41598,7 @@ records:
     repository_path: docs/tasks/SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1.md
   integrity:
     kind: sha256
-    sha256: a7ffc90fcfbd9b57d34192d750699c3220392aa96d11f107d8ccc701e5dfb784
+    sha256: 9022aee7afd83b6837ba9fd89ee9a8e4c40a82275469ba1ee046afc8edbdcd71
   access: *id001
   relations:
   - relation_type: depends_on

@@ -181,3 +181,10 @@ perform the guarded merge. This records the later direct request; the original
 PATCH instruction above was non-merging. Machine readiness, unchanged exact
 head/base, v2 AUTONOMOUS and post-merge readback remain mandatory. No machine
 DENY can be overridden by this authorization.
+
+CONFIRMED_REVIEW_REPAIR: CODE_REVIEWER P1 on 2bc4684f was reproduced through
+ordinary episode and decision-only stored-clock corruption. Compare the full
+canonical originating SignalDecision hash with the existing admitted-position
+hash before consuming its body/clock. This is an identity repair within the
+existing corruption scope, without risk-policy, schema or V2 lifecycle change.
+Refresh native/frozen before, focused after, current proofs and four reviews.
