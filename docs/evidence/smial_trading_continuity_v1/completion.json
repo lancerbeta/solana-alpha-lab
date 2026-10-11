@@ -4,7 +4,7 @@
   "acceptance_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1-PARTIAL-ENGINEERING-CANDIDATE",
   "as_of": "2026-10-11",
   "task_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
-  "state_change": "Confirmed offline V1 continuity repairs and truthful readback; ordinary PAPER mixed/list-only and SHADOW mixed reconcile. CAPABILITY_OUTCOME=REPAIR_PARTIAL_BLOCKED: required active V2 alongside V1 remains blocked by preserved scientific handoff V1 guard; original S08/S13 denominator retained. No canonical DONE or full-scope acceptance.",
+  "state_change": "Confirmed offline V1 continuity and admission/outcome repairs: ordinary source ENTER with denied admission keeps its exact packet, reason/scope/policy; unattempted cancellation commits, actual errors roll back and successful reservation stays atomic. PAPER mixed/list-only and SHADOW mixed reconcile. CAPABILITY_OUTCOME=REPAIR_PARTIAL_BLOCKED: active V2 alongside V1 remains blocked by preserved scientific V1 handoff; original S08/S13 stay open. No canonical DONE or full-scope acceptance.",
   "base_main": "d244af69bfd7ddc2850b9e5e5823323956e325c4",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
@@ -70,7 +70,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_V1_ORDINARY_AND_ADVERSARIAL_WITH_V2_BLOCKED",
+    "targeted": "PASS_V1_ORDINARY_ADMISSION_OUTCOME_A_D_WITH_V2_BLOCKED",
     "independent_review": {
       "path": "docs/evidence/smial_trading_continuity_v1/independent-review.json",
       "sha256": "ef92bd6dd747f39afc0fce5dcabf69423bdadcd35920642bbb4fe45416f7ded8",
@@ -82,7 +82,10 @@
       "PASS_OWNED_CLEANUP_AND_FRESH_REPRODUCTION",
       "PASS_LITERAL_MONEY_AND_FULL_IDENTITY_SETS",
       "PASS_V1_GUARD_PRESERVED",
-      "PASS_SHARED_SCIENTIFIC_PRICE_ELIGIBILITY_AND_TYPED_REFUSAL"
+      "PASS_SHARED_SCIENTIFIC_PRICE_ELIGIBILITY_AND_TYPED_REFUSAL",
+      "PASS_NORMAL_REFUSAL_AND_UNATTEMPTED_CANCELLATION_DURABLE",
+      "PASS_REAL_ERROR_ROLLBACK_AND_POLICY_REEVALUATION",
+      "PASS_INDEPENDENT_SOURCE_ADMISSION_ATTEMPT_RESULT_IDENTITY_SETS"
     ]
   },
   "non_claims": [
