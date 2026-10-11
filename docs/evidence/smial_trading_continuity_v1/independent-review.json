@@ -1,0 +1,156 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1-REVIEW",
+  "as_of": "2026-10-11",
+  "task_id": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
+  "reviewed_bindings_sha256": "d790dff6f977d4e2f07d5da61994c5748398a5d4472777480ff312423d0a11f9",
+  "reviewed_inventory_sha256": "f35f47fa2813de617a6971a8f1dc0d1b2a0705d9c785590fcd59f161302b929e",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "FULL_DELIVERY_DIFF_AND_DIRECT_CONSUMERS_REVIEWED_NO_BLOCKERS",
+        "EXIT_SOURCE_BODY_STORED_ORIGIN_HASH_EQUALITY_BEFORE_EFFECTS",
+        "IDENTITY_ATOMIC_ERROR_ROLLBACK_REPLAY_OPERATOR_CLOSE_PRESERVED",
+        "CURRENT_53_8_16_4_198_PASS_WINDOWS_SKIP1_IDENTICAL_CURRENT_INPUTS13_CLEAN0",
+        "REPAIR_PARTIAL_BLOCKED_SOURCE_DENOMINATOR_S08_S13_PRESERVED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "READ_ONLY_EXACT_CONTENT_ORDINARY_CALLER_LITERAL_SOURCE_ADMITTED_DENIED_ATTEMPT_RESULT_AND_MONEY_ORACLES_PASS",
+        "NATIVE_AND_FROZEN_BEFORE_ACTUAL_FAIL_CURRENT_53_8_16_4_PASS_REGRESSION198_SKIP1",
+        "FIVE_RECEIPTS_IDENTICAL_CURRENT_GIT_INPUTS13_CLEAN0",
+        "FULL_S00_S23_O1_O8_DENOMINATOR_PARTIAL_OUTCOME_S08_S13_AND_NONCLAIMS_PRESERVED",
+        "EXACT_CONTENT_INVENTORY_BINDINGS_BINARY_DIFF_PACKET_FINGERPRINT_INDEPENDENTLY_VERIFIED"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SEMANTIC_PREMISE=PASS_C1_C9_NO_MATERIAL_FINDINGS",
+        "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG: synthetic arithmetic cannot establish real availability/execution/alpha; event-time substituted for ingestion-time breaks PIT. Current source-owned visibility/deadlines retained.",
+        "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE: full V2 continuity or OFFLINE_CHAIN_VERIFIED exceeds evidence and is excluded. C4 covers named owned resources and five non-target fingerprints only.",
+        "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL: no, three named V1 synthetic journeys with fixed regime; no family/OOS/profitability authority.",
+        "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE: no, membership precedes numeric reads, missing PRICE UNKNOWN, uncertain inventory reconciles, known cost floor retained.",
+        "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY: no, PROMOTE/definition/explicit offline activation/RECONCILED remain separate; modeled accounting terminal is not scientific verdict.",
+        "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING: no material change; conservative legacy visibility, frozen manifests retained, delayed UNKNOWN reconciliation only.",
+        "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER: no, existing Git/ResearchStore/source SQLite hash-bound publication/PaperPlane SQLite owners retained; DuckDB absence does not erase truth; canonical public owners reused.",
+        "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE: late ENTER, source-body changed EXIT at same hash, duplicated attempt send, UNKNOWN as healthy zero, incompatible-scope money headline. Current source-only corruption oracle verifies refusal/no persisted effects.",
+        "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM: local PASS alone could; full report/contract/nonclaims explicitly preserve partial V2 and no live/science/NetReturn/FCF.",
+        "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS: none material; C9 existing admission_content_sha256 before T0/cutoff requires body/stored/origin equality. Recovery retains event history/exact replay; code revert is not data rollback.",
+        "INDEPENDENT_CANONICAL_FINGERPRINTS_60_PATHS_22_EVIDENCE_REFS_13_CURRENT_INPUTS_CURRENT_53_8_16_4_198_SKIP1_VERIFIED",
+        "PACKET_INFORMATION_PATH; LAUNCH_ISOLATION=PROCESS_OBLIGATION; MODEL_DIVERSITY=UNPROVEN; NO_CI_MERGE_SCIENTIFIC_AUTHORITY",
+        "packet_fingerprint_sha256=a74dfe9450127cc38dd3a1d1261480a75646f4ab842e7a5540dc68946327feb4",
+        "FROZEN_SEMANTIC_PACKET={\"schema\":\"smial.semantic-premise-review-packet\",\"schema_version\":\"1.0\",\"task\":{\"task_id\":\"SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1\",\"task_contract_sha256\":\"02aa5f0871de8e924e06bcd64d584f77379a7df5d7ee18f71c05398cc7a36839\"},\"candidate\":{\"base\":\"d244af69bfd7ddc2850b9e5e5823323956e325c4\",\"head\":\"f84eaadf8345addf7039175e688e225480a528d8\",\"diff_sha256\":\"23387a71e6ed4d60141f77750577db0394a22856546d3677b83a7cf2c8c38ac3\"},\"review\":{\"profile\":\"SEMANTIC_PREMISE\",\"risk_dimensions\":[\"SCIENTIFIC_ESTIMAND\",\"FALSIFIER_OR_ENDPOINT\",\"EVIDENCE_ADMISSIBILITY\",\"PIT_OR_AVAILABILITY_SEMANTICS\",\"RESEARCH_TRUTH_OWNERSHIP\",\"HYPOTHESIS_OR_FAMILY_CLOSURE\",\"PROMOTION_OR_SUPPRESSION_AUTHORITY\",\"UNKNOWN_VS_NEGATIVE_EVIDENCE\",\"EXECUTION_TRUTH_SEMANTICS\",\"DURABLE_SCIENCE_SCHEMA\",\"OWNER_AUTHORITY_SEMANTICS\",\"HARNESS_PREMISE_OR_MERGE_AUTHORITY\"],\"architecture_owner\":\"ARCHITECTURE_CRITIC\"},\"semantic_claims\":[{\"claim_id\":\"C1\",\"claim\":\"Supported V1 PAPER mixed/list-only and SHADOW mixed traverse real handoff, separately activated runner, canonical source/membership/recipe, durable attempts/results and originating exits to reconciled modeled state.\",\"scope\":\"Synthetic offline V1 only, fixed execution regime.\"},{\"claim_id\":\"C2\",\"claim\":\"Enumerated offline probes verify UNKNOWN/late input refusal, exact replay/conflict, declared result classes and costs, pre-/post-commit recovery, literal money, complete source/action/admission/terminal sets, cumulative .01 cost preservation through UNKNOWN, .02 definitive reconciliation, nondecreasing observation clock, and typed partial EXIT refusal. Shared research/runtime observed decision PRICE eligibility rejects missing/late PRICE before features/admission, including list-only; membership UNKNOWN reads zero values.\",\"scope\":\"Declared supported modeled classes; no external effect.\"},{\"claim_id\":\"C3\",\"claim\":\"CAPABILITY_OUTCOME=REPAIR_PARTIAL_BLOCKED: required active V2 with open V1 is not established; canonical V1 scientific handoff guard retained and V2 rejected. Original S08/S13 remain partial.\",\"scope\":\"Full source-contract denominator is retained; no DONE or OFFLINE_CHAIN_VERIFIED.\"},{\"claim_id\":\"C4\",\"claim\":\"Campaign disposable roots deleted, fresh proof reconstructed without prior DB, owned process exited/absent and five non-target fingerprints equal. Synthetic scientific fixtures own real disposable Git commits of exact spec bytes; native Git-ceiling refusal reproduced before fixture repair and actual decision producer SHA checked after. Production identity guard unchanged.\",\"scope\":\"Campaign-owned paths only; observed sizes lower bound, Windows symlink variant skipped.\"},{\"claim_id\":\"C5\",\"claim\":\"Normal admission refusals preserve exact source ENTER/provenance and durable refusal reason/scope/policy where used. Unattempted stale/pause/disabled reservations remain CANCELLED after reopen; identical evaluation replay has no extra effects, policy revision may re-evaluate while retaining earlier denial. Actual errors retain whole admission rollback and success stays atomic; ATTEMPTING/UNKNOWN reconciliation and risk policy unchanged.\",\"scope\":\"Ordinary V1 source-shaped fixture and existing generic engine consumers only. A-D: eight focused PASS probes plus current fresh/regression; before two actual FAILs on production at content head 3f619f9264dda4d70e41eb01c304280b15bae8f3. Independent literal episode/ENTRY-or-EXIT/key sets and exact result-id-to-attempt links checked; no counts-only denominator shortcut. Current fresh53 and A-D8 rerun with strengthened oracle.\"},{\"claim_id\":\"C6\",\"claim\":\"The existing dispatch recovery assertion is aligned to source-owned first visibility: normal canonical outbox commit is 11:00 and recovered commit 11:05. Every reconstructed source gap field remains equal across histories, while each complete published row including ingestion clock is immutable on replay. Native original assertion failed only on this added clock; all 16 dispatch-window tests now pass. Production clocks, availability cutoffs and risk policy are unchanged.\",\"scope\":\"Same synthetic ordinary dispatch fixture; verification oracle only. No backdating, timeout bypass, source denial erasure or scientific/lifecycle authority.\"},{\"claim_id\":\"C7\",\"claim\":\"Complete originating SignalDecision canonical fingerprint must equal the preexisting admission position fingerprint before its body/clock is consumed by attempt/result/exit. Decision-only clock corruption with unchanged provenance cannot refresh a stale signal: ordinary native and frozen before probes fail, focused after refuses with unchanged persisted readback and zero attempts.\",\"scope\":\"Existing ordinary V1 source-shaped fixture; canonical_spec_sha256 owner reused. No schema, stale threshold, risk policy or successor lifecycle change; full V2 continuity remains blocked.\"},{\"claim_id\":\"C8\",\"claim\":\"The complete accepted originating EXIT packet is atomically hash-bound in the existing execution-event owner; source EXIT attempts/results verify exact type, position/bot scope, source/exit IDs, admitted signal hash and full packet hash before body/clock use. Decision-only exit backdating cannot authorize an attempt before the original availability cutoff. Binding faults roll source and exit state back; identical replay is stable and originating exit after operator close remains usable without a second generic transition event.\",\"scope\":\"Ordinary synthetic V1 fixture and existing canonical hash/event owners only. Native and frozen before each actually fail; four focused identity/atomic/replay/operator-close probes plus fresh53 and direct regressions pass. Missing legacy binding stays typed provenance gap; no fabricated history, new database schema, risk policy or V2 lifecycle.\"},{\"claim_id\":\"C9\",\"claim\":\"Originating EXIT recomputes the canonical source admission body hash before consuming admission fields/T0/cutoff, requiring equality with both the stored hash and original entry hash. Record-only T0 corruption with unchanged hash column is a typed EXIT_ORIGIN_SOURCE_CONFLICT before source exit, exit binding or position effects. Full accepted EXIT packet hashing alone is not source-body integrity proof.\",\"scope\":\"Same ordinary synthetic source-shaped V1 fixture. Native/frozen before actual FAIL; current no-effect after, fresh53, four origin probes and direct regressions PASS. Existing admission_content_sha256 owner reused; no source schema, recipe, risk policy or V2 lifecycle change.\"}],\"non_claims\":[\"NO_ALPHA_OOS_PROFITABILITY_OR_FCF\",\"NO_LIVE_PROVIDER_DEPLOY_WALLET_OR_REAL_ACTIVATION\",\"NO_V2_POSITIVE_MATERIALIZATION_OR_FULL_SCOPE_CHAIN\",\"NO_NEW_ADMISSION_INVENTORY_OR_DEACTIVATED_EXIT_POLICY\",\"NO_REVIEW_MODEL_DIVERSITY_PROOF\"],\"evidence\":[{\"logical_ref\":\"docs/reports/smial_trading_continuity_v1/REPORT.md\",\"sha256_or_fingerprint\":\"16221e8db75ecc1cf17fd349800083d7751f14779a673f2e6b8e96c625211df5\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/source-contract.md\",\"sha256_or_fingerprint\":\"fa27010cd06336d7e962798ce29cf04427ba8a3a23b420a3878357094fc6274c\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/review-handoff.md\",\"sha256_or_fingerprint\":\"00f9589bcecac9e12d83ec8837be6b4398448c8f234d6851a4110cc8a23505d7\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/baseline-replay.json\",\"sha256_or_fingerprint\":\"b3a4b75147151161cac104df355da4fa081bf153bc2adafea6ff2ab3aa90b7d1\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/fresh.json\",\"sha256_or_fingerprint\":\"54e533c31ca320fa79efcb890117205099772b8ee5eeed6949688b5a3e104b48\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/regression.json\",\"sha256_or_fingerprint\":\"5499eecb511e40eb53d675b8e50801d43af17077d7de4009d334c80d023388fb\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/cleanup.json\",\"sha256_or_fingerprint\":\"1e962618210ec354df0338b8626db489a1c5d57aad6d9f7f598c2c6278cfafda\"},{\"logical_ref\":\"tests/test_trading_continuity_v1.py\",\"sha256_or_fingerprint\":\"504498efdd8a67008efb2b0e56eb34f160fae6218d8c43a84b0010a35f4a8987\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/price-before.json\",\"sha256_or_fingerprint\":\"3a953f5e10bb7aa5b2985a1656d64bde98e9496757d64e1a5935bd0c288e0fcd\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/git-boundary-before.json\",\"sha256_or_fingerprint\":\"a20d0936fc4a80a3994d6f24da7c4ce304957113719d19ff9d1cea1d0835b7ab\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/transaction-before.json\",\"sha256_or_fingerprint\":\"a1e63889b94410fdc2e9b731d75f03e7077bd65c7682b4bfdf03f37346bea592\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/transaction-after.json\",\"sha256_or_fingerprint\":\"ec0261951e5599740979f5e363237c26ab7e7a95273c5b23754f6eb82191e52e\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/visibility-before.json\",\"sha256_or_fingerprint\":\"d1d0acd4980ede9d17e34b44a5f363600b744faeea8fa306c4965f50543cfc34\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/source-visibility.json\",\"sha256_or_fingerprint\":\"32696e4214e8f1ddfd52a1bd58889f4e18cfc3ea23a26072d92f09f0533d5eff\"},{\"logical_ref\":\"tests/test_opportunity_episode_dispatch_window_repair_v1.py\",\"sha256_or_fingerprint\":\"dd0120612cfc76bf1bd15f4159582188234ad3590558d6bac2e1a6422990a674\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/origin-fingerprint-before-native.json\",\"sha256_or_fingerprint\":\"f3243537ad83f66794c90fa1dcfe3a05f668aca1dd9edbcd58ba6b92371d776c\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/origin-fingerprint-before.json\",\"sha256_or_fingerprint\":\"bbb808c32d0d8747c85a4f4c3327f2a9117ddf1d9a1f2d572075de98ab1182fc\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/origin-fingerprint.json\",\"sha256_or_fingerprint\":\"611dc58f5776a5163927f56a5f6939dfc0ceb60ad2a3057f0813241a9f5447df\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/exit-origin-before-native.json\",\"sha256_or_fingerprint\":\"8aee4879d59696828cf65e82a643b767eb659582f19dd629bb46068c2c5e8252\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/exit-origin-before.json\",\"sha256_or_fingerprint\":\"925ab9617a9d312fed7b2794a037cb9727034aa70e66ac49f6dc03b071db8647\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/exit-source-before-native.json\",\"sha256_or_fingerprint\":\"2c8f376977e90c96daa2d6c7060903a4d0c21b1ead5318ba899b076b830c5467\"},{\"logical_ref\":\"docs/evidence/smial_trading_continuity_v1/exit-source-before.json\",\"sha256_or_fingerprint\":\"1765a1d588250f03d3a5374d28617e593a93ad83b54e5661b24403a23a898a34\"}],\"questions\":[\"HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG\",\"WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE\",\"IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL\",\"IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE\",\"DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY\",\"DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING\",\"IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER\",\"WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE\",\"WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM\",\"WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS\"],\"independence\":{\"claim_scope\":\"PACKET_INFORMATION_PATH\",\"context_isolated\":true,\"implementation_transcript_seen\":false,\"packet_bound\":true,\"readonly\":true,\"launch_isolation\":\"PROCESS_OBLIGATION\",\"model_diversity\":\"UNPROVEN\",\"model_diversity_identity\":null},\"packet_fingerprint_sha256\":\"a74dfe9450127cc38dd3a1d1261480a75646f4ab842e7a5540dc68946327feb4\"}",
+        "VALIDATE_LAUNCH={\"ok\":true,\"profile\":\"SEMANTIC_PREMISE\",\"packet_fingerprint_sha256\":\"a74dfe9450127cc38dd3a1d1261480a75646f4ab842e7a5540dc68946327feb4\",\"independence_claim_scope\":\"PACKET_INFORMATION_PATH\",\"launch_isolation\":\"PROCESS_OBLIGATION\",\"model_diversity\":\"UNPROVEN\",\"packet_required\":true,\"authority_granted\":false}"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "READ_ONLY_EXACT_CONTENT_COLD_OPERATOR_ROUTE_COMMANDS_RECOVERY_AND_STATUS_PASS_NO_MATERIAL_GAPS",
+        "DENIED_EXIT0_BLOCKED_EXIT2_SEND_ATTEMPT_STOP_DRAIN_RECONCILIATION_SOURCE_CONFLICT_LEGACY_BINDING_EXPLICIT",
+        "HISTORICAL_AND_CURRENT_PROOFS_SEPARATE_CURRENT_53_8_16_4_198_SKIP1_CLEAN0",
+        "REPAIR_PARTIAL_BLOCKED_S08_S13_V1_BOUNDARY_AND_NO_STRONGER_AUTHORITY_PRESERVED",
+        "INDEPENDENT_HEAD_BASE_INVENTORY_BINDINGS_BINARY_DIFF60_PATHS_EXACT3_EXCLUSIONS_MATCH"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_FULL_OFFLINE_CHAIN_VERIFIED_V2_BLOCKED",
+    "NO_ALPHA_OOS_PROFITABILITY",
+    "NO_LIVE_PROVIDER_DEPLOY_TRANSACTION",
+    "NO_REAL_SCIENCE_OR_ACTIVATION",
+    "NO_TOTAL_RISK_EQUITY_FCF",
+    "NO_NEW_ADMISSION_OR_VERSION_AUTHORITY",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "Cumulative confirmed costs could be erased by later zero or missing callback; cost/clock floor repaired and literal probe added.",
+      "observed_head": "160866d6b92e724b48e4c9dceb7b511043d22cb4",
+      "resolved_by_head": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "Cumulative costs and accepted observation chronology could regress; bounded existing-owner repairs and dynamic probes added.",
+      "observed_head": "160866d6b92e724b48e4c9dceb7b511043d22cb4",
+      "resolved_by_head": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "Partial EXIT refusal was claimed executed but only statically guarded; now actual dynamic refusal preserves positions/results.",
+      "observed_head": "160866d6b92e724b48e4c9dceb7b511043d22cb4",
+      "resolved_by_head": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "Runtime omitted canonical decision PRICE eligibility and widened admitted population; shared scientific cell and missing/late PRICE before/after probes repair it.",
+      "observed_head": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7",
+      "resolved_by_head": "4f66ec3fb8756ccf22517dcf6fc450df7ff0a83e"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Runbook implied supported new version; now states V1-only guard, V2 block and exact report link.",
+      "observed_head": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7",
+      "resolved_by_head": "4f66ec3fb8756ccf22517dcf6fc450df7ff0a83e"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Attempt/result counts and shared position ID did not exclude missing-plus-duplicate. Independent literal side/key/episode identity and result-id/attempt link sets added; product unchanged, current proofs repeated.",
+      "observed_head": "6aa402c1793cba992a714713face8c245845206a",
+      "resolved_by_head": "c9df544d4e8a81b61fbd54d1bbeb35918b8ec7ae"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Original reviewer priority=P1. Full originating decision body unbound to admitted position; decision-only clock corruption bypassed stale refusal. Native and frozen before reproduced, existing canonical fingerprint owner reused; focused after preserves all persisted readback.",
+      "observed_head": "2bc4684f5b7307757c37662b62c65f68aac447f8",
+      "resolved_by_head": "aa8d53795db8d60430aeddc5594a6b348ad89e60"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Original reviewer priority=P1. Source ExitDecision body/clock lacked independent durable acceptance integrity, allowing decision-only backdating before originating cutoff. Native/frozen before actual FAIL. Complete accepted packet now atomically hash-bound in existing event owner; attempt/result exact scope/hash check, rollback/replay/operator-close probes added. No policy/database schema/V2 lifecycle change.",
+      "observed_head": "aa8d53795db8d60430aeddc5594a6b348ad89e60",
+      "resolved_by_head": "5a7d0fc02852dd68cfb822daa09e5048a42e0d7c"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Original reviewer priority=P1. Originating EXIT trusted stored admission hash without recomputing mutable body before T0/cutoff. Native/frozen record-only corruption with unchanged stored hash actually FAIL; existing hash owner now enforces body/stored/origin equality before effects. No source schema, scientific recipe, risk policy or V2 lifecycle change.",
+      "observed_head": "5a7d0fc02852dd68cfb822daa09e5048a42e0d7c",
+      "resolved_by_head": "f84eaadf8345addf7039175e688e225480a528d8"
+    }
+  ]
+}

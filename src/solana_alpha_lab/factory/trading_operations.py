@@ -9,7 +9,7 @@ from typing import Any, Mapping
 
 import yaml
 
-from solana_alpha_lab.factory.paper_plane import PaperPlaneError
+from solana_alpha_lab.factory.paper_plane import OPEN_RISK_STATES, PaperPlaneError
 from solana_alpha_lab.factory.paper_shadow_operations import (
     build_operations_projection,
 )
@@ -454,7 +454,7 @@ def _bot_context(
         "entries_paused": paused,
         "started_at": bot.get("started_at"),
         "stopped_at": bot.get("stopped_at"),
-        "open_risk_count": open_positions + partial + unknown,
+        "open_risk_count": _count_states(rows, OPEN_RISK_STATES),
         "open_positions": open_positions,
         "partial_positions": partial,
         "unknown_positions": unknown,

@@ -171,6 +171,15 @@ not entry-admission risk, and not inventory. Its PnL status is
 
 ## 9. Exposure
 
+The Operations projection exposes compatible bot/version/epoch/mode scopes.
+MIXED_SCOPE suppresses aggregate money/streak/drawdown/exposure headlines.
+Its modeled attempt costs are cumulative additional costs **excluding** the
+price-leg fees already included in trade PnL; failures remain in this denominator.
+Missing cost is UNKNOWN. `reconciled_trade_net_pnl_usd` retains the existing
+fee-only trade component. `modeled_net_after_additional_costs_usd` is available
+only for one compatible, terminal, fully-known modeled scope. Neither is live
+NetReturn or FCF. Exact semantics: `docs/contracts/episode_decision_continuity_v1.md`.
+
 `ENTERED_NOTIONAL_EXPOSURE_USD` scoped by strategy_version and mode. Not
 CAPITAL_AT_RISK. UNKNOWN inventory is not zero.
 

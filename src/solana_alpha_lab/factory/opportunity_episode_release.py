@@ -631,6 +631,32 @@ def _read_observation_rows(root: Path, obs_rel: str) -> list[dict[str, Any]]:
     return [dict(row) for row in pq.read_table(path).to_pylist()]
 
 
+def read_timely_episode_publications(store, *, data_root: Path, admission: Mapping[str, Any],
+                                    point_id: str, visible_by: datetime) -> list[dict[str, Any]]:
+    """Exact publication dependencies, bounded to one episode/point/cutoff.
+
+    This does not export, seal, mature or admit a research release. Publication
+    Rows preserve source-owned first visibility across outbox publication.
+    Legacy publications without that clock retain publication time as floor.
+    """
+    publications = store.episode_publications_for_cohort(
+        schedule_sha256=admission["schedule_sha256"], activation_id=admission["activation_id"],
+        cohort_id=admission["cohort_id"],
+    )
+    rows = []
+    for publication in publications:
+        obs_rel, _member_rel, _metadata = _publication_files(data_root, publication)
+        path = _contained(data_root, obs_rel)
+        table = pq.read_table(path, filters=[("entity_id", "=", admission["episode_id"]), ("point_id", "=", point_id)])
+        for row in table.to_pylist():
+            first_visible = row.get("ingested_visible_at") or publication["created_at"]
+            if parse_utc(first_visible) > visible_by:
+                continue
+            rows.append({"row": dict(row), "visible_at": first_visible,
+                         "publication_content_sha256": publication["content_sha256"]})
+    return rows
+
+
 def _read_member_rows(root: Path, member_rel: str) -> list[dict[str, Any]]:
     from solana_alpha_lab.factory.members_snapshot_delta import iter_member_row_batches_for_location
 
@@ -856,7 +882,7 @@ def _release_raw_rel(rel: object) -> str | None:
     return f"{RAW_DIR}/{PurePosixPath(rel).name}"
 
 
-def _observation_rows(source: Mapping[str, Any], release_id: str) -> list[dict[str, Any]]:
+def _observation_rows(source: Mapping[str, Any], release_id: str, *, raw_body_transform=_release_raw_rel) -> list[dict[str, Any]]:
     rows = []
     cohort_id = str(source["receipt"]["cohort_id"])
     for obs in source["observations"]:
@@ -895,12 +921,23 @@ def _observation_rows(source: Mapping[str, Any], release_id: str) -> list[dict[s
                     "observation_clock_policy": obs.get("observation_clock_policy"),
                     "source_price_event_time": obs.get("source_price_event_time"),
                     "member_anchor": obs.get("member_anchor"),
-                    "raw_body_rel": _release_raw_rel(obs.get("raw_body_rel")),
+                    "raw_body_rel": raw_body_transform(obs.get("raw_body_rel")),
                     "evidence_role": EVIDENCE_ROLE,
                     "confirmatory_reuse_forbidden": True,
                 }
             )
     rows.sort(key=lambda row: (row["episode_id"], int(str(row["point_id"])[1:]), str(row["field_id"])))
+    return rows
+
+
+def project_prefix_observations(observations: Sequence[Mapping[str, Any]], *, cohort_id: str) -> list[dict[str, Any]]:
+    """Shared field projection, without manufacturing a mature research release."""
+    rows = _observation_rows(
+        {"receipt": {"cohort_id": cohort_id}, "observations": observations},
+        "TIMELY_PREFIX", raw_body_transform=lambda rel: rel,
+    )
+    for row in rows:
+        row["evidence_role"] = "TIMELY_OBSERVATION_PREFIX"
     return rows
 
 

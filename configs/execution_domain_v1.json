@@ -4,7 +4,10 @@
     "src/solana_alpha_lab/factory/unattended_shadow.py",
     "scripts/factory_paper_shadow_operator_smoke.py",
     "scripts/run_early_state_hypothesis.py",
-    "src/solana_alpha_lab/factory/lifecycle_projection.py"
+    "src/solana_alpha_lab/factory/lifecycle_projection.py",
+    "src/solana_alpha_lab/factory/episode_decision.py",
+    "src/solana_alpha_lab/factory/trading_runner.py",
+    "scripts/trading_continuity.py"
   ],
   "contract_paths": [
     "catalog/schemas/strategy_version_v1_1.schema.json",
@@ -28,7 +31,8 @@
     "tests/test_factory_v1_owner_cockpit.py",
     "tests/test_execution_domain_modularity_and_fast_ci_v1.py",
     "tests/test_risk_and_economics_v1.py",
-    "tests/test_paper_shadow_execution_integrity_vertical_v1.py"
+    "tests/test_paper_shadow_execution_integrity_vertical_v1.py",
+    "tests/test_trading_continuity_v1.py"
   ],
   "runtime_mode_scope": [
     "PAPER",

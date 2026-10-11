@@ -5938,6 +5938,16 @@
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
     },
     {
+      "source_asset_id": "DOC-EPISODE-DECISION-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
+      "source_asset_id": "DOC-EPISODE-DECISION-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
       "source_asset_id": "DOC-EXPERIMENT-EVIDENCE-DECISION-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001"
@@ -6269,6 +6279,11 @@
     },
     {
       "source_asset_id": "DOC-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001"
+    },
+    {
+      "source_asset_id": "DOC-OWNER-LIFECYCLE-PROJECTION-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001"
     },
@@ -6411,6 +6426,16 @@
       "source_asset_id": "DOC-T34A-RUNBOOKS-001",
       "relation": "depends_on",
       "target_asset_id": "SCRIPT-T34A-CONTEXT-001"
+    },
+    {
+      "source_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
+      "source_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
     },
     {
       "source_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001",
@@ -11543,6 +11568,16 @@
       "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
     },
     {
+      "source_asset_id": "MODULE-EPISODE-DECISION-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
+      "source_asset_id": "MODULE-EPISODE-DECISION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
       "source_asset_id": "MODULE-EXPERIMENT-EVIDENCE-001",
       "relation": "consumes",
       "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
@@ -14033,6 +14068,16 @@
       "target_asset_id": "CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001"
     },
     {
+      "source_asset_id": "MODULE-TRADING-CONTINUITY-RUNNER-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
+      "source_asset_id": "MODULE-TRADING-CONTINUITY-RUNNER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
       "source_asset_id": "MODULE-TRADING-OPERATIONS-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PAPER-SHADOW-OPERATIONS-001"
@@ -16298,6 +16343,16 @@
       "target_asset_id": "DOC-RESEARCH-WRITE-LOOKUP-V1-001"
     },
     {
+      "source_asset_id": "SCRIPT-PROVE-TRADING-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-PROVE-TRADING-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
       "source_asset_id": "SCRIPT-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
@@ -16958,6 +17013,16 @@
       "target_asset_id": "POLICY-TASK-CLOSE-FAST-PATH-001"
     },
     {
+      "source_asset_id": "SCRIPT-TRADING-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-TRADING-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
       "source_asset_id": "SCRIPT-TRADING-RUNTIME-POLICY-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-TRADING-RUNTIME-POLICY-001"
@@ -17016,6 +17081,16 @@
       "source_asset_id": "STRAT-V-EARLY-NETFLOW-TILT-V1-001",
       "relation": "governed_by",
       "target_asset_id": "SCHEMA-STRATEGY-VERSION-001"
+    },
+    {
+      "source_asset_id": "TASK-SMIAL-TRADING-CONTINUITY-AUDIT-REPAIR-V1",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
+      "source_asset_id": "TASK-SMIAL-TRADING-CONTINUITY-AUDIT-REPAIR-V1",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
     },
     {
       "source_asset_id": "TASK-T30-A14P-R1-AUTH-RECOVERY-001",
@@ -20581,6 +20656,16 @@
       "source_asset_id": "TEST-TOKENS-V2-TYPED-PROJECTION-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "TEST-TRADING-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
+      "source_asset_id": "TEST-TRADING-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
     },
     {
       "source_asset_id": "TEST-TRADING-OPERATIONS-WORKBENCH-001",

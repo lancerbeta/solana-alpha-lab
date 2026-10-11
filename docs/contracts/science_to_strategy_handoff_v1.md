@@ -7,6 +7,10 @@ deployment.
 
 Catalog document: `DOC-SCIENCE-TO-STRATEGY-HANDOFF-001`
 Semantic route: `SEM-OWNER-LIFECYCLE` (existing; no new route)
+Ordinary offline downstream: `docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md`;
+source/recipe binding: `docs/contracts/episode_decision_continuity_v1.md`.
+Materialization remains separate from explicit activation; these adapters do
+not nominate/promote science or weaken the frozen manifest/execution binding.
 Visual owner: `SMIAL_VISUAL_OPERATING_SYSTEM_V1`
 
 ```text

@@ -1,0 +1,30 @@
+{
+  "base": "d244af69bfd7ddc2850b9e5e5823323956e325c4",
+  "candidate_test_sha256": "7d1df56a7e22f1c3e52336f17f4715173da5b26be29f37ac91eedbc2c03fd357",
+  "egress_canary": "PASS",
+  "elapsed_seconds": 0.823,
+  "environment": "ALLOWLIST",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "exit_code": 1,
+  "ordinary_chain": "PARTIAL_MISSING_PRODUCER_AND_RESULT_CALLER",
+  "output_sha256": "cb9606e2a2f6546ad3c9d0428c59294097e25f38f510384bc3632ccc2622b5ff",
+  "phase": "baseline",
+  "status": "FAIL",
+  "supported_handoff_neighbors": {
+    "egress_canary": "PASS",
+    "elapsed_seconds": 16.902,
+    "environment": "ALLOWLIST",
+    "evidence_class": "SYNTHETIC_OFFLINE",
+    "exit_code": 0,
+    "output_sha256": "1511e3de65ab9c36ff81aac61ed763227abe2aecebd7a5bfb626e19d9b8c1d37",
+    "phase": "baseline-neighbors",
+    "status": "PASS",
+    "test_modules": [
+      "tests.test_science_to_strategy_handoff_v1",
+      "tests.test_execution_evidence_seam_v1"
+    ]
+  },
+  "test_modules": [
+    "tests.test_trading_continuity_v1"
+  ]
+}

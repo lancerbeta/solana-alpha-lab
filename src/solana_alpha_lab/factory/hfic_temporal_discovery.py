@@ -1029,6 +1029,65 @@ def _cell(
     return _select_cell(rows, deadline, exact_numeric=exact_numeric)
 
 
+def episode_decision_price(
+    grouped: Mapping[Any, Sequence[Mapping[str, Any]]], *, cohort: str,
+    release: str, episode_id: str, decision_point: str, decision_deadline: object,
+    snapshot_policy: str | None, decision_due_at: object,
+) -> dict[str, Any]:
+    """Canonical observed-PRICE eligibility cell, shared by research and runtime."""
+    return _cell(grouped, (cohort, release, episode_id, decision_point, PRICE),
+                 decision_deadline, snapshot_policy=snapshot_policy,
+                 point_due_at=decision_due_at)
+
+
+def evaluate_episode_prefix(
+    body: Mapping[str, Any], *, grouped: Mapping[Any, Sequence[Mapping[str, Any]]],
+    cohort: str, episode_id: str, t0: datetime, decision_deadline: datetime,
+    point_window: Any,
+) -> dict[str, Any]:
+    """Entry eligibility and features after the caller resolves membership coverage."""
+    due, _ = point_window(body["decision_point"])
+    price = episode_decision_price(grouped, cohort=cohort, release="TIMELY_PREFIX",
+        episode_id=episode_id, decision_point=body["decision_point"],
+        decision_deadline=decision_deadline, snapshot_policy=body["observation_clock_policy"],
+        decision_due_at=due)
+    status = str(price.get("status") or "ABSENT")
+    if status != "OBSERVED":
+        return {"action": "UNKNOWN", "reason_code": "EPISODE_DECISION_PRICE_" + status,
+                "decision_eligibility": {"status": status}, "values": {}, "details": {}}
+    return {**evaluate_episode_features(body, grouped=grouped, cohort=cohort,
+        episode_id=episode_id, t0=t0, decision_deadline=decision_deadline,
+        point_window=point_window), "decision_eligibility": {"status": status}}
+
+
+def evaluate_episode_features(
+    body: Mapping[str, Any], *, grouped: Mapping[Any, Sequence[Mapping[str, Any]]],
+    cohort: str, episode_id: str, t0: datetime, decision_deadline: datetime,
+    point_window: Any,
+) -> dict[str, Any]:
+    """Use the scientific feature/predicate owner on a lazy, timely source prefix.
+
+    This is arithmetic only; entry callers use evaluate_episode_prefix.
+    Originating exits evaluate their frozen target without admitting a new entry.
+    No outcome point, population statistic or research trial is evaluated here.
+    """
+    values, details = {}, {}
+    for feature in body["features"]:
+        detail: dict[str, Any] = {}
+        value, blocker = _feature_value_with_lineage(
+            grouped, cohort=cohort, release="TIMELY_PREFIX", mint=episode_id,
+            anchor=t0, feature=feature, lateness=0,
+            decision_deadline=decision_deadline, point_window=point_window,
+            snapshot_policy=body["observation_clock_policy"],
+            time_clock=body["time_contract"]["time_feature_clock"], detail=detail,
+        )
+        values[feature["name"]] = value
+        details[feature["name"]] = {**detail, "lineage_blocker": blocker}
+    predicates = [_predicate_holds(values[p["feature"]], p) for p in body["predicates"]]
+    return {"action": "UNKNOWN" if None in predicates else "ENTER" if all(predicates) else "NO_ENTER",
+            "values": values, "details": details}
+
+
 def _predicate_holds(value: float | Fraction | None, predicate: Mapping[str, Any]) -> bool | None:
     if value is None:
         return None
@@ -3382,12 +3441,12 @@ def _project_episode_members(
             scope_exclusion = "SCOPE_UNIVERSE_" + str(scope.universe.get(episode) or "UNKNOWN")
         decision_eligible = False
         if search_base:
-            decision_price = _cell(
+            decision_price = episode_decision_price(
                 grouped,
-                (cohort, release, episode, decision_point, PRICE),
-                decision_deadline,
+                cohort=cohort, release=release, episode_id=episode,
+                decision_point=decision_point, decision_deadline=decision_deadline,
                 snapshot_policy=snapshot_policy,
-                point_due_at=decision_due_at,
+                decision_due_at=decision_due_at,
             )
             decision_status = str(decision_price.get("status") or "")
             decision_eligible = decision_status == "OBSERVED"

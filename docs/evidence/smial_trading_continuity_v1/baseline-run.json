@@ -1,0 +1,13 @@
+{
+  "egress_canary": "PASS",
+  "elapsed_seconds": 0.823,
+  "environment": "ALLOWLIST",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "exit_code": 1,
+  "output_sha256": "cb9606e2a2f6546ad3c9d0428c59294097e25f38f510384bc3632ccc2622b5ff",
+  "phase": "baseline",
+  "status": "FAIL",
+  "test_modules": [
+    "tests.test_trading_continuity_v1"
+  ]
+}

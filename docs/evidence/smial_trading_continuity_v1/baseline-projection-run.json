@@ -1,0 +1,13 @@
+{
+  "egress_canary": "PASS",
+  "elapsed_seconds": 0.862,
+  "environment": "ALLOWLIST",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "exit_code": 1,
+  "output_sha256": "1029771bdf723c9f9fc203391538d36add8e881f9117a0521d375e30a48e6be5",
+  "phase": "baseline-projection",
+  "status": "FAIL",
+  "test_modules": [
+    "tests.test_trading_continuity_v1.ConfirmedBaselineDefects.test_mixed_mode_projection_has_no_combined_money_headline"
+  ]
+}

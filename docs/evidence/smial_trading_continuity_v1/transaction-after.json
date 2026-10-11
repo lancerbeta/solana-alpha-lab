@@ -1,0 +1,75 @@
+{
+  "candidate_input_bindings": {
+    "scripts/prove_trading_continuity.py": "eab2529c618d2449d934667822ffe88a1703ef7fe3badab337639f8d14e488b2",
+    "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
+    "src/solana_alpha_lab/factory/episode_decision.py": "e0f70efc50247fe9ccc9cde48104113ed30baa2f92d29e70e83259b03beed5a0",
+    "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "af898471e64d5beecdb4e6f56caeca7d7cde0ec14fd5e7559634c7b241f0c383",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "361522572d7ec2ef325d58f10c8a804ab020a14e1348406f864b968d8a388060",
+    "src/solana_alpha_lab/factory/opportunity_episode_release.py": "97c2a604f4b10523cb876f6a0a561b291d04ea46e5fb45c0d0917db5f911a0e7",
+    "src/solana_alpha_lab/factory/paper_plane.py": "5f3582fc646d3927aa67f72561c95ae2130d0eb6e7aa5d881a139727090bc342",
+    "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
+    "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
+    "src/solana_alpha_lab/factory/trading_runner.py": "ab20e203e927455af5a24cf9bdbc9b4bcebc4d3bf0f6f1a80914d33206bf8f68",
+    "tests/test_opportunity_episode_dispatch_window_repair_v1.py": "dd0120612cfc76bf1bd15f4159582188234ad3590558d6bac2e1a6422990a674",
+    "tests/test_trading_continuity_v1.py": "504498efdd8a67008efb2b0e56eb34f160fae6218d8c43a84b0010a35f4a8987"
+  },
+  "candidate_inputs_unchanged": true,
+  "candidate_test_sha256": "504498efdd8a67008efb2b0e56eb34f160fae6218d8c43a84b0010a35f4a8987",
+  "egress_canary": "PASS",
+  "elapsed_seconds": 24.979,
+  "environment": "ALLOWLIST",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "executed_cases": [
+    {
+      "status": "ok",
+      "test": "test_ordinary_denied_admission_is_durable_and_idempotent (tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_denied_admission_is_durable_and_idempotent)"
+    },
+    {
+      "status": "ok",
+      "test": "test_ordinary_stale_replay_cancellation_survives_new_connection (tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_stale_replay_cancellation_survives_new_connection)"
+    },
+    {
+      "status": "ok",
+      "test": "test_ordinary_paused_replay_cancellation_is_durable (tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_paused_replay_cancellation_is_durable)"
+    },
+    {
+      "status": "ok",
+      "test": "test_ordinary_disabled_policy_replay_cancellation_is_durable (tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_disabled_policy_replay_cancellation_is_durable)"
+    },
+    {
+      "status": "ok",
+      "test": "test_denial_re_evaluates_after_policy_revision_without_erasing_history (tests.test_trading_continuity_v1.OrdinarySourceTests.test_denial_re_evaluates_after_policy_revision_without_erasing_history)"
+    },
+    {
+      "status": "ok",
+      "test": "test_ordinary_admission_real_errors_rollback_source_reservation_and_risk (tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_admission_real_errors_rollback_source_reservation_and_risk)"
+    },
+    {
+      "status": "ok",
+      "test": "test_episode_replay_cannot_cancel_attempting_or_unknown (tests.test_trading_continuity_v1.OrdinarySourceTests.test_episode_replay_cannot_cancel_attempting_or_unknown)"
+    },
+    {
+      "status": "ok",
+      "test": "test_independent_source_action_admission_terminal_sets (tests.test_trading_continuity_v1.OrdinarySourceTests.test_independent_source_action_admission_terminal_sets)"
+    }
+  ],
+  "exit_code": 0,
+  "observed_peak_bytes": 3172233,
+  "output_sha256": "68c40c0ad023b925672f9772073ce3343f859683371e37bceab6a3201a35070c",
+  "owned_process_exit_code": 0,
+  "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
+  "phase": "transaction-after",
+  "resource_measurement_n": 8,
+  "status": "PASS",
+  "test_modules": [
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_denied_admission_is_durable_and_idempotent",
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_stale_replay_cancellation_survives_new_connection",
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_paused_replay_cancellation_is_durable",
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_disabled_policy_replay_cancellation_is_durable",
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_denial_re_evaluates_after_policy_revision_without_erasing_history",
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_admission_real_errors_rollback_source_reservation_and_risk",
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_episode_replay_cannot_cancel_attempting_or_unknown",
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_independent_source_action_admission_terminal_sets"
+  ]
+}

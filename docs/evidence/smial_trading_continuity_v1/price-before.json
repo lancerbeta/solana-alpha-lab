@@ -1,0 +1,73 @@
+{
+  "baseline_binding": {
+    "base": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7",
+    "frozen_modules": [
+      "hfic_temporal_discovery",
+      "episode_decision"
+    ],
+    "method": "FROZEN_BASE_MODULES_WITH_CURRENT_INDEPENDENT_BASELINE_PROBES",
+    "registry_dependency_sha256": "bf3496206a1cb37e57ec4d41b7c4bd953a7d60a86eb6ed1e0cf7f21c4899263f",
+    "remaining_dependencies": "UNCHANGED_BASE_OWNERS"
+  },
+  "candidate_input_bindings": {
+    "scripts/prove_trading_continuity.py": "2b2965221e4ce89f7df35468c81d73b2b50cae1190a14aad0810673c9f18291e",
+    "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
+    "src/solana_alpha_lab/factory/episode_decision.py": "cf91487ee2284e5bf476066b065658c45d6954a4005938dc264dfdf53a52fc93",
+    "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "cfa659476d2ca93592f0d5ff92c29c85d0ec31a5552f015dda001edb74c284ed",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "361522572d7ec2ef325d58f10c8a804ab020a14e1348406f864b968d8a388060",
+    "src/solana_alpha_lab/factory/opportunity_episode_release.py": "97c2a604f4b10523cb876f6a0a561b291d04ea46e5fb45c0d0917db5f911a0e7",
+    "src/solana_alpha_lab/factory/paper_plane.py": "371753f07d2eb69d52feae08a8f4efb52f456e6327493933961c1af20eceea6f",
+    "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
+    "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
+    "src/solana_alpha_lab/factory/trading_runner.py": "7bc1bb7af298b176356345443ec10cf12b00a39a3d333713fc378fbdbb7abd6e",
+    "tests/test_trading_continuity_v1.py": "3d63b1986b465eda4e8b58cd6b0a826f821f9458b76e1d3ed3ba19c0d62cab5f"
+  },
+  "candidate_inputs_unchanged": true,
+  "candidate_test_sha256": "3d63b1986b465eda4e8b58cd6b0a826f821f9458b76e1d3ed3ba19c0d62cab5f",
+  "egress_canary": "PASS",
+  "elapsed_seconds": 6.441,
+  "environment": "ALLOWLIST",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "executed_cases": [
+    {
+      "status": "FAIL",
+      "test": "test_missing_decision_price_refuses_list_only (tests.test_trading_continuity_v1.OrdinarySourceTests.test_missing_decision_price_refuses_list_only)"
+    },
+    {
+      "status": "FAIL",
+      "test": "test_missing_decision_price_refuses_positive_holder_delta (tests.test_trading_continuity_v1.OrdinarySourceTests.test_missing_decision_price_refuses_positive_holder_delta)"
+    },
+    {
+      "status": "FAIL",
+      "test": "test_late_decision_price_refuses_list_only_without_future_healing (tests.test_trading_continuity_v1.OrdinarySourceTests.test_late_decision_price_refuses_list_only_without_future_healing)"
+    }
+  ],
+  "exit_code": 1,
+  "failure_boundaries": [
+    [
+      "test_missing_decision_price_refuses_list_only (tests.test_trading_continuity_v1.OrdinarySourceTests.test_missing_decision_price_refuses_list_only)",
+      "AssertionError: 'ENTER' != 'UNKNOWN'"
+    ],
+    [
+      "test_missing_decision_price_refuses_positive_holder_delta (tests.test_trading_continuity_v1.OrdinarySourceTests.test_missing_decision_price_refuses_positive_holder_delta)",
+      "AssertionError: 'ENTER' != 'UNKNOWN'"
+    ],
+    [
+      "test_late_decision_price_refuses_list_only_without_future_healing (tests.test_trading_continuity_v1.OrdinarySourceTests.test_late_decision_price_refuses_list_only_without_future_healing)",
+      "AssertionError: 'ENTER' != 'UNKNOWN'"
+    ]
+  ],
+  "observed_peak_bytes": 889240,
+  "output_sha256": "e56d81beba5c6c573112fa3d99a4f8878229c2c3b2e2b4cf7b92a7c84121504c",
+  "owned_process_exit_code": 1,
+  "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
+  "phase": "price-before",
+  "resource_measurement_n": 3,
+  "status": "FAIL",
+  "test_modules": [
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_missing_decision_price_refuses_list_only",
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_missing_decision_price_refuses_positive_holder_delta",
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_late_decision_price_refuses_list_only_without_future_healing"
+  ]
+}

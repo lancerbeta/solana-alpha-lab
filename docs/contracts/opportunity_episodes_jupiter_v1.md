@@ -4,6 +4,13 @@ Status: ACTIVE software capability, live lane DISABLED by default.
 Owner task: `docs/tasks/OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1.md`.
 Domain owner: `src/solana_alpha_lab/factory/opportunity_episodes.py`.
 
+Timely downstream decisions use the bounded readonly prefix seam described in
+`docs/contracts/episode_decision_continuity_v1.md`. Source-owned first visibility
+is preserved as `ingested_visible_at` in canonical outbox/publication observation
+rows; legacy published rows without it use publication time as the floor.
+This adds causal transport metadata, not population/grid/membership meaning.
+It does not bypass mature release, capture/export or protected-data gates.
+
 Dispatch runtime repair: live due checkpoints and the canonical 15s idle timer
 cover the existing immutable 60s windows under the finite ordinary runtime
 model in `docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md`. The episode

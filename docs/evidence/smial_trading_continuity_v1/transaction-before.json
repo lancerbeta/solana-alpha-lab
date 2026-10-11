@@ -1,0 +1,62 @@
+{
+  "before_candidate_head": "3f619f9264dda4d70e41eb01c304280b15bae8f3",
+  "candidate_input_bindings": {
+    "scripts/prove_trading_continuity.py": "8be2c58e0fa2462ab59dd70d0520f1b52b0f803d4fa8ae7ed659a0871b1167e4",
+    "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
+    "src/solana_alpha_lab/factory/episode_decision.py": "c08a55a5c512ca01bffe0e1c5888a76137359f118574bb7f27b9a337cbca0a63",
+    "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "af898471e64d5beecdb4e6f56caeca7d7cde0ec14fd5e7559634c7b241f0c383",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "361522572d7ec2ef325d58f10c8a804ab020a14e1348406f864b968d8a388060",
+    "src/solana_alpha_lab/factory/opportunity_episode_release.py": "97c2a604f4b10523cb876f6a0a561b291d04ea46e5fb45c0d0917db5f911a0e7",
+    "src/solana_alpha_lab/factory/paper_plane.py": "371753f07d2eb69d52feae08a8f4efb52f456e6327493933961c1af20eceea6f",
+    "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
+    "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
+    "src/solana_alpha_lab/factory/trading_runner.py": "7bc1bb7af298b176356345443ec10cf12b00a39a3d333713fc378fbdbb7abd6e",
+    "tests/test_trading_continuity_v1.py": "994caf53271c53e41654ae9518fc4c9ca661e02583afd8d282c92cf44f51ca3c"
+  },
+  "candidate_inputs_unchanged": true,
+  "candidate_test_sha256": "994caf53271c53e41654ae9518fc4c9ca661e02583afd8d282c92cf44f51ca3c",
+  "egress_canary": "PASS",
+  "elapsed_seconds": 5.334,
+  "environment": "ALLOWLIST",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "executed_cases": [
+    {
+      "status": "FAIL",
+      "test": "test_ordinary_denied_admission_is_durable_and_idempotent (tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_denied_admission_is_durable_and_idempotent)"
+    },
+    {
+      "status": "FAIL",
+      "test": "test_ordinary_stale_replay_cancellation_survives_new_connection (tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_stale_replay_cancellation_survives_new_connection)"
+    }
+  ],
+  "exit_code": 1,
+  "expected_defects": [
+    "ORDINARY_DENIAL_SOURCE_ROLLED_BACK",
+    "UNATTEMPTED_CANCELLATION_ROLLED_BACK"
+  ],
+  "observed_peak_bytes": 943550,
+  "output_sha256": "c51f33bc687ffe30ede7795bdc6d52cf15daf531e752553cea95a26c4a4eadbf",
+  "owned_process_exit_code": 1,
+  "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
+  "phase": "transaction-before",
+  "resource_measurement_n": 2,
+  "status": "FAIL",
+  "test_modules": [
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_denied_admission_is_durable_and_idempotent",
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_stale_replay_cancellation_survives_new_connection"
+  ],
+  "failure_boundaries": [
+    "0 != 1 : ordinary refusal must preserve exact source packet",
+    "WATCHED != CANCELLED : cancel must survive the runner transaction"
+  ],
+  "baseline_binding": {
+    "base": "3f619f9264dda4d70e41eb01c304280b15bae8f3",
+    "frozen_modules": [
+      "paper_plane",
+      "trading_runner"
+    ],
+    "method": "ACTUAL_WORKTREE_PRODUCTION_AT_HEAD_WITH_NEW_ORDINARY_PROBES",
+    "reproduce_phase": "transaction-before"
+  }
+}

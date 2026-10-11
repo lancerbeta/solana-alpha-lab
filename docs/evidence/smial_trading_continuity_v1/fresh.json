@@ -1,0 +1,248 @@
+{
+  "candidate_input_bindings": {
+    "scripts/prove_trading_continuity.py": "eab2529c618d2449d934667822ffe88a1703ef7fe3badab337639f8d14e488b2",
+    "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
+    "src/solana_alpha_lab/factory/episode_decision.py": "e0f70efc50247fe9ccc9cde48104113ed30baa2f92d29e70e83259b03beed5a0",
+    "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "af898471e64d5beecdb4e6f56caeca7d7cde0ec14fd5e7559634c7b241f0c383",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "361522572d7ec2ef325d58f10c8a804ab020a14e1348406f864b968d8a388060",
+    "src/solana_alpha_lab/factory/opportunity_episode_release.py": "97c2a604f4b10523cb876f6a0a561b291d04ea46e5fb45c0d0917db5f911a0e7",
+    "src/solana_alpha_lab/factory/paper_plane.py": "5f3582fc646d3927aa67f72561c95ae2130d0eb6e7aa5d881a139727090bc342",
+    "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
+    "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
+    "src/solana_alpha_lab/factory/trading_runner.py": "ab20e203e927455af5a24cf9bdbc9b4bcebc4d3bf0f6f1a80914d33206bf8f68",
+    "tests/test_opportunity_episode_dispatch_window_repair_v1.py": "dd0120612cfc76bf1bd15f4159582188234ad3590558d6bac2e1a6422990a674",
+    "tests/test_trading_continuity_v1.py": "504498efdd8a67008efb2b0e56eb34f160fae6218d8c43a84b0010a35f4a8987"
+  },
+  "candidate_inputs_unchanged": true,
+  "candidate_test_sha256": "504498efdd8a67008efb2b0e56eb34f160fae6218d8c43a84b0010a35f4a8987",
+  "egress_canary": "PASS",
+  "elapsed_seconds": 123.171,
+  "environment": "ALLOWLIST",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "executed_cases": [
+    {
+      "status": "ok",
+      "test": "test_conflicting_entry_result_cannot_rewrite_inventory (tests.test_trading_continuity_v1.ConfirmedBaselineDefects.test_conflicting_entry_result_cannot_rewrite_inventory)"
+    },
+    {
+      "status": "ok",
+      "test": "test_duplicate_entry_result_has_one_accounting_effect (tests.test_trading_continuity_v1.ConfirmedBaselineDefects.test_duplicate_entry_result_has_one_accounting_effect)"
+    },
+    {
+      "status": "ok",
+      "test": "test_mixed_mode_projection_has_no_combined_money_headline (tests.test_trading_continuity_v1.ConfirmedBaselineDefects.test_mixed_mode_projection_has_no_combined_money_headline)"
+    },
+    {
+      "status": "ok",
+      "test": "test_pause_after_admission_before_fill_dominates (tests.test_trading_continuity_v1.ConfirmedBaselineDefects.test_pause_after_admission_before_fill_dominates)"
+    },
+    {
+      "status": "ok",
+      "test": "test_reserved_admission_is_in_operator_entry_count (tests.test_trading_continuity_v1.ConfirmedBaselineDefects.test_reserved_admission_is_in_operator_entry_count)"
+    },
+    {
+      "status": "ok",
+      "test": "test_O1_ordinary_source_to_single_admission (tests.test_trading_continuity_v1.OrdinarySourceTests.test_O1_ordinary_source_to_single_admission)"
+    },
+    {
+      "status": "ok",
+      "test": "test_O2_same_mint_other_episode_does_not_inherit_membership (tests.test_trading_continuity_v1.OrdinarySourceTests.test_O2_same_mint_other_episode_does_not_inherit_membership)"
+    },
+    {
+      "status": "ok",
+      "test": "test_O3_flat_is_not_positive (tests.test_trading_continuity_v1.OrdinarySourceTests.test_O3_flat_is_not_positive)"
+    },
+    {
+      "status": "ok",
+      "test": "test_O4_missing_holder_is_not_zero (tests.test_trading_continuity_v1.OrdinarySourceTests.test_O4_missing_holder_is_not_zero)"
+    },
+    {
+      "status": "ok",
+      "test": "test_O5_membership_unknown_refuses_before_loader (tests.test_trading_continuity_v1.OrdinarySourceTests.test_O5_membership_unknown_refuses_before_loader)"
+    },
+    {
+      "status": "ok",
+      "test": "test_O6_late_input_does_not_heal (tests.test_trading_continuity_v1.OrdinarySourceTests.test_O6_late_input_does_not_heal)"
+    },
+    {
+      "status": "ok",
+      "test": "test_O7_O8_restart_and_future_do_not_change_decision (tests.test_trading_continuity_v1.OrdinarySourceTests.test_O7_O8_restart_and_future_do_not_change_decision)"
+    },
+    {
+      "status": "ok",
+      "test": "test_after_commit_exit_result_replay_finishes_drain_once (tests.test_trading_continuity_v1.OrdinarySourceTests.test_after_commit_exit_result_replay_finishes_drain_once)"
+    },
+    {
+      "status": "ok",
+      "test": "test_atomic_fault_and_uncertain_attempt_do_not_resend (tests.test_trading_continuity_v1.OrdinarySourceTests.test_atomic_fault_and_uncertain_attempt_do_not_resend)"
+    },
+    {
+      "status": "ok",
+      "test": "test_cli_live_and_unowned_root_fail_before_effect (tests.test_trading_continuity_v1.OrdinarySourceTests.test_cli_live_and_unowned_root_fail_before_effect)"
+    },
+    {
+      "status": "ok",
+      "test": "test_cumulative_cost_floor_clock_and_partial_exit_refusal (tests.test_trading_continuity_v1.OrdinarySourceTests.test_cumulative_cost_floor_clock_and_partial_exit_refusal)"
+    },
+    {
+      "status": "ok",
+      "test": "test_definitive_failed_result_preserves_cost_and_no_inventory (tests.test_trading_continuity_v1.OrdinarySourceTests.test_definitive_failed_result_preserves_cost_and_no_inventory)"
+    },
+    {
+      "status": "ok",
+      "test": "test_denial_re_evaluates_after_policy_revision_without_erasing_history (tests.test_trading_continuity_v1.OrdinarySourceTests.test_denial_re_evaluates_after_policy_revision_without_erasing_history)"
+    },
+    {
+      "status": "ok",
+      "test": "test_episode_replay_cannot_cancel_attempting_or_unknown (tests.test_trading_continuity_v1.OrdinarySourceTests.test_episode_replay_cannot_cancel_attempting_or_unknown)"
+    },
+    {
+      "status": "ok",
+      "test": "test_frozen_spec_tamper_and_activation_conflict_cannot_rebind_position (tests.test_trading_continuity_v1.OrdinarySourceTests.test_frozen_spec_tamper_and_activation_conflict_cannot_rebind_position)"
+    },
+    {
+      "status": "ok",
+      "test": "test_half_cent_tie_is_literal_HALF_UP_in_ordinary_exit (tests.test_trading_continuity_v1.OrdinarySourceTests.test_half_cent_tie_is_literal_HALF_UP_in_ordinary_exit)"
+    },
+    {
+      "status": "ok",
+      "test": "test_independent_source_action_admission_terminal_sets (tests.test_trading_continuity_v1.OrdinarySourceTests.test_independent_source_action_admission_terminal_sets)"
+    },
+    {
+      "status": "ok",
+      "test": "test_late_decision_price_refuses_list_only_without_future_healing (tests.test_trading_continuity_v1.OrdinarySourceTests.test_late_decision_price_refuses_list_only_without_future_healing)"
+    },
+    {
+      "status": "ok",
+      "test": "test_list_only_uses_same_source_owner (tests.test_trading_continuity_v1.OrdinarySourceTests.test_list_only_uses_same_source_owner)"
+    },
+    {
+      "status": "ok",
+      "test": "test_missing_decision_price_refuses_list_only (tests.test_trading_continuity_v1.OrdinarySourceTests.test_missing_decision_price_refuses_list_only)"
+    },
+    {
+      "status": "ok",
+      "test": "test_missing_decision_price_refuses_positive_holder_delta (tests.test_trading_continuity_v1.OrdinarySourceTests.test_missing_decision_price_refuses_positive_holder_delta)"
+    },
+    {
+      "status": "ok",
+      "test": "test_mixed_stream_pause_resume_policy_revision_route_loss_restart_conservation (tests.test_trading_continuity_v1.OrdinarySourceTests.test_mixed_stream_pause_resume_policy_revision_route_loss_restart_conservation)"
+    },
+    {
+      "status": "ok",
+      "test": "test_native_corrupt_and_missing_store_readback_is_typed_no_bootstrap (tests.test_trading_continuity_v1.OrdinarySourceTests.test_native_corrupt_and_missing_store_readback_is_typed_no_bootstrap)"
+    },
+    {
+      "status": "ok",
+      "test": "test_no_route_exit_preserves_inventory_then_operator_reconciles_and_drains (tests.test_trading_continuity_v1.OrdinarySourceTests.test_no_route_exit_preserves_inventory_then_operator_reconciles_and_drains)"
+    },
+    {
+      "status": "ok",
+      "test": "test_nonfill_classes_unknown_cost_and_invalid_amounts (tests.test_trading_continuity_v1.OrdinarySourceTests.test_nonfill_classes_unknown_cost_and_invalid_amounts)"
+    },
+    {
+      "status": "ok",
+      "test": "test_ordinary_admission_real_errors_rollback_source_reservation_and_risk (tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_admission_real_errors_rollback_source_reservation_and_risk)"
+    },
+    {
+      "status": "ok",
+      "test": "test_ordinary_denied_admission_is_durable_and_idempotent (tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_denied_admission_is_durable_and_idempotent)"
+    },
+    {
+      "status": "ok",
+      "test": "test_ordinary_disabled_policy_replay_cancellation_is_durable (tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_disabled_policy_replay_cancellation_is_durable)"
+    },
+    {
+      "status": "ok",
+      "test": "test_ordinary_full_chain_decimal_oracle (tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_full_chain_decimal_oracle)"
+    },
+    {
+      "status": "ok",
+      "test": "test_ordinary_paused_replay_cancellation_is_durable (tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_paused_replay_cancellation_is_durable)"
+    },
+    {
+      "status": "ok",
+      "test": "test_ordinary_stale_replay_cancellation_survives_new_connection (tests.test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_stale_replay_cancellation_survives_new_connection)"
+    },
+    {
+      "status": "ok",
+      "test": "test_origin_decision_clock_corruption_refuses_without_effect (tests.test_trading_continuity_v1.OrdinarySourceTests.test_origin_decision_clock_corruption_refuses_without_effect)"
+    },
+    {
+      "status": "ok",
+      "test": "test_origin_exit_binding_atomic_replay_and_operator_close (tests.test_trading_continuity_v1.OrdinarySourceTests.test_origin_exit_binding_atomic_replay_and_operator_close)"
+    },
+    {
+      "status": "ok",
+      "test": "test_origin_exit_clock_corruption_refuses_without_effect (tests.test_trading_continuity_v1.OrdinarySourceTests.test_origin_exit_clock_corruption_refuses_without_effect)"
+    },
+    {
+      "status": "ok",
+      "test": "test_origin_exit_source_admission_corruption_refuses_without_effect (tests.test_trading_continuity_v1.OrdinarySourceTests.test_origin_exit_source_admission_corruption_refuses_without_effect)"
+    },
+    {
+      "status": "ok",
+      "test": "test_origin_packet_corruption_and_missing_research_refuse_without_effect (tests.test_trading_continuity_v1.OrdinarySourceTests.test_origin_packet_corruption_and_missing_research_refuse_without_effect)"
+    },
+    {
+      "status": "ok",
+      "test": "test_pause_between_admission_and_attempt_cancels (tests.test_trading_continuity_v1.OrdinarySourceTests.test_pause_between_admission_and_attempt_cancels)"
+    },
+    {
+      "status": "ok",
+      "test": "test_restore_pending_inventory_and_policy_in_fresh_root (tests.test_trading_continuity_v1.OrdinarySourceTests.test_restore_pending_inventory_and_policy_in_fresh_root)"
+    },
+    {
+      "status": "ok",
+      "test": "test_result_terminal_classes_and_partial_inventory (tests.test_trading_continuity_v1.OrdinarySourceTests.test_result_terminal_classes_and_partial_inventory)"
+    },
+    {
+      "status": "ok",
+      "test": "test_scientific_producer_requires_own_git_identity (tests.test_trading_continuity_v1.OrdinarySourceTests.test_scientific_producer_requires_own_git_identity)"
+    },
+    {
+      "status": "ok",
+      "test": "test_shadow_ordinary_boundary_is_separate_from_paper_and_quote_only (tests.test_trading_continuity_v1.OrdinarySourceTests.test_shadow_ordinary_boundary_is_separate_from_paper_and_quote_only)"
+    },
+    {
+      "status": "ok",
+      "test": "test_source_publication_preserves_first_visibility_and_replay (tests.test_trading_continuity_v1.OrdinarySourceTests.test_source_publication_preserves_first_visibility_and_replay)"
+    },
+    {
+      "status": "ok",
+      "test": "test_store_hardlink_canary_refused_before_writable_effect (tests.test_trading_continuity_v1.OrdinarySourceTests.test_store_hardlink_canary_refused_before_writable_effect)"
+    },
+    {
+      "status": "ok",
+      "test": "test_unknown_close_delayed_positive_preserves_close_and_negative_clears (tests.test_trading_continuity_v1.OrdinarySourceTests.test_unknown_close_delayed_positive_preserves_close_and_negative_clears)"
+    },
+    {
+      "status": "ok",
+      "test": "test_unknown_then_delayed_result_is_one_effect_after_restart (tests.test_trading_continuity_v1.OrdinarySourceTests.test_unknown_then_delayed_result_is_one_effect_after_restart)"
+    },
+    {
+      "status": "ok",
+      "test": "test_version_V2_handoff_boundary_is_explicit_and_V1_exit_survives_list_removal (tests.test_trading_continuity_v1.OrdinarySourceTests.test_version_V2_handoff_boundary_is_explicit_and_V1_exit_survives_list_removal)"
+    },
+    {
+      "status": "ok",
+      "test": "test_windows_rooted_and_drive_relative_source_paths_refused (tests.test_trading_continuity_v1.OrdinarySourceTests.test_windows_rooted_and_drive_relative_source_paths_refused)"
+    },
+    {
+      "status": "ok",
+      "test": "test_literal_exactly_two_at_least_two_unknown_invalid_and_aliases (tests.test_trading_continuity_v1.SelectorOracleTests.test_literal_exactly_two_at_least_two_unknown_invalid_and_aliases)"
+    }
+  ],
+  "exit_code": 0,
+  "observed_peak_bytes": 3172233,
+  "output_sha256": "b3a22afb7b2360e5d53c43f4ecef9227aa109860caa2911f8606becd94d2ea0d",
+  "owned_process_exit_code": 0,
+  "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
+  "phase": "fresh",
+  "resource_measurement_n": 52,
+  "status": "PASS",
+  "test_modules": [
+    "tests.test_trading_continuity_v1"
+  ]
+}

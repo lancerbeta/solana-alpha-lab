@@ -1,0 +1,39 @@
+{
+  "candidate_input_bindings": {
+    "scripts/prove_trading_continuity.py": "8be2c58e0fa2462ab59dd70d0520f1b52b0f803d4fa8ae7ed659a0871b1167e4",
+    "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
+    "src/solana_alpha_lab/factory/episode_decision.py": "c08a55a5c512ca01bffe0e1c5888a76137359f118574bb7f27b9a337cbca0a63",
+    "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "af898471e64d5beecdb4e6f56caeca7d7cde0ec14fd5e7559634c7b241f0c383",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "361522572d7ec2ef325d58f10c8a804ab020a14e1348406f864b968d8a388060",
+    "src/solana_alpha_lab/factory/opportunity_episode_release.py": "97c2a604f4b10523cb876f6a0a561b291d04ea46e5fb45c0d0917db5f911a0e7",
+    "src/solana_alpha_lab/factory/paper_plane.py": "371753f07d2eb69d52feae08a8f4efb52f456e6327493933961c1af20eceea6f",
+    "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
+    "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
+    "src/solana_alpha_lab/factory/trading_runner.py": "7bc1bb7af298b176356345443ec10cf12b00a39a3d333713fc378fbdbb7abd6e",
+    "tests/test_trading_continuity_v1.py": "8c6f72f2d1828e62c67678ebe49b8314c4ded0916419c4a08f8969f6ea218895"
+  },
+  "candidate_inputs_unchanged": true,
+  "candidate_test_sha256": "8c6f72f2d1828e62c67678ebe49b8314c4ded0916419c4a08f8969f6ea218895",
+  "egress_canary": "PASS",
+  "elapsed_seconds": 3.126,
+  "environment": "ALLOWLIST",
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "executed_cases": [
+    {
+      "status": "ok",
+      "test": "test_scientific_producer_requires_own_git_identity (tests.test_trading_continuity_v1.OrdinarySourceTests.test_scientific_producer_requires_own_git_identity)"
+    }
+  ],
+  "exit_code": 0,
+  "observed_peak_bytes": 873918,
+  "output_sha256": "6ec1725afa2871dfed5b14df3d33aba47584ab3e8a7b3a6d3a1486cbc2b14064",
+  "owned_process_exit_code": 0,
+  "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
+  "phase": "git-boundary",
+  "resource_measurement_n": 1,
+  "status": "PASS",
+  "test_modules": [
+    "tests.test_trading_continuity_v1.OrdinarySourceTests.test_scientific_producer_requires_own_git_identity"
+  ]
+}
