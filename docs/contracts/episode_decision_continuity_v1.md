@@ -140,3 +140,9 @@ refusal before effects. Operator exits without source exit decisions retain
 the existing route. A source exit accepted after operator close still creates
 this binding although the generic owner needs no second EXIT_DECISION_ACCEPTED
 transition. No schema, stale threshold or admission/exit risk policy changes.
+
+Both entry and originating EXIT recompute the canonical admission body hash
+before reading source admission fields. EXIT requires the recomputed hash to
+equal the stored source hash and the originating entry hash. A changed record
+with an unchanged hash column is EXIT_ORIGIN_SOURCE_CONFLICT before any source
+exit/admission binding effects; the hash column is never proof of body integrity.

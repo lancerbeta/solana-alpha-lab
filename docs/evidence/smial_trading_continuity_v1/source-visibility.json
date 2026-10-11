@@ -1,8 +1,8 @@
 {
   "candidate_input_bindings": {
-    "scripts/prove_trading_continuity.py": "b8753c6da974b041b4f2d6ef70621433586cbe5f4968230a9a8795f6608d7521",
+    "scripts/prove_trading_continuity.py": "eab2529c618d2449d934667822ffe88a1703ef7fe3badab337639f8d14e488b2",
     "scripts/trading_continuity.py": "fcd0f91012a652d0e8e873a19ba64999d4942584c159fcd4e2f9baf636db8c92",
-    "src/solana_alpha_lab/factory/episode_decision.py": "c08a55a5c512ca01bffe0e1c5888a76137359f118574bb7f27b9a337cbca0a63",
+    "src/solana_alpha_lab/factory/episode_decision.py": "e0f70efc50247fe9ccc9cde48104113ed30baa2f92d29e70e83259b03beed5a0",
     "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
     "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "af898471e64d5beecdb4e6f56caeca7d7cde0ec14fd5e7559634c7b241f0c383",
     "src/solana_alpha_lab/factory/observation_schedule_store.py": "361522572d7ec2ef325d58f10c8a804ab020a14e1348406f864b968d8a388060",
@@ -12,12 +12,12 @@
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
     "src/solana_alpha_lab/factory/trading_runner.py": "ab20e203e927455af5a24cf9bdbc9b4bcebc4d3bf0f6f1a80914d33206bf8f68",
     "tests/test_opportunity_episode_dispatch_window_repair_v1.py": "dd0120612cfc76bf1bd15f4159582188234ad3590558d6bac2e1a6422990a674",
-    "tests/test_trading_continuity_v1.py": "566b9b4cba51e0366737b70a0d5154c617a78f8e9ec9514b635638e14c9b4b82"
+    "tests/test_trading_continuity_v1.py": "504498efdd8a67008efb2b0e56eb34f160fae6218d8c43a84b0010a35f4a8987"
   },
   "candidate_inputs_unchanged": true,
-  "candidate_test_sha256": "566b9b4cba51e0366737b70a0d5154c617a78f8e9ec9514b635638e14c9b4b82",
+  "candidate_test_sha256": "504498efdd8a67008efb2b0e56eb34f160fae6218d8c43a84b0010a35f4a8987",
   "egress_canary": "PASS",
-  "elapsed_seconds": 36.899,
+  "elapsed_seconds": 37.002,
   "environment": "ALLOWLIST",
   "evidence_class": "SYNTHETIC_OFFLINE",
   "executed_cases": [
@@ -88,7 +88,7 @@
   ],
   "exit_code": 0,
   "observed_peak_bytes": 3433677,
-  "output_sha256": "3edb030e36fc21eb97610986d9704a2a83a3e32a3f3f5e2a138478ac3c640ceb",
+  "output_sha256": "cb1a8382a4531fb6bbf258c31ae12e328467edeb711dec0d6008efa04d94a88e",
   "owned_process_exit_code": 0,
   "peak_method": "PRE_TEMP_ROOT_CLEANUP_MAX_NOT_ABSOLUTE_MAXIMUM",
   "phase": "source-visibility",

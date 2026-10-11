@@ -178,7 +178,7 @@ def run(modules: list[str], *, phase: str) -> dict:
     (case / ".owner").write_text(CAMPAIGN, encoding="utf-8")
     (case / "tmp").mkdir()
     (case / "sitecustomize.py").write_text(EGRESS_GUARD, encoding="utf-8")
-    if phase in {"baseline-replay", "cost-before", "price-before", "transaction-before", "origin-fingerprint-before", "exit-origin-before"}:
+    if phase in {"baseline-replay", "cost-before", "price-before", "transaction-before", "origin-fingerprint-before", "exit-origin-before", "exit-source-before"}:
         frozen_root = case / "frozen-repo"
         frozen = frozen_root / "src" / "solana_alpha_lab" / "factory"
         frozen.mkdir(parents=True)
@@ -187,8 +187,10 @@ def run(modules: list[str], *, phase: str) -> dict:
                 "price-before": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7",
                 "transaction-before": "3f619f9264dda4d70e41eb01c304280b15bae8f3",
                 "origin-fingerprint-before": "2bc4684f5b7307757c37662b62c65f68aac447f8",
-                "exit-origin-before": "aa8d53795db8d60430aeddc5594a6b348ad89e60"}[phase]
-        frozen_modules = (("trading_runner",) if phase in {"origin-fingerprint-before", "exit-origin-before"} else
+                "exit-origin-before": "aa8d53795db8d60430aeddc5594a6b348ad89e60",
+                "exit-source-before": "5a7d0fc02852dd68cfb822daa09e5048a42e0d7c"}[phase]
+        frozen_modules = (("episode_decision",) if phase == "exit-source-before" else
+            ("trading_runner",) if phase in {"origin-fingerprint-before", "exit-origin-before", "exit-source-before"} else
             ("paper_plane", "trading_runner") if phase == "transaction-before" else
             ("hfic_temporal_discovery", "episode_decision") if phase == "price-before" else
             ("paper_plane", "trading_operations", "paper_shadow_operations"))
@@ -233,6 +235,8 @@ from solana_alpha_lab.factory.trading_operations import _bot_context
             modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests.test_origin_decision_clock_corruption_refuses_without_effect"]
         if phase == "exit-origin-before":
             modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests.test_origin_exit_clock_corruption_refuses_without_effect"]
+        if phase == "exit-source-before":
+            modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests.test_origin_exit_source_admission_corruption_refuses_without_effect"]
     # Do not inherit provider keys, credentials, user profiles or arbitrary Python hooks.
     env = {key: os.environ[key] for key in ("SYSTEMROOT", "WINDIR", "PATH", "COMSPEC") if key in os.environ}
     env.update(TEMP=str(case / "tmp"), TMP=str(case / "tmp"),
@@ -281,7 +285,7 @@ from solana_alpha_lab.factory.trading_operations import _bot_context
         result["candidate_test_sha256"] = input_bindings["tests/test_trading_continuity_v1.py"]
         result["candidate_input_bindings"] = input_bindings
         result["candidate_inputs_unchanged"] = inputs_unchanged
-        if phase in {"baseline-replay", "cost-before", "price-before", "transaction-before", "origin-fingerprint-before", "exit-origin-before"}:
+        if phase in {"baseline-replay", "cost-before", "price-before", "transaction-before", "origin-fingerprint-before", "exit-origin-before", "exit-source-before"}:
             result["baseline_binding"] = {"base": base, "frozen_modules": list(frozen_modules),
                 "method": "FROZEN_BASE_MODULES_WITH_CURRENT_INDEPENDENT_BASELINE_PROBES", "remaining_dependencies": "UNCHANGED_BASE_OWNERS"}
             if phase == "price-before":
@@ -307,7 +311,7 @@ from solana_alpha_lab.factory.trading_operations import _bot_context
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--phase", choices=("baseline", "baseline-replay", "cost-before", "price-before", "git-boundary", "transaction-before", "transaction-after", "source-visibility", "origin-fingerprint-before", "origin-fingerprint", "exit-origin-before", "baseline-projection", "verify", "regression", "clean", "fresh"), default="verify")
+    parser.add_argument("--phase", choices=("baseline", "baseline-replay", "cost-before", "price-before", "git-boundary", "transaction-before", "transaction-after", "source-visibility", "origin-fingerprint-before", "origin-fingerprint", "exit-origin-before", "exit-source-before", "baseline-projection", "verify", "regression", "clean", "fresh"), default="verify")
     args = parser.parse_args()
     if args.phase == "clean":
         result = clean()
@@ -327,7 +331,8 @@ def main() -> int:
         modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests."+name for name in (
             "test_origin_decision_clock_corruption_refuses_without_effect",
             "test_origin_exit_clock_corruption_refuses_without_effect",
-            "test_origin_exit_binding_atomic_replay_and_operator_close")]
+            "test_origin_exit_binding_atomic_replay_and_operator_close",
+            "test_origin_exit_source_admission_corruption_refuses_without_effect")]
     if args.phase == "transaction-after":
         modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests." + name for name in (
             "test_ordinary_denied_admission_is_durable_and_idempotent",

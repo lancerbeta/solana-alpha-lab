@@ -49,11 +49,11 @@
   },
   "non_target_preservation": "PASS",
   "process_readback": {
-    "15404": "EXITED",
-    "34624": "EXITED",
-    "42480": "ABSENT",
-    "54328": "EXITED",
-    "8396": "EXITED"
+    "33836": "EXITED",
+    "40604": "ABSENT",
+    "53080": "EXITED",
+    "63508": "ABSENT",
+    "70316": "EXITED"
   },
   "remaining_owned_bytes_after": 0,
   "remaining_owned_bytes_before": 40,
@@ -68,7 +68,7 @@
       "path": "local/smial_trading_continuity_v1"
     },
     {
-      "actual_bytes_before_cleanup": 12836,
+      "actual_bytes_before_cleanup": 13078,
       "baseline_existed": false,
       "cleanup": "DELETE_AFTER_HASHED_SUMMARY",
       "created_by_this_run": true,
@@ -77,8 +77,8 @@
       "kind": "DISPOSABLE_CASE_ROOT",
       "marker": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
       "observed_peak_bytes": 3172233,
-      "path": "local/smial_trading_continuity_v1/fresh-86b6c0bda2824a01a31ee033ffea4d9e",
-      "pid": 42480
+      "path": "local/smial_trading_continuity_v1/fresh-9b91b3b2bd7a45bb8cdcead04ac52481",
+      "pid": 63508
     },
     {
       "actual_bytes_before_cleanup": 3258,
@@ -90,8 +90,8 @@
       "kind": "DISPOSABLE_CASE_ROOT",
       "marker": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
       "observed_peak_bytes": 3172233,
-      "path": "local/smial_trading_continuity_v1/transaction-after-90ce94c0abc9478d83a1ab11bb3102d6",
-      "pid": 34624
+      "path": "local/smial_trading_continuity_v1/transaction-after-a388f2b9136047c399ed75abf2ca02a7",
+      "pid": 40604
     },
     {
       "actual_bytes_before_cleanup": 5730,
@@ -103,11 +103,11 @@
       "kind": "DISPOSABLE_CASE_ROOT",
       "marker": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
       "observed_peak_bytes": 3433677,
-      "path": "local/smial_trading_continuity_v1/source-visibility-732a7140e8a344e9ac3d60a6ba31cb2e",
-      "pid": 8396
+      "path": "local/smial_trading_continuity_v1/source-visibility-b68cf79bea5e4807b4ede1ea0bd2b675",
+      "pid": 33836
     },
     {
-      "actual_bytes_before_cleanup": 2107,
+      "actual_bytes_before_cleanup": 2350,
       "baseline_existed": false,
       "cleanup": "DELETE_AFTER_HASHED_SUMMARY",
       "created_by_this_run": true,
@@ -116,8 +116,8 @@
       "kind": "DISPOSABLE_CASE_ROOT",
       "marker": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
       "observed_peak_bytes": 1330444,
-      "path": "local/smial_trading_continuity_v1/origin-fingerprint-4d26abd6ab394514a57b53b4c0ce1e53",
-      "pid": 15404
+      "path": "local/smial_trading_continuity_v1/origin-fingerprint-d2e7d33e77554eef92181ddbc18e9309",
+      "pid": 70316
     },
     {
       "actual_bytes_before_cleanup": 42084,
@@ -128,9 +128,9 @@
       "estimated_bytes": 10485760,
       "kind": "DISPOSABLE_CASE_ROOT",
       "marker": "SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1",
-      "observed_peak_bytes": 9426652,
-      "path": "local/smial_trading_continuity_v1/regression-2d41f6bfe7dc47d284f1c47497246e1a",
-      "pid": 54328
+      "observed_peak_bytes": 9426760,
+      "path": "local/smial_trading_continuity_v1/regression-d584ddfd442745bba5829c253a09a1f5",
+      "pid": 53080
     }
   ],
   "retained_dependencies": "PREEXISTING_LOCKED_ENVIRONMENT_AND_SHARED_CACHE",

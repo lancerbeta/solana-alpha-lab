@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from contextlib import closing
 from contextlib import redirect_stdout
 from io import StringIO
 import hashlib
@@ -35,6 +36,7 @@ from solana_alpha_lab.factory.research_workbench import LifecycleEntityLocatorV1
 from solana_alpha_lab.factory.trading_runner import TradingContinuityRunner, OFFLINE_MARKER
 from solana_alpha_lab.factory.paper_plane import PaperPlaneStore
 from solana_alpha_lab.factory.trading_runtime_policy import apply_policy, show_policy
+from solana_alpha_lab.factory.opportunity_episodes import admission_content_sha256
 from tests.test_opportunity_episodes_harness_v1 import EpisodeScenario, nominate, token_object, synth_mint
 from tests.test_opportunity_episodes_contract_v1 import episode_spec, HOLD
 from tests.test_science_to_strategy_handoff_v1 import _schema_root, _event, _scientific_payload
@@ -897,6 +899,32 @@ class OrdinarySourceTests(unittest.TestCase):
         attempt = self.runner.attempt(position_id=pid, side="EXIT", attempt_key="BOUND-OPERATOR-EXIT",
                                       as_of="2026-10-05T16:10:00Z")
         self.assertTrue(attempt["send_permitted"])
+
+    def test_origin_exit_source_admission_corruption_refuses_without_effect(self):
+        self.prepare()
+        pid, entry_attempt = self._attempt()
+        self.runner.result(self._result(entry_attempt, "LANDED_SUCCESS", unit_price_usd="0.000003",
+                                       filled_notional_usd="30", chargeable_cost_usd="0"))
+        self.source.tick(datetime(2026, 10, 5, 16, 5, tzinfo=UTC))
+        with closing(sqlite3.connect(self.data / "source/observation_schedule_state.sqlite")) as source:
+            body, stored_hash = source.execute("SELECT record_json, content_sha256 FROM episode_admissions WHERE episode_id=?",
+                                              (self.admission["episode_id"],)).fetchone()
+            record = json.loads(body)
+            self.assertEqual(admission_content_sha256(record), stored_hash)
+            record["t0"] = (datetime.fromisoformat(record["t0"]) - timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            self.assertNotEqual(admission_content_sha256(record), stored_hash)
+            source.execute("UPDATE episode_admissions SET record_json=? WHERE episode_id=?",
+                           (json.dumps(record), self.admission["episode_id"]))
+            source.commit()
+            self.assertEqual(source.execute("SELECT content_sha256 FROM episode_admissions WHERE episode_id=?",
+                                           (self.admission["episode_id"],)).fetchone()[0], stored_hash)
+        before = self.runner.readback()
+        with self.assertRaisesRegex(PaperPlaneError, "EXIT_ORIGIN_SOURCE_CONFLICT"):
+            self.runner.exit(position_id=pid, source_relative="source/observation_schedule_state.sqlite",
+                             as_of="2026-10-05T16:10:00Z")
+        after = self.runner.readback()
+        self.assertEqual({k: v for k, v in after.items() if k != "as_of"},
+                         {k: v for k, v in before.items() if k != "as_of"})
 
     def test_origin_packet_corruption_and_missing_research_refuse_without_effect(self):
         self.prepare()

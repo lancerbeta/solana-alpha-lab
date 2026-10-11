@@ -201,7 +201,9 @@ def produce_originating_exit(root: Path, *, source_path: Path, strategy, manifes
     try:
         with source.read_snapshot():
             stored = source.get_episode_admission(episode_id)
-            if stored is None or stored["content_sha256"] != origin_packet["provenance"]["admission_content_sha256"]:
+            if (stored is None
+                or admission_content_sha256(stored["record"]) != stored["content_sha256"]
+                or stored["content_sha256"] != origin_packet["provenance"]["admission_content_sha256"]):
                 raise PaperPlaneError("EXIT_ORIGIN_SOURCE_CONFLICT")
             admission = stored["record"]
             binding = origin_packet["provenance"]["schedule_binding"]

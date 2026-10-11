@@ -1,117 +1,131 @@
 {
   "historical_receipts_not_final": [
     {
+      "output_sha256": "cb9606e2a2f6546ad3c9d0428c59294097e25f38f510384bc3632ccc2622b5ff",
       "phase": "baseline",
-      "result": "FAIL_4_INITIAL_PROBES",
-      "output_sha256": "cb9606e2a2f6546ad3c9d0428c59294097e25f38f510384bc3632ccc2622b5ff"
+      "result": "FAIL_4_INITIAL_PROBES"
     },
     {
+      "correction": "Catalog schema relation/asset types and nonexistent test module; no suite suppression",
       "phase": "expanded-regression",
-      "result": "FAIL_3_TEST_CONFIGURATION_ERRORS",
-      "correction": "Catalog schema relation/asset types and nonexistent test module; no suite suppression"
+      "result": "FAIL_3_TEST_CONFIGURATION_ERRORS"
     },
     {
-      "phase": "active-resource-sampling",
-      "result": "FAIL_NATIVE_WINDOWS_ATOMIC_REPLACE",
+      "causality": "SAMPLER_CAUSE_INFERRED_NOT_PROVEN",
       "evidence": "instrumentation-failure.json",
-      "causality": "SAMPLER_CAUSE_INFERRED_NOT_PROVEN"
+      "phase": "active-resource-sampling",
+      "result": "FAIL_NATIVE_WINDOWS_ATOMIC_REPLACE"
     },
     {
+      "correction": "Canonical SOURCE_NOT_PRESENT retained, fixture expectation corrected",
       "phase": "typed-missing-store-fixture",
-      "result": "FAIL_EXPECTED_CODE",
-      "correction": "Canonical SOURCE_NOT_PRESENT retained, fixture expectation corrected"
+      "result": "FAIL_EXPECTED_CODE"
     },
     {
-      "phase": "37-case-conservation-fixture",
-      "result": "FAIL_TIMESTAMP_INVALID",
+      "correction": "Fixture +00:00 changed to required Z; not product repair; run invalidated by concurrent candidate edits",
       "output_sha256": "72113821c9449526b411319eb926876056c7a793d6224b62b942bc44e33c08c6",
-      "correction": "Fixture +00:00 changed to required Z; not product repair; run invalidated by concurrent candidate edits"
+      "phase": "37-case-conservation-fixture",
+      "result": "FAIL_TIMESTAMP_INVALID"
     },
     {
-      "phase": "baseline-replay-initial",
-      "result": "EXPECTED_FAIL_5",
+      "correction": "Added MULTILINE to compact failure-boundary extraction, repeated before-state once",
       "output_sha256": "7511c0e56629d8699f6c7d0f8120521349e3e515586da8862f5ee1414ccc54e5",
-      "correction": "Added MULTILINE to compact failure-boundary extraction, repeated before-state once"
+      "phase": "baseline-replay-initial",
+      "result": "EXPECTED_FAIL_5"
     },
     {
-      "phase": "price-before-fixture-initial",
-      "result": "2_EXPECTED_FAIL_1_REGISTRY_LOCATION_ERROR",
+      "correction": "Frozen module path must preserve repository dependency layout; no guard bypass",
       "output_sha256": "bb2b629e9cd8d9acf15c89fa7ca116b0cf71d8214daedba0752f624d1377c755",
-      "correction": "Frozen module path must preserve repository dependency layout; no guard bypass"
+      "phase": "price-before-fixture-initial",
+      "result": "2_EXPECTED_FAIL_1_REGISTRY_LOCATION_ERROR"
     },
     {
-      "phase": "price-before-fixture-schema",
-      "result": "2_EXPECTED_FAIL_1_MISSING_REGISTRY_SCHEMA_ERROR",
+      "correction": "Copy exact unchanged schemas with registry; failure block parsing bounded to each test",
       "output_sha256": "2af53034dbc6cc98e93f27e1fb49c3d63e15496b206c8cde91b190a5821a17eb",
-      "correction": "Copy exact unchanged schemas with registry; failure block parsing bounded to each test"
+      "phase": "price-before-fixture-schema",
+      "result": "2_EXPECTED_FAIL_1_MISSING_REGISTRY_SCHEMA_ERROR"
     },
     {
-      "phase": "price-guard-first-after",
-      "result": "1_FAIL_25_PROVENANCE_SERIALIZATION_ERRORS",
+      "correction": "Eligibility records canonical status; exact input lineage remains in readset, no raw datetime cell serialized",
       "output_sha256": "6058a35ed51ac709c3975df0577216e539743dcaf034959a7ca2840e650e0426",
-      "correction": "Eligibility records canonical status; exact input lineage remains in readset, no raw datetime cell serialized"
+      "phase": "price-guard-first-after",
+      "result": "1_FAIL_25_PROVENANCE_SERIALIZATION_ERRORS"
     },
     {
-      "phase": "linux-CI-first-candidate",
-      "run_id": 38152447297,
-      "job_id": 114508799251,
+      "correction": "Disposable fixture Git commit preserves exact spec bytes; producer identity guard unchanged; local Git ceiling counterfactual reproduces refusal",
       "head": "37e1285ef7c5a9273f0fc16e7b0097305831ecd0",
-      "result": "EXECUTION_FAIL_34_GIT_IDENTITY_ERRORS_228_CASES_2_SKIPS",
+      "job_id": 114508799251,
+      "phase": "linux-CI-first-candidate",
       "reason_code": "PRODUCER_GIT_SHA_UNAVAILABLE",
-      "correction": "Disposable fixture Git commit preserves exact spec bytes; producer identity guard unchanged; local Git ceiling counterfactual reproduces refusal"
+      "result": "EXECUTION_FAIL_34_GIT_IDENTITY_ERRORS_228_CASES_2_SKIPS",
+      "run_id": 38152447297
     },
     {
-      "phase": "pre-transaction-patch-fresh",
       "head": "3f619f9264dda4d70e41eb01c304280b15bae8f3",
-      "result": "42_PASS_HISTORICAL_ONLY",
-      "output_sha256": "5cdd55bf22266bcb9f35eaf45484c01a71ffe41282cfbff45da34f8a570f8af5"
+      "output_sha256": "5cdd55bf22266bcb9f35eaf45484c01a71ffe41282cfbff45da34f8a570f8af5",
+      "phase": "pre-transaction-patch-fresh",
+      "result": "42_PASS_HISTORICAL_ONLY"
     },
     {
-      "phase": "pre-strengthened-identity-oracle",
+      "correction": "Literal episode/side/key and result-id/attempt link sets; no production change; exact candidate proofs repeated",
       "head": "6aa402c1793cba992a714713face8c245845206a",
-      "result": "49_PASS_AND_8_A_D_PASS_COUNTS_ORACLE_HISTORICAL_ONLY",
       "output_sha256": "67e56a5e52d05080c4d3ebf277f9991163f9fb906e3b21f2f2e87783febffbf1",
-      "review": "GOAL_DOD_NOT_READY_ATTEMPT_RESULT_IDENTITY_SETS_MISSING",
-      "correction": "Literal episode/side/key and result-id/attempt link sets; no production change; exact candidate proofs repeated"
+      "phase": "pre-strengthened-identity-oracle",
+      "result": "49_PASS_AND_8_A_D_PASS_COUNTS_ORACLE_HISTORICAL_ONLY",
+      "review": "GOAL_DOD_NOT_READY_ATTEMPT_RESULT_IDENTITY_SETS_MISSING"
     },
     {
-      "phase": "pre-CI-visibility-oracle-alignment",
+      "correction": "Direct dispatch consumer added to proof inputs; bounded current proofs repeated without production changes.",
       "head": "22bda7783c889894214e051cea106cca265b3e12",
-      "result": "49_FRESH_AND_8_A_D_PASS_HISTORICAL_INPUT_BINDINGS",
       "output_sha256": "750ea457837a0867f401698f748ed8ea0fbeb5c19e5d010eac1e8ebb0e79a8ce",
-      "correction": "Direct dispatch consumer added to proof inputs; bounded current proofs repeated without production changes."
+      "phase": "pre-CI-visibility-oracle-alignment",
+      "result": "49_FRESH_AND_8_A_D_PASS_HISTORICAL_INPUT_BINDINGS"
     },
     {
-      "phase": "linux-CI-transaction-patch",
-      "run_id": 38158563737,
-      "job_id": 114526498074,
+      "correction": "Affected legacy assertion now independently verifies exact first visibility per history, equal source gap and immutable same-history published replay. Production unchanged; not timeout and not fixed by a blind rerun.",
       "head": "22bda7783c889894214e051cea106cca265b3e12",
-      "result": "DISPATCH_RECOVERY_ASSERTION_FAIL_1_1140_CASES_9_SKIPS",
+      "job_id": 114526498074,
+      "phase": "linux-CI-transaction-patch",
       "reason_code": "ONLY_NEW_INGESTED_VISIBILITY_CLOCK_DIFFERS_AFTER_RECOVERY",
-      "correction": "Affected legacy assertion now independently verifies exact first visibility per history, equal source gap and immutable same-history published replay. Production unchanged; not timeout and not fixed by a blind rerun."
+      "result": "DISPATCH_RECOVERY_ASSERTION_FAIL_1_1140_CASES_9_SKIPS",
+      "run_id": 38158563737
     },
     {
-      "phase": "pre-origin-fingerprint-review-repair",
+      "correction": "Full canonical decision fingerprint compared with existing admitted position fingerprint; no policy/schema/lifecycle change. Before probes actual FAIL; current after proofs/review required.",
       "head": "2bc4684f5b7307757c37662b62c65f68aac447f8",
-      "result": "CODE_REVIEW_NOT_READY_P1_ORIGIN_DECISION_BODY_UNBOUND",
-      "reason_code": "DECISION_ONLY_CLOCK_CORRUPTION_CAN_BYPASS_STALE_GUARD",
       "native_before": "origin-fingerprint-before-native.json",
+      "phase": "pre-origin-fingerprint-review-repair",
+      "reason_code": "DECISION_ONLY_CLOCK_CORRUPTION_CAN_BYPASS_STALE_GUARD",
       "repeatable_frozen_before": "origin-fingerprint-before.json",
-      "correction": "Full canonical decision fingerprint compared with existing admitted position fingerprint; no policy/schema/lifecycle change. Before probes actual FAIL; current after proofs/review required."
+      "result": "CODE_REVIEW_NOT_READY_P1_ORIGIN_DECISION_BODY_UNBOUND"
     },
     {
-      "phase": "origin-fingerprint-after-first-oracle",
-      "result": "49_PASS_1_VOLATILE_PROJECTION_CLOCK_ASSERTION_FAIL",
+      "correction": "Origin hash refusal already occurred; newly written no-effect oracle compared live projection as_of. Exclude only projection read time, compare every persisted field exactly; production unchanged.",
       "output_sha256": "07d76db2904aaa5ccd249fe594b820bd7c5cb1e594a65886ce6a35d0df0ca554",
-      "correction": "Origin hash refusal already occurred; newly written no-effect oracle compared live projection as_of. Exclude only projection read time, compare every persisted field exactly; production unchanged."
+      "phase": "origin-fingerprint-after-first-oracle",
+      "result": "49_PASS_1_VOLATILE_PROJECTION_CLOCK_ASSERTION_FAIL"
     },
     {
-      "phase": "pre-exit-origin-identity-review-repair",
+      "correction": "Full accepted exit packet atomically bound in existing event store; scope/hash check before attempt/result; operator-close compatibility and genuine rollback preserved. New exact proofs/review required.",
       "head": "aa8d53795db8d60430aeddc5594a6b348ad89e60",
-      "result": "ARCHITECTURE_NOT_READY_P1_EXIT_DECISION_BODY_UNBOUND",
       "native_before": "exit-origin-before-native.json",
+      "phase": "pre-exit-origin-identity-review-repair",
       "repeatable_frozen_before": "exit-origin-before.json",
-      "correction": "Full accepted exit packet atomically bound in existing event store; scope/hash check before attempt/result; operator-close compatibility and genuine rollback preserved. New exact proofs/review required."
+      "result": "ARCHITECTURE_NOT_READY_P1_EXIT_DECISION_BODY_UNBOUND"
+    },
+    {
+      "correction": "Python SQLite transaction context does not close connection; disposable fixture now explicitly commits and closes before running producer/cleanup. Production unchanged; native before repeated.",
+      "output_sha256": "1185dfb2358b72d4493b3e8f7dfe7861bf751c1635e886e24491382aa1e90a5d",
+      "phase": "exit-source-first-native-fixture",
+      "result": "REFUSAL_FAIL_PLUS_FIXTURE_UNCLOSED_SQLITE_CLEANUP_ERROR"
+    },
+    {
+      "phase": "pre-exit-source-body-review-repair",
+      "head": "5a7d0fc02852dd68cfb822daa09e5048a42e0d7c",
+      "result": "ARCHITECTURE_NOT_READY_SOURCE_ADMISSION_BODY_HASH_NOT_RECOMPUTED",
+      "native_before": "exit-source-before-native.json",
+      "frozen_before": "exit-source-before.json",
+      "correction": "Canonical admission body hash recomputed before EXIT fields and matched against stored/origin hashes. Scope unchanged; current proofs and fresh review required."
     }
   ]
 }

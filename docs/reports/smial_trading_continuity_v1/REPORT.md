@@ -70,6 +70,7 @@ commissioning. `failure_boundaries` preserves compact actual assertions.
 | F15 transaction/outcome | Native ordinary episode on content head 3f619f92: disabled-policy refusal loses source packet (0 instead of 1); stale WATCHED replay rolls cancellation back to WATCHED | Existing admission owner returns normal DENIED; source, risk refusal and unattempted cancellation commit together; actual errors retain rollback | transaction-before.json: two actual FAILs; transaction-after.json: eight PASS probes A–D; no risk-policy or successor lifecycle change |
 | F16 originating decision fingerprint | Code review at 2bc4684f found that decision-only clock corruption bypassed the stale check; native ordinary episode reproduced missing refusal | Runner compares the complete canonical SignalDecision fingerprint with the existing admitted-position fingerprint before using the decision; admission and risk policy unchanged | origin-fingerprint-before-native.json and repeatable frozen origin-fingerprint-before.json: one actual FAIL each; focused after PASS and fresh50 PASS; no policy/schema/lifecycle change |
 | F17 originating EXIT integrity | Architecture P1 at aa8d5379: decision-only exit backdating bypasses original cutoff; native ordinary episode/entry-result/exit actually FAILs refusal | Existing event owner atomically binds complete accepted exit packet; attempts/results verify binding before body/clock use; operator-close route retained | Native and frozen before actual FAIL; focused 3 PASS, fresh52 PASS and direct regressions PASS; fresh exact reviews/CI required |
+| F18 EXIT source body integrity | Architecture at 5a7d0fc0 found exit consumed admission body after comparing only stored hash column; native record-only T0 corruption with unchanged hash fails refusal | Existing admission_content_sha256 is recomputed before EXIT source fields and required equal stored and originating hashes | Native/frozen before actual FAIL; exact no-effect after and current proof/review required |
 | F12 version gap | Existing _science_lineage_matches requires V1 although schema admits Vn | Preserved guard; V2 VERIFY refuses, V1 originating exit still works after list removal | Dynamic denial, **unrepaired owner boundary**; no automatic V2 materialization claim |
 
 Compatibility: historical manifests 1.0 are not filled from current data;
@@ -127,8 +128,8 @@ PAPER list-only, SHADOW mixed), plus operator-drain recovery; this does not
 erase the separate required version journey. ARC attacks cover 24/24 named
 scenario hypotheses, with S21/S22 review/machine final binding. PEF 24 planned,
 24 attempted, 22 fully executed at most and 2 partial; static-before missing
-callers remain explicit. DER 17/17 finding conclusions have direct evidence:
-15 behavioral before/after or post-review probes, two missing base callers
+callers remain explicit. DER 18/18 finding conclusions have direct evidence:
+16 behavioral before/after or post-review probes, two missing base callers
 established statically and exercised dynamically after repair. FR baseline
 five deterministic frozen-base failures → five current passes; other repairs
 are review/static-discovered with dynamic after-probes, not invented historical
@@ -263,9 +264,9 @@ The runner now stores SOURCE_EXIT_ADMISSION_BOUND atomically in the existing SQL
 
 Reproduce the frozen before with `scripts/prove_trading_continuity.py --phase exit-origin-before` (expected exit 1, runner frozen to aa8d5379); `--phase origin-fingerprint` executes entry-clock corruption, exit-clock corruption and atomic/replay/operator-close probes (expected exit 0).
 
-## Current bounded proofs after EXIT identity repair
+## Historical bounded proofs before EXIT source-body repair
 
-All five current receipts below are PASS with identical 13 current input hashes and candidate_inputs_unchanged=true; prior tables are historical outputs only. No old PASS is carried forward.
+The following 5a7d0fc0 outputs validated the accepted EXIT packet binding. They are historical and do not validate the later source-body repair; current proof outputs follow below.
 
 | Receipt | Actual result | Output SHA256 |
 |---|---|---|
@@ -275,4 +276,23 @@ All five current receipts below are PASS with identical 13 current input hashes 
 | origin-fingerprint.json | 3 PASS + 0 skip | 34f0cb37a47cd72f85ff18790024d4b78a993c84db01ef7d137fc15710c7d708 |
 | regression.json | 198 PASS + 1 skip | 804ecfccaa433f419977f0790c7a5e7051a6540360803be14b5d070c14ff6391 |
 
-Current cleanup: CLEAN, 0 scoped owned bytes, absent campaign root/manifest, five process IDs EXITED/ABSENT and five equal non-target fingerprints. Native/frozen entry and exit before probes retain actual FAIL boundaries. Current entry/exit integrity, rollback/replay and ordinary operator-close probes pass. No providers, real stores, protected science/holdout, deployment, credentials, money or settings changed. REPAIR_PARTIAL_BLOCKED and original S08/S13 remain open. Exact-head CI and readiness remain mandatory for the pushed candidate.
+Historical cleanup at 5a7d0fc0: CLEAN, 0 scoped owned bytes, absent campaign root/manifest, five process IDs EXITED/ABSENT and five equal non-target fingerprints. Native/frozen entry and exit before probes retain actual FAIL boundaries. Current entry/exit integrity, rollback/replay and ordinary operator-close probes pass. No providers, real stores, protected science/holdout, deployment, credentials, money or settings changed. REPAIR_PARTIAL_BLOCKED and original S08/S13 remain open. Exact-head CI and readiness remain mandatory for the pushed candidate.
+
+## EXIT source admission body review repair
+
+ARCHITECTURE_CRITIC on content head 5a7d0fc02852dd68cfb822daa09e5048a42e0d7c returned NOT_READY: entry recomputed source admission body hash, but originating exit trusted the stored hash column before reading T0/cutoff. Native ordinary episode/entry-result followed by admission record_json-only T0 corruption on a preceding dispatch grid, with content_sha256 unchanged, produced one actual FAIL (PaperPlaneError not raised). A first fixture run also had an unclosed SQLite handle; that invalid combined FAIL/ERROR is retained in history, the fixture explicitly commits/closes and native before was repeated.
+
+The exit producer now reuses admission_content_sha256 before consuming the body, requiring equality with stored source hash and original entry hash. The existing EXIT_ORIGIN_SOURCE_CONFLICT refuses without source/exit/position/binding effects. Complete accepted packet hashing does not substitute for source-body hashing. No source schema, recipe, risk policy or V2 lifecycle change. Reproduce frozen before via `scripts/prove_trading_continuity.py --phase exit-source-before` (expected exit 1, producer frozen to 5a7d0fc0); the existing origin-fingerprint phase adds this source-body corruption probe. Original scenario denominators and REPAIR_PARTIAL_BLOCKED/S08/S13 remain unchanged.
+## Current bounded proofs after EXIT source-body repair
+
+All five current receipts bind the identical 13 current implementation/test inputs and verify that those bytes remained unchanged throughout execution. The native source-body before probe and frozen repeat each retain one actual FAIL; the current after probe requires exact EXIT_ORIGIN_SOURCE_CONFLICT and no persisted effects. F18 is confirmed repaired on this bounded path.
+
+| Receipt | Actual result | Output SHA256 |
+|---|---|---|
+| fresh.json | 53 PASS + 0 skip | b3a22afb7b2360e5d53c43f4ecef9227aa109860caa2911f8606becd94d2ea0d |
+| transaction-after.json | 8 PASS + 0 skip | 68c40c0ad023b925672f9772073ce3343f859683371e37bceab6a3201a35070c |
+| source-visibility.json | 16 PASS + 0 skip | cb1a8382a4531fb6bbf258c31ae12e328467edeb711dec0d6008efa04d94a88e |
+| origin-fingerprint.json | 4 PASS + 0 skip | 5c73898fb23ebb9da368a39d3720b914eea22ed19f381c303d97e0b7f6249596 |
+| regression.json | 198 PASS + 1 skip | f59f3f8c6fe6d436af2b58de5c2b2fa5d9ed4e866c32060bea7ad648d078ffaf |
+
+Final cleanup is CLEAN: 0 scoped owned bytes, absent campaign root/manifest, all owned processes EXITED/ABSENT, five preserved non-target fingerprints and no containers/services/volumes. Observed resource sizes are measured lower bounds, not absolute maximums. These local proofs do not establish exact-head CI or readiness. CAPABILITY_OUTCOME=REPAIR_PARTIAL_BLOCKED; original S08/S13 stay open. No V2/successor lifecycle, risk-policy change, canonical DONE or scientific/live acceptance.

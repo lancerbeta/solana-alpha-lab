@@ -196,3 +196,9 @@ packet atomically in the existing event store; verify exact scope/hash before
 source EXIT attempt/result. Preserve operator-close compatibility and replay;
 real binding errors roll back source and exit state. No risk policy, database
 schema or V2/successor lifecycle change. Rebind all evidence and reviews.
+
+EXIT_SOURCE_INTEGRITY_REPAIR: architecture finding on 5a7d0fc0 reproduced
+source admission record-only corruption with unchanged stored hash. Reuse the
+existing admission_content_sha256 owner in originating exit before reading
+T0/cutoff, require body/stored/origin equality; native/frozen before and exact
+no-effect after probe. No source schema, scientific recipe or policy change.
