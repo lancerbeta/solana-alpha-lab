@@ -147,3 +147,20 @@ run independently on the exact final inventory. No scientific/live/alpha/FCF cla
 Baseline: main d244af69bfd7ddc2850b9e5e5823323956e325c4; clean input tree; no
 planning-anchor drift. Previous task branch preserved. One checkout root only.
 Generated Catalog/navigation propagation uses the sanctioned generator.
+
+Owner-authorized PR #396 PATCH on 2026-10-11 reuses this exact contract. Review
+handoff bytes: docs/evidence/smial_trading_continuity_v1/review-handoff.md,
+SHA256 00f9589bcecac9e12d83ec8837be6b4398448c8f234d6851a4110cc8a23505d7.
+This is a bounded correction to the existing outcome, not a new PRD or task.
+DECISION_DELTA_PATCH: a normal admission refusal/cancellation must commit its
+source and outcome atomically; only actual errors roll back the transaction.
+Cheapest falsifier: ordinary episode on the existing source-shaped fixture,
+then a new readonly connection after disabled-policy denial and stale WATCHED
+replay. Independently enumerate source ENTER, admitted and denied evaluations.
+Preserve existing policy, successful reservation atomicity, legacy callers and
+ATTEMPTING/UNKNOWN reconciliation. Re-evaluation after a policy revision does
+not erase an earlier denial. Refresh impacted tests, evidence, all four isolated
+reviews and exact-head bindings. V2/successor lifecycle and risk-policy changes
+remain excluded; REPAIR_PARTIAL_BLOCKED and open S08/S13 are unchanged.
+STOP_PATCH: exact-head CI then merge-readiness PASS and its machine owner phrase;
+the PATCH instruction explicitly grants no merge authority.

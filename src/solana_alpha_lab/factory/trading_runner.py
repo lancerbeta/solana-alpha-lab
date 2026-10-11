@@ -13,7 +13,7 @@ from typing import Any
 
 from solana_alpha_lab.factory.episode_decision import produce_episode_decision, load_bound_recipe, produce_originating_exit
 from solana_alpha_lab.factory.observation_schedule import parse_utc
-from solana_alpha_lab.factory.paper_plane import (PaperPlaneStore, accept_signal_decision,
+from solana_alpha_lab.factory.paper_plane import (PaperPlaneStore, accept_signal_decision_outcome,
     accept_exit_decision, begin_modeled_attempt, accept_modeled_result)
 from solana_alpha_lab.factory.paper_shadow_commands import apply_operator_command, maybe_finish_drain
 from solana_alpha_lab.factory.paper_shadow_operations import build_operations_projection
@@ -175,7 +175,7 @@ class TradingContinuityRunner:
                 if previous is None:
                     store.append_execution_event(event_type="SOURCE_DECISION_PRODUCED", event_id=sid,
                         bot_instance_id=None, position_id=None, payload=packet, created_at=as_of)
-                admitted = accept_signal_decision(self.root, store, strategy=self.strategy,
+                admitted = accept_signal_decision_outcome(self.root, store, strategy=self.strategy,
                     signal_decision=packet["decision"], known_activation_epochs=known,
                     mode=mode, as_of=as_of, skip_fill=True)
             return {**packet, "admission": admitted}
@@ -270,6 +270,8 @@ class TradingContinuityRunner:
                 view = build_operations_projection(store)
                 view["evidence_class"] = "SYNTHETIC_OFFLINE"
                 view["positions"] = store.positions()
+                view["admission_refusals"] = [event for event in store.execution_events()
+                    if event["event_type"] == "SIGNAL_ADMISSION_DENIED"]
                 view["modeled_attempts"] = [event for event in store.execution_events() if event["event_type"] == "MODELED_ATTEMPT_STARTED"]
                 view["modeled_results"] = [event for event in store.execution_events() if event["event_type"] == "MODELED_RESULT_ACCEPTED"]
                 return view

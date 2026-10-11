@@ -177,15 +177,17 @@ def run(modules: list[str], *, phase: str) -> dict:
     (case / ".owner").write_text(CAMPAIGN, encoding="utf-8")
     (case / "tmp").mkdir()
     (case / "sitecustomize.py").write_text(EGRESS_GUARD, encoding="utf-8")
-    if phase in {"baseline-replay", "cost-before", "price-before"}:
+    if phase in {"baseline-replay", "cost-before", "price-before", "transaction-before"}:
         frozen_root = case / "frozen-repo"
         frozen = frozen_root / "src" / "solana_alpha_lab" / "factory"
         frozen.mkdir(parents=True)
         base = {"baseline-replay": "d244af69bfd7ddc2850b9e5e5823323956e325c4",
                 "cost-before": "160866d6b92e724b48e4c9dceb7b511043d22cb4",
-                "price-before": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7"}[phase]
-        frozen_modules = ("hfic_temporal_discovery", "episode_decision") if phase == "price-before" else (
-            "paper_plane", "trading_operations", "paper_shadow_operations")
+                "price-before": "5db1b8200fe19c88fbaaee49496bcc26ec34c7f7",
+                "transaction-before": "3f619f9264dda4d70e41eb01c304280b15bae8f3"}[phase]
+        frozen_modules = (("paper_plane", "trading_runner") if phase == "transaction-before" else
+            ("hfic_temporal_discovery", "episode_decision") if phase == "price-before" else
+            ("paper_plane", "trading_operations", "paper_shadow_operations"))
         for name in frozen_modules:
             blob = subprocess.run(["git", "show", base + ":src/solana_alpha_lab/factory/" + name + ".py"],
                 cwd=ROOT, capture_output=True, check=True).stdout
@@ -219,6 +221,10 @@ from solana_alpha_lab.factory.trading_operations import _bot_context
                 "test_missing_decision_price_refuses_list_only",
                 "test_missing_decision_price_refuses_positive_holder_delta",
                 "test_late_decision_price_refuses_list_only_without_future_healing")]
+        if phase == "transaction-before":
+            modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests." + name for name in (
+                "test_ordinary_denied_admission_is_durable_and_idempotent",
+                "test_ordinary_stale_replay_cancellation_survives_new_connection")]
     # Do not inherit provider keys, credentials, user profiles or arbitrary Python hooks.
     env = {key: os.environ[key] for key in ("SYSTEMROOT", "WINDIR", "PATH", "COMSPEC") if key in os.environ}
     env.update(TEMP=str(case / "tmp"), TMP=str(case / "tmp"),
@@ -267,7 +273,7 @@ from solana_alpha_lab.factory.trading_operations import _bot_context
         result["candidate_test_sha256"] = input_bindings["tests/test_trading_continuity_v1.py"]
         result["candidate_input_bindings"] = input_bindings
         result["candidate_inputs_unchanged"] = inputs_unchanged
-        if phase in {"baseline-replay", "cost-before", "price-before"}:
+        if phase in {"baseline-replay", "cost-before", "price-before", "transaction-before"}:
             result["baseline_binding"] = {"base": base, "frozen_modules": list(frozen_modules),
                 "method": "FROZEN_BASE_MODULES_WITH_CURRENT_INDEPENDENT_BASELINE_PROBES", "remaining_dependencies": "UNCHANGED_BASE_OWNERS"}
             if phase == "price-before":
@@ -293,7 +299,7 @@ from solana_alpha_lab.factory.trading_operations import _bot_context
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--phase", choices=("baseline", "baseline-replay", "cost-before", "price-before", "git-boundary", "baseline-projection", "verify", "regression", "clean", "fresh"), default="verify")
+    parser.add_argument("--phase", choices=("baseline", "baseline-replay", "cost-before", "price-before", "git-boundary", "transaction-before", "transaction-after", "baseline-projection", "verify", "regression", "clean", "fresh"), default="verify")
     args = parser.parse_args()
     if args.phase == "clean":
         result = clean()
@@ -307,6 +313,16 @@ def main() -> int:
     modules = ["tests.test_trading_continuity_v1"]
     if args.phase == "git-boundary":
         modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests.test_scientific_producer_requires_own_git_identity"]
+    if args.phase == "transaction-after":
+        modules = ["tests.test_trading_continuity_v1.OrdinarySourceTests." + name for name in (
+            "test_ordinary_denied_admission_is_durable_and_idempotent",
+            "test_ordinary_stale_replay_cancellation_survives_new_connection",
+            "test_ordinary_paused_replay_cancellation_is_durable",
+            "test_ordinary_disabled_policy_replay_cancellation_is_durable",
+            "test_denial_re_evaluates_after_policy_revision_without_erasing_history",
+            "test_ordinary_admission_real_errors_rollback_source_reservation_and_risk",
+            "test_episode_replay_cannot_cancel_attempting_or_unknown",
+            "test_independent_source_action_admission_terminal_sets")]
     if args.phase == "baseline-projection":
         modules = ["tests.test_trading_continuity_v1.ConfirmedBaselineDefects.test_mixed_mode_projection_has_no_combined_money_headline"]
     if args.phase == "regression":

@@ -42,6 +42,27 @@ row count, first visibility and source event/received/reliable-availability
 clocks. Consumers verify the packet hash, evidence reference and originating
 strategy/epoch rather than trust a bare SHA string.
 
+The runner uses PaperPlane's `accept_signal_decision_outcome` while owning the
+outer source/admission transaction. A valid source ENTER and admission DENIED
+are separate facts: source action/provenance stay unchanged. Normal stale,
+operator-stop/pause and existing risk-policy refusals return `outcome=DENIED`,
+with exact reason, mode/strategy/version/epoch, source fingerprint and an
+`evaluation_event_id` resolving `SIGNAL_ADMISSION_DENIED` in the existing event
+table. Risk-policy evaluation retains its PRE_TRADE_RISK_SNAPSHOT and policy
+status/revision/hash; refusals before policy evaluation leave policy fields null.
+Reservation cancellation records CANCELLED and its existing cancellation event
+in that same transaction. ATTEMPTING/UNKNOWN remain reconciliation states.
+Evaluation identity includes source fingerprint, explicit evaluation time,
+bot status/pause and, where evaluated, exact risk snapshot/policy binding.
+Identical evaluation replay adds no events or positions. A different policy or
+inventory evaluation remains distinguishable and may admit the same source;
+earlier denials are retained. This does not introduce a permanent denial cache.
+Malformed/conflicting inputs, unknown exceptions and SQLite failures propagate
+and roll back source, risk and reservation together. Successful admission still
+freezes amount, fee and policy revision atomically. `accept_signal_decision`
+retains its legacy exception API; callers composing an outer transaction use
+the outcome API so a normal refusal cannot accidentally abort their commit.
+
 Logical signal identity is strategy/version + activation epoch + episode +
 frozen recipe hash + decision slot. Mint alone is not identity. Closed
 SignalDecision/ExitDecision schemas are preserved: `evidence_refs` points to

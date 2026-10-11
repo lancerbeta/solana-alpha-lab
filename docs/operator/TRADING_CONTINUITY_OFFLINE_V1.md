@@ -91,6 +91,16 @@ REQUEST_CLOSE_POSITION — position_id. Пример:
 Вызов: `Invoke-Continuity operator --input operator-command.json`. Не изменять
 payload под прежним idempotency_key. Код 2 + status=BLOCKED означает отказ;
 сначала устранить exact reason_code у его source owner, не повторять вслепую.
+Для штатного admission refusal команда `episode` завершается кодом 0 и
+возвращает `admission.outcome=DENIED` с точным `reason_code`: решение обработано,
+source packet и отказ сохранены. Source `decision.action=ENTER` не разрешает
+attempt; DENIED не создаёт позицию или send. `readback.admission_refusals`
+показывает сохранённые evaluations, их scope и policy binding, когда policy
+участвовала. Stale/pause/disabled replay отменяет только unattempted reservation;
+повтор не оживляет CANCELLED. ATTEMPTING/UNKNOWN требуют прежней reconciliation.
+Повтор в том же evaluation context не дублирует effects; разрешённая смена
+policy допускает новую оценку, сохраняя старый отказ. Это не разрешение менять
+policy рабочего runtime. Настоящие ошибки остаются BLOCKED и откатываются.
 Для UNRESOLVED после definitive NO_ROUTE можно открыть **новую** exit attempt
 с новым key. Для UNKNOWN сначала reconciliate ту же attempt. Существующую
 позицию V1 закрывает runner её originating V1; это не подтверждает поддержку V2.

@@ -31,8 +31,8 @@ External commissioning: `NOT_ASSESSED_NO_AUTHORITY`.
 | Synthetic observation→episode | Existing EpisodeScenario collector tick; fake vendor response bytes | observation_schedule_state SQLite + outbox/publication; episode_decision reads one WAL-aware snapshot | Literal admission/point/deadline grid, late and missing refusal |
 | Research→handoff→definition | FactoryApplication research_detail / record_research_decision; synthetic ResearchStore evidence only | Exact PROMOTE manifest/execution binding; materialize_strategy_candidate CHECK/RENDER/VERIFY | Missing/legacy/hash/size/fee guards and valid neighbor |
 | Definition→activation | trading_continuity load then explicit activate | Existing PaperPlane bot plus exact activation event; loading does not create bot/store | Actual empty-store assertion before activation; LIVE refusal |
-| Episode→decision | TradingContinuityRunner.episode / CLI episode | SOURCE_DECISION_PRODUCED with complete packet; closed SignalDecision evidence_refs resolves actual event/hash | O1–O8, duplicate replay and three expected source/action sets |
-| Decision→admission | Existing accept_signal_decision, skip_fill=True, one immediate transaction with source event | WATCHED reservation with version/epoch/mode/policy amount/fee; runner attempt reads it | Real SQLite race, pause and frozen-notional probes |
+| Episode→decision | TradingContinuityRunner.episode / CLI episode | SOURCE_DECISION_PRODUCED with complete packet; closed SignalDecision evidence_refs resolves actual event/hash | O1–O8, duplicate replay and four independent source/action identities, including denied ENTER |
+| Decision→admission | PaperPlane accept_signal_decision_outcome, skip_fill=True, one immediate transaction with source event | WATCHED reservation or durable SIGNAL_ADMISSION_DENIED with reason/scope/policy; runner attempt/readback reads it | Real SQLite race, pause, frozen-notional, refusal/re-evaluation and actual-error rollback probes |
 | Attempt→result | CLI attempt commits identity before fake external result; CLI result resolves attempt and originating packet | MODELED_ATTEMPT_STARTED / MODELED_RESULT_ACCEPTED + existing position accounting | Literal state/qty/fee/outcomes; UNKNOWN reconciliation before resend |
 | Position→exit | Runner.exit reads originating recipe and its observable target; operator close for inactive/unresolved path | SOURCE_EXIT_PRODUCED + existing ExitDecision consumer; modeled EXIT result | Later list removal retains V1 exit; no-route retains inventory |
 | Reconcile→readback | Runner.result invokes existing maybe_finish_drain after committed result; CLI readback readonly snapshot | Existing SQLite owners; derived Russian operations view, no new status store | After-commit fault then fresh replay; mixed scopes and costs; raw persistent sets |
@@ -67,6 +67,7 @@ commissioning. `failure_boundaries` preserves compact actual assertions.
 | F11 honest failure/UX | Additional attempt costs omitted from headline; DRAINING implied a background exit | Cost components and UNKNOWN visible; explicit operator/reconcile next action | Dynamic modeled failure/mixed-cost/drain probes + independent owner navigation review |
 | F13 cumulative cost/clock | Review found .01→0/missing could erase confirmed cost; observation clock could regress | Known total regression and reverse clock refused; UNKNOWN total retains .01 lower bound; .02 final + dynamic partial EXIT refusal | Static review → frozen previous-head cost-before FAIL → current literal probe; no historical event rewrite |
 | F14 decision eligibility | Semantic review found missing/late decision PRICE could ENTER outside scientific eligibility; three frozen 5db1b820 probes reproduce ENTER instead of UNKNOWN | Shared scientific PRICE cell precedes entry features, including list-only; typed UNKNOWN and no admission; originating exit retains its own target arithmetic | Dynamic price-before 3 FAIL → fresh 3 PASS with valid neighbors; membership UNKNOWN still reads no values |
+| F15 transaction/outcome | Native ordinary episode on content head 3f619f92: disabled-policy refusal loses source packet (0 instead of 1); stale WATCHED replay rolls cancellation back to WATCHED | Existing admission owner returns normal DENIED; source, risk refusal and unattempted cancellation commit together; actual errors retain rollback | transaction-before.json: two actual FAILs; transaction-after.json: eight PASS probes A–D; no risk-policy or successor lifecycle change |
 | F12 version gap | Existing _science_lineage_matches requires V1 although schema admits Vn | Preserved guard; V2 VERIFY refuses, V1 originating exit still works after list removal | Dynamic denial, **unrepaired owner boundary**; no automatic V2 materialization claim |
 
 Compatibility: historical manifests 1.0 are not filled from current data;
@@ -106,7 +107,7 @@ outcome. Evidence files list exact test case names/statuses/output hashes.
 | S17 | PASS | Actual missing/corrupt state, native existing OS failure probes, SQLite backup restore with policy+pending UNKNOWN |
 | S18 | PASS_WITH_POLICY_LIMIT | Commands/count/readback actual states verified; existing admission versus remaining-inventory policy fork retained |
 | S19 | PASS_WITH_SKIP | Existing v1.0/schema/store commissioning; one Windows symlink-creation skip explicitly retained |
-| S20 | PASS | Mixed duplicate/pause/resume/revision/no-route/restart stream and three independent source outcome sets |
+| S20 | PASS | Mixed duplicate/pause/resume/revision/no-route/restart stream and four independent source identities with one retained denied ENTER |
 | S21 | PASS_REVIEW_BOUND | Canonical SEM-OWNER-LIFECYCLE root document → new runbook; independent cold reader and final Catalog checks required |
 | S22 | PASS | cleanup.json owns/deletes roots, records actual PIDs and before/after non-target fingerprints; fresh.json proves no old DB |
 | S23 | PASS | Synthetic roots only; protected source/config fingerprints, no real science/holdout/provider/deploy authority |
@@ -124,8 +125,8 @@ PAPER list-only, SHADOW mixed), plus operator-drain recovery; this does not
 erase the separate required version journey. ARC attacks cover 24/24 named
 scenario hypotheses, with S21/S22 review/machine final binding. PEF 24 planned,
 24 attempted, 22 fully executed at most and 2 partial; static-before missing
-callers remain explicit. DER 14/14 finding conclusions have direct evidence:
-12 behavioral before/after or post-review probes, two missing base callers
+callers remain explicit. DER 15/15 finding conclusions have direct evidence:
+13 behavioral before/after or post-review probes, two missing base callers
 established statically and exercised dynamically after repair. FR baseline
 five deterministic frozen-base failures → five current passes; other repairs
 are review/static-discovered with dynamic after-probes, not invented historical
@@ -177,6 +178,37 @@ policy questions. Safe operator/reconciliation continues to work.
 
 Final proof is fresh.json after cost/clock and shared PRICE eligibility repairs. pre-cost-verify.json and earlier 37/38-case receipts are historical only. cost-before.json repeats the new regression probe against previous candidate 160866d6 and records the missing cost-regression refusal; clocks were independently static-discovered and dynamically checked after repair. price-before.json freezes 5db1b820 and reproduces three actual ENTER/UNKNOWN mismatches. Two initial frozen-fixture dependency errors and a first-after provenance serialization error are recorded in run-history.json; they are not substituted for final evidence. Canonical SEM-OWNER-LIFECYCLE resolve-route succeeded after incremental generator PASS_IMPACTED_CLOSURE_NOOP; root document links directly to the runbook, which states V1-only support and links this report. Final independent review is separately hash-bound.
 
-Post-review final fresh 42/42 PASS, exact inputs unchanged; output SHA256 5cdd55bf22266bcb9f35eaf45484c01a71ffe41282cfbff45da34f8a570f8af5. Literal cumulative .01→0 and reverse-clock observations are refused without events; .01→UNKNOWN preserves confirmed lower bound; definitive .02 plus exit produces modeled net 2.85. PARTIAL EXIT is dynamically refused with unchanged positions/results. Missing PRICE for mixed/list-only and late PRICE for list-only refuse without future healing; research and runtime reuse the same eligibility cell. Reported V2 partial boundary remains unchanged.
+Pre-transaction-patch fresh 42/42 PASS, output SHA256 5cdd55bf22266bcb9f35eaf45484c01a71ffe41282cfbff45da34f8a570f8af5, is historical and does not validate F15. Literal cumulative .01→0 and reverse-clock observations are refused without events; .01→UNKNOWN preserves confirmed lower bound; definitive .02 plus exit produces modeled net 2.85. PARTIAL EXIT is dynamically refused with unchanged positions/results. Missing PRICE for mixed/list-only and late PRICE for list-only refuse without future healing; research and runtime reuse the same eligibility cell. Reported V2 partial boundary remains unchanged.
 
-First Linux CI execution job (run 38152447297, head 37e1285e) reported 34 fixture errors among 228 cases: PRODUCER_GIT_SHA_UNAVAILABLE. In-repository Windows temporary roots had inherited the parent Git HEAD; Linux temporary roots had no repository. Native GIT_CEILING_DIRECTORIES counterfactual reproduced the same refusal locally (git-boundary-before.json). The fixture now creates its own disposable Git commit of exact ExperimentSpec bytes; production application/identity guards are unchanged. The repaired counterfactual verifies the actual research decision producer SHA and committed spec bytes (git-boundary.json), and final fresh rebuilds all owners with independent Git identity. Per-command synthetic author/autocrlf/signing options apply only to disposable fixture commands, with no host/repository configuration mutation. Git objects are inside recorded disposable roots and removed with them. Earlier 41-case proof is historical; final exact-head CI remains mandatory.
+First Linux CI execution job (run 38152447297, head 37e1285e) reported 34 fixture errors among 228 cases: PRODUCER_GIT_SHA_UNAVAILABLE. In-repository Windows temporary roots had inherited the parent Git HEAD; Linux temporary roots had no repository. Native GIT_CEILING_DIRECTORIES counterfactual reproduced the same refusal locally (git-boundary-before.json). The fixture now creates its own disposable Git commit of exact ExperimentSpec bytes; production application/identity guards are unchanged. The repaired counterfactual verifies the actual research decision producer SHA and committed spec bytes (historical git-boundary.json); current fresh includes that same native Git-ceiling case with new candidate bindings. Per-command synthetic author/autocrlf/signing options apply only to disposable fixture commands, with no host/repository configuration mutation. Git objects are inside recorded disposable roots and removed with them. Earlier 41/42-case proofs are historical; final exact-head CI remains mandatory.
+
+## PR #396 transaction/outcome PATCH: A–D
+
+The owner explicitly authorized the exact review handoff retained in
+review-handoff.md (SHA256 00f9589bcecac9e12d83ec8837be6b4398448c8f234d6851a4110cc8a23505d7).
+The finding was tested first on the existing source-shaped OrdinarySourceTests /
+EpisodeScenario with actual SQLite, without injecting a final SignalDecision.
+Two actual red probes were recorded before any production edit. The nested
+immediate_write owner only yields inside an outer transaction; a legacy normal
+refusal exception therefore triggered the runner's outer ROLLBACK. The store's
+rollback semantics remain unchanged. The runner now consumes the explicit
+outcome API, while legacy engine callers retain their exception API.
+
+| Proof | Before/after result on normal caller, read from new connection |
+|---|---|
+| A | Disabled policy: source ENTER remains exact; one risk BLOCK and one DENIED evaluation retain reason, scope and policy hash; zero positions/attempts/results; identical API, CLI and legacy replay add no events. A policy revision allows a distinct evaluation/reservation while retaining the denial. |
+| B | Unattempted WATCHED stale replay leaves CANCELLED/SIGNAL_EXPIRED and zero open-entry count. Pause and disabled-policy replay leave their own cancellation reasons. Repeats cannot revive the reservation or duplicate cancellation. ATTEMPTING/UNKNOWN are preserved and require existing reconciliation. |
+| C | Independently expected four valid sources: two ENTER, one NO_ENTER, one UNKNOWN. Exactly one ENTER is admitted and one is denied by policy. The difference is fully explained by a retained refusal; one position, two attempts/results and one reconciled terminal belong only to the admitted source. |
+| D | Unexpected RuntimeError, genuine typed PaperPlaneError and a native SQLite RAISE(ABORT) trigger all leave the pre-call source/risk/reservation state unchanged. Successful neighbor commits source, reservation and frozen fingerprint/amount/fee together. Conflicting source identity/body remains an error with no new effects. Existing real-SQLite concurrency and consumer suites remain the serialization oracle. |
+
+transaction-before.json retains the actual pre-edit two FAILs and output SHA256
+c51f33bc687ffe30ede7795bdc6d52cf15daf531e752553cea95a26c4a4eadbf.
+For a native reproduction on the frozen production owners, run
+`scripts/prove_trading_continuity.py --phase transaction-before` (expected exit 1).
+`--phase transaction-after` executes eight A–D probes (expected exit 0).
+These bounded phases share the existing ownership journal/egress guard and
+cleanup. Reproduction does not authorize operational policy mutation.
+The original S00–S23/O1–O8 denominator and REPAIR_PARTIAL_BLOCKED remain; S08/S13
+are still open. V2/successor lifecycle and risk-policy changes were excluded.
+
+Final PATCH fresh: 49/49 PASS, exact inputs unchanged; output SHA256 67e56a5e52d05080c4d3ebf277f9991163f9fb906e3b21f2f2e87783febffbf1. Eight A-D probes PASS; impacted regression 198 PASS plus one explicit Windows symlink skip. Cleanup CLEAN, zero remaining owned bytes, campaign root/manifest absent and five non-target fingerprints preserved. These receipts validate the transaction PATCH; prior 41/42-case PASS is not carried forward as current evidence.

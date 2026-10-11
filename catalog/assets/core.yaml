@@ -29686,7 +29686,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: 371753f07d2eb69d52feae08a8f4efb52f456e6327493933961c1af20eceea6f}
+  integrity: {kind: sha256, sha256: 5f3582fc646d3927aa67f72561c95ae2130d0eb6e7aa5d881a139727090bc342}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -41391,7 +41391,7 @@ records:
     repository_path: docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md
   integrity:
     kind: sha256
-    sha256: 5e4723abe2a0550cac06349bf2b13b6609b9506a67ffbb66ee5e2a4360f3b811
+    sha256: 854f0dd975843dfdb23184f81f79672bb95bbbcd87aa086d01aa31e1530a6e06
   access: &id001
     mode: read_only
     method: file
@@ -41430,7 +41430,7 @@ records:
     repository_path: docs/contracts/episode_decision_continuity_v1.md
   integrity:
     kind: sha256
-    sha256: 44aa6fb37990a80e0d48cd8c49842e298e9f503eaeb40ed0cd525ee9eb583a0f
+    sha256: aa087cda19fef154470e851ad2e44d7547653f8fcffaf1820976f80a2bd833c9
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41486,7 +41486,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/trading_runner.py
   integrity:
     kind: sha256
-    sha256: 7bc1bb7af298b176356345443ec10cf12b00a39a3d333713fc378fbdbb7abd6e
+    sha256: 2b1a526bfebfa3b54545863d85c6f97ae31c2178e28b28157ebbecbbfcd36be2
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41542,7 +41542,7 @@ records:
     repository_path: scripts/prove_trading_continuity.py
   integrity:
     kind: sha256
-    sha256: 8be2c58e0fa2462ab59dd70d0520f1b52b0f803d4fa8ae7ed659a0871b1167e4
+    sha256: 90e54c5025e79da6a1c2a1e0e472886f1215af55b5754ad389e2fe08cbd4d461
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41570,7 +41570,7 @@ records:
     repository_path: tests/test_trading_continuity_v1.py
   integrity:
     kind: sha256
-    sha256: 8c6f72f2d1828e62c67678ebe49b8314c4ded0916419c4a08f8969f6ea218895
+    sha256: 3cca081c54b0ba7833c556bce4ded333516835ef50473268f19ba5e7d7467758
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41598,7 +41598,7 @@ records:
     repository_path: docs/tasks/SMIAL_TRADING_CONTINUITY_AUDIT_REPAIR_V1.md
   integrity:
     kind: sha256
-    sha256: 63be5b5c7f49479b1081d1b8f1b90f895aa9089f563c030c5962986b81734685
+    sha256: a0f095bf6b97cc45085e3686982fd59afa571504ce39e5db4e15da150a03b945
   access: *id001
   relations:
   - relation_type: depends_on

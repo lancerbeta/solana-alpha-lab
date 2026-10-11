@@ -276,6 +276,240 @@ class OrdinarySourceTests(unittest.TestCase):
         committed_spec = subprocess.check_output(["git", "show", "HEAD:" + self.spec_rel], cwd=self.root)
         self.assertEqual(committed_spec, (self.root / self.spec_rel).read_bytes())
 
+    def fixture_policy(self, enabled, *, key="ADMISSION-POLICY"):
+        store = PaperPlaneStore(self.runner.store_path)
+        try:
+            current = show_policy(store, "PAPER")["policy_sha256"]
+            return apply_policy(ROOT, store, mode="PAPER",
+                candidate_raw={"new_entries_enabled": enabled, "max_total_open_positions": 2},
+                expected_current_sha256=current or "0" * 64, idempotency_key=key,
+                owner_authorization_phrase="AUTHORIZE PAPER SHADOW TRADING RUNTIME POLICY APPLY",
+                reason="SYNTHETIC_ADMISSION_OUTCOME")
+        finally:
+            store.close()
+
+    def test_ordinary_denied_admission_is_durable_and_idempotent(self):
+        self.prepare()
+        applied = self.fixture_policy(False)
+        packet = None
+        try:
+            packet = self.decision()
+        except PaperPlaneError as error:
+            self.assertEqual(str(error), "BLOCK_NEW_ENTRIES_DISABLED")
+        reader = PaperPlaneStore(self.runner.store_path, readonly=True)
+        try:
+            before = reader.execution_events()
+            sources = [e for e in before if e["event_type"] == "SOURCE_DECISION_PRODUCED"]
+            risks = [e for e in before if e["event_type"] == "PRE_TRADE_RISK_SNAPSHOT"]
+            self.assertEqual(len(sources), 1, "ordinary refusal must preserve exact source packet")
+            self.assertEqual(sources[0]["payload"]["decision"]["action"], "ENTER")
+            self.assertEqual(len(risks), 1)
+            self.assertEqual(risks[0]["payload"]["decision"], "BLOCK_NEW_ENTRIES_DISABLED")
+            self.assertEqual(risks[0]["payload"]["runtime_policy_sha256"], applied["readback"]["policy_sha256"])
+            self.assertEqual(reader.positions(), [])
+        finally:
+            reader.close()
+        self.assertIsNotNone(packet)
+        self.assertEqual(packet["admission"]["outcome"], "DENIED")
+        self.assertEqual(packet["admission"]["reason_code"], "BLOCK_NEW_ENTRIES_DISABLED")
+        self.assertEqual(packet["decision"]["action"], "ENTER")
+        replay = self.decision()
+        self.assertTrue(replay["admission"]["idempotent"])
+        cli_replay = self.cli("episode", source="source/observation_schedule_state.sqlite",
+            episode_id=self.admission["episode_id"], epoch=self.epoch, mode="PAPER", as_of="2026-10-05T12:40:00Z")
+        self.assertEqual(cli_replay["admission"], replay["admission"])
+        store = PaperPlaneStore(self.runner.store_path)
+        try:
+            with self.assertRaisesRegex(PaperPlaneError, "BLOCK_NEW_ENTRIES_DISABLED"):
+                accept_signal_decision(self.root, store, strategy=self.runner.strategy,
+                    signal_decision=packet["decision"], known_activation_epochs={self.epoch},
+                    mode="PAPER", as_of="2026-10-05T12:40:00Z", skip_fill=True)
+        finally:
+            store.close()
+        reader = PaperPlaneStore(self.runner.store_path, readonly=True)
+        try:
+            self.assertEqual(reader.execution_events(), before)
+            self.assertEqual(reader.positions(), [])
+        finally:
+            reader.close()
+
+    def test_ordinary_stale_replay_cancellation_survives_new_connection(self):
+        self.prepare()
+        first = self.decision()
+        try:
+            self.runner.episode(source_relative="source/observation_schedule_state.sqlite",
+                episode_id=self.admission["episode_id"], epoch_id=self.epoch,
+                mode="PAPER", as_of="2026-10-05T12:40:31Z")
+        except PaperPlaneError as error:
+            self.assertEqual(str(error), "SIGNAL_DECISION_STALE")
+        reader = PaperPlaneStore(self.runner.store_path, readonly=True)
+        try:
+            position = reader.get_position(first["admission"]["position_id"])
+            self.assertEqual(position["state"], "CANCELLED", "cancel must survive the runner transaction")
+            self.assertEqual(position["cancel_reason_code"], "SIGNAL_EXPIRED")
+            self.assertEqual(reader.open_risk_count(first["admission"]["bot_instance_id"]), 0)
+            events = reader.execution_events()
+            self.assertEqual(len([e for e in events if e["event_type"] == "ENTRY_INTENT_CANCELLED"]), 1)
+            self.assertEqual(len([e for e in events if e["event_type"] == "SOURCE_DECISION_PRODUCED"]), 1)
+        finally:
+            reader.close()
+        replay = self.runner.episode(source_relative="source/observation_schedule_state.sqlite",
+            episode_id=self.admission["episode_id"], epoch_id=self.epoch,
+            mode="PAPER", as_of="2026-10-05T12:40:31Z")
+        self.assertEqual(replay["admission"]["state"], "CANCELLED")
+        reader = PaperPlaneStore(self.runner.store_path, readonly=True)
+        try:
+            self.assertEqual(reader.execution_events(), events)
+        finally:
+            reader.close()
+
+    def assert_cancelled_episode_replay(self, cause):
+        self.prepare()
+        first = self.decision()
+        if cause == "PAUSED":
+            self.runner.command({"command_type": "PAUSE_NEW_ENTRIES", "idempotency_key": "REPLAY-PAUSE",
+                "bot_instance_id": first["admission"]["bot_instance_id"]})
+            expected = "ENTRIES_PAUSED"
+        else:
+            applied = self.fixture_policy(False)
+            expected = "NEW_ENTRIES_DISABLED"
+        refused = self.decision()
+        self.assertEqual(refused["admission"]["outcome"], "DENIED")
+        reader = PaperPlaneStore(self.runner.store_path, readonly=True)
+        try:
+            position = reader.get_position(first["admission"]["position_id"])
+            self.assertEqual((position["state"], position["cancel_reason_code"]), ("CANCELLED", expected))
+            self.assertEqual(reader.open_risk_count(first["admission"]["bot_instance_id"]), 0)
+            events = reader.execution_events()
+            self.assertEqual(len([e for e in events if e["event_type"] == "SOURCE_DECISION_PRODUCED"]), 1)
+            self.assertEqual(len([e for e in events if e["event_type"] == "ENTRY_INTENT_CANCELLED"]), 1)
+            denials = [e for e in events if e["event_type"] == "SIGNAL_ADMISSION_DENIED"]
+            self.assertEqual(len(denials), 1)
+            if cause == "DISABLED":
+                self.assertEqual(denials[0]["payload"]["runtime_policy_sha256"], applied["readback"]["policy_sha256"])
+            self.assertFalse(any(e["event_type"] in {"MODELED_ATTEMPT_STARTED", "MODELED_RESULT_ACCEPTED"} for e in events))
+        finally:
+            reader.close()
+        self.assertEqual(self.decision()["admission"]["state"], "CANCELLED")
+        reader = PaperPlaneStore(self.runner.store_path, readonly=True)
+        try:
+            self.assertEqual(reader.execution_events(), events)
+        finally:
+            reader.close()
+
+    def test_ordinary_paused_replay_cancellation_is_durable(self):
+        self.assert_cancelled_episode_replay("PAUSED")
+
+    def test_ordinary_disabled_policy_replay_cancellation_is_durable(self):
+        self.assert_cancelled_episode_replay("DISABLED")
+
+    def test_denial_re_evaluates_after_policy_revision_without_erasing_history(self):
+        self.prepare()
+        self.fixture_policy(False)
+        denied = self.decision()
+        self.assertEqual(denied["admission"]["outcome"], "DENIED")
+        applied = self.fixture_policy(True, key="ADMISSION-ENABLE")
+        admitted = self.decision()
+        self.assertEqual(admitted["decision"], denied["decision"])
+        self.assertEqual(admitted["provenance"], denied["provenance"])
+        self.assertEqual(admitted["admission"]["state"], "WATCHED")
+        self.decision()
+        reader = PaperPlaneStore(self.runner.store_path, readonly=True)
+        try:
+            events = reader.execution_events()
+            self.assertEqual(len([e for e in events if e["event_type"] == "SOURCE_DECISION_PRODUCED"]), 1)
+            self.assertEqual(len([e for e in events if e["event_type"] == "SIGNAL_ADMISSION_DENIED"]), 1)
+            risks = [e for e in events if e["event_type"] == "PRE_TRADE_RISK_SNAPSHOT"]
+            self.assertEqual({e["payload"]["decision"] for e in risks}, {"BLOCK_NEW_ENTRIES_DISABLED", "ALLOW"})
+            self.assertEqual(len(risks), 2)
+            positions = reader.positions()
+            self.assertEqual(len(positions), 1)
+            self.assertEqual(positions[0]["runtime_policy_sha256"], applied["readback"]["policy_sha256"])
+            self.assertEqual((positions[0]["admitted_entry_notional_usd_dec"], positions[0]["admitted_fee_bps"]), ("30.0", 20))
+        finally:
+            reader.close()
+
+    def test_ordinary_admission_real_errors_rollback_source_reservation_and_risk(self):
+        self.prepare()
+        reader = PaperPlaneStore(self.runner.store_path, readonly=True)
+        before = reader.execution_events()
+        reader.close()
+        original = PaperPlaneStore.append_execution_event
+        for error in (RuntimeError("INJECTED_ADMISSION_CRASH"), PaperPlaneError("ADMISSION_BINDING_MISSING")):
+            def failing(store, **kwargs):
+                result = original(store, **kwargs)
+                if kwargs["event_type"] == "SIGNAL_DECISION_ACCEPTED":
+                    raise error
+                return result
+            with patch.object(PaperPlaneStore, "append_execution_event", failing):
+                with self.assertRaises(type(error)):
+                    self.decision()
+            reader = PaperPlaneStore(self.runner.store_path, readonly=True)
+            try:
+                self.assertEqual(reader.execution_events(), before)
+                self.assertEqual(reader.positions(), [])
+            finally:
+                reader.close()
+        store = PaperPlaneStore(self.runner.store_path)
+        store._conn.execute("CREATE TRIGGER admission_fault BEFORE INSERT ON positions BEGIN SELECT RAISE(ABORT, 'SYNTHETIC_STORAGE_FAULT'); END")
+        store.close()
+        with self.assertRaises(sqlite3.IntegrityError):
+            self.decision()
+        reader = PaperPlaneStore(self.runner.store_path, readonly=True)
+        try:
+            self.assertEqual(reader.execution_events(), before)
+            self.assertEqual(reader.positions(), [])
+        finally:
+            reader.close()
+        store = PaperPlaneStore(self.runner.store_path)
+        store._conn.execute("DROP TRIGGER admission_fault")
+        store.close()
+        packet = self.decision()
+        reader = PaperPlaneStore(self.runner.store_path, readonly=True)
+        try:
+            position = reader.positions()[0]
+            self.assertEqual(position["signal_decision_id"], packet["decision"]["signal_decision_id"])
+            self.assertEqual(position["signal_decision_sha256"], canonical_spec_sha256(packet["decision"]))
+            self.assertIsNotNone(position["admitted_fee_bps"])
+            self.assertEqual(len([e for e in reader.execution_events() if e["event_type"] == "SOURCE_DECISION_PRODUCED"]), 1)
+            self.assertEqual(len([e for e in reader.execution_events() if e["event_type"] == "PRE_TRADE_RISK_SNAPSHOT"]), 1)
+        finally:
+            reader.close()
+        store = PaperPlaneStore(self.runner.store_path)
+        store._conn.execute("UPDATE execution_events SET payload_json='{}' WHERE event_id=?", ("SRC-" + packet["decision"]["signal_decision_id"],))
+        before = store.execution_events()
+        positions = store.positions()
+        store.close()
+        with self.assertRaisesRegex(PaperPlaneError, "SOURCE_DECISION_CONTENT_CONFLICT"):
+            self.decision()
+        reader = PaperPlaneStore(self.runner.store_path, readonly=True)
+        try:
+            self.assertEqual(reader.execution_events(), before)
+            self.assertEqual(reader.positions(), positions)
+        finally:
+            reader.close()
+
+    def test_episode_replay_cannot_cancel_attempting_or_unknown(self):
+        self.prepare()
+        first = self.decision()
+        attempted = self.runner.attempt(position_id=first["admission"]["position_id"], side="ENTRY",
+            attempt_key="DENIAL-UNKNOWN", as_of="2026-10-05T12:40:00Z")
+        self.fixture_policy(False)
+        for expected in ("ATTEMPTING", "UNKNOWN"):
+            if expected == "UNKNOWN":
+                self.runner.result(self._result(attempted["attempt_id"], "UNKNOWN_REQUIRES_RECONCILIATION", chargeable_cost_usd=None))
+            before = self.runner.readback()
+            replay = self.runner.episode(source_relative="source/observation_schedule_state.sqlite",
+                episode_id=self.admission["episode_id"], epoch_id=self.epoch,
+                mode="PAPER", as_of="2026-10-05T12:40:31Z")
+            self.assertTrue(replay["admission"]["reconciliation_required"])
+            after = self.runner.readback()
+            self.assertEqual(after["positions"][0]["state"], expected)
+            self.assertEqual(after["positions"], before["positions"])
+            self.assertEqual(after["modeled_attempts"], before["modeled_attempts"])
+            self.assertEqual(after["modeled_results"], before["modeled_results"])
+            self.assertEqual(after["admission_refusals"], [])
+
     def test_O5_membership_unknown_refuses_before_loader(self):
         self.membership = "UNKNOWN"
         self.prepare()
@@ -683,14 +917,15 @@ class OrdinarySourceTests(unittest.TestCase):
         first = self.decision()
         expected = {self.admission["episode_id"]: "ENTER"}
         packets = [first]
-        for index, action in ((1, "NO_ENTER"), (2, "UNKNOWN")):
+        expected_denied = {}
+        for index, action in ((1, "NO_ENTER"), (2, "UNKNOWN"), (3, "ENTER")):
             start = self.start + timedelta(days=7 * index)
             name = "stream-source-" + str(index)
             source = EpisodeScenario(self.data / name, start=start, stops=start + timedelta(minutes=1))
             obj = token_object(self.mint, price=0.000003, liquidity=10000, holders=60)
             nominate(source.market, start, {"toptraded": [obj], "toptrending": [] if action == "NO_ENTER" else [obj]})
             source.market.series[self.mint] = lambda now: token_object(self.mint, price=0.000003,
-                liquidity=10000, holders=None)
+                liquidity=10000, holders=(66 if now.minute >= 35 else 60) if action == "ENTER" else None)
             source.tick(start)
             admission = source.admissions()[0]
             source.tick(start.replace(minute=10, second=0))
@@ -698,9 +933,13 @@ class OrdinarySourceTests(unittest.TestCase):
             expected[admission["episode_id"]] = action
             args = dict(source_relative=name + "/observation_schedule_state.sqlite", episode_id=admission["episode_id"],
                 epoch_id=self.epoch, mode="PAPER", as_of=start.replace(minute=40, second=0).strftime("%Y-%m-%dT%H:%M:%SZ"))
+            if action == "ENTER":
+                self.fixture_policy(False, key="DENOMINATOR-DISABLE")
+                expected_denied[admission["episode_id"]] = "BLOCK_NEW_ENTRIES_DISABLED"
             packets.append(self.runner.episode(**args))
             self.runner.episode(**args)
         self.assertEqual({p["provenance"]["logical_key"]["episode_id"]: p["decision"]["action"] for p in packets}, expected)
+        self.fixture_policy(True, key="DENOMINATOR-ENABLE")
         pid = first["admission"]["position_id"]
         attempted = self.runner.attempt(position_id=pid, side="ENTRY", attempt_key="SET-ENTRY", as_of="2026-10-05T12:40:00Z")
         self.runner.result(self._result(attempted["attempt_id"], "LANDED_SUCCESS", unit_price_usd="0.000003", filled_notional_usd="30", chargeable_cost_usd="0"))
@@ -718,9 +957,21 @@ class OrdinarySourceTests(unittest.TestCase):
             positions = reader.positions()
             admitted = {signals[p["signal_decision_id"]] for p in positions}
             terminal = {signals[p["signal_decision_id"]] for p in positions if p["state"] == "RECONCILED"}
-            self.assertEqual(admitted, {episode for episode, action in expected.items() if action == "ENTER"})
+            source_enters = {episode for episode, action in expected.items() if action == "ENTER"}
+            denials = [e for e in reader.execution_events() if e["event_type"] == "SIGNAL_ADMISSION_DENIED"]
+            actual_denied = {signals[e["payload"]["signal_decision_id"]]: e["payload"]["reason_code"] for e in denials}
+            self.assertEqual(actual_denied, expected_denied)
+            self.assertEqual(len(denials), 1)
+            self.assertEqual(admitted, {self.admission["episode_id"]})
+            self.assertLess(admitted, source_enters)
+            self.assertEqual(source_enters - admitted, set(expected_denied))
             self.assertEqual(terminal, {self.admission["episode_id"]})
             self.assertEqual(len(positions), 1)
+            attempts = [e for e in reader.execution_events() if e["event_type"] == "MODELED_ATTEMPT_STARTED"]
+            results = [e for e in reader.execution_events() if e["event_type"] == "MODELED_RESULT_ACCEPTED"]
+            self.assertEqual(len(attempts), 2)
+            self.assertEqual(len(results), 2)
+            self.assertEqual({e["position_id"] for e in attempts + results}, {pid})
         finally:
             reader.close()
 

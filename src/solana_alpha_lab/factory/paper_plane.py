@@ -37,6 +37,7 @@ __all__ = [
     "PaperPlaneStore",
     "accept_exit_decision",
     "accept_signal_decision",
+    "accept_signal_decision_outcome",
     "load_strategy_version",
     "modeled_unrealized_mark",
     "observe_shadow",
@@ -1632,7 +1633,55 @@ def _resume_block(
     return None, None
 
 
+def _append_exact_admission_event(store, *, event_type, bot_instance_id, position_id, payload, as_of):
+    event_id = "ADMISSION-" + canonical_spec_sha256({"event_type": event_type, "payload": payload})
+    previous = store.get_execution_event(event_id)
+    if previous is not None:
+        if (previous["event_type"], previous["bot_instance_id"], previous["position_id"], previous["payload"]) != (
+            event_type, bot_instance_id, position_id, payload):
+            raise PaperPlaneError("ADMISSION_EVALUATION_CONTENT_CONFLICT")
+        return event_id, True
+    store.append_execution_event(event_type=event_type, event_id=event_id,
+        bot_instance_id=bot_instance_id, position_id=position_id, payload=payload, created_at=as_of)
+    return event_id, False
+
+
+def _signal_refusal(store, *, decision, lineage, bot, mode, as_of, reason_code,
+                    position=None, risk_event_id=None, current_policy=None):
+    policy = (current_policy or {}).get("policy")
+    payload = {**_identity_fields(decision), **lineage, "outcome": "DENIED",
+        "source_reason_code": decision["reason_code"], "reason_code": reason_code,
+        "mode": mode, "evaluated_at": as_of, "bot_status": bot["status"],
+        "entries_paused": int(bot.get("entries_paused") or 0),
+        "state": None if position is None else position["state"],
+        "cancel_reason_code": None if position is None else position.get("cancel_reason_code"),
+        "risk_event_id": risk_event_id,
+        "runtime_policy_status": (current_policy or {}).get("status"),
+        "runtime_policy_revision": None if policy is None else policy.get("revision"),
+        "runtime_policy_sha256": None if policy is None else policy.get("policy_sha256")}
+    position_id = None if position is None else position["position_id"]
+    event_id, replay = _append_exact_admission_event(store, event_type="SIGNAL_ADMISSION_DENIED",
+        bot_instance_id=bot["bot_instance_id"], position_id=position_id, payload=payload, as_of=as_of)
+    return {**payload, "opened": False, "position_id": position_id,
+        "bot_instance_id": bot["bot_instance_id"], "evaluation_event_id": event_id, "idempotent": replay}
+
+
 def accept_signal_decision(
+    root: Path, store: PaperPlaneStore, *, strategy: Mapping[str, Any],
+    signal_decision: Mapping[str, Any],
+    known_activation_epochs: Mapping[str, Any] | set[str] | frozenset[str],
+    mode: str = "PAPER", as_of: str | None = None, skip_fill: bool = False,
+) -> dict[str, Any]:
+    """Legacy exception API; orchestration transactions use the outcome API."""
+    outcome = accept_signal_decision_outcome(root, store, strategy=strategy,
+        signal_decision=signal_decision, known_activation_epochs=known_activation_epochs,
+        mode=mode, as_of=as_of, skip_fill=skip_fill)
+    if outcome.get("outcome") == "DENIED":
+        raise PaperPlaneError(outcome["reason_code"])
+    return outcome
+
+
+def accept_signal_decision_outcome(
     root: Path,
     store: PaperPlaneStore,
     *,
@@ -1643,7 +1692,11 @@ def accept_signal_decision(
     as_of: str | None = None,
     skip_fill: bool = False,
 ) -> dict[str, Any]:
-    """Consume a frozen SignalDecision on the v1.1 path. Feature-name agnostic."""
+    """Return a normal refusal without aborting the caller's atomic transaction.
+
+    Malformed/conflicting input, storage failures and unexpected exceptions still
+    propagate. No exception catch or transaction behavior is changed here.
+    """
 
     if mode not in {"PAPER", "SHADOW"}:
         raise PaperPlaneError("BOT_MODE_INVALID")
@@ -1718,12 +1771,9 @@ def accept_signal_decision(
         }
     max_age = int(strategy["signal_input"]["max_age_seconds"])
     stale = (as_of_dt - decision_at).total_seconds() > max_age
-    if stale and store.get_position(position_id) is None:
-        raise PaperPlaneError("SIGNAL_DECISION_STALE")
     admitted_notional = Decimal(str(strategy["notional_policy"]["notional_usd"]))
     was_existing = False
     resume_only = False
-    block_code: str | None = None
     bot_instance_id = ""
     with store.immediate_write():
         existing = store.get_position(position_id)
@@ -1750,6 +1800,9 @@ def accept_signal_decision(
             mode=mode,
             activation_epoch_id=str(decision["activation_epoch_id"]),
         )
+        if stale and existing is None:
+            return _signal_refusal(store, decision=decision, lineage=lineage, bot=bot,
+                mode=mode, as_of=as_of, reason_code="SIGNAL_DECISION_STALE")
         if existing is not None:
             was_existing = True
             state = str(existing["state"])
@@ -1771,7 +1824,12 @@ def accept_signal_decision(
                 return {**base, "opened": state == "PARTIAL"}
             block_code, cancel_reason = _resume_block(store, bot, mode, stale=stale)
             if block_code is not None:
-                store.cancel_entry_intent(position_id, reason_code=str(cancel_reason))
+                cancelled = store.cancel_entry_intent(position_id, reason_code=str(cancel_reason))
+                from solana_alpha_lab.factory.trading_runtime_policy import resolve_current_policy
+                policy_used = block_code in {"RUNTIME_POLICY_INVALID", "BLOCK_NEW_ENTRIES_DISABLED"}
+                return _signal_refusal(store, decision=decision, lineage=lineage, bot=bot,
+                    mode=mode, as_of=as_of, reason_code=block_code, position=cancelled,
+                    current_policy=resolve_current_policy(store, mode) if policy_used else None)
             else:
                 frozen = existing.get("admitted_entry_notional_usd_dec")
                 if frozen not in {None, ""}:
@@ -1789,11 +1847,13 @@ def accept_signal_decision(
                     }:
                         raise PaperPlaneError("ADMISSION_BINDING_MISSING")
                 resume_only = True
-        if block_code is None and not resume_only:
+        if not resume_only:
             if str(bot.get("status")) in {"DRAINING", "STOPPED"}:
-                raise PaperPlaneError(f"BOT_STATUS_BLOCKS_ENTRY:{bot['status']}")
+                return _signal_refusal(store, decision=decision, lineage=lineage, bot=bot,
+                    mode=mode, as_of=as_of, reason_code=f"BOT_STATUS_BLOCKS_ENTRY:{bot['status']}")
             if int(bot.get("entries_paused") or 0) == 1:
-                raise PaperPlaneError("ENTRIES_PAUSED")
+                return _signal_refusal(store, decision=decision, lineage=lineage, bot=bot,
+                    mode=mode, as_of=as_of, reason_code="ENTRIES_PAUSED")
             from solana_alpha_lab.factory.trading_runtime_policy import (
                 evaluate_admission,
                 resolve_current_policy,
@@ -1816,19 +1876,21 @@ def accept_signal_decision(
                 inventory=inventory,
             )
             risk["signal_decision_id"] = decision["signal_decision_id"]
-            store.append_execution_event(
+            risk_event_id, _ = _append_exact_admission_event(store,
                 event_type="PRE_TRADE_RISK_SNAPSHOT",
                 bot_instance_id=bot["bot_instance_id"],
                 position_id=position_id if existing else None,
                 payload={
-                    **risk,
+                    **risk, **lineage, "evaluated_at": as_of,
                     **_identity_fields(decision),
                     "strategy_id": strategy["strategy_id"],
                     "strategy_version": strategy["strategy_version"],
-                },
+                }, as_of=as_of,
             )
             if str(risk["decision"]) != "ALLOW":
-                block_code = str(risk["decision"])
+                return _signal_refusal(store, decision=decision, lineage=lineage, bot=bot,
+                    mode=mode, as_of=as_of, reason_code=str(risk["decision"]),
+                    risk_event_id=risk_event_id, current_policy=current_policy)
             else:
                 if existing is None:
                     store.open_position_from_signal(
@@ -1879,8 +1941,6 @@ def accept_signal_decision(
                     },
                 )
         bot_instance_id = bot["bot_instance_id"]
-    if block_code:
-        raise PaperPlaneError(block_code)
     if skip_fill:
         reserved = store.get_position(position_id)
         assert reserved is not None

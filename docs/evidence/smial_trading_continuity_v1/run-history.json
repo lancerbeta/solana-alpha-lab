@@ -59,6 +59,12 @@
       "result": "EXECUTION_FAIL_34_GIT_IDENTITY_ERRORS_228_CASES_2_SKIPS",
       "reason_code": "PRODUCER_GIT_SHA_UNAVAILABLE",
       "correction": "Disposable fixture Git commit preserves exact spec bytes; producer identity guard unchanged; local Git ceiling counterfactual reproduces refusal"
+    },
+    {
+      "phase": "pre-transaction-patch-fresh",
+      "head": "3f619f9264dda4d70e41eb01c304280b15bae8f3",
+      "result": "42_PASS_HISTORICAL_ONLY",
+      "output_sha256": "5cdd55bf22266bcb9f35eaf45484c01a71ffe41282cfbff45da34f8a570f8af5"
     }
   ]
 }
