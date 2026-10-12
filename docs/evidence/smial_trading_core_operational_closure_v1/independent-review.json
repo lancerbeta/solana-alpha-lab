@@ -7,155 +7,27 @@
   ],
   "remediation_history": [
     {
-      "finding": "Exact 510e6701 review found false READY for missing/corrupt envelope/funding and unsafe terminal release prefilter. Original verdicts/native before preserved; current fresh proof and role re-review close these defects. Uncommitted secondary quantity/cancellation/preflight findings retain explicit source pins, not invented commit heads.",
-      "observed_head": "510e6701c5f282f904b9f8e33591ca2b1b5df6b1",
+      "finding": "Pending origin identity TypeError stopped healthy neighbor; typed per-obligation origin verifier preserves original reconciliation/noresend; exact historical review/raw native facts in review-cd663642.json; current targeted13/whole191 source-bound evidence and fresh role verdicts required.",
+      "observed_head": "cd6636427e50ea3c04e9b3d2140f571a9429022e",
       "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
+      "resolved_by_head": "0d877ee7ed73d7051ced8de17fa8eeadfb26f017",
       "role": "CODE_REVIEWER",
       "severity": "MAJOR"
     },
     {
-      "finding": "Exact 510e6701 review found false READY for missing/corrupt envelope/funding and unsafe terminal release prefilter. Original verdicts/native before preserved; current fresh proof and role re-review close these defects. Uncommitted secondary quantity/cancellation/preflight findings retain explicit source pins, not invented commit heads.",
-      "observed_head": "510e6701c5f282f904b9f8e33591ca2b1b5df6b1",
+      "finding": "Genuine public managed native fill lacked serviceable EXIT/release witness; shared pure original native intent/ENTRY/full EXIT verifier preserves cap and missing-modeled negative; exact historical review/raw native facts in review-cd663642.json; current targeted13/whole191 source-bound evidence and fresh role verdicts required.",
+      "observed_head": "cd6636427e50ea3c04e9b3d2140f571a9429022e",
       "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
+      "resolved_by_head": "0d877ee7ed73d7051ced8de17fa8eeadfb26f017",
       "role": "GOAL_DOD_CRITIC",
       "severity": "MAJOR"
     },
     {
-      "finding": "Exact 510e6701 review found false READY for missing/corrupt envelope/funding and unsafe terminal release prefilter. Original verdicts/native before preserved; current fresh proof and role re-review close these defects. Uncommitted secondary quantity/cancellation/preflight findings retain explicit source pins, not invented commit heads.",
-      "observed_head": "510e6701c5f282f904b9f8e33591ca2b1b5df6b1",
+      "finding": "Missing original quantity retained UNKNOWN but authorized a fresh native EXIT quote. Common quantity witness now distinguishes original no-inventory nonfill/cancel from retained positive ENTRY/economic evidence. Original v1.0/v1.1 nonfill and unattempted cancellation use strict existing witnesses. Actual BEFORE/reproducer/interim single-regression negative are in review-a2cc-quantity-guard.json; current191/13 and narrow completion of the same exact final review set are required.",
+      "observed_head": "a2ccab5a12f352a4b21bacb37bf9a0c26c3f496c",
       "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
+      "resolved_by_head": "0d877ee7ed73d7051ced8de17fa8eeadfb26f017",
       "role": "ARCHITECTURE_CRITIC",
-      "severity": "MAJOR"
-    },
-    {
-      "finding": "Frozen fd9169 review found legacy recipe/SIGDEC identity and schema1.0 provenance drift from unconditional operational fields. Native pinned baseline producer/current store replay demonstrated source-content conflict and a second reservation; explicit absent/null legacy replay now preserves exact original packet and no new effect. Baseline producer scope is not a full old-binary/store-version claim.",
-      "observed_head": "fd9169bee4dfc7a33e397c38af50e77a7a302d01",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "CODE_REVIEWER",
-      "severity": "MAJOR"
-    },
-    {
-      "finding": "Frozen fd9169 review found legacy recipe/SIGDEC identity and schema1.0 provenance drift from unconditional operational fields. Native pinned baseline producer/current store replay demonstrated source-content conflict and a second reservation; explicit absent/null legacy replay now preserves exact original packet and no new effect. Baseline producer scope is not a full old-binary/store-version claim.",
-      "observed_head": "fd9169bee4dfc7a33e397c38af50e77a7a302d01",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "GOAL_DOD_CRITIC",
-      "severity": "MAJOR"
-    },
-    {
-      "finding": "Frozen fd9169 review found legacy recipe/SIGDEC identity and schema1.0 provenance drift from unconditional operational fields. Native pinned baseline producer/current store replay demonstrated source-content conflict and a second reservation; explicit absent/null legacy replay now preserves exact original packet and no new effect. Baseline producer scope is not a full old-binary/store-version claim.",
-      "observed_head": "fd9169bee4dfc7a33e397c38af50e77a7a302d01",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "ARCHITECTURE_CRITIC",
-      "severity": "MAJOR"
-    },
-    {
-      "finding": "Actual historical shadow-pin predicate denied optional domain-policy registry prose change. Preserve the original domain-policy/TASK30 bytes; this software task pins current registry-011 explicitly. No old proof rebinding, gate exception or authority widening.",
-      "observed_head": "0f1c30b3e87fbe1dc0c721a6336d60a59a1ff362",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "CODE_REVIEWER",
-      "severity": "MAJOR"
-    },
-    {
-      "finding": "A native recovered originating EXIT retained a false active integrity diagnosis after transient missing funding. Validated recovery clears only the active cause while retaining audit history; corrupt origin and UNKNOWN neighbors stay fail-closed.",
-      "observed_head": "0f1c30b3e87fbe1dc0c721a6336d60a59a1ff362",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "GOAL_DOD_CRITIC",
-      "severity": "MAJOR"
-    },
-    {
-      "finding": "Native backup/cut/restore lost a post-backup envelope tightening and admitted an originally denied entry. Exact current operating-envelope chain must survive reconciliation and ACK; absent/conflicting authority retains a fence. This closes a required software recovery seam, not future commissioning work.",
-      "observed_head": "0f1c30b3e87fbe1dc0c721a6336d60a59a1ff362",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "ARCHITECTURE_CRITIC",
-      "severity": "BLOCKER"
-    },
-    {
-      "finding": "Frozen 7ebf review reproduced false READY with invalid current runtime policy and historical --as-of overriding OBSERVED current health. Readonly projection must reuse current policy owner; OBSERVED current health must use physical clock while preserving synthetic time and original activation/cut metadata. Actual independent before probes and regressions retained.",
-      "observed_head": "7ebf809f5c0003f729dec583055ffadfb07abe95",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "CODE_REVIEWER",
-      "severity": "MAJOR"
-    },
-    {
-      "finding": "Frozen 7ebf review reproduced false READY with invalid current runtime policy and historical --as-of overriding OBSERVED current health. Readonly projection must reuse current policy owner; OBSERVED current health must use physical clock while preserving synthetic time and original activation/cut metadata. Actual independent before probes and regressions retained.",
-      "observed_head": "7ebf809f5c0003f729dec583055ffadfb07abe95",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "GOAL_DOD_CRITIC",
-      "severity": "MAJOR"
-    },
-    {
-      "finding": "Frozen 7ebf review reproduced false READY with invalid current runtime policy and historical --as-of overriding OBSERVED current health. Readonly projection must reuse current policy owner; OBSERVED current health must use physical clock while preserving synthetic time and original activation/cut metadata. Actual independent before probes and regressions retained.",
-      "observed_head": "7ebf809f5c0003f729dec583055ffadfb07abe95",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "ARCHITECTURE_CRITIC",
-      "severity": "BLOCKER"
-    },
-    {
-      "finding": "Frozen 0df9aa7e native partial-EXIT counterexample showed UNKNOWN corrupted remainder becoming a new attempt authority and self-consistent false READY. Original indexed quantity/cost/fee history must fence dispatch, transactional claim and result acceptance; healthy neighbors continue. Actual CODE/GOAL/OWNER PASS for that head remain recorded as their scoped historical verdicts, not rewritten to NOT_READY. Current native before/after and fresh four-role review close this required software seam.",
-      "observed_head": "0df9aa7e8cf199cbddf3b97ca7effe63f12fafbd",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "ARCHITECTURE_CRITIC",
-      "severity": "BLOCKER"
-    },
-    {
-      "finding": "Frozen 4a327869 review found valid ENTRY1.1 nonfill recovery retaining a false inventory incident and single-grant SHADOW routing unable to serve separately authorized old A EXIT/new B ENTRY. Actual CODE/ARCH NOT_READY and GOAL PASS are preserved; missing OWNER review was not fabricated. Native original released-obligation proof and pre-claim originating grant selection close both required internal seams with measured before/after, current whole outcome and fresh four-role review.",
-      "observed_head": "4a327869b5a439c938e2bccb97079c25883e4168",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "CODE_REVIEWER",
-      "severity": "MAJOR"
-    },
-    {
-      "finding": "Frozen 4a327869 review found valid ENTRY1.1 nonfill recovery retaining a false inventory incident and single-grant SHADOW routing unable to serve separately authorized old A EXIT/new B ENTRY. Actual CODE/ARCH NOT_READY and GOAL PASS are preserved; missing OWNER review was not fabricated. Native original released-obligation proof and pre-claim originating grant selection close both required internal seams with measured before/after, current whole outcome and fresh four-role review.",
-      "observed_head": "4a327869b5a439c938e2bccb97079c25883e4168",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "ARCHITECTURE_CRITIC",
-      "severity": "BLOCKER"
-    },
-    {
-      "finding": "Frozen 1cdf0003 native review reproduced backup sidecar aliases overwriting an owned synthetic non-target; CODE also reproduced malformed original source JSON crashing tick/status and starving a healthy due EXIT. Captured-result shape was an explicitly static neighboring finding. Original actual three NOT_READY verdicts, probes and missing measurement fields are retained; missing OWNER review was not invented. Native artifact reservation/backup isolation and typed original/capture shape validation close these internal recovery seams, verified by current whole outcome and fresh exact four-role review.",
-      "observed_head": "1cdf00035c2b13c24f03ced2702e1553e22eeda1",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "CODE_REVIEWER",
-      "severity": "MAJOR"
-    },
-    {
-      "finding": "Frozen 1cdf0003 native review reproduced backup sidecar aliases overwriting an owned synthetic non-target; CODE also reproduced malformed original source JSON crashing tick/status and starving a healthy due EXIT. Captured-result shape was an explicitly static neighboring finding. Original actual three NOT_READY verdicts, probes and missing measurement fields are retained; missing OWNER review was not invented. Native artifact reservation/backup isolation and typed original/capture shape validation close these internal recovery seams, verified by current whole outcome and fresh exact four-role review.",
-      "observed_head": "1cdf00035c2b13c24f03ced2702e1553e22eeda1",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "GOAL_DOD_CRITIC",
-      "severity": "MAJOR"
-    },
-    {
-      "finding": "Frozen 1cdf0003 native review reproduced backup sidecar aliases overwriting an owned synthetic non-target; CODE also reproduced malformed original source JSON crashing tick/status and starving a healthy due EXIT. Captured-result shape was an explicitly static neighboring finding. Original actual three NOT_READY verdicts, probes and missing measurement fields are retained; missing OWNER review was not invented. Native artifact reservation/backup isolation and typed original/capture shape validation close these internal recovery seams, verified by current whole outcome and fresh exact four-role review.",
-      "observed_head": "1cdf00035c2b13c24f03ced2702e1553e22eeda1",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "ARCHITECTURE_CRITIC",
-      "severity": "BLOCKER"
-    },
-    {
-      "finding": "Frozen 08c5ae1e CODE native review reproduced deletion of preexisting regular restore destination -journal/-wal/-shm files while restore returned success. Actual GOAL/ARCH PASS remain their scoped historical verdicts, and missing OWNER was not fabricated. Complete destination-family guards, exclusive publication and private native recovery preparation preserve existing artifacts while retaining original snapshot identity/fence/pause; native before/after, fresh whole outcome and four current P0/P1-only reviews close this required software recovery seam.",
-      "observed_head": "08c5ae1e9385202a27a0f18640f0b208ad34928d",
-      "prior_verdict": "NOT_READY",
-      "resolved_by_head": "1a617c5fd39c64ca295834d44f2b1cdf26fa3d39",
-      "role": "CODE_REVIEWER",
       "severity": "MAJOR"
     }
   ],
@@ -166,33 +38,52 @@
     "OWNER_UX_CRITIC"
   ],
   "review_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1-FINAL-REVIEW",
-  "reviewed_bindings_sha256": "8eb045b70f0653e0c50efe946a260c3a286c71463cd744ee0527a5a334553731",
-  "reviewed_inventory_sha256": "57be6bf83885ecf2ca96cce0d02d57d0156473be0bd073621fb268e7af4b784f",
+  "reviewed_bindings_sha256": "18a79976814f94522cc990b1726738ba08d97722f1d5eecb116fcb1b1fe99c14",
+  "reviewed_inventory_sha256": "4a5a029975cb7fb5ca2a4bf405a94daa798ad1016889beb38af159e8be05c992",
   "reviews": [
     {
       "findings": [
-        "packet_fingerprint_sha256=2a8a5701f79d7f5e01d1a0697b134b25c908e6faf36305738619b4bb147c1e82",
-        "SEMANTIC_PREMISE PASS: все 12 risk dimensions проверены по exact contract, diff и named owners; P0/P1 отсутствуют.",
-        "D1-D4 сохраняют отдельные scientific identities, один PaperPlane inventory, originating exits, typed UNKNOWN, original accounting и snapshot-bound recovery.",
-        "Независимые native probes 6/6 PASS; кандидат неизменен, собственные fixtures и review-root ABSENT.",
-        "PASS ограничен declared PAPER/SHADOW software scope; scientific acceptance, runtime commissioning, financial execution и merge authority не предоставлены."
+        "P0/P1 не обнаружены в известном quantity/no-inventory delta относительно a2cc. paper_plane.py:379,398,420,435 блокирует отсутствующую quantity при сохранённых ENTRY/economic facts; genuine definitive nonfill и unattempted cancellation проверяются исходными witnesses. Прямые consumers до EXIT effect: trading_coordinator.py:359; paper_plane.py:3092,3169. Проверены соответствующие regression oracles, включая tests/test_trading_operational_recovery_v1.py:1027 и tests/test_trading_operational_obligations_v1.py:317.",
+        "reviewed_head=0d877ee7ed73d7051ced8de17fa8eeadfb26f017; expected_base=ba87f8e339d5cc3aa55322801ae56e3f92369446; reviewed_bindings_sha256=18a79976814f94522cc990b1726738ba08d97722f1d5eecb116fcb1b1fe99c14; reviewed_inventory_sha256=4a5a029975cb7fb5ca2a4bf405a94daa798ad1016889beb38af159e8be05c992.",
+        "Независимо пересчитанный compute_evidence_chain совпал с chain.json: 65 bindings. Frozen diff совпал с Git byte-for-byte, diff_sha256=5885dc8f9dea942c4ad9d75e61bd361f5bf5433bad4b650225883afa1a83dd10. Проверены self hashes и source pins текущих receipts: 191 native, 13 targeted, 99 consumers, 2 clocks, 24 cold CLI; расхождений нет. Это проверка сохранённого evidence; native тесты в данном review не запускались. Predecessor PASS и три excluded evidence-файла не использованы как current readiness.",
+        "Scope ограничен указанным common seam и exact binding/proof verification. Новых критиков, широкого поиска и local full gate не было. Reviewer fixtures/scratch не создавались; cleanup не требовался. Product/evidence mutations и внешние операции отсутствуют; HEAD неизменён, tracked diff чистый. Verdict не разрешает merge."
       ],
-      "role": "ARCHITECTURE_CRITIC",
-      "verdict": "PASS"
-    },
-    {
-      "findings": [],
-      "role": "OWNER_UX_CRITIC",
-      "verdict": "PASS"
-    },
-    {
-      "findings": [],
       "role": "CODE_REVIEWER",
       "verdict": "PASS"
     },
     {
-      "findings": [],
+      "findings": [
+        "Подтверждённых P0/P1 gaps в известном quantity/no-inventory delta к a2cc не обнаружено. Guard запрещает fresh EXIT effect при missing qty и retained ENTRY/economic evidence; original v1.0/v1.1 nonfill и unattempted cancellation сохраняют строгую witness-проверку. C01–C24/DoD не сокращены.",
+        "Exact head=0d877ee7ed73d7051ced8de17fa8eeadfb26f017; reviewed_bindings_sha256=18a79976814f94522cc990b1726738ba08d97722f1d5eecb116fcb1b1fe99c14; reviewed_inventory_sha256=4a5a029975cb7fb5ca2a4bf405a94daa798ad1016889beb38af159e8be05c992. Независимый read-only пересчёт chain совпал;65 bindings совпали с Git/worktree; frozen diff SHA256=5885dc8f9dea942c4ad9d75e61bd361f5bf5433bad4b650225883afa1a83dd10.",
+        "Фактически проверены current191/13/99/2clock/24CLI receipts, selfhash/source pins,24 coverage rows и114 historical Git blobs. First-guard nonfill FAIL source восстановлен по exact patch/hash; original a2cc ARCH NOT_READY/native BEFORE сохранены. Durable reproducer pins и raw-hash ссылки на current proofs совпадают. Native tests в этом review не повторялись.",
+        "Автор не выступал рецензентом; проверку выполнил отдельный isolated critic. Campaign не расширялась. Source/evidence не изменялись; fixture/scratch/process не создавались, own cleanup=NOT_APPLICABLE. Финальный HEAD неизменён, git status чистый. Три excluded predecessor gatefiles не использованы как текущий verdict; merge authority не заявляется."
+      ],
       "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "P0/P1 owner-operability gaps в известном quantity/no-inventory delta не обнаружены. head=0d877ee7ed73d7051ced8de17fa8eeadfb26f017; reviewed_bindings_sha256=18a79976814f94522cc990b1726738ba08d97722f1d5eecb116fcb1b1fe99c14; reviewed_inventory_sha256=4a5a029975cb7fb5ca2a4bf405a94daa798ad1016889beb38af159e8be05c992. Канонические fingerprints независимо пересчитаны; 65 bindings совпадают с immutable Git blobs. Предыдущий PASS не перенесён на новый head.",
+        "На текущих bytes независимо исполнены 24 ordinary CLI команды за19.956011s, CLI duration16.736681s, и2 semantic navigation calls PASS. Пять readonly family canaries byte-exact, WAL во всех=0. ACK сохраняет pause SQLite integer1; explicit resume/drain и original EXIT дают RECONCILED_STOPPED. Три русских refusal/next-action сообщения подтверждены literal stdout hashes. Дополнительно2/2 известных native regressions PASS за15.105s: пять nonfill outcomes v1.0/v1.1 дают READY/KNOWN с нулевым inventory; четыре cancellation witness variants освобождают reservation только при valid original witness.",
+        "reproducer_sha256=2fc3126943ddfff8d0837ed5d6fecb8fc894e42bd535ef232d1419d36e2d8a29; independent_receipt_raw_sha256=bee3938b7e9a3cb3fd2bc84e63351505934dd204e532e3b850bf8a4710870179; independent_receipt_self_sha256=40d913c6af4e526ede2ce00d69216cdb76d4cef4e23c8b3869c4db2e8d51e528; compact_summary_self_sha256=ffe7f2ff97128b151d96d3b7adef842e741ea3b6f69bf2b2d63e1a22cb657532. Current16 source pins unchanged; candidate operator receipt unchanged; owned native fixtures ABSENT; checked marked scratch ABSENT; tracked worktree clean и HEAD неизменён. Три excluded predecessor gatefiles не использованы как current evidence; broad campaign/full gate/product mutation не выполнялись."
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Подтверждённых текущих P0/P1 в ограниченном missing-quantity/positive-vs-no-inventory seam не осталось. Предшествующий NOT_READY для a2ccab5a12f352a4b21bacb37bf9a0c26c3f496c сохраняет силу для своего candidate и не переименован в PASS.",
+        "reviewed_head=0d877ee7ed73d7051ced8de17fa8eeadfb26f017; base=ba87f8e339d5cc3aa55322801ae56e3f92369446; reviewed_bindings_sha256=18a79976814f94522cc990b1726738ba08d97722f1d5eecb116fcb1b1fe99c14; reviewed_inventory_sha256=4a5a029975cb7fb5ca2a4bf405a94daa798ad1016889beb38af159e8be05c992; diff_sha256=5885dc8f9dea942c4ad9d75e61bd361f5bf5433bad4b650225883afa1a83dd10.",
+        "packet_fingerprint_sha256=3bb17ff5e10d57d57ce2817530ce83eabd245cc961b0cf07a218cfb09908c321",
+        "Общий owner paper_plane._assert_quantity_inventory_witness теперь различает отсутствие inventory и утрату quantity при retained ENTRY/economic evidence. Coordinator проверяет witness до EXIT inputs; begin_modeled_attempt повторяет проверку внутри immediate transaction до перехода EXITING и записи attempt; accept_modeled_result и envelope используют тот же owner. Projection не получает самостоятельной authority. Для CANCELLED без quantity допускается только исходный валидный nonfill/cancellation witness с нулевым остатком.",
+        "Фактически исполнен cited quantity-witness-reproducer.py, sha256=61db0cf1b8dda405973f653b4752cb9b922322ed64474e8a47d25de5e226b5a1. Intact SHADOW control: RECONCILED, один synthetic quote, raw amount=10000000000000. Прежнее повреждение qty_dec=NULL с forged remainder сохраняет original journal и floor30, даёт EXIT_INVENTORY_WITNESS_CONFLICT; state=EXIT_REQUIRED, inventory=UNKNOWN, новые attempts/requests/captures/quote calls=0. native_stdout_sha256=792e9fe52c718a84ad970aa6f3ffc027070adc4b6e189ea80ce8e2a979848570.",
+        "Фактически исполнены четыре targeted tests: missing original quantity; original ENTRY nonfill recovery после cold restart; natural unattempted cancellation с повреждёнными witnesses; nonfill capacity release при UNKNOWN economic cost. PASS: 4 tests, failures=0, errors=0, 30.849s. Проверены 12 damage variants PAPER/SHADOW × native/modeled ENTRY, восстановление исходного EXIT и no-resend; original nonfill v1.0/v1.1 и cancellation compatibility сохранены. targeted_stdout_sha256=74c361933164daca767e00cea8695c2db9c004c28329b2a90c9d2b6aa93569b1.",
+        "Read-only compute_evidence_chain до и после совпал с frozen chain; все 65 committed/worktree bindings, 24 packet evidence hashes, 16 current receipt source pins и task-contract SHA совпали. Frozen diff byte-exact равен Git diff. HEAD/packet/diff/source bytes неизменны, tracked worktree чистый. Own wrapper local/smial-operational-closure-delivery/architecture-0d877-quantity-validation.py sha256=7fa43cea7329bc084502e495eb179ebf1c3a61d9aa5e66a9ab6004212e4832b3; compact receipt architecture-0d877-quantity-validation.json sha256=de3a44b390c28d8d615de060ebe5aa03a5f8115e6c0995fe4557c568508a2e7c. Все помеченные native/test fixtures и оба scratch roots проверены ABSENT. Сохранены только ignored reproducer/readback artifacts. Real provider calls=0, credential reads=0, full_gate=NOT_EXECUTED; product/canonical evidence mutations и merge отсутствуют.",
+        "Coverage 12/12 пропорционально изменённому seam: SCIENTIFIC_ESTIMAND, FALSIFIER_OR_ENDPOINT, EVIDENCE_ADMISSIBILITY, PIT_OR_AVAILABILITY_SEMANTICS и RESEARCH_TRUTH_OWNERSHIP ограничивают доказательство synthetic execution и исходными bytes; HYPOTHESIS_OR_FAMILY_CLOSURE и PROMOTION_OR_SUPPRESSION_AUTHORITY не получают authority от software status; UNKNOWN_VS_NEGATIVE_EVIDENCE и EXECUTION_TRUTH_SEMANTICS проверены native отказом до эффекта; DURABLE_SCIENCE_SCHEMA сохраняет смысл старого evidence/nonfill; OWNER_AUTHORITY_SEMANTICS и HARNESS_PREMISE_OR_MERGE_AUTHORITY сохраняют отдельные acceptance/merge gates. Live/science/alpha, wallet truth и внешняя ledger completeness этим PASS не доказаны.",
+        "Проверены 10/10 canonical questions: прежние зелёные tests могли сосуществовать с missing-quantity bypass; stronger C3/C4 claims теперь имеют прямой falsifier; локальная проверка не расширена до family/global closure; UNKNOWN не разрешает fresh effect; lifecycle status не становится scientific authority; v1.0 nonfill сохраняет смысл; mutable projection остаётся производной; наблюдение fresh attempt/request/quote при retained positive ENTRY и missing quantity опровергло бы premise; будущий агент должен читать PASS как bounded software review; минимальная коррекция выполнена в существующем verifier. Git frozen specs/ResearchStore records и исходные PaperPlane/source SQLite bytes остаются truth при отсутствии DuckDB. Изменение не вводит TASK→чужой private TASK API; общий verifier и существующая SQLite архитектура достаточны.",
+        "Process information-path isolation соблюдена: тот же isolated critic, новый frozen packet+diff, cited evidence и необходимые direct owners; implementation transcript не использован. PACKET_INFORMATION_PATH не доказывает withholding parent chat; launch_isolation=PROCESS_OBLIGATION, builder flags не считаются live attestation. model_diversity=UNPROVEN. Широкая campaign, subagents и full gate не запускались. Три excluded completion/factory-fit/independent-review файла не использованы как текущая readiness; native receipts и этот PASS не дают semantic acceptance, canonical DONE или merge authority."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS"
     }
   ],
