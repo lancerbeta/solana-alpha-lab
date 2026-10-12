@@ -1,0 +1,58 @@
+{
+  "before": {
+    "native_exit_code": 2,
+    "native_result": "EXECUTION_DOMAIN_BOUNDARY: FAIL UNDECLARED_FACTORY_IMPORT:src/solana_alpha_lab/factory/paper_plane.py:solana_alpha_lab.factory.hfic_research_scope",
+    "source_pins_after": {
+      "configs/execution_domain_v1.json": "b166a847c7aaebe4db249ad3b506b2d66c5e518f5ab23b9576a9646735da33c3",
+      "scripts/validate_execution_domain.py": "f647d0fc9d2de00e0378e1c95569dde75ef63c59fbf5e0cb6894491b3bb0e025",
+      "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+      "src/solana_alpha_lab/factory/paper_plane.py": "b832b090453ef475b06268aa1ecf0308879339c61b1423efa894256fa8b14c02",
+      "tests/test_execution_domain_modularity_and_fast_ci_v1.py": "bedd112aadaac3460235a52d5e16c5799ad526fb04707f94c5175278ad756500"
+    },
+    "source_pins_before": {
+      "configs/execution_domain_v1.json": "b166a847c7aaebe4db249ad3b506b2d66c5e518f5ab23b9576a9646735da33c3",
+      "scripts/validate_execution_domain.py": "f647d0fc9d2de00e0378e1c95569dde75ef63c59fbf5e0cb6894491b3bb0e025",
+      "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+      "src/solana_alpha_lab/factory/paper_plane.py": "b832b090453ef475b06268aa1ecf0308879339c61b1423efa894256fa8b14c02",
+      "tests/test_execution_domain_modularity_and_fast_ci_v1.py": "bedd112aadaac3460235a52d5e16c5799ad526fb04707f94c5175278ad756500"
+    },
+    "stderr_sha256": "d3b63445f751153a0520ca572a0d4785ee07401e710346c792a55156bc904777",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "ci_ref": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/38304289812/job/114994450064",
+  "credential_reads": 0,
+  "current191_source_pins_unchanged": true,
+  "elapsed_seconds": 3.904572,
+  "exact_delta": "One existing canonical sha256_of factory import declared; runtime/validator/oracle/live authority unchanged",
+  "failed_ci_log_sha256": "405ec5025b5d133dc184562841753b114f1ad4d9e80f441005f46e8b9527825e",
+  "failed_head": "03e866c703697236e678dde696a30645818ac211",
+  "failed_job_id": 114994450064,
+  "full_local_gate": "NOT_EXECUTED",
+  "native_exit_code": 0,
+  "native_result": "EXECUTION_DOMAIN_BOUNDARY: PASS",
+  "provider_calls": 0,
+  "receipt_sha256": "c092416accfefc2c902956bf65f1fba9dfe0e2dcdcbed09f6a8af74f8bcb052e",
+  "run_id": 38304289812,
+  "schema": "smial.ci-domain-declaration-repair",
+  "source_pins_after": {
+    "configs/execution_domain_v1.json": "cce7c516dc4c259121c57330ee6ed0fc558f2c6d181ec8c45e40eaafc62f2ece",
+    "scripts/validate_execution_domain.py": "f647d0fc9d2de00e0378e1c95569dde75ef63c59fbf5e0cb6894491b3bb0e025",
+    "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+    "src/solana_alpha_lab/factory/paper_plane.py": "b832b090453ef475b06268aa1ecf0308879339c61b1423efa894256fa8b14c02",
+    "tests/test_execution_domain_modularity_and_fast_ci_v1.py": "bedd112aadaac3460235a52d5e16c5799ad526fb04707f94c5175278ad756500"
+  },
+  "source_pins_before": {
+    "configs/execution_domain_v1.json": "cce7c516dc4c259121c57330ee6ed0fc558f2c6d181ec8c45e40eaafc62f2ece",
+    "scripts/validate_execution_domain.py": "f647d0fc9d2de00e0378e1c95569dde75ef63c59fbf5e0cb6894491b3bb0e025",
+    "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+    "src/solana_alpha_lab/factory/paper_plane.py": "b832b090453ef475b06268aa1ecf0308879339c61b1423efa894256fa8b14c02",
+    "tests/test_execution_domain_modularity_and_fast_ci_v1.py": "bedd112aadaac3460235a52d5e16c5799ad526fb04707f94c5175278ad756500"
+  },
+  "status": "PASS",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "6891f44f700b2f3a7693874ad021319de018fae418173fb1c61bfc11e780312f",
+  "test_exit_code": 0,
+  "test_result": "...\r\n----------------------------------------------------------------------\r\nRan 1 test in 0.000s\r\n\r\nOK\r\n..........\r\n----------------------------------------------------------------------\r\nRan 12 tests in 1.844s\r\n\r\nOK",
+  "test_stderr_sha256": "5563505b49bc0299f7b37ed0d12a67350f406a443c9ff5c0a5c3bc3f70b8ad74",
+  "test_stdout_sha256": "2444d4bd8342d4bf095543f45ea8f28e49cac0f5c9af93a4df894371ea53c908"
+}

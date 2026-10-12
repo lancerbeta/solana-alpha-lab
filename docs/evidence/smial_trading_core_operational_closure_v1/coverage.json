@@ -593,6 +593,7 @@
     "accounting-brief.md": "5faf5fa3dc2deaf8bc058ac723627f5be7cf19d4bda7790ed0abeed52870a7e1",
     "accounting-report.md": "b93ec05c2adc27a7faa891f2dd94464775915d14d09df90e343cbc2d648f3999",
     "ci-atom-hour-budget.json": "f49afe02f47154ad0873608dbbf9c75682aae6ba30a4a4771971c94e8c8c5847",
+    "ci-domain-declaration-repair.json": "59619b671f47d227716e4f6819886cf15afec7db862639e55c6aa5d2be99390b",
     "ci-semantic-capacity-remediation.json": "0510959241a6c25dd62da346be6c14e43d6a1c4229d0392259359a0c2d2106cd",
     "ci-source-capacity-remediation.json": "b81048cdf011d60e1dc6930cd7b6b8064eefcc57b08732c3cc3b80ed56e49174",
     "cleanup.json": "6bb758c766c572eee7c227b4235dee960e67c86ae48433bbc9d8c6eb44a0dfa4",
@@ -617,7 +618,7 @@
     "semantic-non-claims.json": "626cfa05e29aaf975a906d22290ecb857e17084ad0d835dd0e3830efcab606a6",
     "source-contract.md": "addc05071197efb3462771b52f5699170d54061656efeda0b7f48e52bdb0f0b7"
   },
-  "receipt_sha256": "0ce3f868d6b5f7e3095bc39667b4acc397df196f107e0f460eb826ac5322bb50",
+  "receipt_sha256": "a83268c34f9a65090ae7931b2884b832d1783777ba26faab10318cbb2b6f170c",
   "schema": "smial.operating-closure-coverage",
   "schema_version": "1.0",
   "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",

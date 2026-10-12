@@ -53,7 +53,8 @@
     {
       "allowed_factory_imports": [
         "solana_alpha_lab.factory.strategy_runtime",
-        "solana_alpha_lab.factory.trading_runtime_policy"
+        "solana_alpha_lab.factory.trading_runtime_policy",
+        "solana_alpha_lab.factory.hfic_research_scope"
       ],
       "path": "src/solana_alpha_lab/factory/paper_plane.py"
     },
