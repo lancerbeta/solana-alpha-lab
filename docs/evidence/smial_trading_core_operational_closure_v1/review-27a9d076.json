@@ -1,0 +1,135 @@
+{
+  "architecture_native_before": {
+    "canonical_questions_answered": 10,
+    "facts": {
+      "additional_effects": 0,
+      "after_inventory": "KNOWN 3",
+      "after_new30": "ALLOW WITHIN_LIMIT",
+      "before_inventory": "KNOWN 30",
+      "before_new30": "DENIED OUTSTANDING_COST_BASIS_LIMIT",
+      "original_journal_unchanged": true,
+      "provider_calls": 0,
+      "readonly_status": "READY"
+    },
+    "fault": "Only mutable remaining_qty=1000000, remaining_cost=3, remaining_fee=0.01; original entry30/qty10000000, no EXIT",
+    "initial_environment_attempts": "UV_CACHE_FAILURE_BEFORE_SCENARIO_NOT_PRODUCT_COUNTEREXAMPLE",
+    "model_diversity": "UNPROVEN",
+    "native_process_count": 0,
+    "original_journal_sha256": "1f49ad6aabf2c653b9e1177a419c0c25492ca0961b420d5576048cde302c6e61",
+    "owned_fixture_root_absent": true,
+    "packet_evidence_hashes_verified": 36,
+    "packet_fingerprint_sha256": "74aec46e9ff4b61683c5994952925a4a2c6bdd0efe1ce7ae8fc4d72d2faf4b6f",
+    "producer": "Independent packet-only native ordinary PAPER v1.0 initial activation and tick; original cap40/count2",
+    "raw_native_carrier": "NOT_RETAINED_BY_PARENT",
+    "raw_stdout_sha256": "UNKNOWN",
+    "reported_native_receipt_canonical_sha256": "cd2365f172d8bf89179758bd92679578938347c8865562367b4b0f3cc93fc660",
+    "risk_dimensions_assessed": 12,
+    "scenario_elapsed_seconds": 2.395617,
+    "scientific_invalidity_established": false,
+    "software_premise": "FAIL",
+    "source_changes": false
+  },
+  "code_native_before": {
+    "after_pin_mismatches": [],
+    "before_pin_mismatches": [],
+    "binding_count": 132,
+    "cleanup": {
+      "background_processes_started": 0,
+      "deleted_file_count": "UNKNOWN",
+      "native_process_count": 0,
+      "owned_fixture_root_absent": true,
+      "process_count_basis": "NO_BACKGROUND_NATIVE_PROCESS_STARTED_NO_SEPARATE_OS_ENUMERATION"
+    },
+    "command_exit_code": 0,
+    "command_wall_seconds": 3.4419532,
+    "facts": {
+      "entries_enabled": true,
+      "entry_block": null,
+      "integrity_verified": true,
+      "position_state": "OPEN",
+      "status": "READY",
+      "tick_attempts": 1,
+      "tick_decisions": 1
+    },
+    "fault": "Only latest SWITCH.payload.expected_current_epoch: null -> ACTIVATION-EPOCH-NONEXISTENT",
+    "producer": "OperatingDriverTests.setUp -> start_operating -> _operating_entry_block -> coordinator.tick -> coordinator.status -> runner.readback -> tearDown",
+    "producer_file": "NOT_RETAINED_INLINE",
+    "scenario_elapsed_seconds": "UNKNOWN",
+    "stdout_file": "NOT_RETAINED_TOOL_TRANSCRIPT_ONLY",
+    "stdout_sha256": "UNKNOWN",
+    "tool_chunk": "9d1ca2"
+  },
+  "expected_base": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "goal_owner_native_before": {
+    "review-27a9-goal-native-before.json": {
+      "omitted_value_count": 0,
+      "original_capture_raw_sha256": "3da58603399a4a9aef0e92d0d37554990314af9d11920629973968a3653210ea",
+      "receipt_sha256": "29b11e139678c6de74349de5c43356aa78c2eaf5602799a9bba986e428c83de9"
+    },
+    "review-27a9-owner-native-before.json": {
+      "omitted_value_count": 0,
+      "original_capture_raw_sha256": "04d2c0ca84ea28ff3ebb7d2d0e0c526a63053fe3fe2bfdb69955081f5b6b300b",
+      "receipt_sha256": "7b087e2b04c8505de173c733bf7ba631e722b3415350687cd41ced3822e1ffa8"
+    }
+  },
+  "head": "27a9d0763eaf40b3a1267825738ee261cbbca327",
+  "historical_successful_proof_archives": {
+    "interim-cleanup-before-common-lineage-repair.json": {
+      "carrier": "BYTE_EXACT_FROZEN_GIT_BLOB",
+      "raw_sha256": "460b48fd0d14c0df590e0de5f59bed38a3bbbd85814d0b8dff64077560de867f",
+      "receipt_sha256": "66d330c878bc3780cf977407c3bd189422993575de72287d5b7fbd34b78f7640"
+    },
+    "interim-clock-before-common-lineage-repair.json": {
+      "carrier": "BYTE_EXACT_FROZEN_GIT_BLOB",
+      "raw_sha256": "6333582567052a169b73e89ffcac816a4063a334c256ef93dbf335e137bb103c",
+      "receipt_sha256": "c6928f5403f08d683a8e9b4de29074b02b5802e8c531b6086dcf9c678f24d71f"
+    },
+    "interim-consumers-before-common-lineage-repair.json": {
+      "carrier": "BYTE_EXACT_FROZEN_GIT_BLOB",
+      "raw_sha256": "e443e764a69ae3e8134020d6b0443933e25905c7ae66a122c42c7d8c8716698e",
+      "receipt_sha256": "64ffd305b44845a07e78951a8c1240f7eea05ba2de293a2cfdd934cd42968815"
+    },
+    "interim-operator-before-common-lineage-repair.json": {
+      "carrier": "BYTE_EXACT_FROZEN_GIT_BLOB",
+      "raw_sha256": "f1e103341e8c353eb5d623bc212c7d55ee27db7b841e5675f18c5a04128c238b",
+      "receipt_sha256": "35dad9b1ff560ec85099acae482eddf3ef2d773f96544ad2ce1b048ed55dcf22"
+    },
+    "interim-suite-before-common-lineage-repair.json": {
+      "carrier": "BYTE_EXACT_FROZEN_GIT_BLOB",
+      "raw_sha256": "77da11ca4d510f102b0a915c0d0ca6f245747bb6973fbfb31b3e2f905b018145",
+      "receipt_sha256": "db8257a19b3b71e7a2983bcc7afe61ee4c707b2ee0c8a98d10e203a05bb7c218"
+    }
+  },
+  "receipt_sha256": "e0b4b2335a068c4a20231f3f137f824aed19db988de42d8cb01ee9df5f2dd426",
+  "replan": "One bounded PaperPlane common lineage and original inventory-witness repair, preserving actual legacy carriers/old exits/restore fences/reconciliation/no-resend/atomic refusal. No new functionality or authority.",
+  "reviewed_bindings_sha256": "0ee96f25af50a360c1751b6badb314afbc8005825e1f105fabce23c2b3368892",
+  "reviewed_inventory_sha256": "b0c75c62ac2c74fe0251218fe0fea81699933b999f50a7dd48c05822a5af2dd3",
+  "reviews": [
+    {
+      "finding": "Common managed guard omitted original CAS/count lineage; native corrupt predecessor admitted OPEN and READY.",
+      "role": "CODE_REVIEWER",
+      "severity": "P1",
+      "verdict": "NOT_READY"
+    },
+    {
+      "finding": "Conditional switch strategy check lets tick/status report READY while native ingress denies.",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "P1",
+      "verdict": "NOT_READY"
+    },
+    {
+      "finding": "Native/cold CLI exposes enabled READY and no repair action despite exact strategy conflict at new-entry ingress.",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "P1",
+      "verdict": "NOT_READY"
+    },
+    {
+      "finding": "Genuine ordinary PAPER v1.0 escapes original inventory validation; coherent unwitnessed remainder frees D2 capacity.",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "P1",
+      "verdict": "NOT_READY"
+    }
+  ],
+  "schema": "smial.frozen-independent-review-history",
+  "schema_version": "1.0"
+}

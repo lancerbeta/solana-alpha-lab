@@ -259,6 +259,72 @@ def modeled_final_witness_valid(attempt: Mapping[str, Any], final: Mapping[str, 
         return False
 
 
+def _native_legacy_inventory_witness_valid(position: Mapping[str, Any], events: list[dict[str, Any]], *, mode: str) -> bool:
+    """Released native full inventory/release, from its original observations."""
+    try:
+        if mode not in {"PAPER", "SHADOW"} or position.get("entry_fee_semantics") is not None:
+            return False
+        pid, bot = position["position_id"], position["bot_instance_id"]
+        entries = [event for event in events if event["event_type"] in {
+            "PAPER_SIMULATION_OBSERVED", "SHADOW_EXECUTABLE_OBSERVED"}]
+        exits = [event for event in events if event["event_type"] in {
+            "PAPER_EXIT_OBSERVED", "SHADOW_EXIT_EXECUTABLE_OBSERVED"}]
+        if len(entries) != 1 or len(exits) > 1 or any(position.get(key) is not None for key in (
+                "remaining_qty_dec", "remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec")):
+            return False
+        entry, source = entries[0], entries[0]["payload"]
+        if (entry["event_type"] != ("PAPER_SIMULATION_OBSERVED" if mode == "PAPER" else "SHADOW_EXECUTABLE_OBSERVED")
+            or entry["position_id"] != pid or entry["bot_instance_id"] != bot
+            or source["side"] != "ENTRY" or source["mode"] != mode
+            or _identity_fields(source) != _identity_fields(position)):
+            return False
+        values = {}
+        for field, original_field in (("qty_dec", "qty_dec"), ("entry_price_dec", "entry_price_dec"),
+                ("entered_notional_usd_dec", "entry_gross_notional_usd_dec"), ("entry_fee_usd_dec", "entry_fee_usd_dec")):
+            original = _positive_model_decimal(source[original_field], "EXIT_INVENTORY_WITNESS_CONFLICT",
+                allow_zero=field == "entry_fee_usd_dec")
+            if _positive_model_decimal(position[field], "EXIT_INVENTORY_WITNESS_CONFLICT",
+                    allow_zero=field == "entry_fee_usd_dec") != original:
+                return False
+            values[field] = original
+        exit_fields = ("exit_price_dec", "exit_fee_usd_dec", "exit_notional_usd_dec",
+            "realized_gross_pnl_usd_dec", "realized_net_pnl_usd_dec", "pnl_evidence_class")
+        if not exits:
+            return position["state"] != "RECONCILED" and all(position.get(field) is None for field in exit_fields)
+        event, payload = exits[0], exits[0]["payload"]
+        if (event["event_type"] != ("PAPER_EXIT_OBSERVED" if mode == "PAPER" else "SHADOW_EXIT_EXECUTABLE_OBSERVED")
+            or event["position_id"] != pid or event["bot_instance_id"] != bot
+            or payload["side"] != "EXIT" or payload["mode"] != mode
+            or _identity_fields(payload) != _identity_fields(position)
+            or _parse_utc(event["created_at"]) < _parse_utc(entry["created_at"])
+            or position["state"] != "RECONCILED"
+            or position["pnl_evidence_class"] != ("PAPER_RECONCILED_MODEL" if mode == "PAPER" else "SHADOW_RECONCILED_QUOTE_MODEL")):
+            return False
+        price = _positive_model_decimal(payload["exit_price_dec"], "EXIT_INVENTORY_WITNESS_CONFLICT")
+        proceeds = (price * values["qty_dec"]).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        fee_bps = _bound_entry_fee_bps(position, int(position["fee_bps"]))
+        fee = (proceeds * Decimal(fee_bps) / Decimal("10000")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        gross = (proceeds - values["entered_notional_usd_dec"]).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        net = (gross - values["entry_fee_usd_dec"] - fee).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        if Decimal(payload["exit_fee_usd_dec"]) != fee or Decimal(payload["realized_net_pnl_usd_dec"]) != net:
+            return False
+        return all(Decimal(position[field]) == expected for field, expected in (
+            ("exit_price_dec", price), ("exit_fee_usd_dec", fee), ("exit_notional_usd_dec", proceeds),
+            ("realized_gross_pnl_usd_dec", gross), ("realized_net_pnl_usd_dec", net)))
+    except (KeyError, TypeError, ValueError, ArithmeticError, AttributeError, PaperPlaneError):
+        return False
+
+
+def _sql_native_legacy_inventory_witness(position_raw: Any, events_raw: Any, mode: Any) -> int:
+    try:
+        events = json.loads(events_raw)
+        for event in events:
+            event["payload"] = json.loads(event.pop("payload_json"))
+        return int(_native_legacy_inventory_witness_valid(json.loads(position_raw), events, mode=mode))
+    except (TypeError, ValueError, KeyError):
+        return 0
+
+
 def assert_quantity_inventory_witness(store: PaperPlaneStore, position: Mapping[str, Any], *,
                                       pending_attempt_id: str | None = None,
                                       allow_pending: bool = False, force_quantity: bool = False) -> None:
@@ -269,18 +335,25 @@ def assert_quantity_inventory_witness(store: PaperPlaneStore, position: Mapping[
     The caller supplies its read snapshot or immediate claim/result transaction.
     """
     events = store.filtered_execution_events(position_ids=[position["position_id"]])
-    quantitative = force_quantity or position.get("entry_fee_semantics") is not None or any(
+    quantitative = force_quantity or position.get("entry_fee_semantics") is not None or (
+        position.get("qty_dec") is not None and (position.get("ordinary_operating") or any(
+            event["event_type"] == "MODELED_ATTEMPT_STARTED" and isinstance(event["payload"], Mapping)
+            and event["payload"].get("side") == "ENTRY" for event in events))) or any(
         event["event_type"] == "MODELED_EXIT_QUANTITY_LEG"
         or event["event_type"] == "MODELED_ATTEMPT_FINAL" and isinstance(event["payload"], Mapping)
            and event["payload"].get("schema_version") == "1.1"
         or event["event_type"] == "MODELED_RESULT_ACCEPTED" and isinstance(event["payload"], Mapping)
            and isinstance(event["payload"].get("result"), Mapping)
            and event["payload"]["result"].get("schema_version") == "1.1" for event in events)
-    if not quantitative:
+    if not quantitative and position.get("qty_dec") is None:
         return
     try:
         pid, bot = position["position_id"], position["bot_instance_id"]
         mode = store.get_bot(bot)["mode"]
+        if not quantitative:
+            if not _native_legacy_inventory_witness_valid(position, events, mode=mode):
+                raise ValueError()
+            return
         starts = [event for event in events if event["event_type"] == "MODELED_ATTEMPT_STARTED"]
         attempts = {event["event_id"]: event for event in starts}
         finals = {event["event_id"]: event for event in events if event["event_type"] == "MODELED_ATTEMPT_FINAL"}
@@ -354,7 +427,9 @@ def assert_quantity_inventory_witness(store: PaperPlaneStore, position: Mapping[
         remainder, proceeds, exit_fees, allocated_fee = original, Decimal("0"), Decimal("0"), Decimal("0")
         gross, net = Decimal("0"), Decimal("0")
         legs = {event["event_id"]: event for event in events if event["event_type"] == "MODELED_EXIT_QUANTITY_LEG"}
+        native_exits = [event for event in events if event["event_type"] in {"PAPER_EXIT_OBSERVED", "SHADOW_EXIT_EXECUTABLE_OBSERVED"}]
         consumed = set()
+        consumed_native = set()
         for attempt in starts:
             body = attempt["payload"]
             if body["side"] != "EXIT":
@@ -402,6 +477,22 @@ def assert_quantity_inventory_witness(store: PaperPlaneStore, position: Mapping[
                     and event["payload"]["request"]["quantity_sold"] == format(sold, "f")
                     and event["payload"]["request"]["remaining_quantity"] == format(remaining, "f")]
                 leg = matches[0] if len(matches) == 1 else None
+            if leg is None and not modern and legacy is not None:
+                # Genuine v1.0 full EXIT has its original native observation,
+                # without a quantity leg or invented v1.1 accounting marker.
+                if len(native_exits) != 1 or consumed_native:
+                    raise ValueError()
+                native = native_exits[0]
+                payload = native["payload"]
+                if (native["position_id"] != pid or native["bot_instance_id"] != bot
+                    or payload["side"] != "EXIT" or payload["mode"] != mode
+                    or Decimal(payload["exit_price_dec"]) != price
+                    or Decimal(payload["exit_fee_usd_dec"]) != leg_fee
+                    or Decimal(payload["realized_net_pnl_usd_dec"]) != next_net):
+                    raise ValueError()
+                consumed_native.add(native["event_id"])
+                remainder, allocated_fee, gross, net = remaining, next_fee, next_gross, next_net
+                continue
             if leg is None or leg["position_id"] != pid or leg["bot_instance_id"] != bot:
                 raise ValueError()
             clock = result["observed_at"] if modern else leg["created_at"]
@@ -416,14 +507,16 @@ def assert_quantity_inventory_witness(store: PaperPlaneStore, position: Mapping[
                 raise ValueError()
             consumed.add(leg["event_id"])
             remainder, allocated_fee, gross, net = remaining, next_fee, next_gross, next_net
-        if consumed != set(legs):
+        if consumed != set(legs) or consumed_native != {event["event_id"] for event in native_exits}:
             raise ValueError()
         if position.get("remaining_qty_dec") is not None:
             for key, value in (("remaining_qty_dec", remainder), ("remaining_cost_basis_usd_dec", notional * remainder / original),
                                ("remaining_entry_fee_usd_dec", entry_fee - allocated_fee)):
                 if Decimal(position[key]) != value:
                     raise ValueError()
-        elif position.get("entry_fee_semantics") is not None or consumed:
+        elif (position.get("entry_fee_semantics") is not None or consumed
+            or position.get("remaining_cost_basis_usd_dec") is not None
+            or position.get("remaining_entry_fee_usd_dec") is not None):
             raise ValueError()
         for key, value in (("exit_notional_usd_dec", proceeds), ("exit_fee_usd_dec", exit_fees),
                            ("realized_gross_pnl_usd_dec", gross), ("realized_net_pnl_usd_dec", net)):
@@ -510,6 +603,17 @@ _NO_ORPHAN_MODELED_EVENTS_SQL = f"""NOT EXISTS(SELECT 1 FROM execution_events e
             AND modeled_final_witness_v1(a.event_type,a.event_id,a.bot_instance_id,a.position_id,a.created_at,a.payload_json,
                 NULL,NULL,NULL,NULL,NULL,NULL,e.event_type,e.event_id,e.bot_instance_id,e.position_id,e.created_at,e.payload_json,bot_instances.mode,
                 {_LEGACY_QUANTITY_SQL},{_ORIGINAL_ENTRY_SQL})=1))))"""
+_NATIVE_LEGACY_POSITION_SQL = "json_object(" + ",".join("'" + field + "',positions." + field for field in (
+    "position_id", "bot_instance_id", "signal_decision_id", "strategy_id", "strategy_version_label", "reason_code", "activation_epoch_id", "mint", "state",
+    "qty_dec", "entry_price_dec", "entered_notional_usd_dec", "entry_fee_usd_dec", "entry_fee_semantics", "fee_bps", "admitted_fee_bps",
+    "remaining_qty_dec", "remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec", "exit_price_dec", "exit_fee_usd_dec",
+    "exit_notional_usd_dec", "realized_gross_pnl_usd_dec", "realized_net_pnl_usd_dec", "pnl_evidence_class")) + ")"
+_NATIVE_LEGACY_RELEASE_SQL = f"""native_legacy_inventory_witness_v1({_NATIVE_LEGACY_POSITION_SQL},
+    (SELECT json_group_array(json_object('event_type',ne.event_type,'position_id',ne.position_id,
+        'bot_instance_id',ne.bot_instance_id,'created_at',ne.created_at,'payload_json',ne.payload_json))
+    FROM execution_events ne WHERE ne.position_id=positions.position_id
+    AND ne.event_type IN ('PAPER_SIMULATION_OBSERVED','SHADOW_EXECUTABLE_OBSERVED',
+        'PAPER_EXIT_OBSERVED','SHADOW_EXIT_EXECUTABLE_OBSERVED')),bot_instances.mode)=1"""
 _PROVED_RELEASE_SQL = f"""({_ALL_ATTEMPTS_FINAL_SQL}) AND ({_NO_ORPHAN_MODELED_EVENTS_SQL}) AND (
     (state='CANCELLED' AND (EXISTS(SELECT 1 FROM execution_events a
         WHERE a.position_id=positions.position_id AND a.event_type='MODELED_ATTEMPT_STARTED'
@@ -526,7 +630,7 @@ _PROVED_RELEASE_SQL = f"""({_ALL_ATTEMPTS_FINAL_SQL}) AND ({_NO_ORPHAN_MODELED_E
             AND json_extract(CASE WHEN json_valid(a.payload_json) THEN a.payload_json ELSE '{{}}' END,'$.side')='ENTRY'
             AND EXISTS(SELECT 1 FROM {_FINAL_WITNESS_JOIN_SQL}
                 AND json_extract(CASE WHEN json_valid(f.payload_json) THEN f.payload_json ELSE '{{}}' END,'$.outcome') IN ('LANDED_SUCCESS','PARTIAL')))))
-        OR (COALESCE(ordinary_operating,0)=0 AND {_NO_MODELED_EVENTS_SQL}))))"""
+        OR (COALESCE(ordinary_operating,0)=0 AND {_NO_MODELED_EVENTS_SQL} AND {_NATIVE_LEGACY_RELEASE_SQL}))))"""
 
 
 def _now() -> str:
@@ -632,6 +736,7 @@ def _connect_sqlite(path: Path, *, readonly: bool) -> sqlite3.Connection:
     conn.row_factory = sqlite3.Row
     conn.create_function("modeled_final_witness_v1", 21, _sql_modeled_final_witness, deterministic=True)
     conn.create_function("unattempted_cancel_witness_v1", 7, _sql_unattempted_cancel_witness, deterministic=True)
+    conn.create_function("native_legacy_inventory_witness_v1", 3, _sql_native_legacy_inventory_witness, deterministic=True)
     if readonly:
         try:
             # Validate actual source access now, so discovery can report an
@@ -2225,19 +2330,24 @@ def _effective_operating_scope(store, mode):
 
 
 def _operating_binding_block(store, *, mode, epoch_id, strategy_sha256=None, as_of=None):
+    return _operating_binding_records_block(store.get_execution_event("OPERATING-" + epoch_id),
+        store.get_execution_event(epoch_id), mode=mode, epoch_id=epoch_id,
+        strategy_sha256=strategy_sha256, as_of=as_of)
+
+
+def _operating_binding_records_block(event, original, *, mode, epoch_id, strategy_sha256=None, as_of=None):
     from solana_alpha_lab.factory.hfic_research_scope import sha256_of
     try:
-        event = store.get_execution_event("OPERATING-" + epoch_id)
         if event is None:
             return "OPERATING_BINDING_MISSING"
         body = event["payload"]
         activation = body["activation"]
         strategy = body["strategy"]
-        original = store.get_execution_event(epoch_id)
         if original is None:
             return "OPERATING_ACTIVATION_BINDING_INCOMPLETE"
         expected_bot = f"BOT-{strategy['strategy_id']}-{strategy['strategy_version']}-{mode}-{epoch_id}"
         if (event["event_type"] != "OPERATING_BINDING_COMMITTED"
+            or event["event_id"] != "OPERATING-" + epoch_id or original["event_id"] != epoch_id
             or sha256_of({key: value for key, value in body.items() if key != "binding_sha256"}) != body["binding_sha256"]
             or activation["epoch_id"] != epoch_id or activation["mode"] != mode
             or activation["evidence_class"] not in {"OBSERVED", "SYNTHETIC_OFFLINE"}
@@ -2260,6 +2370,66 @@ def _operating_binding_block(store, *, mode, epoch_id, strategy_sha256=None, as_
     return None
 
 
+def _operating_switch_lineage_block(*, mode, current, switches, bindings,
+                                    strategy_sha256=None, as_of=None, initializing=False):
+    """One original CAS/identity verifier for managed ingress and recovery cuts."""
+    from solana_alpha_lab.factory.hfic_research_scope import sha256_of
+    conflict = "OPERATING_SWITCH_STATE_CONFLICT"
+    try:
+        if (not isinstance(switches, list) or not switches or type(current["generation"]) is not int
+            or len(switches) != current["generation"] or len({event["event_id"] for event in switches}) != len(switches)
+            or switches[-1]["payload"]["epoch_id"] != current["epoch_id"]):
+            return conflict
+        previous = None
+        for event in switches:
+            body = event["payload"]
+            epoch = body["epoch_id"]
+            bundle = bindings[epoch]
+            activation, binding, profile_event = bundle["activation"], bundle["binding"], bundle["profile"]
+            if (set(event) != {"event_id", "event_type", "bot_instance_id", "position_id", "created_at", "payload"}
+                or event["event_type"] != "OPERATING_SWITCH_COMMITTED" or event["bot_instance_id"] is not None
+                or event["position_id"] is not None or not isinstance(event["event_id"], str)
+                or not event["event_id"].startswith("SWITCH-") or len(event["event_id"]) != 71
+                or any(char not in "0123456789abcdef" for char in event["event_id"][7:])
+                or set(body) != {"epoch_id", "at", "mode", "profile", "strategy_sha256", "expected_current_epoch"}
+                or body["mode"] != mode or body["expected_current_epoch"] != previous
+                or event["created_at"] != body["at"]):
+                return conflict
+            if profile_event is None:
+                return "OPERATING_PROFILE_REQUIRED"
+            profile = profile_event["payload"]
+            if (profile_event["event_type"] != "OPERATING_PROFILE_COMMITTED" or profile_event["event_id"] != "PROFILE-" + epoch
+                or profile_event["bot_instance_id"] is not None or profile_event["position_id"] is not None
+                or set(profile) != {"profile", "profile_sha256"} or not isinstance(profile["profile"], dict)
+                or profile["profile_sha256"] != sha256_of(profile["profile"]) or profile["profile"].get("mode") != mode):
+                return "OPERATING_PROFILE_INTEGRITY_CONFLICT"
+            if body["profile"] != profile["profile"] or profile_event["created_at"] != body["at"]:
+                return conflict
+            # The existing native initialization transaction stages current
+            # profile/switch before start_bot writes activation and binding.
+            if initializing and epoch == current["epoch_id"] and activation is None and binding is None:
+                if strategy_sha256 is None or body["strategy_sha256"] != strategy_sha256:
+                    return conflict
+            else:
+                block = _operating_binding_records_block(binding, activation, mode=mode, epoch_id=epoch)
+                if block:
+                    return block
+                if (activation["payload"]["at"] != body["at"]
+                    or body["strategy_sha256"] != binding["payload"]["strategy"]["spec_sha256"]):
+                    return conflict
+                if epoch == current["epoch_id"] and strategy_sha256 is not None:
+                    block = _operating_binding_records_block(binding, activation, mode=mode,
+                        epoch_id=epoch, strategy_sha256=strategy_sha256)
+                    if block:
+                        return block
+            if as_of is not None and _parse_utc(body["at"]) > _parse_utc(as_of):
+                return "DECISION_BEFORE_ACTIVATION"
+            previous = epoch
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return conflict
+    return None
+
+
 def _operating_entry_block(store, scope, *, epoch_id, strategy_sha256=None, as_of=None, initializing=False):
     from solana_alpha_lab.factory.hfic_research_scope import sha256_of
     if not scope["managed"]:
@@ -2278,16 +2448,21 @@ def _operating_entry_block(store, scope, *, epoch_id, strategy_sha256=None, as_o
             or set(body) != {"profile", "profile_sha256"} or not isinstance(profile, dict)
             or body["profile_sha256"] != sha256_of(profile) or profile.get("mode") != scope["mode"]):
             return "OPERATING_PROFILE_INTEGRITY_CONFLICT"
-        switches = [event for event in store.filtered_execution_events(event_type="OPERATING_SWITCH_COMMITTED")
-            if event["payload"].get("mode") == scope["mode"]]
-        if not switches or switches[-1]["payload"].get("epoch_id") != epoch_id:
-            return "OPERATING_SWITCH_STATE_CONFLICT"
-        switched = switches[-1]["payload"]
-        if (switched.get("profile") != profile or strategy_sha256 is not None
-            and switched.get("strategy_sha256") != strategy_sha256):
-            return "OPERATING_SWITCH_STATE_CONFLICT"
     except (ValueError, KeyError, TypeError, AttributeError):
         return "OPERATING_PROFILE_INTEGRITY_CONFLICT"
+    try:
+        switches = [event for event in store.filtered_execution_events(event_type="OPERATING_SWITCH_COMMITTED")
+            if event["payload"].get("mode") == scope["mode"]]
+        bindings = {event["payload"]["epoch_id"]: {
+            "activation": store.get_execution_event(event["payload"]["epoch_id"]),
+            "binding": store.get_execution_event("OPERATING-" + event["payload"]["epoch_id"]),
+            "profile": store.get_execution_event("PROFILE-" + event["payload"]["epoch_id"])} for event in switches}
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return "OPERATING_SWITCH_STATE_CONFLICT"
+    block = _operating_switch_lineage_block(mode=scope["mode"], current=scope["state"], switches=switches,
+        bindings=bindings, strategy_sha256=strategy_sha256, as_of=as_of, initializing=initializing)
+    if block:
+        return block
     return None if initializing else _operating_binding_block(store, mode=scope["mode"], epoch_id=epoch_id,
         strategy_sha256=strategy_sha256, as_of=as_of)
 

@@ -639,7 +639,10 @@ class OperatingDriverTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "NATIVE_ACTIVATION_FAILURE"):
                 coordinator.activate(epoch_id=self.epoch, at="2026-10-05T12:41:00Z", profile=old_profile,
                     switch_key="ROLLBACK-PATCH", expected_current_epoch=old_epoch)
-        self.assertEqual(self.runner.readback(), before)
+        # Refusal atomicity compares the same readback clock; elapsed wall time
+        # can cross a second even when all native state is unchanged.
+        with patch("solana_alpha_lab.factory.paper_shadow_operations._now", return_value=before["as_of"]):
+            self.assertEqual(self.runner.readback(), before)
         store = PaperPlaneStore(self.runner.store_path, readonly=True)
         try:
             self.assertEqual(store.execution_events(), events)
@@ -665,6 +668,163 @@ class OperatingDriverTests(unittest.TestCase):
         self.assertEqual(replay["attempt_id"], claim["attempt_id"])
         legacy = self.runner.activate(epoch_id="ACTIVATION-EPOCH-LEGACY-NEIGHBOR", mode="PAPER", at="2026-10-05T12:40:00Z")
         self.assertFalse(legacy["idempotent"])
+
+    def test_native_unmodeled_legacy_projection_cannot_free_managed_cap(self):
+        from solana_alpha_lab.factory.paper_plane import (
+            PaperPlaneError, accept_signal_decision, assert_quantity_inventory_witness,
+        )
+        from solana_alpha_lab.factory.trading_runtime_policy import obligation_summary, enforce_operating_envelope
+
+        self.prepare(operating=False)
+        legacy_runner = self.runner
+        packet = continuity_fixture.OrdinarySourceTests.decision(self)
+        at = "2026-10-05T12:40:00Z"
+        store = PaperPlaneStore(legacy_runner.store_path)
+        try:
+            def legacy_accept():
+                return accept_signal_decision(self.root, store, strategy=legacy_runner.strategy,
+                    signal_decision=packet["decision"], known_activation_epochs=legacy_runner._epoch(store, self.epoch, "PAPER"),
+                    mode="PAPER", as_of=at)
+
+            opened = legacy_accept()  # Released public default skip_fill=False.
+            pid = opened["position_id"]
+            original = store.apply_paper_entry_fill(position_id=pid, entry_unit_price_usd="0.000003",
+                entry_gross_notional_usd="30", fee_bps=20, mode="PAPER")
+            self.assertEqual(original["state"], "OPEN")
+            self.assertEqual(Decimal(original["qty_dec"]), Decimal("10000000"))
+            self.assertEqual(original["entered_notional_usd_dec"], "30")
+            self.assertIsNone(original["ordinary_operating"])
+            self.assertIsNone(original["entry_fee_semantics"])
+            remainder_fields = ("remaining_qty_dec", "remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec")
+            self.assertTrue(all(original[field] is None for field in remainder_fields))
+            original_events = store.filtered_execution_events(position_ids=[pid])
+            self.assertFalse(any(event["event_type"].startswith("MODELED_") for event in original_events))
+            self.assertFalse(any("EXIT" in event["event_type"] for event in original_events))
+            self.assertEqual(len([event for event in original_events if event["event_type"] == "PAPER_SIMULATION_OBSERVED"]), 1)
+            before_replay = store.execution_events()
+            self.assertTrue(legacy_accept()["idempotent"])
+            self.assertEqual(store.apply_paper_entry_fill(position_id=pid, entry_unit_price_usd="0.000003",
+                entry_gross_notional_usd="30", fee_bps=20, mode="PAPER"), original)
+            self.assertEqual(store.execution_events(), before_replay)
+            assert_quantity_inventory_witness(store, original, allow_pending=True)
+        finally:
+            store.close()
+
+        stopped = legacy_runner.command({"command_type": "STOP_BOT", "idempotency_key": "LEGACY-NATIVE-CAP-DRAIN",
+            "bot_instance_id": original["bot_instance_id"]})
+        self.assertEqual(stopped["bot_status"], "DRAINING")
+        self.start_operating(suffix="-MANAGED", envelope_limits={"max_outstanding_positions": 2,
+            "max_outstanding_cost_basis_usd": "40"})
+        store = PaperPlaneStore(self.runner.store_path)
+        rows = []
+        try:
+            positive = obligation_summary(store, mode="PAPER")
+            self.assertEqual(positive["inventory_status"], "KNOWN")
+            self.assertEqual(positive["outstanding_cost_basis_usd"], "30")
+            self.assertEqual(enforce_operating_envelope(store, mode="PAPER", admitted_notional_usd="30")["reason_code"],
+                "OUTSTANDING_COST_BASIS_LIMIT")
+            cases = {"remaining-tuple": {"remaining_qty_dec": "1000000", "remaining_cost_basis_usd_dec": "3",
+                    "remaining_entry_fee_usd_dec": "0.006"}, "remaining-cost-only": {"remaining_cost_basis_usd_dec": "3"},
+                "remaining-qty-only": {"remaining_qty_dec": "1000000"}, "remaining-fee-only": {"remaining_entry_fee_usd_dec": "0.006"},
+                "base-cost-only": {"entered_notional_usd_dec": "3"}, "base-qty-only": {"qty_dec": "1000000"},
+                "coherent-base-tuple": {"qty_dec": "1000000", "entered_notional_usd_dec": "3", "entry_fee_usd_dec": "0.006"},
+                "base-fee-only": {"entry_fee_usd_dec": "0.006"}, "base-price-only": {"entry_price_dec": "0.00003"},
+                "forged-terminal-no-original-exit": {"state": "RECONCILED", "exit_price_dec": "0.0000033",
+                    "exit_notional_usd_dec": "33", "exit_fee_usd_dec": "0.07", "realized_gross_pnl_usd_dec": "3",
+                    "realized_net_pnl_usd_dec": "2.87", "pnl_evidence_class": "PAPER_RECONCILED_MODEL"}}
+            base_fields = ("qty_dec", "entered_notional_usd_dec", "entry_fee_usd_dec", "entry_price_dec")
+            exit_fields = ("state", "exit_price_dec", "exit_notional_usd_dec", "exit_fee_usd_dec",
+                "realized_gross_pnl_usd_dec", "realized_net_pnl_usd_dec", "pnl_evidence_class")
+            for damage, changed in cases.items():
+                with self.subTest(projection=damage):
+                    with store.immediate_write():
+                        for field in (*remainder_fields, *base_fields, *exit_fields):
+                            store._conn.execute("UPDATE positions SET " + field + "=? WHERE position_id=?",
+                                (changed.get(field, original[field]), pid))
+                    with self.assertRaisesRegex(PaperPlaneError, "^EXIT_INVENTORY_WITNESS_CONFLICT$"):
+                        assert_quantity_inventory_witness(store, store.get_position(pid), allow_pending=True)
+                    summary = obligation_summary(store, mode="PAPER")
+                    self.assertEqual(summary["inventory_status"], "UNKNOWN")
+                    self.assertIsNone(summary["outstanding_cost_basis_usd"])
+                    self.assertEqual(Decimal(summary["known_cost_basis_floor_usd"]), Decimal("30"))
+                    self.assertEqual(enforce_operating_envelope(store, mode="PAPER", admitted_notional_usd="30")["reason_code"],
+                        "OUTSTANDING_OBLIGATIONS_UNKNOWN")
+                    denied = self.runner.episode(source_relative="source/observation_schedule_state.sqlite",
+                        episode_id=self.admission["episode_id"], epoch_id=self.epoch, mode="PAPER", as_of=at,
+                        ordinary_operating=True)["admission"]
+                    self.assertEqual(denied["outcome"], "DENIED")
+                    self.assertEqual(denied["reason_code"], "OUTSTANDING_OBLIGATIONS_UNKNOWN")
+                    self.assertIsNone(denied["position_id"])
+                    self.assertEqual(len(store.positions()), 1)
+                    self.assertEqual(store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED"), [])
+                    self.assertEqual(store.filtered_execution_events(event_type="ADAPTER_REQUEST_BOUND"), [])
+                    self.assertEqual(store.filtered_execution_events(event_type="MODELED_RESULT_ACCEPTED"), [])
+                    self.assertEqual(store.filtered_execution_events(position_ids=[pid]), original_events)
+                    rows.append({"projection": damage, "inventory": summary["inventory_status"],
+                        "known_original_floor_usd": summary["known_cost_basis_floor_usd"], "native_new_admission": denied["outcome"],
+                        "reason": denied["reason_code"], "new_attempt_request_result": 0})
+            with store.immediate_write():
+                for field in (*remainder_fields, *base_fields, *exit_fields):
+                    store._conn.execute("UPDATE positions SET " + field + "=? WHERE position_id=?", (original[field], pid))
+            assert_quantity_inventory_witness(store, store.get_position(pid), allow_pending=True)
+            self.assertEqual(obligation_summary(store, mode="PAPER")["outstanding_cost_basis_usd"], "30")
+            native_entry = next(event for event in original_events if event["event_type"] == "PAPER_SIMULATION_OBSERVED")
+            entry_row = dict(store._conn.execute("SELECT rowid AS retained_rowid,* FROM execution_events WHERE event_id=?",
+                (native_entry["event_id"],)).fetchone())
+            with store.immediate_write():
+                store._conn.execute("DELETE FROM execution_events WHERE event_id=?", (native_entry["event_id"],))
+            with self.assertRaisesRegex(PaperPlaneError, "^EXIT_INVENTORY_WITNESS_CONFLICT$"):
+                assert_quantity_inventory_witness(store, store.get_position(pid), allow_pending=True)
+            self.assertEqual(obligation_summary(store, mode="PAPER")["inventory_status"], "UNKNOWN")
+            self.assertEqual(enforce_operating_envelope(store, mode="PAPER", admitted_notional_usd="30")["reason_code"],
+                "OUTSTANDING_OBLIGATIONS_UNKNOWN")
+            with store.immediate_write():
+                store._conn.execute("INSERT INTO execution_events(rowid,event_id,event_type,bot_instance_id,position_id,created_at,payload_json) "
+                    "VALUES(?,?,?,?,?,?,?)", tuple(entry_row[field] for field in ("retained_rowid", "event_id", "event_type",
+                        "bot_instance_id", "position_id", "created_at", "payload_json")))
+            self.assertEqual(store.filtered_execution_events(position_ids=[pid]), original_events)
+            closed = store.apply_paper_exit_fill(position_id=pid, exit_unit_price_usd="0.0000033", mode="PAPER")
+            self.assertEqual(closed["state"], "RECONCILED")
+            self.assertTrue(all(closed[field] is None for field in remainder_fields))
+            assert_quantity_inventory_witness(store, closed, allow_pending=True)
+            released = obligation_summary(store, mode="PAPER")
+            self.assertEqual(released["inventory_status"], "KNOWN")
+            self.assertEqual(released["position_count"], 0)
+            self.assertEqual(store.obligation_positions("PAPER"), [])
+            self.assertEqual(enforce_operating_envelope(store, mode="PAPER", admitted_notional_usd="30")["decision"], "ALLOW")
+            self.assertEqual(store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED"), [])
+            self.assertEqual(store.filtered_execution_events(event_type="MODELED_RESULT_ACCEPTED"), [])
+            self.assertTrue(all(event in store.filtered_execution_events(position_ids=[pid]) for event in original_events))
+            complete_events = store.filtered_execution_events(position_ids=[pid])
+            native_exit = next(event for event in complete_events if event["event_type"] == "PAPER_EXIT_OBSERVED")
+            exit_row = dict(store._conn.execute("SELECT rowid AS retained_rowid,* FROM execution_events WHERE event_id=?",
+                (native_exit["event_id"],)).fetchone())
+            with store.immediate_write():
+                store._conn.execute("DELETE FROM execution_events WHERE event_id=?", (native_exit["event_id"],))
+            with self.assertRaisesRegex(PaperPlaneError, "^EXIT_INVENTORY_WITNESS_CONFLICT$"):
+                assert_quantity_inventory_witness(store, store.get_position(pid), allow_pending=True)
+            missing_exit = obligation_summary(store, mode="PAPER")
+            self.assertEqual(missing_exit["inventory_status"], "UNKNOWN")
+            self.assertEqual(missing_exit["position_count"], 1)
+            self.assertEqual(Decimal(missing_exit["known_cost_basis_floor_usd"]), Decimal("30"))
+            self.assertEqual(enforce_operating_envelope(store, mode="PAPER", admitted_notional_usd="30")["reason_code"],
+                "OUTSTANDING_OBLIGATIONS_UNKNOWN")
+            with store.immediate_write():
+                store._conn.execute("INSERT INTO execution_events(rowid,event_id,event_type,bot_instance_id,position_id,created_at,payload_json) "
+                    "VALUES(?,?,?,?,?,?,?)", tuple(exit_row[field] for field in ("retained_rowid", "event_id", "event_type",
+                        "bot_instance_id", "position_id", "created_at", "payload_json")))
+            self.assertEqual(store.filtered_execution_events(position_ids=[pid]), complete_events)
+            self.assertEqual(store.obligation_positions("PAPER"), [])
+            self.metrics = {"native_legacy": "DEFAULT_PUBLIC_FILL_AND_NATIVE_ACCOUNTING", "original_cost_usd": "30",
+                "original_quantity": original["qty_dec"], "original_entry_observation_sha256": sha256_of(next(
+                    event["payload"] for event in original_events if event["event_type"] == "PAPER_SIMULATION_OBSERVED")),
+                "original_journal_sha256": sha256_of(original_events), "managed_cap_usd": "40", "cases": rows,
+                "native_stop": "DRAINING", "managed_activation": "SUCCEEDED", "null_legacy_replay": "EXACT_NO_EVENT_DRIFT",
+                "restored_all_null_inventory": "KNOWN_30", "missing_original_entry": "UNKNOWN_NO_HEADROOM",
+                "legacy_full_exit": "RECONCILED_RELEASED_EXCLUDED", "missing_original_exit": "UNKNOWN_RETAINED_30",
+                "original_native_exit_sha256": sha256_of(native_exit["payload"]), "modeled_attempts_results": 0}
+        finally:
+            store.close()
 
     def test_C05_C06_real_loss_after_claim_paper_reconciles(self):
         self.start_operating()
@@ -1036,6 +1196,92 @@ class OperatingDriverTests(unittest.TestCase):
             "corrupt_policy": "ACTION_REQUIRED", "original_inventory_status": "KNOWN",
             "db_wal_bytes_unchanged_by_native_json_human_readback": True,
             "old_exit_after_policy_corruption": "RECONCILED", "pending_attempts": 0}
+
+    def test_common_original_switch_lineage_blocks_ingress_and_readiness_before_first_effect(self):
+        from solana_alpha_lab.factory.paper_plane import _effective_operating_scope, _operating_entry_block
+        self.start_operating()
+        rows = []
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            original = store.filtered_execution_events(event_type="OPERATING_SWITCH_COMMITTED")[0]
+            self.assertEqual(_operating_entry_block(store, _effective_operating_scope(store, "PAPER"),
+                epoch_id=self.epoch, as_of="2026-09-30T23:59:59Z"), "DECISION_BEFORE_ACTIVATION")
+            for alteration in ("INITIAL_CAS", "STRATEGY", "GENERATION", "CHAIN_COUNT"):
+                with self.subTest(alteration=alteration):
+                    damaged = json.loads(json.dumps(original["payload"]))
+                    if alteration == "INITIAL_CAS":
+                        damaged["expected_current_epoch"] = "ACTIVATION-EPOCH-NONEXISTENT"
+                    elif alteration == "STRATEGY":
+                        damaged["strategy_sha256"] = "f" * 64
+                    with store.immediate_write():
+                        if alteration == "GENERATION":
+                            store._conn.execute("UPDATE ordinary_state SET generation=2 WHERE mode='PAPER'")
+                        elif alteration == "CHAIN_COUNT":
+                            store.append_execution_event(**{**original, "event_id": "SWITCH-" + "e" * 64})
+                        else:
+                            store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(damaged), original["event_id"]))
+                    self.assertEqual(_operating_entry_block(store, _effective_operating_scope(store, "PAPER"),
+                        epoch_id=self.epoch, as_of="2026-10-05T12:40:00Z"), "OPERATING_SWITCH_STATE_CONFLICT")
+                    tick = self.coordinator.tick()
+                    self.assertFalse(tick["entries_enabled"])
+                    self.assertEqual(tick["attempts"], 0)
+                    packet = self.runner.episode(source_relative="source/observation_schedule_state.sqlite",
+                        source_path=self.source.data_root / "observation_schedule_state.sqlite",
+                        episode_id=self.admission["episode_id"], epoch_id=self.epoch, mode="PAPER", as_of="2026-10-05T12:40:00Z")
+                    self.assertEqual(packet["decision"]["action"], "ENTER")
+                    self.assertEqual(packet["admission"]["reason_code"], "OPERATING_SWITCH_STATE_CONFLICT")
+                    paths = [self.runner.store_path, Path(str(self.runner.store_path) + "-wal"), Path(str(self.runner.store_path) + "-shm")]
+                    before = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}
+                    for view in (self.coordinator.status(), self.invoke("status", as_of="2026-10-05T12:40:00Z")):
+                        self.assertEqual(view["status"], "ACTION_REQUIRED")
+                        self.assertFalse(view["entries_enabled"])
+                        self.assertFalse(view["integrity_verified"])
+                        self.assertEqual(view["operating_configuration_status"], "OPERATING_SWITCH_STATE_CONFLICT")
+                        self.assertEqual(view["inventory"]["inventory_status"], "KNOWN")
+                        self.assertEqual(view["next_safe_action"], "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING")
+                    self.assertEqual({path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}, before)
+                    for key in ("positions", "modeled_attempts", "modeled_results"):
+                        self.assertEqual(self.runner.readback()[key], [])
+                    rows.append({"alteration": alteration, "reason": packet["admission"]["reason_code"],
+                        "tick_entries_enabled": False, "native_and_cold_status": "ACTION_REQUIRED",
+                        "positions": 0, "attempts": 0, "results": 0, "readonly_db_wal_shm_unchanged": True})
+                    with store.immediate_write():
+                        store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(original["payload"]), original["event_id"]))
+                        store._conn.execute("DELETE FROM execution_events WHERE event_id=?", ("SWITCH-" + "e" * 64,))
+                        store._conn.execute("UPDATE ordinary_state SET generation=1 WHERE mode='PAPER'")
+            tick = self.coordinator.tick()
+            self.assertTrue(tick["entries_enabled"])
+            self.assertEqual(tick["attempts"], 1)
+            self.assertEqual(self.runner.readback()["positions"][0]["state"], "OPEN")
+        self.metrics = {"cases": rows, "positive_original_attempts": 1, "positive_original": "OPEN",
+            "honest_before_activation_clock": "DECISION_BEFORE_ACTIVATION"}
+
+    def test_native_successor_initialization_checks_previous_original_chain_atomically(self):
+        self.start_operating()
+        old_epoch, old_profile = self.epoch, self.profile
+        self.prepare(operating=True, suffix="-B", negative=True, exit_point="E3600")
+        coordinator = TradingCoordinator(self.runner, mode="PAPER", clock=lambda: self.now)
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            original = store.filtered_execution_events(event_type="OPERATING_SWITCH_COMMITTED")[0]
+            body = {**original["payload"], "expected_current_epoch": "ACTIVATION-EPOCH-NONEXISTENT"}
+            store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(body), original["event_id"]))
+            before = list(store._conn.iterdump())
+            with self.assertRaisesRegex(ValueError, "^OPERATING_SWITCH_STATE_CONFLICT$"):
+                coordinator.activate(epoch_id=self.epoch, at="2026-10-05T12:41:00Z", profile=old_profile,
+                    switch_key="ORIGINAL-CHAIN-B", expected_current_epoch=old_epoch)
+            self.assertEqual(list(store._conn.iterdump()), before)
+            store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(original["payload"]), original["event_id"]))
+            switched = coordinator.activate(epoch_id=self.epoch, at="2026-10-05T12:41:00Z", profile=old_profile,
+                switch_key="ORIGINAL-CHAIN-B", expected_current_epoch=old_epoch)
+            self.assertEqual(switched["generation"], 2)
+            latest = store.filtered_execution_events(event_type="OPERATING_SWITCH_COMMITTED")[-1]
+            body = {**latest["payload"], "expected_current_epoch": None}
+            store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(body), latest["event_id"]))
+            self.now = datetime(2026, 10, 5, 12, 41, tzinfo=UTC)
+            self.assertFalse(coordinator.tick()["entries_enabled"])
+            self.assertEqual(coordinator.status()["operating_configuration_status"], "OPERATING_SWITCH_STATE_CONFLICT")
+            self.assertEqual(store.positions(), [])
+        self.metrics = {"invalid_previous_chain": "ATOMIC_DENIAL", "initializing_current_binding": "NATIVE_COMPATIBLE",
+            "positive_successor_generation": 2, "successor_predecessor_conflict": "OPERATING_SWITCH_STATE_CONFLICT", "attempts": 0}
 
     def test_current_switch_conflict_blocks_readiness_without_unknown_original_inventory_or_exit_starvation(self):
         self.start_operating()

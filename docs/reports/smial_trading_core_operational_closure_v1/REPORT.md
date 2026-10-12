@@ -1,10 +1,11 @@
 # SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1
 
-VERDICT: ENGINEERING_PASS_CANDIDATE. Current native proof и consumers/cold CLI
-повторены после закрытия четырёх границ frozen970 review. Исторический176 PASS
-сохранён отдельно и не подменяет текущий181 PASS. Required reviews и exact-head
-CI/readiness остаются обязательными отдельными gates. Owner acceptance,
-runtime commissioning и merge authority этим отчётом не предоставляются.
+VERDICT: ENGINEERING_PASS_CANDIDATE_PENDING_EXACT_DELIVERY_GATES. Обычный software outcome подтверждён свежими186 native tests, 99 consumers,2 clock probes и24 cold CLI этапами на текущих байтах.
+Исходные F-A/F-B и последующие P1 воспроизведены через native paths и закрыты
+в существующих owners. Historical NOT_READY/PASS/FAIL сохранены с исходными
+pins; они не подменяют текущий proof. Четыре свежие isolated P0/P1 роли,
+exact-head CI/readiness и отдельная owner phrase остаются delivery gates.
+Owner acceptance, рабочая activation и merge этим отчётом не предоставляются.
 Base: `ba87f8e339d5cc3aa55322801ae56e3f92369446`; exact content fingerprint,
 review inventory и CI связываются Delivery Harness. Green local tests не
 являются owner acceptance либо merge authority.
@@ -79,7 +80,7 @@ packet через current native source/store owners. Это проверка п
 
 ## C01–C24
 
-Native automated status: PASS, 181 tests, 654.49181s; source bytes до/после
+Native automated status: PASS, 186 tests, 674.051268s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -195,6 +196,31 @@ events совместим только при уже сохранённой exac
 из-за неверного producer fixture сохранён; corrected native producer отдельно
 зафиксирован. Whole proof и четыре review-роли этим targeted receipt не заявлены.
 
+Frozen27a9 четыре isolated P0/P1 роли дали actual NOT_READY. CODE native
+изменил только initial SWITCH.expected_current_epoch и получил OPEN; GOAL/OWNER
+изменили только original SWITCH.strategy_sha256 и получили ENTER DENIED при
+false READY. Packet-only ARCH использовал genuine PAPER v1.0: original entry
+$30/10M, cap$40, без EXIT; remaining1M/$3/fee$0.01 при неизменённом original
+journal превратил новый$30 из DENIED в ALLOW. Дополнительный effect не выполнялся.
+Before carriers и пять exact historical27a9 proofs сохранены отдельно.
+
+Общий PaperPlane verifier теперь сверяет полную original SWITCH/CAS/count/
+generation/activation/binding/profile цепочку для live ingress, health и cold
+recovery. Health проверяет original strategy независимо от caller SHA.
+Native initialization допускает только свой staged current activation/binding;
+previous chain обязательна, отказ атомарен. Original witness validation также
+проверяет присутствующие native v1.0 quantity/cost/fee остатки: неподтверждённый
+остаток даёт UNKNOWN и не освобождает envelope headroom. Старый повреждённый
+origin может штатно получить EXIT_REQUIRED после своего EXIT decision, но
+нового EXIT attempt/request/result нет; здоровый сосед завершается.
+Genuine unmanaged legacy сохраняет original packet/replay. В общем managed envelope
+его positive inventory требует original native ENTRY/full EXIT; отсутствующее
+подтверждение остаётся UNKNOWN, без нового modeled journal или legacy partial feature. Native modeled v1.0 с
+absent/null остатком, original replay/full terminal и partial-v1.1 сохранены.
+Targeted21/21 PASS за56.597423s; реальные Decimal-format и EXIT_REQUIRED oracle
+FAIL сохранены в [remediation](../../evidence/smial_trading_core_operational_closure_v1/review-27a9-common-lineage-remediation.json).
+Этот targeted receipt не заменяет свежий whole outcome либо четыре review-роли.
+
 [Исходный S08/S13 report](../smial_trading_continuity_v1/REPORT.md) сохраняет
 REPAIR_PARTIAL_BLOCKED своего scope. Negative same-ID V2 не стал positive.
 D1 явно заменил текущий operational successor критерий на разные accepted
@@ -202,7 +228,7 @@ V1 identities; новый A/B native proof проверяет именно эт�
 
 | Класс | Остаток |
 |---|---|
-| SOFTWARE_GAP/EVIDENCE_GAP | По завершённым current native proof известных critical software gaps=0. Raw-unit-zero, malformed postclaim response, truthful current SWITCH health и post-backup successor recovery имеют native after. Required-review verdict, exact inventory и delivery остаются отдельным обязательным gate |
+| SOFTWARE_GAP/EVIDENCE_GAP | Mandatory C01–C24 и operating PATCH закрыты current native proof. Original SWITCH/CAS и modeled/native legacy ENTRY/full EXIT проверяются общими owners; unsupported projections удерживают UNKNOWN и exposure floor. Targeted22 и final whole proof имеют отдельные exact pins. Historical185 PASS и failed186 clock oracle не retagged. Fresh four-role review и live exact-head CI/readiness обязательны до owner phrase |
 | CONFIG_REQUIRED | Real eligible strategy, scope/runtime/source, explicit model/envelope/TTL/limits, timely funding producer/cadence |
 | EXTERNAL_UNVERIFIED | Real quote latency/schema/route/quota/credentials, target-host supervision, independent ledger custody; separate owner operation |
 | NOT_CONFIGURED | Scientific monitor/degrade thresholds; software health не experiment policy |
@@ -238,28 +264,28 @@ before/after и прежний scoped review PASS сохранены в
 purpose lifecycle-маршрута: IDs, вопросы, ссылки и authority сохранены; новый
 размер 16349 bytes, прямой semantic consumer module — 15 PASS.
 
-Peak suite process RSS: 147591168 bytes (140.75 MiB). Native 14-day producer
+Peak suite process RSS: 147189760 bytes (140.37 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.2113–0.3043s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.2061–0.2363s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04950–0.05655 |
-| 1000 | 364544 | 0.04637–0.05165 |
-| 4000 | 843776 | 0.04840–0.05766 |
+| 0 | 204800 | 0.04984–0.05295 |
+| 1000 | 364544 | 0.04702–0.05773 |
+| 4000 | 843776 | 0.04746–0.05248 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 980 | 0.000663 |
-| 100 proved terminal | 78430 | 0.015224 |
-| 1000 proved terminal | 774540 | 0.159074 |
-| 1000 terminal + 12000 unrelated events | 774560 | 0.155868 |
+| 1 outstanding | 1010 | 0.000639 |
+| 100 proved terminal | 78460 | 0.015540 |
+| 1000 proved terminal | 774570 | 0.157062 |
+| 1000 terminal + 12000 unrelated events | 774590 | 0.181779 |
 
-Native history preparation: 13.083s.
+Native history preparation: 13.360s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.
@@ -288,3 +314,18 @@ binding/preflight → normal task push/one PR → exact-head CI → readiness.
 Актуальные verdicts/pins находятся в completion/independent-review/factory-fit;
 этот отчёт не объявляет delivery выполненной до этих readbacks.
 Рабочий runtime/provider/deploy здесь не запускались.
+
+Дополнительная legacy-граница закрыта в существующем PaperPlane owner:
+original native ENTRY/full EXIT проверяются до освобождения managed-лимита,
+включая SQL terminal predicate. Неподтверждённые base/remaining/terminal
+проекции сохраняют UNKNOWN и исходный exposure floor. Genuine all-NULL replay
+и полный EXIT сохранены; новая legacy partial functionality не добавлена.
+22 scoped native checks PASS за60.2148304s на стабильных16 pins; это targeted
+repair evidence, отдельно от итогового whole proof и четырёх review verdicts.
+
+Прямое решение owner задаёт60 минут на каждый CI job только для #398 и его
+обычного merge в main. Другие PR/main сохраняют прежние бюджеты. Если native
+gate выбирает trusted tracked-only fallback, его лимит на этой task branch/
+contract —3600s; выбор gate не меняется.50 affected CI tests PASS. Лимит каждого
+job не является общим wall-time пределом workflow. Merge/post-merge пока
+NOT_EXECUTED: необходима отдельная machine-rendered owner phrase.

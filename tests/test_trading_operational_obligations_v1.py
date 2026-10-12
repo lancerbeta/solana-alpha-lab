@@ -773,9 +773,16 @@ class OperatingObligationsTests(StoreCase):
         event = next(event for event in store.execution_events() if event["event_type"] == "MODELED_RESULT_ACCEPTED")
         self.assertEqual(event["payload"]["result"], result)
         self.assertNotIn("schema_version", event["payload"]["result"])
+        original = store.get_position(admitted["position_id"])
+        self.assertFalse(original["ordinary_operating"])
+        self.assertTrue(all(original[key] is None for key in ("entry_fee_semantics", "remaining_qty_dec", "remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec")))
+        assert_quantity_inventory_witness(store, original)
         before = store.execution_events()
         accept_modeled_result(store, result=result)
         self.assertEqual(store.execution_events(), before)
+        self.assertEqual(store.get_position(admitted["position_id"]), original)
+        self.metrics = {"genuine_unmanaged_v1_0": True, "remaining_tuple": "ABSENT", "original_payload_and_replay_unchanged": True,
+            "result_payload_sha256": canonical_spec_sha256(event["payload"])}
 
     def test_entry_price_quantity_notional_conflict_rejected_atomically(self):
         store = self.store()

@@ -9,7 +9,7 @@ permissions:
 jobs:
   watch-and-pulse:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: "${{ (github.repository == 'lancerbeta/solana-alpha-lab' && ((github.event_name == 'pull_request' && github.event.pull_request.number == 398 && github.event.pull_request.head.ref == 'codex/smial-trading-core-operational-closure-v1') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'Merge pull request #398 from lancerbeta/codex/smial-trading-core-operational-closure-v1')))) && 60 || 20 }}"
     env:
       UV_NO_ENV_FILE: "1"
       PYTHONDONTWRITEBYTECODE: "1"

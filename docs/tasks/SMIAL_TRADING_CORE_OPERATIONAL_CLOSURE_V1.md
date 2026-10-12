@@ -15,6 +15,11 @@ git_binding:
   dirty_mode: ALLOW_REPORTED
 objective: Complete the ordinary source-driven PAPER/SHADOW software operating path, including durable activation, automatic adapters, successor continuity, shared outstanding-obligation envelope, originating exits, partial accounting, cold recovery, truthful readback and ownership cleanup, without operational or financial authority.
 managed_write_set:
+- .github/workflows/ci.yml
+- .github/workflows/factory-operability-resource-proof.yml
+- scripts/validate_ci.py
+- scripts/render_ci_workflow.py
+- tests/test_ci.py
 - docs/tasks/SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1.md
 - docs/evidence/smial_trading_core_operational_closure_v1/**
 - docs/reports/smial_trading_core_operational_closure_v1/**
@@ -287,3 +292,80 @@ The original switch chain, not a reconstructed current pointer, now supports
 cross-snapshot ACK/pause/explicit RESUME and eligible successor entry.
 Full affected outcome/consumers/clock/cold proof and four fresh isolated roles
 remain required for this candidate; the owner PATCH grants no merge authority.
+
+Frozen27a9d076 all four actual isolated P0/P1 roles returned NOT_READY.
+Native CODE changes only initial SWITCH.expected_current_epoch and still gets
+one OPEN entry; GOAL/OWNER change only original SWITCH.strategy_sha256 and get
+fresh ENTER DENIED but false READY/entries_enabled/integrity_verified. Native
+packet-only ARCH uses genuine ordinary PAPER v1.0: original entry30/no EXIT,
+mutable remaining1M/cost3/fee0.01, unchanged journal, shared cap40. New30 moves
+from DENIED to ALLOW and status remains READY. No additional effect was sent.
+Retain actual before facts, measurement gaps and five byte-exact27a9 proof
+archives. One bounded repair shares complete original SWITCH/CAS/count/
+generation/activation/binding/profile validation between common PaperPlane
+ingress, health and existing recovery, and extends original inventory-witness
+validation to native v1.0 residual projections. No new store/schema/adapter
+version/policy authority. Genuine legacy, original reconciliation/no-resend,
+restore fence/ACK pause, old EXIT independence and atomic refusals remain.
+After final source freeze rerun affected native outcome,99 consumers,2 clocks,
+24 cold CLI stages plus2 final semantic navigation calls, and all four fresh
+P0/P1-only roles. Exact-head CI/readiness and separate owner phrase remain;
+this pending replan grants no merge or external authority.
+
+Final common-owner source freeze:21/21 selected native checks PASS in56.597423s,
+16 source pins stable before/after; four new exact regression IDs and two
+actual oracle FAIL corrections retained in review-27a9-common-lineage-remediation.json.
+Native initializing predecessor/CAS refusal stays atomic; real PAPER v1.0
+tuple/cost-only/quantity-only/fee-only damage cannot create new headroom or
+EXIT effect. Damaged origin may retain its legitimate EXIT_REQUIRED decision,
+healthy old neighbor completes. Genuine legacy original packets/replay/full
+v1.0 terminal and current partial-v1.1 remain compatible. Fresh full affected
+proofs, final navigation, four roles and exact-head gates remain mandatory.
+
+Supplemental native boundary check on frozen uncommitted source16 (not a new
+reviewed Git head) reproduced the same remaining-projection authority gap on
+genuine legacy public owners. Default skip_fill=False accepted SignalDecision,
+native apply_paper_entry_fill created original OPEN30/10M/fee0.06 without
+MODELED events; native STOP_BOT APPLIED and managed B activation succeeded.
+Only remaining_*=(1M,3,0.006) changed: original journal unchanged, KNOWN30/
+new30 DENIED became KNOWN3/new30 ALLOW, then actual B reservation30 and shared
+attempt send_permitted=true (attempt1/results0). Tick/status were not run and
+remain UNKNOWN. Before and actual fixture bootstrap failure are retained
+byte-for-byte, together with185/99/2/cold24 historical proof carriers.
+Close unsupported positive legacy remaining projections in the existing
+witness owner using its existing typed conflict, while genuine absent/all-NULL
+legacy/full EXIT/replay stay compatible. Do not introduce a new legacy partial
+feature or force genuine no-MODELED history into the modeled fold. Re-run
+current proof/final navigation/four reviews/exact-head gates after finalfreeze.
+
+Native legacy remediation completed22/22 scoped checks PASS in60.2148304s,
+with16 source pins stable. One pure PaperPlane verifier proves the original
+native ENTRY/full EXIT and is reused by cumulative admission and SQL release
+via a deterministic UDF. Unsupported base/remainder or forged terminal
+projections retain typed UNKNOWN and the original exposure floor. Missing
+original ENTRY/EXIT stays UNKNOWN; genuine all-NULL replay and full EXIT
+remain valid. Exact executed cases, actual before and fixture corrections,
+source pins and owned cleanup are retained in the new remediation receipt.
+
+First186 affected run completed185 PASS/1 FAIL in672.642169s. Native refusal
+readbacks straddled adjacent wall-clock seconds at the equality oracle; the
+complete historical diff was truncated and remains UNKNOWN. Exact FAIL receipt
+is archived before any oracle change. The existing test now compares at one
+projection time and retains complete native journal/state rollback assertions:
+targeted1 PASS in3.793863s, production source unchanged. Final affected proof,
+99 consumers/2 clocks/cold24/four roles must use the final test pin.
+
+Owner subsequently authorized one-off CI budget60 minutes for this exact atom
+at PR and merge. Scope is PR398 on the exact task branch and its ordinary
+two-parent guarded merge push to main; all unrelated PR/main events retain
+default job caps. The local tracked-only merge fallback gets3600 seconds only
+on this exact branch with the matching Git task contract. Existing checks,
+deny semantics, exact-head gates, owner phrase and merge prohibition remain.
+Because trusted CI/workflow paths change, preserve native validation eligibility
+and trusted-path checks. The existing gate selects exact-head CI or a trusted
+project-bound fallback; do not change that selection or run a full local gate
+before PR. The3600-second fallback cap applies only if that native path executes.
+Generated ci.yml is rendered from its existing owner. The50 affected CI tests
+PASS, including wrong PR/main scope and malformed/missing/wrong task binding
+refusal; initial unquoted YAML expression probe and corrected renderer PASS
+are retained in ci-atom-hour-budget.json. No settings/credentials mutation.

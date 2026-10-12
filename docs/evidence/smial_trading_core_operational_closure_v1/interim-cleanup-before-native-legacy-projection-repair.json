@@ -1,0 +1,39 @@
+{
+  "canaries": {
+    "actual_loopback_egress_hits": 0,
+    "non_target_sha256_unchanged": true,
+    "secret_canary_absent": true
+  },
+  "cash_spend": 0,
+  "checked_test_roots": 185,
+  "credential_reads": 0,
+  "current_cleanup_scope": "ONLY_CURRENT_NATIVE_SUITE_OWNED_FIXTURES_AND_SEPARATELY_MARKED_REVIEW_SCRATCH",
+  "deployment": 0,
+  "historical_interrupted_review_run": {
+    "final_pass_receipt": "NOT_WRITTEN",
+    "native_fixture_markers_remaining": 0,
+    "processes": "ABSENT",
+    "source_receipt_archive": "interim-cleanup-before-inventory-source-isolation-repair.json"
+  },
+  "historical_interrupted_root_status": "UNKNOWN_PATH_NOT_RETAINED_NO_GLOBAL_ABSENCE_CLAIM",
+  "peak_rss_bytes": 146935808,
+  "power_loss_or_hardware_tolerance": "NOT_CLAIMED",
+  "process_measurement": "PEAK_SUITE_PROCESS_RSS",
+  "proof_fixture_roots": "ABSENT",
+  "proof_receipt_sha256": "7de496bf1df1cf775b32a3c079fa30a66f486fbc56353b771e118782e8707e8e",
+  "provider_calls": 0,
+  "receipt_sha256": "3790aeb940a54795e732c5cc7ad94b4e1927cccf7847f3f7191d8200160024dc",
+  "review_scratch": "OWNED_EPHEMERAL_REMOVE_AFTER_FINAL_REVIEW",
+  "schema": "smial.operating-proof-cleanup",
+  "schema_version": "1.0",
+  "shared_cache_environment_live_data_and_other_roots": "NOT_CLEANUP_TARGETS",
+  "signing_or_transactions": 0,
+  "status": "PASS",
+  "synthetic_processes": "CLOSED_BY_NATIVE_TEST_TEARDOWN",
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "unchanged_immutable_bindings": {
+    "configs/provider_route_capability_registry_v11.yaml": "527baaad75de6c35d04b4f97ad528cacdac03981e2ec05a9da96b9becf039b34",
+    "docs/evidence/smial_trading_continuity_v1/source-contract.md": "fa27010cd06336d7e962798ce29cf04427ba8a3a23b420a3878357094fc6274c",
+    "docs/reports/smial_trading_continuity_v1/REPORT.md": "16221e8db75ecc1cf17fd349800083d7751f14779a673f2e6b8e96c625211df5"
+  }
+}

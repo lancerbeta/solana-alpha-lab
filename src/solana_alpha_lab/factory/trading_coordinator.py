@@ -12,7 +12,7 @@ from pathlib import Path
 
 from solana_alpha_lab.factory.trading_runner import TradingContinuityRunner
 from solana_alpha_lab.factory.trading_adapters import PaperModelAdapter, JupiterQuoteAdapter, raw_amount, checked_observation
-from solana_alpha_lab.factory.paper_plane import PRE_ATTEMPT_STATES, accept_exit_decision, assert_quantity_inventory_witness, _effective_operating_scope, _operating_entry_block
+from solana_alpha_lab.factory.paper_plane import PRE_ATTEMPT_STATES, accept_exit_decision, assert_quantity_inventory_witness, _effective_operating_scope, _operating_entry_block, _operating_switch_lineage_block
 from solana_alpha_lab.factory.paper_shadow_commands import maybe_finish_drain, apply_operator_command
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
@@ -1155,36 +1155,13 @@ class TradingCoordinator:
             retained = [event for event in store.filtered_execution_events(event_type="OPERATING_SWITCH_COMMITTED")
                 if isinstance(event["payload"], dict) and event["payload"].get("mode") == self.mode]
             switches = cut.get("operating_switches", retained)
-            if (not isinstance(switches, list) or not switches or type(current["generation"]) is not int
-                or len(switches) != current["generation"] or len({event["event_id"] for event in switches}) != len(switches)):
+            if _operating_switch_lineage_block(mode=self.mode, current=current, switches=switches,
+                    bindings=bindings, as_of=cut["as_of"]):
                 raise PaperPlaneError(invalid)
-            previous = None
             for event in switches:
-                body = event["payload"]
-                epoch = body["epoch_id"]
-                bundle = bindings[epoch]
-                activation, binding, profile = bundle["activation"], bundle["binding"], bundle["profile"]
-                if (set(event) != {"event_id", "event_type", "bot_instance_id", "position_id", "created_at", "payload"}
-                    or event["event_type"] != "OPERATING_SWITCH_COMMITTED" or event["bot_instance_id"] is not None
-                    or event["position_id"] is not None or not isinstance(event["event_id"], str)
-                    or not event["event_id"].startswith("SWITCH-") or len(event["event_id"]) != 71
-                    or any(char not in "0123456789abcdef" for char in event["event_id"][7:])
-                    or set(body) != {"epoch_id", "at", "mode", "profile", "strategy_sha256", "expected_current_epoch"}
-                    or body["mode"] != self.mode or body["expected_current_epoch"] != previous
-                    or event["created_at"] != body["at"] or parse_utc(body["at"]) > parse_utc(cut["as_of"])
-                    or activation["event_id"] != epoch or activation["payload"] != binding["payload"]["activation"]
-                    or activation["payload"]["epoch_id"] != epoch or activation["payload"]["mode"] != self.mode
-                    or activation["created_at"] != body["at"] or activation["payload"]["at"] != body["at"]
-                    or body["strategy_sha256"] != binding["payload"]["strategy"]["spec_sha256"]
-                    or body["profile"] != profile["payload"]["profile"]
-                    or sha256_of(body["profile"]) != profile["payload"]["profile_sha256"]):
-                    raise PaperPlaneError(invalid)
                 prior = store.get_execution_event(event["event_id"])
                 if prior is not None and prior != event:
                     raise PaperPlaneError("RECOVERY_BINDING_CONTENT_CONFLICT")
-                previous = epoch
-            if previous != current["epoch_id"]:
-                raise PaperPlaneError(invalid)
             by_id = {event["event_id"]: event for event in switches}
             if any(event["event_id"] not in by_id or by_id[event["event_id"]] != event for event in retained):
                 raise PaperPlaneError("RECOVERY_BINDING_CONTENT_CONFLICT")

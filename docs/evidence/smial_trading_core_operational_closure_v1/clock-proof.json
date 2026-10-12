@@ -15,10 +15,10 @@
   ],
   "clock_basis": "CONTROLLED_ORDINARY_COORDINATOR_CLOCK",
   "code_unchanged_during_execution": true,
-  "completed_at": "2026-10-12T14:30:52.795085Z",
+  "completed_at": "2026-10-12T16:32:58.200705Z",
   "contract_reference": "source-contract.md section 11.3 / C03 / C04",
   "credential_reads": false,
-  "elapsed_seconds": 5.568854,
+  "elapsed_seconds": 5.686997,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "historical_1599_snapshot_comparison": "UNKNOWN_ALGORITHM_NOT_RETAINED_NO_COMPARISON_CLAIM",
   "historical_receipt_archives": [
@@ -41,6 +41,16 @@
       "byte_exact": true,
       "path": "docs/evidence/smial_trading_core_operational_closure_v1/interim-clock-before-input-policy-repair.json",
       "raw_sha256": "59137045b6d30eb1ddeecf94de2acec18474130557f7b1bd64e15f212c16a670"
+    },
+    {
+      "byte_exact": true,
+      "path": "docs/evidence/smial_trading_core_operational_closure_v1/interim-clock-before-native-boundary-recovery-repair.json",
+      "raw_sha256": "263e0d9ed1557cfdf552a5d0f2292b6c980dcf01ccc8f74b0a7927323aed509b"
+    },
+    {
+      "byte_exact": true,
+      "path": "docs/evidence/smial_trading_core_operational_closure_v1/interim-clock-before-common-lineage-repair.json",
+      "raw_sha256": "6333582567052a169b73e89ffcac816a4063a334c256ef93dbf335e137bb103c"
     }
   ],
   "imported_source_pins": {
@@ -107,7 +117,7 @@
     "src/solana_alpha_lab/factory/owner_language.py": "a65008f623f7cd1d8b3ce7176fa8548d321e1fb84b0d49226d2991e099f82771",
     "src/solana_alpha_lab/factory/owner_review_cursor.py": "2c88e95f06aaf4d2a6dbb1a27c7b6cc602800317bf28fd91a6b0a13f8cdec948",
     "src/solana_alpha_lab/factory/owner_surface.py": "d64230d9de541d1ce3d3cc4aaf351b7c23522b2f85f2e53f3291e2c0fa6a60e9",
-    "src/solana_alpha_lab/factory/paper_plane.py": "64c6a497f72aa0f3e03749ed413dab2ebf87c8ee22e9fd407b87adec23b398e1",
+    "src/solana_alpha_lab/factory/paper_plane.py": "0473f46914a0406e52ebe1d22fecee1c2c74ec91f8b98f095c128205d69be5f6",
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
     "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
     "src/solana_alpha_lab/factory/pit_data_truth_canonicalization.py": "922e26dee0132b074fe46476d3351dcb7d54fe4eb9b9fd64f338f161921127c8",
@@ -128,7 +138,7 @@
     "src/solana_alpha_lab/factory/t0_friction_screen.py": "732f14a309ea7bc2b0181dcb5abcb6d5ef7bf732fb0b2fc53459e12f3bda0506",
     "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py": "351a253ccf5eec73094158d2e1895948ec96e7ede6e57369cda80eac1113ae7c",
     "src/solana_alpha_lab/factory/trading_adapters.py": "cf6fa566e491d68aeee5c059228fc2385b2884c23c297aa6905f00f3606c8e05",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "00481ccb35501e46e9fc69bc006e42adbad5318a61d452b6cc807d24d680b944",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "467b0355cf405631c4f2eac0139aecfea7c0f9ebea6e39cee3246fda8700367d",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
@@ -162,7 +172,7 @@
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "08537cd9ff1bc77b071602f913fda93859a478b4dbfb390da75d16a1a5656370"
+    "tests/test_trading_core_operational_closure_v1.py": "d7da1009592b1c2449cc32f0b8ceb5dd64f4afca17cca982cd6782483e1a4a92"
   },
   "live_authority": false,
   "locked_environment": true,
@@ -173,15 +183,15 @@
   "owned_scratch_cleanup": {
     "active_owned_probe_processes": 0,
     "created_absent": true,
-    "deleted_bytes": 34495,
+    "deleted_bytes": 34515,
     "deleted_file_count": 7,
     "deletion": "POWERSHELL_REMOVE_ITEM_LITERALPATH_EXACT_MARKED_ROOT",
     "helper_sha256s": {
-      "clocks.py": "b8b0dac087e835eec1d70014fdf8ef4a3cdf28e04f8446037ce82e8e88845981",
-      "common.py": "3b7dc22e7662f37bc174f5dda5215ac8bce6db9b184c878cbf3972cf14d3a4e4",
-      "consumers.py": "bb72c92384b6ba00c2be61521aa5fbc7db3c9209977e31c81995c97e6e0638f2"
+      "clocks.py": "911eb73a965d4cdafd3fb13df126b02322d1b9724727de1f93f3adfbd332f871",
+      "common.py": "37ecea5f8a368096b5fa3efdaf2009ac1d5da3fb47f608e44920941d12cf5587",
+      "consumers.py": "d43475737e56677fc1f04c11ca5b2023124e9b96cce0ae1323b326628ba8617d"
     },
-    "marker_sha256": "ba79896408bd98ebdad489813af750bb08a1f19e05c5bddd29ba351fe53ca97a",
+    "marker_sha256": "2a9f3eb73f762ac774fc682e7f7fd353cdaaf9c80d6d639754be4830db40d5aa",
     "owned_root_absent": true,
     "relative_path": "local/smial-patch-consumer-proofs",
     "reparse_points": false,
@@ -191,8 +201,8 @@
   },
   "prior_receipt_archive": {
     "byte_exact": true,
-    "path": "docs/evidence/smial_trading_core_operational_closure_v1/interim-clock-before-native-boundary-recovery-repair.json",
-    "raw_sha256": "263e0d9ed1557cfdf552a5d0f2292b6c980dcf01ccc8f74b0a7927323aed509b"
+    "path": "docs/evidence/smial_trading_core_operational_closure_v1/interim-clock-before-native-legacy-projection-repair.json",
+    "raw_sha256": "bd0b772ed10558a419b8145be5ef475425df8eb5842c15186082b12f6f9f6ea7"
   },
   "probes": [
     {
@@ -213,7 +223,7 @@
         "run_completed": true
       },
       "controlled_clock": "2026-10-05T12:40:30Z",
-      "elapsed_seconds": 2.379661,
+      "elapsed_seconds": 2.456317,
       "limits": {
         "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001",
         "decision_point": "E1800",
@@ -222,7 +232,7 @@
         "request_not_before": "2026-10-05T12:35:00Z",
         "schedule_sha256": "8e0f4eea76207d5b9cf014c535218e513fcf271e9b5b362d3fe0d8ac0bc7d969",
         "source_cutoff": "2026-10-05T12:40:00Z",
-        "strategy_sha256": "458fe9fa78e229eef5897f1795f88a852ff22b65380d4d30d4f1be52808b6baa",
+        "strategy_sha256": "62b125af4277a5bd3931cd4d54af4a53d9883a781261de13e24f1d267b6f4777",
         "t0": "2026-10-05T12:01:15Z"
       },
       "native_decision_at": [
@@ -261,17 +271,17 @@
       "backward": {
         "controlled_clock": "2026-10-05T12:40:00Z",
         "database_family_sha256_after": {
-          "main_db": "3d248821c00a6b8a39d580301bd0553796c944ebe8b32a5e1eb78f17174c971a",
+          "main_db": "b9885daab05fe4cd3c26acc387bcb6a8bc770d3f7f3434035040014db86f4f5d",
           "shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
           "wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         "database_family_sha256_before": {
-          "main_db": "3d248821c00a6b8a39d580301bd0553796c944ebe8b32a5e1eb78f17174c971a",
+          "main_db": "b9885daab05fe4cd3c26acc387bcb6a8bc770d3f7f3434035040014db86f4f5d",
           "shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
           "wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
-        "execution_sha256_after": "82c0446b3b47d48bd6dbbd9fdf140012c13ca191c9199f6a79359a85257ea499",
-        "execution_sha256_before": "82c0446b3b47d48bd6dbbd9fdf140012c13ca191c9199f6a79359a85257ea499",
+        "execution_sha256_after": "4d3d27cebb15b392a790e612a10ab1cdafed8305334784cbf3df1d42802aab1f",
+        "execution_sha256_before": "4d3d27cebb15b392a790e612a10ab1cdafed8305334784cbf3df1d42802aab1f",
         "persisted_last_tick_at": "2026-10-05T12:41:00Z",
         "persisted_runtime_sha256_after": "4431263ec888996cdac3c940599b584a20a230d969cfe185f6fb63a30f6e40f1",
         "persisted_runtime_sha256_before": "4431263ec888996cdac3c940599b584a20a230d969cfe185f6fb63a30f6e40f1",
@@ -313,7 +323,7 @@
         "last_tick_preserves_forward_clock": true,
         "native_cutoff_matches_literal_oracle": true
       },
-      "elapsed_seconds": 2.234398,
+      "elapsed_seconds": 2.247105,
       "forward": {
         "attempt_count": 0,
         "controlled_clock": "2026-10-05T12:41:00Z",
@@ -341,7 +351,7 @@
         "request_not_before": "2026-10-05T12:35:00Z",
         "schedule_sha256": "8e0f4eea76207d5b9cf014c535218e513fcf271e9b5b362d3fe0d8ac0bc7d969",
         "source_cutoff": "2026-10-05T12:40:00Z",
-        "strategy_sha256": "39166ae0c8923ad481225150e88d925dbc1c0eb0be5c16d438b2bb82a22fb8a4",
+        "strategy_sha256": "cc382329f3f724c7d77d13fed899b6e4da723594eac01ffdb976c8ace95a8ead",
         "t0": "2026-10-05T12:01:15Z"
       },
       "probe": "FORWARD_THEN_BACKWARD_CLOCK",
@@ -350,7 +360,7 @@
   ],
   "provider_calls": false,
   "python_downloads": "never",
-  "receipt_sha256": "c6928f5403f08d683a8e9b4de29074b02b5802e8c531b6086dcf9c678f24d71f",
+  "receipt_sha256": "e35cb68ae068d4aa2087874d783981740cde9966aa96f16a469ee72444952730",
   "required_current_source_pin_count": 16,
   "schema": "smial.operating-clock-proof",
   "schema_version": "1.0",
@@ -422,7 +432,7 @@
     "src/solana_alpha_lab/factory/owner_language.py": "a65008f623f7cd1d8b3ce7176fa8548d321e1fb84b0d49226d2991e099f82771",
     "src/solana_alpha_lab/factory/owner_review_cursor.py": "2c88e95f06aaf4d2a6dbb1a27c7b6cc602800317bf28fd91a6b0a13f8cdec948",
     "src/solana_alpha_lab/factory/owner_surface.py": "d64230d9de541d1ce3d3cc4aaf351b7c23522b2f85f2e53f3291e2c0fa6a60e9",
-    "src/solana_alpha_lab/factory/paper_plane.py": "64c6a497f72aa0f3e03749ed413dab2ebf87c8ee22e9fd407b87adec23b398e1",
+    "src/solana_alpha_lab/factory/paper_plane.py": "0473f46914a0406e52ebe1d22fecee1c2c74ec91f8b98f095c128205d69be5f6",
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
     "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
     "src/solana_alpha_lab/factory/pit_data_truth_canonicalization.py": "922e26dee0132b074fe46476d3351dcb7d54fe4eb9b9fd64f338f161921127c8",
@@ -443,7 +453,7 @@
     "src/solana_alpha_lab/factory/t0_friction_screen.py": "732f14a309ea7bc2b0181dcb5abcb6d5ef7bf732fb0b2fc53459e12f3bda0506",
     "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py": "351a253ccf5eec73094158d2e1895948ec96e7ede6e57369cda80eac1113ae7c",
     "src/solana_alpha_lab/factory/trading_adapters.py": "cf6fa566e491d68aeee5c059228fc2385b2884c23c297aa6905f00f3606c8e05",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "00481ccb35501e46e9fc69bc006e42adbad5318a61d452b6cc807d24d680b944",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "467b0355cf405631c4f2eac0139aecfea7c0f9ebea6e39cee3246fda8700367d",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
@@ -477,10 +487,10 @@
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "08537cd9ff1bc77b071602f913fda93859a478b4dbfb390da75d16a1a5656370",
+    "tests/test_trading_core_operational_closure_v1.py": "d7da1009592b1c2449cc32f0b8ceb5dd64f4afca17cca982cd6782483e1a4a92",
     "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
-    "tests/test_trading_operational_obligations_v1.py": "3ff23c730986ea55cf969d7743641e4e77cde25df8631d765ce33d7dd02df0d4",
-    "tests/test_trading_operational_recovery_v1.py": "87d93d28c6b9115c378e878306f5199e3c49a633722fde145fafc38e2f71f280"
+    "tests/test_trading_operational_obligations_v1.py": "436a9258ac44674d7306864c9c447916907cf790870a3892ea26f59e03c56893",
+    "tests/test_trading_operational_recovery_v1.py": "06670247cee889a72c57ecdf69a508782b6afcda6ba453d8fc061b5d43f6b1d8"
   },
   "source_pins_before": {
     "scripts/observation_schedule.py": "d8205cff11a3e14175080e81759d62ac5560452951032945a22250af58319b68",
@@ -548,7 +558,7 @@
     "src/solana_alpha_lab/factory/owner_language.py": "a65008f623f7cd1d8b3ce7176fa8548d321e1fb84b0d49226d2991e099f82771",
     "src/solana_alpha_lab/factory/owner_review_cursor.py": "2c88e95f06aaf4d2a6dbb1a27c7b6cc602800317bf28fd91a6b0a13f8cdec948",
     "src/solana_alpha_lab/factory/owner_surface.py": "d64230d9de541d1ce3d3cc4aaf351b7c23522b2f85f2e53f3291e2c0fa6a60e9",
-    "src/solana_alpha_lab/factory/paper_plane.py": "64c6a497f72aa0f3e03749ed413dab2ebf87c8ee22e9fd407b87adec23b398e1",
+    "src/solana_alpha_lab/factory/paper_plane.py": "0473f46914a0406e52ebe1d22fecee1c2c74ec91f8b98f095c128205d69be5f6",
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
     "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
     "src/solana_alpha_lab/factory/pit_data_truth_canonicalization.py": "922e26dee0132b074fe46476d3351dcb7d54fe4eb9b9fd64f338f161921127c8",
@@ -569,7 +579,7 @@
     "src/solana_alpha_lab/factory/t0_friction_screen.py": "732f14a309ea7bc2b0181dcb5abcb6d5ef7bf732fb0b2fc53459e12f3bda0506",
     "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py": "351a253ccf5eec73094158d2e1895948ec96e7ede6e57369cda80eac1113ae7c",
     "src/solana_alpha_lab/factory/trading_adapters.py": "cf6fa566e491d68aeee5c059228fc2385b2884c23c297aa6905f00f3606c8e05",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "00481ccb35501e46e9fc69bc006e42adbad5318a61d452b6cc807d24d680b944",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "467b0355cf405631c4f2eac0139aecfea7c0f9ebea6e39cee3246fda8700367d",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
@@ -603,16 +613,16 @@
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "08537cd9ff1bc77b071602f913fda93859a478b4dbfb390da75d16a1a5656370",
+    "tests/test_trading_core_operational_closure_v1.py": "d7da1009592b1c2449cc32f0b8ceb5dd64f4afca17cca982cd6782483e1a4a92",
     "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
-    "tests/test_trading_operational_obligations_v1.py": "3ff23c730986ea55cf969d7743641e4e77cde25df8631d765ce33d7dd02df0d4",
-    "tests/test_trading_operational_recovery_v1.py": "87d93d28c6b9115c378e878306f5199e3c49a633722fde145fafc38e2f71f280"
+    "tests/test_trading_operational_obligations_v1.py": "436a9258ac44674d7306864c9c447916907cf790870a3892ea26f59e03c56893",
+    "tests/test_trading_operational_recovery_v1.py": "06670247cee889a72c57ecdf69a508782b6afcda6ba453d8fc061b5d43f6b1d8"
   },
   "source_snapshot_algorithm": "git ls-files -z -- src scripts tests; sorted unique repository-relative paths; SHA256 of raw file bytes; aggregate SHA256 of UTF-8 JSON map with sort_keys=true, separators=(comma,colon), ensure_ascii=false",
   "source_snapshot_file_count": 1260,
-  "source_snapshot_sha256_after": "ac32a86b9b3f6d8d58fa6514f640924b816558f690587b47ccb93748b7c0b596",
-  "source_snapshot_sha256_before": "ac32a86b9b3f6d8d58fa6514f640924b816558f690587b47ccb93748b7c0b596",
-  "started_at": "2026-10-12T14:30:47.226229Z",
+  "source_snapshot_sha256_after": "6b29aca4bae864bbc34e5214914ee29590ed4f223072c31b46445f5f176139bb",
+  "source_snapshot_sha256_before": "6b29aca4bae864bbc34e5214914ee29590ed4f223072c31b46445f5f176139bb",
+  "started_at": "2026-10-12T16:32:52.513706Z",
   "status": "PASS",
   "temporary_directory_cleanup": {
     "owned_root_count": 2,

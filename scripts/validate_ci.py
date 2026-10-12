@@ -46,6 +46,53 @@ SHARD_COUNT_MIN = 4
 SHARD_COUNT_MAX = 6
 DELIVERY_PREFLIGHT_TIMEOUT_MINUTES = 25
 DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = DELIVERY_PREFLIGHT_TIMEOUT_MINUTES * 60
+# Owner-authorized budget for this single atom; other PRs/main pushes keep
+# their existing caps. A retry of the same PR or merge remains this atom.
+TRADING_CLOSURE_CI_TASK_ID = "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1"
+TRADING_CLOSURE_CI_BRANCH = "codex/smial-trading-core-operational-closure-v1"
+TRADING_CLOSURE_CI_TIMEOUT_MINUTES = 60
+TRADING_CLOSURE_CI_CONDITION = (
+    "github.repository == 'lancerbeta/solana-alpha-lab' && ("
+    "(github.event_name == 'pull_request' && github.event.pull_request.number == 398 "
+    "&& github.event.pull_request.head.ref == '" + TRADING_CLOSURE_CI_BRANCH + "') || "
+    "(github.event_name == 'push' && github.ref == 'refs/heads/main' "
+    "&& startsWith(github.event.head_commit.message, 'Merge pull request #398 from "
+    "lancerbeta/" + TRADING_CLOSURE_CI_BRANCH + "')))"
+)
+
+
+def github_job_timeout(default_minutes: int) -> str:
+    if default_minutes == TRADING_CLOSURE_CI_TIMEOUT_MINUTES:
+        return str(default_minutes)
+    return (
+        "${{ (" + TRADING_CLOSURE_CI_CONDITION + ") && 60 || "
+        + str(default_minutes) + " }}"
+    )
+
+
+def delivery_preflight_timeout_seconds(branch: str) -> int:
+    if branch != TRADING_CLOSURE_CI_BRANCH:
+        return DELIVERY_PREFLIGHT_TIMEOUT_SECONDS
+    path = ROOT / "docs/tasks" / (TRADING_CLOSURE_CI_TASK_ID + ".md")
+    try:
+        text = path.read_text(encoding="utf-8")
+        if not text.startswith("---\n"):
+            return DELIVERY_PREFLIGHT_TIMEOUT_SECONDS
+        frontmatter, delimiter, _body = text[4:].partition("\n---\n")
+        if not delimiter:
+            return DELIVERY_PREFLIGHT_TIMEOUT_SECONDS
+        contract = yaml.safe_load(frontmatter)
+        if (
+            contract.get("task_id") == TRADING_CLOSURE_CI_TASK_ID
+            and contract.get("expected_repository") == "lancerbeta/solana-alpha-lab"
+            and contract.get("git_binding", {}).get("expected_branch") == branch
+        ):
+            return TRADING_CLOSURE_CI_TIMEOUT_MINUTES * 60
+    except (OSError, ValueError, TypeError, AttributeError, yaml.YAMLError):
+        pass
+    return DELIVERY_PREFLIGHT_TIMEOUT_SECONDS
+
+
 CI_TEST_SHARDS_PLAN = ROOT / "configs/ci_test_shards_v1.json"
 EXECUTION_DOMAIN_MANIFEST = ROOT / "configs/execution_domain_v1.json"
 EXECUTION_DOMAIN_COMMAND = (
@@ -434,6 +481,7 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
     candidate = git_text(["rev-parse", "HEAD"])
     tree = git_text(["show", "-s", "--format=%T", candidate])
     branch = git_text(["symbolic-ref", "--quiet", "--short", "HEAD"])
+    timeout_seconds = delivery_preflight_timeout_seconds(branch)
     tracked_dirty = git_text(["status", "--porcelain=v1", "--untracked-files=no"])
     if tracked_dirty:
         raise CiValidationError("delivery_candidate_has_tracked_changes")
@@ -521,7 +569,7 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
                     stderr=subprocess.PIPE,
                     check=False,
                     shell=False,
-                    timeout=DELIVERY_PREFLIGHT_TIMEOUT_SECONDS,
+                    timeout=timeout_seconds,
                 )
             except subprocess.TimeoutExpired as exc:
                 raise CiValidationError("delivery_full_gate_timeout") from exc
@@ -563,7 +611,7 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
             "gate": {
                 "command": VALIDATION_COMMAND,
                 "exit_code": exit_code,
-                "timeout_seconds": DELIVERY_PREFLIGHT_TIMEOUT_SECONDS,
+                "timeout_seconds": timeout_seconds,
                 "wall_seconds": elapsed,
                 **summary,
             },
@@ -718,7 +766,7 @@ def expected_workflow() -> dict[str, Any]:
         "jobs": {
             "validate-core": {
                 "runs-on": "ubuntu-24.04",
-                "timeout-minutes": str(GITHUB_VALIDATE_TIMEOUT_MINUTES),
+                "timeout-minutes": github_job_timeout(GITHUB_VALIDATE_TIMEOUT_MINUTES),
                 "env": {
                     "UV_NO_ENV_FILE": "1",
                     "PYTHONDONTWRITEBYTECODE": "1",
@@ -727,7 +775,7 @@ def expected_workflow() -> dict[str, Any]:
             },
             "validate-execution": {
                 "runs-on": "ubuntu-24.04",
-                "timeout-minutes": str(GITHUB_VALIDATE_TIMEOUT_MINUTES),
+                "timeout-minutes": github_job_timeout(GITHUB_VALIDATE_TIMEOUT_MINUTES),
                 "needs": ["validate-core"],
                 "env": {
                     "UV_NO_ENV_FILE": "1",
@@ -758,7 +806,7 @@ def expected_workflow() -> dict[str, Any]:
                 "if": "${{ always() }}",
                 "needs": ["validate-core", "validate-execution", "validate-tests", "validate-operability-resources"],
                 "runs-on": "ubuntu-24.04",
-                "timeout-minutes": str(GITHUB_AGGREGATOR_TIMEOUT_MINUTES),
+                "timeout-minutes": github_job_timeout(GITHUB_AGGREGATOR_TIMEOUT_MINUTES),
                 "env": {
                     "CORE_RESULT": "${{ needs.validate-core.result }}",
                     "EXECUTION_RESULT": "${{ needs.validate-execution.result }}",

@@ -1864,7 +1864,7 @@ class OperationalRecoveryTests(unittest.TestCase):
         runner, coordinator = self.restored(backup, suffix="exact-lineage-restored",
             adapter=RecordingQuoteAdapter(ledger, json.loads(plan.read_text())))
         denied = []
-        for alteration in ("OLD_CUT_MISSING", "EMPTY", "CAS", "CONFLICT"):
+        for alteration in ("OLD_CUT_MISSING", "EMPTY", "CAS", "INITIAL_CAS", "STRATEGY", "GENERATION", "CHAIN_COUNT", "CONFLICT"):
             bad = copy.deepcopy(cut)
             if alteration == "OLD_CUT_MISSING":
                 del bad["operating_switches"]
@@ -1872,6 +1872,14 @@ class OperationalRecoveryTests(unittest.TestCase):
                 bad["operating_switches"] = []
             elif alteration == "CAS":
                 bad["operating_switches"][-1]["payload"]["expected_current_epoch"] = "ACTIVATION-EPOCH-WRONG"
+            elif alteration == "INITIAL_CAS":
+                bad["operating_switches"][0]["payload"]["expected_current_epoch"] = "ACTIVATION-EPOCH-NONEXISTENT"
+            elif alteration == "STRATEGY":
+                bad["operating_switches"][-1]["payload"]["strategy_sha256"] = "f" * 64
+            elif alteration == "GENERATION":
+                bad["current_entry"]["generation"] = 3
+            elif alteration == "CHAIN_COUNT":
+                bad["operating_switches"] = bad["operating_switches"][-1:]
             else:
                 bad["operating_switches"][0]["event_id"] = "SWITCH-" + "f" * 64
             bad["cut_sha256"] = sha256_of({key: value for key, value in bad.items() if key != "cut_sha256"})
@@ -1927,6 +1935,78 @@ class OperationalRecoveryTests(unittest.TestCase):
             "switch_rows": [{"event_id": event["event_id"], "created_at": event["created_at"],
                 "payload_sha256": sha256_of(event["payload"]), "epoch_id": event["payload"]["epoch_id"],
                 "expected_current_epoch": event["payload"]["expected_current_epoch"]} for event in cut["operating_switches"]]}
+
+    def test_native_paper_v1_0_original_inventory_projection_cannot_free_headroom(self):
+        from solana_alpha_lab.factory.paper_plane import assert_quantity_inventory_witness
+        from solana_alpha_lab.factory.trading_runtime_policy import obligation_summary, enforce_operating_envelope
+        self.start_operating(envelope_limits={"max_outstanding_positions": 2, "max_outstanding_cost_basis_usd": "40"})
+        self.assertEqual(self.coordinator.tick()["attempts"], 1)
+        rows = []
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            original = store.positions()[0]
+            pid = original["position_id"]
+            journal = store.filtered_execution_events(position_ids=[pid])
+            accepted = next(event for event in journal if event["event_type"] == "MODELED_RESULT_ACCEPTED")
+            self.assertNotIn("schema_version", accepted["payload"]["result"])
+            self.assertIsNone(original["entry_fee_semantics"])
+            self.assertEqual(Decimal(original["qty_dec"]), Decimal("10000000"))
+            self.assertEqual(Decimal(obligation_summary(store, mode="PAPER")["outstanding_cost_basis_usd"]), Decimal("30"))
+            self.assertEqual(enforce_operating_envelope(store, mode="PAPER", admitted_notional_usd="30")["reason_code"], "OUTSTANDING_COST_BASIS_LIMIT")
+            for label, values in (("COHERENT_TUPLE", {"remaining_qty_dec": "1000000", "remaining_cost_basis_usd_dec": "3", "remaining_entry_fee_usd_dec": "0.01"}),
+                                  ("COST_ONLY", {"remaining_cost_basis_usd_dec": "3"}),
+                                  ("QUANTITY_ONLY", {"remaining_qty_dec": "1000000"}),
+                                  ("FEE_ONLY", {"remaining_entry_fee_usd_dec": "0.01"})):
+                with self.subTest(alteration=label):
+                    store._conn.execute("UPDATE positions SET " + ",".join(key + "=?" for key in values) + " WHERE position_id=?", [*values.values(), pid])
+                    with self.assertRaisesRegex(PaperPlaneError, "^EXIT_INVENTORY_WITNESS_CONFLICT$"):
+                        assert_quantity_inventory_witness(store, store.get_position(pid), allow_pending=True)
+                    inventory = obligation_summary(store, mode="PAPER")
+                    self.assertEqual(inventory["inventory_status"], "UNKNOWN")
+                    self.assertIsNone(inventory["outstanding_cost_basis_usd"])
+                    self.assertEqual(Decimal(inventory["known_cost_basis_floor_usd"]), Decimal("30"))
+                    self.assertEqual(enforce_operating_envelope(store, mode="PAPER", admitted_notional_usd="30")["reason_code"], "OUTSTANDING_OBLIGATIONS_UNKNOWN")
+                    view = self.coordinator.status()
+                    self.assertEqual(view["status"], "ACTION_REQUIRED")
+                    self.assertFalse(view["entries_enabled"])
+                    self.assertEqual(view["inventory"]["inventory_status"], "UNKNOWN")
+                    self.assertEqual(self.coordinator.tick()["attempts"], 0)
+                    self.assertEqual(store.filtered_execution_events(position_ids=[pid]), journal)
+                    rows.append({"alteration": label, "inventory": "UNKNOWN", "known_floor_usd": inventory["known_cost_basis_floor_usd"],
+                        "new30": "OUTSTANDING_OBLIGATIONS_UNKNOWN", "original_journal_unchanged": True, "additional_attempts": 0})
+                    store._conn.execute("UPDATE positions SET " + ",".join(key + "=?" for key in values) + " WHERE position_id=?", [*(original[key] for key in values), pid])
+            assert_quantity_inventory_witness(store, store.get_position(pid))
+            self.assertEqual(store.filtered_execution_events(position_ids=[pid]), journal)
+            self.assertEqual(self.coordinator.status()["inventory"]["inventory_status"], "KNOWN")
+        self.metrics = {"adapter": "NATIVE_PAPER_MODEL_V1_0", "original_cost_usd": original["entered_notional_usd_dec"], "original_quantity": original["qty_dec"],
+            "cap_usd": "40", "cases": rows, "legacy_remaining_tuple": "ABSENT_AND_UNCHANGED", "original_payload_sha256": sha256_of(accepted["payload"])}
+
+    def test_native_paper_v1_0_damaged_origin_exit_isolated_from_healthy_neighbor(self):
+        self.two_native_open_positions(mode="PAPER")
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            original, healthy = store.positions()
+            journal = store.filtered_execution_events(position_ids=[original["position_id"]])
+            store._conn.execute("UPDATE positions SET remaining_qty_dec='1000000',remaining_cost_basis_usd_dec='3',remaining_entry_fee_usd_dec='0.01' WHERE position_id=?", (original["position_id"],))
+            ticks = self.coordinator.run(ticks=2)
+            self.assertEqual(ticks["ticks"], 2)
+            damaged = store.get_position(original["position_id"])
+            completed = store.get_position(healthy["position_id"])
+            self.assertEqual(damaged["state"], "EXIT_REQUIRED")
+            self.assertEqual(completed["state"], "RECONCILED")
+            for event in journal:
+                self.assertEqual(store.get_execution_event(event["event_id"]), event)
+            attempts = store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED", position_ids=[original["position_id"]])
+            self.assertEqual(len(attempts), 1)
+            self.assertEqual(attempts[0]["payload"]["side"], "ENTRY")
+            self.assertEqual(len(store.filtered_execution_events(event_type="ADAPTER_REQUEST_BOUND", position_ids=[original["position_id"]])), 1)
+            self.assertEqual(len(store.filtered_execution_events(event_type="MODELED_RESULT_ACCEPTED", position_ids=[original["position_id"]])), 1)
+            self.assertEqual((damaged["remaining_qty_dec"], damaged["remaining_cost_basis_usd_dec"], damaged["remaining_entry_fee_usd_dec"]), ("1000000", "3", "0.01"))
+            self.assertEqual(store._conn.execute("SELECT reason FROM ordinary_incidents WHERE incident_key=? AND active=1", (original["position_id"],)).fetchone()[0], "EXIT_INVENTORY_WITNESS_CONFLICT")
+            self.assertEqual(self.coordinator.status()["inventory"]["inventory_status"], "UNKNOWN")
+            self.assertFalse(self.coordinator.status()["entries_enabled"])
+            self.assertEqual(len(store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED")), 3)
+        self.metrics = {"adapter": "NATIVE_PAPER_MODEL_V1_0", "native_ticks": ticks["ticks"], "damaged_origin": "EXIT_REQUIRED_NO_EXIT_EFFECT",
+            "retained_original_events_unchanged": True, "new_origin_exit_attempt_request_result": 0,
+            "typed_reason": "EXIT_INVENTORY_WITNESS_CONFLICT", "healthy_neighbor": "RECONCILED", "total_attempts": 3, "inventory": "UNKNOWN"}
 
     def test_restore_without_effects_imports_successor_binding_and_generation_paused(self):
         self.start_operating(mode="SHADOW")
