@@ -5,14 +5,14 @@
   ],
   "code_unchanged_during_execution": true,
   "credential_reads": 0,
-  "elapsed_seconds": 79.475813,
+  "elapsed_seconds": 70.347384,
   "failed_test_ids": [],
   "full_local_gate": "NOT_EXECUTED",
   "live_authority": false,
   "native_test_output_bytes": 3740,
-  "native_test_output_sha256": "af927ced203071df103277be50585d9c05d22dcdc80d0ea1285f8c14de83af44",
+  "native_test_output_sha256": "58816cec371fa6886edca3364875100c694093201fc4b8a5ce14851bc1a02d08",
   "provider_calls": 0,
-  "receipt_sha256": "61b9f66b64c90ee3c52246860832587f97a3d4438c7f3e3cd23118ca8678f36c",
+  "receipt_sha256": "b1e7579c701e360be4648843d636e8bb2b8e7f65c62070d9573f047a20f46be8",
   "schema": "smial.managed-native-recovery-remediation",
   "schema_version": "1.0",
   "source_pins_after": {
@@ -28,7 +28,7 @@
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "15da7cad481361f2395d59a65f1bcb4e648df851459d510a2d6c8aeb3c902c43",
+    "tests/test_trading_core_operational_closure_v1.py": "aa224814b1d3774174c330c5356816d167a7e5eea76d1e6d7c485ef8dc055e25",
     "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
     "tests/test_trading_operational_obligations_v1.py": "5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880",
     "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
@@ -46,7 +46,7 @@
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "15da7cad481361f2395d59a65f1bcb4e648df851459d510a2d6c8aeb3c902c43",
+    "tests/test_trading_core_operational_closure_v1.py": "aa224814b1d3774174c330c5356816d167a7e5eea76d1e6d7c485ef8dc055e25",
     "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
     "tests/test_trading_operational_obligations_v1.py": "5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880",
     "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
@@ -54,7 +54,7 @@
   "status": "PASS",
   "tests": [
     {
-      "elapsed_seconds": 3.416126,
+      "elapsed_seconds": 3.573908,
       "metrics": {
         "attempts_unchanged_after_repeat": true,
         "inventory_status": "KNOWN",
@@ -70,7 +70,7 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_managed_native_public_paper_fill_retains_original_full_exit_and_cap_release"
     },
     {
-      "elapsed_seconds": 3.340518,
+      "elapsed_seconds": 2.977112,
       "metrics": {
         "attempts_unchanged_after_repeat": true,
         "inventory_status": "KNOWN",
@@ -86,7 +86,7 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_managed_native_public_shadow_fill_retains_original_full_exit_and_cap_release"
     },
     {
-      "elapsed_seconds": 2.579003,
+      "elapsed_seconds": 2.112169,
       "metrics": {
         "damaged_modeled_entry": "UNKNOWN",
         "known_cost_basis_floor_usd": "30",
@@ -97,7 +97,7 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_modeled_entry_cannot_be_reclassified_as_native_public_fill"
     },
     {
-      "elapsed_seconds": 4.478244,
+      "elapsed_seconds": 3.899745,
       "metrics": {
         "cases": [
           {
@@ -192,7 +192,7 @@
         "null_legacy_replay": "EXACT_NO_EVENT_DRIFT",
         "original_cost_usd": "30",
         "original_entry_observation_sha256": "d0bd5bc7503c690e2b36db02643c1459c909c90b5d5c55e3a391ae995a6372b6",
-        "original_journal_sha256": "61309dc4d86b0ecfb5c2ad498974e27d84a5aa523e53f2c3ee55564f8540b019",
+        "original_journal_sha256": "1565b185be33ebcc0c3320bbdf39d7e65a6127411e43b88fafbe9a6156af29c9",
         "original_native_exit_sha256": "e9d05bebd52a3c3cf3c36aeab73e32aaa150c1d3582df8a6f739df001b476978",
         "original_quantity": "10000000.00000000",
         "restored_all_null_inventory": "KNOWN_30"
@@ -201,13 +201,13 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_native_unmodeled_legacy_projection_cannot_free_managed_cap"
     },
     {
-      "elapsed_seconds": 2.54356,
+      "elapsed_seconds": 2.1025,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_genuine_legacy_binding_and_exact_attempt_replay_remain_compatible"
     },
     {
-      "elapsed_seconds": 3.536374,
+      "elapsed_seconds": 3.441467,
       "metrics": {
         "damaged_origin": "QUARANTINED",
         "exact_identity_restore": "RECONCILED",
@@ -220,7 +220,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_missing_pending_origin_identity_isolated_without_stopping_healthy_exit_or_resend"
     },
     {
-      "elapsed_seconds": 4.247656,
+      "elapsed_seconds": 3.564411,
       "metrics": {
         "adapter": "NATIVE_PAPER_MODEL_V1_0",
         "damaged_origin": "EXIT_REQUIRED_NO_EXIT_EFFECT",
@@ -236,7 +236,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_paper_v1_0_damaged_origin_exit_isolated_from_healthy_neighbor"
     },
     {
-      "elapsed_seconds": 2.73733,
+      "elapsed_seconds": 2.285509,
       "metrics": {
         "new_attempts": 0,
         "new_effects": 0,
@@ -248,13 +248,13 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_shared_store_failure_remains_fatal_and_atomic_in_ordinary_run"
     },
     {
-      "elapsed_seconds": 3.038235,
+      "elapsed_seconds": 2.897193,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_terminal_release_requires_intact_final_result_chain"
     },
     {
-      "elapsed_seconds": 0.079125,
+      "elapsed_seconds": 0.063108,
       "metrics": {
         "legacy_original_payload_unchanged": true,
         "partial_quantity": "6000000",
@@ -264,7 +264,7 @@
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_genuine_v1_0_entry_then_v1_1_partial_and_full_preserves_original_payload"
     },
     {
-      "elapsed_seconds": 17.094144,
+      "elapsed_seconds": 14.275581,
       "metrics": {
         "cases": [
           {
@@ -314,7 +314,7 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect"
     },
     {
-      "elapsed_seconds": 15.354761,
+      "elapsed_seconds": 12.77721,
       "metrics": {
         "cases": [
           {
@@ -359,13 +359,13 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart"
     },
     {
-      "elapsed_seconds": 0.327915,
+      "elapsed_seconds": 0.263672,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_unattempted_cancel_releases_only_with_original_pre_attempt_witness"
     },
     {
-      "elapsed_seconds": 5.43859,
+      "elapsed_seconds": 4.843987,
       "metrics": {
         "db_wal_shm_bytes_unchanged_by_native_json_human_readback": true,
         "disabled_new_attempts": 0,
@@ -404,7 +404,7 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit"
     },
     {
-      "elapsed_seconds": 6.17595,
+      "elapsed_seconds": 6.150418,
       "metrics": {
         "cases": [
           {
@@ -456,7 +456,7 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_common_original_switch_lineage_blocks_ingress_and_readiness_before_first_effect"
     },
     {
-      "elapsed_seconds": 4.417151,
+      "elapsed_seconds": 4.152492,
       "metrics": {
         "db_wal_shm_unchanged_by_readback": true,
         "inventory_status": "KNOWN",

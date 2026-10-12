@@ -14,7 +14,8 @@
     "switch_final_positive_failure": "PRECEDING_ASSERTIONS_ABORTED_FIXTURE_REPAIR",
     "tests_run": 378
   },
-  "after_linux": "ENFORCED_LIVE_AT_EXACT_HEAD_CI",
+  "after_linux": "LOCAL_NATIVE_PASS_EXACT_HEAD_GITHUB_CI_REQUIRED",
+  "cause": "RAW_HASH_DESCRIPTOR_CLOSE_RELEASED_WRITER_PROCESS_POSIX_LOCKS_BEFORE_COLD_CLI",
   "ci_ref": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/38306899461/job/115003861607",
   "contract_ref": "source-contract.md section423: Native WAL coordination is not business write",
   "current_local": {
@@ -22,21 +23,32 @@
     "cold_cli_commands": 24,
     "consumers_tests": 99,
     "native_suite_tests": 191,
-    "suite_receipt_sha256": "9cc5a1e06c3951fb505d2c57286918c1a6b74ead18b01767888a0615260b0f67",
-    "targeted_receipt_sha256": "61b9f66b64c90ee3c52246860832587f97a3d4438c7f3e3cd23118ca8678f36c",
+    "suite_receipt_sha256": "9daebf2bddd83804e0781db64afd114207ae134d4f85906ffa0b03b6eb9116cb",
+    "targeted_receipt_sha256": "b1e7579c701e360be4648843d636e8bb2b8e7f65c62070d9573f047a20f46be8",
     "targeted_tests": 16
   },
-  "current_test_sha256": "15da7cad481361f2395d59a65f1bcb4e648df851459d510a2d6c8aeb3c902c43",
+  "current_test_sha256": "aa224814b1d3774174c330c5356816d167a7e5eea76d1e6d7c485ef8dc055e25",
   "exact_delta": {
     "added_fixture_helper": 1,
+    "affected_native_tests": 3,
+    "business_assertion_changes": 0,
+    "full_byte_oracle_coverage_changes": 0,
+    "hash_calls": 6,
     "immutable_or_checkpoint_changes": 0,
-    "oracle_changes": 0,
-    "original_test_ast_unchanged_except_setup": true,
+    "normalized_original_ast_equal": true,
     "product_or_validator_changes": 0,
-    "readonly_setup_calls": 3,
     "shm_exclusions": 0
   },
   "failed_head": "18594ae2e2c1bb3d083d98d36f3cfa5ff0cb0059",
+  "fixture_setup_negative": {
+    "actual_canary_executed": false,
+    "after": "SYNTHETIC_1T_QUOTA_SMALL_FIXTURES_NO_PHYSICAL_CAPACITY_CLAIM",
+    "cause": "TMPFS_512M_SYNTHETIC_CAPACITY_TOO_SMALL_FOR_NATIVE_ADMISSION",
+    "errors": 3,
+    "failures": 0,
+    "stdout_sha256": "a7593ee0baa507f62802d459d621253a083f0780371a65ca1153cff94bed59c1",
+    "tests_run": 3
+  },
   "full_local_gate": "NOT_EXECUTED",
   "helper_negative": {
     "action": "DELETE_ONLY_MARKED_OWNED_CACHE_THEN_REAL_CURRENT_99_TEST_RUN",
@@ -45,14 +57,111 @@
     "tests_executed": 0
   },
   "job_id": 115003861607,
+  "local_linux_after": {
+    "container_removed": true,
+    "elapsed_seconds": 21.230117,
+    "errors": 0,
+    "failures": 0,
+    "filesystem_capacity": "SYNTHETIC_TMPFS_1T_QUOTA_SMALL_NATIVE_CANARY_ONLY",
+    "image_pull": "NEVER",
+    "native_output_sha256": "63a0cf975927eaeb237d7bfba051d9d2f8d797466ab80a7da72b978260d9ac63",
+    "network": "NONE",
+    "owned_roots_absent": true,
+    "provider_calls": 0,
+    "python_version": "3.13.14",
+    "source_pins_before": {
+      "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+      "scripts/trading_continuity.py": "ba9615ae37886197b52a394415989427b182a33976d03b1985868d2f36f597dd",
+      "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+      "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+      "src/solana_alpha_lab/factory/paper_plane.py": "b832b090453ef475b06268aa1ecf0308879339c61b1423efa894256fa8b14c02",
+      "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+      "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+      "src/solana_alpha_lab/factory/trading_adapters.py": "cf6fa566e491d68aeee5c059228fc2385b2884c23c297aa6905f00f3606c8e05",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "78dc900e17849aab9b55753b9148370914363d3362c7d6aecfca880eb5e25748",
+      "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+      "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
+      "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+      "tests/test_trading_core_operational_closure_v1.py": "aa224814b1d3774174c330c5356816d167a7e5eea76d1e6d7c485ef8dc055e25",
+      "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
+      "tests/test_trading_operational_obligations_v1.py": "5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880",
+      "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
+    },
+    "sqlite_version": "3.53.1",
+    "status": "PASS",
+    "stdout_sha256": "d640e7f3565862729aec8226ea0b8a41e2fd739b2d8b2adbcd2968a25f6d2919",
+    "tests_run": 3
+  },
+  "local_linux_before": {
+    "elapsed_seconds": 18.922202,
+    "errors": 0,
+    "failures": 7,
+    "fixture_read_snapshot_hypothesis": "FAIL_7",
+    "inprocess_hash_reader_partial": "FAIL_4_AFTER_FIRST_SUBCASE_PASSED",
+    "stdout_sha256": "6c143538ae5da9504d1c25df19db7e10af71f53a67fcd697d935403f0ee306b2",
+    "tests_run": 3
+  },
   "official_refs": [
     "https://sqlite.org/walformat.html",
-    "https://www.sqlite.org/wal.html"
+    "https://www.sqlite.org/wal.html",
+    "https://www.sqlite.org/howtocorrupt.html#_posix_advisory_locks_canceled_by_a_separate_thread_doing_close_"
   ],
   "old_test_sha256": "f0094ce44ee7b168729cb6686ae2e5070849c19a347b5159624152105d55f0b0",
+  "oracle_equivalence": {
+    "business_assertions_changed": 0,
+    "current_sha256": "aa224814b1d3774174c330c5356816d167a7e5eea76d1e6d7c485ef8dc055e25",
+    "full_db_wal_shm_oracle": true,
+    "hash_calls": 6,
+    "normalized_ast_equals_original": true,
+    "original_ref": "18594ae2e2c1bb3d083d98d36f3cfa5ff0cb0059:tests/test_trading_core_operational_closure_v1.py",
+    "original_sha256": "f0094ce44ee7b168729cb6686ae2e5070849c19a347b5159624152105d55f0b0",
+    "product_changes": 0,
+    "status": "PASS"
+  },
+  "oracle_negatives": {
+    "cases": [
+      {
+        "case": "ONE_BYTE_MUTATION_native.sqlite",
+        "detected": true
+      },
+      {
+        "case": "ONE_BYTE_MUTATION_native.sqlite-wal",
+        "detected": true
+      },
+      {
+        "case": "ONE_BYTE_MUTATION_native.sqlite-shm",
+        "detected": true
+      },
+      {
+        "case": "SIDECAR_DELETION",
+        "detected": true
+      },
+      {
+        "case": "SIDECAR_CREATION",
+        "detected": true
+      }
+    ],
+    "full_bytes_hash_equal_to_original_expression": true,
+    "owned_root_absent": true,
+    "provider_calls": 0,
+    "status": "PASS"
+  },
+  "rationale": "Hash in a separate process to preserve writer locks; keep the original full DB/WAL/SHM and path-presence oracle.",
   "raw_ci_log_sha256": "2ec97e179ba93e229bf0e947bc42e3b1065e6a208809c81c2a56a31a9f37e099",
-  "receipt_sha256": "af52d677c7a9103c5cae9eeebaed66605ba51bf569abb807ecbd16f54c4b6eec",
+  "receipt_sha256": "0eb3fda0c2911fecebdd111df2d670196cb5676ac3bf28c56e82a2e0ec680156",
+  "repeated_exact_ci_failure": {
+    "elapsed_seconds": 625.578,
+    "errors": 0,
+    "failures": 7,
+    "head": "b9d97bb1aa485016e488236d6fd78f833e1b3ea4",
+    "job_id": 115024721898,
+    "raw_log_sha256": "f23fac26c0a7a2ebad0a8eb73370fcf0292ef25808746cba10ea4d51e8a22b43",
+    "ref": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/38313430457/job/115024721898",
+    "run_id": 38313430457,
+    "skipped": 2,
+    "tests_run": 378
+  },
   "run_id": 38306899461,
   "schema": "smial.readonly-canary-fixture-repair",
-  "status": "LOCAL_NATIVE_PASS_EXACT_LINUX_CI_REQUIRED"
+  "status": "LOCAL_WINDOWS_AND_LINUX_NATIVE_PASS_EXACT_GITHUB_CI_REQUIRED"
 }

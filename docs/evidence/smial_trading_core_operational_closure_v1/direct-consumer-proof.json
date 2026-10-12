@@ -6,7 +6,7 @@
   },
   "code_unchanged_during_execution": true,
   "credential_reads": false,
-  "elapsed_seconds": 26.193264,
+  "elapsed_seconds": 26.034081,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "failed_test_ids": [],
   "full_local_gate": "NOT_EXECUTED",
@@ -124,7 +124,7 @@
     "tests/test_risk_and_economics_v1.py": "6d0742193f5fd20ec9a660074a826561b9f0b27e443b09efee11c880c9681a2e",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "15da7cad481361f2395d59a65f1bcb4e648df851459d510a2d6c8aeb3c902c43",
+    "tests/test_trading_core_operational_closure_v1.py": "aa224814b1d3774174c330c5356816d167a7e5eea76d1e6d7c485ef8dc055e25",
     "tests/test_trading_operations_workbench_v2.py": "0764f3652f042d2306e70defc3de3462d3c4ff5606f24bef048d8c34d49e7a32",
     "tests/test_trading_runtime_admission_concurrency_v1.py": "8f863f65b6448beec1406538e220efc43f03df2096631888eb72bebbd6a8dcae",
     "tests/test_trading_runtime_policy_backup_restore_v1.py": "ff3e2e96ecbf089274385640606bd7b43eb7d730035bf08624bdfe76305c38e3",
@@ -143,14 +143,14 @@
   ],
   "output_bytes": 16575,
   "output_encoding": "UTF8",
-  "output_sha256": "99c63edef402190ea179d9b62068ec6f9d012434beed21ae539eaa2d62ecda3d",
+  "output_sha256": "e22b6db1d1db6e486e206ade368280624f8990e29d5ce1b9f3a4e04429beffe7",
   "owned_scratch_cleanup": {
     "owned_root_absent": true,
     "scope": "ONLY_OWN_MARKED_FIXTURE_ROOT"
   },
   "prior_receipt_git_ref": "cd6636427e50ea3c04e9b3d2140f571a9429022e:docs/evidence/smial_trading_core_operational_closure_v1/direct-consumer-proof.json",
   "provider_calls": false,
-  "receipt_sha256": "338e92500a24e0cc396fb651bc3282d2180b9428ad9be1149c4df5c9e0e58930",
+  "receipt_sha256": "f94c5985a71061188e773c6c140bbb5ae6c24b4dd1db44fb610206a87b4aa571",
   "schema": "smial.direct-consumer-proof",
   "schema_version": "1.0",
   "source_pins_after": {
@@ -166,7 +166,7 @@
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "15da7cad481361f2395d59a65f1bcb4e648df851459d510a2d6c8aeb3c902c43",
+    "tests/test_trading_core_operational_closure_v1.py": "aa224814b1d3774174c330c5356816d167a7e5eea76d1e6d7c485ef8dc055e25",
     "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
     "tests/test_trading_operational_obligations_v1.py": "5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880",
     "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
@@ -184,705 +184,705 @@
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "15da7cad481361f2395d59a65f1bcb4e648df851459d510a2d6c8aeb3c902c43",
+    "tests/test_trading_core_operational_closure_v1.py": "aa224814b1d3774174c330c5356816d167a7e5eea76d1e6d7c485ef8dc055e25",
     "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
     "tests/test_trading_operational_obligations_v1.py": "5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880",
     "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
   },
   "source_snapshot_file_count": 1260,
-  "source_snapshot_sha256_after": "52d09e146881a0a1e6cdf992f1e5a23769fb4be201c3c76ea0c45a1fcac37795",
-  "source_snapshot_sha256_before": "52d09e146881a0a1e6cdf992f1e5a23769fb4be201c3c76ea0c45a1fcac37795",
+  "source_snapshot_sha256_after": "3a1704697e9d5e7c8d69194d336b0eaddddb54d2c14dd2ca13463bdd8bf197d7",
+  "source_snapshot_sha256_before": "3a1704697e9d5e7c8d69194d336b0eaddddb54d2c14dd2ca13463bdd8bf197d7",
   "status": "PASS",
   "test_ids_match_prior_receipt": true,
   "tests": [
     {
-      "duration_seconds": 0.068388,
+      "duration_seconds": 0.102352,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_crash_after_allow_retry_keeps_binding"
     },
     {
-      "duration_seconds": 0.101503,
+      "duration_seconds": 0.09559,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_policy_apply_and_enter_do_not_mix_revisions"
     },
     {
-      "duration_seconds": 0.105177,
+      "duration_seconds": 0.174352,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_same_signal_retry_one_position"
     },
     {
-      "duration_seconds": 0.066844,
+      "duration_seconds": 0.065541,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_shared_store_two_threads_one_remaining_slot"
     },
     {
-      "duration_seconds": 0.141315,
+      "duration_seconds": 0.093587,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_two_distinct_enters_one_remaining_slot"
     },
     {
-      "duration_seconds": 2.2e-05,
+      "duration_seconds": 2.3e-05,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
       "test": "test_trading_runtime_policy_backup_restore_v1.TradingRuntimePolicyBackupRestoreTests.test_paper_plane_sqlite_is_a_mutable_backup_source"
     },
     {
-      "duration_seconds": 0.055182,
+      "duration_seconds": 0.05579,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_policy_backup_restore_v1.TradingRuntimePolicyBackupRestoreTests.test_policy_revision_survives_file_copy_restore"
     },
     {
-      "duration_seconds": 0.054225,
+      "duration_seconds": 0.050987,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_as_of_is_required"
     },
     {
-      "duration_seconds": 0.062598,
+      "duration_seconds": 0.067185,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_exit_decision_version_must_match_the_position"
     },
     {
-      "duration_seconds": 0.059759,
+      "duration_seconds": 0.066528,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_future_decision_is_rejected_beyond_skew"
     },
     {
-      "duration_seconds": 0.072684,
+      "duration_seconds": 0.064759,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_one_id_binds_one_body"
     },
     {
-      "duration_seconds": 0.074092,
+      "duration_seconds": 0.079839,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_position_lineage_is_queryable_from_the_store"
     },
     {
-      "duration_seconds": 0.054742,
+      "duration_seconds": 0.053724,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_strategy_spec_drift_fails_closed"
     },
     {
-      "duration_seconds": 0.068388,
+      "duration_seconds": 0.074763,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_cancel_rules"
     },
     {
-      "duration_seconds": 0.073511,
+      "duration_seconds": 0.075675,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_cancelled_intent_releases_its_entry_slot"
     },
     {
-      "duration_seconds": 0.06995,
+      "duration_seconds": 0.066282,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_close_all_cancels_pre_attempt_and_skips_in_flight"
     },
     {
-      "duration_seconds": 0.060039,
+      "duration_seconds": 0.063578,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_close_position_cancels_a_pre_attempt_intent"
     },
     {
-      "duration_seconds": 0.207056,
+      "duration_seconds": 0.307432,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_consumers_treat_cancelled_as_settled_without_pnl"
     },
     {
-      "duration_seconds": 0.06031,
+      "duration_seconds": 0.057747,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_entry_fill_is_bound_to_the_admission"
     },
     {
-      "duration_seconds": 0.118489,
+      "duration_seconds": 0.127327,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_retry_never_fills_an_in_flight_attempt"
     },
     {
-      "duration_seconds": 0.059806,
+      "duration_seconds": 0.062513,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_stale_resume_cancels_the_reserved_intent"
     },
     {
-      "duration_seconds": 0.061396,
+      "duration_seconds": 0.063397,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_stop_bot_cancels_pre_attempt_intents_and_reaches_stopped"
     },
     {
-      "duration_seconds": 0.257445,
+      "duration_seconds": 0.242312,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_stops_cancel_reserved_intents_instead_of_opening_them"
     },
     {
-      "duration_seconds": 1.026082,
+      "duration_seconds": 0.99768,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_lifecycle_and_http_read_the_same_live_position_owner"
     },
     {
-      "duration_seconds": 0.075678,
+      "duration_seconds": 0.065259,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_missing_and_corrupt_source_never_bootstraps_or_all_clears"
     },
     {
-      "duration_seconds": 0.105484,
+      "duration_seconds": 0.104357,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_non_wal_compatibility_is_readonly_without_business_writes"
     },
     {
-      "duration_seconds": 0.111321,
+      "duration_seconds": 0.107789,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_one_projection_snapshot_and_next_request_freshness"
     },
     {
-      "duration_seconds": 1.549569,
+      "duration_seconds": 1.543152,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_os_denies_source_access_without_bootstrap_or_stale_fallback"
     },
     {
-      "duration_seconds": 1.106383,
+      "duration_seconds": 1.126085,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_overlapping_http_gets_do_not_close_each_others_reader"
     },
     {
-      "duration_seconds": 0.243415,
+      "duration_seconds": 0.257302,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_public_live_wal_position_policy_and_next_read_two_repetitions"
     },
     {
-      "duration_seconds": 0.116213,
+      "duration_seconds": 0.110223,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_read_failure_does_not_reuse_success_or_infer_empty_runtime"
     },
     {
-      "duration_seconds": 0.074787,
+      "duration_seconds": 0.068534,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_accept_fill_is_atomic_with_intent_events"
     },
     {
-      "duration_seconds": 0.138635,
+      "duration_seconds": 0.109161,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_accounting_fixture_projection_scalars_survive_event_reorder"
     },
     {
-      "duration_seconds": 0.42053,
+      "duration_seconds": 0.40327,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_close_request_serializes_with_concurrent_exit_fill"
     },
     {
-      "duration_seconds": 3.241388,
+      "duration_seconds": 3.282405,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_close_vs_exit_race_never_regresses_or_duplicates"
     },
     {
-      "duration_seconds": 0.101614,
+      "duration_seconds": 0.085469,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_concurrent_same_signal_accept_writes_intent_events_once"
     },
     {
-      "duration_seconds": 0.072524,
+      "duration_seconds": 0.069775,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_entry_fill_is_atomic_with_its_event"
     },
     {
-      "duration_seconds": 0.069924,
+      "duration_seconds": 0.068499,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_execution_events_are_returned_in_causal_order"
     },
     {
-      "duration_seconds": 0.068984,
+      "duration_seconds": 0.074727,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_exit_fill_is_atomic_with_its_events"
     },
     {
-      "duration_seconds": 0.074798,
+      "duration_seconds": 0.071429,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_operator_command_is_atomic_with_its_record"
     },
     {
-      "duration_seconds": 0.06995,
+      "duration_seconds": 0.067055,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_unresolved_exit_is_atomic_with_its_reconciliation_event"
     },
     {
-      "duration_seconds": 2.704815,
+      "duration_seconds": 2.750141,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a1_absent_source"
     },
     {
-      "duration_seconds": 0.075362,
+      "duration_seconds": 0.086161,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a2_paper_reconciliation"
     },
     {
-      "duration_seconds": 0.085794,
+      "duration_seconds": 0.088557,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a3_a4_paper_and_shadow_separate"
     },
     {
-      "duration_seconds": 0.089645,
+      "duration_seconds": 0.084504,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a5_different_strategy_versions"
     },
     {
-      "duration_seconds": 0.086322,
+      "duration_seconds": 0.083227,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a6_accounting_conflict_excludes_row"
     },
     {
-      "duration_seconds": 0.071611,
+      "duration_seconds": 0.069461,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a7_known_exact_zero"
     },
     {
-      "duration_seconds": 0.000208,
+      "duration_seconds": 0.000221,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_home_has_no_fourth_economics_domain"
     },
     {
-      "duration_seconds": 0.416628,
+      "duration_seconds": 0.376975,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_i1_exit_required_not_all_risk_clear"
     },
     {
-      "duration_seconds": 0.067086,
+      "duration_seconds": 0.065302,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_m1_m2_open_mark_fees"
     },
     {
-      "duration_seconds": 0.066883,
+      "duration_seconds": 0.067435,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_m4_missing_mark_as_of"
     },
     {
-      "duration_seconds": 0.082431,
+      "duration_seconds": 0.086962,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_m5_m6_legacy_mark_components"
     },
     {
-      "duration_seconds": 7.111244,
+      "duration_seconds": 6.736645,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_o_owner_nonclaims_and_get_purity"
     },
     {
-      "duration_seconds": 0.183129,
+      "duration_seconds": 0.185167,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 2,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_p_path_metrics"
     },
     {
-      "duration_seconds": 0.452114,
+      "duration_seconds": 0.426447,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_r2_r3_at_and_over_limit"
     },
     {
-      "duration_seconds": 0.43161,
+      "duration_seconds": 0.487852,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_r_declared_entry_limit"
     },
     {
-      "duration_seconds": 0.52081,
+      "duration_seconds": 0.531218,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_semantic_route_reused"
     },
     {
-      "duration_seconds": 0.074579,
+      "duration_seconds": 0.089304,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_x_exposure_named_and_separate"
     },
     {
-      "duration_seconds": 0.130743,
+      "duration_seconds": 0.132537,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 2,
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_absent_policy_keeps_bot_local_strategy_version_max_open"
     },
     {
-      "duration_seconds": 0.062554,
+      "duration_seconds": 0.077406,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_absent_policy_preserves_strategy_only_paper_and_shadow"
     },
     {
-      "duration_seconds": 0.000829,
+      "duration_seconds": 0.000985,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_capability_phrase_is_not_a_runtime_value"
     },
     {
-      "duration_seconds": 0.049333,
+      "duration_seconds": 0.071516,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_check_classifies_tightening"
     },
     {
-      "duration_seconds": 0.075639,
+      "duration_seconds": 0.084287,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_entry_stop_and_revision_semantics"
     },
     {
-      "duration_seconds": 0.071496,
+      "duration_seconds": 0.080619,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_invalid_policy_blocks_new_entry_exit_continues"
     },
     {
-      "duration_seconds": 0.067243,
+      "duration_seconds": 0.069509,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_missing_strategy_id_fail_closes_family_notional_cap"
     },
     {
-      "duration_seconds": 0.067442,
+      "duration_seconds": 0.080548,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_paper_shadow_isolation_and_live_denied"
     },
     {
-      "duration_seconds": 0.064316,
+      "duration_seconds": 0.078321,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_position_and_notional_caps"
     },
     {
-      "duration_seconds": 0.068219,
+      "duration_seconds": 0.06117,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_readonly_get_does_not_create_or_apply"
     },
     {
-      "duration_seconds": 0.06624,
+      "duration_seconds": 0.074904,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_sizing_min_and_no_headroom_shrink"
     },
     {
-      "duration_seconds": 0.075692,
+      "duration_seconds": 0.08678,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_unknown_open_risk_blocks_historical_does_not"
     },
     {
-      "duration_seconds": 0.059633,
+      "duration_seconds": 0.066844,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_valid_policy_resume_without_frozen_binding_fails_closed"
     },
     {
-      "duration_seconds": 0.090762,
+      "duration_seconds": 0.113699,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_decimal_fixture_pnl_streak_drawdown"
     },
     {
-      "duration_seconds": 0.066994,
+      "duration_seconds": 0.082187,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_entry_fee_required_and_no_terminal_resurrect"
     },
     {
-      "duration_seconds": 3e-05,
+      "duration_seconds": 4.4e-05,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_loss_streak_unknown_when_latest_unknown"
     },
     {
-      "duration_seconds": 0.087288,
+      "duration_seconds": 0.101553,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_pause_close_all_stop_drain_idempotent"
     },
     {
-      "duration_seconds": 0.079701,
+      "duration_seconds": 0.089925,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_pause_resume_happy_path"
     },
     {
-      "duration_seconds": 0.069295,
+      "duration_seconds": 0.068359,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_shadow_evidence_class_separate"
     },
     {
-      "duration_seconds": 0.220466,
+      "duration_seconds": 0.21182,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_smoke_script_pass"
     },
     {
-      "duration_seconds": 0.083638,
+      "duration_seconds": 0.074161,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_activation_epoch_separates_bots"
     },
     {
-      "duration_seconds": 0.074659,
+      "duration_seconds": 0.071449,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_closed_enter_returns_real_state"
     },
     {
-      "duration_seconds": 0.007148,
+      "duration_seconds": 0.00558,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_decision_schemas_validate"
     },
     {
-      "duration_seconds": 0.068602,
+      "duration_seconds": 0.069271,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_enter_opens_through_canonical_signal"
     },
     {
-      "duration_seconds": 0.107127,
+      "duration_seconds": 0.069475,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_enter_rejects_epoch_mismatch_on_existing_signal"
     },
     {
-      "duration_seconds": 0.084259,
+      "duration_seconds": 0.071844,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_exit_decision_advances_without_fill_claim"
     },
     {
-      "duration_seconds": 0.068559,
+      "duration_seconds": 0.070354,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_exit_rejects_epoch_mismatch"
     },
     {
-      "duration_seconds": 0.067407,
+      "duration_seconds": 0.065406,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_future_available_enter_forbidden"
     },
     {
-      "duration_seconds": 0.084493,
+      "duration_seconds": 0.085865,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_legacy_v1_0_loads_and_behaves"
     },
     {
-      "duration_seconds": 0.064937,
+      "duration_seconds": 0.064351,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_missing_activation_fails_closed"
     },
     {
-      "duration_seconds": 0.188013,
+      "duration_seconds": 0.180141,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 3,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_non_enter_actions_do_not_open"
     },
     {
-      "duration_seconds": 0.069882,
+      "duration_seconds": 0.087066,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_resume_incomplete_enter_lifecycle"
     },
     {
-      "duration_seconds": 0.08131,
+      "duration_seconds": 0.079411,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_same_mint_distinct_signal_ids"
     },
     {
-      "duration_seconds": 0.073713,
+      "duration_seconds": 0.063413,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_same_signal_idempotent"
     },
     {
-      "duration_seconds": 0.067901,
+      "duration_seconds": 0.060112,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_shadow_mode_uses_shadow_executable"
     },
     {
-      "duration_seconds": 0.071192,
+      "duration_seconds": 0.070488,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_sqlite_migration_idempotent_on_legacy_reopen"
     },
     {
-      "duration_seconds": 0.134619,
+      "duration_seconds": 0.124711,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 2,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_stale_signal_and_max_open_enforced"
     },
     {
-      "duration_seconds": 0.089341,
+      "duration_seconds": 0.078362,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_two_structurally_different_producers_same_interface"
     },
     {
-      "duration_seconds": 0.008405,
+      "duration_seconds": 0.006484,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_v1_1_path_does_not_call_signal_kind_for"
     },
     {
-      "duration_seconds": 0.018802,
+      "duration_seconds": 0.011476,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_v1_1_rejects_feature_fields"
     },
     {
-      "duration_seconds": 0.02019,
+      "duration_seconds": 0.012805,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,

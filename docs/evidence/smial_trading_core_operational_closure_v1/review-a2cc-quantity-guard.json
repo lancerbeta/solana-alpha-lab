@@ -64,8 +64,8 @@
     "stdout_sha256": "72f812648044787831f759a20c67f09d8cd80a07f08f1abc077bf54edfa57abf"
   },
   "current_regression_test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect",
-  "current_targeted_receipt_sha256": "84278a31bf9b876f6f29f2380497e2c9edcb7cc4e848770bfb43294282773918",
-  "current_whole_receipt_sha256": "e818ec0b45dd2fa2e935b95cc21491aabd96edff612a804a2671b58318428164",
+  "current_targeted_receipt_sha256": "1d5afca005228ed728e55556342c28849dc8e0a2c61d3a407e49b114ffa9378c",
+  "current_whole_receipt_sha256": "b3742e96621b0466ab60282448d47bc1a8bb965122b0b433195c855583d54e2f",
   "do_d_oracle_recovery_ci_safety_weakened": false,
   "history_rewritten": false,
   "interim_regression_negatives": [

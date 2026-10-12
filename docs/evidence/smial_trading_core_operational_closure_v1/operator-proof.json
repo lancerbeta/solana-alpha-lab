@@ -8,18 +8,18 @@
     "native_fixture_root_absent": true,
     "owned_root_absent": true
   },
-  "cli_elapsed_seconds": 16.467327,
+  "cli_elapsed_seconds": 16.059639,
   "configuration_recovery": {
     "original_policy_envelope_events_exact": true,
     "post_backup_configuration_extension_exercised": false
   },
   "credential_reads": false,
-  "elapsed_seconds": 19.119937,
+  "elapsed_seconds": 18.600388,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "explicit_resume_executed": true,
   "external_cut_basis": "EMPTY_INDEPENDENT_EFFECT_LEDGER_NO_POST_BACKUP_EFFECTS_CALLER_ASSERTED_COMPLETE",
   "final_state": "RECONCILED_STOPPED",
-  "fixture_preparation_elapsed_seconds": 1.777763,
+  "fixture_preparation_elapsed_seconds": 1.665905,
   "fixture_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "identities": {
     "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-COLD-FINAL",
@@ -27,9 +27,9 @@
       "ATTEMPT-086A806EDA2DB59871650A819F9D3BA4356C5F35A15EEA1D0C4B62959843A916",
       "ATTEMPT-6BF204842254402C08039BC2523174CF3D307220455AF53217B83C91F7ECD3E9"
     ],
-    "backup_database_sha256": "b78947afe2ddaef402b33c9f10ce28fcbafe14c2b1a5899de4edf84f6ef14cbd",
+    "backup_database_sha256": "ae324f334f23c4f5fa10799e736455dd87c1ba2e07e3e13b0393469299987567",
     "bot_instance_id": "BOT-STRAT-CONTINUITY-SYNTH-001-COLD-FINAL-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-COLD-FINAL",
-    "cut_sha256": "75887448c8eb49460f5395488dcca12f2f95d84136cfcec47301b60996486172",
+    "cut_sha256": "854ce683f534122e6bd220f8603bb1a9c6268c1a1f5853a15bb228b9dbbf79af",
     "inventory_sha256": "b87e055f2d00272488c114bc6f75a52a14fdbe7fe84f1aad97c6fce8821ab58c",
     "position_id": "POS-SIG-SIGDEC-1984A0A347E8238F2571E78380F7E6EFFB683E3543640EC1469E4CA3319C586F"
   },
@@ -43,35 +43,35 @@
   "readonly_canaries": [
     {
       "command": "status",
-      "family_sha256": "eda30ed08e529077db575552516dd38e922d08df10200213fbd81ec0e451b408",
+      "family_sha256": "69d31e3f107cc3cd1e5c51e2eabe39992171af1c0760a44c46d7ff8d1a55c732",
       "physical_family_byte_exact": true,
       "sequence": 4,
       "wal_bytes": 0
     },
     {
       "command": "status",
-      "family_sha256": "1dbdc0eea104a68330c65d215ca1004726267ea228801d1c5f95444a548168c6",
+      "family_sha256": "77b80fbed74470dc49569968e255d9fef682fbb70b7ebfe2f1923ba51c638628",
       "physical_family_byte_exact": true,
       "sequence": 6,
       "wal_bytes": 0
     },
     {
       "command": "status",
-      "family_sha256": "c38cc6c5a21377d6cca148220ffc23fe4eccd13e5db5440ccd9641dbe480bd42",
+      "family_sha256": "bda3b2decf59f740c2026ce2921dbe5ffd199b7dd5965b4e1c3253cef0259db2",
       "physical_family_byte_exact": true,
       "sequence": 13,
       "wal_bytes": 0
     },
     {
       "command": "status",
-      "family_sha256": "c38cc6c5a21377d6cca148220ffc23fe4eccd13e5db5440ccd9641dbe480bd42",
+      "family_sha256": "bda3b2decf59f740c2026ce2921dbe5ffd199b7dd5965b4e1c3253cef0259db2",
       "physical_family_byte_exact": true,
       "sequence": 14,
       "wal_bytes": 0
     },
     {
       "command": "status",
-      "family_sha256": "66a2ffdb1e1452650e74a4d49c66487b98cd78c5c72da457df8c2e9d121843f0",
+      "family_sha256": "40ca27ba5bd96139377a27f8635c6927d84cf9701ede366b287494b939803e4e",
       "physical_family_byte_exact": true,
       "sequence": 16,
       "wal_bytes": 0
@@ -79,7 +79,7 @@
   ],
   "readonly_status_canaries_verified": true,
   "readonly_status_canary_count": 5,
-  "receipt_sha256": "1385a73faf3510c243236167a10fda820fa9cf321f2a5a6a21abd15c239fe26f",
+  "receipt_sha256": "930d49d93f5e14bb81326f3f53506988daa779fa2935a7eadc737c4dacce099a",
   "reproducer_ref": "docs/evidence/smial_trading_core_operational_closure_v1/operator-reproducer.py",
   "reproducer_sha256": "2fc3126943ddfff8d0837ed5d6fecb8fc894e42bd535ef232d1419d36e2d8a29",
   "role": "ROOT_NATIVE_PROOF_NOT_CRITIC_VERDICT",
@@ -92,7 +92,7 @@
       {
         "argument": "SEM-OWNER-LIFECYCLE",
         "command": "resolve-route",
-        "elapsed_seconds": 4.670291,
+        "elapsed_seconds": 4.735712,
         "exit_code": 0,
         "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "stdout_sha256": "76f3d621d9b3fc7424ee0bda50373ff05832dd13709ddb8f8cb8aa323473d7cd"
@@ -100,7 +100,7 @@
       {
         "argument": "DOC-TRADING-CONTINUITY-OFFLINE-001",
         "command": "resolve-asset",
-        "elapsed_seconds": 4.697933,
+        "elapsed_seconds": 4.553036,
         "exit_code": 0,
         "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "stdout_sha256": "63b69159f1279953726e89e3f0bad5c370f64566b6a5c89699e925415fcaaf78"
@@ -108,19 +108,19 @@
     ],
     "native_navigation_command_count": 2,
     "network_required": false,
-    "non_navigation_canonical_sha256": "d558368f00eb5ee1bd15adbb28817b54512207dcf06898c75d55f9ea83aee8a2",
+    "non_navigation_canonical_sha256": "ee308e823af5e2b4e8d6c1143f4e2b4ab8c9b7ea66f4574c90d9340d4d1e8d20",
     "read_only": true,
     "readback_anchors": {
-      "catalog/assets/core.yaml": "f4aa04f06111b002b1dff5216c67c67a5b102d94812671f90c16e49f03bb770c",
+      "catalog/assets/core.yaml": "1ef8e4004d0779cf6b69fc7ad0c4074470e334c2089073dc1dfec4fd452deb75",
       "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "a1f0dabbc50819b092403fa9b2dda3d4b2f296947d311668de94ad4b148c8dc7",
-      "docs/reports/smial_trading_core_operational_closure_v1/REPORT.md": "7372ed2ee9ce868f3a9d58c95c1619f8eba90cb5925fa64b648333e8fe2f04dc",
+      "docs/reports/smial_trading_core_operational_closure_v1/REPORT.md": "59416a184649c402d771656026c3db013e6dcfc6459f8a3a58073a701b0b94f0",
       "docs/tasks/SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1.md": "2913799fe347869cf68d6a41fad9d470549f77fdb4aa8d87a6136ac4e844801a"
     },
     "readback_anchors_unchanged": true,
     "record_status_is_not_product_acceptance": true,
     "status": "PASS"
   },
-  "source_exit_producer_elapsed_seconds": 0.435216,
+  "source_exit_producer_elapsed_seconds": 0.440567,
   "source_exit_producer_prepared_natively": true,
   "source_pins_after": {
     "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
@@ -135,7 +135,7 @@
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "15da7cad481361f2395d59a65f1bcb4e648df851459d510a2d6c8aeb3c902c43",
+    "tests/test_trading_core_operational_closure_v1.py": "aa224814b1d3774174c330c5356816d167a7e5eea76d1e6d7c485ef8dc055e25",
     "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
     "tests/test_trading_operational_obligations_v1.py": "5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880",
     "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
@@ -153,7 +153,7 @@
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "15da7cad481361f2395d59a65f1bcb4e648df851459d510a2d6c8aeb3c902c43",
+    "tests/test_trading_core_operational_closure_v1.py": "aa224814b1d3774174c330c5356816d167a7e5eea76d1e6d7c485ef8dc055e25",
     "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
     "tests/test_trading_operational_obligations_v1.py": "5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880",
     "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
@@ -167,7 +167,7 @@
         "strategy": "configs/strategies/continuity_synth-COLD-FINAL.yaml"
       },
       "command": "check",
-      "elapsed_seconds": 0.69833,
+      "elapsed_seconds": 0.712378,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -187,7 +187,7 @@
         "switch_key": "COLD-FINAL-INITIAL"
       },
       "command": "operating-activate",
-      "elapsed_seconds": 0.779875,
+      "elapsed_seconds": 0.775747,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -196,7 +196,7 @@
       "sequence": 2,
       "status": null,
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "ce450ce5d068bfe67b314009aa54b755086c226b1a00996c8b651c59c3f721d7"
+      "stdout_sha256": "f1f18c869e692a38a6e7295299dffe76ab4632df0f38f9be232735a8e345664f"
     },
     {
       "arguments": {
@@ -204,7 +204,7 @@
         "ticks": "1"
       },
       "command": "run",
-      "elapsed_seconds": 0.985506,
+      "elapsed_seconds": 0.959336,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -220,7 +220,7 @@
         "as_of": "2026-10-05T12:40:00Z"
       },
       "command": "status",
-      "elapsed_seconds": 0.671402,
+      "elapsed_seconds": 0.66813,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -229,7 +229,7 @@
       "sequence": 4,
       "status": "READY",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "be7b20506b7cd15418dfbcfbdb91489f3ce2d611b5e670bb3f10ecdcd89a2a18"
+      "stdout_sha256": "c9b7f3033b06c2e79c77f49401d0e43b4ecb9d52da935340137b9caabeef8563"
     },
     {
       "arguments": {
@@ -237,7 +237,7 @@
         "idempotency_key": "COLD-FINAL-PAUSE"
       },
       "command": "pause",
-      "elapsed_seconds": 0.606978,
+      "elapsed_seconds": 0.60767,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -254,7 +254,7 @@
         "format": "human"
       },
       "command": "status",
-      "elapsed_seconds": 0.70454,
+      "elapsed_seconds": 0.670168,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -270,7 +270,7 @@
         "destination": "backups/cold-final.sqlite"
       },
       "command": "backup",
-      "elapsed_seconds": 0.684516,
+      "elapsed_seconds": 0.61034,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -279,7 +279,7 @@
       "sequence": 7,
       "status": null,
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "bba27ca690c3dd5dacbd80c4ffe10b9ca9aae26c342fbb0bf298774adba2f1a8"
+      "stdout_sha256": "01ec1e9779a348fb6ee306f474883ce08845cf82fdaf057570f5b42343876a2c"
     },
     {
       "arguments": {
@@ -291,7 +291,7 @@
         "input": "independent-effect-receipts.json"
       },
       "command": "export-cut",
-      "elapsed_seconds": 0.617587,
+      "elapsed_seconds": 0.593411,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -305,7 +305,7 @@
     {
       "arguments": {},
       "command": "init",
-      "elapsed_seconds": 0.593687,
+      "elapsed_seconds": 0.570459,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -321,7 +321,7 @@
         "backup": "<retained-native-backup>"
       },
       "command": "restore",
-      "elapsed_seconds": 0.654839,
+      "elapsed_seconds": 0.614375,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -338,7 +338,7 @@
         "input": "external-cut-input.json"
       },
       "command": "seal-cut",
-      "elapsed_seconds": 0.625266,
+      "elapsed_seconds": 0.617141,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -347,14 +347,14 @@
       "sequence": 11,
       "status": "CUT_VERIFIED_AND_SEALED",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "9ec4d02bccb4ed25f88b998dfcb8113399c1aba8c607866461bc5eae865df888"
+      "stdout_sha256": "f8d29fa38eaf023889ef915063b2a1ec02d77bf19acb400d68240fdde3e10b6b"
     },
     {
       "arguments": {
         "input": "complete-external-cut.json"
       },
       "command": "reconcile",
-      "elapsed_seconds": 0.697508,
+      "elapsed_seconds": 0.676716,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -370,7 +370,7 @@
         "as_of": "2026-10-05T12:40:00Z"
       },
       "command": "status",
-      "elapsed_seconds": 0.675199,
+      "elapsed_seconds": 0.690729,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -379,7 +379,7 @@
       "sequence": 13,
       "status": "ACTION_REQUIRED",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "6be66989f80100f20f763011f82e668bbcad64cd87c67a5d03d8d2f972e6589e"
+      "stdout_sha256": "0d72b2b4af5502c866edb9c5347942125f19c1ad61ee75f4fc36f30d126d76b9"
     },
     {
       "arguments": {
@@ -387,7 +387,7 @@
         "format": "human"
       },
       "command": "status",
-      "elapsed_seconds": 0.688592,
+      "elapsed_seconds": 0.692729,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -405,7 +405,7 @@
         "inventory_sha256": "b87e055f2d00272488c114bc6f75a52a14fdbe7fe84f1aad97c6fce8821ab58c"
       },
       "command": "ack-restore",
-      "elapsed_seconds": 0.641775,
+      "elapsed_seconds": 0.665536,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -421,7 +421,7 @@
         "as_of": "2026-10-05T12:40:00Z"
       },
       "command": "status",
-      "elapsed_seconds": 0.67916,
+      "elapsed_seconds": 0.65864,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -430,7 +430,7 @@
       "sequence": 16,
       "status": "READY",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "6079b38c6e3235adea55a212c5ea52295124922f83e72b290834971ffb0e5d76"
+      "stdout_sha256": "6b8e750203efcea381e9854e548d228a11966a139967ad1d13e05802ca79c35d"
     },
     {
       "arguments": {
@@ -438,7 +438,7 @@
         "idempotency_key": "COLD-FINAL-RESUME"
       },
       "command": "resume",
-      "elapsed_seconds": 0.606605,
+      "elapsed_seconds": 0.582301,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -455,7 +455,7 @@
         "idempotency_key": "COLD-FINAL-DRAIN"
       },
       "command": "drain",
-      "elapsed_seconds": 0.613689,
+      "elapsed_seconds": 0.594151,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -472,7 +472,7 @@
         "ticks": "1"
       },
       "command": "run",
-      "elapsed_seconds": 1.004395,
+      "elapsed_seconds": 0.985037,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -486,7 +486,7 @@
     {
       "arguments": {},
       "command": "readback",
-      "elapsed_seconds": 0.610266,
+      "elapsed_seconds": 0.580912,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -495,7 +495,7 @@
       "sequence": 20,
       "status": "STOPPED",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "022dfa4c563b929dcb2a4b86573203117fd5ff5344cdc138c6282c23066f652a"
+      "stdout_sha256": "4a6f7042c60bad56011467ad80fd80775b7a1249b36590e9c03d73c1b3eb5896"
     },
     {
       "arguments": {
@@ -505,7 +505,7 @@
         "strategy": "configs/strategies/continuity_synth-COLD-FINAL.yaml"
       },
       "command": "check",
-      "elapsed_seconds": 0.639938,
+      "elapsed_seconds": 0.641149,
       "exit_code": 2,
       "expected_exit_code": 2,
       "mode": "SHADOW",
@@ -523,7 +523,7 @@
         "strategy": "configs/strategies/continuity_synth-COLD-FINAL.yaml"
       },
       "command": "check",
-      "elapsed_seconds": 0.6371,
+      "elapsed_seconds": 0.634063,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "SHADOW",
@@ -542,7 +542,7 @@
         "strategy": "configs/strategies/continuity_synth-COLD-FINAL.yaml"
       },
       "command": "check",
-      "elapsed_seconds": 0.662503,
+      "elapsed_seconds": 0.625793,
       "exit_code": 2,
       "expected_exit_code": 2,
       "mode": "SHADOW",
@@ -561,7 +561,7 @@
         "strategy": "configs/strategies/continuity_synth-COLD-FINAL.yaml"
       },
       "command": "check",
-      "elapsed_seconds": 0.688071,
+      "elapsed_seconds": 0.632728,
       "exit_code": 2,
       "expected_exit_code": 2,
       "mode": "PAPER",

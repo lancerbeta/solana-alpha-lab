@@ -34,12 +34,14 @@ class OperatingDriverTests(unittest.TestCase):
     tearDown = continuity_fixture.OrdinarySourceTests.tearDown
     prepare = continuity_fixture.OrdinarySourceTests.prepare
 
-    def settle_readonly_canary_fixture(self):
-        # Fixture setup includes SQLite's first readonly WAL-index coordination.
-        # The measured native/CLI reads still must preserve every DB/WAL/SHM byte.
-        with closing(PaperPlaneStore(self.runner.store_path, readonly=True)) as observer:
-            with observer.read_snapshot():
-                observer._conn.execute("SELECT COUNT(*) FROM execution_events").fetchone()
+    def readonly_canary_hashes(self, paths):
+        # A raw descriptor close in this process can release SQLite's POSIX
+        # locks. Hash in a separate process; keep the full DB/WAL/SHM oracle.
+        code = ("import hashlib,json,sys; from pathlib import Path; "
+                "print(json.dumps({p.name:hashlib.sha256(p.read_bytes()).hexdigest() "
+                "for p in map(Path,sys.argv[1:]) if p.exists()}))")
+        return json.loads(subprocess.check_output(
+            [sys.executable, "-B", "-c", code, *map(str, paths)], cwd=ROOT, timeout=10))
 
     def test_C06_C19_frozen_base_episode_replay_preserves_identity_and_payload(self):
         from solana_alpha_lab.factory import episode_decision
@@ -1410,8 +1412,7 @@ class OperatingDriverTests(unittest.TestCase):
                     self.assertEqual(packet["decision"]["action"], "ENTER")
                     self.assertEqual(packet["admission"]["reason_code"], "OPERATING_SWITCH_STATE_CONFLICT")
                     paths = [self.runner.store_path, Path(str(self.runner.store_path) + "-wal"), Path(str(self.runner.store_path) + "-shm")]
-                    self.settle_readonly_canary_fixture()
-                    before = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}
+                    before = self.readonly_canary_hashes(paths)
                     for view in (self.coordinator.status(), self.invoke("status", as_of="2026-10-05T12:40:00Z")):
                         self.assertEqual(view["status"], "ACTION_REQUIRED")
                         self.assertFalse(view["entries_enabled"])
@@ -1419,7 +1420,7 @@ class OperatingDriverTests(unittest.TestCase):
                         self.assertEqual(view["operating_configuration_status"], "OPERATING_SWITCH_STATE_CONFLICT")
                         self.assertEqual(view["inventory"]["inventory_status"], "KNOWN")
                         self.assertEqual(view["next_safe_action"], "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING")
-                    self.assertEqual({path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}, before)
+                    self.assertEqual(self.readonly_canary_hashes(paths), before)
                     for key in ("positions", "modeled_attempts", "modeled_results"):
                         self.assertEqual(self.runner.readback()[key], [])
                     rows.append({"alteration": alteration, "reason": packet["admission"]["reason_code"],
@@ -1476,8 +1477,7 @@ class OperatingDriverTests(unittest.TestCase):
             self.assertFalse(tick["entries_enabled"])
             self.assertEqual(tick["attempts"], 0)
             paths = [self.runner.store_path, Path(str(self.runner.store_path) + "-wal"), Path(str(self.runner.store_path) + "-shm")]
-            self.settle_readonly_canary_fixture()
-            before = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}
+            before = self.readonly_canary_hashes(paths)
             native = self.coordinator.status()
             cli = self.invoke("status", as_of="2026-10-05T12:40:00Z")
             for view in (native, cli):
@@ -1489,7 +1489,7 @@ class OperatingDriverTests(unittest.TestCase):
                 self.assertTrue(view["exit_reconciliation_healthy"])
                 self.assertEqual(view["next_safe_action"], "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING")
                 self.assertEqual(view["next_safe_command"], "readback --mode PAPER")
-            self.assertEqual({path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}, before)
+            self.assertEqual(self.readonly_canary_hashes(paths), before)
             self.assertEqual(writer.positions(), [original])
         self.source.tick(datetime(2026, 10, 5, 13, 5, tzinfo=UTC))
         self.now = datetime(2026, 10, 5, 13, 10, tzinfo=UTC)
@@ -1532,8 +1532,7 @@ class OperatingDriverTests(unittest.TestCase):
             writer._conn.execute("PRAGMA wal_autocheckpoint=0")
             paths = [self.runner.store_path, Path(str(self.runner.store_path) + "-wal"),
                      Path(str(self.runner.store_path) + "-shm")]
-            self.settle_readonly_canary_fixture()
-            before = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}
+            before = self.readonly_canary_hashes(paths)
             native = self.coordinator.status()
             cli = self.invoke("status", as_of="2026-10-05T12:40:00Z")
             for view in (native, cli):
@@ -1556,7 +1555,7 @@ class OperatingDriverTests(unittest.TestCase):
             self.assertIn("новые входы разрешены: False", text)
             self.assertIn("Следующее безопасное действие: VERIFY_RUNTIME_POLICY", text)
             self.assertNotIn("PAPER · READY", text)
-            self.assertEqual({path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}, before)
+            self.assertEqual(self.readonly_canary_hashes(paths), before)
             self.assertEqual(writer.positions(), [original])
             self.assertFalse(policy_owner.resolve_current_policy(writer, "PAPER")["policy"]["new_entries_enabled"])
         self.source.tick(datetime(2026, 10, 5, 13, 5, tzinfo=UTC))

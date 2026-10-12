@@ -1,7 +1,7 @@
 # SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1
 
 VERDICT: ENGINEERING_PASS_CANDIDATE_PENDING_EXACT_DELIVERY_GATES.
-Текущие байты:191 native tests (754.254608s),99 consumers (26.193264s), два clock probes и24 cold CLI этапа.
+Текущие байты:191 native tests (737.71521s),99 consumers (26.034081s), два clock probes и24 cold CLI этапа.
 F-A/F-B и обнаруженные P1 закрыты в existing owners;16 адресных регрессий сохраняют original witnesses, no-resend, cap safety и fatal shared-store boundary.
 Финальный review a2cc сохранил ARCH NOT_READY: отсутствующая quantity допускала fresh EXIT. Common-seam replan запрещает этот effect по retained ENTRY/economic evidence; завершение того же review set ограничено этим delta и exact bindings. Широкая campaign остановлена.
 Exact-head CI/readiness и отдельная owner phrase остаются gates.
@@ -79,7 +79,7 @@ packet через current native source/store owners. Это проверка п
 
 ## C01–C24
 
-Native automated status: PASS, 191 tests, 754.254608s; source bytes до/после
+Native automated status: PASS, 191 tests, 737.71521s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -188,28 +188,28 @@ before/after и прежний scoped review PASS сохранены в
 purpose lifecycle-маршрута: IDs, вопросы, ссылки и authority сохранены; новый
 размер 16349 bytes, прямой semantic consumer module — 15 PASS.
 
-Peak suite process RSS: 151027712 bytes (144.03 MiB). Native 14-day producer
+Peak suite process RSS: 150056960 bytes (143.11 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.2144–0.2781s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.2139–0.2523s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04808–0.05437 |
-| 1000 | 364544 | 0.05019–0.05598 |
-| 4000 | 843776 | 0.06436–0.06829 |
+| 0 | 204800 | 0.05211–0.06109 |
+| 1000 | 364544 | 0.04958–0.06092 |
+| 4000 | 843776 | 0.05292–0.05538 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 1200 | 0.000515 |
-| 100 proved terminal | 96260 | 0.032270 |
-| 1000 proved terminal | 950780 | 0.209966 |
-| 1000 terminal + 12000 unrelated events | 950790 | 0.218729 |
+| 1 outstanding | 1200 | 0.000550 |
+| 100 proved terminal | 96260 | 0.021489 |
+| 1000 proved terminal | 950780 | 0.236262 |
+| 1000 terminal + 12000 unrelated events | 950790 | 0.237305 |
 
-Native history preparation: 13.650s.
+Native history preparation: 13.648s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.
@@ -256,4 +256,4 @@ NOT_EXECUTED: необходима отдельная machine-rendered owner phr
 
 Final quantity seam: retained positive ENTRY или economic projection не превращаются в доказанное отсутствие inventory при qty_dec=NULL. Direct witness, pre-input и transactional claim используют existing owner; fresh attempt/request/quote запрещены. PAPER/SHADOW, native public/modeled ENTRY и три damage variants проверены; original source EXIT decision допускается, исходный execution journal неизменён. Восстановление original quantity завершает original full EXIT без resend. Actual a2cc NOT_READY/native BEFORE и durable reproducer: review-a2cc-quantity-guard.json, quantity-witness-reproducer.py; historical190 и другие snapshots доступны по exact refs в history.json.
 
-Linux CI fixture correction: three existing strict readonly byte-canaries establish the native WAL/SHM reader index before taking their baseline. Whole test AST equals prior18594 after removing only the helper and three setup calls; all assertions, full DB/WAL/SHM comparisons and business oracles remain unchanged. Current191/16 native proofs are source-bound; Linux AFTER must be proved by new exact-head CI. Actual CI failure/hash/ref and essential negative facts: ci-readonly-canary-repair.json.
+Linux readonly byte-canary correction: baseline hash readers previously closed raw DB/WAL/SHM descriptors in the SQLite writer process, dropping its POSIX locks before cold CLI status. Warm-up and retained readonly snapshot did not fix this common seam. Six full-byte hash measurements in the same three native tests now run in separate short-lived processes. Normalizing only that helper and six equivalent hash calls yields the original18594 AST; no business assertion, path-presence check, DB/WAL/SHM coverage, product/validator or recovery gate is weakened. Actual offline Linux3tests PASS (0failures), five mutation/sidecar oracle negatives PASS, and current191/16/99/2clock/24CLI proofs are source-bound. New exact-head GitHub CI remains required. Compact failure/proof hashes and refs: ci-readonly-canary-repair.json.
