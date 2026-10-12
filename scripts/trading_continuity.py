@@ -243,6 +243,7 @@ def main(argv=None) -> int:
             print(f"{result['mode']} · {result['status']} · epoch {result['activation_epoch_id']}\n"
                 f"На {result['as_of']} · последний tick: {result['last_tick_at'] or 'NONE'}\n"
                 f"Процесс: {result['process_alive']} · источник: {result['input_reason']} ({result['source_latest_at'] or 'NONE'}) · прогресс: {result['progress_moving']}\n"
+                f"Текущий вход: {result['activation_epoch_id']} · новые входы разрешены: {result['entries_enabled']} · источник: {result['source_status']}\n"
                 f"Конфигурация: {result['operating_configuration_status']} · входы исполнения: {result['execution_input_status']}\n"
                 f"Политика входов: {result['runtime_policy_status']} · revision: {result['runtime_policy_revision'] if result['runtime_policy_revision'] is not None else 'NONE'} · SHA256: {result['runtime_policy_sha256']}\n"
                 f"Обязательства: {inventory['position_count']} · стоимость: {inventory['outstanding_cost_basis_usd'] if inventory['outstanding_cost_basis_usd'] is not None else 'UNKNOWN'} USD · pending attempts: {result['pending_attempts']}\n"
@@ -255,6 +256,10 @@ def main(argv=None) -> int:
             for incident in result["incidents"]:
                 if incident["active"]:
                     print(f"Incident {incident['incident_key']} · {incident['reason']} · с {incident['first_at']} · {incident['occurrences']} наблюдений")
+            for blocker in result["entry_blockers"]:
+                print(f"Новый вход заблокирован: {blocker['reason']} · исходный grant или входные данные требуют проверки")
+            print("Выходы по исходным позициям: " + ("исправны" if result["exit_reconciliation_healthy"] else "требуют сверки"))
+            print("Следующее безопасное действие: " + result["next_safe_action"])
             print("Далее: CLI "+result["next_safe_command"]+" (с теми же repository/data/scope flags)")
         else:
             print(json.dumps(result, ensure_ascii=False, sort_keys=True, allow_nan=False))

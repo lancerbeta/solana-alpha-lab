@@ -13,7 +13,7 @@ from typing import Any
 from solana_alpha_lab.factory.episode_decision import produce_episode_decision, load_bound_recipe, produce_originating_exit, produce_frozen_time_exit
 from solana_alpha_lab.factory.observation_schedule import parse_utc
 from solana_alpha_lab.factory.paper_plane import (PaperPlaneStore, accept_signal_decision_outcome,
-    accept_exit_decision, begin_modeled_attempt, accept_modeled_result)
+    accept_exit_decision, begin_modeled_attempt, accept_modeled_result, _operating_binding_block)
 from solana_alpha_lab.factory.paper_shadow_commands import apply_operator_command, maybe_finish_drain
 from solana_alpha_lab.factory.paper_shadow_operations import build_operations_projection
 from solana_alpha_lab.factory.promotion_handoff import compose_science_to_strategy_handoff
@@ -276,9 +276,10 @@ class TradingContinuityRunner:
         bound = record["payload"]
         frozen = store.get_execution_event("OPERATING-" + epoch_id)
         if frozen is not None:
+            block = _operating_binding_block(store, mode=mode, epoch_id=epoch_id)
+            if block:
+                raise PaperPlaneError(block)
             self._set_frozen(frozen)
-            if frozen["payload"]["activation"] != bound:
-                raise PaperPlaneError("OPERATING_BINDING_INTEGRITY_CONFLICT")
         if (bound["mode"], bound["strategy_sha256"]) != (mode, self.strategy["spec_sha256"]):
             raise PaperPlaneError("ACTIVATION_BINDING_CONFLICT")
         return {epoch_id: bound}
@@ -345,6 +346,8 @@ class TradingContinuityRunner:
             packet = produce_episode_decision(self.root, source_path=source_path, strategy=self.strategy,
                 manifest=self.manifest, execution_binding=self.binding, epoch_id=epoch_id,
                 episode_id=episode_id, as_of=as_of, frozen_recipe=self.recipe)
+            if not isinstance(packet, dict) or not isinstance(packet.get("decision"), dict):
+                raise PaperPlaneError("INPUT_SHAPE_INVALID")
             with store.immediate_write():
                 sid = "SRC-" + packet["decision"]["signal_decision_id"]
                 previous = store.get_execution_event(sid)

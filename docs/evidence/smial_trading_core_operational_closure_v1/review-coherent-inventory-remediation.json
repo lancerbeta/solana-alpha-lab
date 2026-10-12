@@ -1,0 +1,591 @@
+{
+  "after": {
+    "elapsed_seconds": 18.652248,
+    "errors": 0,
+    "failed_test_ids": [],
+    "failures": 0,
+    "head": "9ee9fb5763ff572da293cf8ec0b2d2e53a16f52b",
+    "output_sha256": "63534d854a9ee5ae80e8f5bf26563489a1be213632adc662dfee7cf0e15eeb20",
+    "owned_fixture_root_count": 18,
+    "owned_fixture_roots_absent": true,
+    "phase": "after",
+    "skips": 0,
+    "source_pins_after": {
+      "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+      "scripts/trading_continuity.py": "9694d0b589b0fd560e250324bd7cef07c547ec8b6e8c137d471f028a6083538b",
+      "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+      "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+      "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+      "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+      "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+      "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "48b45dfa48a57cbce65559006b30e8a5974a0137c846e626d41a2de5de52c090",
+      "src/solana_alpha_lab/factory/trading_runner.py": "6d110b3cb314f4171a3406f134dd77cbb0237d6541020628791f698370f23b59",
+      "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
+      "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+      "tests/test_trading_core_operational_closure_v1.py": "2c9f40b73bc065338f6e9b089d8c26d58f42670fe5994b1f028eedfff69fa4fa",
+      "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+      "tests/test_trading_operational_obligations_v1.py": "3ff23c730986ea55cf969d7743641e4e77cde25df8631d765ce33d7dd02df0d4",
+      "tests/test_trading_operational_recovery_v1.py": "8bb5d52236c44a0c1a3842c752e467a32398d74e6cfdb69c09508d55f73e02d9"
+    },
+    "source_pins_before": {
+      "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+      "scripts/trading_continuity.py": "9694d0b589b0fd560e250324bd7cef07c547ec8b6e8c137d471f028a6083538b",
+      "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+      "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+      "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+      "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+      "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+      "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "48b45dfa48a57cbce65559006b30e8a5974a0137c846e626d41a2de5de52c090",
+      "src/solana_alpha_lab/factory/trading_runner.py": "6d110b3cb314f4171a3406f134dd77cbb0237d6541020628791f698370f23b59",
+      "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
+      "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+      "tests/test_trading_core_operational_closure_v1.py": "2c9f40b73bc065338f6e9b089d8c26d58f42670fe5994b1f028eedfff69fa4fa",
+      "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+      "tests/test_trading_operational_obligations_v1.py": "3ff23c730986ea55cf969d7743641e4e77cde25df8631d765ce33d7dd02df0d4",
+      "tests/test_trading_operational_recovery_v1.py": "8bb5d52236c44a0c1a3842c752e467a32398d74e6cfdb69c09508d55f73e02d9"
+    },
+    "status": "PASS",
+    "test_count": 18,
+    "tests": [
+      {
+        "elapsed_seconds": 0.3351,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_coherent_remainder_reduction_requires_original_inventory_before_headroom",
+        "metrics": {
+          "basis": "ORIGINAL_CUMULATIVE_INVENTORY_WITNESS",
+          "cases": [
+            {
+              "coherent_mutated_cost_basis_usd": "3",
+              "inventory_status": "UNKNOWN",
+              "mode": "PAPER",
+              "new_admission": "DENIED",
+              "original_realized_legs_unchanged": true,
+              "phase": "OPEN",
+              "proved_cost_basis_usd": "30",
+              "retained_admission_bound_usd": "30"
+            },
+            {
+              "coherent_mutated_cost_basis_usd": "3",
+              "inventory_status": "UNKNOWN",
+              "mode": "PAPER",
+              "new_admission": "DENIED",
+              "original_realized_legs_unchanged": true,
+              "phase": "PARTIAL",
+              "proved_cost_basis_usd": "18",
+              "retained_admission_bound_usd": "30"
+            },
+            {
+              "coherent_mutated_cost_basis_usd": "3",
+              "inventory_status": "UNKNOWN",
+              "mode": "SHADOW",
+              "new_admission": "DENIED",
+              "original_realized_legs_unchanged": true,
+              "phase": "OPEN",
+              "proved_cost_basis_usd": "30",
+              "retained_admission_bound_usd": "30"
+            },
+            {
+              "coherent_mutated_cost_basis_usd": "3",
+              "inventory_status": "UNKNOWN",
+              "mode": "SHADOW",
+              "new_admission": "DENIED",
+              "original_realized_legs_unchanged": true,
+              "phase": "PARTIAL",
+              "proved_cost_basis_usd": "18",
+              "retained_admission_bound_usd": "30"
+            }
+          ]
+        },
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.144343,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_claim_rechecks_coherent_predecessor_corruption_atomically",
+        "metrics": {
+          "cases": [
+            {
+              "admitted_b_usd": "30",
+              "coherent_a_projection_usd": "3",
+              "entry_claim": "DENIED",
+              "headroom_limit_usd": "40",
+              "mode": "PAPER",
+              "new_entry_attempts": 0,
+              "original_a_journal_unchanged": true
+            },
+            {
+              "admitted_b_usd": "30",
+              "coherent_a_projection_usd": "3",
+              "entry_claim": "DENIED",
+              "headroom_limit_usd": "40",
+              "mode": "SHADOW",
+              "new_entry_attempts": 0,
+              "original_a_journal_unchanged": true
+            }
+          ],
+          "claim_guard_transaction": "EXISTING_IMMEDIATE_WRITE"
+        },
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.102653,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_concurrent_admission_and_entry_claim_both_deny_coherent_inventory_corruption",
+        "metrics": {
+          "admission": "DENIED",
+          "concurrent_connections": 2,
+          "entry_claim": "DENIED",
+          "new_entry_attempts": 0,
+          "original_a_journal_unchanged": true,
+          "retained_admission_bound_usd": "30"
+        },
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.069926,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_shared_predecessor_reservation_and_no_auto_shrink",
+        "metrics": {},
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.080347,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_literal_partial_accounting_oracle_replay_and_cold_readback",
+        "metrics": {},
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.066338,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_genuine_v1_0_entry_then_v1_1_partial_and_full_preserves_original_payload",
+        "metrics": {
+          "legacy_original_payload_unchanged": true,
+          "partial_quantity": "6000000",
+          "terminal_net_usd": "1.07"
+        },
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.070499,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_unknown_exit_retains_inventory_and_blocks_overlapping_attempt",
+        "metrics": {},
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.065953,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_partial_unknown_retains_realized_leg_and_residual_upper_bound",
+        "metrics": {},
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.063037,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_1_entry_preserves_raw_quote_quantity_and_included_fee",
+        "metrics": {},
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.061555,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_partial_entry_raw_rounddown_retains_exact_paid_notional_without_fee_double_count",
+        "metrics": {},
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.066815,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_nonfill_frees_capacity_but_unknown_cost_stays_economic",
+        "metrics": {},
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.154063,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_0_native_complete_result_chain_still_releases_capacity",
+        "metrics": {},
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.08476,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_modes_independent_and_concurrent_reservations_serialized",
+        "metrics": {},
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.285031,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_unattempted_cancel_releases_only_with_original_pre_attempt_witness",
+        "metrics": {},
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 2.81999,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_terminal_release_requires_intact_final_result_chain",
+        "metrics": {},
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.070855,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_fee_allocation_and_leg_pnl_conserve_on_three_exits",
+        "metrics": {},
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.128174,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_corrupt_remainder_or_final_never_frees_capacity",
+        "metrics": {},
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 13.451832,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_readback_cost_is_bounded_by_outstanding_scope_not_historical_journal",
+        "metrics": {
+          "after_1000_valid_releases": {
+            "elapsed_seconds": 0.15470450000429992,
+            "sqlite_steps": 774540
+          },
+          "after_100_valid_releases": {
+            "elapsed_seconds": 0.015146500008995645,
+            "sqlite_steps": 78430
+          },
+          "after_unrelated_journal": {
+            "elapsed_seconds": 0.15514240000629798,
+            "sqlite_steps": 774560
+          },
+          "before": {
+            "elapsed_seconds": 0.0005085000011604279,
+            "sqlite_steps": 980
+          },
+          "native_history_preparation_seconds": 13.028409499995178,
+          "native_valid_terminal_positions": 1000,
+          "unrelated_journal_events": 12000
+        },
+        "owned_root_absent": true
+      }
+    ]
+  },
+  "after_scope": "3 new native regressions plus 15 direct accounting/legacy/TOKEN/UNKNOWN/full/partial/nonfill/concurrency/indexed-resource neighbors. Not the complete suite or full project gate.",
+  "before_native": {
+    "elapsed_seconds": 0.305109,
+    "head": "9ee9fb5763ff572da293cf8ec0b2d2e53a16f52b",
+    "owned_fixture_roots_absent": true,
+    "scenarios": [
+      {
+        "canonical_witness": "EXIT_INVENTORY_WITNESS_CONFLICT",
+        "effect": {
+          "action": "ENTER",
+          "fill_deferred": true,
+          "position_id": "POS-SIG-SIGDEC-B-AFTER-OPEN-ADMISSION",
+          "reason_code": "VERTICAL_ENTER",
+          "send_permitted": null
+        },
+        "mutated_cost_basis_usd": "3",
+        "mutated_quantity": "1000000",
+        "original_cost_basis_usd": "30",
+        "original_journal_unchanged": true,
+        "original_quantity": "10000000",
+        "original_realized_net_unchanged": true,
+        "owned_root_absent": true,
+        "scenario": "OPEN_ADMISSION",
+        "summary": {
+          "basis": "OUTSTANDING_OBLIGATIONS_V1",
+          "inventory_status": "KNOWN",
+          "known_cost_basis_floor_usd": "3",
+          "mode": "PAPER",
+          "outstanding_cost_basis_usd": "3",
+          "pending_attempt_count": 0,
+          "position_count": 1,
+          "positions": [
+            {
+              "activation_epoch_id": "ACTIVATION-EPOCH-ACCOUNTING-PAPER-001",
+              "bot_instance_id": "BOT-STRAT-ACCOUNTING-CONTROL-A-V1-PAPER-ACTIVATION-EPOCH-ACCOUNTING-PAPER-001",
+              "cost_basis_usd": "3",
+              "inventory_status": "KNOWN",
+              "position_id": "POS-SIG-SIGDEC-OBLIGATION-A",
+              "remaining_quantity": "1000000",
+              "state": "OPEN",
+              "strategy_id": "STRAT-ACCOUNTING-CONTROL-A"
+            }
+          ]
+        }
+      },
+      {
+        "canonical_witness": "EXIT_INVENTORY_WITNESS_CONFLICT",
+        "effect": {
+          "action": null,
+          "fill_deferred": null,
+          "position_id": "POS-SIG-SIGDEC-B-CLAIM",
+          "reason_code": null,
+          "send_permitted": true
+        },
+        "mutated_cost_basis_usd": "3",
+        "mutated_quantity": "1000000",
+        "original_cost_basis_usd": "30",
+        "original_journal_unchanged": true,
+        "original_quantity": "10000000",
+        "original_realized_net_unchanged": true,
+        "owned_root_absent": true,
+        "scenario": "PENDING_CLAIM",
+        "summary": {
+          "basis": "OUTSTANDING_OBLIGATIONS_V1",
+          "inventory_status": "KNOWN",
+          "known_cost_basis_floor_usd": "33",
+          "mode": "PAPER",
+          "outstanding_cost_basis_usd": "33",
+          "pending_attempt_count": 0,
+          "position_count": 2,
+          "positions": [
+            {
+              "activation_epoch_id": "ACTIVATION-EPOCH-ACCOUNTING-PAPER-001",
+              "bot_instance_id": "BOT-STRAT-ACCOUNTING-CONTROL-A-V1-PAPER-ACTIVATION-EPOCH-ACCOUNTING-PAPER-001",
+              "cost_basis_usd": "3",
+              "inventory_status": "KNOWN",
+              "position_id": "POS-SIG-SIGDEC-OBLIGATION-A",
+              "remaining_quantity": "1000000",
+              "state": "OPEN",
+              "strategy_id": "STRAT-ACCOUNTING-CONTROL-A"
+            },
+            {
+              "activation_epoch_id": "ACTIVATION-EPOCH-ACCOUNTING-PAPER-001",
+              "bot_instance_id": "BOT-STRAT-ACCOUNTING-CONTROL-A-V1-PAPER-ACTIVATION-EPOCH-ACCOUNTING-PAPER-001",
+              "cost_basis_usd": "30",
+              "inventory_status": "KNOWN",
+              "position_id": "POS-SIG-SIGDEC-B-CLAIM",
+              "remaining_quantity": null,
+              "state": "WATCHED",
+              "strategy_id": "STRAT-ACCOUNTING-CONTROL-A"
+            }
+          ]
+        }
+      },
+      {
+        "canonical_witness": "EXIT_INVENTORY_WITNESS_CONFLICT",
+        "effect": {
+          "action": "ENTER",
+          "fill_deferred": true,
+          "position_id": "POS-SIG-SIGDEC-B-AFTER-PARTIAL-REMAINDER",
+          "reason_code": "VERTICAL_ENTER",
+          "send_permitted": null
+        },
+        "mutated_cost_basis_usd": "3",
+        "mutated_quantity": "1000000",
+        "original_cost_basis_usd": "18",
+        "original_journal_unchanged": true,
+        "original_quantity": "6000000",
+        "original_realized_net_unchanged": true,
+        "owned_root_absent": true,
+        "scenario": "PARTIAL_REMAINDER",
+        "summary": {
+          "basis": "OUTSTANDING_OBLIGATIONS_V1",
+          "inventory_status": "KNOWN",
+          "known_cost_basis_floor_usd": "3",
+          "mode": "PAPER",
+          "outstanding_cost_basis_usd": "3",
+          "pending_attempt_count": 0,
+          "position_count": 1,
+          "positions": [
+            {
+              "activation_epoch_id": "ACTIVATION-EPOCH-ACCOUNTING-PAPER-001",
+              "bot_instance_id": "BOT-STRAT-ACCOUNTING-CONTROL-A-V1-PAPER-ACTIVATION-EPOCH-ACCOUNTING-PAPER-001",
+              "cost_basis_usd": "3",
+              "inventory_status": "KNOWN",
+              "position_id": "POS-SIG-SIGDEC-OBLIGATION-A",
+              "remaining_quantity": "1000000",
+              "state": "EXIT_REQUIRED",
+              "strategy_id": "STRAT-ACCOUNTING-CONTROL-A"
+            }
+          ]
+        }
+      }
+    ],
+    "scope": "3 native disposable PAPER DB before probes; no provider effects",
+    "source_pins_after": {
+      "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+      "scripts/trading_continuity.py": "9694d0b589b0fd560e250324bd7cef07c547ec8b6e8c137d471f028a6083538b",
+      "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+      "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+      "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+      "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+      "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+      "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "48b45dfa48a57cbce65559006b30e8a5974a0137c846e626d41a2de5de52c090",
+      "src/solana_alpha_lab/factory/trading_runner.py": "6d110b3cb314f4171a3406f134dd77cbb0237d6541020628791f698370f23b59",
+      "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
+      "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+      "tests/test_trading_core_operational_closure_v1.py": "2c9f40b73bc065338f6e9b089d8c26d58f42670fe5994b1f028eedfff69fa4fa",
+      "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+      "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
+      "tests/test_trading_operational_recovery_v1.py": "524b2bf596df6d61d997e471b921342fb22a1bd70603f0557b9c85e596d3d0ee"
+    },
+    "source_pins_before": {
+      "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+      "scripts/trading_continuity.py": "9694d0b589b0fd560e250324bd7cef07c547ec8b6e8c137d471f028a6083538b",
+      "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+      "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+      "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+      "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+      "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+      "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "48b45dfa48a57cbce65559006b30e8a5974a0137c846e626d41a2de5de52c090",
+      "src/solana_alpha_lab/factory/trading_runner.py": "6d110b3cb314f4171a3406f134dd77cbb0237d6541020628791f698370f23b59",
+      "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
+      "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+      "tests/test_trading_core_operational_closure_v1.py": "2c9f40b73bc065338f6e9b089d8c26d58f42670fe5994b1f028eedfff69fa4fa",
+      "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+      "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
+      "tests/test_trading_operational_recovery_v1.py": "524b2bf596df6d61d997e471b921342fb22a1bd70603f0557b9c85e596d3d0ee"
+    },
+    "status": "REPRODUCED_P1"
+  },
+  "before_native_receipt_sha256": "13741ffb4ee1d06d94d6899b0491b52ca33e50d18484982e314d0aaca20a6dea",
+  "before_regression_error_explanation": "The concurrent claim was permitted and therefore had no denied reason_code. The assertion originally indexed that missing key. After implementation its assertion uses get and still requires the exact deny reason. The independently executed PENDING_CLAIM before probe proves send_permitted=true.",
+  "before_regressions": {
+    "elapsed_seconds": 1.059296,
+    "errors": 1,
+    "failed_test_ids": [
+      "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_coherent_remainder_reduction_requires_original_inventory_before_headroom (mode='PAPER', partial=False)",
+      "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_coherent_remainder_reduction_requires_original_inventory_before_headroom (mode='PAPER', partial=True)",
+      "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_coherent_remainder_reduction_requires_original_inventory_before_headroom (mode='SHADOW', partial=False)",
+      "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_coherent_remainder_reduction_requires_original_inventory_before_headroom (mode='SHADOW', partial=True)",
+      "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_claim_rechecks_coherent_predecessor_corruption_atomically (mode='PAPER')",
+      "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_claim_rechecks_coherent_predecessor_corruption_atomically (mode='SHADOW')",
+      "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_concurrent_admission_and_entry_claim_both_deny_coherent_inventory_corruption"
+    ],
+    "failures": 6,
+    "head": "9ee9fb5763ff572da293cf8ec0b2d2e53a16f52b",
+    "output_sha256": "4b261360eb556dd34f077f103b2aa1da0abf5f7c127a36f5baa2de00c8ec415c",
+    "owned_fixture_root_count": 3,
+    "owned_fixture_roots_absent": true,
+    "phase": "regression-before",
+    "skips": 0,
+    "source_pins_after": {
+      "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+      "scripts/trading_continuity.py": "9694d0b589b0fd560e250324bd7cef07c547ec8b6e8c137d471f028a6083538b",
+      "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+      "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+      "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+      "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+      "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+      "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "48b45dfa48a57cbce65559006b30e8a5974a0137c846e626d41a2de5de52c090",
+      "src/solana_alpha_lab/factory/trading_runner.py": "6d110b3cb314f4171a3406f134dd77cbb0237d6541020628791f698370f23b59",
+      "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
+      "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+      "tests/test_trading_core_operational_closure_v1.py": "2c9f40b73bc065338f6e9b089d8c26d58f42670fe5994b1f028eedfff69fa4fa",
+      "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+      "tests/test_trading_operational_obligations_v1.py": "81a966e3f6d914d3a2b384683bdd64d9401183e43fd2ceecf6eb3d74232ff142",
+      "tests/test_trading_operational_recovery_v1.py": "524b2bf596df6d61d997e471b921342fb22a1bd70603f0557b9c85e596d3d0ee"
+    },
+    "source_pins_before": {
+      "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+      "scripts/trading_continuity.py": "9694d0b589b0fd560e250324bd7cef07c547ec8b6e8c137d471f028a6083538b",
+      "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+      "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+      "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+      "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+      "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+      "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "48b45dfa48a57cbce65559006b30e8a5974a0137c846e626d41a2de5de52c090",
+      "src/solana_alpha_lab/factory/trading_runner.py": "6d110b3cb314f4171a3406f134dd77cbb0237d6541020628791f698370f23b59",
+      "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
+      "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+      "tests/test_trading_core_operational_closure_v1.py": "2c9f40b73bc065338f6e9b089d8c26d58f42670fe5994b1f028eedfff69fa4fa",
+      "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+      "tests/test_trading_operational_obligations_v1.py": "81a966e3f6d914d3a2b384683bdd64d9401183e43fd2ceecf6eb3d74232ff142",
+      "tests/test_trading_operational_recovery_v1.py": "524b2bf596df6d61d997e471b921342fb22a1bd70603f0557b9c85e596d3d0ee"
+    },
+    "status": "FAIL",
+    "test_count": 3,
+    "tests": [
+      {
+        "elapsed_seconds": 0.299339,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_coherent_remainder_reduction_requires_original_inventory_before_headroom",
+        "metrics": {
+          "basis": "ORIGINAL_CUMULATIVE_INVENTORY_WITNESS",
+          "cases": []
+        },
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.128036,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_claim_rechecks_coherent_predecessor_corruption_atomically",
+        "metrics": {
+          "cases": [],
+          "claim_guard_transaction": "EXISTING_IMMEDIATE_WRITE"
+        },
+        "owned_root_absent": true
+      },
+      {
+        "elapsed_seconds": 0.101389,
+        "id": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_concurrent_admission_and_entry_claim_both_deny_coherent_inventory_corruption",
+        "metrics": {},
+        "owned_root_absent": true
+      }
+    ]
+  },
+  "changed_owners": [
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py",
+    "tests/test_trading_operational_obligations_v1.py"
+  ],
+  "credential_reads": false,
+  "current_owned_source_pins": {
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
+    "tests/test_trading_operational_obligations_v1.py": "3ff23c730986ea55cf969d7743641e4e77cde25df8631d765ce33d7dd02df0d4"
+  },
+  "deployment": false,
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "external_status": "UNKNOWN_NOT_EXECUTED",
+  "finding": "Coherent mutable remainder/cost arithmetic bypassed original cumulative inventory witness in shared obligations, new admission and already-admitted ENTRY claim.",
+  "legacy_payloads": "Verified by genuine v1.0-to-v1.1 partial/full and complete legacy result neighbors; originals remain exact.",
+  "live_authority": false,
+  "new_test_count": 3,
+  "owned_source_unchanged_during_after_execution": true,
+  "pending_and_realized_legs": "Valid pending UNKNOWN after a native partial retains proved residual cost $18 and realized legs. Only cumulative conflict restores conservative admitted $30 bound; no projection or journal repair occurs.",
+  "provider_calls": false,
+  "receipt_sha256": "fcee4e15bf0a0478e847d3bccc9f0fa65be686d0b014a4cc603bd4f9b3ae2f78",
+  "repair": "Reuse assert_quantity_inventory_witness(..., allow_pending=True) for quantity-bearing candidates before terminal release. Conflict retains typed UNKNOWN and a conservative admitted bound. Both existing immediate-write admission and ENTRY claims use the same enforce_operating_envelope; no cache/schema/state owner added.",
+  "resource_boundary": "Indexed outstanding-scope readback probe includes 1000 native terminal releases and 12000 unrelated events; actual metrics included in after.tests.",
+  "root_cause": "obligation_summary validated proportional arithmetic but did not use the original PaperPlane cumulative witness before releasing or consuming headroom.",
+  "schema": "smial.coherent-inventory-remediation",
+  "schema_version": "1.0",
+  "scratch_cleanup": {
+    "active_owned_probe_processes": 0,
+    "bytes": 54430,
+    "file_count": 12,
+    "files": [
+      "after-ids.json",
+      "after.json",
+      "after.log",
+      "before.json",
+      "before.py",
+      "ownership.json",
+      "publish.py",
+      "regression-before-ids.json",
+      "regression-before.json",
+      "regression-before.log",
+      "run.py",
+      "uv-f3b5d49afd892e85.lock"
+    ],
+    "owned_fixture_root_count": 24,
+    "owned_fixture_roots_absent": true,
+    "owned_root": "local/smial-mode-witness-repair",
+    "owned_root_absent": true,
+    "ownership_verified": true,
+    "status": "ABSENT",
+    "strict_literal_path_boundary_verified": true
+  },
+  "setup_failures": [
+    {
+      "owned_empty_temp_removed": true,
+      "scope": "First sandbox startup before any PaperPlane effect",
+      "status": "ENVIRONMENT_DENIED"
+    },
+    {
+      "fixture_cleanup": "ABSENT",
+      "reprobe_status": "REPRODUCED_P1",
+      "scope": "Disposable helper synthetic signal ID initially used underscore",
+      "status": "MECHANICAL_HELPER_ONLY"
+    }
+  ],
+  "severity": "P1",
+  "source_pin_scope": "Actual 16 source-owner hash maps before/after each probe; concurrent workers may change other owners between phases. No cross-phase invariance claimed.",
+  "status": "PASS",
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "transactions_or_money": false,
+  "untested_hypotheses": [
+    "Terminal query prefilter behavior beyond returned quantity-bearing candidates is not claimed by this bounded repair."
+  ],
+  "working_configuration_changes": false
+}

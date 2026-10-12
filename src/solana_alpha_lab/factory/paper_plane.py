@@ -890,6 +890,10 @@ class PaperPlaneStore:
         mode: str = "PAPER",
         activation_epoch_id: str | None = None,
     ) -> dict[str, Any]:
+        with self.immediate_write():
+            return self._start_bot(strategy, mode=mode, activation_epoch_id=activation_epoch_id)
+
+    def _start_bot(self, strategy, *, mode, activation_epoch_id):
         if mode not in {"PAPER", "SHADOW"}:
             raise PaperPlaneError("BOT_MODE_INVALID")
         schema_version = str(strategy.get("schema_version", "1.0"))
@@ -931,6 +935,22 @@ class PaperPlaneStore:
             if status in {"DRAINING", "STOPPED"}:
                 # Never resurrect control-plane status via start_bot side effect.
                 return existing
+        scope = _effective_operating_scope(self, mode)
+        recovering = False
+        if scope["managed"]:
+            retained = self.get_execution_event(str(activation_epoch_id))
+            recovering = (scope["reason_code"] == "RESTORE_NEW_EFFECTS_FORBIDDEN" and retained is not None
+                and retained["event_type"] == "OFFLINE_ACTIVATION_CREATED" and retained["bot_instance_id"] == bot_instance_id
+                and _operating_binding_block(self, mode=mode, epoch_id=activation_epoch_id, strategy_sha256=spec) is None
+                and retained["payload"] == self.get_execution_event("OPERATING-" + activation_epoch_id)["payload"]["activation"])
+            block = None if recovering else _operating_entry_block(self, scope, epoch_id=activation_epoch_id,
+                strategy_sha256=spec, initializing=True)
+            if block:
+                raise PaperPlaneError(block)
+            # Only the native switch transaction can stage a new current epoch.
+            # Re-reading a retained bot above is not a new activation.
+            if retained is not None and not recovering:
+                raise PaperPlaneError("OPERATING_ACTIVATION_BINDING_INCOMPLETE")
         record = {
             "bot_instance_id": bot_instance_id,
             "strategy_id": str(strategy["strategy_id"]),
@@ -977,6 +997,8 @@ class PaperPlaneStore:
                 spec,
             ),
         )
+        if recovering:
+            self._conn.execute("UPDATE bot_instances SET entries_paused=1 WHERE bot_instance_id=?", (bot_instance_id,))
         self._commit()
         refreshed = self.get_bot(bot_instance_id)
         assert refreshed is not None
@@ -2168,6 +2190,120 @@ def _resume_block(
     return None, None
 
 
+def _effective_operating_scope(store, mode):
+    """Read the existing lifecycle owner in the caller's SQLite transaction.
+
+    Frozen bindings also exist in legacy databases. A state row or native
+    profile/switch history establishes managed scope; a lost part cannot make
+    that scope legacy again. Envelope-only opt-in remains legacy compatible.
+    """
+    table = store._conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='ordinary_state'").fetchone()
+    row = None if table is None else store._conn.execute("SELECT * FROM ordinary_state WHERE mode=?", (mode,)).fetchone()
+    managed = row is not None
+    for event_type in ("OPERATING_PROFILE_COMMITTED", "OPERATING_SWITCH_COMMITTED"):
+        for raw in store._conn.execute("SELECT payload_json FROM execution_events WHERE event_type=?", (event_type,)):
+            try:
+                payload = json.loads(raw[0])
+                event_mode = payload["profile"]["mode"] if event_type == "OPERATING_PROFILE_COMMITTED" else payload["mode"]
+            except (ValueError, KeyError, TypeError):
+                # An unreadable native lifecycle marker has no safe legacy scope.
+                managed = True
+                continue
+            managed = managed or event_mode == mode
+    if not managed:
+        return {"managed": False, "mode": mode, "state": None, "reason_code": None}
+    if row is None:
+        return {"managed": True, "mode": mode, "state": None, "reason_code": "OPERATING_STATE_REQUIRED"}
+    state = dict(row)
+    if (not isinstance(state.get("epoch_id"), str) or not state["epoch_id"]
+        or type(state.get("generation")) is not int or state["generation"] < 1
+        or type(state.get("restore_guard")) is not int or state["restore_guard"] not in (0, 1)):
+        reason = "OPERATING_STATE_INVALID"
+    else:
+        reason = "RESTORE_NEW_EFFECTS_FORBIDDEN" if state["restore_guard"] else None
+    return {"managed": True, "mode": mode, "state": state, "reason_code": reason}
+
+
+def _operating_binding_block(store, *, mode, epoch_id, strategy_sha256=None, as_of=None):
+    from solana_alpha_lab.factory.hfic_research_scope import sha256_of
+    try:
+        event = store.get_execution_event("OPERATING-" + epoch_id)
+        if event is None:
+            return "OPERATING_BINDING_MISSING"
+        body = event["payload"]
+        activation = body["activation"]
+        strategy = body["strategy"]
+        original = store.get_execution_event(epoch_id)
+        if original is None:
+            return "OPERATING_ACTIVATION_BINDING_INCOMPLETE"
+        expected_bot = f"BOT-{strategy['strategy_id']}-{strategy['strategy_version']}-{mode}-{epoch_id}"
+        if (event["event_type"] != "OPERATING_BINDING_COMMITTED"
+            or sha256_of({key: value for key, value in body.items() if key != "binding_sha256"}) != body["binding_sha256"]
+            or activation["epoch_id"] != epoch_id or activation["mode"] != mode
+            or activation["evidence_class"] not in {"OBSERVED", "SYNTHETIC_OFFLINE"}
+            or activation["strategy_sha256"] != strategy["spec_sha256"]
+            or activation["strategy_id"] != strategy["strategy_id"] or activation["strategy_version"] != strategy["strategy_version"]
+            or event["bot_instance_id"] != expected_bot or event["position_id"] is not None
+            or event["created_at"] != activation["at"]
+            or original["event_type"] != "OFFLINE_ACTIVATION_CREATED" or original["payload"] != activation
+            or original["bot_instance_id"] != expected_bot or original["position_id"] is not None
+            or original["created_at"] != activation["at"]
+            or strategy_sha256 is not None and activation["strategy_sha256"] != strategy_sha256):
+            return "OPERATING_BINDING_INTEGRITY_CONFLICT"
+        if as_of is not None and _parse_utc(as_of) < _parse_utc(activation["at"]):
+            return "DECISION_BEFORE_ACTIVATION"
+        if as_of is not None and activation["evidence_class"] == "OBSERVED":
+            if abs((datetime.now(UTC) - _parse_utc(as_of)).total_seconds()) > SIGNAL_MAX_CLOCK_SKEW_SECONDS:
+                return "OBSERVED_RUNTIME_REQUIRES_PHYSICAL_CLOCK"
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return "OPERATING_BINDING_INTEGRITY_CONFLICT"
+    return None
+
+
+def _operating_entry_block(store, scope, *, epoch_id, strategy_sha256=None, as_of=None, initializing=False):
+    from solana_alpha_lab.factory.hfic_research_scope import sha256_of
+    if not scope["managed"]:
+        return None
+    if scope["reason_code"]:
+        return scope["reason_code"]
+    if scope["state"]["epoch_id"] != epoch_id:
+        return "OPERATING_ENTRY_SCOPE_NOT_CURRENT"
+    try:
+        profile_event = store.get_execution_event("PROFILE-" + epoch_id)
+        if profile_event is None:
+            return "OPERATING_PROFILE_REQUIRED"
+        body = profile_event["payload"]
+        profile = body["profile"]
+        if (profile_event["event_type"] != "OPERATING_PROFILE_COMMITTED"
+            or set(body) != {"profile", "profile_sha256"} or not isinstance(profile, dict)
+            or body["profile_sha256"] != sha256_of(profile) or profile.get("mode") != scope["mode"]):
+            return "OPERATING_PROFILE_INTEGRITY_CONFLICT"
+        switches = [event for event in store.filtered_execution_events(event_type="OPERATING_SWITCH_COMMITTED")
+            if event["payload"].get("mode") == scope["mode"]]
+        if not switches or switches[-1]["payload"].get("epoch_id") != epoch_id:
+            return "OPERATING_SWITCH_STATE_CONFLICT"
+        switched = switches[-1]["payload"]
+        if (switched.get("profile") != profile or strategy_sha256 is not None
+            and switched.get("strategy_sha256") != strategy_sha256):
+            return "OPERATING_SWITCH_STATE_CONFLICT"
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return "OPERATING_PROFILE_INTEGRITY_CONFLICT"
+    return None if initializing else _operating_binding_block(store, mode=scope["mode"], epoch_id=epoch_id,
+        strategy_sha256=strategy_sha256, as_of=as_of)
+
+
+def _operating_attempt_block(store, scope, *, epoch_id, side, as_of):
+    if not scope["managed"]:
+        return None
+    if scope["reason_code"]:
+        return scope["reason_code"]
+    if side == "ENTRY":
+        return _operating_entry_block(store, scope, epoch_id=epoch_id, as_of=as_of)
+    # Old exits use their originating binding and remain independent of a
+    # poisoned successor profile. The restore fence still covers both sides.
+    return _operating_binding_block(store, mode=scope["mode"], epoch_id=epoch_id, as_of=as_of)
+
+
 def _append_exact_admission_event(store, *, event_type, bot_instance_id, position_id, payload, as_of):
     event_id = "ADMISSION-" + canonical_spec_sha256({"event_type": event_type, "payload": payload})
     previous = store.get_execution_event(event_id)
@@ -2235,6 +2371,8 @@ def accept_signal_decision_outcome(
     propagate. No exception catch or transaction behavior is changed here.
     """
 
+    if not isinstance(strategy, Mapping) or not isinstance(signal_decision, Mapping):
+        raise PaperPlaneError("INPUT_SHAPE_INVALID")
     if mode not in {"PAPER", "SHADOW"}:
         raise PaperPlaneError("BOT_MODE_INVALID")
     if not as_of:
@@ -2384,6 +2522,20 @@ def accept_signal_decision_outcome(
                     }:
                         raise PaperPlaneError("ADMISSION_BINDING_MISSING")
                 resume_only = True
+        scope = _effective_operating_scope(store, mode)
+        effective_operating = ordinary_operating or scope["managed"]
+        block_code = _operating_entry_block(store, scope,
+            epoch_id=str(decision["activation_epoch_id"]), strategy_sha256=str(strategy.get("spec_sha256") or ""), as_of=as_of)
+        if block_code:
+            return _signal_refusal(store, decision=decision, lineage=lineage, bot=bot,
+                mode=mode, as_of=as_of, reason_code=block_code)
+        if resume_only and effective_operating:
+            from solana_alpha_lab.factory.trading_runtime_policy import enforce_operating_envelope
+            operating_risk = enforce_operating_envelope(store, mode=mode,
+                admitted_notional_usd=admitted_notional, exclude_position_id=position_id)
+            if operating_risk["decision"] != "ALLOW":
+                return _signal_refusal(store, decision=decision, lineage=lineage, bot=bot,
+                    mode=mode, as_of=as_of, reason_code=operating_risk["reason_code"])
         if not resume_only:
             if str(bot.get("status")) in {"DRAINING", "STOPPED"}:
                 return _signal_refusal(store, decision=decision, lineage=lineage, bot=bot,
@@ -2412,7 +2564,7 @@ def accept_signal_decision_outcome(
                 policy=current_policy.get("policy"),
                 inventory=inventory,
             )
-            if ordinary_operating and risk["decision"] == "ALLOW":
+            if effective_operating and risk["decision"] == "ALLOW":
                 from solana_alpha_lab.factory.trading_runtime_policy import enforce_operating_envelope
                 operating_risk = enforce_operating_envelope(store, mode=mode,
                     admitted_notional_usd=risk["effective_entry_notional_usd_dec"])
@@ -2467,7 +2619,7 @@ def accept_signal_decision_outcome(
                         else current_policy["policy"].get("policy_sha256")
                     ),
                 )
-                if ordinary_operating:
+                if effective_operating:
                     store._conn.execute("UPDATE positions SET ordinary_operating=1, ordinary_envelope_sha256=? WHERE position_id=?",
                         (operating_risk["envelope"]["envelope_sha256"], position_id))
                 store.append_execution_event(
@@ -2511,6 +2663,19 @@ def accept_signal_decision_outcome(
         if before is not None and str(before["state"]) in PRE_ATTEMPT_STATES:
             current_bot = store.get_bot(bot_instance_id)
             assert current_bot is not None
+            scope = _effective_operating_scope(store, mode)
+            operating_block = _operating_entry_block(store, scope, epoch_id=before.get("activation_epoch_id"),
+                strategy_sha256=before.get("strategy_spec_sha256"), as_of=as_of)
+            if operating_block:
+                return _signal_refusal(store, decision=decision, lineage=lineage, bot=current_bot,
+                    mode=mode, as_of=as_of, reason_code=operating_block, position=before)
+            if ordinary_operating or scope["managed"] or before.get("ordinary_operating") == 1:
+                from solana_alpha_lab.factory.trading_runtime_policy import enforce_operating_envelope
+                operating_risk = enforce_operating_envelope(store, mode=mode,
+                    admitted_notional_usd=admitted_notional, exclude_position_id=position_id)
+                if operating_risk["decision"] != "ALLOW":
+                    return _signal_refusal(store, decision=decision, lineage=lineage, bot=current_bot,
+                        mode=mode, as_of=as_of, reason_code=operating_risk["reason_code"], position=before)
             final_block, cancel_reason = _resume_block(store, current_bot, mode, stale=stale)
             if final_block is not None:
                 cancelled = store.cancel_entry_intent(position_id, reason_code=str(cancel_reason))
@@ -2631,6 +2796,12 @@ def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str
         bot = store.get_bot(str(position["bot_instance_id"]))
         if bot is None or bot["mode"] != mode:
             raise PaperPlaneError("MODELED_ATTEMPT_MODE_MISMATCH")
+        scope = _effective_operating_scope(store, mode)
+        block = _operating_attempt_block(store, scope, epoch_id=position.get("activation_epoch_id"),
+            side=side, as_of=as_of)
+        if block:
+            return {"send_permitted": False, "action": "BLOCKED", "reason_code": block,
+                    "position_id": position_id, "state": position["state"], "idempotent": False}
         prior = [event for event in store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED",position_ids=[position_id])
                  if event["event_type"] == "MODELED_ATTEMPT_STARTED" and event["position_id"] == position_id
                  and event["payload"].get("side") == side]
@@ -2655,7 +2826,7 @@ def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str
                 store.cancel_entry_intent(position_id, reason_code=str(cancel))
                 return {"send_permitted": False, "action": "BLOCKED", "reason_code": block,
                         "position_id": position_id, "state": "CANCELLED"}
-            if ordinary_operating or position.get("ordinary_operating") == 1:
+            if ordinary_operating or scope["managed"] or position.get("ordinary_operating") == 1:
                 from solana_alpha_lab.factory.trading_runtime_policy import enforce_operating_envelope
                 safety = enforce_operating_envelope(store, mode=mode,
                     admitted_notional_usd=position.get("admitted_entry_notional_usd_dec"),

@@ -142,8 +142,10 @@ The optional ordinary profile stores an append-only, hash-linked
 `smial.ordinary-operating-envelope` v1.0 event in the same PaperPlane database.
 It requires two explicit positive bounds: `max_outstanding_positions` and
 `max_outstanding_cost_basis_usd`. Missing configuration is
-`CONFIGURATION_REQUIRED` for an ordinary caller; legacy APIs retain their
+`CONFIGURATION_REQUIRED` for an ordinary caller. Genuine legacy scope retains
 StrategyVersion/runtime-policy entry-risk semantics and original hashes.
+Public legacy APIs used on a managed mode inherit its durable operating rules;
+omitting or setting the caller flag to False cannot disable those rules.
 These bounds are operating cost basis, never wallet cash, equity, VaR or a
 scientific risk estimate. Configuration takes authority from its enclosing
 explicit operator/profile command; the storage helper grants none.
@@ -171,9 +173,23 @@ envelope/control. Exit/reconciliation remains available during safety veto.
 Existing owner API: `normalize_operating_envelope`,
 `configure_operating_envelope` (compare-and-swap plus command idempotency),
 `read_operating_envelope`, `obligation_summary`, `enforce_operating_envelope`.
-`accept_signal_decision_outcome(..., ordinary_operating=True)` adds the atomic
-ordinary check. `begin_modeled_attempt` repeats it for the frozen ordinary
-reservation. No competing inventory table or risk engine is introduced.
+The shared admission and attempt owners derive effective managed scope from
+the existing ordinary state and native profile/switch history in the same
+transaction. A frozen OPERATING binding alone does not establish managed
+scope: compatible legacy activations also retain one. Missing or corrupt
+managed state fails closed, without silently falling back to legacy.
+`accept_signal_decision_outcome` enforces the current entry epoch and shared
+envelope on every managed ingress. An explicit `ordinary_operating=True`
+can tighten genuine legacy calls; False cannot downgrade managed state.
+`begin_modeled_attempt` repeats current entry/control/envelope checks before
+new ENTRY effects and applies the restore fence to new ENTRY and EXIT claims.
+Exact retained attempt replay returns its original identity with send denied;
+original result reconciliation and snapshot-bound cut/ACK remain available.
+Managed OBSERVED new-effect claims require physical current time, including
+manual stages; original result/activation/recovery clocks are preserved.
+New managed activation must follow the same atomic current-epoch/CAS owner;
+retrieving a retained bot is not a new activation. No competing inventory
+table or risk engine is introduced.
 Indexed event-type/position queries read the envelope revision chain and the
 original witnesses of current and terminal position candidates. Terminal
 release requires verified attempt/FINAL/result, so SQL work grows linearly

@@ -635,6 +635,117 @@ class OperatingObligationsTests(StoreCase):
         self.assertEqual(summary["inventory_status"], "UNKNOWN")
         self.assertEqual(summary["known_cost_basis_floor_usd"], "30")
 
+    def test_coherent_remainder_reduction_requires_original_inventory_before_headroom(self):
+        rows = []
+        for mode in ("PAPER", "SHADOW"):
+            for partial in (False, True):
+                with self.subTest(mode=mode, partial=partial):
+                    suffix = mode + ("-PARTIAL" if partial else "-OPEN")
+                    store = self.store("coherent-" + suffix + ".sqlite")
+                    self.envelope(store, mode=mode, money="40")
+                    pid = self.entry(store, key="SIGDEC-COHERENT-" + suffix, mode=mode)
+                    if partial:
+                        self.close_request(store, pid, "close")
+                        attempted = self.attempt(store, pid, "EXIT", "first", mode=mode)
+                        accept_modeled_result(store, result=self.exit_result(attempted["attempt_id"], "partial-" + suffix))
+                    original = store.get_position(pid)
+                    original_journal = store.filtered_execution_events(position_ids=[pid])
+                    healthy = obligation_summary(store, mode=mode)
+                    self.assertEqual(healthy["inventory_status"], "KNOWN")
+                    self.assertEqual(healthy["outstanding_cost_basis_usd"], "18" if partial else "30")
+                    with store.immediate_write():
+                        store._conn.execute("UPDATE positions SET remaining_qty_dec='1000000', remaining_cost_basis_usd_dec='3', remaining_entry_fee_usd_dec='0.01' WHERE position_id=?", (pid,))
+                    damaged = store.get_position(pid)
+                    with self.assertRaisesRegex(PaperPlaneError, "^EXIT_INVENTORY_WITNESS_CONFLICT$"):
+                        assert_quantity_inventory_witness(store, damaged, allow_pending=True)
+                    reader = PaperPlaneStore(store.path, readonly=True)
+                    try:
+                        summary = obligation_summary(reader, mode=mode)
+                    finally:
+                        reader.close()
+                    self.assertEqual(summary["inventory_status"], "UNKNOWN")
+                    self.assertIsNone(summary["outstanding_cost_basis_usd"])
+                    self.assertEqual(summary["known_cost_basis_floor_usd"], "30")
+                    self.assertEqual(summary["position_count"], 1)
+                    self.assertEqual(enforce_operating_envelope(store, mode=mode, admitted_notional_usd="30")["reason_code"], "OUTSTANDING_OBLIGATIONS_UNKNOWN")
+                    denied = self.admission(store, "SIGDEC-AFTER-COHERENT-" + suffix, mode=mode)
+                    self.assertEqual(denied["reason_code"], "OUTSTANDING_OBLIGATIONS_UNKNOWN")
+                    self.assertEqual(store.get_position(pid), damaged)
+                    self.assertEqual(store.filtered_execution_events(position_ids=[pid]), original_journal)
+                    self.assertEqual(damaged["realized_net_pnl_usd_dec"], original["realized_net_pnl_usd_dec"])
+                    rows.append({"mode": mode, "phase": "PARTIAL" if partial else "OPEN",
+                        "proved_cost_basis_usd": healthy["outstanding_cost_basis_usd"], "coherent_mutated_cost_basis_usd": "3",
+                        "inventory_status": summary["inventory_status"], "retained_admission_bound_usd": "30",
+                        "original_realized_legs_unchanged": True, "new_admission": "DENIED"})
+        self.metrics = {"cases": rows, "basis": "ORIGINAL_CUMULATIVE_INVENTORY_WITNESS"}
+
+    def test_entry_claim_rechecks_coherent_predecessor_corruption_atomically(self):
+        rows = []
+        for mode in ("PAPER", "SHADOW"):
+            with self.subTest(mode=mode):
+                store = self.store("coherent-claim-" + mode + ".sqlite")
+                self.envelope(store, mode=mode, money="60")
+                pid = self.entry(store, key="SIGDEC-CLAIM-A-" + mode, mode=mode)
+                ready = self.admission(store, "SIGDEC-CLAIM-B-" + mode, mode=mode)
+                self.assertTrue(ready["fill_deferred"])
+                self.envelope(store, mode=mode, money="40", key="tighten-claim-" + mode)
+                original_journal = store.filtered_execution_events(position_ids=[pid])
+                with store.immediate_write():
+                    store._conn.execute("UPDATE positions SET remaining_qty_dec='1000000', remaining_cost_basis_usd_dec='3', remaining_entry_fee_usd_dec='0.01' WHERE position_id=?", (pid,))
+                damaged = store.get_position(pid)
+                claimed = self.attempt(store, ready["position_id"], key="coherent-claim", mode=mode)
+                self.assertFalse(claimed["send_permitted"])
+                self.assertEqual(claimed["reason_code"], "OUTSTANDING_OBLIGATIONS_UNKNOWN")
+                self.assertEqual(store.get_position(ready["position_id"])["state"], "CANCELLED")
+                self.assertEqual(store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED", position_ids=[ready["position_id"]]), [])
+                self.assertEqual(store.get_position(pid), damaged)
+                self.assertEqual(store.filtered_execution_events(position_ids=[pid]), original_journal)
+                self.assertEqual(obligation_summary(store, mode=mode)["known_cost_basis_floor_usd"], "30")
+                rows.append({"mode": mode, "admitted_b_usd": "30", "headroom_limit_usd": "40",
+                    "coherent_a_projection_usd": "3", "entry_claim": "DENIED", "new_entry_attempts": 0,
+                    "original_a_journal_unchanged": True})
+        self.metrics = {"cases": rows, "claim_guard_transaction": "EXISTING_IMMEDIATE_WRITE"}
+
+    def test_concurrent_admission_and_entry_claim_both_deny_coherent_inventory_corruption(self):
+        store = self.store()
+        second = self.store()
+        self.envelope(store, money="60")
+        pid = self.entry(store, key="SIGDEC-COHERENT-RACE-A")
+        ready = self.admission(store, "SIGDEC-COHERENT-RACE-B")
+        self.envelope(store, money="40", key="tighten-race")
+        original_journal = store.filtered_execution_events(position_ids=[pid])
+        with store.immediate_write():
+            store._conn.execute("UPDATE positions SET remaining_qty_dec='1000000', remaining_cost_basis_usd_dec='3', remaining_entry_fee_usd_dec='0.01' WHERE position_id=?", (pid,))
+        damaged = store.get_position(pid)
+        barrier = threading.Barrier(2)
+        results = {}
+        errors = []
+        def work(name, operation):
+            try:
+                barrier.wait(timeout=5)
+                results[name] = operation()
+            except Exception as exc:
+                errors.append(exc)
+        workers = [threading.Thread(target=work, args=("admission", lambda: self.admission(store, "SIGDEC-COHERENT-RACE-C"))),
+            threading.Thread(target=work, args=("claim", lambda: self.attempt(second, ready["position_id"], key="race-claim")))]
+        for worker in workers:
+            worker.start()
+        for worker in workers:
+            worker.join(timeout=10)
+        self.assertFalse(any(worker.is_alive() for worker in workers))
+        self.assertEqual(errors, [])
+        self.assertEqual(set(results), {"admission", "claim"})
+        self.assertEqual(results["admission"]["reason_code"], "OUTSTANDING_OBLIGATIONS_UNKNOWN")
+        self.assertEqual(results["claim"].get("reason_code"), "OUTSTANDING_OBLIGATIONS_UNKNOWN")
+        self.assertFalse(results["claim"]["send_permitted"])
+        self.assertIsNone(store.get_position("POS-SIG-SIGDEC-COHERENT-RACE-C"))
+        self.assertEqual(store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED", position_ids=[ready["position_id"]]), [])
+        self.assertEqual(store.get_position(pid), damaged)
+        self.assertEqual(store.filtered_execution_events(position_ids=[pid]), original_journal)
+        self.assertEqual(obligation_summary(store, mode="PAPER")["known_cost_basis_floor_usd"], "30")
+        self.metrics = {"concurrent_connections": 2, "admission": "DENIED", "entry_claim": "DENIED",
+            "new_entry_attempts": 0, "retained_admission_bound_usd": "30", "original_a_journal_unchanged": True}
+
     def test_entry_fee_allocation_and_leg_pnl_conserve_on_three_exits(self):
         store = self.store()
         self.envelope(store)

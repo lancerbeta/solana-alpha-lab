@@ -78,7 +78,7 @@ packet через current native source/store owners. Это проверка п
 
 ## C01–C24
 
-Native automated status: PASS, 155 tests, 537.935065s; source bytes до/после
+Native automated status: PASS, 172 tests, 615.651358s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -120,7 +120,7 @@ test_trading_operational_recovery_v1; engines: continuity/obligations/adapters.
 | C23 | Actual loopback egress hits0, secret sentinel not read/stored, non-target SHA unchanged, roots ABSENT |
 | C24 | D1 historical mapping; separate software/science/runtime/delivery/financial and explicit live ledger |
 
-C22: 22 ordinary CLI stages + 1 readonly limit diagnostic. Независимый оператор
+C22: 22 ordinary CLI stages + 1 drain control + 1 readonly limit diagnostic. Независимый оператор
 прошёл cold PAPER CLI до RECONCILED:2 original
 attempts/results, exact inventory SHA, pause preserved after ACK. Он не
 составлял bindings/per-token outcomes вручную. SHADOW missing/stale funding
@@ -129,6 +129,32 @@ proof, не production smoke либо научный PROMOTE. Semantic route/car
 после final generated sync; его отдельный observable verdict — operator-proof.
 
 ## Исторический аудит, residuals и LIVE
+
+Owner-authorized `SMIAL_PR398_OPERATING_BOUNDARY_PATCH_V1` закрывает два P1
+в существующем #398. Attached review содержит source-flow hypotheses;
+native BEFORE/AFTER исполнены отдельно и имеют собственные source pins.
+
+| Finding | Native BEFORE | Existing owner / AFTER |
+|---|---|---|
+| F-A: caller-controlled operating scope | Один и тот же B ENTER: ordinary отказал при A=$30/cap=$30; default/False public path создал B и разрешил attempt, raw liabilities=$60. Genuine restored EXIT также разрешил fresh attempt до ACK | PaperPlane derives managed scope from durable state/profile/switch; shared admission/attempt and runner use retained activation/binding guard. B reservation отсутствует, raw liabilities=$30; restored fresh ENTRY/EXIT запрещены без request/quota delta. Original replay/result/cut/ACK и genuine legacy сохранены |
+| F-B: локальный entry failure прекращал continuous run | Реальный missing/expired B grant checker прерывал run до следующего тика; malformed source JSON и retained request array прерывали healthy old EXIT service | Coordinator isolates expected entry/source/position failures by stage. Same run/PID/3 ticks закрывает A original EXIT, B preclaim имеет0attempt/0quota. Postclaim B сохраняет1original pending attempt/request/quota; original callback reconciles без resend. Shared-store failure остаётся fatal/atomic |
+
+Measured evidence: [managed boundary](../../evidence/smial_trading_core_operational_closure_v1/review-operating-boundary-remediation.json),
+[continuous failure isolation](../../evidence/smial_trading_core_operational_closure_v1/review-source-shape-isolation-remediation.json),
+[coherent inventory](../../evidence/smial_trading_core_operational_closure_v1/review-coherent-inventory-remediation.json).
+Frozen9ee three actual NOT_READY reviews остаются historical; missing OWNER
+review не выдуман. Intermediate guard также пропускал direct attempt при
+удалённом original activation event: actual before/after сохранены, common
+lineage owner исправлен. Прерванный whole run не PASS. C23 отдельно сохранил
+FAIL старого exit-code oracle; новый scoped blocker меняет ожидаемый результат
+run, а egress0/secret/non-target invariants остаются строгими.
+Следующий whole snapshot выполнил172 tests и сохранил10 FAIL subcases в4
+existing recovery methods: все ожидали exception вместо требуемого scoped
+entry blocker. Этот FAIL сохранён LF carrier с неизменными JSON values/native selfhash;
+original capture raw SHA отмечен отдельно. Consumer oracles
+уточняются с независимыми raw reasons и прежними zero-effect/pending guards.
+После PATCH source/test bytes заморожены для общего proof и новых четырёх
+изолированных P0/P1 reviews. Рабочая authority этим PATCH не расширена.
 
 [Исходный S08/S13 report](../smial_trading_continuity_v1/REPORT.md) сохраняет
 REPAIR_PARTIAL_BLOCKED своего scope. Negative same-ID V2 не стал positive.
@@ -173,28 +199,28 @@ before/after и прежний scoped review PASS сохранены в
 purpose lifecycle-маршрута: IDs, вопросы, ссылки и authority сохранены; новый
 размер 16349 bytes, прямой semantic consumer module — 15 PASS.
 
-Peak suite process RSS: 146681856 bytes (139.89 MiB). Native 14-day producer
+Peak suite process RSS: 146710528 bytes (139.91 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.1932–0.2216s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.2021–0.2316s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04653–0.05165 |
-| 1000 | 364544 | 0.04718–0.05176 |
-| 4000 | 843776 | 0.04533–0.05437 |
+| 0 | 204800 | 0.04492–0.04992 |
+| 1000 | 364544 | 0.04612–0.05038 |
+| 4000 | 843776 | 0.04442–0.05313 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 840 | 0.000434 |
-| 100 proved terminal | 78270 | 0.015511 |
-| 1000 proved terminal | 774410 | 0.155576 |
-| 1000 terminal + 12000 unrelated events | 774410 | 0.157873 |
+| 1 outstanding | 980 | 0.000549 |
+| 100 proved terminal | 78430 | 0.015269 |
+| 1000 proved terminal | 774540 | 0.154522 |
+| 1000 terminal + 12000 unrelated events | 774560 | 0.156701 |
 
-Native history preparation: 13.088s.
+Native history preparation: 13.244s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.

@@ -135,7 +135,8 @@ class OperatingDriverTests(unittest.TestCase):
         self.metrics = {"baseline_commit": base, "scope": "BASE_PRODUCER_CURRENT_NATIVE_STORE",
                         "cases": metrics, "owned_cleanup_verified_by_teardown": True}
 
-    def start_operating(self, *, mode="PAPER", suffix="", negative=False, exit_cap=None, list_only=False, clock_at=None, batch_size=2):
+    def start_operating(self, *, mode="PAPER", suffix="", negative=False, exit_cap=None, list_only=False, clock_at=None, batch_size=2,
+                        envelope_limits=None):
         if mode == "SHADOW" and not suffix:
             suffix = "-S"
         self.prepare(operating=True, suffix=suffix, negative=negative, exit_point="E3600", list_only=list_only)
@@ -146,7 +147,7 @@ class OperatingDriverTests(unittest.TestCase):
             "batch_size": batch_size, "poll_seconds": 0.02, "source_max_age_seconds": 900,
             "progress_max_age_seconds": 60, "observation_max_age_seconds": 900,
             "envelope": {"schema_version": "1.0", "mode": mode, "basis": "OUTSTANDING_OBLIGATIONS_V1",
-                "max_outstanding_positions": 1, "max_outstanding_cost_basis_usd": "30"},
+                "max_outstanding_positions": 1, "max_outstanding_cost_basis_usd": "30", **(envelope_limits or {})},
             "model": {"version": "TIMELY_OBSERVATION_MODEL_V1", "missing_input": "UNKNOWN",
                 "latency_seconds": 0, "additional_cost_usd": "0.01"},
             "quote": {"timeout_seconds": 1, "max_response_bytes": 8192,
@@ -284,8 +285,9 @@ class OperatingDriverTests(unittest.TestCase):
         self.assertEqual(readback["positions"][0]["state"], "RECONCILED")
         self.assertTrue(self.invoke("status", as_of="2026-10-05T13:10:00Z")["instances"][0]["entries_paused"])
 
-    def test_C07_C08_C09_positive_successor_and_old_exit(self):
-        self.start_operating()
+    def managed_successor(self, *, envelope_limits=None):
+        """The original C07 A-to-B source fixture, shared by ingress proofs."""
+        self.start_operating(envelope_limits=envelope_limits)
         self.coordinator.tick()
         old_epoch, old_mint = self.epoch, self.mint
         old_runner, old_profile = self.runner, self.profile
@@ -295,7 +297,7 @@ class OperatingDriverTests(unittest.TestCase):
                             old_runner.recipe["predicates"] if "predicates" in old_runner.recipe else old_runner.recipe)
         start = datetime(2026, 10, 5, 12, 16, 6, tzinfo=UTC)
         feed = EpisodeScenario(self.data / "successor-source", start=start, stops=start + timedelta(hours=3))
-        blocked_mint, new_mint = synth_mint("DeniedB"), synth_mint("NewB")
+        blocked_mint = synth_mint("DeniedB")
         obj = token_object(blocked_mint, price=.000003, liquidity=10000, holders=66)
         nominate(feed.market, start, {"toptraded": [obj], "toptrending": [obj]})
         feed.market.series[blocked_mint] = lambda now: token_object(blocked_mint, price=.000003, liquidity=10000,
@@ -318,6 +320,11 @@ class OperatingDriverTests(unittest.TestCase):
         feed.tick(datetime(2026, 10, 5, 12, 50, tzinfo=UTC))
         now[0] = datetime(2026, 10, 5, 12, 55, tzinfo=UTC)
         coordinator.tick()
+        return old_epoch, old_mint, old_runner, coordinator, feed, now
+
+    def test_C07_C08_C09_positive_successor_and_old_exit(self):
+        old_epoch, old_mint, old_runner, coordinator, feed, now = self.managed_successor()
+        new_mint = synth_mint("NewB")
         view = self.invoke("readback")
         self.assertEqual({p["mint"] for p in view["positions"]}, {old_mint})
         refusals = view["admission_refusals"]
@@ -357,6 +364,305 @@ class OperatingDriverTests(unittest.TestCase):
         self.assertEqual({p["position_id"] for p in before["positions"]}, {p["position_id"] for p in after["positions"]})
         self.assertEqual(len(after["modeled_attempts"]), 1)
         self.assertEqual(after["positions"][0]["state"], "OPEN")
+
+    def test_patch_A1_A2_default_false_shared_admission_uses_managed_envelope(self):
+        from solana_alpha_lab.factory.paper_plane import accept_signal_decision_outcome
+        for index, (count, money, reason) in enumerate(((1, "60", "OUTSTANDING_POSITION_LIMIT"),
+                                                      (2, "30", "OUTSTANDING_COST_BASIS_LIMIT"))):
+            if index:
+                self.tearDown()
+                self.setUp()
+            with self.subTest(count=count, money=money):
+                old_epoch, _, old_runner, _, feed, _ = self.managed_successor(envelope_limits={
+                    "max_outstanding_positions": count, "max_outstanding_cost_basis_usd": money})
+                before = self.invoke("readback")
+                packet = self.runner.episode(source_relative="successor-source/observation_schedule_state.sqlite",
+                    episode_id=feed.admissions()[0]["episode_id"], epoch_id=self.epoch, mode="PAPER",
+                    as_of="2026-10-05T12:55:00Z")
+                self.assertEqual(packet["decision"]["action"], "ENTER")
+                self.assertEqual(packet["admission"]["reason_code"], reason)
+                self.assertEqual(packet["admission"]["source_reason_code"], packet["decision"]["reason_code"])
+                store = PaperPlaneStore(self.runner.store_path)
+                try:
+                    direct = accept_signal_decision_outcome(self.root, store, strategy=self.runner.strategy,
+                        signal_decision=packet["decision"], known_activation_epochs={self.epoch},
+                        mode="PAPER", as_of="2026-10-05T12:55:00Z", skip_fill=True, ordinary_operating=False)
+                    self.assertEqual(direct["reason_code"], reason)
+                    self.assertTrue(direct["idempotent"])
+                finally:
+                    store.close()
+                after = self.invoke("readback")
+                self.assertEqual(after["positions"], before["positions"])
+                self.assertEqual(after["modeled_attempts"], before["modeled_attempts"])
+                self.assertEqual({p["activation_epoch_id"] for p in after["positions"]}, {old_epoch})
+                self.assertEqual(sum(Decimal(p["admitted_entry_notional_usd_dec"]) for p in after["positions"]), Decimal("30"))
+                with closing(sqlite3.connect(self.runner.store_path.resolve().as_uri() + "?mode=ro", uri=True)) as observer:
+                    self.assertEqual(observer.execute("SELECT COUNT(*) FROM positions").fetchone()[0], 1)
+                    self.assertEqual(observer.execute("SELECT COUNT(*) FROM execution_events WHERE event_type IN ('ADAPTER_REQUEST_BOUND','QUOTE_CALL_CLAIMED')").fetchone()[0], 1)
+                self.assertEqual(old_runner.readback()["positions"], before["positions"])
+
+    def test_patch_A3_native_restore_fences_new_both_sides_preserves_replay_ack_exit(self):
+        from solana_alpha_lab.factory.paper_plane import begin_modeled_attempt
+        from scripts.prove_trading_core_operational_closure import RecordingQuoteAdapter
+        self.start_operating(mode="SHADOW")
+        ledger, plan = self.wire_files()
+        self.coordinator.quote_adapter = RecordingQuoteAdapter(ledger, json.loads(plan.read_text()))
+        self.coordinator.tick()
+        original = self.invoke("readback")
+        receipt = self.ledger_receipts(ledger)[0]
+        backup = self.data / "backups/patch-open.sqlite"
+        self.coordinator.backup(destination_relative="backups/patch-open.sqlite")
+        restored = self.root / "local/patch-native-restored"
+        restored.mkdir()
+        shutil.copyfile(self.data / "offline_runtime.json", restored / "offline_runtime.json")
+        runner = TradingContinuityRunner(self.root, data_root=restored)
+        restore_native_backup(backup_path=backup, destination_runner=runner)
+        position = runner.readback()["positions"][0]
+        with closing(sqlite3.connect(runner.store_path.resolve().as_uri() + "?mode=ro", uri=True)) as observer:
+            self.assertEqual(observer.execute("SELECT restore_guard FROM ordinary_state WHERE mode='SHADOW'").fetchone()[0], 1)
+            self.assertEqual(observer.execute("SELECT entries_paused FROM bot_instances").fetchone()[0], 1)
+        runner.command({"command_type": "REQUEST_CLOSE_POSITION", "idempotency_key": "PATCH-CLOSE",
+                        "position_id": position["position_id"]})
+        before = runner.readback()
+        for side in ("ENTRY", "EXIT"):
+            with self.subTest(side=side):
+                outcome = runner.attempt(position_id=position["position_id"], side=side,
+                    attempt_key="PATCH-LEGACY-" + side, as_of="2026-10-05T12:41:00Z")
+                self.assertEqual(outcome["reason_code"], "RESTORE_NEW_EFFECTS_FORBIDDEN")
+                self.assertFalse(outcome["send_permitted"])
+                store = PaperPlaneStore(runner.store_path)
+                try:
+                    direct = begin_modeled_attempt(store, position_id=position["position_id"], side=side,
+                        mode="SHADOW", attempt_key="PATCH-DIRECT-" + side, decision_at="2026-10-05T12:40:00Z",
+                        max_age_seconds=900, as_of="2026-10-05T12:41:00Z", ordinary_operating=False)
+                    self.assertEqual(direct["reason_code"], outcome["reason_code"])
+                finally:
+                    store.close()
+        original_attempt = original["modeled_attempts"][0]["payload"]
+        replay = runner.attempt(position_id=position["position_id"], side="ENTRY",
+            attempt_key=original_attempt["attempt_key"], as_of="2026-10-05T12:40:00Z")
+        self.assertTrue(replay["idempotent"])
+        self.assertFalse(replay["send_permitted"])
+        self.assertEqual(replay["as_of"], original_attempt["as_of"])
+        self.assertTrue(runner.result(receipt["result"])["idempotent"])
+        after = runner.readback()
+        for field in ("positions", "modeled_attempts", "modeled_results"):
+            self.assertEqual(after[field], before[field])
+        cut = self.recovery_cut(ledger, backup)
+        coordinator = TradingCoordinator(runner, mode="SHADOW", clock=lambda: self.now)
+        coordinator.reconcile_cut(cut)
+        inventory = coordinator.status()["inventory"]
+        coordinator.acknowledge_restore(expected_inventory_sha256=sha256_of(inventory), as_of=cut["as_of"], cut=cut)
+        self.assertFalse(coordinator.status()["restore_guard"])
+        self.assertTrue(coordinator.status()["instances"][0]["entries_paused"])
+        permitted = runner.attempt(position_id=position["position_id"], side="EXIT",
+            attempt_key="PATCH-ACK-EXIT", as_of="2026-10-05T12:41:00Z")
+        self.assertTrue(permitted["send_permitted"])
+        self.assertEqual(len(self.ledger_receipts(ledger)), 1)
+
+    def test_patch_A4_missing_corrupt_state_and_legacy_activation_cannot_downgrade(self):
+        from solana_alpha_lab.factory.paper_plane import accept_signal_decision_outcome
+        _, _, _, _, feed, _ = self.managed_successor()
+        packet = self.runner.episode(source_relative="successor-source/observation_schedule_state.sqlite",
+            episode_id=feed.admissions()[0]["episode_id"], epoch_id=self.epoch, mode="PAPER", as_of="2026-10-05T12:55:00Z")
+        store = PaperPlaneStore(self.runner.store_path)
+        try:
+            original_state = dict(store._conn.execute("SELECT * FROM ordinary_state WHERE mode='PAPER'").fetchone())
+            for sql, reason in (("DELETE FROM ordinary_state WHERE mode='PAPER'", "OPERATING_STATE_REQUIRED"),
+                                ("UPDATE ordinary_state SET restore_guard=2 WHERE mode='PAPER'", "OPERATING_STATE_INVALID"),
+                                ("UPDATE ordinary_state SET epoch_id='ACTIVATION-EPOCH-STALE' WHERE mode='PAPER'", "OPERATING_ENTRY_SCOPE_NOT_CURRENT")):
+                with self.subTest(reason=reason):
+                    with store.immediate_write():
+                        store._conn.execute(sql)
+                        before = store.positions()
+                        result = accept_signal_decision_outcome(self.root, store, strategy=self.runner.strategy,
+                            signal_decision=packet["decision"], known_activation_epochs={self.epoch}, mode="PAPER",
+                            as_of="2026-10-05T12:55:00Z", skip_fill=True)
+                        self.assertEqual(result["reason_code"], reason)
+                        self.assertEqual(store.positions(), before)
+                    if "DELETE" in sql:
+                        columns = list(original_state)
+                        store._conn.execute("INSERT INTO ordinary_state(" + ",".join(columns) + ") VALUES(" + ",".join("?" for _ in columns) + ")", list(original_state.values()))
+                    else:
+                        store._conn.execute("UPDATE ordinary_state SET epoch_id=?,restore_guard=? WHERE mode='PAPER'", (original_state["epoch_id"], original_state["restore_guard"]))
+            bot_before = store.bots()
+            events_before = store.execution_events()
+            with self.assertRaisesRegex(ValueError, "OPERATING_ENTRY_SCOPE_NOT_CURRENT"):
+                store.start_bot(self.runner.strategy, mode="PAPER", activation_epoch_id="ACTIVATION-EPOCH-PATCH-LEGACY")
+            self.assertEqual(store.bots(), bot_before)
+            self.assertEqual(store.execution_events(), events_before)
+        finally:
+            store.close()
+        before = self.runner.readback()
+        with self.assertRaisesRegex(ValueError, "OPERATING_ENTRY_SCOPE_NOT_CURRENT"):
+            self.runner.activate(epoch_id="ACTIVATION-EPOCH-PATCH-LEGACY", mode="PAPER", at="2026-10-05T12:55:00Z")
+        self.assertEqual(self.runner.readback(), before)
+
+    def test_patch_A4_binding_profile_envelope_corruption_fails_closed_at_direct_owner(self):
+        from solana_alpha_lab.factory.paper_plane import accept_signal_decision_outcome
+        _, _, _, _, feed, _ = self.managed_successor()
+        packet = self.runner.episode(source_relative="successor-source/observation_schedule_state.sqlite",
+            episode_id=feed.admissions()[0]["episode_id"], epoch_id=self.epoch, mode="PAPER", as_of="2026-10-05T12:55:00Z")
+        store = PaperPlaneStore(self.runner.store_path)
+        try:
+            for prefix, missing, corrupt in (("OPERATING-", "OPERATING_BINDING_MISSING", "OPERATING_BINDING_INTEGRITY_CONFLICT"),
+                                              ("PROFILE-", "OPERATING_PROFILE_REQUIRED", "OPERATING_PROFILE_INTEGRITY_CONFLICT"),
+                                              ("", "OPERATING_ACTIVATION_BINDING_INCOMPLETE", "OPERATING_BINDING_INTEGRITY_CONFLICT")):
+                event_id = prefix + self.epoch
+                original = dict(store._conn.execute("SELECT * FROM execution_events WHERE event_id=?", (event_id,)).fetchone())
+                for alteration, reason in (("DELETE", missing), ("CORRUPT", corrupt)):
+                    with self.subTest(owner=prefix, alteration=alteration):
+                        with store.immediate_write():
+                            if alteration == "DELETE":
+                                store._conn.execute("DELETE FROM execution_events WHERE event_id=?", (event_id,))
+                            else:
+                                store._conn.execute("UPDATE execution_events SET payload_json='{}' WHERE event_id=?", (event_id,))
+                            positions = store.positions()
+                            direct = accept_signal_decision_outcome(self.root, store, strategy=self.runner.strategy,
+                                signal_decision=packet["decision"], known_activation_epochs={self.epoch},
+                                mode="PAPER", as_of="2026-10-05T12:55:00Z", skip_fill=True)
+                            self.assertEqual(direct["reason_code"], reason)
+                            self.assertEqual(store.positions(), positions)
+                        if alteration == "DELETE":
+                            columns = list(original)
+                            store._conn.execute("INSERT INTO execution_events(" + ",".join(columns) + ") VALUES(" + ",".join("?" for _ in columns) + ")", list(original.values()))
+                        else:
+                            store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (original["payload_json"], event_id))
+            event_id = "OPERATING-ENVELOPE-PAPER-1"
+            original = dict(store._conn.execute("SELECT * FROM execution_events WHERE event_id=?", (event_id,)).fetchone())
+            for alteration, reason in (("DELETE", "CONFIGURATION_REQUIRED"), ("CORRUPT", "OPERATING_ENVELOPE_INVALID")):
+                with self.subTest(owner="envelope", alteration=alteration):
+                    if alteration == "DELETE":
+                        store._conn.execute("DELETE FROM execution_events WHERE event_id=?", (event_id,))
+                    else:
+                        store._conn.execute("UPDATE execution_events SET payload_json='{}' WHERE event_id=?", (event_id,))
+                    positions = store.positions()
+                    direct = accept_signal_decision_outcome(self.root, store, strategy=self.runner.strategy,
+                        signal_decision=packet["decision"], known_activation_epochs={self.epoch},
+                        mode="PAPER", as_of="2026-10-05T12:55:00Z", skip_fill=True)
+                    self.assertEqual(direct["reason_code"], reason)
+                    self.assertEqual(store.positions(), positions)
+                    if alteration == "DELETE":
+                        columns = list(original)
+                        store._conn.execute("INSERT INTO execution_events(" + ",".join(columns) + ") VALUES(" + ",".join("?" for _ in columns) + ")", list(original.values()))
+                    else:
+                        store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (original["payload_json"], event_id))
+        finally:
+            store.close()
+
+    def test_patch_A4_observed_physical_clock_guard_at_cli_and_direct_owner(self):
+        from solana_alpha_lab.factory.paper_plane import accept_signal_decision_outcome, begin_modeled_attempt
+        # Author OBSERVED at original activation; do not relabel retained bindings.
+        self.prepare(operating=True, suffix="-OBSERVED", exit_point="E3600")
+        scope = self.root / "local/observed-scope"
+        observed = scope / "native"
+        observed.mkdir(parents=True)
+        (observed / "operating_runtime.json").write_text(json.dumps({"schema": "smial.operating-runtime",
+            "schema_version": "1.0", "evidence_class": "OBSERVED"}), encoding="utf-8")
+        shutil.copytree(self.data / "research-data", observed / "research-data")
+        shutil.copytree(self.source.data_root, observed / "source")
+        runner = TradingContinuityRunner(self.root, data_root=observed, strategy_relative=self.strategy_rel, scope_root=scope)
+        self.profile = {"schema_version": "1.0", "mode": "PAPER",
+            "source": {"root": str(self.source.data_root), "file": "observation_schedule_state.sqlite",
+                "schedule_sha256": self.admission["schedule_sha256"], "activation_id": self.admission["activation_id"]},
+            "batch_size": 2, "poll_seconds": .02, "source_max_age_seconds": 900,
+            "progress_max_age_seconds": 60, "observation_max_age_seconds": 900,
+            "envelope": {"schema_version": "1.0", "mode": "PAPER", "basis": "OUTSTANDING_OBLIGATIONS_V1",
+                "max_outstanding_positions": 1, "max_outstanding_cost_basis_usd": "30"},
+            "model": {"version": "TIMELY_OBSERVATION_MODEL_V1", "missing_input": "UNKNOWN", "latency_seconds": 0, "additional_cost_usd": "0.01"},
+            "quote": {"timeout_seconds": 1, "max_response_bytes": 8192,
+                "funding_mint": "So11111111111111111111111111111111111111112",
+                "asset_metadata_file": "assets.json", "funding_observation_file": "funding.json", "max_exit_input_raw": None},
+            "network_authorized": False}
+        coordinator = TradingCoordinator(runner, mode="PAPER", clock=lambda: datetime(2026, 10, 5, 12, 40, tzinfo=UTC))
+        coordinator.activate(epoch_id=self.epoch, at=self.manifest["decision_effective_at"], profile=self.profile, switch_key="OBSERVED-INITIAL")
+        from solana_alpha_lab.factory.episode_decision import produce_episode_decision
+        packet = produce_episode_decision(self.root, source_path=self.source.ops_path, strategy=runner.strategy,
+            manifest=runner.manifest, execution_binding=runner.binding, epoch_id=self.epoch,
+            episode_id=self.admission["episode_id"], as_of="2026-10-05T12:40:00Z", frozen_recipe=runner.recipe)
+        store = PaperPlaneStore(runner.store_path)
+        try:
+            outcome = accept_signal_decision_outcome(self.root, store, strategy=runner.strategy,
+                signal_decision=packet["decision"], known_activation_epochs={self.epoch}, mode="PAPER",
+                as_of="2026-10-05T12:40:00Z", skip_fill=True)
+            self.assertEqual(outcome["reason_code"], "OBSERVED_RUNTIME_REQUIRES_PHYSICAL_CLOCK")
+            self.assertEqual(store.positions(), [])
+        finally:
+            store.close()
+        child = subprocess.run([sys.executable, "-B", str(ROOT / "scripts/trading_continuity.py"), "episode",
+            "--repository-root", str(self.root), "--data-root", str(observed), "--scope-root", str(scope),
+            "--strategy", self.strategy_rel, "--epoch", self.epoch, "--episode-id", self.admission["episode_id"],
+            "--source", "source/observation_schedule_state.sqlite", "--as-of", "2026-10-05T12:40:00Z"],
+            cwd=ROOT, capture_output=True, timeout=30)
+        self.assertEqual(child.returncode, 0, child.stderr.decode(errors="replace"))
+        self.assertEqual(json.loads(child.stdout)["admission"]["reason_code"], "OBSERVED_RUNTIME_REQUIRES_PHYSICAL_CLOCK")
+        class FixturePhysicalClock(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return datetime(2026, 10, 5, 12, 40, tzinfo=UTC)
+        # A native positive neighbour changes only the test-owned physical
+        # clock. The OBSERVED binding, position and attempts are real owners.
+        with patch("solana_alpha_lab.factory.paper_plane.datetime", FixturePhysicalClock):
+            coordinator.tick()
+        view = runner.readback()
+        self.assertEqual(view["positions"][0]["state"], "OPEN")
+        original_attempt = view["modeled_attempts"][0]["payload"]
+        pid = view["positions"][0]["position_id"]
+        runner.command({"command_type": "REQUEST_CLOSE_POSITION", "idempotency_key": "OBSERVED-CLOSE", "position_id": pid})
+        attempts_before = runner.readback()["modeled_attempts"]
+        for side in ("ENTRY", "EXIT"):
+            refusal = runner.attempt(position_id=pid, side=side, attempt_key="OBSERVED-HISTORICAL-" + side,
+                as_of="2026-10-05T12:40:00Z")
+            self.assertEqual(refusal["reason_code"], "OBSERVED_RUNTIME_REQUIRES_PHYSICAL_CLOCK")
+            self.assertFalse(refusal["send_permitted"])
+        replay = runner.attempt(position_id=pid, side="ENTRY", attempt_key=original_attempt["attempt_key"],
+            as_of="2026-10-05T12:40:00Z")
+        self.assertFalse(replay["send_permitted"])
+        self.assertTrue(replay["idempotent"])
+        self.assertEqual(replay["as_of"], original_attempt["as_of"])
+        self.assertEqual(runner.readback()["modeled_attempts"], attempts_before)
+
+    def test_patch_A4_native_switch_failure_rolls_back_all_staged_scope(self):
+        self.start_operating()
+        old_epoch, old_profile = self.epoch, self.profile
+        self.prepare(operating=True, suffix="-B", negative=True, exit_point="E3600")
+        before = self.runner.readback()
+        store = PaperPlaneStore(self.runner.store_path, readonly=True)
+        try:
+            events, state = store.execution_events(), dict(store._conn.execute("SELECT * FROM ordinary_state WHERE mode='PAPER'").fetchone())
+        finally:
+            store.close()
+        coordinator = TradingCoordinator(self.runner, mode="PAPER", clock=lambda: datetime(2026, 10, 5, 12, 41, tzinfo=UTC))
+        with patch.object(PaperPlaneStore, "start_bot", side_effect=RuntimeError("NATIVE_ACTIVATION_FAILURE")):
+            with self.assertRaisesRegex(RuntimeError, "NATIVE_ACTIVATION_FAILURE"):
+                coordinator.activate(epoch_id=self.epoch, at="2026-10-05T12:41:00Z", profile=old_profile,
+                    switch_key="ROLLBACK-PATCH", expected_current_epoch=old_epoch)
+        self.assertEqual(self.runner.readback(), before)
+        store = PaperPlaneStore(self.runner.store_path, readonly=True)
+        try:
+            self.assertEqual(store.execution_events(), events)
+            self.assertEqual(dict(store._conn.execute("SELECT * FROM ordinary_state WHERE mode='PAPER'").fetchone()), state)
+        finally:
+            store.close()
+
+    def test_patch_A4_genuine_legacy_binding_and_exact_attempt_replay_remain_compatible(self):
+        self.prepare(operating=False)
+        packet = continuity_fixture.OrdinarySourceTests.decision(self)
+        self.assertEqual(packet["decision"]["action"], "ENTER")
+        self.assertIsNotNone(packet["admission"]["position_id"])
+        positions = self.runner.readback()["positions"]
+        self.assertIsNone(positions[0]["ordinary_operating"])
+        self.assertEqual(continuity_fixture.OrdinarySourceTests.decision(self)["decision"], packet["decision"])
+        claim = self.runner.attempt(position_id=positions[0]["position_id"], side="ENTRY",
+            attempt_key="LEGACY-COMPATIBLE", as_of="2026-10-05T12:40:00Z")
+        self.assertTrue(claim["send_permitted"])
+        replay = self.runner.attempt(position_id=positions[0]["position_id"], side="ENTRY",
+            attempt_key="LEGACY-COMPATIBLE", as_of="2026-10-05T12:40:00Z")
+        self.assertFalse(replay["send_permitted"])
+        self.assertTrue(replay["idempotent"])
+        self.assertEqual(replay["attempt_id"], claim["attempt_id"])
+        legacy = self.runner.activate(epoch_id="ACTIVATION-EPOCH-LEGACY-NEIGHBOR", mode="PAPER", at="2026-10-05T12:40:00Z")
+        self.assertFalse(legacy["idempotent"])
 
     def test_C05_C06_real_loss_after_claim_paper_reconciles(self):
         self.start_operating()
@@ -887,8 +1193,16 @@ class OperatingDriverTests(unittest.TestCase):
         try:
             proxy="http://127.0.0.1:"+str(server.server_port)
             with patch.dict(os.environ,{"HTTPS_PROXY":proxy,"HTTP_PROXY":proxy,"NO_PROXY":"", "JUPITER_API_KEY":canary}):
-                blocked=self.invoke("run",mode="SHADOW",ticks=1,as_of="2026-10-05T12:40:00Z",expect=2)
-                self.assertEqual(blocked["reason_code"],"QUOTE_EXTERNAL_AUTHORITY_REQUIRED")
+                blocked=self.invoke("run",mode="SHADOW",ticks=1,as_of="2026-10-05T12:40:00Z")
+                self.assertEqual(blocked["status"],"GRACEFUL_SHUTDOWN")
+                self.assertEqual(blocked["ticks"],1)
+                observer=self.invoke("status",mode="SHADOW",as_of="2026-10-05T12:40:00Z")
+                self.assertFalse(observer["entries_enabled"])
+                self.assertTrue(any(row["reason"]=="QUOTE_EXTERNAL_AUTHORITY_REQUIRED" for row in observer["entry_blockers"]))
+                self.assertTrue(observer["exit_reconciliation_healthy"])
+                with closing(sqlite3.connect(self.runner.store_path.resolve().as_uri()+"?mode=ro",uri=True)) as native:
+                    for kind in ("MODELED_ATTEMPT_STARTED","ADAPTER_REQUEST_BOUND","QUOTE_CALL_CLAIMED"):
+                        self.assertEqual(native.execute("SELECT COUNT(*) FROM execution_events WHERE event_type=?",(kind,)).fetchone()[0],0)
                 live=self.invoke("run",mode="LIVE",ticks=1,expect=2)
                 self.assertEqual(live["reason_code"],"LIVE_ROUTE_FORBIDDEN")
             self.assertEqual(hits,[])
@@ -896,7 +1210,8 @@ class OperatingDriverTests(unittest.TestCase):
             for path in self.data.rglob("*"):
                 if path.is_file():
                     self.assertNotIn(canary.encode(),path.read_bytes())
-            self.metrics={"actual_loopback_egress_hits":0,"secret_canary_absent":True,"non_target_sha256_unchanged":True}
+            self.metrics={"actual_loopback_egress_hits":0,"secret_canary_absent":True,"non_target_sha256_unchanged":True,
+                "new_attempts_requests_quota":0,"scoped_missing_grant_retained":True,"exit_reconciliation_healthy":True}
         finally:
             server.shutdown()
             server.server_close()

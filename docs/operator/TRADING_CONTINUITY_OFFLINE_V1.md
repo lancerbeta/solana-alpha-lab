@@ -101,6 +101,14 @@ mode envelope одной транзакцией. `run` использует со
 закрывает процесс корректно; kernel lock исключает второго sender. `--as-of`
 или `--clock-file` для run/tick разрешены только синтетическому root.
 
+После ordinary activation ограничения mode действуют и для прежних публичных
+`episode`/`attempt` APIs: опущенный operating flag не снимает общий лимит,
+текущий entry scope или restore fence. Новый managed bot создаётся через
+тот же atomic activation/switch; чтение прежнего bot не создаёт activation.
+Отдельный genuine legacy runtime сохраняет прежнюю совместимость.
+Managed OBSERVED новые effects требуют физических часов и в ручных stages;
+исходные result/activation/recovery timestamps остаются исходными metadata.
+
 PAPER использует timely observation model. SHADOW использует production
 Jupiter quote parser; quote никогда не объявляется actual fill. Без отдельного
 external grant provider вызов запрещён. Для будущего разрешённого OBSERVED
@@ -113,6 +121,16 @@ strategy SHA позиции; старый A EXIT использует A profile 
 — B profile и B quota. Single grant остаётся совместимым. Конфликтующие duplicate scope,
 Уже выявленный до claim missing/wrong/expired grant или исчерпанный durable cap отказывают до новой
 attempt/quote claim; новая identity не переносит чужую quota.
+
+Локальный отказ нового входа — например missing/expired B grant или невалидный
+entry input — сохраняется как blocker и не завершает `run`. Тот же процесс
+продолжает polling и здоровые исходные EXIT A. После committed attempt
+неизвестный результат остаётся на прежней identity/request/quota: нужен
+original reconciliation, повторной отправки или выдуманного nonfill нет.
+Entry blocker не означает ошибку здорового старого выхода. Повреждение общего
+store, при котором нельзя доказать его целостность, завершает работу с честным
+fatal/unavailable результатом. Первый безопасный шаг — readonly status и
+проверка указанной зависимости; это не разрешение менять рабочие настройки.
 Credentials читаются только после проверки выбранного grant, а call claim
 сохраняется до HTTP. Срок проверяется ещё раз непосредственно перед HTTP;
 Если срок истёк после committed claim, HTTP запрещён, а исходная pending

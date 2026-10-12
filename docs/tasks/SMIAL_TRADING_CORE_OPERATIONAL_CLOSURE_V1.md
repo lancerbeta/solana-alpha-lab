@@ -204,3 +204,50 @@ The same CI's shard4 also proved the semantic overview was 16404 bytes against
 the existing 16384-byte limit. Compress only SEM-OWNER-LIFECYCLE purpose text;
 retain route/question/owner/operator bindings and authority/size boundaries.
 The direct semantic consumer module proves 16349 bytes and 15 PASS tests.
+
+Frozen 9ee9fb57 CODE/GOAL/ARCH P0/P1 reviews returned actual NOT_READY:
+coherent mutable quantity/cost could undercount the shared mode envelope;
+malformed new source JSON and retained SHADOW request shapes could terminate
+the process before healthy originating exits. OWNER review was not performed
+on that blocked inventory. Preserve the actual verdicts and byte-exact proof
+archives. Reuse original cumulative inventory witnesses before capacity
+release/admission and existing per-source/per-position error boundaries;
+healthy independent exits continue, damaged obligations remain unresolved.
+
+The owner subsequently authorized bounded PATCH #398 using
+SMIAL_PR398_OPERATING_BOUNDARY_PATCH_V1, preserved byte-for-byte at
+docs/evidence/smial_trading_core_operational_closure_v1/operating-boundary-patch-review.md,
+SHA256 3defd490906ef153417a0b44203adb1b50544c4ed6342f52aecc701bdae1a7f4.
+That document is source-control-flow review, not executed native evidence.
+Its reviewed remote head is d8ee540f; actual entry readback still finds OPEN
+PR398 at that head, base ba87f8e3 and failed CI. Local repair head 9ee9fb57 is
+not pushed. First reproduce F-A admission/attempt bypass and native restore
+fence bypass, and F-B scoped new-entry grant refusal on unchanged relevant
+native owners. Record actual source fingerprints rather than relabeling
+changed bytes as the review head.
+Repair only these existing boundaries: effective managed operating scope
+comes from durable state under the existing transaction, caller flags cannot
+downgrade envelope/current-entry/restore/clock rules, and scoped entry failures
+preserve same-process originating EXIT service. Preserve genuine legacy
+compatibility, original reconciliation, no-resend, normal-denial atomicity,
+pause/controls, request/attempt/quota identities and fatal shared-store failure.
+No new product functionality, scientific semantics, grants, dependency or
+external authority. C01-C24 remain mandatory. Refresh affected native outcome,
+consumer/clock/operator proof, all four isolated P0/P1 roles, bindings and
+exact-head CI/readiness in the same PR. This PATCH grants no merge; stop only
+after readiness PASS for the separate exact machine-rendered owner phrase.
+
+Native patch BEFORE confirmed F-A at the unchanged admission/attempt owners
+shared by reviewed d8ee and local9ee, and F-B at the unchanged grant checker
+and loop boundary. Source-scoped before identities are explicit; no whole-head
+execution identity is inferred from a subset of pins. The intermediate managed
+guard still admitted a fresh direct attempt after the original activation event
+was removed. Replan keeps one retained activation/binding invariant in the
+existing PaperPlane owner, reused by runner; exact original replay and recovery
+remain available. Its native intermediate BEFORE/AFTER is separate from9ee.
+The interrupted intermediate whole run has no completed execution receipt and
+is not PASS. Native C23 then reproduced the obsolete exit2 oracle after expected
+entry failures became retained blockers; only that outcome assertion changes,
+with egress, secret, non-target, noattempt/noquota and LIVE refusal kept strict.
+Final source/test freeze precedes whole proof, direct consumers, independent
+clock/cold operator, exact four-role review and unchanged delivery gates.

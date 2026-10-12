@@ -13,7 +13,11 @@ from typing import Any, Mapping
 
 import yaml
 
-from solana_alpha_lab.factory.paper_plane import OPEN_RISK_STATES, PRE_ATTEMPT_STATES, PaperPlaneStore, modeled_final_witness_valid, unattempted_cancel_witness_valid
+from solana_alpha_lab.factory.paper_plane import (
+    OPEN_RISK_STATES, PRE_ATTEMPT_STATES, PaperPlaneError, PaperPlaneStore,
+    assert_quantity_inventory_witness, modeled_final_witness_valid,
+    unattempted_cancel_witness_valid,
+)
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 
 SCHEMA = "smial.trading-runtime-policy"
@@ -825,9 +829,17 @@ def obligation_summary(store: PaperPlaneStore, *, mode: str,
             and all(position.get(field) is None or _as_decimal(position[field]) == 0
                 for field in ("remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec"))
             and any(unattempted_cancel_witness_valid(position, event) for event in cancellations_by_position.get(pid, [])))
-        if not unresolved_attempts and not corrupt_modeled_events and (flat or nonfill or unattempted_cancel):
+        inventory_witness_conflict = False
+        if position.get("qty_dec") is not None:
+            try:
+                # Share the original cumulative owner used by EXIT claims.
+                # Coherent mutable quantity/cost arithmetic proves no release.
+                assert_quantity_inventory_witness(store, position, allow_pending=True)
+            except PaperPlaneError:
+                inventory_witness_conflict = True
+        if not unresolved_attempts and not corrupt_modeled_events and not inventory_witness_conflict and (flat or nonfill or unattempted_cancel):
             continue
-        row_unknown = position_mode is None or bool(unresolved_attempts) or corrupt_modeled_events or state in {"UNKNOWN", "ATTEMPTING", "CANCELLED", "RECONCILED"}
+        row_unknown = position_mode is None or bool(unresolved_attempts) or corrupt_modeled_events or inventory_witness_conflict or state in {"UNKNOWN", "ATTEMPTING", "CANCELLED", "RECONCILED"}
         if state not in PRE_ATTEMPT_STATES and (quantity is None or quantity <= 0):
             row_unknown = True
         if state == "UNRESOLVED" and (not attempts or unresolved_attempts):
@@ -852,7 +864,7 @@ def obligation_summary(store: PaperPlaneStore, *, mode: str,
             exposure = None
         # A possible entry must retain its admission bound. A possible exit
         # retains the last proved inventory, never a hypothesized sold quantity.
-        if row_unknown and (not has_remainder or invalid_remainder or exposure is None) and admitted is not None:
+        if row_unknown and (not has_remainder or invalid_remainder or inventory_witness_conflict or exposure is None) and admitted is not None:
             exposure = max(exposure or Decimal("0"), admitted)
         pending += len(unresolved_attempts)
         unknown = unknown or row_unknown or exposure is None

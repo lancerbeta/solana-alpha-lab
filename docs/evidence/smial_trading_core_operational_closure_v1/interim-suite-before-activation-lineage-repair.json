@@ -1,0 +1,13 @@
+{
+  "cleanup": "PROCESS_FINISHED_EXIT_1; original active fixture path not retained; no unidentified temporary roots deleted",
+  "completed_execution_receipt": "NOT_WRITTEN",
+  "credential_reads": false,
+  "failed_test_identity": "NOT_RETAINED_AT_INTERRUPTION",
+  "observed_completed_markers": 35,
+  "observed_failure_markers": 1,
+  "provider_calls": false,
+  "reason": "confirmed original activation event absence permitted a fresh managed attempt; repaired before final suite",
+  "scope": "five-module native suite on intermediate managed guard before original-activation-lineage repair",
+  "status": "INTERRUPTED_NOT_PASS",
+  "subsequent_C23_finding": "separate native C23 run retained actual failure for obsolete run-exit oracle; see review-operating-boundary-remediation.json"
+}

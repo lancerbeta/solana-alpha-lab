@@ -23,6 +23,23 @@ from solana_alpha_lab.factory.strategy_runtime import PaperPlaneError
 from solana_alpha_lab.factory.hfic_research_scope import sha256_of
 
 
+ENTRY_INPUT_BLOCKERS = frozenset({
+    "INPUT_SHAPE_INVALID", "SIGNAL_DECISION_SCHEMA_INVALID", "EPISODE_ADMISSION_MISSING",
+    "EPISODE_ADMISSION_HASH_CONFLICT", "EPISODE_ADMISSION_NOT_VISIBLE", "EPISODE_SCHEDULE_BINDING_MISSING",
+    "PREFIX_IDENTITY_MISMATCH", "PREFIX_OBSERVATION_IDENTITY_MISMATCH", "PREFIX_OBSERVATION_COPY_CONFLICT",
+    "QUOTE_EXTERNAL_AUTHORITY_REQUIRED", "QUOTE_CALL_CAP_EXHAUSTED", "QUOTE_CREDENTIAL_CONFIGURATION_REQUIRED",
+    "EXECUTION_FUNDING_INPUT_UNAVAILABLE", "EXECUTION_FUNDING_INPUT_INVALID",
+    "EXECUTION_ASSET_METADATA_INTEGRITY_CONFLICT", "EXECUTION_ASSET_IDENTITY_INVALID",
+    "EXECUTION_ASSET_WITNESS_INTEGRITY_CONFLICT", "EXECUTION_ASSET_WITNESS_IDENTITY_CONFLICT",
+    "EXECUTION_OBSERVATION_STALE_OR_FUTURE", "ADAPTER_REQUEST_INTEGRITY_CONFLICT",
+    "QUOTE_DECIMALS_INVALID", "QUOTE_ENTRY_SEND_EXPIRED", "QUOTE_REDIRECT_OR_HOST_REJECTED",
+    "QUOTE_RESPONSE_LIMIT_INVALID", "QUOTE_RESPONSE_SCHEMA_INVALID", "QUOTE_ONLY_TRANSACTION_REJECTED",
+    "QUOTE_RESPONSE_MINT_CONFLICT", "QUOTE_RESPONSE_AMOUNT_CONFLICT", "QUOTE_PROVIDER_TYPED_FAILURE",
+    "QUOTE_OUTPUT_AMOUNT_INVALID", "QUOTE_ROUTE_IDENTITY_INVALID", "QUOTE_REQUEST_ID_MISSING",
+    "QUOTE_FEE_SEMANTICS_UNKNOWN", "QUOTE_NOTIONAL_EXCEEDS_ADMISSION",
+})
+
+
 def exact_child(root, relative, *, exists=True):
     path = root / Path(relative)
     if Path(relative).is_absolute() or ".." in Path(relative).parts:
@@ -238,11 +255,6 @@ class TradingCoordinator:
                     configure_operating_envelope(store, mode=self.mode, candidate_raw=normalized,
                         expected_current_sha256=envelope.get("envelope_sha256") or "0" * 64,
                         idempotency_key="ENVELOPE-" + switch_key, as_of=at)
-                activated = self.runner.activate(epoch_id=epoch_id, mode=self.mode, at=at, transaction_store=store)
-                if current_epoch and current_epoch != epoch_id:
-                    old = next(bot for bot in store.bots() if bot.get("activation_epoch_id") == current_epoch and bot["mode"] == self.mode)
-                    apply_operator_command(store, {"command_type": "STOP_BOT", "idempotency_key": "DRAIN-" + switch_key,
-                                                   "bot_instance_id": old["bot_instance_id"]})
                 profile_id = "PROFILE-" + epoch_id
                 frozen = {"profile": candidate, "profile_sha256": sha256_of(candidate)}
                 prior_profile = store.get_execution_event(profile_id)
@@ -256,6 +268,14 @@ class TradingCoordinator:
                                     (self.mode, epoch_id, generation))
                 store.append_execution_event(event_type="OPERATING_SWITCH_COMMITTED", event_id=event_id,
                     bot_instance_id=None, position_id=None, payload=body, created_at=at)
+                # The shared fresh-activation guard reads the same managed
+                # state/profile/CAS switch inside this transaction. Any genuine
+                # activation error rolls all of them back with the envelope.
+                activated = self.runner.activate(epoch_id=epoch_id, mode=self.mode, at=at, transaction_store=store)
+                if current_epoch and current_epoch != epoch_id:
+                    old = next(bot for bot in store.bots() if bot.get("activation_epoch_id") == current_epoch and bot["mode"] == self.mode)
+                    apply_operator_command(store, {"command_type": "STOP_BOT", "idempotency_key": "DRAIN-" + switch_key,
+                                                   "bot_instance_id": old["bot_instance_id"]})
                 return {**activated, "generation": generation}
         finally:
             store.close()
@@ -304,6 +324,30 @@ class TradingCoordinator:
         for key in (position["position_id"], "EXIT-INPUT-" + position["position_id"]):
             store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND active=1",
                 (at, key))
+
+    def _entry_blocker(self, store, identity, error, at):
+        reason = str(error)
+        if reason not in ENTRY_INPUT_BLOCKERS:
+            # Scope, control, fence and unexpected shared-owner failures are
+            # never converted into a successful continuous tick.
+            raise error
+        self._incident(store, "ENTRY-" + self.mode + "-" + identity, reason, at)
+
+    @staticmethod
+    def _checked_source_admission(source, raw):
+        try:
+            record = source._decode_episode_admission(raw)
+        except (ValueError, TypeError):
+            raise PaperPlaneError("EPISODE_ADMISSION_INVALID") from None
+        admission = record["record"]
+        fields = ("episode_id", "schedule_sha256", "activation_id", "mint", "t0", "cohort_id")
+        if not isinstance(admission, dict) or any(not isinstance(admission.get(key), str) for key in fields):
+            raise PaperPlaneError("EPISODE_ADMISSION_INVALID")
+        if any(admission[key] != raw[key] for key in fields):
+            raise PaperPlaneError("EPISODE_ADMISSION_IDENTITY_CONFLICT")
+        if admission_content_sha256(admission) != record["content_sha256"]:
+            raise PaperPlaneError("EPISODE_ADMISSION_HASH_CONFLICT")
+        return record
 
     def _inputs(self, bound, store, position, profile, side, at):
         if side == "EXIT":
@@ -358,7 +402,18 @@ class TradingCoordinator:
                 raise PaperPlaneError("EXECUTION_FUNDING_INPUT_INVALID") from None
             request["funding_valid_until"] = render_utc(parse_utc(funding["observed_at"])+timedelta(seconds=profile["observation_max_age_seconds"]))
             entries=store.filtered_execution_events(event_type="ADAPTER_REQUEST_BOUND",position_ids=[position["position_id"]]) if side=="EXIT" else []
-            retained=next((event["payload"] for event in entries if event["payload"].get("asset_metadata") and event["payload"].get("outputMint")==position["mint"]),None)
+            retained = None
+            for event in entries:
+                payload = event["payload"]
+                if not isinstance(payload, dict):
+                    raise PaperPlaneError("ADAPTER_REQUEST_INTEGRITY_CONFLICT")
+                asset = payload.get("asset_metadata")
+                if (not isinstance(asset, dict) or not asset
+                    or sha256_of(asset) != payload.get("asset_metadata_sha256")
+                    or payload.get("request_sha256") != sha256_of({key: value for key, value in payload.items() if key != "request_sha256"})):
+                    raise PaperPlaneError("EXECUTION_ASSET_METADATA_INTEGRITY_CONFLICT")
+                if payload.get("outputMint") == position["mint"] and retained is None:
+                    retained = payload
             if retained:
                 asset=retained["asset_metadata"]
                 if sha256_of(asset)!=retained["asset_metadata_sha256"] or retained["request_sha256"]!=sha256_of({k:v for k,v in retained.items() if k!="request_sha256"}):
@@ -482,6 +537,9 @@ class TradingCoordinator:
                 (json.dumps(request,sort_keys=True),"REQUEST-"+attempt["attempt_id"]))
             if side == "EXIT":
                 self._clear_exit_incidents(store, position, bound, at)
+            else:
+                store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND active=1",
+                    (at, "ENTRY-" + self.mode + "-" + position["position_id"]))
             if adapter is not None and adapter.transport is None:
                 # Scope and quota are validated under the same native claim
                 # transaction. A later crash spends this grant's slot only.
@@ -517,7 +575,7 @@ class TradingCoordinator:
         for row in pending:
             try:
                 healthy = self._recover_attempt(store, row[0], at) and healthy
-            except (PaperPlaneError, KeyError, ValueError, OSError, sqlite3.Error) as error:
+            except (PaperPlaneError, KeyError, ValueError, OSError) as error:
                 reason = str(error) if isinstance(error, PaperPlaneError) else "ATTEMPT_RECOVERY_INPUT_UNAVAILABLE"
                 self._incident(store, row[0], reason, at)
                 healthy = False
@@ -590,6 +648,8 @@ class TradingCoordinator:
         store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND active=1", (at, attempt_id))
         store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND reason='EXIT_INVENTORY_WITNESS_CONFLICT' AND active=1",
             (at, position["position_id"]))
+        store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND active=1",
+            (at, "ENTRY-" + self.mode + "-" + position["position_id"]))
         return True
 
     def tick(self):
@@ -623,7 +683,7 @@ class TradingCoordinator:
                         bound = self.runner.for_epoch(position["activation_epoch_id"])
                         bound.exit(position_id=position["position_id"], source_relative="unused", as_of=at, ordinary_operating=True)
                         counts["exits"] += 1
-                    except (PaperPlaneError,KeyError,ValueError,TypeError,OSError,sqlite3.Error) as error:
+                    except (PaperPlaneError,KeyError,ValueError,TypeError,OSError) as error:
                         if str(error) != "EPISODE_EXIT_NOT_DUE":
                             self._incident(store, position["position_id"], str(error) if isinstance(error,PaperPlaneError) else "OPERATING_BINDING_INTEGRITY_CONFLICT", at)
                             recovery_healthy = False
@@ -639,7 +699,7 @@ class TradingCoordinator:
                     try:
                         bound = self.runner.for_epoch(position["activation_epoch_id"])
                         counts["attempts"] += int(self._dispatch(store, bound, position, self._profile(store, position["activation_epoch_id"]), "EXIT", at))
-                    except (PaperPlaneError,KeyError,ValueError,TypeError,OSError,sqlite3.Error) as error:
+                    except (PaperPlaneError,KeyError,ValueError,TypeError,OSError) as error:
                         reason = str(error) if isinstance(error,PaperPlaneError) else "OPERATING_BINDING_INTEGRITY_CONFLICT"
                         key = "EXIT-INPUT-" + position["position_id"] if reason.startswith("EXECUTION_FUNDING_INPUT_") else position["position_id"]
                         self._incident(store, key, reason, at)
@@ -666,41 +726,61 @@ class TradingCoordinator:
             at = render_utc(self.clock())
             source = None
             try:
-                source = self._source(profile)
+                try:
+                    source = self._source(profile)
+                except sqlite3.Error:
+                    raise PaperPlaneError("SOURCE_UNAVAILABLE") from None
                 with source.read_snapshot():
                     cfg = profile["source"]
                     # Stable source-native rowid paging plus cyclic anti-join.
                     # Queue owns delayed due slots; cursor never owns effects.
-                    records = source._conn.execute("SELECT rowid,* FROM episode_admissions WHERE rowid>? AND schedule_sha256=? AND activation_id=? ORDER BY rowid LIMIT ?", (state["discovery_rowid"], cfg["schedule_sha256"], cfg["activation_id"], profile["batch_size"])).fetchall()
-                    append_page = bool(records)
-                    if not records:
-                        # New append work always wins over cyclic retention
-                        # checking; a large known history cannot starve it.
-                        records = source._conn.execute("SELECT rowid,* FROM episode_admissions WHERE rowid>? AND schedule_sha256=? AND activation_id=? ORDER BY rowid LIMIT ?", (state["rescan_rowid"], cfg["schedule_sha256"], cfg["activation_id"], profile["batch_size"])).fetchall()
-                    latest = self._source_latest(source, profile)
+                    try:
+                        records = source._conn.execute("SELECT rowid,* FROM episode_admissions WHERE rowid>? AND schedule_sha256=? AND activation_id=? ORDER BY rowid LIMIT ?", (state["discovery_rowid"], cfg["schedule_sha256"], cfg["activation_id"], profile["batch_size"])).fetchall()
+                        append_page = bool(records)
+                        if not records:
+                            # New append work always wins over cyclic retention
+                            # checking; a large known history cannot starve it.
+                            records = source._conn.execute("SELECT rowid,* FROM episode_admissions WHERE rowid>? AND schedule_sha256=? AND activation_id=? ORDER BY rowid LIMIT ?", (state["rescan_rowid"], cfg["schedule_sha256"], cfg["activation_id"], profile["batch_size"])).fetchall()
+                        latest = self._source_latest(source, profile)
+                    except sqlite3.Error:
+                        raise PaperPlaneError("SOURCE_UNAVAILABLE") from None
                     if latest is None or not 0 <= (parse_utc(at) - parse_utc(latest)).total_seconds() <= profile["source_max_age_seconds"]:
                         source_status = "SOURCE_STALE"
+                    page_discovered = 0
                     with store.immediate_write():
                         for raw in records:
-                            record = source._decode_episode_admission(raw)
+                            record = self._checked_source_admission(source, raw)
                             admission = record["record"]
                             digest = admission_content_sha256(admission)
                             if digest != record["content_sha256"]:
                                 raise PaperPlaneError("EPISODE_ADMISSION_HASH_CONFLICT")
-                            schedule = source.get_registered_schedule(admission["schedule_sha256"])
+                            try:
+                                schedule = source.get_registered_schedule(admission["schedule_sha256"])
+                            except (sqlite3.Error, ValueError, TypeError):
+                                raise PaperPlaneError("SOURCE_UNAVAILABLE") from None
+                            if not isinstance(schedule, dict) or not isinstance(schedule.get("document"), dict):
+                                raise PaperPlaneError("EPISODE_SCHEDULE_BINDING_MISSING")
                             cutoff = resolve_point(schedule_binding(schedule["document"]), parse_utc(admission["t0"]), bound.recipe["decision_point"]).availability_deadline
                             existing = store._conn.execute("SELECT source_sha256 FROM ordinary_work WHERE epoch_id=? AND episode_id=?", (state["epoch_id"], admission["episode_id"])).fetchone()
                             if existing and existing[0] != digest:
                                 raise PaperPlaneError("ORDINARY_SOURCE_IDENTITY_CONFLICT")
                             store._conn.execute("INSERT OR IGNORE INTO ordinary_work(epoch_id,episode_id,source_sha256,cutoff,status) VALUES(?,?,?,?, 'PENDING')", (state["epoch_id"], admission["episode_id"], digest, render_utc(cutoff)))
-                            counts["discovered"] += int(existing is None)
+                            page_discovered += int(existing is None)
                         if append_page:
                             store._conn.execute("UPDATE ordinary_state SET discovery_rowid=? WHERE mode=?", (records[-1]["rowid"], self.mode))
                         else:
                             cursor = records[-1]["rowid"] if records else 0
                             store._conn.execute("UPDATE ordinary_state SET rescan_rowid=? WHERE mode=?", (cursor, self.mode))
-            except (OSError, sqlite3.Error):
+                    counts["discovered"] += page_discovered
+            except OSError:
                 source_status = "SOURCE_UNAVAILABLE"
+            except PaperPlaneError as error:
+                if str(error) not in {"SOURCE_UNAVAILABLE", "EPISODE_ADMISSION_INVALID", "EPISODE_ADMISSION_HASH_CONFLICT",
+                    "EPISODE_ADMISSION_IDENTITY_CONFLICT", "ORDINARY_SOURCE_IDENTITY_CONFLICT", "EPISODE_SCHEDULE_BINDING_MISSING"}:
+                    raise
+                source_status = str(error)
+            except (ValueError, TypeError, KeyError):
+                source_status = "EPISODE_ADMISSION_INVALID"
             finally:
                 if source is not None:
                     source.close()
@@ -720,8 +800,13 @@ class TradingCoordinator:
                 pending = store._conn.execute("SELECT * FROM ordinary_work WHERE epoch_id=? AND status='PENDING' AND cutoff<=? ORDER BY cutoff,episode_id LIMIT ?", (state["epoch_id"], at, profile["batch_size"])).fetchall()
                 for work in pending:
                     at = render_utc(self.clock())
-                    packet = bound.episode(source_relative="unused", source_path=exact_child(Path(profile["source"]["root"]), profile["source"]["file"]),
-                        episode_id=work["episode_id"], epoch_id=state["epoch_id"], mode=self.mode, as_of=at, ordinary_operating=True)
+                    work_key = "WORK-" + state["epoch_id"] + "-" + work["episode_id"]
+                    try:
+                        packet = bound.episode(source_relative="unused", source_path=exact_child(Path(profile["source"]["root"]), profile["source"]["file"]),
+                            episode_id=work["episode_id"], epoch_id=state["epoch_id"], mode=self.mode, as_of=at, ordinary_operating=True)
+                    except PaperPlaneError as error:
+                        self._entry_blocker(store, work_key, error, at)
+                        continue
                     self.fault("AFTER_DECISION_COMMIT")
                     admission = packet["admission"]
                     status = admission.get("outcome") or packet["decision"]["action"]
@@ -730,6 +815,8 @@ class TradingCoordinator:
                     with store.immediate_write():
                         store._conn.execute("UPDATE ordinary_work SET status=?,position_id=?,evaluation_revision=? WHERE epoch_id=? AND episode_id=?", (status, admission.get("position_id"), revision, state["epoch_id"], work["episode_id"]))
                         store._conn.execute("UPDATE ordinary_state SET last_progress_at=?,last_work_id=? WHERE mode=?", (at, packet["decision"]["signal_decision_id"], self.mode))
+                        store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND active=1",
+                            (at, "ENTRY-" + self.mode + "-" + work_key))
                     counts["decisions"] += 1
             # Admission and effect may be separated by pause/switch/crash.
             for position in store.obligation_positions(self.mode):
@@ -739,14 +826,19 @@ class TradingCoordinator:
                     if bot["entries_paused"] or bot["status"] != "RUNNING":
                         store.cancel_entry_intent(position["position_id"], reason_code="ENTRIES_PAUSED" if bot["entries_paused"] else "BOT_DRAINING" if bot["status"] == "DRAINING" else "BOT_STOPPED")
                     continue
-                counts["attempts"] += int(self._dispatch(store, bound, position, profile, "ENTRY", at))
+                try:
+                    counts["attempts"] += int(self._dispatch(store, bound, position, profile, "ENTRY", at))
+                except PaperPlaneError as error:
+                    self._entry_blocker(store, position["position_id"], error, at)
             with store.immediate_write():
                 at = render_utc(self.clock())
                 store._conn.execute("UPDATE ordinary_state SET last_tick_at=?,source_status=?,source_latest_at=? WHERE mode=?", (at, source_status, latest, self.mode))
                 if counts["attempts"] or counts["exits"]:
                     store._conn.execute("UPDATE ordinary_state SET last_progress_at=? WHERE mode=?", (at, self.mode))
             return {"status": "TICK_COMPLETE", "mode": self.mode, "epoch_id": state["epoch_id"], "as_of": at,
-                    "source_status": source_status, "reconciliation_healthy": recovery_healthy, **counts}
+                    "source_status": source_status, "reconciliation_healthy": recovery_healthy,
+                    "entries_enabled": allows_entries and not store._conn.execute("SELECT 1 FROM ordinary_incidents WHERE active=1 AND incident_key LIKE ? LIMIT 1",
+                        ("ENTRY-" + self.mode + "-%",)).fetchone(), **counts}
         finally:
             store.close()
 
@@ -802,7 +894,8 @@ class TradingCoordinator:
                 moving = None if profile is None else not expected or progress_age is not None and 0 <= progress_age <= profile["progress_max_age_seconds"]
                 incidents = [dict(row) for row in store._conn.execute("SELECT * FROM ordinary_incidents ORDER BY incident_key")]
                 for incident in incidents:
-                    if incident["active"] and any(tag in incident["reason"] for tag in ("INTEGRITY", "CONFLICT", "CORRUPT")):
+                    if (incident["active"] and not incident["incident_key"].startswith(("ENTRY-", "SOURCE-"))
+                        and any(tag in incident["reason"] for tag in ("INTEGRITY", "CONFLICT", "CORRUPT"))):
                         integrity.append({"incident_key":incident["incident_key"],"status":incident["reason"]})
                 if integrity and inventory["position_count"]:
                     inventory = {**inventory, "inventory_status": "UNKNOWN", "outstanding_cost_basis_usd": None}
@@ -822,6 +915,9 @@ class TradingCoordinator:
                 source_age = None if observed_source_latest is None else (parse_utc(at) - parse_utc(observed_source_latest)).total_seconds()
                 fresh = profile is not None and source_available and source_age is not None and 0 <= source_age <= profile["source_max_age_seconds"]
                 input_reason = "OPERATING_PROFILE_UNAVAILABLE_OR_CORRUPT" if profile is None else "SOURCE_UNAVAILABLE" if not source_available else "SOURCE_CLOCK_FROM_FUTURE" if source_age is not None and source_age < 0 else "SOURCE_STALE" if not fresh else "SOURCE_FRESH"
+                source_issue = next((row for row in incidents if row["active"] and row["incident_key"] == "SOURCE-" + self.mode), None)
+                if source_issue is not None:
+                    input_reason = source_issue["reason"]
                 envelope = read_operating_envelope(store, self.mode)
                 envelope_valid = envelope["status"] == "VALID"
                 runtime_policy = resolve_current_policy(store, self.mode)
@@ -837,8 +933,14 @@ class TradingCoordinator:
                 execution_inputs_verified = execution_input_status in {"PAPER_NATIVE_PREFIX", "QUOTE_INPUTS_VERIFIED"}
                 if fresh and not execution_inputs_verified:
                     input_reason = execution_input_status
-                exit_blocked = any(row["active"] and not row["incident_key"].startswith("SOURCE-") for row in incidents)
-                healthy = policy_valid and envelope_valid and execution_inputs_verified and not integrity and not exit_blocked and alive and moving and fresh and not unresolved and inventory["inventory_status"] == "KNOWN" and not state["restore_guard"]
+                entry_blockers = [row for row in incidents if row["active"] and row["incident_key"].startswith("ENTRY-" + self.mode + "-")]
+                exit_blocked = any(row["active"] and not row["incident_key"].startswith(("SOURCE-", "ENTRY-")) for row in incidents)
+                active_bot = next((bot for bot in bots if bot["activation_epoch_id"] == state["epoch_id"]), None)
+                entries_enabled = bool(active_bot and active_bot["status"] == "RUNNING" and not active_bot["entries_paused"]
+                    and policy_valid and envelope_valid and execution_inputs_verified and not integrity and not unresolved
+                    and inventory["inventory_status"] == "KNOWN" and not state["restore_guard"] and fresh
+                    and source_issue is None and not entry_blockers)
+                healthy = policy_valid and envelope_valid and execution_inputs_verified and not integrity and not exit_blocked and not entry_blockers and source_issue is None and alive and moving and fresh and not unresolved and inventory["inventory_status"] == "KNOWN" and not state["restore_guard"]
                 restored_cut = store._conn.execute("SELECT event_id FROM execution_events WHERE event_type='RESTORE_EXTERNAL_CUT_RECONCILED' AND json_extract(payload_json,'$.mode')=? ORDER BY rowid DESC LIMIT 1", (self.mode,)).fetchone()
                 restore_ready_for_ack = bool(restored_cut and policy_valid and envelope_valid and not unresolved and not integrity and inventory["inventory_status"]=="KNOWN")
                 restore_next = "ack-restore --mode "+self.mode+" --input complete-external-cut.json --inventory-sha256 "+sha256_of(inventory)+" --as-of "+at if restore_ready_for_ack else "reconcile --mode "+self.mode+" --input complete-external-cut.json"
@@ -860,7 +962,8 @@ class TradingCoordinator:
                     "as_of": at, "store": "paper_plane.sqlite", "activation_epoch_id": state["epoch_id"],
                     "generation":state["generation"],"inventory_sha256":sha256_of(inventory),
                     "profile_sha256": None if profile is None else sha256_of(profile), "process_alive": alive,
-                    "input_fresh": fresh and execution_inputs_verified, "source_fresh": fresh,
+                    "input_fresh": fresh and execution_inputs_verified and source_issue is None, "source_fresh": fresh,
+                    "source_status": state["source_status"], "entries_enabled": entries_enabled, "entry_blockers": entry_blockers,
                     "execution_input_status": execution_input_status,
                     "input_reason":input_reason,"source_available": source_available, "source_latest_at": observed_source_latest, "last_tick_at":tick,"progress_moving": moving,
                     # Current entry policy is separate from the position's
@@ -877,8 +980,8 @@ class TradingCoordinator:
                     "economics": economics, "economics_coverage": "RECENT_100_POSITION_ROWS_PER_MODE",
                     "complete_execution_readback": "trading_continuity.py readback", "netreturn_status": "NOT_ESTABLISHED", "owner_fcf_status": "NOT_AVAILABLE",
                     "scientific_monitoring_thresholds": "NOT_CONFIGURED",
-                    "next_safe_action": "ACKNOWLEDGE_RESTORED_INVENTORY" if state["restore_guard"] and restore_ready_for_ack else "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING" if unresolved or integrity or state["restore_guard"] else "VERIFY_RUNTIME_POLICY" if not policy_valid else "VERIFY_OPERATING_ENVELOPE" if not envelope_valid else "CHECK_EXECUTION_QUOTE_INPUTS" if not execution_inputs_verified else "CHECK_PROCESS_SOURCE_AND_PROFILE" if not healthy else "NONE",
-                    "next_safe_command": restore_next if state["restore_guard"] else "readback --mode "+self.mode if unresolved or integrity or exit_blocked or not policy_valid or not envelope_valid or not execution_inputs_verified else "run --mode "+self.mode+" --ticks 1" if not fresh else "run --mode "+self.mode if not alive else "status --mode "+self.mode+" --format human",
+                    "next_safe_action": "ACKNOWLEDGE_RESTORED_INVENTORY" if state["restore_guard"] and restore_ready_for_ack else "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING" if unresolved or integrity or state["restore_guard"] else "VERIFY_RUNTIME_POLICY" if not policy_valid else "VERIFY_OPERATING_ENVELOPE" if not envelope_valid else "CHECK_EXECUTION_QUOTE_INPUTS" if not execution_inputs_verified else "VERIFY_ORIGINAL_ENTRY_GRANT_OR_INPUT" if entry_blockers else "RESTORE_EXACT_SOURCE_RECORD_WITHOUT_ADVANCING_CURSOR" if source_issue and source_issue["reason"] not in {"SOURCE_STALE", "SOURCE_UNAVAILABLE"} else "CHECK_PROCESS_SOURCE_AND_PROFILE" if not healthy else "NONE",
+                    "next_safe_command": restore_next if state["restore_guard"] else "readback --mode "+self.mode if unresolved or integrity or exit_blocked or entry_blockers or source_issue or not policy_valid or not envelope_valid or not execution_inputs_verified else "run --mode "+self.mode+" --ticks 1" if not fresh else "run --mode "+self.mode if not alive else "status --mode "+self.mode+" --format human",
                     "live_authority": False, "financial_authority": False}
         finally:
             store.close()
