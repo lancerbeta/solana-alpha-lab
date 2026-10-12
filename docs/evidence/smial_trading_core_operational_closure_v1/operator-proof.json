@@ -8,18 +8,18 @@
     "native_fixture_root_absent": true,
     "owned_root_absent": true
   },
-  "cli_elapsed_seconds": 16.278,
+  "cli_elapsed_seconds": 16.584326,
   "configuration_recovery": {
     "original_policy_envelope_events_exact": true,
     "post_backup_configuration_extension_exercised": false
   },
   "credential_reads": false,
-  "elapsed_seconds": 18.921612,
+  "elapsed_seconds": 19.177837,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "explicit_resume_executed": true,
   "external_cut_basis": "EMPTY_INDEPENDENT_EFFECT_LEDGER_NO_POST_BACKUP_EFFECTS_CALLER_ASSERTED_COMPLETE",
   "final_state": "RECONCILED_STOPPED",
-  "fixture_preparation_elapsed_seconds": 1.732985,
+  "fixture_preparation_elapsed_seconds": 1.731918,
   "fixture_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "identities": {
     "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-COLD-FINAL",
@@ -27,9 +27,9 @@
       "ATTEMPT-086A806EDA2DB59871650A819F9D3BA4356C5F35A15EEA1D0C4B62959843A916",
       "ATTEMPT-6BF204842254402C08039BC2523174CF3D307220455AF53217B83C91F7ECD3E9"
     ],
-    "backup_database_sha256": "fadb8a0002e81e2d0ddfb326774726a564174a257405bbed92e3415b5e321ecb",
+    "backup_database_sha256": "9fdafa85a0b61a2edabb740a85e160bd98f08b589ca7cd432c3688179a192768",
     "bot_instance_id": "BOT-STRAT-CONTINUITY-SYNTH-001-COLD-FINAL-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-COLD-FINAL",
-    "cut_sha256": "63c1cf9ebb901564a169cd4ac5880334b11ba6e6182afc75dd30dfc7f0cdb993",
+    "cut_sha256": "56e75a7a1db1a7c18e629ae93d0e135305702deb940b885f98810b48be3dcd48",
     "inventory_sha256": "b87e055f2d00272488c114bc6f75a52a14fdbe7fe84f1aad97c6fce8821ab58c",
     "position_id": "POS-SIG-SIGDEC-1984A0A347E8238F2571E78380F7E6EFFB683E3543640EC1469E4CA3319C586F"
   },
@@ -43,35 +43,35 @@
   "readonly_canaries": [
     {
       "command": "status",
-      "family_sha256": "0bd71588e8eda3028496c8719aaef0102bd39407cf9646505aa874d97587da8a",
+      "family_sha256": "809f2b55ee44e34787d57aa32f6488846a2ebc76531e59ca59305dc8fee32f7c",
       "physical_family_byte_exact": true,
       "sequence": 4,
       "wal_bytes": 0
     },
     {
       "command": "status",
-      "family_sha256": "3ef6798a22a97fb3532be7807377c84a2eeffe4423ed77433721a53a18bcec2c",
+      "family_sha256": "e9c023cb87aba32f2d67f0718100876bf15e68bfe18702e1f8ce3a03f3cfa32a",
       "physical_family_byte_exact": true,
       "sequence": 6,
       "wal_bytes": 0
     },
     {
       "command": "status",
-      "family_sha256": "5602719aa203c3e9d751bd61b53ac70a610f977439c258e55dc824203565292c",
+      "family_sha256": "f2976f4d863b69ab1d899118025407c86facf4f0f795da9644b1def6d9723e77",
       "physical_family_byte_exact": true,
       "sequence": 13,
       "wal_bytes": 0
     },
     {
       "command": "status",
-      "family_sha256": "5602719aa203c3e9d751bd61b53ac70a610f977439c258e55dc824203565292c",
+      "family_sha256": "f2976f4d863b69ab1d899118025407c86facf4f0f795da9644b1def6d9723e77",
       "physical_family_byte_exact": true,
       "sequence": 14,
       "wal_bytes": 0
     },
     {
       "command": "status",
-      "family_sha256": "99d93d8db3a9219d7e8ccec415e6dfe8153b1573d92666476b6e332830feb4d6",
+      "family_sha256": "3437d526d69ed67628c86fc23b64f8faae8c102e46b78621a335e8d66b6b1107",
       "physical_family_byte_exact": true,
       "sequence": 16,
       "wal_bytes": 0
@@ -79,7 +79,7 @@
   ],
   "readonly_status_canaries_verified": true,
   "readonly_status_canary_count": 5,
-  "receipt_sha256": "77837d8986a2c3febb28f58a8b120d5f3ec75787016ce7606de94c302eda52a5",
+  "receipt_sha256": "dbaf34b41bf54ff0e2d78a617ffc0b7b519b73ca72f7f468d28435af80a6897f",
   "reproducer_ref": "docs/evidence/smial_trading_core_operational_closure_v1/operator-reproducer.py",
   "reproducer_sha256": "2fc3126943ddfff8d0837ed5d6fecb8fc894e42bd535ef232d1419d36e2d8a29",
   "role": "ROOT_NATIVE_PROOF_NOT_CRITIC_VERDICT",
@@ -92,42 +92,42 @@
       {
         "argument": "SEM-OWNER-LIFECYCLE",
         "command": "resolve-route",
-        "elapsed_seconds": 17.33419,
+        "elapsed_seconds": 4.786226,
         "exit_code": 0,
-        "stderr_sha256": "ef35b8e5f20e46cf9332e72ca7430527ca4a016b878c8a30dad58604e35809c2",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "stdout_sha256": "76f3d621d9b3fc7424ee0bda50373ff05832dd13709ddb8f8cb8aa323473d7cd"
       },
       {
         "argument": "DOC-TRADING-CONTINUITY-OFFLINE-001",
         "command": "resolve-asset",
-        "elapsed_seconds": 17.746063,
+        "elapsed_seconds": 4.764856,
         "exit_code": 0,
-        "stderr_sha256": "ef35b8e5f20e46cf9332e72ca7430527ca4a016b878c8a30dad58604e35809c2",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "stdout_sha256": "63b69159f1279953726e89e3f0bad5c370f64566b6a5c89699e925415fcaaf78"
       }
     ],
     "native_navigation_command_count": 2,
     "network_required": false,
-    "non_navigation_canonical_sha256": "3ba8f0080181294dcfe7a018531bac950e954d36bb15d3cc64e5c7df715c1fab",
+    "non_navigation_canonical_sha256": "a4d4bae8e2692a500ba1a6d0dd9a01d8c5e19a26a4dc0bbfbc6b6d3b89eb2ac3",
     "read_only": true,
     "readback_anchors": {
-      "catalog/assets/core.yaml": "6c060ec667909e5c66b775cb647cfad390957d84366aabf9414b3a8945ef768d",
+      "catalog/assets/core.yaml": "76df5af51012685b500d4e8c12643ea55c21396496b3277eacbedf6d71283a43",
       "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "a1f0dabbc50819b092403fa9b2dda3d4b2f296947d311668de94ad4b148c8dc7",
-      "docs/reports/smial_trading_core_operational_closure_v1/REPORT.md": "9e3230377639ef3e4f5e19cb3271d68009633eedd3c1dfe2897ea64930e5213a",
-      "docs/tasks/SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1.md": "cdeda8b517a03ebc33210aa3606fde7c7f85001d28cd4493f0dbd16f4a88b5bd"
+      "docs/reports/smial_trading_core_operational_closure_v1/REPORT.md": "5f9a6972e0fa64adf41179cc0793638e4bdfee5497ae3be80d1c456451f536ca",
+      "docs/tasks/SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1.md": "2913799fe347869cf68d6a41fad9d470549f77fdb4aa8d87a6136ac4e844801a"
     },
     "readback_anchors_unchanged": true,
     "record_status_is_not_product_acceptance": true,
     "status": "PASS"
   },
-  "source_exit_producer_elapsed_seconds": 0.466587,
+  "source_exit_producer_elapsed_seconds": 0.439365,
   "source_exit_producer_prepared_natively": true,
   "source_pins_after": {
     "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
     "scripts/trading_continuity.py": "ba9615ae37886197b52a394415989427b182a33976d03b1985868d2f36f597dd",
     "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
     "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
-    "src/solana_alpha_lab/factory/paper_plane.py": "492447ca810175823ebcd5a267c69b7b13c8b091db94f149d8efe2a65b885710",
+    "src/solana_alpha_lab/factory/paper_plane.py": "b832b090453ef475b06268aa1ecf0308879339c61b1423efa894256fa8b14c02",
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
     "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
     "src/solana_alpha_lab/factory/trading_adapters.py": "cf6fa566e491d68aeee5c059228fc2385b2884c23c297aa6905f00f3606c8e05",
@@ -135,9 +135,9 @@
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "b6502ecf8abe00f949717dbe126ef9e8828368b12ec3db6bc6ac909825935546",
+    "tests/test_trading_core_operational_closure_v1.py": "f0094ce44ee7b168729cb6686ae2e5070849c19a347b5159624152105d55f0b0",
     "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
-    "tests/test_trading_operational_obligations_v1.py": "436a9258ac44674d7306864c9c447916907cf790870a3892ea26f59e03c56893",
+    "tests/test_trading_operational_obligations_v1.py": "5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880",
     "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
   },
   "source_pins_before": {
@@ -145,7 +145,7 @@
     "scripts/trading_continuity.py": "ba9615ae37886197b52a394415989427b182a33976d03b1985868d2f36f597dd",
     "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
     "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
-    "src/solana_alpha_lab/factory/paper_plane.py": "492447ca810175823ebcd5a267c69b7b13c8b091db94f149d8efe2a65b885710",
+    "src/solana_alpha_lab/factory/paper_plane.py": "b832b090453ef475b06268aa1ecf0308879339c61b1423efa894256fa8b14c02",
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
     "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
     "src/solana_alpha_lab/factory/trading_adapters.py": "cf6fa566e491d68aeee5c059228fc2385b2884c23c297aa6905f00f3606c8e05",
@@ -153,9 +153,9 @@
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "b6502ecf8abe00f949717dbe126ef9e8828368b12ec3db6bc6ac909825935546",
+    "tests/test_trading_core_operational_closure_v1.py": "f0094ce44ee7b168729cb6686ae2e5070849c19a347b5159624152105d55f0b0",
     "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
-    "tests/test_trading_operational_obligations_v1.py": "436a9258ac44674d7306864c9c447916907cf790870a3892ea26f59e03c56893",
+    "tests/test_trading_operational_obligations_v1.py": "5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880",
     "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
   },
   "source_pins_unchanged": true,
@@ -167,7 +167,7 @@
         "strategy": "configs/strategies/continuity_synth-COLD-FINAL.yaml"
       },
       "command": "check",
-      "elapsed_seconds": 0.685646,
+      "elapsed_seconds": 0.71955,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -187,7 +187,7 @@
         "switch_key": "COLD-FINAL-INITIAL"
       },
       "command": "operating-activate",
-      "elapsed_seconds": 0.779501,
+      "elapsed_seconds": 0.786887,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -196,7 +196,7 @@
       "sequence": 2,
       "status": null,
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "fbc7defb54995e4342bda14745ba4d9d49cbc43c03cd3a46db2a92c894c81d97"
+      "stdout_sha256": "47bf2b92bc1c123843f98740b16c2cec9e8deedba2ea50f5c3acb2ca4cd3adc3"
     },
     {
       "arguments": {
@@ -204,7 +204,7 @@
         "ticks": "1"
       },
       "command": "run",
-      "elapsed_seconds": 0.972406,
+      "elapsed_seconds": 0.974233,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -220,7 +220,7 @@
         "as_of": "2026-10-05T12:40:00Z"
       },
       "command": "status",
-      "elapsed_seconds": 0.652835,
+      "elapsed_seconds": 0.689221,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -229,7 +229,7 @@
       "sequence": 4,
       "status": "READY",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "9101f58a1b62fcf033adfab20315c25dc83627304a9839715b2c4da9985e6284"
+      "stdout_sha256": "59a2f2fbe7d4a58654aba0acdc0feee145c96e8f93242afa5db2e37cd8e9c018"
     },
     {
       "arguments": {
@@ -237,7 +237,7 @@
         "idempotency_key": "COLD-FINAL-PAUSE"
       },
       "command": "pause",
-      "elapsed_seconds": 0.595828,
+      "elapsed_seconds": 0.618008,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -254,7 +254,7 @@
         "format": "human"
       },
       "command": "status",
-      "elapsed_seconds": 0.655157,
+      "elapsed_seconds": 0.697934,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -270,7 +270,7 @@
         "destination": "backups/cold-final.sqlite"
       },
       "command": "backup",
-      "elapsed_seconds": 0.591156,
+      "elapsed_seconds": 0.62901,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -279,7 +279,7 @@
       "sequence": 7,
       "status": null,
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "5ddb4b713ef06fffd46f188c9a3612f9d06e724d284118792af05b66db692fd4"
+      "stdout_sha256": "9a7694bc4f01ca35fab8daa9511ab2a450f7fa8e71db018dd54035086aad6c18"
     },
     {
       "arguments": {
@@ -291,7 +291,7 @@
         "input": "independent-effect-receipts.json"
       },
       "command": "export-cut",
-      "elapsed_seconds": 0.580622,
+      "elapsed_seconds": 0.63138,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -305,7 +305,7 @@
     {
       "arguments": {},
       "command": "init",
-      "elapsed_seconds": 0.569956,
+      "elapsed_seconds": 0.601055,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -321,7 +321,7 @@
         "backup": "<retained-native-backup>"
       },
       "command": "restore",
-      "elapsed_seconds": 0.64019,
+      "elapsed_seconds": 0.648498,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -338,7 +338,7 @@
         "input": "external-cut-input.json"
       },
       "command": "seal-cut",
-      "elapsed_seconds": 0.621689,
+      "elapsed_seconds": 0.63317,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -347,14 +347,14 @@
       "sequence": 11,
       "status": "CUT_VERIFIED_AND_SEALED",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "3aaf3629dabdc4ab9348fef35219aa5b3d653797f1096043d9f4a40afed4e7e6"
+      "stdout_sha256": "9f9c86518395427363bb5f394cd2009a23027d2f84b8f4b7dcc8b1531f9e98d7"
     },
     {
       "arguments": {
         "input": "complete-external-cut.json"
       },
       "command": "reconcile",
-      "elapsed_seconds": 0.697571,
+      "elapsed_seconds": 0.703022,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -370,7 +370,7 @@
         "as_of": "2026-10-05T12:40:00Z"
       },
       "command": "status",
-      "elapsed_seconds": 0.688777,
+      "elapsed_seconds": 0.697734,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -379,7 +379,7 @@
       "sequence": 13,
       "status": "ACTION_REQUIRED",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "7991a40fffcd785ec808e6333cf7dbde4ff665218ee0fffd359525598c703170"
+      "stdout_sha256": "38b276d7c143ebfeb4e9619488fa35a702c8e8d6dd963fb00b52a3f246c2e0d3"
     },
     {
       "arguments": {
@@ -387,7 +387,7 @@
         "format": "human"
       },
       "command": "status",
-      "elapsed_seconds": 0.686359,
+      "elapsed_seconds": 0.695595,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -405,7 +405,7 @@
         "inventory_sha256": "b87e055f2d00272488c114bc6f75a52a14fdbe7fe84f1aad97c6fce8821ab58c"
       },
       "command": "ack-restore",
-      "elapsed_seconds": 0.691564,
+      "elapsed_seconds": 0.676095,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -421,7 +421,7 @@
         "as_of": "2026-10-05T12:40:00Z"
       },
       "command": "status",
-      "elapsed_seconds": 0.680661,
+      "elapsed_seconds": 0.702825,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -430,7 +430,7 @@
       "sequence": 16,
       "status": "READY",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "73f5d885390dc71bbd095c230d533331fb87c4bdad4ef41c93abdb19f2f25a0e"
+      "stdout_sha256": "86f6520d216c04c9fff58066e76232542d55d71881879d16aedea21c84d910dd"
     },
     {
       "arguments": {
@@ -438,7 +438,7 @@
         "idempotency_key": "COLD-FINAL-RESUME"
       },
       "command": "resume",
-      "elapsed_seconds": 0.618943,
+      "elapsed_seconds": 0.619095,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -455,7 +455,7 @@
         "idempotency_key": "COLD-FINAL-DRAIN"
       },
       "command": "drain",
-      "elapsed_seconds": 0.625997,
+      "elapsed_seconds": 0.607311,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -472,7 +472,7 @@
         "ticks": "1"
       },
       "command": "run",
-      "elapsed_seconds": 1.027316,
+      "elapsed_seconds": 1.016626,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -486,7 +486,7 @@
     {
       "arguments": {},
       "command": "readback",
-      "elapsed_seconds": 0.599595,
+      "elapsed_seconds": 0.617238,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
@@ -495,7 +495,7 @@
       "sequence": 20,
       "status": "STOPPED",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stdout_sha256": "a1709d92a8ac00a1a63bc5bb287c3b12eff85ec58b479a94853c023005a0b80e"
+      "stdout_sha256": "5b9e5ae86b684815d22879ce1a23a2a36de56c378eea17a1022572e515658a3e"
     },
     {
       "arguments": {
@@ -505,7 +505,7 @@
         "strategy": "configs/strategies/continuity_synth-COLD-FINAL.yaml"
       },
       "command": "check",
-      "elapsed_seconds": 0.648499,
+      "elapsed_seconds": 0.655747,
       "exit_code": 2,
       "expected_exit_code": 2,
       "mode": "SHADOW",
@@ -523,7 +523,7 @@
         "strategy": "configs/strategies/continuity_synth-COLD-FINAL.yaml"
       },
       "command": "check",
-      "elapsed_seconds": 0.658697,
+      "elapsed_seconds": 0.649844,
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "SHADOW",
@@ -542,7 +542,7 @@
         "strategy": "configs/strategies/continuity_synth-COLD-FINAL.yaml"
       },
       "command": "check",
-      "elapsed_seconds": 0.656616,
+      "elapsed_seconds": 0.656081,
       "exit_code": 2,
       "expected_exit_code": 2,
       "mode": "SHADOW",
@@ -561,7 +561,7 @@
         "strategy": "configs/strategies/continuity_synth-COLD-FINAL.yaml"
       },
       "command": "check",
-      "elapsed_seconds": 0.652419,
+      "elapsed_seconds": 0.658167,
       "exit_code": 2,
       "expected_exit_code": 2,
       "mode": "PAPER",

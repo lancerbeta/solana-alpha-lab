@@ -1,9 +1,10 @@
 # SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1
 
 VERDICT: ENGINEERING_PASS_CANDIDATE_PENDING_EXACT_DELIVERY_GATES.
-Текущие байты: 190 native tests (721.266124s), 99 consumers (23.877297s), два clock probes и24 cold CLI этапа.
-Оба cd663642 P1 закрыты existing-owner repair и10 адресными регрессиями; original witnesses, no-resend, cap safety и fatal shared-store boundary сохранены.
-Один финальный комплект четырёх независимых P0/P1 reviews, exact-head CI/readiness и отдельная owner phrase остаются gates.
+Текущие байты:191 native tests (787.259798s),99 consumers (25.755944s), два clock probes и24 cold CLI этапа.
+F-A/F-B и обнаруженные P1 закрыты в existing owners;13 адресных регрессий сохраняют original witnesses, no-resend, cap safety и fatal shared-store boundary.
+Финальный review a2cc сохранил ARCH NOT_READY: отсутствующая quantity допускала fresh EXIT. Common-seam replan запрещает этот effect по retained ENTRY/economic evidence; завершение того же review set ограничено этим delta и exact bindings. Широкая campaign остановлена.
+Exact-head CI/readiness и отдельная owner phrase остаются gates.
 Base: `ba87f8e339d5cc3aa55322801ae56e3f92369446`; exact content fingerprint,
 review inventory и CI связываются Delivery Harness. Green local tests не
 являются owner acceptance либо merge authority.
@@ -78,7 +79,7 @@ packet через current native source/store owners. Это проверка п
 
 ## C01–C24
 
-Native automated status: PASS, 190 tests, 721.266124s; source bytes до/после
+Native automated status: PASS, 191 tests, 787.259798s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -151,7 +152,7 @@ V1 identities; новый A/B native proof проверяет именно эт�
 
 | Класс | Остаток |
 |---|---|
-| SOFTWARE_GAP/EVIDENCE_GAP | Mandatory C01–C24 и operating PATCH закрыты current native proof. Original SWITCH/CAS и modeled/native legacy ENTRY/full EXIT проверяются общими owners; unsupported projections удерживают UNKNOWN и exposure floor. Final targeted10 и whole190 имеют отдельные exact pins; historical22 находится по frozen Git ref. Historical185 PASS и failed186 clock oracle не retagged. Fresh four-role review и live exact-head CI/readiness обязательны до owner phrase |
+| SOFTWARE_GAP/EVIDENCE_GAP | Mandatory C01–C24 и operating PATCH закрыты current native proof. Original SWITCH/CAS и modeled/native legacy ENTRY/full EXIT проверяются общими owners; unsupported projections удерживают UNKNOWN и exposure floor. Final targeted13 и whole191 имеют отдельные exact pins; historical22 находится по frozen Git ref. Historical185 PASS и failed186 clock oracle не retagged. Fresh four-role review и live exact-head CI/readiness обязательны до owner phrase |
 | CONFIG_REQUIRED | Real eligible strategy, scope/runtime/source, explicit model/envelope/TTL/limits, timely funding producer/cadence |
 | EXTERNAL_UNVERIFIED | Real quote latency/schema/route/quota/credentials, target-host supervision, independent ledger custody; separate owner operation |
 | NOT_CONFIGURED | Scientific monitor/degrade thresholds; software health не experiment policy |
@@ -187,28 +188,28 @@ before/after и прежний scoped review PASS сохранены в
 purpose lifecycle-маршрута: IDs, вопросы, ссылки и authority сохранены; новый
 размер 16349 bytes, прямой semantic consumer module — 15 PASS.
 
-Peak suite process RSS: 150978560 bytes (143.98 MiB). Native 14-day producer
+Peak suite process RSS: 150585344 bytes (143.61 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.1988–0.2839s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.2187–0.2568s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04607–0.05052 |
-| 1000 | 364544 | 0.04569–0.05417 |
-| 4000 | 843776 | 0.04766–0.05334 |
+| 0 | 204800 | 0.04703–0.05591 |
+| 1000 | 364544 | 0.04871–0.05528 |
+| 4000 | 843776 | 0.04898–0.05580 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 1200 | 0.000573 |
-| 100 proved terminal | 96260 | 0.020679 |
-| 1000 proved terminal | 950780 | 0.222476 |
-| 1000 terminal + 12000 unrelated events | 950790 | 0.228342 |
+| 1 outstanding | 1200 | 0.000777 |
+| 100 proved terminal | 96260 | 0.029509 |
+| 1000 proved terminal | 950780 | 0.247778 |
+| 1000 terminal + 12000 unrelated events | 950790 | 0.238838 |
 
-Native history preparation: 13.778s.
+Native history preparation: 15.271s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.
@@ -243,8 +244,8 @@ original native ENTRY/full EXIT проверяются до освобожден
 включая SQL terminal predicate. Неподтверждённые base/remaining/terminal
 проекции сохраняют UNKNOWN и исходный exposure floor. Genuine all-NULL replay
 и полный EXIT сохранены; новая legacy partial functionality не добавлена.
-Historical22 scoped checks сохранены по frozen Git ref. Current10 адресных
-регрессий PASS за27.752812s; whole190 и четыре review verdicts имеют собственные bindings.
+Historical22 scoped checks сохранены по frozen Git ref. Current13 адресных
+регрессий PASS за64.10742s; whole191 и четыре review verdicts имеют собственные bindings.
 
 Прямое решение owner задаёт60 минут на каждый CI job только для #398 и его
 обычного merge в main. Другие PR/main сохраняют прежние бюджеты. Если native
@@ -252,3 +253,5 @@ gate выбирает trusted tracked-only fallback, его лимит на эт
 contract —3600s; выбор gate не меняется.50 affected CI tests PASS. Лимит каждого
 job не является общим wall-time пределом workflow. Merge/post-merge пока
 NOT_EXECUTED: необходима отдельная machine-rendered owner phrase.
+
+Final quantity seam: retained positive ENTRY или economic projection не превращаются в доказанное отсутствие inventory при qty_dec=NULL. Direct witness, pre-input и transactional claim используют existing owner; fresh attempt/request/quote запрещены. PAPER/SHADOW, native public/modeled ENTRY и три damage variants проверены; original source EXIT decision допускается, исходный execution journal неизменён. Восстановление original quantity завершает original full EXIT без resend. Actual a2cc NOT_READY/native BEFORE и durable reproducer: review-a2cc-quantity-guard.json, quantity-witness-reproducer.py; historical190 и другие snapshots доступны по exact refs в history.json.

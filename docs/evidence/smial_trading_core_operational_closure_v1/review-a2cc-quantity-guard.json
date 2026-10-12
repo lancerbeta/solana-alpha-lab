@@ -1,0 +1,226 @@
+{
+  "common_seam_interim_negative": {
+    "actual_failure": "Original ENTRY v1.0 NO_ROUTE: READY expected, ACTION_REQUIRED observed. Zero nonfill projection mistaken for positive inventory.",
+    "all_owned_roots_absent": true,
+    "elapsed_seconds": 790.073314,
+    "failed_test_ids": [
+      "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart (version='1.0', outcome='NO_ROUTE')"
+    ],
+    "raw_receipt_sha256": "8103119367c603255e804024f9ac0b9e9e966e1aa3a89155d64841b85d1c55b9",
+    "receipt_sha256": "0c7eb39bbdd06310b125830fc0b64005e868fa615a76045ece58b2c35adf58f0",
+    "repair": "Existing pure original nonfill/cancel witness branch now validates cancelled no-quantity rows. All originals, zeros and no orphan results are checked; genuine unattempted cancellation reuses original cancellation witness. Oracle unchanged.",
+    "reproducible_source_patch": {
+      "exact_replace_once": "    if not quantitative and position.get(\"qty_dec\") is None:\n        return\n",
+      "frozen_git_ref": "a2ccab5a12f352a4b21bacb37bf9a0c26c3f496c:src/solana_alpha_lab/factory/paper_plane.py",
+      "purpose": "Preserve exact first-guard nonfill regression source without full superseded source or 191-test dump.",
+      "replacement": "    # Missing mutable quantity does not erase an original positive ENTRY or\n    # its economic projection. Only a genuine legacy row with no inventory\n    # evidence can use the no-quantity compatibility path.\n    inventory_evidence = any(position.get(key) is not None for key in (\n        \"entry_price_dec\", \"entered_notional_usd_dec\", \"entry_fee_usd_dec\",\n        \"remaining_qty_dec\", \"remaining_cost_basis_usd_dec\", \"remaining_entry_fee_usd_dec\",\n    )) or any(event[\"event_type\"] in {\n        \"PAPER_SIMULATION_OBSERVED\", \"SHADOW_EXECUTABLE_OBSERVED\",\n        \"PAPER_EXIT_OBSERVED\", \"SHADOW_EXIT_EXECUTABLE_OBSERVED\",\n    } for event in events)\n    if not quantitative and position.get(\"qty_dec\") is None and not inventory_evidence:\n        return\n",
+      "result_sha256": "7b2148ebedb88443a0a214c3b9055362bd14a57424ccbeafd3f71a17a649353d"
+    },
+    "source_pins": {
+      "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+      "scripts/trading_continuity.py": "ba9615ae37886197b52a394415989427b182a33976d03b1985868d2f36f597dd",
+      "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+      "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+      "src/solana_alpha_lab/factory/paper_plane.py": "7b2148ebedb88443a0a214c3b9055362bd14a57424ccbeafd3f71a17a649353d",
+      "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+      "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+      "src/solana_alpha_lab/factory/trading_adapters.py": "cf6fa566e491d68aeee5c059228fc2385b2884c23c297aa6905f00f3606c8e05",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "78dc900e17849aab9b55753b9148370914363d3362c7d6aecfca880eb5e25748",
+      "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+      "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
+      "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+      "tests/test_trading_core_operational_closure_v1.py": "f0094ce44ee7b168729cb6686ae2e5070849c19a347b5159624152105d55f0b0",
+      "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
+      "tests/test_trading_operational_obligations_v1.py": "436a9258ac44674d7306864c9c447916907cf790870a3892ea26f59e03c56893",
+      "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
+    },
+    "status": "FAIL",
+    "tests_run": 191
+  },
+  "current_after": {
+    "addressed_regressions": 13,
+    "native_tests": 191,
+    "quantity_damage_variants": 12,
+    "scope": "KNOWN_QUANTITY_SEAM_ONLY_NO_BROAD_REVIEW_CAMPAIGN",
+    "status": "PASS"
+  },
+  "current_durable_reproducer_execution": {
+    "credential_reads": 0,
+    "damage_inventory": "UNKNOWN",
+    "damage_new_attempts_requests_captures_quote_calls": 0,
+    "damage_state": "EXIT_REQUIRED",
+    "elapsed_seconds": 8.15814,
+    "intact_control_state": "RECONCILED",
+    "original_journal_unchanged": true,
+    "owned_fixtures_and_scratch_absent": true,
+    "real_provider_calls": 0,
+    "source_pins": {
+      "src/solana_alpha_lab/factory/paper_plane.py": "b832b090453ef475b06268aa1ecf0308879339c61b1423efa894256fa8b14c02",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "78dc900e17849aab9b55753b9148370914363d3362c7d6aecfca880eb5e25748",
+      "tests/test_trading_core_operational_closure_v1.py": "f0094ce44ee7b168729cb6686ae2e5070849c19a347b5159624152105d55f0b0"
+    },
+    "status": "PASS",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "72f812648044787831f759a20c67f09d8cd80a07f08f1abc077bf54edfa57abf"
+  },
+  "current_regression_test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect",
+  "current_targeted_receipt_sha256": "0f2b10247dd06ca7b5102026b91c00507332b18014713b73940c5d77b779d27c",
+  "current_whole_receipt_sha256": "3f4fe5be8ca04c33f5db4f947f737ab49b0ea244b130d3a4318c2fbfab03ea14",
+  "do_d_oracle_recovery_ci_safety_weakened": false,
+  "history_rewritten": false,
+  "interim_regression_negatives": [
+    {
+      "cause": "Test incorrectly expected no source EXIT decision; original journal remains intact and legitimate SOURCE_EXIT_PRODUCED/EXIT_DECISION_ACCEPTED/SOURCE_EXIT_ADMISSION_BOUND are allowed. Fresh execution effects remain forbidden.",
+      "elapsed_seconds": 16.06,
+      "failed_subtests": 12,
+      "status": "FAIL",
+      "tests_run": 1
+    },
+    {
+      "cause": "Test used invented POSITION_STATE_CHANGED event name.",
+      "elapsed_seconds": 15.451,
+      "failed_subtests": 12,
+      "status": "FAIL",
+      "tests_run": 1
+    },
+    {
+      "cause": "Test used POSITION_TRANSITION instead of actual SOURCE_EXIT_ADMISSION_BOUND.",
+      "elapsed_seconds": 15.478,
+      "failed_subtests": 12,
+      "status": "FAIL",
+      "tests_run": 1
+    },
+    {
+      "cause": "Actual three source/decision event types captured and oracle corrected.",
+      "elapsed_seconds": 15.441,
+      "failed_subtests": 12,
+      "status": "FAIL",
+      "tests_run": 1
+    }
+  ],
+  "interim_stdout_hashes": "UNKNOWN_NOT_CAPTURED",
+  "live_authority": false,
+  "loading_only_negative": {
+    "actual_product_tests_passed": 2,
+    "cause": "Third selected unittest class ObligationTests does not exist; corrected to OperatingObligationsTests and actual target PASS. No source/runtime/oracle change caused by this loader error.",
+    "elapsed_seconds": 28.98,
+    "requested_tests": 3,
+    "status": "FAIL",
+    "stdout_sha256": "UNKNOWN_NOT_CAPTURED"
+  },
+  "native_before": {
+    "capture_basis": "Exact successful native tool-return facts; stdout hash not captured",
+    "classification": "P1_IMPLEMENTATION_DEFECT_AUTHORITY_WIDENING",
+    "common_seam": "paper_plane._assert_quantity_inventory_witness early return at qty_dec=None",
+    "control": {
+      "accepted_results_after": 1,
+      "after_inventory_status": "KNOWN",
+      "attempts_after": 1,
+      "attempts_before": 0,
+      "before_inventory_status": "KNOWN",
+      "captures_after": 1,
+      "finals_after": 1,
+      "original_journal_sha256": "a4d66aec0532c4adaf14c49a5e335ef11e0013214a9975ba3002dc24a0f99885",
+      "original_native_quantity": "10000000.00000000",
+      "owned_fixture_absent": true,
+      "requests_after": 1,
+      "state_after": "RECONCILED",
+      "synthetic_quote_calls": 1,
+      "wire_raw_amount": "10000000000000",
+      "wire_remaining_quantity": "10000000.00000000"
+    },
+    "damaged": {
+      "accepted_results_after": 0,
+      "after_inventory_status": "UNKNOWN",
+      "attempts_after": 1,
+      "attempts_before": 0,
+      "before_inventory_status": "UNKNOWN",
+      "before_known_floor_usd": "30.0",
+      "captures_after": 1,
+      "damage_preserved_original_journal": true,
+      "finals_after": 0,
+      "inventory_verifier": "RETURNED_WITHOUT_ERROR",
+      "mutation": "qty_dec=NULL,remaining_qty_dec='1000000',remaining_cost_basis_usd_dec='3',remaining_entry_fee_usd_dec='0.006'",
+      "original_journal_sha256": "0e8098652205c395a7b711bcd346b50ac073ac529f816583f71aee09554f8f16",
+      "original_native_quantity": "10000000.00000000",
+      "owned_fixture_absent": true,
+      "requests_after": 1,
+      "run_status": "GRACEFUL_SHUTDOWN",
+      "state_after": "EXITING",
+      "synthetic_quote_calls": 1,
+      "ticks": 1,
+      "wire_raw_amount": "1000000000000",
+      "wire_remaining_quantity": "1000000"
+    },
+    "head": "a2ccab5a12f352a4b21bacb37bf9a0c26c3f496c",
+    "negative_facts": {
+      "credential_reads": 0,
+      "full_gate": "NOT_EXECUTED",
+      "initial_inaccessible_sandbox_temp_cleanup": "EXACT_FAILED_SANDBOX_TEMP_ABSENT_VERIFIED",
+      "initial_sandbox_attempts": "Interpreter cache denial, helper import correction, native DATA_ROOT_UNAVAILABLE; no product falsifier result",
+      "native_effect_boundary": "Lowest fake HTTP only",
+      "owned_scratch_absent": true,
+      "provider_calls": 0,
+      "source_product_canonical_evidence_changes": 0
+    },
+    "packet_fingerprint_sha256": "3fa29fe583cff08302d5216224d9b3e0999a16bce66205672ee39ad5bb3bb936",
+    "schema": "smial.isolated-architecture-native-falsifier",
+    "source_pins": {
+      "src/solana_alpha_lab/factory/paper_plane.py": "492447ca810175823ebcd5a267c69b7b13c8b091db94f149d8efe2a65b885710",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "78dc900e17849aab9b55753b9148370914363d3362c7d6aecfca880eb5e25748",
+      "tests/test_trading_core_operational_closure_v1.py": "b6502ecf8abe00f949717dbe126ef9e8828368b12ec3db6bc6ac909825935546"
+    },
+    "stdout_sha256": null
+  },
+  "observed_head": "a2ccab5a12f352a4b21bacb37bf9a0c26c3f496c",
+  "relocated_reproducer_sha256": "61db0cf1b8dda405973f653b4752cb9b922322ed64474e8a47d25de5e226b5a1",
+  "replan": "One existing quantity witness owner must distinguish absent inventory from absent quantity. Retained native ENTRY/economic fields prohibit the legacy early return before fresh EXIT attempt/request/quote. No new broad review campaign.",
+  "reproducer_command": "uv run --locked --managed-python python -B docs/evidence/smial_trading_core_operational_closure_v1/quantity-witness-reproducer.py",
+  "reviews": [
+    {
+      "findings": [
+        "P0/P1 findings не обнаружены в exact bounded diff и прямых consumers. Проверены original native/modeled witness, managed safety, SWITCH/CAS lineage и изоляция recovery обязательств: paper_plane.py:262,349,379,2428,2525; trading_runtime_policy.py:745; trading_coordinator.py:585,601.",
+        "reviewed_head=a2ccab5a12f352a4b21bacb37bf9a0c26c3f496c; expected_base=ba87f8e339d5cc3aa55322801ae56e3f92369446; reviewed_bindings_sha256=e4e86fa701ca41ced721451ff708f3b83078bf9ca2320d451f680ff05cdfbd5d; reviewed_inventory_sha256=45bca49a50265fe571b9cbc3163c21e417f29e3dc3bdab640254245e3e448085.",
+        "Выполнены read-only проверки: 63 committed blob hashes совпали; frozen diff byte-for-byte совпал с Git, SHA256=64fcb16fe96aed896aebd4c1f94898d58ac9f300f3d50e28e22a879497b461ae; compute_evidence_chain полностью совпал с chain.json. Source pins текущих receipts 190 native/99 consumers/2 clocks/cold24/target10 совпали с candidate. Native тесты и full gate в этом review НЕ запускались; historical PASS и excluded completion/factory-fit/independent-review не использованы как финальная readiness.",
+        "Reviewer fixtures/scratch не создавались; cleanup не требовался. Product/evidence mutations, provider/credential operations и merge отсутствуют. Финальный HEAD неизменён, git status чистый. PASS относится только к независимому CODE_REVIEWER review и не разрешает merge."
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Подтверждённых P0/P1 gaps не обнаружено. Проверен consumer-useful outcome C01–C24 по exact contract/source-contract и frozen diff; commissioning/non-claims не подменяют software acceptance или merge authority.",
+        "Exact head=a2ccab5a12f352a4b21bacb37bf9a0c26c3f496c; reviewed_bindings_sha256=e4e86fa701ca41ced721451ff708f3b83078bf9ca2320d451f680ff05cdfbd5d; reviewed_inventory_sha256=45bca49a50265fe571b9cbc3163c21e417f29e3dc3bdab640254245e3e448085. Независимый read-only пересчёт chain совпал;63 bindings совпадают с Git/worktree; frozen diff SHA256=64fcb16fe96aed896aebd4c1f94898d58ac9f300f3d50e28e22a879497b461ae.",
+        "Фактически выполнена сверка24 coverage rows с190 executed IDs, hashes текущих receipts/source pins,118 imported consumer pins и108 historical Git blobs. Проверены current190/99/2 clock/24 cold CLI/target10 carriers, original literal accounting, recovery/no-resend/legacy/cap safety и оба common seams. Native tests в этом review повторно не исполнялись.",
+        "Review isolated; SINGLE_AGENT_REVIEW_FALLBACK отсутствует. Source/evidence не изменялись; native fixture/scratch/process не создавались, cleanup=NOT_APPLICABLE. Финальный HEAD неизменён, git status чистый. completion/factory-fit/independent-review оставлены вне текущего verdict до финального binding всех ролей."
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "P0/P1 operability gaps не обнаружены. head=a2ccab5a12f352a4b21bacb37bf9a0c26c3f496c; reviewed_bindings_sha256=e4e86fa701ca41ced721451ff708f3b83078bf9ca2320d451f680ff05cdfbd5d; reviewed_inventory_sha256=45bca49a50265fe571b9cbc3163c21e417f29e3dc3bdab640254245e3e448085. Канонические fingerprints независимо пересчитаны; 63 bindings совпадают с committed Git bytes.",
+        "Независимо исполнены 24 ordinary CLI команды за 19.233104s, CLI subprocess duration=16.447804s, дополнительно 2 readonly semantic navigation calls PASS. Пять DB/WAL/sidecar canaries byte-exact; WAL во всех пяти=0 bytes. ACK сохраняет pause как SQLite integer1; отдельные resume/drain и исходный EXIT завершают RECONCILED_STOPPED с двумя original attempts/results. Три русских refusal/next-action сообщения missing/stale SHADOW funding и CONFIGURATION_REQUIRED независимо подтверждены literal stdout hashes.",
+        "reproducer_sha256=2fc3126943ddfff8d0837ed5d6fecb8fc894e42bd535ef232d1419d36e2d8a29; independent_receipt_raw_sha256=07a54c2854295bf68c6c6918e8aeb999a745f93279b2d2dfdc6497a7d8758be1; independent_receipt_self_sha256=810b1ef2c503b5b5d04953669410541615a6b90e43c2fbbb33f93334aed85a4b. source_pins_unchanged=true; candidate_operator_receipt_unchanged=true; owned_native_fixture_absent=true; owned_marked_scratch_absent=true; tracked worktree clean. Два sandbox bootstrap отказа произошли до business CLI; разрешённый escalated offline запуск PASS, первый denied tempfile ABSENT."
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "reviewed_head=a2ccab5a12f352a4b21bacb37bf9a0c26c3f496c; base=ba87f8e339d5cc3aa55322801ae56e3f92369446; reviewed_bindings_sha256=e4e86fa701ca41ced721451ff708f3b83078bf9ca2320d451f680ff05cdfbd5d; reviewed_inventory_sha256=45bca49a50265fe571b9cbc3163c21e417f29e3dc3bdab640254245e3e448085; diff_sha256=64fcb16fe96aed896aebd4c1f94898d58ac9f300f3d50e28e22a879497b461ae.",
+        "packet_fingerprint_sha256=3fa29fe583cff08302d5216224d9b3e0999a16bce66205672ee39ad5bb3bb936",
+        "P1 — IMPLEMENTATION_DEFECT / AUTHORITY_WIDENING. Общий seam src/solana_alpha_lab/factory/paper_plane.py:_assert_quantity_inventory_witness возвращается без проверки при !quantitative && qty_dec=None. Genuine managed native SHADOW ENTRY сохраняет original observation 10M/$30 и неизменный journal. После qty_dec=NULL и forged remaining_*=(1M,3,0.006) obligation_summary честно показывает UNKNOWN/floor30, но verifier пропускает повреждение. trading_coordinator._inputs и begin_modeled_attempt используют этот owner: ordinary run создаёт fresh EXIT attempt/request/capture и выполняет один synthetic quote на raw amount 1000000000000 вместо original 10000000000000. Accepted results=0, finals=0, state=EXITING, inventory остаётся UNKNOWN. Intact control завершает RECONCILED. UNKNOWN сохраняется в readback, но одновременно получает недоказанную authority для нового эффекта.",
+        "SEMANTIC_FAIL относится к C3/C4: гарантии проверки original inventory перед EXIT effect сильнее реализации и имеющегося покрытия. 190 PASS и 10 scoped PASS могут сосуществовать с этим нарушением; будущий агент ошибочно прочтёт их как доказательство отсутствия bypass. Минимальная коррекция — в существующем quantity-witness owner различать доказанное отсутствие inventory и отсутствующую mutable quantity при retained positive ENTRY/quantity-backed lineage; второй случай должен давать EXIT_INVENTORY_WITNESS_CONFLICT до attempt/request/quote. Сохранить genuine no-inventory legacy/nonfill, original replay/reconciliation и обслуживание здорового соседнего EXIT. Новый store/schema/adapter или suffix campaign не нужны.",
+        "Native falsifier исполнен на exact source pins. Reproducer: local/smial-operational-closure-delivery/architecture-a2cc-null-qty-probe.py; sha256=b3082741bebd6010c37d21e31e37ed32eb03cb4e2c1dc9c6501ba336ed600443. Compact facts: local/smial-operational-closure-delivery/architecture-a2cc-null-qty-result.json; sha256=29dc43e016cb6964bd52b9b850445d226d765ecb140f535e728a2a1d78ef7eaa. Команда: uv run --locked --managed-python python -B local/smial-operational-closure-delivery/architecture-a2cc-null-qty-probe.py при UV_OFFLINE=1, UV_NO_ENV_FILE=1. Первый sandbox bootstrap не достиг product boundary; успешный native запуск выполнен через escalation. stdout_sha256 не захвачен и остаётся UNKNOWN.",
+        "Validation/cleanup: совпали 22 packet evidence hashes, 16 current proof source pins, task-contract SHA, frozen diff SHA и HEAD. После native probe PaperPlane/coordinator source SHA и HEAD неизменны; tracked diff пуст. Обе disposable fixtures, own scratch и exact failed sandbox temp проверены ABSENT. Сохранены только два ignored reproducer/result файла. Real provider calls=0, credential reads=0; full gate, deploy, settings, signer, money и merge не выполнялись.",
+        "Coverage 12/12: SCIENTIFIC_ESTIMAND, FALSIFIER_OR_ENDPOINT, EVIDENCE_ADMISSIBILITY, PIT_OR_AVAILABILITY_SEMANTICS, RESEARCH_TRUTH_OWNERSHIP, HYPOTHESIS_OR_FAMILY_CLOSURE, PROMOTION_OR_SUPPRESSION_AUTHORITY, UNKNOWN_VS_NEGATIVE_EVIDENCE, EXECUTION_TRUTH_SEMANTICS, DURABLE_SCIENCE_SCHEMA, OWNER_AUTHORITY_SEMANTICS, HARNESS_PREMISE_OR_MERGE_AUTHORITY. Проверены все 10 canonical questions: exact-but-wrong, stronger claim, local/global scope, UNKNOWN, lifecycle authority, old schema meaning, accidental truth owner, falsifier, future inference и smallest correction. D1/spec/runtime contracts и reports сохраняют отдельные scientific identities, historical S08/S13, legacy result meaning и отсутствие научной/финансовой authority у software status. Обнаруженное расширение authority — конкретно missing quantity → fresh EXIT effect.",
+        "Truth/recovery/compatibility: Git frozen specs и исходные ResearchStore records остаются scientific truth; PaperPlane original events/positions и source SQLite сохраняют execution/source evidence при отсутствии DuckDB. Queue, cursor и UDF являются производными механизмами проверки. Нового TASK→чужой private TASK API import не найдено; private imports внутри named factory owners переиспользуют существующие PIT/ingress/accounting owners. Native SQLite backup, одна DB и общий verifier соответствуют более простой зрелой архитектуре. Packet-only information path соблюдён; implementation transcript не получен. PACKET_INFORMATION_PATH не доказывает withholding parent chat; launch_isolation=PROCESS_OBLIGATION, builder flags не считаются live attestation. model_diversity=UNPROVEN. Native receipts не дают acceptance/merge authority; три excluded completion/factory-fit/independent-review файла не использованы как final evidence. Live/science/alpha и внешняя ledger completeness остаются в явно ограниченном UNKNOWN/UNVERIFIED scope."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY"
+    }
+  ],
+  "schema": "smial.compact-final-review-common-seam-replan",
+  "verdict": "NOT_READY"
+}

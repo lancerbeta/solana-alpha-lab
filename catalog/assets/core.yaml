@@ -29686,7 +29686,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: 492447ca810175823ebcd5a267c69b7b13c8b091db94f149d8efe2a65b885710}
+  integrity: {kind: sha256, sha256: b832b090453ef475b06268aa1ecf0308879339c61b1423efa894256fa8b14c02}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -41738,7 +41738,7 @@ records:
     repository_path: tests/test_trading_core_operational_closure_v1.py
   integrity:
     kind: sha256
-    sha256: b6502ecf8abe00f949717dbe126ef9e8828368b12ec3db6bc6ac909825935546
+    sha256: f0094ce44ee7b168729cb6686ae2e5070849c19a347b5159624152105d55f0b0
   access:
     mode: read_only
     method: file
@@ -41811,7 +41811,7 @@ records:
     repository_path: tests/test_trading_operational_obligations_v1.py
   integrity:
     kind: sha256
-    sha256: 436a9258ac44674d7306864c9c447916907cf790870a3892ea26f59e03c56893
+    sha256: 5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880
   access:
     mode: read_only
     method: file
@@ -41847,7 +41847,7 @@ records:
     repository_path: docs/tasks/SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: cdeda8b517a03ebc33210aa3606fde7c7f85001d28cd4493f0dbd16f4a88b5bd
+    sha256: 2913799fe347869cf68d6a41fad9d470549f77fdb4aa8d87a6136ac4e844801a
   access:
     mode: read_only
     method: file
@@ -41884,7 +41884,7 @@ records:
     repository_path: docs/reports/smial_trading_core_operational_closure_v1/REPORT.md
   integrity:
     kind: sha256
-    sha256: 9e3230377639ef3e4f5e19cb3271d68009633eedd3c1dfe2897ea64930e5213a
+    sha256: 5f9a6972e0fa64adf41179cc0793638e4bdfee5497ae3be80d1c456451f536ca
   access:
     mode: read_only
     method: file

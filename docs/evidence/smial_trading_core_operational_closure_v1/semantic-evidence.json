@@ -5,31 +5,31 @@
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/coverage.json",
-    "sha256_or_fingerprint": "f247b60d341af7e9017b92692fbdc155eb081839c69dc284f8ce5ac505f0e35d"
+    "sha256_or_fingerprint": "db4be1c52c491ed700e29635c6b01fb82c07ed8fef014f2f5292cfcc12ad8b4f"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/executed-tests.json",
-    "sha256_or_fingerprint": "473b6799a87bac1090d6007e7d93c8257a3fd31d3b683d90b93bdd20e80c25c0"
+    "sha256_or_fingerprint": "3f4fe5be8ca04c33f5db4f947f737ab49b0ea244b130d3a4318c2fbfab03ea14"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/direct-consumer-proof.json",
-    "sha256_or_fingerprint": "571c51dafac9dc46a6179b7c469c778694c37b0df8ab2e98c17a769c0fd809da"
+    "sha256_or_fingerprint": "84445c4dbcea9b8fed7c765e163186060e7fd2989f7495b4e0d1942b433ad096"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/operator-proof.json",
-    "sha256_or_fingerprint": "b3dbad183ed625b64b9e30d26bd72f2d71a795f86e68415a5fbd181c6af52436"
+    "sha256_or_fingerprint": "e29be519bf2fc6d3a45185c9626923d048fc4b5c270564684fb250caf72d46c1"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/clock-proof.json",
-    "sha256_or_fingerprint": "fa4139b1cf864caa15380b7b07a5048491c56c12e04a2e6d2a8a0207eb803447"
+    "sha256_or_fingerprint": "487c33ab9f9ff9d1e911bceddb6a4ca92fe547b52bd31799d32a140bfdb7b627"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/cleanup.json",
-    "sha256_or_fingerprint": "ee399192d0f05e1c23e2488b98be8e5edfa0eef6e0105685c46e72e700eb02d0"
+    "sha256_or_fingerprint": "6bb758c766c572eee7c227b4235dee960e67c86ae48433bbc9d8c6eb44a0dfa4"
   },
   {
     "logical_ref": "docs/reports/smial_trading_core_operational_closure_v1/REPORT.md",
-    "sha256_or_fingerprint": "9e3230377639ef3e4f5e19cb3271d68009633eedd3c1dfe2897ea64930e5213a"
+    "sha256_or_fingerprint": "5f9a6972e0fa64adf41179cc0793638e4bdfee5497ae3be80d1c456451f536ca"
   },
   {
     "logical_ref": "docs/reports/smial_trading_continuity_v1/REPORT.md",
@@ -45,7 +45,7 @@
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/history.json",
-    "sha256_or_fingerprint": "03e28794775f1530e49abd637a1e24e15cb8828e83035c6897614dca6ca42637"
+    "sha256_or_fingerprint": "d3e830f6aabef3aa273c81f050e3eb96b40d4bbf93e9fe61479dbe0c844c083d"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/ci-source-capacity-remediation.json",
@@ -61,7 +61,7 @@
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/operating-boundary-patch-review.md",
-    "sha256_or_fingerprint": "a37e59b0b1830ff3110fe3588dbd9584171c573397187e95fb9992025af79671"
+    "sha256_or_fingerprint": "9f67bb3827c51171e581c67e636cb897db5e74871da898066cba9108a36c7189"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/compaction.json",
@@ -73,7 +73,7 @@
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/review-managed-native-recovery-remediation.json",
-    "sha256_or_fingerprint": "810df57645870a4eea329525af65ce38c08466684c2304088a6d635b45896147"
+    "sha256_or_fingerprint": "0f2b10247dd06ca7b5102026b91c00507332b18014713b73940c5d77b779d27c"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/ci-atom-hour-budget.json",
@@ -86,5 +86,13 @@
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/operator-helper-negative.json",
     "sha256_or_fingerprint": "2495755439a2d58bbdd5c73e0b84f2c4e42e8bd34cdbd310ba8fc63daa0ab783"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/review-a2cc-quantity-guard.json",
+    "sha256_or_fingerprint": "dd990617ff9da6d45db65a8a46c867c952314dab1a8c4c9165d9deb6e61355fb"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/quantity-witness-reproducer.py",
+    "sha256_or_fingerprint": "61db0cf1b8dda405973f653b4752cb9b922322ed64474e8a47d25de5e226b5a1"
   }
 ]

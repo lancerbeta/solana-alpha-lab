@@ -330,6 +330,11 @@ class OperatingObligationsTests(StoreCase):
                 elif damage is not None:
                     payload = {} if damage == "EMPTY" else {**event["payload"], "from_state": "ATTEMPTING"}
                     store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(payload), event["event_id"]))
+                if damage is None:
+                    assert_quantity_inventory_witness(store, natural)
+                else:
+                    with self.assertRaisesRegex(PaperPlaneError, "^EXIT_INVENTORY_WITNESS_CONFLICT$"):
+                        assert_quantity_inventory_witness(store, natural)
                 reader = PaperPlaneStore(store.path, readonly=True)
                 try:
                     summary = obligation_summary(reader, mode="PAPER")

@@ -386,6 +386,7 @@ def _assert_quantity_inventory_witness(position: Mapping[str, Any], events: list
     The caller supplies its read snapshot or immediate claim/result transaction.
     """
     quantitative = force_quantity or position.get("entry_fee_semantics") is not None or (
+        position.get("qty_dec") is None and position.get("state") == "CANCELLED") or (
         position.get("qty_dec") is not None and any(
             event["event_type"] == "MODELED_ATTEMPT_STARTED" for event in events)) or any(
         event["event_type"] == "MODELED_EXIT_QUANTITY_LEG"
@@ -394,7 +395,17 @@ def _assert_quantity_inventory_witness(position: Mapping[str, Any], events: list
         or event["event_type"] == "MODELED_RESULT_ACCEPTED" and isinstance(event["payload"], Mapping)
            and isinstance(event["payload"].get("result"), Mapping)
            and event["payload"]["result"].get("schema_version") == "1.1" for event in events)
-    if not quantitative and position.get("qty_dec") is None:
+    # Missing mutable quantity does not erase an original positive ENTRY or
+    # its economic projection. Only a genuine legacy row with no inventory
+    # evidence can use the no-quantity compatibility path.
+    inventory_evidence = any(position.get(key) is not None for key in (
+        "entry_price_dec", "entered_notional_usd_dec", "entry_fee_usd_dec",
+        "remaining_qty_dec", "remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec",
+    )) or any(event["event_type"] in {
+        "PAPER_SIMULATION_OBSERVED", "SHADOW_EXECUTABLE_OBSERVED",
+        "PAPER_EXIT_OBSERVED", "SHADOW_EXIT_EXECUTABLE_OBSERVED",
+    } for event in events)
+    if not quantitative and position.get("qty_dec") is None and not inventory_evidence:
         return
     try:
         pid, bot = position["position_id"], position["bot_instance_id"]
@@ -409,7 +420,7 @@ def _assert_quantity_inventory_witness(position: Mapping[str, Any], events: list
         if position["qty_dec"] is None:
             # A definitive original ENTRY nonfill proves no inventory. It has
             # no positive entry from which a quantity EXIT can be derived.
-            if (position["state"] != "CANCELLED" or not starts or len(finals) != len(starts)
+            if (position["state"] != "CANCELLED" or len(finals) != len(starts)
                 or any(event["payload"]["side"] != "ENTRY" for event in starts)
                 or any(event["event_type"] in {"PAPER_SIMULATION_OBSERVED", "SHADOW_EXECUTABLE_OBSERVED", "MODELED_EXIT_QUANTITY_LEG"}
                        for event in events)):
@@ -421,6 +432,11 @@ def _assert_quantity_inventory_witness(position: Mapping[str, Any], events: list
             for key in ("remaining_qty_dec", "remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec"):
                 if _positive_model_decimal(position[key], "EXIT_INVENTORY_WITNESS_CONFLICT", allow_zero=True) != 0:
                     raise ValueError()
+            if not starts:
+                if observations or not any(event["event_type"] == "ENTRY_INTENT_CANCELLED"
+                        and unattempted_cancel_witness_valid(position, event) for event in events):
+                    raise ValueError()
+                return
             for event in observations.values():
                 attempt = attempts.get(event["payload"]["result"]["attempt_id"])
                 if attempt is None or not modeled_final_witness_valid(attempt, None, event, mode=mode,
