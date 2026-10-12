@@ -107,7 +107,8 @@
         "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_unattempted_cancel_releases_only_with_original_pre_attempt_witness",
         "test_trading_operational_obligations_v1.OperatingObligationsTests.test_shared_predecessor_reservation_and_no_auto_shrink",
         "test_trading_operational_obligations_v1.OperatingObligationsTests.test_unknown_exit_retains_inventory_and_blocks_overlapping_attempt",
-        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy"
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_sealed_source_rejects_unsigned_wal_and_preserves_standalone_legacy_lineage"
       ],
       "status": "PASS"
     },
@@ -196,7 +197,8 @@
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_hash_conflict_denies_before_quote_effect",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_nonfill_corrupt_witness_remains_active_and_truthful_restore_recovers",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_original_result_damage_blocks_quote_and_healthy_neighbor_continues",
-        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_projection_damage_blocks_ordinary_quote_until_truthful_restoration"
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_projection_damage_blocks_ordinary_quote_until_truthful_restoration",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_sealed_source_rejects_unsigned_wal_and_preserves_standalone_legacy_lineage"
       ],
       "status": "PASS"
     },
@@ -279,7 +281,11 @@
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_later_shadow_pending_cut_accepts_original_earlier_definitive_receipt",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_projection_race_after_claim_retains_original_capture_without_resend",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_pending_quote_claim_restores_unknown_without_manufacturing_result_or_resend",
-        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_without_effects_imports_successor_binding_and_generation_paused"
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_all_destination_artifact_collisions_preserve_regular_and_hardlink_bytes",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_exclusive_reservation_late_auxiliary_and_native_failure_preserve_non_targets",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_sealed_source_rejects_unsigned_wal_and_preserves_standalone_legacy_lineage",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_without_effects_imports_successor_binding_and_generation_paused",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_two_ordinary_restore_cycles_preserve_original_history_and_each_new_snapshot_fence"
       ],
       "status": "PASS"
     },
@@ -292,7 +298,9 @@
         "test_trading_operational_obligations_v1.OperatingObligationsTests.test_genuine_v1_0_entry_then_v1_1_partial_and_full_preserves_original_payload",
         "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_0_result_event_payload_and_replay_remain_exact",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_corrupt_exit_request_stays_unknown_until_exact_owner_witness_restored",
-        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_metadata_survives_source_deletion_for_due_exit"
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_metadata_survives_source_deletion_for_due_exit",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_sealed_source_rejects_unsigned_wal_and_preserves_standalone_legacy_lineage",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_two_ordinary_restore_cycles_preserve_original_history_and_each_new_snapshot_fence"
       ],
       "status": "PASS"
     },
@@ -349,6 +357,9 @@
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_cli_repeated_quote_grant_paths_bind_original_profiles_and_reject_conflicting_scope",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_invalid_quote_scope_and_expiry_deny_before_native_attempt_and_credential",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_quote_expiry_rechecked_at_atomic_claim_and_last_http_boundary",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_all_destination_artifact_collisions_preserve_regular_and_hardlink_bytes",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_exclusive_reservation_late_auxiliary_and_native_failure_preserve_non_targets",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_sealed_source_rejects_unsigned_wal_and_preserves_standalone_legacy_lineage",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_separate_original_quote_grants_close_predecessor_and_admit_successor_with_cold_quota"
       ],
       "status": "PASS"
@@ -385,7 +396,9 @@
     "review-4a327869.json",
     "review-nonfill-grant-remediation.json",
     "review-1cdf0003.json",
-    "review-backup-origin-remediation.json"
+    "review-backup-origin-remediation.json",
+    "review-08c5ae1e.json",
+    "review-restore-artifact-remediation.json"
   ],
   "non_claims": [
     "NO_CANONICAL_DONE_OR_OWNER_SEMANTIC_ACCEPTANCE",
@@ -395,11 +408,11 @@
   ],
   "receipt_files": {
     "canary-rename-proof.json": "e2449ad9084c695b74c50dbc1249db839f525547e4bd516024b50bad83ec056b",
-    "cleanup.json": "a9ef97bca54f3447576883930c7c9df7fadf265a410d6313cf710583d640f7e6",
-    "clock-proof.json": "dbae36eb537184337e528061f79862a60b5d8165dfda7fa848ef8a51fd92fc39",
-    "direct-consumer-proof.json": "42514038f1cd1c42e10234bfb0d5c61647ffae19bb9d9151e60664867014bbb4",
+    "cleanup.json": "a7b021a6865c72fe75bd6bb0c565ed0afb3f0963aabcc2f66d259542587b7fba",
+    "clock-proof.json": "da45fb9d29cfc78040773dd349ac4c32898a418d69a32cae9554bcdba1e48ad6",
+    "direct-consumer-proof.json": "6aee5ec1d7c53dd130d369fbfa2962d7eb9d9fce646e6ac5235c28094f82a2c9",
     "eof-normalization-proof.json": "67794cb24f7cfa69dc63451a2ac1e8d321489e528316f65d2c12abc78ae8c232",
-    "executed-tests.json": "b56620377555df2c60afde5f61525e2610a69c6be5dd5fa82e23fabbecdb059b",
+    "executed-tests.json": "32b8c26508cd4d83118f1c3fa6855230a1e50f31bea45d46d6aa7296c01d866d",
     "interim-before-ack-readback.json": "2a9d23db087c39dc5335287ee1252f4b8afa91f96760a59f8c55aff46369140f",
     "interim-before-backup-origin-repair.json": "826d064afd5a159f8efd1ac39d1be0cd4994039574d2b489ff6dddc885207e96",
     "interim-before-envelope-incident-repair.json": "f480fb50ba39d4e82a959b589765289618a59a8089ed84f31f354e2464a94a3b",
@@ -408,11 +421,13 @@
     "interim-before-nonfill-grant-repair.json": "ed616a2c70256361efbdd2eff2e2cd384042267d4e4552bc82d5c7aadb2616ce",
     "interim-before-partial-dispatch-repair.json": "c20e0176e0e50443895ac3d72e3cd4ffb836842fd8a0ca2863dd5e50bd70fe39",
     "interim-before-policy-clock-repair.json": "a29055ee3d97f4d1f35c92ea49f52cbc746ee7a7e866692fe96e6fec4560a87d",
+    "interim-before-restore-artifact-repair.json": "b56620377555df2c60afde5f61525e2610a69c6be5dd5fa82e23fabbecdb059b",
     "interim-clock-before-final-review.json": "346a016b59d1541b18d5b4752ba4c015aa7dd24d2b692832fa049242350cf32b",
     "interim-consumers-before-final-review.json": "c8df261e81cefb63788dbfe4f6d108e5072c89e70a4650be8f4987498fc18bf1",
     "interim-operator-before-final-review.json": "b11acd8db40927d16bde857e9581317116d4952fed8f2f7e29aff8cea2515d0c",
-    "operator-proof.json": "527b90a8331624d86fa68ed7b961c0f40e0764598f32534e3eb5cf9f4d321afc",
+    "operator-proof.json": "1e70e73c99c700bbbed51a8324f07f4a8508f945bd5944dc13a903286b3bf187",
     "operator-readonly-oracle-interim.json": "309799c051e0dceae20029835fe1b78b5970db6faba54fbff556a2853b565207",
+    "review-08c5ae1e.json": "2dd9bca835e4306fe288ab04d8325b8a99d20bab890b1935426a7206f541e0ef",
     "review-0df9aa7e.json": "1d7bc3b12180a72119372128abdea0fc8e996249d522ac5a21aeb215d474c335",
     "review-0f1c30b3.json": "955899f42ad10d72c61a8f1b9860b84d1a29101c85d2b36cb1406a4a10c36fff",
     "review-1cdf0003.json": "5def19ffba5afb45b3d5730a0e14d11884ad9bccb1575bd8e7f008fc59086e57",
@@ -429,11 +444,12 @@
     "review-policy-clock-remediation.json": "8399ba3412fb6ab57d93902e7eb0946ce8264adec2ae3a42af857acdd3aeae77",
     "review-preflight-before.json": "71889f2a8b6dbcd8120d03795776124dbcae700236c4fef74aa31a07a633c663",
     "review-readiness-before.json": "71d3e0bb6141a324c6726c281ce71c6d06deec602f3901b49c16d3d6659bd2eb",
+    "review-restore-artifact-remediation.json": "024696d4ff54b1dd5d2ab414a65ae3d9e5e1206a969b9f2512efdb1fadf054d4",
     "review-terminal-quantity-before.json": "9143b463e15fb0583ef19c09faa228ba998dd5ab61251d5105047fb2260f4629",
     "review-terminal-release-before.json": "cbd0d3cefd2ed43027bf0bacbc45e48a4f18f3f997031cf0bf53a3a976405b50",
     "source-contract.md": "addc05071197efb3462771b52f5699170d54061656efeda0b7f48e52bdb0f0b7"
   },
-  "receipt_sha256": "c2d8c224bcb9b7138937ada8052ac370c5f6a04e796db46e4226f8a753213130",
+  "receipt_sha256": "64b1a52b5507a001cb06613433418e82ab09c8d9ce09e501d8dc5492b8523ac8",
   "schema": "smial.operating-closure-coverage",
   "schema_version": "1.0",
   "superseded_pre_remediation_history": [
@@ -450,7 +466,8 @@
     "canary-rename-proof.json",
     "interim-before-nonfill-grant-repair.json",
     "operator-readonly-oracle-interim.json",
-    "interim-before-backup-origin-repair.json"
+    "interim-before-backup-origin-repair.json",
+    "interim-before-restore-artifact-repair.json"
   ],
   "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
   "tested_to_candidate_byte_equivalence": [],

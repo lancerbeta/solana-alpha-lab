@@ -212,6 +212,20 @@ CLI ack-restore --mode PAPER --input complete-external-cut.json --inventory-sha2
 вызывает отказ до записи; такой отказ не даёт права удалять чужие artifacts.
 Успешный backup содержит standalone DB и manifest, без зависимости от WAL.
 
+Restore требует новый marked root без основной DB и её `-journal`, `-wal`,
+`-shm`. Существующие artifacts сохраняются при отказе. Source backup тоже
+должен быть standalone: SQLite auxiliaries вызывают отказ, поскольку manifest
+покрывает SHA основной DB. Не удаляй sidecars вручную ради прохождения проверки;
+получи штатный native backup в новую family из совместимого исходного runtime.
+Restore проверяет и копирует покрытые SHA source bytes в приватный namespace;
+SQLite готовит fence/pause там, затем публикуется новая самостоятельная DB.
+
+Повторный backup/restore после первого ACK создаёт новый snapshot event,
+сохраняя прежние события. Reconciliation и ACK привязаны к текущему snapshot:
+прежний cut отклоняется, а совпадение времени и inventory не переиспользует
+ACK прошлого восстановления. После нового complete cut и ACK исходные
+обязательства продолжают обслуживаться, включая due EXIT.
+
 Каждый вызов использует свой exact runtime. Backup — native SQLite snapshot
 с manifest/hash и frozen dependency closure. Future source observations не
 входят в этот cut. Restore требует fresh marked root, проверяет snapshot и

@@ -58,6 +58,185 @@ class OperationalRecoveryTests(unittest.TestCase):
     ledger_receipts = closure_fixture.OperatingDriverTests.ledger_receipts
     recovery_cut = closure_fixture.OperatingDriverTests.recovery_cut
 
+    def fresh_restore_runner(self, suffix):
+        destination=self.root/"local"/suffix
+        destination.mkdir()
+        shutil.copyfile(self.data/"offline_runtime.json",destination/"offline_runtime.json")
+        return TradingContinuityRunner(self.root,data_root=destination)
+
+    def test_restore_all_destination_artifact_collisions_preserve_regular_and_hardlink_bytes(self):
+        self.start_operating()
+        self.coordinator.backup(destination_relative="backups/restore-collisions.sqlite")
+        backup=self.data/"backups/restore-collisions.sqlite"
+        cases=[]
+        for index,suffix in enumerate(("","-journal","-wal","-shm")):
+            for kind in ("regular","hardlink"):
+                with self.subTest(suffix=suffix,kind=kind):
+                    runner=self.fresh_restore_runner("restore-"+str(index)+"-"+kind)
+                    artifact=type(backup)(str(runner.store_path)+suffix)
+                    victim=self.root/("restore-victim-"+str(index)+"-"+kind+".txt")
+                    victim.write_bytes(b"SYNTHETIC_RESTORE_NON_TARGET")
+                    if kind=="hardlink":
+                        os.link(victim,artifact)
+                    else:
+                        artifact.write_bytes(victim.read_bytes())
+                    before={p.name:p.read_bytes() for p in runner.data_root.iterdir() if p.is_file()}
+                    with self.assertRaisesRegex(PaperPlaneError,"RESTORE_REQUIRES_FRESH_ROOT|OFFLINE_STORE_ALIAS_FORBIDDEN|OPERATING_CHILD_ALIAS_FORBIDDEN"):
+                        restore_native_backup(backup_path=backup,destination_runner=runner)
+                    self.assertEqual({p.name:p.read_bytes() for p in runner.data_root.iterdir() if p.is_file()},before)
+                    self.assertEqual(victim.read_bytes(),b"SYNTHETIC_RESTORE_NON_TARGET")
+                    self.assertEqual(list(runner.data_root.glob(".native-restore-*")),[])
+                    cases.append({"suffix":suffix,"kind":kind,"nontarget_unchanged":True,"native_final_write":False})
+        self.metrics={"destination_collisions":cases,"artifact_cases":8}
+
+    def test_two_ordinary_restore_cycles_preserve_original_history_and_each_new_snapshot_fence(self):
+        self.start_operating()
+        self.coordinator.tick()
+        original=self.runner.readback()
+        self.coordinator.backup(destination_relative="backups/cycle-one.sqlite")
+        first_backup=self.data/"backups/cycle-one.sqlite"
+        first_cut=self.production_cut(first_backup)
+        first_runner,first=self.restored(first_backup,suffix="restore-cycle-one",mode="PAPER")
+        first.reconcile_cut(first_cut)
+        self.acknowledge(first,first_cut)
+        with closing(PaperPlaneStore(first_runner.store_path,readonly=True)) as store:
+            original_events=store.execution_events()
+        first.backup(destination_relative="backups/cycle-two.sqlite")
+        second_backup=first_runner.data_root/"backups/cycle-two.sqlite"
+        second_cut=first.export_recovery_cut(backup_path=second_backup,effects=[],
+            external_cut_id="SYNTHETIC_SECOND_COMPLETE_CUT",as_of=first_cut["as_of"])
+        second_cut={**second_cut,"cut_sha256":sha256_of(second_cut)}
+        second_runner,second=self.restored(second_backup,suffix="restore-cycle-two",mode="PAPER")
+        self.assertTrue(second.status()["restore_guard"])
+        self.assertEqual(second_runner.readback()["positions"],original["positions"])
+        self.assertEqual(second_runner.readback()["modeled_attempts"],original["modeled_attempts"])
+        self.assertEqual(second_runner.readback()["modeled_results"],original["modeled_results"])
+        self.assertEqual(second.status()["inventory"],first.status()["inventory"])
+        with self.assertRaisesRegex(PaperPlaneError,"RESTORE_EXTERNAL_CUT_BACKUP_CONFLICT"):
+            second.reconcile_cut(first_cut)
+        self.assertTrue(second.status()["restore_guard"])
+        with closing(PaperPlaneStore(first_runner.store_path,readonly=True)) as store:
+            first_events=store.filtered_execution_events(event_type="RESTORE_SNAPSHOT_BOUND")
+        with closing(PaperPlaneStore(second_runner.store_path,readonly=True)) as store:
+            second_events=store.filtered_execution_events(event_type="RESTORE_SNAPSHOT_BOUND")
+            self.assertEqual(store.execution_events()[:-1],original_events)
+            self.assertTrue(all(bot["entries_paused"] for bot in store.bots()))
+        self.assertEqual(len(first_events),1)
+        self.assertEqual(len(second_events),2)
+        self.assertEqual(second_events[0],first_events[0])
+        self.assertEqual(second_events[1]["payload"],{"database_sha256":hashlib.sha256(second_backup.read_bytes()).hexdigest()})
+        second.reconcile_cut(second_cut)
+        self.acknowledge(second,second_cut)
+        self.acknowledge(second,second_cut)
+        with closing(PaperPlaneStore(second_runner.store_path,readonly=True)) as store:
+            acks=store.filtered_execution_events(event_type="RESTORE_RECONCILIATION_ACKNOWLEDGED")
+            self.assertEqual(len(acks),2)
+            self.assertNotEqual(acks[0]["event_id"],acks[1]["event_id"])
+        self.source.tick(datetime(2026,10,5,13,5,tzinfo=UTC))
+        self.now=datetime(2026,10,5,13,10,tzinfo=UTC)
+        second.tick()
+        self.assertEqual(second_runner.readback()["positions"][0]["state"],"RECONCILED")
+        self.assertEqual(len(second_runner.readback()["modeled_attempts"]),2)
+        self.metrics={"ordinary_restore_cycles":2,"original_history_retained":True,"snapshot_events":2,
+            "each_new_fence":True,"prior_cut_denied":True,"same_inventory_and_ack_clock":True,
+            "distinct_restore_acks":2,"second_ack_repeat":"IDEMPOTENT",
+            "original_exit_after_second_ack":"RECONCILED"}
+
+    def test_restore_exclusive_reservation_late_auxiliary_and_native_failure_preserve_non_targets(self):
+        self.start_operating()
+        self.coordinator.backup(destination_relative="backups/restore-races.sqlite")
+        backup=self.data/"backups/restore-races.sqlite"
+        for seam in ("RESERVATION","LATE_AUXILIARY","NATIVE_FAILURE"):
+            with self.subTest(seam=seam):
+                runner=self.fresh_restore_runner("restore-"+seam.lower())
+                artifact=runner.store_path if seam=="RESERVATION" else type(backup)(str(runner.store_path)+"-shm")
+                victim=self.root/("restore-race-victim-"+seam+".txt")
+                victim.write_bytes(b"SYNTHETIC_RESTORE_RACE_NON_TARGET")
+                if seam=="RESERVATION":
+                    native_open=os.open
+                    def reserve(path,flags,*args,**kwargs):
+                        if str(path)==str(runner.store_path):
+                            os.link(victim,path)
+                        return native_open(path,flags,*args,**kwargs)
+                    context=patch("solana_alpha_lab.factory.trading_coordinator.os.open",side_effect=reserve)
+                    expected=PaperPlaneError
+                    reason="RESTORE_REQUIRES_FRESH_ROOT"
+                else:
+                    native_connect=sqlite3.connect
+                    def connect(database,*args,**kwargs):
+                        if str(database).endswith("restored.sqlite"):
+                            if seam=="NATIVE_FAILURE":
+                                raise RuntimeError("SYNTHETIC_NATIVE_RESTORE_FAILURE")
+                            artifact.write_bytes(victim.read_bytes())
+                        return native_connect(database,*args,**kwargs)
+                    context=patch("solana_alpha_lab.factory.trading_coordinator.sqlite3.connect",side_effect=connect)
+                    expected=RuntimeError if seam=="NATIVE_FAILURE" else PaperPlaneError
+                    reason="SYNTHETIC_NATIVE_RESTORE_FAILURE" if seam=="NATIVE_FAILURE" else "RESTORE_REQUIRES_FRESH_ROOT"
+                with context,self.assertRaisesRegex(expected,reason):
+                    restore_native_backup(backup_path=backup,destination_runner=runner)
+                self.assertEqual(victim.read_bytes(),b"SYNTHETIC_RESTORE_RACE_NON_TARGET")
+                if seam!="NATIVE_FAILURE":
+                    self.assertEqual(artifact.read_bytes(),victim.read_bytes())
+                if seam!="RESERVATION":
+                    self.assertFalse(runner.store_path.exists())
+                self.assertEqual(list(runner.data_root.glob(".native-restore-*")),[])
+        self.metrics={"reservation_race":"DENY_NON_TARGET_UNCHANGED","late_auxiliary":"DENY_NON_TARGET_UNCHANGED",
+            "native_failure":"ONLY_OWNED_MAIN_REMOVED","native_staging_roots_absent":True}
+
+    def test_restore_sealed_source_rejects_unsigned_wal_and_preserves_standalone_legacy_lineage(self):
+        from solana_alpha_lab.factory.trading_runtime_policy import configure_operating_envelope,read_operating_envelope
+        self.start_operating()
+        self.coordinator.tick()
+        original=self.runner.readback()
+        self.coordinator.backup(destination_relative="backups/source-seal.sqlite")
+        base=self.data/"backups/source-seal.sqlite"
+        manifest=json.loads(type(base)(str(base)+".json").read_text())
+        legacy=base.parent/"legacy-format.sqlite"
+        shutil.copyfile(base,legacy)
+        with closing(PaperPlaneStore(legacy)):
+            pass
+        sealed_hash=hashlib.sha256(legacy.read_bytes()).hexdigest()
+        type(base)(str(legacy)+".json").write_text(json.dumps({**manifest,"database_sha256":sealed_hash}),encoding="utf-8")
+        # A complete standalone WAL-header carrier remains compatible. Only
+        # native source format is old; no historical whole binary is claimed.
+        runner=self.fresh_restore_runner("restore-legacy-standalone")
+        restored=restore_native_backup(backup_path=legacy,destination_runner=runner)
+        self.assertEqual(restored["status"],"RESTORED_RECONCILIATION_REQUIRED")
+        with closing(PaperPlaneStore(runner.store_path,readonly=True)) as store:
+            self.assertEqual(store.positions(),original["positions"])
+            self.assertEqual(store.get_execution_event("RESTORE-SNAPSHOT")["payload"],{"database_sha256":sealed_hash})
+            self.assertTrue(all(b["entries_paused"] for b in store.bots()))
+            self.assertEqual(read_operating_envelope(store,"PAPER")["revision"],1)
+            self.assertTrue(store._conn.execute("SELECT restore_guard FROM ordinary_state").fetchone()[0])
+        self.assertEqual(list(legacy.parent.glob(legacy.name+"-"+"*")),[])
+        with closing(PaperPlaneStore(legacy)) as writer:
+            current=read_operating_envelope(writer,"PAPER")
+            configure_operating_envelope(writer,mode="PAPER",candidate_raw={**current["envelope"],
+                "max_outstanding_positions":3,"max_outstanding_cost_basis_usd":"90"},
+                expected_current_sha256=current["envelope_sha256"],idempotency_key="UNSIGNED_SOURCE_WAL",
+                as_of="2026-10-05T12:41:00Z")
+            self.assertEqual(hashlib.sha256(legacy.read_bytes()).hexdigest(),sealed_hash)
+            shutil.copyfile(type(base)(str(legacy)+"-wal"),type(base)(str(base)+"-wal"))
+            shutil.copyfile(type(base)(str(legacy)+"-shm"),type(base)(str(base)+"-shm"))
+            for index,source in enumerate((legacy,base)):
+                source_family={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in source.parent.glob(source.name+"*")}
+                destination=self.fresh_restore_runner("restore-source-wal-"+str(index))
+                with self.assertRaisesRegex(PaperPlaneError,"BACKUP_CONTENT_CONFLICT"):
+                    restore_native_backup(backup_path=source,destination_runner=destination)
+                self.assertFalse(destination.store_path.exists())
+                self.assertEqual({p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in source.parent.glob(source.name+"*")},source_family)
+        for index,bad in enumerate((None,[],7)):
+            malformed=base.parent/("malformed-"+str(index)+".sqlite")
+            shutil.copyfile(base,malformed)
+            type(base)(str(malformed)+".json").write_text(json.dumps(bad),encoding="utf-8")
+            destination=self.fresh_restore_runner("restore-manifest-"+str(index))
+            with self.assertRaisesRegex(PaperPlaneError,"BACKUP_CONTENT_CONFLICT"):
+                restore_native_backup(backup_path=malformed,destination_runner=destination)
+            self.assertFalse(destination.store_path.exists())
+        self.metrics={"unsigned_wal_sources_denied":2,"original_sealed_limit":"30","unsigned_limit_not_imported":"90",
+            "source_artifacts_unchanged":True,"standalone_legacy_format":"ORIGINAL_IDENTITIES_FENCE_PAUSE_PRESERVED",
+            "malformed_manifest_shapes":3}
+
     def two_native_open_positions(self, *, mode="PAPER"):
         activate=TradingCoordinator.activate
         def expand(coordinator,**kwargs):

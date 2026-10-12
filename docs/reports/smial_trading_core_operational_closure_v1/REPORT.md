@@ -61,6 +61,9 @@ Original attached MD byte-for-byte находится в source-contract.md; е�
 | REVIEW_GRANTED_SHADOW_SUCCESSOR_COUNTEREXAMPLE | Single B grant создавал A EXIT attempt и расходовал B quota до scope rejection; оба A/B grants доступны | Один ordinary caller выбирает отдельно разрешённый grant по origin epoch/strategy до attempt/quota; A-oldEXIT/B-newENTRY используют собственные profiles/caps |
 | REVIEW_BACKUP_ARTIFACT_COUNTEREXAMPLE | Native backup менял чужие bytes через hardlinked .json/-shm; SQLite также удалял existing -journal/-wal aliases | Все пять final artifacts проверяются до записи; exclusive reservations, private SQLite staging, standalone copy и cleanup только собственных identities |
 | REVIEW_ORIGINAL_JSON_COUNTEREXAMPLE | Scalar/null/list original origin или capture ломал tick/status и оставлял healthy due EXIT открытым | Typed shape validation и quarantine исходного обязательства; damaged bytes/pending UNKNOWN сохранены, healthy old EXIT закрывается без resend |
+| REVIEW_RESTORE_ARTIFACT_COUNTEREXAMPLE | Restore возвращал успех и удалял existing -journal/-wal/-shm | Полная destination family проверяется до записи; exclusive publication из private native staging, cleanup только собственного reserved DB |
+| RESTORE_SOURCE_SEAL_COUNTEREXAMPLE | При unchanged sealed main SHA unsigned source WAL менял envelope $30→$90 | Standalone source family и private hash-verified input; source artifacts сохранены, текущие runtime reads остаются WAL-aware |
+| INTERIM_REPEAT_RESTORE_COUNTEREXAMPLE | Второй genuine restore после первого ACK падал на duplicate RESTORE-SNAPSHOT | Append-only snapshot identity и current-snapshot reconciliation/ACK; два цикла с одинаковыми inventory/clock, prior cut DENY, due original EXIT RECONCILED |
 | DELIVERY_PIN_COUNTEREXAMPLE | Необязательное изменение domain-policy prose нарушало исторический TASK30 SHA | Policy/TASK30 сохранены буквально; этот task pin registry-011 остаётся explicit, gate exceptions не добавлены |
 
 Baseline failures для новых capabilities не выдуманы. Reviewer before traces
@@ -75,7 +78,7 @@ packet через current native source/store owners. Это проверка п
 
 ## C01–C24
 
-Native automated status: PASS, 150 tests, 543.360276s; source bytes до/после
+Native automated status: PASS, 154 tests, 536.079047s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -157,28 +160,28 @@ real strategy promotion не установлены. Там, где NOT_IMPLEMEN
 
 ## Resources, rollback, delivery
 
-Peak suite process RSS: 146202624 bytes (139.43 MiB). Native 14-day producer
+Peak suite process RSS: 146309120 bytes (139.53 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.2042–0.2372s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.1978–0.2536s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04780–0.05155 |
-| 1000 | 364544 | 0.04868–0.07710 |
-| 4000 | 843776 | 0.04694–0.05338 |
+| 0 | 204800 | 0.04986–0.05327 |
+| 1000 | 364544 | 0.04745–0.05310 |
+| 4000 | 843776 | 0.04836–0.06353 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 840 | 0.000470 |
-| 100 proved terminal | 78270 | 0.015927 |
-| 1000 proved terminal | 774410 | 0.166968 |
-| 1000 terminal + 12000 unrelated events | 774410 | 0.167824 |
+| 1 outstanding | 840 | 0.000425 |
+| 100 proved terminal | 78270 | 0.014935 |
+| 1000 proved terminal | 774410 | 0.163067 |
+| 1000 terminal + 12000 unrelated events | 774410 | 0.161970 |
 
-Native history preparation: 13.907s.
+Native history preparation: 13.218s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.

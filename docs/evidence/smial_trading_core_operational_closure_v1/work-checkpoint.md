@@ -6,7 +6,7 @@ Ordinary source-driven PAPER/SHADOW loop/adapters, atomic accepted A@V1/B@V1
 successor, shared obligations, originating exits, partial economics, cold restore,
 original result/cost history and current readonly readiness implemented.
 
-Fresh native proof: 150 PASS / 543.360276s; all source pins current,
+Fresh native proof: 154 PASS / 536.079047s; all source pins current,
 all proof fixture roots ABSENT. Consumers:99 PASS; independent ordinary
 operator journey PASS; exact clock/jump probes PASS. Original source MD, old S08/S13
 report and immutable provider registry11 unchanged. True before review findings

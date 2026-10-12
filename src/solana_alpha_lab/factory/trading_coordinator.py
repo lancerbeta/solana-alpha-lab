@@ -1288,7 +1288,8 @@ class TradingCoordinator:
             raise PaperPlaneError("RESTORE_EXTERNAL_CUT_CONTENT_INVALID")
         probe=self.runner._store(readonly=True)
         try:
-            restored=probe.get_execution_event("RESTORE-SNAPSHOT")
+            snapshots=probe.filtered_execution_events(event_type="RESTORE_SNAPSHOT_BOUND")
+            restored=snapshots[-1] if snapshots else None
             if restored is None or restored["payload"]["database_sha256"]!=cut["backup_sha256"]:
                 raise PaperPlaneError("RESTORE_EXTERNAL_CUT_BACKUP_CONFLICT")
         finally:
@@ -1316,7 +1317,8 @@ class TradingCoordinator:
                 for bot in store.bots():
                     if bot["mode"] == self.mode:
                         self.runner.for_epoch(bot["activation_epoch_id"])
-                ack_id="RESTORE-ACK-" + sha256_of({"mode": self.mode, "inventory": expected_inventory_sha256, "at": as_of})
+                ack_id="RESTORE-ACK-" + sha256_of({"mode": self.mode, "cut_sha256": cut["cut_sha256"],
+                    "inventory": expected_inventory_sha256, "at": as_of})
                 if store.get_execution_event(ack_id) is not None:
                     return {"status":"RESTORE_RECONCILED","idempotent":True,"controls_preserved":True}
                 store._conn.execute("UPDATE ordinary_state SET restore_guard=0 WHERE mode=?", (self.mode,))
@@ -1363,30 +1365,95 @@ class TradingCoordinator:
 
 def restore_native_backup(*, backup_path, destination_runner):
     import hashlib
-    manifest = json.loads(backup_path.with_suffix(backup_path.suffix + ".json").read_text(encoding="utf-8"))
-    if manifest.get("database_sha256") != hashlib.sha256(backup_path.read_bytes()).hexdigest():
+    import tempfile
+    from solana_alpha_lab.factory.paper_plane import PaperPlaneStore
+    manifest_path = exact_child(backup_path.parent, backup_path.name + ".json")
+    backup_path = exact_child(backup_path.parent, backup_path.name)
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except ValueError:
+        raise PaperPlaneError("BACKUP_CONTENT_CONFLICT") from None
+    if not isinstance(manifest, dict) or not isinstance(manifest.get("database_sha256"), str):
         raise PaperPlaneError("BACKUP_CONTENT_CONFLICT")
+    # A seal covers only the standalone main DB. An auxiliary file must never
+    # supplement its authority, even when the main header uses DELETE mode.
+    def check_source_family():
+        for suffix in ("-journal", "-wal", "-shm"):
+            auxiliary = exact_child(backup_path.parent, backup_path.name + suffix, exists=False)
+            if auxiliary.exists():
+                raise PaperPlaneError("BACKUP_CONTENT_CONFLICT")
+    check_source_family()
     destination_runner._validate_store_paths()
-    if destination_runner.store_path.exists():
-        raise PaperPlaneError("RESTORE_REQUIRES_FRESH_ROOT")
-    source = sqlite3.connect(backup_path.resolve().as_uri() + "?mode=ro", uri=True)
-    target = sqlite3.connect(destination_runner.store_path)
+    target_path = destination_runner.store_path
+    for suffix in ("", "-journal", "-wal", "-shm"):
+        artifact = exact_child(destination_runner.data_root, str(target_path.relative_to(destination_runner.data_root)) + suffix, exists=False)
+        if artifact.exists():
+            raise PaperPlaneError("RESTORE_REQUIRES_FRESH_ROOT")
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
     try:
-        source.backup(target)
-        if target.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
-            raise PaperPlaneError("RESTORE_INTEGRITY_FAILED")
-        target.execute("UPDATE ordinary_state SET restore_guard=1")
-        target.commit()
-    finally:
-        target.close()
-        source.close()
-    restored=destination_runner._store()
+        fd = os.open(target_path, flags, 0o600)
+    except FileExistsError:
+        raise PaperPlaneError("RESTORE_REQUIRES_FRESH_ROOT") from None
+    original, complete = os.fstat(fd), False
+    handle = os.fdopen(fd, "wb")
     try:
-        with restored.immediate_write():
-            restored._conn.execute("UPDATE bot_instances SET entries_paused=1")
-            restored.append_execution_event(event_type="RESTORE_SNAPSHOT_BOUND",event_id="RESTORE-SNAPSHOT",
-                bot_instance_id=None,position_id=None,payload={"database_sha256":manifest["database_sha256"]},
-                created_at=render_utc(datetime.now(UTC)))
+        with tempfile.TemporaryDirectory(prefix=".native-restore-", dir=target_path.parent) as staging:
+            staged_input, staged_output = Path(staging) / "sealed.sqlite", Path(staging) / "restored.sqlite"
+            digest = hashlib.sha256()
+            # Copy only the sealed main file. SQLite reads a private namespace,
+            # so a raced source WAL cannot enter the restored snapshot.
+            with backup_path.open("rb") as source_file, staged_input.open("xb") as sealed:
+                while chunk := source_file.read(1024 * 1024):
+                    sealed.write(chunk)
+                    digest.update(chunk)
+            if digest.hexdigest() != manifest["database_sha256"]:
+                raise PaperPlaneError("BACKUP_CONTENT_CONFLICT")
+            check_source_family()
+            source = sqlite3.connect(staged_input.as_uri() + "?mode=ro", uri=True)
+            try:
+                target = sqlite3.connect(staged_output)
+                try:
+                    source.backup(target)
+                    if target.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+                        raise PaperPlaneError("RESTORE_INTEGRITY_FAILED")
+                finally:
+                    target.close()
+            finally:
+                source.close()
+            restored = PaperPlaneStore(staged_output)
+            try:
+                with restored.immediate_write():
+                    restored._conn.execute("UPDATE ordinary_state SET restore_guard=1")
+                    restored._conn.execute("UPDATE bot_instances SET entries_paused=1")
+                    snapshot_id = ("RESTORE-SNAPSHOT" if restored.get_execution_event("RESTORE-SNAPSHOT") is None
+                        else "RESTORE-SNAPSHOT-" + manifest["database_sha256"].upper())
+                    restored.append_execution_event(event_type="RESTORE_SNAPSHOT_BOUND", event_id=snapshot_id,
+                        bot_instance_id=None, position_id=None, payload={"database_sha256":manifest["database_sha256"]},
+                        created_at=render_utc(datetime.now(UTC)))
+                if (restored._conn.execute("PRAGMA journal_mode=DELETE").fetchone()[0] != "delete"
+                    or restored._conn.execute("PRAGMA integrity_check").fetchone()[0] != "ok"):
+                    raise PaperPlaneError("RESTORE_INTEGRITY_FAILED")
+            finally:
+                restored.close()
+            with staged_output.open("rb") as restored_file:
+                while chunk := restored_file.read(1024 * 1024):
+                    handle.write(chunk)
+        handle.flush()
+        os.fsync(handle.fileno())
+        exact_child(destination_runner.data_root, target_path.relative_to(destination_runner.data_root))
+        current = target_path.stat()
+        if (current.st_dev, current.st_ino, current.st_nlink) != (original.st_dev, original.st_ino, 1):
+            raise PaperPlaneError("OFFLINE_STORE_ALIAS_FORBIDDEN")
+        for suffix in ("-journal", "-wal", "-shm"):
+            auxiliary = exact_child(destination_runner.data_root, str(target_path.relative_to(destination_runner.data_root)) + suffix, exists=False)
+            if auxiliary.exists():
+                raise PaperPlaneError("RESTORE_REQUIRES_FRESH_ROOT")
+        check_source_family()
+        complete = True
     finally:
-        restored.close()
+        handle.close()
+        if not complete and target_path.exists() and not target_path.is_symlink():
+            current = target_path.stat()
+            if (current.st_dev, current.st_ino, current.st_nlink) == (original.st_dev, original.st_ino, 1):
+                target_path.unlink()
     return {"status": "RESTORED_RECONCILIATION_REQUIRED", "new_effects_enabled": False, "database_integrity": "ok"}

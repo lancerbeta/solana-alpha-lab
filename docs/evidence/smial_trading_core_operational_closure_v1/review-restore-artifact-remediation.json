@@ -1,0 +1,660 @@
+{
+  "after": {
+    "direct_native_recovery_neighbors": {
+      "cleanup": {
+        "all_absent": true,
+        "owned_fixture_root_count": 11
+      },
+      "elapsed_seconds": 35.768734,
+      "errors": 0,
+      "evidence_class": "SYNTHETIC_OFFLINE",
+      "failures": 0,
+      "output_sha256": "682c46f093e4c34e26aa229026cb40a78abad52b956f38f45f7b583be604d71c",
+      "provider_calls": 0,
+      "real_credentials_read": 0,
+      "receipt_sha256": "0a667bde3075909ef4ac47b99660214f3d99ce2a1eb8bf36e6ac46ea890d37a4",
+      "schema": "smial.restore-artifact-after",
+      "schema_version": "1.0",
+      "scope": "DIRECT_NATIVE_RECOVERY_NEIGHBORS",
+      "skips": 0,
+      "source_pins_after": {
+        "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+        "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+        "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "48b45dfa48a57cbce65559006b30e8a5974a0137c846e626d41a2de5de52c090",
+        "src/solana_alpha_lab/factory/trading_runner.py": "6d110b3cb314f4171a3406f134dd77cbb0237d6541020628791f698370f23b59",
+        "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
+        "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+        "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
+        "tests/test_trading_operational_recovery_v1.py": "524b2bf596df6d61d997e471b921342fb22a1bd70603f0557b9c85e596d3d0ee"
+      },
+      "source_pins_before": {
+        "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+        "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+        "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "48b45dfa48a57cbce65559006b30e8a5974a0137c846e626d41a2de5de52c090",
+        "src/solana_alpha_lab/factory/trading_runner.py": "6d110b3cb314f4171a3406f134dd77cbb0237d6541020628791f698370f23b59",
+        "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
+        "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+        "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
+        "tests/test_trading_operational_recovery_v1.py": "524b2bf596df6d61d997e471b921342fb22a1bd70603f0557b9c85e596d3d0ee"
+      },
+      "source_unchanged": true,
+      "status": "PASS",
+      "test_count": 11,
+      "tests": [
+        {
+          "elapsed_seconds": 2.166198,
+          "metrics": {
+            "artifact_collisions": [
+              {
+                "denied": true,
+                "kind": "regular",
+                "nontarget_unchanged": true,
+                "suffix": ""
+              },
+              {
+                "denied": true,
+                "kind": "hardlink",
+                "nontarget_unchanged": true,
+                "suffix": ""
+              },
+              {
+                "denied": true,
+                "kind": "regular",
+                "nontarget_unchanged": true,
+                "suffix": ".json"
+              },
+              {
+                "denied": true,
+                "kind": "hardlink",
+                "nontarget_unchanged": true,
+                "suffix": ".json"
+              },
+              {
+                "denied": true,
+                "kind": "regular",
+                "nontarget_unchanged": true,
+                "suffix": "-journal"
+              },
+              {
+                "denied": true,
+                "kind": "hardlink",
+                "nontarget_unchanged": true,
+                "suffix": "-journal"
+              },
+              {
+                "denied": true,
+                "kind": "regular",
+                "nontarget_unchanged": true,
+                "suffix": "-wal"
+              },
+              {
+                "denied": true,
+                "kind": "hardlink",
+                "nontarget_unchanged": true,
+                "suffix": "-wal"
+              },
+              {
+                "denied": true,
+                "kind": "regular",
+                "nontarget_unchanged": true,
+                "suffix": "-shm"
+              },
+              {
+                "denied": true,
+                "kind": "hardlink",
+                "nontarget_unchanged": true,
+                "suffix": "-shm"
+              }
+            ],
+            "native_destination_writes": 0
+          },
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_backup_all_final_artifact_collisions_preserve_owned_non_targets_before_write"
+        },
+        {
+          "elapsed_seconds": 2.094491,
+          "metrics": {
+            "final_auxiliary_files": 0,
+            "native_failure": "OWNED_OUTPUTS_REMOVED",
+            "sidecar_race": "DENY_NON_TARGET_UNCHANGED",
+            "standalone_backup_restore": "PASS"
+          },
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_backup_exclusive_sidecar_race_and_native_failure_remove_only_reserved_outputs"
+        },
+        {
+          "elapsed_seconds": 5.549197,
+          "metrics": {
+            "controls": [
+              "ENVELOPE_REVISION_2_10_USD",
+              "RUNTIME_POLICY_ENTRIES_DISABLED"
+            ],
+            "external_effects": 0,
+            "idempotent_reconcile": true,
+            "original_attempts": 0,
+            "restored_attempts": 0
+          },
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy"
+        },
+        {
+          "elapsed_seconds": 3.551313,
+          "metrics": {
+            "cases": [
+              {
+                "attempts": 0,
+                "damage": "MISSING",
+                "guard": true,
+                "reason": "RESTORE_OPERATING_CONFIGURATION_REQUIRED"
+              },
+              {
+                "attempts": 0,
+                "damage": "TRUNCATED_ENVELOPE",
+                "guard": true,
+                "reason": "RESTORE_OPERATING_CONFIGURATION_INVALID"
+              },
+              {
+                "attempts": 0,
+                "damage": "TRUNCATED_POLICY",
+                "guard": true,
+                "reason": "RESTORE_OPERATING_CONFIGURATION_INVALID"
+              },
+              {
+                "attempts": 0,
+                "damage": "HASH",
+                "guard": true,
+                "reason": "RESTORE_OPERATING_CONFIGURATION_INVALID"
+              },
+              {
+                "attempts": 0,
+                "damage": "FOREIGN_MODE",
+                "guard": true,
+                "reason": "RESTORE_OPERATING_CONFIGURATION_INVALID"
+              },
+              {
+                "attempts": 0,
+                "damage": "FUTURE_CLOCK",
+                "guard": true,
+                "reason": "RESTORE_OPERATING_CONFIGURATION_INVALID"
+              }
+            ]
+          },
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_configuration_chain_damage_or_omission_cannot_acknowledge_restore"
+        },
+        {
+          "elapsed_seconds": 2.778851,
+          "metrics": {
+            "attempts": 0,
+            "conflicting_local_revision": "DENY",
+            "later_cap_preserved_usd": "5",
+            "later_local_revision": 3,
+            "post_import_damage_ack": "DENY"
+          },
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_configuration_restore_preserves_later_local_authority_and_detects_damage"
+        },
+        {
+          "elapsed_seconds": 3.659078,
+          "metrics": {},
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_without_effects_imports_successor_binding_and_generation_paused"
+        },
+        {
+          "elapsed_seconds": 2.393329,
+          "metrics": {},
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_post_restore_stop_survives_older_complete_cut"
+        },
+        {
+          "elapsed_seconds": 2.799939,
+          "metrics": {},
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_post_restore_drain_with_inventory_survives_older_complete_cut"
+        },
+        {
+          "elapsed_seconds": 4.408487,
+          "metrics": {},
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_C19_native_restore_before_effect_independent_ledger"
+        },
+        {
+          "elapsed_seconds": 2.679136,
+          "metrics": {},
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_pre_admission_snapshot_complete_cut_no_duplicate"
+        },
+        {
+          "elapsed_seconds": 3.11614,
+          "metrics": {},
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_backup_before_due_exit_imports_original_exit_no_repeat"
+        }
+      ]
+    },
+    "new_p1_regressions": {
+      "cleanup": {
+        "all_absent": true,
+        "owned_fixture_root_count": 4
+      },
+      "elapsed_seconds": 11.444827,
+      "errors": 0,
+      "evidence_class": "SYNTHETIC_OFFLINE",
+      "failures": 0,
+      "output_sha256": "b9801773326723124c39b9600a8a295446fd12eea7f7800019664bbcc63d1363",
+      "provider_calls": 0,
+      "real_credentials_read": 0,
+      "receipt_sha256": "211e81344ce798b7d48c122e36d861b156634c485f832af0f86821f493e11b82",
+      "schema": "smial.restore-artifact-after",
+      "schema_version": "1.0",
+      "scope": "NEW_RESTORE_P1_REGRESSIONS",
+      "skips": 0,
+      "source_pins_after": {
+        "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+        "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+        "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "48b45dfa48a57cbce65559006b30e8a5974a0137c846e626d41a2de5de52c090",
+        "src/solana_alpha_lab/factory/trading_runner.py": "6d110b3cb314f4171a3406f134dd77cbb0237d6541020628791f698370f23b59",
+        "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
+        "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+        "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
+        "tests/test_trading_operational_recovery_v1.py": "524b2bf596df6d61d997e471b921342fb22a1bd70603f0557b9c85e596d3d0ee"
+      },
+      "source_pins_before": {
+        "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+        "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+        "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "48b45dfa48a57cbce65559006b30e8a5974a0137c846e626d41a2de5de52c090",
+        "src/solana_alpha_lab/factory/trading_runner.py": "6d110b3cb314f4171a3406f134dd77cbb0237d6541020628791f698370f23b59",
+        "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
+        "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+        "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
+        "tests/test_trading_operational_recovery_v1.py": "524b2bf596df6d61d997e471b921342fb22a1bd70603f0557b9c85e596d3d0ee"
+      },
+      "source_unchanged": true,
+      "status": "PASS",
+      "test_count": 4,
+      "tests": [
+        {
+          "elapsed_seconds": 2.353321,
+          "metrics": {
+            "artifact_cases": 8,
+            "destination_collisions": [
+              {
+                "kind": "regular",
+                "native_final_write": false,
+                "nontarget_unchanged": true,
+                "suffix": ""
+              },
+              {
+                "kind": "hardlink",
+                "native_final_write": false,
+                "nontarget_unchanged": true,
+                "suffix": ""
+              },
+              {
+                "kind": "regular",
+                "native_final_write": false,
+                "nontarget_unchanged": true,
+                "suffix": "-journal"
+              },
+              {
+                "kind": "hardlink",
+                "native_final_write": false,
+                "nontarget_unchanged": true,
+                "suffix": "-journal"
+              },
+              {
+                "kind": "regular",
+                "native_final_write": false,
+                "nontarget_unchanged": true,
+                "suffix": "-wal"
+              },
+              {
+                "kind": "hardlink",
+                "native_final_write": false,
+                "nontarget_unchanged": true,
+                "suffix": "-wal"
+              },
+              {
+                "kind": "regular",
+                "native_final_write": false,
+                "nontarget_unchanged": true,
+                "suffix": "-shm"
+              },
+              {
+                "kind": "hardlink",
+                "native_final_write": false,
+                "nontarget_unchanged": true,
+                "suffix": "-shm"
+              }
+            ]
+          },
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_all_destination_artifact_collisions_preserve_regular_and_hardlink_bytes"
+        },
+        {
+          "elapsed_seconds": 4.209285,
+          "metrics": {
+            "distinct_restore_acks": 2,
+            "each_new_fence": true,
+            "ordinary_restore_cycles": 2,
+            "original_exit_after_second_ack": "RECONCILED",
+            "original_history_retained": true,
+            "prior_cut_denied": true,
+            "same_inventory_and_ack_clock": true,
+            "second_ack_repeat": "IDEMPOTENT",
+            "snapshot_events": 2
+          },
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_two_ordinary_restore_cycles_preserve_original_history_and_each_new_snapshot_fence"
+        },
+        {
+          "elapsed_seconds": 1.99615,
+          "metrics": {
+            "late_auxiliary": "DENY_NON_TARGET_UNCHANGED",
+            "native_failure": "ONLY_OWNED_MAIN_REMOVED",
+            "native_staging_roots_absent": true,
+            "reservation_race": "DENY_NON_TARGET_UNCHANGED"
+          },
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_exclusive_reservation_late_auxiliary_and_native_failure_preserve_non_targets"
+        },
+        {
+          "elapsed_seconds": 2.296586,
+          "metrics": {
+            "malformed_manifest_shapes": 3,
+            "original_sealed_limit": "30",
+            "source_artifacts_unchanged": true,
+            "standalone_legacy_format": "ORIGINAL_IDENTITIES_FENCE_PAUSE_PRESERVED",
+            "unsigned_limit_not_imported": "90",
+            "unsigned_wal_sources_denied": 2
+          },
+          "owned_fixture_root_absent": true,
+          "status": "PASS",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_sealed_source_rejects_unsigned_wal_and_preserves_standalone_legacy_lineage"
+        }
+      ]
+    }
+  },
+  "authority": {
+    "credential_reads": 0,
+    "dependencies_adopted": 0,
+    "deployment": false,
+    "provider_calls": 0,
+    "settings_or_history_rewrite": false,
+    "signers_transactions_or_money": false,
+    "stage_commit_push_pr_merge": false
+  },
+  "before": {
+    "frozen08_native_counterexamples": {
+      "cleanup": [
+        {
+          "owned_root_absent": true,
+          "probe": "DESTINATION"
+        },
+        {
+          "owned_root_absent": true,
+          "probe": "SOURCE"
+        }
+      ],
+      "elapsed_seconds": 4.356148,
+      "errors": 0,
+      "evidence_class": "SYNTHETIC_OFFLINE",
+      "failures": 2,
+      "measurement": "INDEPENDENT_NEW_NATIVE_BEFORE",
+      "observations": [
+        {
+          "artifact_present_after": false,
+          "artifact_preserved": false,
+          "case": "REGULAR_DESTINATION_COLLISION",
+          "elapsed_seconds": 0.025412,
+          "original_sha256": "f23535da073c783982ad56293d9c0d15507712a55fea78f9e093083e786b4816",
+          "status": "SUCCESS",
+          "suffix": "-journal",
+          "typed_reason": null
+        },
+        {
+          "artifact_present_after": false,
+          "artifact_preserved": false,
+          "case": "REGULAR_DESTINATION_COLLISION",
+          "elapsed_seconds": 0.020141,
+          "original_sha256": "f23535da073c783982ad56293d9c0d15507712a55fea78f9e093083e786b4816",
+          "status": "SUCCESS",
+          "suffix": "-wal",
+          "typed_reason": null
+        },
+        {
+          "artifact_present_after": false,
+          "artifact_preserved": false,
+          "case": "REGULAR_DESTINATION_COLLISION",
+          "elapsed_seconds": 0.020332,
+          "original_sha256": "f23535da073c783982ad56293d9c0d15507712a55fea78f9e093083e786b4816",
+          "status": "SUCCESS",
+          "suffix": "-shm",
+          "typed_reason": null
+        },
+        {
+          "actual": "AttributeError",
+          "case": "MANIFEST_NULL"
+        },
+        {
+          "case": "NATIVE_LEGACY_WAL_FORMAT_SEALED_CARRIER",
+          "elapsed_seconds": 0.031389,
+          "imported_limit": "90",
+          "imported_revision": 2,
+          "original_envelope_revision": 1,
+          "original_limit": "30",
+          "scope": "CURRENT_NATIVE_OWNERS_HISTORICAL_SQLITE_FORMAT",
+          "sealed_main_hash_unchanged": true,
+          "source_wal_bytes": 24752
+        },
+        {
+          "case": "FRESH_DELETE_FORMAT_WITH_WAL_OVERLAY",
+          "imported_revision": 2,
+          "main_hash_matches_seal": true,
+          "status": "SUCCESS",
+          "typed_reason": null
+        }
+      ],
+      "observed_head": "08c5ae1e9385202a27a0f18640f0b208ad34928d",
+      "output_sha256": "b70e3067d7586392aaa0c4e1d78b6d419bd87ba711079970a7d8ecad301f14fa",
+      "provider_calls": 0,
+      "real_credentials_read": 0,
+      "receipt_sha256": "e32c5fc876c4a5d61557329aa2da04d3df6b9ee03e9c21a6f2bb80acc869408b",
+      "schema": "smial.restore-artifact-before",
+      "schema_version": "1.0",
+      "source_pins_after": {
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "3df6051d8eac666b6f8e63bc32d6df26cffc786d7a8bb0dec67014001079f915",
+        "tests/test_trading_operational_recovery_v1.py": "90d60cb77cfc31d74d0ae26a16f831a5a9fb40d64a88e2de015777e5b86ee3fe"
+      },
+      "source_pins_before": {
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "3df6051d8eac666b6f8e63bc32d6df26cffc786d7a8bb0dec67014001079f915",
+        "tests/test_trading_operational_recovery_v1.py": "90d60cb77cfc31d74d0ae26a16f831a5a9fb40d64a88e2de015777e5b86ee3fe"
+      },
+      "source_unchanged": true,
+      "status": "FAIL_REPRODUCED",
+      "test_count": 2
+    },
+    "interim_attribution": "PRIVATE_RESTORE_REPAIR_SOURCE_PINS_D49CA78D_E675081C_NOT_FROZEN08_REVIEW",
+    "interim_first_actual_run_cleanup": "UNKNOWN_NOT_CAPTURED; REPEATED_MEASUREMENT_HAS_ACTUAL_ABSENT_ROOT",
+    "interim_two_cycle_counterexample": {
+      "elapsed_seconds": 2.800871,
+      "errors": 1,
+      "failures": 0,
+      "first_actual_run": {
+        "elapsed_seconds": 2.78238,
+        "errors": 1,
+        "failures": 0,
+        "measurement": "INTERIM_PRIVATE_RESTORE_REPAIR_BEFORE_LINEAGE_FIX_NOT_FROZEN08_BASELINE",
+        "output_sha256": "b324ef6ef7883d49c9bed4d3812814c9ace9274f76c62295fe5c9050ab580795",
+        "receipt_sha256": "96df5d42fb56018d3c4f373b6508411906260098e5fc5316c483c78e31158c8a",
+        "schema": "smial.restore-lineage-before",
+        "schema_version": "1.0",
+        "source_pins_after": {
+          "src/solana_alpha_lab/factory/trading_coordinator.py": "d49ca78d0e8322103f647e31764394b0772138f81ec335d8d0c6ff7d78cdf80e",
+          "tests/test_trading_operational_recovery_v1.py": "e675081c0f4cef61889f9ed5a2d8b2df3daaae7f628292cdfa6136f74e124e0e"
+        },
+        "source_pins_before": {
+          "src/solana_alpha_lab/factory/trading_coordinator.py": "d49ca78d0e8322103f647e31764394b0772138f81ec335d8d0c6ff7d78cdf80e",
+          "tests/test_trading_operational_recovery_v1.py": "e675081c0f4cef61889f9ed5a2d8b2df3daaae7f628292cdfa6136f74e124e0e"
+        },
+        "source_unchanged": true,
+        "status": "FAIL_REPRODUCED",
+        "test_count": 1
+      },
+      "measurement": "INTERIM_PRIVATE_RESTORE_REPAIR_BEFORE_LINEAGE_FIX_NOT_FROZEN08_BASELINE",
+      "output_sha256": "1ff837feb94ee45df13fa8ec0db1c92eef61a815f3217304ae542757dd04420a",
+      "owned_fixture_root_absent": true,
+      "receipt_sha256": "2761b1d58f3c04f8e6c6ed10077dc97769f311fe78c20ac465c728bc3b738751",
+      "schema": "smial.restore-lineage-before",
+      "schema_version": "1.0",
+      "source_pins_after": {
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "d49ca78d0e8322103f647e31764394b0772138f81ec335d8d0c6ff7d78cdf80e",
+        "tests/test_trading_operational_recovery_v1.py": "e675081c0f4cef61889f9ed5a2d8b2df3daaae7f628292cdfa6136f74e124e0e"
+      },
+      "source_pins_before": {
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "d49ca78d0e8322103f647e31764394b0772138f81ec335d8d0c6ff7d78cdf80e",
+        "tests/test_trading_operational_recovery_v1.py": "e675081c0f4cef61889f9ed5a2d8b2df3daaae7f628292cdfa6136f74e124e0e"
+      },
+      "source_unchanged": true,
+      "status": "FAIL_REPRODUCED",
+      "test_count": 1
+    },
+    "observed_head": "08c5ae1e9385202a27a0f18640f0b208ad34928d",
+    "prior_full_source_snapshot": "UNKNOWN_NOT_CAPTURED_OR_RECONSTRUCTED"
+  },
+  "changes": [
+    "Reject every existing destination main/journal/wal/shm before native writes; reserve main with exclusive open.",
+    "Read a SHA256-verified standalone main DB into a private SQLite namespace; unsigned source journal/wal/shm is denied and source artifacts remain unchanged.",
+    "Prepare restore guard, entry pauses and snapshot binding in private native output; publish through reserved main handle, fsync, final family and own identity checks; remove only own exact reserved main on failure.",
+    "Append legacy first snapshot event and subsequent incoming-backup-SHA-bound snapshot events; retain original event bytes, clocks and identities.",
+    "Validate cut against the last appended restore snapshot; bind new ACK identity to cut SHA so equal inventory and clock cannot reuse a prior restore ACK."
+  ],
+  "cleanup": {
+    "native_fixture_root_count": 15,
+    "native_fixture_roots_absent": true,
+    "owned_scratch": {
+      "files_removed": 6,
+      "name": "smial-operational-restore-artifact-repair",
+      "owned_root_absent": true,
+      "status": "ABSENT_AFTER_EXACT_SCOPE_MARKER_FILE_WHITELIST_AND_REPARSE_CHECKS"
+    },
+    "unowned_roots": "NOT_TOUCHED"
+  },
+  "current_source_snapshot": {
+    "algorithm": "sha256_of({relative_path:SHA256(raw_bytes) for relative_path in sorted(git ls-files src scripts tests)})",
+    "historical_1599_comparison": "UNKNOWN_HISTORICAL_PATH_SET_AND_ALGORITHM_NOT_PRESERVED",
+    "measurement": "AFTER_ONLY_NOT_RETROACTIVE_BEFORE",
+    "roots": [
+      "src",
+      "scripts",
+      "tests"
+    ],
+    "source_snapshot_file_count": 1260,
+    "source_snapshot_sha256": "2498db7d061acd05c35b3e5a097b18c09072e34f17289726c2ad0446435b970d"
+  },
+  "input_receipt_file_sha256": {
+    "after-neighbors.json": "fe9d33c03a4d94d312ce5420038bf8028b175982520337bd63229d3f1017e08b",
+    "after-new.json": "fd68638d14642ef9331c4f4bf2bfe2d9978ab49df5ef57d46945a8fc19ecfb6e",
+    "before.json": "8580f2e00c6347c84a1239518f6a42b58c677d73c8bf44f6cfa1373106d3ad54",
+    "repeat-cycle-before.json": "7764c39a606a2bfd3ae9a82d3fa75f3d4008c35e9d66f40e2a274a505a66c728"
+  },
+  "native_case_map": [
+    {
+      "cases": "4 destination suffixes times regular/hardlink = 8; all denied and non-target bytes preserved",
+      "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_all_destination_artifact_collisions_preserve_regular_and_hardlink_bytes"
+    },
+    {
+      "cases": "2 actual backup/restore/reconcile/ACK cycles, original full event history, positions/attempts/results retained, prior cut denied, same inventory/ACK clock, 2 distinct ACKs, repeated ACK idempotent, originating due EXIT RECONCILED",
+      "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_two_ordinary_restore_cycles_preserve_original_history_and_each_new_snapshot_fence"
+    },
+    {
+      "cases": "exclusive reservation race, late auxiliary race, native failure; non-target unchanged and only own main removed",
+      "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_exclusive_reservation_late_auxiliary_and_native_failure_preserve_non_targets"
+    },
+    {
+      "cases": "2 unsigned WAL sources denied with same main seal, standalone WAL-header legacy native format retained, 3 malformed manifest shapes denied; source artifacts unchanged",
+      "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_sealed_source_rejects_unsigned_wal_and_preserves_standalone_legacy_lineage"
+    }
+  ],
+  "receipt_sha256": "41c6590aeffec3c1d1fde1376a26c2eeef0172e13fc8002bb734a7a671b570cb",
+  "reproduction": {
+    "environment": {
+      "PYTHONIOENCODING": "utf-8",
+      "PYTHONPATH": "src;tests",
+      "UV_OFFLINE": "true",
+      "UV_PYTHON_DOWNLOADS": "never"
+    },
+    "scope": "Run exactly these 15 existing test methods; original custom result collector output hashes remain preserved independently.",
+    "selected_method_ids": [
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_backup_all_final_artifact_collisions_preserve_owned_non_targets_before_write",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_backup_exclusive_sidecar_race_and_native_failure_remove_only_reserved_outputs",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_configuration_chain_damage_or_omission_cannot_acknowledge_restore",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_configuration_restore_preserves_later_local_authority_and_detects_damage",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_without_effects_imports_successor_binding_and_generation_paused",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_post_restore_stop_survives_older_complete_cut",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_post_restore_drain_with_inventory_survives_older_complete_cut",
+      "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_C19_native_restore_before_effect_independent_ledger",
+      "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_pre_admission_snapshot_complete_cut_no_duplicate",
+      "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_backup_before_due_exit_imports_original_exit_no_repeat",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_all_destination_artifact_collisions_preserve_regular_and_hardlink_bytes",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_two_ordinary_restore_cycles_preserve_original_history_and_each_new_snapshot_fence",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_exclusive_reservation_late_auxiliary_and_native_failure_preserve_non_targets",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_sealed_source_rejects_unsigned_wal_and_preserves_standalone_legacy_lineage"
+    ],
+    "toolchain": "uv run --locked --managed-python python -B -m unittest"
+  },
+  "schema": "smial.restore-artifact-remediation",
+  "schema_version": "1.0",
+  "scope": "EXISTING_NATIVE_RESTORE_AND_CUT_ACK_OWNERS_SYNTHETIC_OFFLINE_P1_ONLY_NOT_WHOLE_GATE",
+  "source_freeze": "FROZEN_AFTER_BOTH_NATIVE_PASS_GROUPS; NO_SOURCE_WRITES_AFTER_VALIDATION",
+  "source_pins": {
+    "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+    "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+    "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "48b45dfa48a57cbce65559006b30e8a5974a0137c846e626d41a2de5de52c090",
+    "src/solana_alpha_lab/factory/trading_runner.py": "6d110b3cb314f4171a3406f134dd77cbb0237d6541020628791f698370f23b59",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
+    "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+    "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
+    "tests/test_trading_operational_recovery_v1.py": "524b2bf596df6d61d997e471b921342fb22a1bd70603f0557b9c85e596d3d0ee"
+  },
+  "status": "PASS",
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "unmeasured": {
+    "final_independent_review": "ROOT_OWNED_NOT_CLAIMED",
+    "historical_whole_binary_compatibility": "NOT_CLAIMED; NATIVE_STANDALONE_LEGACY_SQLITE_FORMAT_ONLY",
+    "real_host_provider_or_live_behavior": "UNKNOWN_NOT_MEASURED",
+    "separate_native_symlink_junction_generation": "NOT_SEPARATELY_MEASURED; EXISTING_EXACT_CHILD_ALIAS_GUARDS_REUSED"
+  },
+  "validation": {
+    "elapsed_seconds_sum_of_two_actual_runs": 47.213561,
+    "errors": 0,
+    "failures": 0,
+    "full_gate": "NOT_RUN",
+    "native_test_count": 15,
+    "neighbors_output_sha256": "682c46f093e4c34e26aa229026cb40a78abad52b956f38f45f7b583be604d71c",
+    "new_output_sha256": "b9801773326723124c39b9600a8a295446fd12eea7f7800019664bbcc63d1363",
+    "skips": 0,
+    "source_unchanged_in_and_between_runs": true,
+    "whole_outcome_and_final_four_role_review": "ROOT_OWNED_NOT_CLAIMED"
+  }
+}

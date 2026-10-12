@@ -8,7 +8,7 @@
     "unowned_resources_touched": false
   },
   "credential_reads": false,
-  "elapsed_seconds": 17.854684,
+  "elapsed_seconds": 196.088595,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "external_cut_basis": "No process or effect invoked after backup before export/restore; independent absence assertion effects []; donor CLI exports frozen bindings/controls/current state.",
   "final_state": {
@@ -25,7 +25,7 @@
   },
   "fixture_generator": {
     "path": "tests/test_trading_continuity_v1.py",
-    "purpose": "synthetic source/science environment preparation only",
+    "purpose": "synthetic source/science preparation only; E3600 source publication before due CLI run; no trading stages",
     "sha256": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f"
   },
   "grant_roster_assessment": {
@@ -118,13 +118,18 @@
     "graceful_shutdown_may_retain_recent_heartbeat_until_ttl": true,
     "grant_expiry_preclaim_vs_postclaim_boundary_documented": true,
     "malformed_origin_typed_recovery_boundary_documented": true,
+    "nonempty_wal_status_canaries_not_exercised": true,
+    "nonempty_wal_status_canary_count": 0,
     "observed_physical_clock_boundary_documented": true,
     "observed_runtime_exercised_in_operator_journey": false,
     "optional_policy_absence_is_strategy_only": true,
     "partial_corruption_probe_repeated_in_operator_journey": false,
     "partial_witness_recovery_boundary_documented": true,
     "process_alive_basis": "RECENT_HEARTBEAT_TTL_ESTIMATE",
+    "readonly_observer_closed_before_business_mutations": true,
     "ready_basis": "SOFTWARE_SNAPSHOT",
+    "repeat_restore_exercised_in_operator_journey": false,
+    "repeat_restore_snapshot_event_boundary_documented": true,
     "runbook_boundary_verified": true
   },
   "identities": {
@@ -151,7 +156,7 @@
       "SIGDEC-49A9CF1A18E9BC5241317E274C7C0F34D2613AE7CD68AA524D87FAEDB3A5C809"
     ],
     "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
-    "backup_database_sha256": "6fcc8af481873f8446b597c89c5618427a3d4ab52f8756edc2c47ee634a9826d",
+    "backup_database_sha256": "b9ca4f2609430e66afe21373e394b6488012c544469af309d4579492b1853d71",
     "bot_instance_id": "BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
     "inventory_sha256_before_ack": "33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746",
     "position_ids": [
@@ -159,15 +164,15 @@
     ],
     "source_episode_id": "EP-705da8cd8881c5f381f5d4e9a6b6ee37",
     "strategy_id": "STRAT-CONTINUITY-SYNTH-001-C22-FROZEN",
-    "strategy_sha256": "7df9a00751b91015d9fc0d22d853e2c52c64a3d7361aa724ea204efc4a352c49"
+    "strategy_sha256": "e8df0344318a38b53ca8773ba6812beb9684c430b0bad5a61fb15db5fa988e03"
   },
-  "independence": "ISOLATED_OPERATOR_WITH_EXACT_CONTRACT_DIFF_RUNBOOK",
+  "independence": "ISOLATED_FRESH_OPERATOR_RUNBOOK_AND_PRIOR_RECEIPT_DECLARED_FIXTURE_ONLY",
   "journey_status": "PASS",
   "live_authority": false,
   "manual_binding_construction": false,
   "manual_token_json": false,
   "network_calls": false,
-  "observed_at_utc": "2026-10-12T05:41:41.139299Z",
+  "observed_at_utc": "2026-10-12T09:19:55.803350Z",
   "provider_calls": false,
   "readonly_canary_contract": "Exact DB/nonempty WAL bytes; only ABSENT/zero-byte WAL and SHM read-lock auxiliary coordination allowed",
   "readonly_status_canaries_verified": true,
@@ -192,11 +197,11 @@
       "post_backup_configuration_change_exercised": false,
       "readonly_business_bytes_unchanged": true,
       "readonly_canary_after": {
-        "paper_plane.sqlite": "c167c8b92da47347ff8b29089da3fac2e49a1b3fb208a397bfa06868d3b9191a",
+        "paper_plane.sqlite": "7a661579e213e921c86d400d0797187c1b0a52d265812f335967c80444b6ad57",
         "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       "readonly_canary_before": {
-        "paper_plane.sqlite": "c167c8b92da47347ff8b29089da3fac2e49a1b3fb208a397bfa06868d3b9191a",
+        "paper_plane.sqlite": "7a661579e213e921c86d400d0797187c1b0a52d265812f335967c80444b6ad57",
         "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       "runtime_policy_configuration_state": "NOT_CONFIGURED_STRATEGY_ONLY"
@@ -269,33 +274,34 @@
   "schema_version": "1.0",
   "semantic_navigation": {
     "authority_granted": false,
-    "catalog_integrity_sha256": "389be0b2c3f0e247e766b4fe14c0734a95c3a2682a0e9678773e44da3ca94a9a",
+    "catalog_integrity_sha256": "3a8372dca0183518246819ee493ffbc385b8b3303d95122d605eb0b3dbe1b050",
     "catalog_record_status": "IMPLEMENTED_UNVERIFIED",
     "catalog_status_is_not_product_acceptance": true,
-    "elapsed_seconds": 21.40002,
+    "elapsed_seconds": 5.105824,
     "gaps": [],
     "network_required": false,
-    "observed_at_utc": "2026-10-12T05:47:10.388811Z",
+    "observed_at_utc": "2026-10-12T09:26:37.297220Z",
     "operator_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001",
     "operator_asset_ids": [
       "DOC-TRADING-CONTINUITY-OFFLINE-001"
     ],
+    "prior_readback_is_historical": false,
     "read_only": true,
     "readback_anchors": {
-      "catalog/assets/core.yaml": "4bb52efe1d3d73fc03e15f86298dcc0e5c2d63c36fa9e3e1fb5a9293987daec4",
+      "catalog/assets/core.yaml": "2151bb194d7a24d8a69df8ae5851e08256a94d26b44f81a152e477546412731a",
       "configs/factory_semantic_operability_v1.yaml": "8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83",
       "docs/FACTORY_SEMANTIC_MAP.md": "2fbf4e7edce8c53b83ccec0f837ff49eef706d72448b9fe89ea8e4ab11ae35a6",
-      "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "389be0b2c3f0e247e766b4fe14c0734a95c3a2682a0e9678773e44da3ca94a9a",
-      "docs/reports/smial_trading_core_operational_closure_v1/REPORT.md": "5d45973f185c151696251c384abcde715939072371593ceec51ec30219ecb53a"
+      "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "3a8372dca0183518246819ee493ffbc385b8b3303d95122d605eb0b3dbe1b050",
+      "docs/reports/smial_trading_core_operational_closure_v1/REPORT.md": "e4637443ce45632052e14843d99aab979ea5a34cc39828ccb64cc960775f242f"
     },
     "readback_execution": "LOCKED_MANAGED_PYTHON_NATIVE_CLI_SUBPROCESSES",
     "repository_path": "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md",
     "resolve_asset_command": "uv run --locked --managed-python python -B scripts/catalog_cli.py resolve-asset DOC-TRADING-CONTINUITY-OFFLINE-001 --json",
-    "resolve_asset_elapsed_seconds": 21.246936,
+    "resolve_asset_elapsed_seconds": 5.081619,
     "resolve_asset_exit_code": 0,
-    "resolve_asset_output_sha256": "adae6eafffe0be67a568b3c9433198f267a6a5520061016406b77abfaa6b9bef",
+    "resolve_asset_output_sha256": "0368812419d8bd3447284b79964bbfa7a0086fc0202839e9306d9dc22b94bbf3",
     "resolve_route_command": "uv run --locked --managed-python python -B scripts/catalog_cli.py resolve-route SEM-OWNER-LIFECYCLE --json",
-    "resolve_route_elapsed_seconds": 21.394979,
+    "resolve_route_elapsed_seconds": 5.101979,
     "resolve_route_exit_code": 0,
     "resolve_route_output_sha256": "fa40c40ea3e6b85e5ccc29acbf75e293d74d8431a36b261788a7c28ab6f2fd7a",
     "route_id": "SEM-OWNER-LIFECYCLE",
@@ -310,7 +316,7 @@
   "source_line_endings": "LF",
   "source_pins": {
     "configs/factory_semantic_operability_v1.yaml": "8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83",
-    "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "389be0b2c3f0e247e766b4fe14c0734a95c3a2682a0e9678773e44da3ca94a9a",
+    "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "3a8372dca0183518246819ee493ffbc385b8b3303d95122d605eb0b3dbe1b050",
     "scripts/trading_continuity.py": "9694d0b589b0fd560e250324bd7cef07c547ec8b6e8c137d471f028a6083538b",
     "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
     "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
@@ -318,12 +324,12 @@
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
     "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
     "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "3df6051d8eac666b6f8e63bc32d6df26cffc786d7a8bb0dec67014001079f915",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "48b45dfa48a57cbce65559006b30e8a5974a0137c846e626d41a2de5de52c090",
     "src/solana_alpha_lab/factory/trading_runner.py": "6d110b3cb314f4171a3406f134dd77cbb0237d6541020628791f698370f23b59",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
     "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
     "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
-    "tests/test_trading_operational_recovery_v1.py": "90d60cb77cfc31d74d0ae26a16f831a5a9fb40d64a88e2de015777e5b86ee3fe"
+    "tests/test_trading_operational_recovery_v1.py": "524b2bf596df6d61d997e471b921342fb22a1bd70603f0557b9c85e596d3d0ee"
   },
   "source_pins_unchanged": true,
   "steps": [
@@ -342,7 +348,7 @@
       "runtime_scope": "DONOR",
       "sequence": 1,
       "status": "PROFILE_VERIFIED",
-      "stdout_sha256": "2f43e6a183c077d7dd6701fb05de6757b89ee0b5f8b6cf1577446300b61a908a"
+      "stdout_sha256": "97e8f70841a95630971f14f0fcb3e4c0aa02e70ca9bbcd68733e21eea199a094"
     },
     {
       "arguments": {
@@ -360,9 +366,9 @@
       "mode": "PAPER",
       "runtime_scope": "DONOR",
       "sequence": 2,
-      "stdout_sha256": "2054decc1eb259e9a90acd5b3e458176f402686194e8662f050176c79456dd2c",
+      "stdout_sha256": "f0b4aff9b3b5a504d19f77f14245e79f2686c058ba07aa22e6df2ca31f683806",
       "strategy_id": "STRAT-CONTINUITY-SYNTH-001-C22-FROZEN",
-      "strategy_sha256": "7df9a00751b91015d9fc0d22d853e2c52c64a3d7361aa724ea204efc4a352c49"
+      "strategy_sha256": "e8df0344318a38b53ca8773ba6812beb9684c430b0bad5a61fb15db5fa988e03"
     },
     {
       "activation_created": false,
@@ -377,7 +383,7 @@
       "runtime_scope": "DONOR",
       "sequence": 3,
       "status": "GRACEFUL_SHUTDOWN",
-      "stdout_sha256": "762edb18cb87b479e098a9fe076d27b1a0666892ba586fd3b1dcab6246bbafbb"
+      "stdout_sha256": "fc7744ea5035aa4d94cc7d4c819ac39cb1fded82d08388749d8429fbcea3b05f"
     },
     {
       "arguments": {
@@ -412,16 +418,19 @@
       "progress_moving": true,
       "readonly_store_canary": {
         "after": {
-          "paper_plane.sqlite": "73e4a758c2a7c0bce6d99be75debf823694a5161c2c2f21d00d2cb717a5b813e",
+          "paper_plane.sqlite": "8e8ae155c8e86e4387f0dc6d1bec8855e9c86e12b0c6997f4e3237e887828c19",
           "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
-        "allowed_empty_wal_coordination": true,
+        "allowed_empty_wal_coordination": false,
         "before": {
-          "paper_plane.sqlite": "73e4a758c2a7c0bce6d99be75debf823694a5161c2c2f21d00d2cb717a5b813e",
-          "paper_plane.sqlite-wal": "ABSENT"
+          "paper_plane.sqlite": "8e8ae155c8e86e4387f0dc6d1bec8855e9c86e12b0c6997f4e3237e887828c19",
+          "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         "business_bytes_unchanged": true,
-        "physical_state_unchanged": false
+        "nonempty_committed_wal_verified": false,
+        "nonempty_wal_bytes_after": 0,
+        "nonempty_wal_bytes_before": 0,
+        "physical_state_unchanged": true
       },
       "restore_guard": false,
       "runtime_policy_revision": null,
@@ -433,7 +442,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "READY",
-      "stdout_sha256": "12962bb59ab6741de4f03cee0bf5a2724ccad0a340d5c17e15da5fc982cf439a"
+      "stdout_sha256": "33ac2a7b5804bfd8531a40a3d02fdfc101e8f7b49518bbb45a3defd5da5af21b"
     },
     {
       "arguments": {
@@ -448,7 +457,7 @@
       "runtime_scope": "DONOR",
       "sequence": 5,
       "status": "APPLIED",
-      "stdout_sha256": "702db47e4a0febc689ea4f12faa365fdaea9909ef52d6af5bbcae82a3baee0bd"
+      "stdout_sha256": "73682160572c61fcf40882f1f9b60b00b3c98f08a68261ed3f912736bf884de5"
     },
     {
       "arguments": {
@@ -458,38 +467,41 @@
       "command": "status",
       "exit_code": 0,
       "expected_exit_code": 0,
-      "human": "PAPER · READY · epoch ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN\nНа 2026-10-05T12:40:00Z · последний tick: 2026-10-05T12:40:00Z\nПроцесс: True · источник: SOURCE_FRESH (2026-10-05T12:35:01Z) · прогресс: True\nКонфигурация: VALID · входы исполнения: PAPER_NATIVE_PREFIX\nПолитика входов: NOT_CONFIGURED_STRATEGY_ONLY · revision: NONE · SHA256: 0000000000000000000000000000000000000000000000000000000000000000\nОбязательства: 1 · стоимость: 30.0 USD · pending attempts: 0\nЦелостность: True · restore fence: False · earliest overdue: NONE\nInventory SHA256: 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746\nBot BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN · RUNNING · entries paused: True\nPosition POS-SIG-SIGDEC-49A9CF1A18E9BC5241317E274C7C0F34D2613AE7CD68AA524D87FAEDB3A5C809 · OPEN · remaining: 10000000.00000000\nДалее: CLI status --mode PAPER --format human (с теми же repository/data/scope flags)",
+      "human": "PAPER · READY · epoch ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN\r\nНа 2026-10-05T12:40:00Z · последний tick: 2026-10-05T12:40:00Z\r\nПроцесс: True · источник: SOURCE_FRESH (2026-10-05T12:35:01Z) · прогресс: True\r\nКонфигурация: VALID · входы исполнения: PAPER_NATIVE_PREFIX\r\nПолитика входов: NOT_CONFIGURED_STRATEGY_ONLY · revision: NONE · SHA256: 0000000000000000000000000000000000000000000000000000000000000000\r\nОбязательства: 1 · стоимость: 30.0 USD · pending attempts: 0\r\nЦелостность: True · restore fence: False · earliest overdue: NONE\r\nInventory SHA256: 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746\r\nBot BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN · RUNNING · entries paused: True\r\nPosition POS-SIG-SIGDEC-49A9CF1A18E9BC5241317E274C7C0F34D2613AE7CD68AA524D87FAEDB3A5C809 · OPEN · remaining: 10000000.00000000\r\nДалее: CLI status --mode PAPER --format human (с теми же repository/data/scope flags)",
       "mode": "PAPER",
       "readonly_store_canary": {
         "after": {
-          "paper_plane.sqlite": "bf08bab4303f81ec95991ce955e17911649113b1c26048e509cfd50d47baa427",
+          "paper_plane.sqlite": "c3e40e34323f65319d96f5ea481d971bedfdd6c737c7b441540fce5499a5ec55",
           "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
-        "allowed_empty_wal_coordination": true,
+        "allowed_empty_wal_coordination": false,
         "before": {
-          "paper_plane.sqlite": "bf08bab4303f81ec95991ce955e17911649113b1c26048e509cfd50d47baa427",
-          "paper_plane.sqlite-wal": "ABSENT"
+          "paper_plane.sqlite": "c3e40e34323f65319d96f5ea481d971bedfdd6c737c7b441540fce5499a5ec55",
+          "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         "business_bytes_unchanged": true,
-        "physical_state_unchanged": false
+        "nonempty_committed_wal_verified": false,
+        "nonempty_wal_bytes_after": 0,
+        "nonempty_wal_bytes_before": 0,
+        "physical_state_unchanged": true
       },
       "runtime_scope": "DONOR",
       "sequence": 6,
       "status": "HUMAN_STATUS_RENDERED",
-      "stdout_sha256": "8d7f883573320ad966d0aba58a83920824013685b6b3b8eab3814dbeed39ad89"
+      "stdout_sha256": "b7cc125445eeeee64535f6d8b8e7d2a6bfa29fec7e25f5214542433395171c65"
     },
     {
       "arguments": {
         "destination": "backups/c22.sqlite"
       },
       "command": "backup",
-      "database_sha256": "6fcc8af481873f8446b597c89c5618427a3d4ab52f8756edc2c47ee634a9826d",
+      "database_sha256": "b9ca4f2609430e66afe21373e394b6488012c544469af309d4579492b1853d71",
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
       "runtime_scope": "DONOR",
       "sequence": 7,
-      "stdout_sha256": "20edb358974c14626954934b65b8b65c44b9e4ffe1c971653aefb0383d63dc22"
+      "stdout_sha256": "18cd9f78cb0e63b0796e2f2019ba0780c821cae1c3992f1084bf1a9ef6ea0088"
     },
     {
       "arguments": {
@@ -508,7 +520,7 @@
       "send_permitted": false,
       "sequence": 8,
       "status": "RECOVERY_CUT_EXPORTED",
-      "stdout_sha256": "4ce13fddcae36c16b843a3684d1b79a1ca791597830eeff35932c37e2e4e5bfc"
+      "stdout_sha256": "d2bc4d2fd06c71379b0584f674fb46ed855454584e9f23820b3c8558087fe76a"
     },
     {
       "activation_created": false,
@@ -520,7 +532,7 @@
       "runtime_scope": "RESTORED",
       "sequence": 9,
       "status": "INITIALIZED",
-      "stdout_sha256": "4eb829004ad337eac5c7f6bff930c9c6d954bc8dbd6ecf79e3a40512b72b421d"
+      "stdout_sha256": "a82ca841d058dba97ca85529313af09e663fd5e514a2662a1d885d6e93f6949a"
     },
     {
       "arguments": {
@@ -533,7 +545,7 @@
       "runtime_scope": "RESTORED",
       "sequence": 10,
       "status": "RESTORED_RECONCILIATION_REQUIRED",
-      "stdout_sha256": "b8a9d37594fe1a3c16f0aef1395a4efa29df4d5e9c7f3b9d21874b371cb4892f"
+      "stdout_sha256": "63dfcf31305726f0723cfff814de5edb456af323d4ab4fd52d8ebeffa66d0ade"
     },
     {
       "arguments": {
@@ -541,14 +553,14 @@
         "input": "external-cut-input.json"
       },
       "command": "seal-cut",
-      "cut_sha256": "90df5db4105c324ae329e4f89e8b27348064f720e0f76224e595ce241e5b31ba",
+      "cut_sha256": "31c7cc15a1223ce160b3e5bb405bbc7badf2e4b131834f34f60a87e947b8d7fc",
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
       "runtime_scope": "RESTORED",
       "sequence": 11,
       "status": "CUT_VERIFIED_AND_SEALED",
-      "stdout_sha256": "bb30429f6554e5750dc06cb3ad82784b9085385bef458b2d505353d44425685e"
+      "stdout_sha256": "bf7f948d388c5a6d21aa2202e06e4697df78337b6c42832042580440131cdab3"
     },
     {
       "arguments": {
@@ -563,7 +575,7 @@
       "send_permitted": false,
       "sequence": 12,
       "status": "EXTERNAL_CUT_RECONCILED",
-      "stdout_sha256": "3cf55da1e820f70c93c0cb66aaa5bfaaf38d8324b234ad55bd323925385f0a0e"
+      "stdout_sha256": "9429da0319ae2c28b0c0635d020e80afe7a0f740bb53a539190b73bcd68bded3"
     },
     {
       "arguments": {
@@ -598,16 +610,19 @@
       "progress_moving": true,
       "readonly_store_canary": {
         "after": {
-          "paper_plane.sqlite": "3674edf2638bdbfd3836a64eac15c26677b217c66439f7e971600d0c67c6b136",
+          "paper_plane.sqlite": "b7f8f83c732bac408355c1fe73165d9f2c0b041c2aed4eb3239690c586c074b7",
           "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
-        "allowed_empty_wal_coordination": true,
+        "allowed_empty_wal_coordination": false,
         "before": {
-          "paper_plane.sqlite": "3674edf2638bdbfd3836a64eac15c26677b217c66439f7e971600d0c67c6b136",
-          "paper_plane.sqlite-wal": "ABSENT"
+          "paper_plane.sqlite": "b7f8f83c732bac408355c1fe73165d9f2c0b041c2aed4eb3239690c586c074b7",
+          "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         "business_bytes_unchanged": true,
-        "physical_state_unchanged": false
+        "nonempty_committed_wal_verified": false,
+        "nonempty_wal_bytes_after": 0,
+        "nonempty_wal_bytes_before": 0,
+        "physical_state_unchanged": true
       },
       "restore_guard": true,
       "runtime_policy_revision": null,
@@ -619,7 +634,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "ACTION_REQUIRED",
-      "stdout_sha256": "28afe7379f6bd2c48d3cfd04aa4d9c33e638bdaf76526e361d63f2fa11e3fdef"
+      "stdout_sha256": "d678c19c40a857eb3e4b77b04cce19c04db59a66a7b4681e3a1cad61676543dd"
     },
     {
       "arguments": {
@@ -629,25 +644,28 @@
       "command": "status",
       "exit_code": 0,
       "expected_exit_code": 0,
-      "human": "PAPER · ACTION_REQUIRED · epoch ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN\nНа 2026-10-05T12:40:00Z · последний tick: 2026-10-05T12:40:00Z\nПроцесс: True · источник: SOURCE_FRESH (2026-10-05T12:35:01Z) · прогресс: True\nКонфигурация: VALID · входы исполнения: PAPER_NATIVE_PREFIX\nПолитика входов: NOT_CONFIGURED_STRATEGY_ONLY · revision: NONE · SHA256: 0000000000000000000000000000000000000000000000000000000000000000\nОбязательства: 1 · стоимость: 30.0 USD · pending attempts: 0\nЦелостность: True · restore fence: True · earliest overdue: NONE\nInventory SHA256: 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746\nBot BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN · RUNNING · entries paused: True\nPosition POS-SIG-SIGDEC-49A9CF1A18E9BC5241317E274C7C0F34D2613AE7CD68AA524D87FAEDB3A5C809 · OPEN · remaining: 10000000.00000000\nДалее: CLI ack-restore --mode PAPER --input complete-external-cut.json --inventory-sha256 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746 --as-of 2026-10-05T12:40:00Z (с теми же repository/data/scope flags)",
+      "human": "PAPER · ACTION_REQUIRED · epoch ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN\r\nНа 2026-10-05T12:40:00Z · последний tick: 2026-10-05T12:40:00Z\r\nПроцесс: True · источник: SOURCE_FRESH (2026-10-05T12:35:01Z) · прогресс: True\r\nКонфигурация: VALID · входы исполнения: PAPER_NATIVE_PREFIX\r\nПолитика входов: NOT_CONFIGURED_STRATEGY_ONLY · revision: NONE · SHA256: 0000000000000000000000000000000000000000000000000000000000000000\r\nОбязательства: 1 · стоимость: 30.0 USD · pending attempts: 0\r\nЦелостность: True · restore fence: True · earliest overdue: NONE\r\nInventory SHA256: 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746\r\nBot BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN · RUNNING · entries paused: True\r\nPosition POS-SIG-SIGDEC-49A9CF1A18E9BC5241317E274C7C0F34D2613AE7CD68AA524D87FAEDB3A5C809 · OPEN · remaining: 10000000.00000000\r\nДалее: CLI ack-restore --mode PAPER --input complete-external-cut.json --inventory-sha256 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746 --as-of 2026-10-05T12:40:00Z (с теми же repository/data/scope flags)",
       "mode": "PAPER",
       "readonly_store_canary": {
         "after": {
-          "paper_plane.sqlite": "3674edf2638bdbfd3836a64eac15c26677b217c66439f7e971600d0c67c6b136",
+          "paper_plane.sqlite": "b7f8f83c732bac408355c1fe73165d9f2c0b041c2aed4eb3239690c586c074b7",
           "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         "allowed_empty_wal_coordination": false,
         "before": {
-          "paper_plane.sqlite": "3674edf2638bdbfd3836a64eac15c26677b217c66439f7e971600d0c67c6b136",
+          "paper_plane.sqlite": "b7f8f83c732bac408355c1fe73165d9f2c0b041c2aed4eb3239690c586c074b7",
           "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         "business_bytes_unchanged": true,
+        "nonempty_committed_wal_verified": false,
+        "nonempty_wal_bytes_after": 0,
+        "nonempty_wal_bytes_before": 0,
         "physical_state_unchanged": true
       },
       "runtime_scope": "RESTORED",
       "sequence": 14,
       "status": "HUMAN_STATUS_RENDERED",
-      "stdout_sha256": "db3d46a8bd8ae15c91dadfbfd1e5c5c528493c7a567af86fd54f8821e2079659"
+      "stdout_sha256": "4b5a02bfe1fa485bc683fca521016fb7c1dec050239f54bdd31981d328707c40"
     },
     {
       "arguments": {
@@ -662,7 +680,7 @@
       "runtime_scope": "RESTORED",
       "sequence": 15,
       "status": "RESTORE_RECONCILED",
-      "stdout_sha256": "230b459fbe556d2b44a4d98e34774e859bd4c4ef29808800b9e573604de2aeff"
+      "stdout_sha256": "679c582bc6a0a2423d4d8162f72959415b91194e499694a3793f37079ed5c6fe"
     },
     {
       "arguments": {
@@ -697,16 +715,19 @@
       "progress_moving": true,
       "readonly_store_canary": {
         "after": {
-          "paper_plane.sqlite": "86e291a466d9f2f9c8878a90c40602028b5943aa045b89d7f87214cfad28453c",
+          "paper_plane.sqlite": "158b126056cf5b2fbd6c32dbdcbdc9aa1764fc0a8ba551663e4917d3712dd550",
           "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
-        "allowed_empty_wal_coordination": true,
+        "allowed_empty_wal_coordination": false,
         "before": {
-          "paper_plane.sqlite": "86e291a466d9f2f9c8878a90c40602028b5943aa045b89d7f87214cfad28453c",
-          "paper_plane.sqlite-wal": "ABSENT"
+          "paper_plane.sqlite": "158b126056cf5b2fbd6c32dbdcbdc9aa1764fc0a8ba551663e4917d3712dd550",
+          "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         "business_bytes_unchanged": true,
-        "physical_state_unchanged": false
+        "nonempty_committed_wal_verified": false,
+        "nonempty_wal_bytes_after": 0,
+        "nonempty_wal_bytes_before": 0,
+        "physical_state_unchanged": true
       },
       "restore_guard": false,
       "runtime_policy_revision": null,
@@ -718,7 +739,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "READY",
-      "stdout_sha256": "2e057bc28711bd12bf6f58a0a558b58430045c6b7c5e65279f85607e566fd034"
+      "stdout_sha256": "9dfb7894fb6e8056492a33f9a7116825bf4cfab2d3c3ac510b4e9c0e8338590c"
     },
     {
       "arguments": {
@@ -733,7 +754,7 @@
       "runtime_scope": "RESTORED",
       "sequence": 17,
       "status": "APPLIED",
-      "stdout_sha256": "2b50d5dbcbfb64997745dbc171ae41820f5c90b9bb8b9129b3aa5e5389d0e2d5"
+      "stdout_sha256": "234b5b95be4c9eb68ed6bd3bdbe35a3724f0cd20a201a9b023ea4d8cb269866f"
     },
     {
       "activation_created": false,
@@ -748,7 +769,7 @@
       "runtime_scope": "RESTORED",
       "sequence": 18,
       "status": "GRACEFUL_SHUTDOWN",
-      "stdout_sha256": "762edb18cb87b479e098a9fe076d27b1a0666892ba586fd3b1dcab6246bbafbb"
+      "stdout_sha256": "fc7744ea5035aa4d94cc7d4c819ac39cb1fded82d08388749d8429fbcea3b05f"
     },
     {
       "arguments": {},
@@ -760,7 +781,7 @@
       "runtime_scope": "RESTORED",
       "sequence": 19,
       "status": "RUNNING",
-      "stdout_sha256": "086e591e4751417370eac12a9c9c5b946334f875147a8da8ddf68857abd1192f"
+      "stdout_sha256": "f9bc69057192c6250299632a9158615c2335fe757039b66291e41f116c653760"
     },
     {
       "arguments": {
@@ -772,13 +793,13 @@
       "command": "check",
       "exit_code": 2,
       "expected_exit_code": 2,
-      "human": "Действие заблокировано · EXECUTION_QUOTE_INPUT_NOT_PRESENT\nДалее: Подготовь указанный в quote profile файл funding observation внутри source.root и повтори check.",
+      "human": "Действие заблокировано · EXECUTION_QUOTE_INPUT_NOT_PRESENT\r\nДалее: Подготовь указанный в quote profile файл funding observation внутри source.root и повтори check.",
       "mode": "SHADOW",
       "reason_code": "EXECUTION_QUOTE_INPUT_NOT_PRESENT",
       "runtime_scope": "DONOR",
       "sequence": 20,
       "status": "BLOCKED",
-      "stdout_sha256": "20e17a8ce15f4f2b815f2446db340157ba369499353ea83dac8cd9a37f210c00"
+      "stdout_sha256": "a771b928fd285401848dffb9169bacfcc98ffbe5bf8d5bc74fc2f6394e113142"
     },
     {
       "activation_created": false,
@@ -796,7 +817,7 @@
       "runtime_scope": "DONOR",
       "sequence": 21,
       "status": "PROFILE_VERIFIED",
-      "stdout_sha256": "d20a84ca886f776bb0042fd148b860af336e59aa93010686de59590c19d7958f"
+      "stdout_sha256": "6981a3a78ddcf90c8fd121045b6639af0903384a1ac20c7621cefa3978457e40"
     },
     {
       "arguments": {
@@ -808,13 +829,13 @@
       "command": "check",
       "exit_code": 2,
       "expected_exit_code": 2,
-      "human": "Действие заблокировано · EXECUTION_OBSERVATION_STALE_OR_FUTURE\nДалее: Обнови своевременное наблюдение в exact source; затем повтори check. UNKNOWN не освобождает обязательства.",
+      "human": "Действие заблокировано · EXECUTION_OBSERVATION_STALE_OR_FUTURE\r\nДалее: Обнови своевременное наблюдение в exact source; затем повтори check. UNKNOWN не освобождает обязательства.",
       "mode": "SHADOW",
       "reason_code": "EXECUTION_OBSERVATION_STALE_OR_FUTURE",
       "runtime_scope": "DONOR",
       "sequence": 22,
       "status": "BLOCKED",
-      "stdout_sha256": "dff7ca0de5239f6927e2e30a59f2358478d3881cd813a1d140b4c689b78201bc"
+      "stdout_sha256": "12bf81e68d540c1b70ba01df3129274514a96bd7e9e8aeba338fff6fa167f8da"
     },
     {
       "arguments": {
@@ -826,13 +847,13 @@
       "command": "check",
       "exit_code": 2,
       "expected_exit_code": 2,
-      "human": "Действие заблокировано · CONFIGURATION_REQUIRED\nДалее: Укажи явно разрешённые max_outstanding_positions и max_outstanding_cost_basis_usd в envelope профиля; затем повтори check.",
+      "human": "Действие заблокировано · CONFIGURATION_REQUIRED\r\nДалее: Укажи явно разрешённые max_outstanding_positions и max_outstanding_cost_basis_usd в envelope профиля; затем повтори check.",
       "mode": "PAPER",
       "reason_code": "CONFIGURATION_REQUIRED",
       "runtime_scope": "DONOR",
       "sequence": 23,
       "status": "BLOCKED",
-      "stdout_sha256": "69e2a469a9898d49eb9d884becb62f2cc11432cfe0aa48b79ad117cdb6ef332b"
+      "stdout_sha256": "dd117c98ec1e500d52f8b1964157a0efe37d018d55840fdefd8679e5c481ef67"
     }
   ],
   "superseded_operator_oracle": {

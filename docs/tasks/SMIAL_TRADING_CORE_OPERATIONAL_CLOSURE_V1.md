@@ -167,3 +167,25 @@ quarantine the exact affected obligation without resend or fabricated closure.
 No new schema, state owner, dependency, product decision or external authority.
 Preserve native before/after and actual role verdicts; require fresh whole
 outcome, cold operator and all four isolated exact-inventory reviews.
+
+Frozen 08c5ae1e CODE review reproduced a P1 restore destination collision:
+preexisting regular -journal/-wal/-shm were deleted by native SQLite while
+restore returned success. Actual GOAL and ARCH PASS remain scoped historical
+verdicts; OWNER review was not performed on the blocked inventory. Reuse the
+native restore owner with complete fresh destination-family guards, exclusive
+publication and private preparation of the original fence/pause/snapshot event.
+Preserve native before/after and rerun whole outcome plus four frozen roles.
+Further critic output is restricted to P0/P1 by the owner's explicit steering;
+the required role set, exact-head gate and separate merge phrase stay binding.
+The bounded native repair falsifier also proved an unhashed WAL overlay could
+change the restored envelope $30 to $90 while the sealed main DB hash matched,
+for both historical WAL-format and fresh DELETE-format carriers. Preserve this
+actual P1 before evidence; require a standalone source and hash-verified private
+input copy before native restore, without deleting source artifacts or using
+immutable readers for current runtime truth.
+An interim repair native two-cycle backup/restore/reconcile/ACK falsifier then
+hit the fixed RESTORE-SNAPSHOT event ID; its actual interim source pins are
+preserved separately rather than attributed to frozen 08c5ae1e. Append a new
+snapshot-bound event through the same owner, retain every original event/body/
+clock, and bind cut/reconcile/ACK to the current restore. Prove the second ACK
+and originating due EXIT before fresh whole-outcome evidence.
