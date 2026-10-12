@@ -51,15 +51,21 @@ Original attached MD byte-for-byte находится в source-contract.md; е�
 | REMEDIATION_COUNTEREXAMPLE | Отмена до попытки удерживала лимит; противоречивый sold/remnant освобождал его | Natural unattempted cancel освобождается; result количества сверяются с original attempt |
 | OWNER_UX_COUNTEREXAMPLE | CLI check принимал missing/invalid D2 envelope limits | Shared owner validation до activation, пять native readonly cases |
 | OWNER_UX_COUNTEREXAMPLE | После reconcile action ещё предлагал reconcile при верной ACK-команде | Readback использует один phase predicate для action/command; native restore и cold CLI повторены |
+| REVIEW_LEGACY_COUNTEREXAMPLE | Legacy recipe/provenance менялись; saved baseline packet конфликтовал, native reservation count 1→2 | Operational поля только при явном runtime_execution; absent/null сохраняют прежний packet, одну позицию и неизменённый journal |
 
 Baseline failures для новых capabilities не выдуманы. Reviewer before traces
 относятся к changing implementation bytes; они не приписываются base #396.
 Окончательное причинное доказательство дают native regression after traces.
 История промежуточных неуспешных прогонов сохранена отдельно от final receipt.
+Legacy regression исполняет exact Git blob baseline producer и сохраняет его
+packet через current native source/store owners. Это проверка прежнего packet
+и upgrade replay; весь старый binary/store version этим тестом не исполняется.
+У компактных historical interim receipts прежний receipt SHA сохранён только
+как original run reference; selfhash текущего компактного документа не заявлен.
 
 ## C01–C24
 
-Native automated status: PASS, 122 tests, 400.829198s; source bytes до/после
+Native automated status: PASS, 123 tests, 428.041017s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -81,7 +87,7 @@ test_trading_operational_recovery_v1; engines: continuity/obligations/adapters.
 | C03 | Mixed/list-only shared owners; missing/late price, deadline−ε/deadline/stale; future point не лечит историю |
 | C04 | Equal clocks, late insert, pagination/restart/publication; exact source/mint sets и 14/14 timely stream |
 | C05 | #396 A–D durable refusal/cancellation vs native/typed/unexpected rollback; actual process loss |
-| C06 | Fresh invocation без новой epoch; stable IDs, exact replay, conflict без content overwrite |
+| C06 | Fresh invocation без новой epoch; stable IDs, exact replay; native frozen-base legacy packet повторяется без новой позиции/journal |
 | C07 | Positive different-science A/B с открытой A; invalid B сохраняет A; concurrent SQLite CAS один winner |
 | C08 | A остаётся в mode envelope после switch; B без auto-shrink; UNKNOWN frees nothing; separate modes |
 | C09 | Pause между reservation/send; real writer wait TTL; STOP/DRAIN restore dominance; old EXIT/reconcile |
@@ -141,28 +147,28 @@ real strategy promotion не установлены. Там, где NOT_IMPLEMEN
 
 ## Resources, rollback, delivery
 
-Peak suite process RSS: 146284544 bytes (139.51 MiB). Native 14-day producer
+Peak suite process RSS: 146526208 bytes (139.74 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.2023–0.2407s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.1990–0.3198s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04781–0.05306 |
-| 1000 | 364544 | 0.04797–0.11176 |
-| 4000 | 843776 | 0.04883–0.05454 |
+| 0 | 204800 | 0.04699–0.06603 |
+| 1000 | 364544 | 0.04617–0.07581 |
+| 4000 | 843776 | 0.04624–0.05240 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 630 | 0.000284 |
-| 100 proved terminal | 78070 | 0.015571 |
-| 1000 proved terminal | 774200 | 0.156420 |
-| 1000 terminal + 12000 unrelated events | 774200 | 0.166564 |
+| 1 outstanding | 630 | 0.000413 |
+| 100 proved terminal | 78070 | 0.015268 |
+| 1000 proved terminal | 774200 | 0.169762 |
+| 1000 terminal + 12000 unrelated events | 774200 | 0.159045 |
 
-Native history preparation: 13.441s.
+Native history preparation: 13.527s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.

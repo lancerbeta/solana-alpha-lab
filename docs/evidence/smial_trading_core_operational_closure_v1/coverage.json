@@ -28,8 +28,8 @@
       ],
       "executed_test_ids": [
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_C02_C03_C05_C06_native_loop_full_money_oracle",
-        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer",
-        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_check_rejects_missing_or_invalid_operating_limits_readonly"
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_check_rejects_missing_or_invalid_operating_limits_readonly",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer"
       ],
       "status": "PASS"
     },
@@ -80,6 +80,7 @@
       "executed_test_ids": [
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_C02_C03_C05_C06_native_loop_full_money_oracle",
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_C15_real_loss_after_admission",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C06_C19_frozen_base_episode_replay_preserves_identity_and_payload",
         "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_0_result_event_payload_and_replay_remain_exact"
       ],
       "status": "PASS"
@@ -184,10 +185,10 @@
       "additional_evidence": [],
       "executed_test_ids": [
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C15_C16_pause_during_live_lock_survives_restart",
-        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_virtual_two_weeks_history_sizes_and_incident_bound",
-        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_active_successor_profile_failure_does_not_starve_predecessor_exit",
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_missing_or_corrupt_envelope_never_ready",
-        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_shadow_quote_inputs_are_current_readonly_health"
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_shadow_quote_inputs_are_current_readonly_health",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_virtual_two_weeks_history_sizes_and_incident_bound",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_active_successor_profile_failure_does_not_starve_predecessor_exit"
       ],
       "status": "PASS"
     },
@@ -218,10 +219,11 @@
     "C19": {
       "additional_evidence": [],
       "executed_test_ids": [
-        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_metadata_survives_source_deletion_for_due_exit",
-        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_C19_native_restore_before_effect_independent_ledger",
         "test_trading_continuity_v1.OrdinarySourceTests.test_version_V2_handoff_boundary_is_explicit_and_V1_exit_survives_list_removal",
-        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_0_result_event_payload_and_replay_remain_exact"
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C06_C19_frozen_base_episode_replay_preserves_identity_and_payload",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_C19_native_restore_before_effect_independent_ledger",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_0_result_event_payload_and_replay_remain_exact",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_metadata_survives_source_deletion_for_due_exit"
       ],
       "status": "PASS"
     },
@@ -285,7 +287,9 @@
     "review-terminal-release-before.json",
     "review-terminal-quantity-before.json",
     "review-preflight-before.json",
-    "review-ack-readback-before.json"
+    "review-ack-readback-before.json",
+    "review-fd9169be.json",
+    "review-legacy-identity-before.json"
   ],
   "non_claims": [
     "NO_CANONICAL_DONE_OR_OWNER_SEMANTIC_ACCEPTANCE",
@@ -295,26 +299,29 @@
   ],
   "receipt_files": {
     "canary-rename-proof.json": "e2449ad9084c695b74c50dbc1249db839f525547e4bd516024b50bad83ec056b",
-    "cleanup.json": "058a2d71ed0694c44df4b9dc39b02087e90b70df3154990f299ab2db81144f25",
-    "clock-proof.json": "1d612cfe2c6d168c0315e17d659d0000e050143fa1d4ef1f70a13e35aaf0c5ae",
-    "direct-consumer-proof.json": "f285bacd3176ee60910504f753fbe8ae669e12889ddf4276bd11f7b9ac51a46a",
+    "cleanup.json": "dc2b6cde4ca08c01bd758ea5c09b332803cc253f45a9dca59761ae43916cd7bc",
+    "clock-proof.json": "e2c6b4aeed35fda8649a0b1beaff37b3a8ea6183d0ed8b0862c0faa08aca901a",
+    "direct-consumer-proof.json": "16a6838f05c52769aea86baf745cad1e9b41e31d79f961b4b9eed56d0374277e",
     "eof-normalization-proof.json": "67794cb24f7cfa69dc63451a2ac1e8d321489e528316f65d2c12abc78ae8c232",
-    "executed-tests.json": "8d54be35878eabded8aa7d12e3fb5f97f269d8553f683b681e906cfb44d85965",
+    "executed-tests.json": "f480fb50ba39d4e82a959b589765289618a59a8089ed84f31f354e2464a94a3b",
     "interim-before-ack-readback.json": "2a9d23db087c39dc5335287ee1252f4b8afa91f96760a59f8c55aff46369140f",
     "interim-before-final-review.json": "2899d525617851033c62149e4bf0be5d4e4df389ae971a7790ec17c3169ef297",
+    "interim-before-legacy-replay.json": "8d54be35878eabded8aa7d12e3fb5f97f269d8553f683b681e906cfb44d85965",
     "interim-clock-before-final-review.json": "346a016b59d1541b18d5b4752ba4c015aa7dd24d2b692832fa049242350cf32b",
     "interim-consumers-before-final-review.json": "c8df261e81cefb63788dbfe4f6d108e5072c89e70a4650be8f4987498fc18bf1",
     "interim-operator-before-final-review.json": "b11acd8db40927d16bde857e9581317116d4952fed8f2f7e29aff8cea2515d0c",
-    "operator-proof.json": "385a5a825de0466f62382cefd4ff54a76e7b53eb30193d67f5e572230557b96a",
+    "operator-proof.json": "e203f35502434b4a8db68c4f46888ec1807f4e85110bd8d52342f9e9be6956f5",
     "review-510e6701.json": "7c5df920cab16a539ce58b5e4fc7692454b8bcd32739d57f5a5bd21695cf3f09",
     "review-ack-readback-before.json": "2874502e20049e4034baf076bbf0522d9a29d3649cf470c5ebd660527813c528",
+    "review-fd9169be.json": "08d1eb15dcc799ba1feff26e4fc53947977f8a63faab76bce3a8e3545015f57c",
+    "review-legacy-identity-before.json": "4cfc797dbb3d3a326e1286cce24e37a4e81c22c321708cbcafa3b034ff4c6163",
     "review-preflight-before.json": "71889f2a8b6dbcd8120d03795776124dbcae700236c4fef74aa31a07a633c663",
     "review-readiness-before.json": "71d3e0bb6141a324c6726c281ce71c6d06deec602f3901b49c16d3d6659bd2eb",
     "review-terminal-quantity-before.json": "9143b463e15fb0583ef19c09faa228ba998dd5ab61251d5105047fb2260f4629",
     "review-terminal-release-before.json": "cbd0d3cefd2ed43027bf0bacbc45e48a4f18f3f997031cf0bf53a3a976405b50",
     "source-contract.md": "addc05071197efb3462771b52f5699170d54061656efeda0b7f48e52bdb0f0b7"
   },
-  "receipt_sha256": "ca8780006633760a43534ffabdece36f4621887ec21addd41080d4b0da849c2e",
+  "receipt_sha256": "bcc2641e54ce16d87c28891ecc93d107e36f139cf28d6aafafcd7805a603b5e1",
   "schema": "smial.operating-closure-coverage",
   "schema_version": "1.0",
   "superseded_pre_remediation_history": [
@@ -323,6 +330,7 @@
     "interim-operator-before-final-review.json",
     "interim-clock-before-final-review.json",
     "interim-before-ack-readback.json",
+    "interim-before-legacy-replay.json",
     "eof-normalization-proof.json",
     "canary-rename-proof.json"
   ],

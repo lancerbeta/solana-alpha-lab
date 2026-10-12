@@ -34,6 +34,107 @@ class OperatingDriverTests(unittest.TestCase):
     tearDown = continuity_fixture.OrdinarySourceTests.tearDown
     prepare = continuity_fixture.OrdinarySourceTests.prepare
 
+    def test_C06_C19_frozen_base_episode_replay_preserves_identity_and_payload(self):
+        from solana_alpha_lab.factory import episode_decision
+        from solana_alpha_lab.factory.experiment_spec import validate_experiment_document
+
+        # The oracle is the exact released producer, not expectations derived
+        # from the upgraded implementation. CI retains this ancestor's object.
+        base = "ba87f8e339d5cc3aa55322801ae56e3f92369446"
+        relative = "src/solana_alpha_lab/factory/episode_decision.py"
+        frozen = subprocess.check_output(["git", "show", base + ":" + relative],
+                                         cwd=ROOT, timeout=10)
+        self.assertEqual(hashlib.sha256(frozen).hexdigest(),
+                         "e0f70efc50247fe9ccc9cde48104113ed30baa2f92d29e70e83259b03beed5a0")
+        baseline = {"__name__": "frozen_legacy_episode_decision", "__file__": str(ROOT / relative)}
+        exec(compile(frozen, "frozen-base:episode_decision.py", "exec"), baseline)
+
+        def original_producer(root, **kwargs):
+            kwargs.pop("frozen_recipe", None)
+            return baseline["produce_episode_decision"](root, **kwargs)
+
+        metrics = []
+        owned_roots = []
+        for variant in ("absent", "explicit-null", "operating"):
+            with self.subTest(runtime_execution=variant):
+                if owned_roots:
+                    self.tearDown()
+                    self.assertFalse(owned_roots[-1].exists())
+                    self.setUp()
+                owned_roots.append(self.root.parent)
+                if variant == "operating":
+                    self.start_operating()
+                    self.coordinator.tick()
+                    store = PaperPlaneStore(self.runner.store_path)
+                    try:
+                        packets = store.filtered_execution_events(event_type="SOURCE_DECISION_PRODUCED")
+                        self.assertEqual(len(packets), 1)
+                        self.assertEqual(packets[0]["payload"]["provenance"]["origin_admission"], self.admission)
+                        self.assertEqual(self.runner.recipe["executable_exit"],
+                                         {"kind": "FROZEN_TIME_EXIT", "exit_point": "E3600"})
+                        self.assertEqual(store.positions()[0]["state"], "OPEN")
+                    finally:
+                        store.close()
+                    metrics.append({"runtime_execution": variant, "origin_retained": True,
+                                    "executable_exit_retained": True})
+                    continue
+
+                dump = continuity_fixture.yaml.safe_dump
+
+                def dump_spec(document, *args, **kwargs):
+                    if (variant == "explicit-null" and isinstance(document, dict)
+                        and document.get("experiment_id") == "EXP-CONTINUITY-SYNTH-001"):
+                        document = {**document, "parameters": {**document["parameters"], "runtime_execution": None}}
+                    return dump(document, *args, **kwargs)
+
+                # Author explicit null through the ordinary fixture's spec
+                # writer before Git freeze, science, promotion and activation.
+                with patch.object(continuity_fixture.yaml, "safe_dump", dump_spec):
+                    self.prepare(operating=False)
+                document = continuity_fixture.yaml.safe_load((self.root / self.spec_rel).read_text(encoding="utf-8"))
+                validate_experiment_document(document, root=self.root)
+                if variant == "absent":
+                    self.assertNotIn("runtime_execution", document["parameters"])
+                else:
+                    self.assertIsNone(document["parameters"]["runtime_execution"])
+                original_recipe = baseline["load_bound_recipe"](
+                    self.root, strategy=self.runner.strategy, manifest=self.manifest, execution_binding=self.binding)
+                episode = {"source_relative": "source/observation_schedule_state.sqlite",
+                           "episode_id": self.admission["episode_id"], "epoch_id": self.epoch,
+                           "mode": "PAPER", "as_of": "2026-10-05T12:40:00Z"}
+                # Only the producer is the baseline implementation; native
+                # source, admission and persistence use the current owners.
+                with patch("solana_alpha_lab.factory.trading_runner.produce_episode_decision", original_producer):
+                    original = self.runner.episode(**episode)
+                store = PaperPlaneStore(self.runner.store_path)
+                try:
+                    positions_before = store.positions()
+                    journal_before = store.execution_events()
+                finally:
+                    store.close()
+                self.assertEqual(len(positions_before), 1)
+
+                self.runner = TradingContinuityRunner(self.root, data_root=self.data, strategy_relative=self.strategy_rel)
+                replay = self.runner.episode(**episode)
+                self.assertEqual(self.runner.recipe, original_recipe)
+                self.assertNotIn("executable_exit", self.runner.recipe)
+                self.assertNotIn("origin_admission", replay["provenance"])
+                for field in ("decision", "provenance", "provenance_sha256"):
+                    self.assertEqual(replay[field], original[field])
+                store = PaperPlaneStore(self.runner.store_path)
+                try:
+                    self.assertEqual(store.positions(), positions_before)
+                    self.assertEqual(store.execution_events(), journal_before)
+                    self.assertEqual(store.get_execution_event("SRC-" + original["decision"]["signal_decision_id"])["payload"],
+                                     {field: original[field] for field in ("decision", "provenance", "provenance_sha256")})
+                finally:
+                    store.close()
+                metrics.append({"runtime_execution": variant, "decision_sha256": sha256_of(replay["decision"]),
+                                "provenance_sha256": replay["provenance_sha256"], "position_count": 1,
+                                "journal_count": len(journal_before), "replay_new_journal_events": 0})
+        self.metrics = {"baseline_commit": base, "scope": "BASE_PRODUCER_CURRENT_NATIVE_STORE",
+                        "cases": metrics, "owned_cleanup_verified_by_teardown": True}
+
     def start_operating(self, *, mode="PAPER", suffix="", negative=False, exit_cap=None, list_only=False, clock_at=None, batch_size=2):
         if mode == "SHADOW" and not suffix:
             suffix = "-S"

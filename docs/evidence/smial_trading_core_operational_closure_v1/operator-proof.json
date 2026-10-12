@@ -8,7 +8,7 @@
     "unowned_resources_touched": false
   },
   "credential_reads": false,
-  "elapsed_seconds": 17.849823,
+  "elapsed_seconds": 17.904544,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "external_cut_basis": "No process or effect invoked after backup before export/restore; independent absence assertion effects []; donor CLI exports frozen bindings/controls/current state.",
   "final_state": {
@@ -28,6 +28,13 @@
     "purpose": "synthetic source/science environment preparation only",
     "sha256": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f"
   },
+  "health_semantics": {
+    "actual_os_supervision_verified": false,
+    "graceful_shutdown_may_retain_recent_heartbeat_until_ttl": true,
+    "process_alive_basis": "RECENT_HEARTBEAT_TTL_ESTIMATE",
+    "ready_basis": "SOFTWARE_SNAPSHOT",
+    "runbook_boundary_verified": true
+  },
   "identities": {
     "accepted_attempt_ids": [
       "ATTEMPT-A6C6611ED0D2A878A9D094F4304283011876C058D37E9A81AB3272F794E17069",
@@ -38,7 +45,7 @@
       "RESULT-EC53044AC7E8546E440DEE907A8C4895A416872A969EF355EAE040C8778A12E0"
     ],
     "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
-    "backup_database_sha256": "f40788f871a34e8bd4e6ab41bac50214c59499f90e5f209e7c138069529a4279",
+    "backup_database_sha256": "6ec81d22221f51cb40fb8bebb6fff96f9920cb3290bcc721516115fefe024ebc",
     "bot_instance_id": "BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
     "inventory_sha256_before_ack": "33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746",
     "position_ids": [
@@ -46,7 +53,7 @@
     ],
     "source_episode_id": "EP-705da8cd8881c5f381f5d4e9a6b6ee37",
     "strategy_id": "STRAT-CONTINUITY-SYNTH-001-C22-FROZEN",
-    "strategy_sha256": "635ef04c513028f659bfa7547e0718a077a83eb3ea86e449f10439e05d5408a0"
+    "strategy_sha256": "24c2c5274e065ff0be7a3b13fe2796827fa762caab55c2c5ae4f48beff212b48"
   },
   "independence": "ISOLATED_OPERATOR_WITH_EXACT_CONTRACT_DIFF_RUNBOOK",
   "journey_status": "PASS",
@@ -54,7 +61,7 @@
   "manual_binding_construction": false,
   "manual_token_json": false,
   "network_calls": false,
-  "observed_at_utc": "2026-10-12T00:44:30.035875Z",
+  "observed_at_utc": "2026-10-12T01:21:04.159459Z",
   "provider_calls": false,
   "recovery_cut": {
     "all_bindings_exported_by_cli": true,
@@ -88,19 +95,19 @@
   "schema_version": "1.0",
   "semantic_navigation": {
     "authority_granted": false,
-    "catalog_integrity_sha256": "dee80313dcb18d70d984735c4946932e66403894d3258418b7a6b439b2c7b432",
+    "catalog_integrity_sha256": "780e6265c0c193b31e1ac0f27ecfc4fdf6daa212adbeeb168e8f5e816c824476",
     "catalog_record_status": "IMPLEMENTED_UNVERIFIED",
     "catalog_status_is_not_product_acceptance": true,
     "gaps": [],
     "network_required": false,
-    "observed_at_utc": "2026-10-12T00:53:11.062715Z",
+    "observed_at_utc": "2026-10-12T01:29:52.824995Z",
     "operator_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001",
     "operator_asset_ids": [
       "DOC-TRADING-CONTINUITY-OFFLINE-001"
     ],
     "read_only": true,
     "readback_anchors": {
-      "catalog/assets/core.yaml": "3b5206dc05b0d5d0fb9e022215122717fb4a7a133cab9910431baab02057b096",
+      "catalog/assets/core.yaml": "deee7db77a885ed3c910f60c895778cc5af8a85dfc355e5e674497ea71fc23f7",
       "configs/factory_semantic_operability_v1.yaml": "8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83",
       "docs/FACTORY_SEMANTIC_MAP.md": "2fbf4e7edce8c53b83ccec0f837ff49eef706d72448b9fe89ea8e4ab11ae35a6"
     },
@@ -119,9 +126,9 @@
   },
   "source_pins": {
     "configs/factory_semantic_operability_v1.yaml": "8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83",
-    "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "dee80313dcb18d70d984735c4946932e66403894d3258418b7a6b439b2c7b432",
+    "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "780e6265c0c193b31e1ac0f27ecfc4fdf6daa212adbeeb168e8f5e816c824476",
     "scripts/trading_continuity.py": "116c804dde1fa1e6bccf1fb612e6f6e1ce1645d6cd9fd2c95f1ced173f1380cd",
-    "src/solana_alpha_lab/factory/episode_decision.py": "7bb12ff16952de23535cb926fbd65a7b7e2a8de6e879b16bac449ee35674af3e",
+    "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
     "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
     "src/solana_alpha_lab/factory/paper_plane.py": "a8c2563d6a01ccf9c035cea404647a247e6cb6e4beb3144c56c379054b5e9f0b",
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
@@ -166,9 +173,9 @@
       "mode": "PAPER",
       "runtime_scope": "DONOR",
       "sequence": 2,
-      "stdout_sha256": "5e3a9e817ab1493ee816f55dbad341838c243204f40beaf64fc210ab6287e3c1",
+      "stdout_sha256": "55f6ba39ebd53df7fcc85e02f7640f61bffb69d710e144d356d0c68fe98024e3",
       "strategy_id": "STRAT-CONTINUITY-SYNTH-001-C22-FROZEN",
-      "strategy_sha256": "635ef04c513028f659bfa7547e0718a077a83eb3ea86e449f10439e05d5408a0"
+      "strategy_sha256": "24c2c5274e065ff0be7a3b13fe2796827fa762caab55c2c5ae4f48beff212b48"
     },
     {
       "activation_created": false,
@@ -218,7 +225,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "READY",
-      "stdout_sha256": "bbf1067c72ad7cf58c737d5472d22e64ca25d6e1f5b865c7288734eea049a0a2"
+      "stdout_sha256": "66ac388218e1d812fedec6ad831c9f1286ffb303bd22a70de1fc03a45e0b029e"
     },
     {
       "arguments": {
@@ -255,13 +262,13 @@
         "destination": "backups/c22.sqlite"
       },
       "command": "backup",
-      "database_sha256": "f40788f871a34e8bd4e6ab41bac50214c59499f90e5f209e7c138069529a4279",
+      "database_sha256": "6ec81d22221f51cb40fb8bebb6fff96f9920cb3290bcc721516115fefe024ebc",
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
       "runtime_scope": "DONOR",
       "sequence": 7,
-      "stdout_sha256": "270c48b4569bd026319bb6463921229636679c4d30712f4af6f6360a96beefe0"
+      "stdout_sha256": "63fd1f298723139a8f442804ec15c34f5a18e6576280f17f49bda228c6140c05"
     },
     {
       "arguments": {
@@ -313,14 +320,14 @@
         "input": "external-cut-input.json"
       },
       "command": "seal-cut",
-      "cut_sha256": "2177458cfaf6c44d2eaeeb0ca2b4cdcce5175d027017ae807cbb8d83210f42fe",
+      "cut_sha256": "5c2f65c1f9f7327df6d5c6d83cd575160ee8523b57dbc81fcb1cf924c8399573",
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
       "runtime_scope": "RESTORED",
       "sequence": 11,
       "status": "CUT_VERIFIED_AND_SEALED",
-      "stdout_sha256": "d5911724002276b38be8b2c6aa2613c2e7487b4cafab69f6e963244da597b940"
+      "stdout_sha256": "5536ce2f942538c5e9f9756078f0ec4942faebd0d444122959a928ad40f0b67d"
     },
     {
       "arguments": {
@@ -370,7 +377,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "ACTION_REQUIRED",
-      "stdout_sha256": "f4312ace40d64da26fd74af2eb9b31086c253c0bb82c2d523a50e95856ef9df8"
+      "stdout_sha256": "d231a3212497775363669ff9df43e67a2a19a6f24a641d7fb5ea7332c285eed6"
     },
     {
       "arguments": {
@@ -435,7 +442,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "READY",
-      "stdout_sha256": "c69da5156dfde06369728c616b82f99aac7f2bc7202fa1b04f9115a4ee39e68c"
+      "stdout_sha256": "bc10ecbcab67ca5352f3fca7559f30d648e6f9564cc6387ebf9b98975d4bf8ab"
     },
     {
       "arguments": {
@@ -477,7 +484,7 @@
       "runtime_scope": "RESTORED",
       "sequence": 19,
       "status": "RUNNING",
-      "stdout_sha256": "15c67fef6aec305418851cba2fce74ed643c0d66cd0cf33db137f127b21118c5"
+      "stdout_sha256": "990852748ec9668315c737f84d1f914d457f3f8462a7e2dcba9e82779b201571"
     },
     {
       "arguments": {

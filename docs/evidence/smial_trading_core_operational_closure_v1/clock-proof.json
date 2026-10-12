@@ -12,10 +12,10 @@
   ],
   "clock_basis": "CONTROLLED_ORDINARY_COORDINATOR_CLOCK",
   "code_unchanged_during_execution": true,
-  "completed_at": "2026-10-12T00:42:38.562153Z",
+  "completed_at": "2026-10-12T01:25:50.931082Z",
   "contract_reference": "source-contract.md section 11.3 / C03 / C04",
   "credential_reads": false,
-  "elapsed_seconds": 4.957851,
+  "elapsed_seconds": 5.354062,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "live_authority": false,
   "locked_environment": true,
@@ -42,7 +42,7 @@
         "run_completed": true
       },
       "controlled_clock": "2026-10-05T12:40:30Z",
-      "elapsed_seconds": 2.009117,
+      "elapsed_seconds": 1.969489,
       "limits": {
         "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001",
         "decision_point": "E1800",
@@ -51,7 +51,7 @@
         "request_not_before": "2026-10-05T12:35:00Z",
         "schedule_sha256": "8e0f4eea76207d5b9cf014c535218e513fcf271e9b5b362d3fe0d8ac0bc7d969",
         "source_cutoff": "2026-10-05T12:40:00Z",
-        "strategy_sha256": "82571fa4890c1bee75f49fd762b00da0606062ca2d1dab70c566da0c09dbfe74",
+        "strategy_sha256": "606220adadd8056ec2aeae3dad35730fa1d536139a7ec5b4b8dd14296d3dd4e7",
         "t0": "2026-10-05T12:01:15Z"
       },
       "native_decision_at": [
@@ -89,11 +89,11 @@
     {
       "backward": {
         "controlled_clock": "2026-10-05T12:40:00Z",
-        "execution_sha256_after": "2c40d970957063a79531bb2c94b8fe978c5d4b3339cb92181fbc5133691575dd",
-        "execution_sha256_before": "2c40d970957063a79531bb2c94b8fe978c5d4b3339cb92181fbc5133691575dd",
+        "execution_sha256_after": "a293f855137ce2ac74b14adfc531ff3423f215b85feb28105f47805584fcac22",
+        "execution_sha256_before": "a293f855137ce2ac74b14adfc531ff3423f215b85feb28105f47805584fcac22",
         "persisted_last_tick_at": "2026-10-05T12:41:00Z",
-        "persisted_runtime_sha256_after": "2d09604ea113be4300abda7ff1492680019412d65eb95c148e9e6978d50d9828",
-        "persisted_runtime_sha256_before": "2d09604ea113be4300abda7ff1492680019412d65eb95c148e9e6978d50d9828",
+        "persisted_runtime_sha256_after": "9b9d456454bc3f59d83b0be31142057222ffa2c24f42c10d555b2e9bdf352db1",
+        "persisted_runtime_sha256_before": "9b9d456454bc3f59d83b0be31142057222ffa2c24f42c10d555b2e9bdf352db1",
         "positions_sha256_after": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "positions_sha256_before": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "run": {
@@ -131,7 +131,7 @@
         "last_tick_preserves_forward_clock": true,
         "native_cutoff_matches_literal_oracle": true
       },
-      "elapsed_seconds": 1.925261,
+      "elapsed_seconds": 2.028644,
       "forward": {
         "attempt_count": 0,
         "controlled_clock": "2026-10-05T12:41:00Z",
@@ -159,7 +159,7 @@
         "request_not_before": "2026-10-05T12:35:00Z",
         "schedule_sha256": "8e0f4eea76207d5b9cf014c535218e513fcf271e9b5b362d3fe0d8ac0bc7d969",
         "source_cutoff": "2026-10-05T12:40:00Z",
-        "strategy_sha256": "f88dcec96c746785d4ff9a7137170800e491a40e7d0bbbca61cdab9da3aea0e6",
+        "strategy_sha256": "18607c3e112e64e4d3de5dab6e6a22cd40243b42f51f6b45e57e07ff5232559f",
         "t0": "2026-10-05T12:01:15Z"
       },
       "probe": "FORWARD_THEN_BACKWARD_CLOCK",
@@ -177,7 +177,7 @@
   ],
   "provider_calls": false,
   "python_downloads": "never",
-  "receipt_sha256": "994fc7e75df971b8fd39953177cd9df3540d9db4088bd703033c02d23068e2fb",
+  "receipt_sha256": "8a647b9f2bbf5abb5f143d3b3f4ee20444c85de37ac03482b0c56d5b9d392427",
   "schema": "smial.operating-clock-proof",
   "schema_version": "1.0",
   "source_change_paths": [],
@@ -203,7 +203,7 @@
     "src/solana_alpha_lab/factory/due_pressure.py": "eb93e0b18d9da16abd0054286484701a1a9991d794f1630382d7f61348a37ac5",
     "src/solana_alpha_lab/factory/early_market_panel_field_semantics.py": "4d556063d1dec495852eb818e8e4155f743ae00996b461d0642d9476f4f3e4e4",
     "src/solana_alpha_lab/factory/early_market_panel_importer.py": "5ef0bed72b0baa58108ff01884a5462a0141912203fe3c8b6ff53c23a7439f39",
-    "src/solana_alpha_lab/factory/episode_decision.py": "7bb12ff16952de23535cb926fbd65a7b7e2a8de6e879b16bac449ee35674af3e",
+    "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
     "src/solana_alpha_lab/factory/experiment_evidence.py": "8cdc314f482297420c08f81523273439654aa42c0c8d915462d55c861d404eb5",
     "src/solana_alpha_lab/factory/experiment_spec.py": "6bff053c5d458f6e33929cec67bb88ce9a13bf9979d59364ab6eb425ccc29cac",
     "src/solana_alpha_lab/factory/external_heartbeat.py": "0f59fad9778c3de6bda6079202bfba01e134aba72b27714e50e4eac1523a1928",
@@ -303,7 +303,7 @@
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "f129183124181537508ae19b2a6d9919df7af1147424aad15c86bf3f622b6aa2",
+    "tests/test_trading_core_operational_closure_v1.py": "25b6b75e9bd250676c03ac92cd8732300aae431a12dc6e0e0e85bd22922987b9",
     "tests/test_trading_operational_obligations_v1.py": "c884f384117eebb0624723d2bf771564db1446e76eba2dafa85a4780e694c16c"
   },
   "source_pins_before": {
@@ -327,7 +327,7 @@
     "src/solana_alpha_lab/factory/due_pressure.py": "eb93e0b18d9da16abd0054286484701a1a9991d794f1630382d7f61348a37ac5",
     "src/solana_alpha_lab/factory/early_market_panel_field_semantics.py": "4d556063d1dec495852eb818e8e4155f743ae00996b461d0642d9476f4f3e4e4",
     "src/solana_alpha_lab/factory/early_market_panel_importer.py": "5ef0bed72b0baa58108ff01884a5462a0141912203fe3c8b6ff53c23a7439f39",
-    "src/solana_alpha_lab/factory/episode_decision.py": "7bb12ff16952de23535cb926fbd65a7b7e2a8de6e879b16bac449ee35674af3e",
+    "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
     "src/solana_alpha_lab/factory/experiment_evidence.py": "8cdc314f482297420c08f81523273439654aa42c0c8d915462d55c861d404eb5",
     "src/solana_alpha_lab/factory/experiment_spec.py": "6bff053c5d458f6e33929cec67bb88ce9a13bf9979d59364ab6eb425ccc29cac",
     "src/solana_alpha_lab/factory/external_heartbeat.py": "0f59fad9778c3de6bda6079202bfba01e134aba72b27714e50e4eac1523a1928",
@@ -427,12 +427,12 @@
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "f129183124181537508ae19b2a6d9919df7af1147424aad15c86bf3f622b6aa2",
+    "tests/test_trading_core_operational_closure_v1.py": "25b6b75e9bd250676c03ac92cd8732300aae431a12dc6e0e0e85bd22922987b9",
     "tests/test_trading_operational_obligations_v1.py": "c884f384117eebb0624723d2bf771564db1446e76eba2dafa85a4780e694c16c"
   },
   "source_snapshot_file_count": 1590,
-  "source_snapshot_sha256_after": "730521d9d89f68313c2b0ee313759bf99a98496743cc57f44ad9e60008fefece",
-  "source_snapshot_sha256_before": "730521d9d89f68313c2b0ee313759bf99a98496743cc57f44ad9e60008fefece",
-  "started_at": "2026-10-12T00:42:33.604313Z",
+  "source_snapshot_sha256_after": "3e246b291ee74c3365df991807658ecbbed4ecd32c155271ef3370ffbab660ea",
+  "source_snapshot_sha256_before": "3e246b291ee74c3365df991807658ecbbed4ecd32c155271ef3370ffbab660ea",
+  "started_at": "2026-10-12T01:25:45.577016Z",
   "status": "PASS"
 }

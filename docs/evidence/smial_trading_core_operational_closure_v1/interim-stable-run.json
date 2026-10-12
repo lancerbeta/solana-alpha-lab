@@ -5,6 +5,7 @@
   "explanation": "109 suite passed stable bytes; independent native review then identified untested pending-clock, export-omission and residual-money gaps. New regressions and stable rerun required.",
   "peak_rss_bytes": 122556416,
   "receipt_sha256": "2db1334f1336d9008075a1ede32a79143f7ba9897874d3fcecfe45fc19b27567",
+  "receipt_sha256_scope": "ORIGINAL_RUN_REFERENCE_NOT_CURRENT_COMPACT_DOCUMENT_SELFHASH",
   "source_pins": {
     "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
     "scripts/trading_continuity.py": "1d87130bea4f9fdd85eda0569f2d607e5f30d07d420466191c69008736ba294e",

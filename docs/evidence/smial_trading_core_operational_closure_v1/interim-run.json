@@ -14,6 +14,7 @@
   ],
   "peak_rss_bytes": 122757120,
   "receipt_sha256": "f439ced07b274fa8d9024022077419c0971eca37f7b178ed281482581525a4c9",
+  "receipt_sha256_scope": "ORIGINAL_RUN_REFERENCE_NOT_CURRENT_COMPACT_DOCUMENT_SELFHASH",
   "status": "FAIL",
   "tests_run": 99
 }

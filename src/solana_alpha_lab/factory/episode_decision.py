@@ -123,7 +123,9 @@ def bound_recipe_body(document, *, strategy):
     body["membership_snapshot_shas"] = sorted(set(shas))
     # Evaluation targets alone do not authorize unattended exits. This explicit
     # spec field is frozen by the same scientific spec hash, never inferred.
-    body["executable_exit"] = (document.get("parameters") or {}).get("runtime_execution")
+    runtime_execution = (document.get("parameters") or {}).get("runtime_execution")
+    if runtime_execution is not None:
+        body["executable_exit"] = runtime_execution
     return body
 
 
@@ -181,7 +183,7 @@ def produce_episode_decision(root: Path, *, source_path: Path, strategy: Mapping
                 "promotion_handoff_manifest_sha256": manifest["manifest_sha256"],
                 "experiment_spec_sha256": manifest["experiment_spec_sha256"],
                 "admission_content_sha256": stored["content_sha256"], "frame_sha256": admission["frame_sha256"],
-                "origin_admission": admission,
+                **({"origin_admission": admission} if body.get("executable_exit") is not None else {}),
                 "schedule_binding": binding, "membership": evidence.episode_states(episode_id),
                 "decision_cutoff": render_utc(cutoff), "numeric": numeric,
                 "read_set": sorted(prefix.read_set, key=lambda item: (item["point_id"], item["field_id"]))})

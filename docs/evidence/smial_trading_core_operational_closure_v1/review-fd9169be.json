@@ -1,0 +1,77 @@
+{
+  "after_evidence": "Requires new compatibility repair, genuine baseline-state replay, fresh whole proof and exact inventory reviews",
+  "non_claims": [
+    "NO_BASELINE_PRODUCTION_INCIDENT",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MODEL_DIVERSITY_PROVEN"
+  ],
+  "observed_head": "fd9169bee4dfc7a33e397c38af50e77a7a302d01",
+  "packet_fingerprint_sha256": "4a96ba63e4506cf7654754174fc3efba4596518e80f14a3868d0b36580c1a421",
+  "pure_counterexample": {
+    "database_or_effect_counterexample": "NOT_EXECUTED_IN_THIS_PURE_PROBE",
+    "new_recipe_sha256": "d0fa1fa2533a06b7d30d55f618f641df721523027b1a4e88aea40d0925b9d29c",
+    "new_signal_decision_id": "SIGDEC-98540290A612D0899497AEB9DFAA9FB430532DA6025D99091166B4E81D092DBD",
+    "old_recipe_sha256": "998520f7ffd99cde4f9a6f49a8cfa0df5da26debdcb6f40e7ef47c98a6065679",
+    "old_signal_decision_id": "SIGDEC-643EF697953600D6B94C0C446DC36B65C7B0B94211394F94B54ED15B068CDEE5",
+    "only_new_recipe_key": "executable_exit=None",
+    "provider_calls": 0,
+    "scope": "Same lawful legacy OPPORTUNITY_EPISODES recipe, strategy/epoch/episode/slot, no runtime_execution"
+  },
+  "receipt_sha256": "ebbb8743fa2ecb1eb471d0003ac7a3f93a2961b3d8cecd8214cb5d22b6662b35",
+  "reviewed_bindings_sha256": "f04e0851f7f98240f8258c3aaedf22b864192a5bef335f2dc64cf9de2393b123",
+  "reviewed_inventory_sha256": "07723af397b229e899e9a795eec58a73bb527bc2bf8b1ec71884a21c94f70b65",
+  "reviews": [
+    {
+      "executed_checks": [
+        "66 committed/worktree bindings",
+        "474 current source pins",
+        "five current selfhashes",
+        "24 coverage rows/19 receipt files/18 semantic refs",
+        "26 Catalog integrity hashes/nine new asset relations",
+        "three native readiness/ACK tests PASS9.1444241s, three roots ABSENT"
+      ],
+      "finding_evidence": "Static exact diff and producer consumers; pure hash counterexample executed independently by architecture critic. No claim that CODE executed that probe.",
+      "material_findings": [
+        "LEGACY_RECIPE_IDENTITY_AND_PROVENANCE_DRIFT"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY"
+    },
+    {
+      "executed_checks": [
+        "66 exact Git/worktree bindings and authoritative chain",
+        "122 native/99 consumer/23 operator/two clock current receipts",
+        "24 native coverage locators",
+        "seven narrow native scenarios PASS29.458s; own fixture teardown verified"
+      ],
+      "finding_evidence": "Exact unconditional recipe/provenance diff plus architecture independent pure identity counterexample; fresh-store proofs do not establish upgrade replay.",
+      "material_findings": [
+        "C06_C19_BASE_TO_CURRENT_REPLAY_NOT_PRESERVED"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY"
+    },
+    {
+      "executed_checks": [
+        "Exact task/head/diff and canonical six-field packet fingerprint",
+        "66 bindings and inventory independently recomputed",
+        "19 packet evidence SHA refs",
+        "Read-only valid legacy schema1.2 pure-function base/current hash probe"
+      ],
+      "material_findings": [
+        "LEGACY_RECIPE_IDENTITY_DRIFT",
+        "SCHEMA_1_0_PROVENANCE_CONTENT_DRIFT"
+      ],
+      "native_database_probe": "NOT_EXECUTED_BY_ARCHITECTURE_CRITIC",
+      "non_blocking_findings": [
+        "process_alive is a recent-heartbeat TTL estimate, not actual OS process liveness; make runbook wording explicit"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY"
+    }
+  ],
+  "schema": "smial.frozen-review-remediation-ledger",
+  "schema_version": "1.0",
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "verdict": "NOT_READY"
+}

@@ -1,0 +1,83 @@
+{
+  "schema": "smial.review-legacy-identity-before",
+  "schema_version": "1.0",
+  "verdict": "FAIL_REPRODUCED",
+  "candidate_commit": "fd9169bee4dfc7a33e397c38af50e77a7a302d01",
+  "baseline_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "baseline_episode_decision_sha256": "e0f70efc50247fe9ccc9cde48104113ed30baa2f92d29e70e83259b03beed5a0",
+  "scope": "Exact frozen baseline producer evaluated against identical native source/spec/strategy/epoch; persisted through current native store and replayed through current runner. This does not execute the entire baseline store/runtime binary.",
+  "procedure": [
+    "Load exact frozen baseline episode_decision.py Git blob without modifying Git.",
+    "Prepare operating=False native synthetic source/scientific PROMOTE/activation fixture.",
+    "Evaluate frozen-base and current producer on identical arguments. Validate legal explicit-null spec separately.",
+    "Persist frozen-base producer packet through current runner. Replay current provenance with original recipe, then replay default current recipe.",
+    "Read native positions/journal and destroy the owned disposable fixture."
+  ],
+  "observations": {
+    "absent_runtime_execution": {
+      "baseline": {
+        "recipe_sha256": "3e70d342a5015ab0f013a28802cf7777e6643c7fbd26b19bef4bff82d3023f54",
+        "signal_decision_id": "SIGDEC-0EEFE43EB61BEAA691EBF07C7125A78B9493EF0D6387F8040C0EFFA5D3B69922",
+        "decision_sha256": "3b936d7347fcd3bbb35f0ca3434831b60cca993be8d5ffac0fbe7a38606083c5",
+        "provenance_sha256": "c5ff2fedd78621f496f7d6df19c31d2746e36db5d4023c181268f0c98c330ea3",
+        "evidence_refs": [
+          "execution-event:SRC-SIGDEC-0EEFE43EB61BEAA691EBF07C7125A78B9493EF0D6387F8040C0EFFA5D3B69922:sha256:c5ff2fedd78621f496f7d6df19c31d2746e36db5d4023c181268f0c98c330ea3"
+        ],
+        "origin_admission_present": false
+      },
+      "current": {
+        "recipe_sha256": "3cbdda3295fa9ed2803769a2fd88dc7ec3f37e9f3f205e9968bc5b2296806d3e",
+        "signal_decision_id": "SIGDEC-35BDDEE11D1FF4935377A4BA1471D36B55DE128EC55C7ED0E69DD443AA835582",
+        "decision_sha256": "15814e2efb4dd2b07e4afa9661fc67fb844a56545051a4f6225632ad838f2e7d",
+        "provenance_sha256": "79604c2eca5fd7fe8338ccd4c90de13e8a5c2e15be285a3ca041de04d51ee3ff",
+        "evidence_refs": [
+          "execution-event:SRC-SIGDEC-35BDDEE11D1FF4935377A4BA1471D36B55DE128EC55C7ED0E69DD443AA835582:sha256:79604c2eca5fd7fe8338ccd4c90de13e8a5c2e15be285a3ca041de04d51ee3ff"
+        ],
+        "origin_admission_present": true
+      },
+      "baseline_executable_exit_present": false,
+      "current_executable_exit_present": true,
+      "legacy_identity_equal": false,
+      "legacy_provenance_equal": false
+    },
+    "explicit_null": {
+      "schema_validation": "PASS",
+      "same_body_as_current_absent": true,
+      "legacy_recipe_sha256": "3e70d342a5015ab0f013a28802cf7777e6643c7fbd26b19bef4bff82d3023f54",
+      "current_recipe_sha256": "3cbdda3295fa9ed2803769a2fd88dc7ec3f37e9f3f205e9968bc5b2296806d3e"
+    },
+    "native_base_producer_current_store_replay": {
+      "original_position_count": 1,
+      "replayed_position_count": 2,
+      "original_journal_count": 5,
+      "replayed_journal_count": 8,
+      "same_recipe_replay_reason": "SOURCE_DECISION_CONTENT_CONFLICT",
+      "current_replay_signal_id": "SIGDEC-35BDDEE11D1FF4935377A4BA1471D36B55DE128EC55C7ED0E69DD443AA835582",
+      "modeled_attempts": 0,
+      "accepted_results": 0
+    }
+  },
+  "elapsed_seconds": 2.549524,
+  "source_pins_before": {
+    "src/solana_alpha_lab/factory/episode_decision.py": "7bb12ff16952de23535cb926fbd65a7b7e2a8de6e879b16bac449ee35674af3e",
+    "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
+    "src/solana_alpha_lab/factory/paper_plane.py": "a8c2563d6a01ccf9c035cea404647a247e6cb6e4beb3144c56c379054b5e9f0b",
+    "tests/test_trading_core_operational_closure_v1.py": "f129183124181537508ae19b2a6d9919df7af1147424aad15c86bf3f622b6aa2",
+    "catalog/schemas/experiment_spec.schema.json": "c42e374fc942b168ea30d25f901b81bde04861426003492061d37d651c60bc69"
+  },
+  "source_pins_after": {
+    "src/solana_alpha_lab/factory/episode_decision.py": "7bb12ff16952de23535cb926fbd65a7b7e2a8de6e879b16bac449ee35674af3e",
+    "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
+    "src/solana_alpha_lab/factory/paper_plane.py": "a8c2563d6a01ccf9c035cea404647a247e6cb6e4beb3144c56c379054b5e9f0b",
+    "tests/test_trading_core_operational_closure_v1.py": "f129183124181537508ae19b2a6d9919df7af1147424aad15c86bf3f622b6aa2",
+    "catalog/schemas/experiment_spec.schema.json": "c42e374fc942b168ea30d25f901b81bde04861426003492061d37d651c60bc69"
+  },
+  "source_unchanged": true,
+  "cleanup": {
+    "owned_fixture_root_absent": true,
+    "helper_files_written": false,
+    "child_processes_remaining": 0
+  },
+  "external_provider_calls": 0,
+  "modeled_effects": 0
+}

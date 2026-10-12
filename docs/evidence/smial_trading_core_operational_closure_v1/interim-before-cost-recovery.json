@@ -5,6 +5,7 @@
   "explanation": "115 stable tests PASS; independent native C20 then reproduced loss of earlier known cost floor on restore. New native regression and updated stable run required.",
   "peak_rss_bytes": 122683392,
   "receipt_sha256": "5786485a74c1839b609c26818bfe770fba13b9982044111eeded18699d82fc7c",
+  "receipt_sha256_scope": "ORIGINAL_RUN_REFERENCE_NOT_CURRENT_COMPACT_DOCUMENT_SELFHASH",
   "schema": "smial.operating-software-proof",
   "schema_version": "1.0",
   "source_pins": {
