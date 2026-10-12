@@ -35,6 +35,18 @@
     {
       "canary": "TRUNCATED_PERSISTED_CONFIG",
       "returncode": 1
+    },
+    {
+      "canary": "FOREIGN_RECEIPT_PROTOCOL_CORE_SHA256",
+      "returncode": 1,
+      "detected_by": "RECEIPT_CORE_BINDING_MISMATCH",
+      "receipt_self_hash_recomputed": true
+    },
+    {
+      "canary": "FOREIGN_RECEIPT_SAMPLE_BINDING_SHA256",
+      "returncode": 1,
+      "detected_by": "RECEIPT_SAMPLE_BINDING_MISMATCH",
+      "receipt_self_hash_recomputed": true
     }
   ],
   "owned_temp_root_removed": true,

@@ -20,7 +20,7 @@
       ],
       "status": "PASS",
       "cold_process": true,
-      "refused_copies": 3,
+      "refused_copies": 5,
       "temp_removed": true
     },
     {
@@ -83,5 +83,19 @@
       "scope": "Prior -text-staged metadata receipt had CRLF; commit denied",
       "repair": "Normalize own metadata receipt to LF; reseal sample/raw bindings and cold readback; renormalize stage; no source metadata content change"
     }
-  ]
+  ],
+  "independent_review_remediation": {
+    "observed_head": "5a03ec83ad260e7a57be31284c6c848967948fd5",
+    "severity": "P2",
+    "roles": [
+      "CODE_REVIEWER",
+      "ARCHITECTURE_CRITIC"
+    ],
+    "finding": "Receipt self identity did not prove equality to config core/sample scientific identity",
+    "repair": "Both explicit domain equality guards and both shape-valid foreign-receipt canaries with recomputed self identity",
+    "baseline_published_artifacts": "CONSISTENT_NO_ACTUAL_FOREIGN_RECEIPT",
+    "positive_baseline": "PASS",
+    "foreign_core_actual": "RECEIPT_CORE_BINDING_MISMATCH",
+    "foreign_sample_actual": "RECEIPT_SAMPLE_BINDING_MISMATCH"
+  }
 }

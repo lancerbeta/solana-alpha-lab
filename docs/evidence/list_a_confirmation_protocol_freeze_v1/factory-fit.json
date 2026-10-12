@@ -18,7 +18,7 @@
     "monitoring_and_recovery": "Fresh artifact consumer; tamper/hash/truncation refusal; revert unused design without erasing exposure",
     "build_vs_buy": "WRAP existing native hash/list/schedule/root owners with small stateless evidence helpers; no dependency or framework",
     "security": "No values/credentials/provider/VPS read or writer; metadata projection and redacted locators; own cleanup only",
-    "red_team": "51 expected/actual model/contract/native-seam checks plus3 independently invoked refusal canaries; real-binding gaps retained"
+    "red_team": "51 expected/actual model/contract/native-seam checks plus5 independently invoked refusal canaries; real-binding gaps retained; both independent P2 identity findings repaired with equality guards and foreign-receipt canaries"
   },
   "capability_radar": {
     "now": "NONE: bounded design is delivered through existing harness; no new plugin or capability registration",

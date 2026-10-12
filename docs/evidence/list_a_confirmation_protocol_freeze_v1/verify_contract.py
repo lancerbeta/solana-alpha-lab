@@ -215,14 +215,16 @@ def tests(cfg):
     return cases
 
 
-def readback(config_path=CONFIG):
+def readback(config_path=CONFIG,receipt_path=HERE/'freeze-receipt.json'):
     cfg=load_config(config_path);core=validate_design(cfg)
     require(cfg['fingerprints']['protocol_core_sha256']==canonical_sha256(core),'CORE_HASH_MISMATCH')
     require(cfg['fingerprints']['sample_binding_sha256']==canonical_sha256(cfg['sample_binding']),'SAMPLE_HASH_MISMATCH')
     require(cfg['derived_seeds']=={str(h):seed(canonical_sha256(core),h) for h in core['inference']['time_block_seconds']},'SEED_HASH_MISMATCH')
     meta=json.loads((HERE/'metadata-bindings.json').read_text(encoding='utf-8'))
     require(cfg['sample_binding']['metadata_evidence_sha256']==sha(HERE/'metadata-bindings.json'),'METADATA_RECEIPT_HASH_MISMATCH')
-    receipt=json.loads((HERE/'freeze-receipt.json').read_text(encoding='utf-8'))
+    receipt=json.loads(receipt_path.read_text(encoding='utf-8'))
+    require(receipt['protocol_core_sha256']==canonical_sha256(core),'RECEIPT_CORE_BINDING_MISMATCH')
+    require(receipt['sample_binding_sha256']==canonical_sha256(cfg['sample_binding']),'RECEIPT_SAMPLE_BINDING_MISMATCH')
     for key,path in [('config_raw_sha256',config_path),('contract_raw_sha256',CONTRACT),('source_spec_raw_sha256',HERE/'source-contract.md'),('accepted_task_raw_sha256',TASK),('metadata_evidence_raw_sha256',HERE/'metadata-bindings.json')]:require(receipt[key]==sha(path),'RAW_BINDING_MISMATCH:'+key)
     identity={k:receipt[k] for k in ('protocol_core_sha256','sample_binding_sha256','accepted_task_raw_sha256','source_spec_raw_sha256','metadata_evidence_raw_sha256','validation_sha256')}
     require(receipt['freeze_receipt_identity_sha256']==canonical_sha256(identity),'FREEZE_RECEIPT_HASH_MISMATCH')
@@ -264,18 +266,27 @@ def canaries():
         results.append({'canary':'RAW_CONFIG_HASH_AS_PROTOCOL_CORE','returncode':completed.returncode,'detected_by':'CORE_HASH_MISMATCH'})
         candidate.write_bytes(raw[:-40]);completed=subprocess.run([sys.executable,'-B',str(Path(__file__).resolve()),'--verify','--config',str(candidate)],capture_output=True,text=True)
         require(completed.returncode!=0,'TRUNCATION_CANARY_NOT_DETECTED');results.append({'canary':'TRUNCATED_PERSISTED_CONFIG','returncode':completed.returncode})
+        receipt_candidate=Path(temp)/'receipt.json'
+        for field,code in [('protocol_core_sha256','RECEIPT_CORE_BINDING_MISMATCH'),('sample_binding_sha256','RECEIPT_SAMPLE_BINDING_MISMATCH')]:
+            modified=json.loads((HERE/'freeze-receipt.json').read_text(encoding='utf-8'))
+            modified[field]='f'*64
+            modified['freeze_receipt_identity_sha256']=canonical_sha256({k:modified[k] for k in ('protocol_core_sha256','sample_binding_sha256','accepted_task_raw_sha256','source_spec_raw_sha256','metadata_evidence_raw_sha256','validation_sha256')})
+            dump(receipt_candidate,modified)
+            completed=subprocess.run([sys.executable,'-B',str(Path(__file__).resolve()),'--verify','--receipt',str(receipt_candidate)],capture_output=True,text=True)
+            require(completed.returncode!=0 and code in completed.stdout,'FOREIGN_RECEIPT_CANARY_NOT_DETECTED')
+            results.append({'canary':'FOREIGN_RECEIPT_'+field.upper(),'returncode':completed.returncode,'detected_by':code,'receipt_self_hash_recomputed':True})
     dump(HERE/'cold-readback.json',{'consumer':baseline,'adversarial_canaries':results,'owned_temp_root_removed':not Path(temp).exists(),'future_confirmer_reservation_tests':'NOT_EXECUTED_OUT_OF_SCOPE'})
     print(json.dumps({'status':'PASS_COLD_AND_TAMPER_CANARIES','result':baseline['result'],'temp_removed':not Path(temp).exists()}))
 
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser();mode=parser.add_mutually_exclusive_group(required=True)
-    mode.add_argument('--seal',action='store_true');mode.add_argument('--verify',action='store_true');mode.add_argument('--canaries',action='store_true');parser.add_argument('--config',type=Path,default=CONFIG)
+    mode.add_argument('--seal',action='store_true');mode.add_argument('--verify',action='store_true');mode.add_argument('--canaries',action='store_true');parser.add_argument('--config',type=Path,default=CONFIG);parser.add_argument('--receipt',type=Path,default=HERE/'freeze-receipt.json')
     args=parser.parse_args()
     try:
         if args.seal:seal()
         elif args.canaries:canaries()
-        else:print(json.dumps(readback(args.config),ensure_ascii=False,allow_nan=False))
+        else:print(json.dumps(readback(args.config,args.receipt),ensure_ascii=False,allow_nan=False))
     except (ValueError,KeyError,TypeError,IndexError,yaml.YAMLError) as error:
         import re
         reason=str(error) if isinstance(error,ValueError) and re.fullmatch(r'[A-Z0-9_]+(?::[A-Za-z0-9_.]+)?',str(error)) else 'CONFIG_PARSE_OR_REQUIRED_FIELD_INVALID'

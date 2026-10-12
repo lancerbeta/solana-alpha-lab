@@ -194,7 +194,7 @@
     {
       "id": "F11",
       "expected": "Fresh process rereads exact persisted bytes and readiness",
-      "actual": "Independent process PASS_COLD_ARTIFACT_CONSUMER with BOUND_CONTRACT_NOT_READY;3 altered copies refused",
+      "actual": "Fresh process PASS_COLD_ARTIFACT_CONSUMER with BOUND_CONTRACT_NOT_READY;5 altered copies refused, including each foreign receipt digest with recomputed valid self identity",
       "status": "PASS",
       "fidelity": "SEGMENT_ARTIFACT_CONSUMER",
       "readback_refs": [
