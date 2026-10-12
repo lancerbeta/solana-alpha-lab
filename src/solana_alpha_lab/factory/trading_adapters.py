@@ -216,11 +216,13 @@ class JupiterQuoteAdapter:
             raise PaperPlaneError("QUOTE_PROVIDER_TYPED_FAILURE")
         if not isinstance(payload.get("outAmount"), str) or not re.fullmatch(r"[1-9][0-9]{0,29}", payload["outAmount"]):
             raise PaperPlaneError("QUOTE_OUTPUT_AMOUNT_INVALID")
-        if payload.get("router") not in {"metis", "jupiterz", "dflow", "okx"} or payload.get("mode") not in {"ultra", "manual"}:
+        if (not isinstance(payload.get("router"), str) or not isinstance(payload.get("mode"), str)
+            or payload["router"] not in {"metis", "jupiterz", "dflow", "okx"} or payload["mode"] not in {"ultra", "manual"}):
             raise PaperPlaneError("QUOTE_ROUTE_IDENTITY_INVALID")
         if not isinstance(payload.get("requestId"), str) or not 1 <= len(payload["requestId"]) <= 128:
             raise PaperPlaneError("QUOTE_REQUEST_ID_MISSING")
-        if type(payload.get("feeBps")) is not int or not 0 <= payload["feeBps"] <= 10000 or payload.get("feeMint") not in {raw_request["inputMint"], raw_request["outputMint"]}:
+        if (type(payload.get("feeBps")) is not int or not 0 <= payload["feeBps"] <= 10000
+            or not isinstance(payload.get("feeMint"), str) or payload["feeMint"] not in {raw_request["inputMint"], raw_request["outputMint"]}):
             raise PaperPlaneError("QUOTE_FEE_SEMANTICS_UNKNOWN")
         in_units = Decimal(raw_request["amount"]) / (10 ** request["input_decimals"])
         out_units = Decimal(payload["outAmount"]) / (10 ** request["output_decimals"])

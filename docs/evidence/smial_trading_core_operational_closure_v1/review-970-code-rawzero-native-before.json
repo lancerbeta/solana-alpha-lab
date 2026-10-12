@@ -1,0 +1,60 @@
+{
+  "B_funding": {
+    "B_notional_usd": "30",
+    "available_at": "2026-10-05T12:55:00Z",
+    "decimals": 0,
+    "observed_at": "2026-10-05T12:55:00Z",
+    "rounded_input_raw": "0",
+    "unit_price_usd": "1000"
+  },
+  "actual_facts": {
+    "attempt_count": 1,
+    "clock_advances": 0,
+    "fake_http_calls": 1,
+    "grant": "asset-array",
+    "positions": [
+      {
+        "epoch": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+        "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE",
+        "state": "OPEN"
+      },
+      {
+        "epoch": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B",
+        "position_id": "POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+        "state": "WATCHED"
+      }
+    ],
+    "quote_claims": 1,
+    "same_process": true
+  },
+  "attempt_ids": [
+    "ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C"
+  ],
+  "credentials": false,
+  "current_clock": "2026-10-05T12:55:00+00:00",
+  "elapsed_seconds": 5.372699,
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "finished_at_utc": "2026-10-12T13:48:31.411749+00:00",
+  "fixture_root_absent": true,
+  "native_run_terminal": {
+    "reason": "QUOTE_RAW_AMOUNT_ZERO",
+    "type": "PaperPlaneError"
+  },
+  "old_A_exit_clock": "2026-10-05T13:10:00Z",
+  "old_A_position_state": "OPEN",
+  "owned_root_absent": true,
+  "provider_calls": false,
+  "receipt_sha256": "5c75c971816a7ef12715bb98179598b3c4c359a9a731b6712c1125786e0cb5d2",
+  "scenario": "VALID_FUNDING_RAW_UNIT_ZERO_PRECLAIM",
+  "schema": "code-review-native-falsifier",
+  "source_pins": {
+    "src/solana_alpha_lab/factory/paper_plane.py": "64c6a497f72aa0f3e03749ed413dab2ebf87c8ee22e9fd407b87adec23b398e1",
+    "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "8f5959bee54d9d0937b7585b5e4f8bb317075171b2bdb8205ab14361bf801732",
+    "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+    "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+    "tests/test_trading_operational_recovery_v1.py": "4303996707afefe1d6459fc59be35fbca79bdbbcba4cec25a945fe12a651c4df"
+  },
+  "source_pins_unchanged": true,
+  "started_at_utc": "2026-10-12T13:48:26.039074+00:00"
+}

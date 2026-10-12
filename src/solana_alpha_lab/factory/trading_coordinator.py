@@ -12,7 +12,7 @@ from pathlib import Path
 
 from solana_alpha_lab.factory.trading_runner import TradingContinuityRunner
 from solana_alpha_lab.factory.trading_adapters import PaperModelAdapter, JupiterQuoteAdapter, raw_amount, checked_observation
-from solana_alpha_lab.factory.paper_plane import PRE_ATTEMPT_STATES, accept_exit_decision, assert_quantity_inventory_witness
+from solana_alpha_lab.factory.paper_plane import PRE_ATTEMPT_STATES, accept_exit_decision, assert_quantity_inventory_witness, _effective_operating_scope, _operating_entry_block
 from solana_alpha_lab.factory.paper_shadow_commands import maybe_finish_drain, apply_operator_command
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
@@ -32,7 +32,8 @@ ENTRY_INPUT_BLOCKERS = frozenset({
     "EXECUTION_ASSET_METADATA_INTEGRITY_CONFLICT", "EXECUTION_ASSET_IDENTITY_INVALID",
     "EXECUTION_ASSET_WITNESS_INTEGRITY_CONFLICT", "EXECUTION_ASSET_WITNESS_IDENTITY_CONFLICT",
     "EXECUTION_OBSERVATION_STALE_OR_FUTURE", "ADAPTER_REQUEST_INTEGRITY_CONFLICT",
-    "QUOTE_DECIMALS_INVALID", "QUOTE_ENTRY_SEND_EXPIRED", "QUOTE_REDIRECT_OR_HOST_REJECTED",
+    "QUOTE_DECIMALS_INVALID", "QUOTE_RAW_AMOUNT_ZERO", "QUOTE_REQUEST_INVALID", "QUOTE_MINT_INVALID",
+    "QUOTE_RAW_AMOUNT_INVALID", "ADAPTER_AMOUNT_INVALID", "QUOTE_ENTRY_SEND_EXPIRED", "QUOTE_REDIRECT_OR_HOST_REJECTED",
     "QUOTE_RESPONSE_LIMIT_INVALID", "QUOTE_RESPONSE_SCHEMA_INVALID", "QUOTE_ONLY_TRANSACTION_REJECTED",
     "QUOTE_RESPONSE_MINT_CONFLICT", "QUOTE_RESPONSE_AMOUNT_CONFLICT", "QUOTE_PROVIDER_TYPED_FAILURE",
     "QUOTE_OUTPUT_AMOUNT_INVALID", "QUOTE_ROUTE_IDENTITY_INVALID", "QUOTE_REQUEST_ID_MISSING",
@@ -805,7 +806,9 @@ class TradingCoordinator:
             else:
                 store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND active=1", (at, "SOURCE-" + self.mode))
             bot = next(bot for bot in store.bots() if bot.get("activation_epoch_id") == state["epoch_id"] and bot["mode"] == self.mode)
-            allows_entries = source_status == "AVAILABLE" and recovery_healthy and bot["status"] == "RUNNING" and not bot["entries_paused"] and not state["restore_guard"]
+            entry_scope_reason = _operating_entry_block(store, _effective_operating_scope(store, self.mode),
+                epoch_id=state["epoch_id"], as_of=at)
+            allows_entries = entry_scope_reason is None and source_status == "AVAILABLE" and recovery_healthy and bot["status"] == "RUNNING" and not bot["entries_paused"] and not state["restore_guard"]
             if allows_entries:
                 from solana_alpha_lab.factory.trading_runtime_policy import read_operating_envelope, show_policy, obligation_summary
                 revision = sha256_of({"policy": show_policy(store, self.mode).get("policy_sha256"),
@@ -941,6 +944,9 @@ class TradingCoordinator:
                 envelope = read_operating_envelope(store, self.mode)
                 envelope_valid = envelope["status"] == "VALID"
                 runtime_policy = resolve_current_policy(store, self.mode)
+                entry_scope_reason = _operating_entry_block(store, _effective_operating_scope(store, self.mode),
+                    epoch_id=state["epoch_id"], as_of=at)
+                entry_scope_verified = entry_scope_reason in {None, "RESTORE_NEW_EFFECTS_FORBIDDEN"}
                 policy_valid = runtime_policy["status"] in {"VALID", "NOT_CONFIGURED_STRATEGY_ONLY"}
                 policy_enabled = (runtime_policy["status"] == "NOT_CONFIGURED_STRATEGY_ONLY"
                     or runtime_policy["status"] == "VALID" and runtime_policy["policy"]["new_entries_enabled"])
@@ -959,10 +965,10 @@ class TradingCoordinator:
                 exit_blocked = any(row["active"] and not row["incident_key"].startswith(("SOURCE-", "ENTRY-")) for row in incidents)
                 active_bot = next((bot for bot in bots if bot["activation_epoch_id"] == state["epoch_id"]), None)
                 entries_enabled = bool(active_bot and active_bot["status"] == "RUNNING" and not active_bot["entries_paused"]
-                    and policy_enabled and envelope_valid and execution_inputs_verified and not integrity and not unresolved
+                    and entry_scope_reason is None and policy_enabled and envelope_valid and execution_inputs_verified and not integrity and not unresolved
                     and inventory["inventory_status"] == "KNOWN" and not state["restore_guard"] and fresh
                     and source_issue is None and not entry_blockers)
-                healthy = policy_enabled and envelope_valid and execution_inputs_verified and not integrity and not exit_blocked and not entry_blockers and source_issue is None and alive and moving and fresh and not unresolved and inventory["inventory_status"] == "KNOWN" and not state["restore_guard"]
+                healthy = entry_scope_verified and policy_enabled and envelope_valid and execution_inputs_verified and not integrity and not exit_blocked and not entry_blockers and source_issue is None and alive and moving and fresh and not unresolved and inventory["inventory_status"] == "KNOWN" and not state["restore_guard"]
                 restored_cut = store._conn.execute("SELECT event_id FROM execution_events WHERE event_type='RESTORE_EXTERNAL_CUT_RECONCILED' AND json_extract(payload_json,'$.mode')=? ORDER BY rowid DESC LIMIT 1", (self.mode,)).fetchone()
                 restore_ready_for_ack = bool(restored_cut and policy_valid and envelope_valid and not unresolved and not integrity and inventory["inventory_status"]=="KNOWN")
                 restore_next = "ack-restore --mode "+self.mode+" --input complete-external-cut.json --inventory-sha256 "+sha256_of(inventory)+" --as-of "+at if restore_ready_for_ack else "reconcile --mode "+self.mode+" --input complete-external-cut.json"
@@ -992,9 +998,9 @@ class TradingCoordinator:
                     # proved origin and old EXIT obligation. Invalid current
                     # configuration degrades health without fabricating an
                     # UNKNOWN original position or starving its exit.
-                    "integrity_verified": not integrity and policy_valid, "exit_reconciliation_healthy": not exit_blocked and unresolved == 0 and inventory["inventory_status"] == "KNOWN",
+                    "integrity_verified": not integrity and policy_valid and entry_scope_verified, "exit_reconciliation_healthy": not exit_blocked and unresolved == 0 and inventory["inventory_status"] == "KNOWN",
                     "restore_guard": bool(state["restore_guard"]), "inventory": inventory,
-                    "envelope": envelope, "operating_configuration_status": envelope["status"] if policy_valid else runtime_policy["status"], "instances": bots,
+                    "envelope": envelope, "operating_configuration_status": entry_scope_reason if not entry_scope_verified else envelope["status"] if policy_valid else runtime_policy["status"], "instances": bots,
                     "runtime_policy_status": runtime_policy["status"], "runtime_policy_revision": runtime_policy["revision"],
                     "runtime_policy_sha256": runtime_policy["policy_sha256"], "runtime_policy_verified": policy_valid,
                     "pending_attempts": unresolved, "due_work": pending[0], "earliest_overdue": pending[1],
@@ -1002,8 +1008,8 @@ class TradingCoordinator:
                     "economics": economics, "economics_coverage": "RECENT_100_POSITION_ROWS_PER_MODE",
                     "complete_execution_readback": "trading_continuity.py readback", "netreturn_status": "NOT_ESTABLISHED", "owner_fcf_status": "NOT_AVAILABLE",
                     "scientific_monitoring_thresholds": "NOT_CONFIGURED",
-                    "next_safe_action": "ACKNOWLEDGE_RESTORED_INVENTORY" if state["restore_guard"] and restore_ready_for_ack else "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING" if unresolved or integrity or state["restore_guard"] else "VERIFY_RUNTIME_POLICY" if not policy_enabled else "VERIFY_OPERATING_ENVELOPE" if not envelope_valid else "CHECK_EXECUTION_QUOTE_INPUTS" if not execution_inputs_verified else "VERIFY_ORIGINAL_ENTRY_GRANT_OR_INPUT" if entry_blockers else "RESTORE_EXACT_SOURCE_RECORD_WITHOUT_ADVANCING_CURSOR" if source_issue and source_issue["reason"] not in {"SOURCE_STALE", "SOURCE_UNAVAILABLE"} else "CHECK_PROCESS_SOURCE_AND_PROFILE" if not healthy else "NONE",
-                    "next_safe_command": restore_next if state["restore_guard"] else "readback --mode "+self.mode if unresolved or integrity or exit_blocked or entry_blockers or source_issue or not policy_enabled or not envelope_valid or not execution_inputs_verified else "run --mode "+self.mode+" --ticks 1" if not fresh else "run --mode "+self.mode if not alive else "status --mode "+self.mode+" --format human",
+                    "next_safe_action": "ACKNOWLEDGE_RESTORED_INVENTORY" if state["restore_guard"] and restore_ready_for_ack else "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING" if unresolved or integrity or state["restore_guard"] or not entry_scope_verified else "VERIFY_RUNTIME_POLICY" if not policy_enabled else "VERIFY_OPERATING_ENVELOPE" if not envelope_valid else "CHECK_EXECUTION_QUOTE_INPUTS" if not execution_inputs_verified else "VERIFY_ORIGINAL_ENTRY_GRANT_OR_INPUT" if entry_blockers else "RESTORE_EXACT_SOURCE_RECORD_WITHOUT_ADVANCING_CURSOR" if source_issue and source_issue["reason"] not in {"SOURCE_STALE", "SOURCE_UNAVAILABLE"} else "CHECK_PROCESS_SOURCE_AND_PROFILE" if not healthy else "NONE",
+                    "next_safe_command": restore_next if state["restore_guard"] else "readback --mode "+self.mode if unresolved or integrity or exit_blocked or entry_blockers or source_issue or not policy_enabled or not envelope_valid or not execution_inputs_verified or not entry_scope_verified else "run --mode "+self.mode+" --ticks 1" if not fresh else "run --mode "+self.mode if not alive else "status --mode "+self.mode+" --format human",
                     "live_authority": False, "financial_authority": False}
         finally:
             store.close()
@@ -1127,6 +1133,8 @@ class TradingCoordinator:
                     "result_observations":result_observations,
                     "operating_configuration":self._configuration_snapshot(store,as_of),
                     "current_entry":{"epoch_id":state["epoch_id"],"generation":state["generation"]},
+                    "operating_switches":[event for event in store.filtered_execution_events(event_type="OPERATING_SWITCH_COMMITTED")
+                        if isinstance(event["payload"],dict) and event["payload"].get("mode")==self.mode],
                     "operating_bindings":[{"activation":store.get_execution_event(bot["activation_epoch_id"]),
                         "binding":store.get_execution_event("OPERATING-"+bot["activation_epoch_id"]),
                         "profile":store.get_execution_event("PROFILE-"+bot["activation_epoch_id"])} for bot in bots],
@@ -1137,6 +1145,60 @@ class TradingCoordinator:
                     "controls":[{"bot_instance_id":bot["bot_instance_id"],"status":bot["status"],"entries_paused":bool(bot["entries_paused"])} for bot in bots]}
         finally:
             store.close()
+
+    def _retain_operating_switches(self, store, cut, *, import_missing=False):
+        """Retain original CAS history; an older cut needs that history locally."""
+        invalid = "RECOVERY_OPERATING_BINDING_INVALID"
+        try:
+            current = cut["current_entry"]
+            bindings = {bundle["activation"]["payload"]["epoch_id"]: bundle for bundle in cut["operating_bindings"]}
+            retained = [event for event in store.filtered_execution_events(event_type="OPERATING_SWITCH_COMMITTED")
+                if isinstance(event["payload"], dict) and event["payload"].get("mode") == self.mode]
+            switches = cut.get("operating_switches", retained)
+            if (not isinstance(switches, list) or not switches or type(current["generation"]) is not int
+                or len(switches) != current["generation"] or len({event["event_id"] for event in switches}) != len(switches)):
+                raise PaperPlaneError(invalid)
+            previous = None
+            for event in switches:
+                body = event["payload"]
+                epoch = body["epoch_id"]
+                bundle = bindings[epoch]
+                activation, binding, profile = bundle["activation"], bundle["binding"], bundle["profile"]
+                if (set(event) != {"event_id", "event_type", "bot_instance_id", "position_id", "created_at", "payload"}
+                    or event["event_type"] != "OPERATING_SWITCH_COMMITTED" or event["bot_instance_id"] is not None
+                    or event["position_id"] is not None or not isinstance(event["event_id"], str)
+                    or not event["event_id"].startswith("SWITCH-") or len(event["event_id"]) != 71
+                    or any(char not in "0123456789abcdef" for char in event["event_id"][7:])
+                    or set(body) != {"epoch_id", "at", "mode", "profile", "strategy_sha256", "expected_current_epoch"}
+                    or body["mode"] != self.mode or body["expected_current_epoch"] != previous
+                    or event["created_at"] != body["at"] or parse_utc(body["at"]) > parse_utc(cut["as_of"])
+                    or activation["event_id"] != epoch or activation["payload"] != binding["payload"]["activation"]
+                    or activation["payload"]["epoch_id"] != epoch or activation["payload"]["mode"] != self.mode
+                    or activation["created_at"] != body["at"] or activation["payload"]["at"] != body["at"]
+                    or body["strategy_sha256"] != binding["payload"]["strategy"]["spec_sha256"]
+                    or body["profile"] != profile["payload"]["profile"]
+                    or sha256_of(body["profile"]) != profile["payload"]["profile_sha256"]):
+                    raise PaperPlaneError(invalid)
+                prior = store.get_execution_event(event["event_id"])
+                if prior is not None and prior != event:
+                    raise PaperPlaneError("RECOVERY_BINDING_CONTENT_CONFLICT")
+                previous = epoch
+            if previous != current["epoch_id"]:
+                raise PaperPlaneError(invalid)
+            by_id = {event["event_id"]: event for event in switches}
+            if any(event["event_id"] not in by_id or by_id[event["event_id"]] != event for event in retained):
+                raise PaperPlaneError("RECOVERY_BINDING_CONTENT_CONFLICT")
+            state = store._conn.execute("SELECT generation FROM ordinary_state WHERE mode=?", (self.mode,)).fetchone()
+            if state is None or current["generation"] < state["generation"]:
+                raise PaperPlaneError("RECOVERY_CONTROL_GENERATION_CONFLICT")
+        except PaperPlaneError:
+            raise
+        except (ValueError, KeyError, TypeError, AttributeError):
+            raise PaperPlaneError(invalid) from None
+        if import_missing:
+            for event in switches:
+                if store.get_execution_event(event["event_id"]) is None:
+                    store.append_execution_event(**event)
 
     def _configuration_snapshot(self, store, as_of):
         from solana_alpha_lab.factory.trading_runtime_policy import operating_configuration_snapshot, TradingRuntimePolicyError
@@ -1331,6 +1393,7 @@ class TradingCoordinator:
                     if bundle["activation"]["bot_instance_id"]!=bot["bot_instance_id"] or bundle["binding"]["bot_instance_id"]!=bot["bot_instance_id"]:
                         raise PaperPlaneError("RECOVERY_BOT_IDENTITY_CONFLICT")
                     store._conn.execute("UPDATE bot_instances SET entries_paused=1 WHERE bot_instance_id=?",(bot["bot_instance_id"],))
+                self._retain_operating_switches(store,cut,import_missing=True)
         finally:
             store.close()
         for receipt in cut["effects"]:
@@ -1385,7 +1448,7 @@ class TradingCoordinator:
     def _validate_cut(self,cut):
         if not isinstance(cut,dict) or "operating_configuration" not in cut:
             raise PaperPlaneError("RESTORE_OPERATING_CONFIGURATION_REQUIRED")
-        if (set(cut)!={"schema","schema_version","mode","backup_sha256","external_cut_id","as_of","effects","result_observations","operating_configuration","current_entry","controls","operating_bindings","quote_claims","pending_attempts","completeness","cut_sha256"}
+        if (set(cut)-{"operating_switches"}!={"schema","schema_version","mode","backup_sha256","external_cut_id","as_of","effects","result_observations","operating_configuration","current_entry","controls","operating_bindings","quote_claims","pending_attempts","completeness","cut_sha256"}
             or cut["schema"]!="smial.operating-external-recovery-cut" or cut["schema_version"]!="1.0"
             or cut["mode"]!=self.mode or cut["completeness"]!="COMPLETE_AFTER_BACKUP"
             or not isinstance(cut["external_cut_id"],str) or not cut["external_cut_id"]
@@ -1417,6 +1480,7 @@ class TradingCoordinator:
             restored=snapshots[-1] if snapshots else None
             if restored is None or restored["payload"]["database_sha256"]!=cut["backup_sha256"]:
                 raise PaperPlaneError("RESTORE_EXTERNAL_CUT_BACKUP_CONFLICT")
+            self._retain_operating_switches(probe,cut)
         finally:
             probe.close()
 

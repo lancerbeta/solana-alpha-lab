@@ -1,8 +1,9 @@
 # SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1
 
-VERDICT: ENGINEERING_PASS_CANDIDATE. Ordinary PAPER/SHADOW software outcome
-проверен на frozen bytes; окончательные required reviews и delivery gate
-связываются отдельно в independent-review/completion. Owner acceptance,
+VERDICT: ENGINEERING_PASS_CANDIDATE. Current native proof и consumers/cold CLI
+повторены после закрытия четырёх границ frozen970 review. Исторический176 PASS
+сохранён отдельно и не подменяет текущий181 PASS. Required reviews и exact-head
+CI/readiness остаются обязательными отдельными gates. Owner acceptance,
 runtime commissioning и merge authority этим отчётом не предоставляются.
 Base: `ba87f8e339d5cc3aa55322801ae56e3f92369446`; exact content fingerprint,
 review inventory и CI связываются Delivery Harness. Green local tests не
@@ -78,7 +79,7 @@ packet через current native source/store owners. Это проверка п
 
 ## C01–C24
 
-Native automated status: PASS, 176 tests, 628.937259s; source bytes до/после
+Native automated status: PASS, 181 tests, 654.49181s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -167,6 +168,33 @@ EXIT, исходные pending/result, legacy и fatal store не меняют �
 ARCH был прерван до verdict, OWNER на blocked inventory не запускался;
 финальные четыре роли проверяют новые bytes независимо.
 
+Frozen970e1176 дал actual CODE/GOAL/ARCH NOT_READY и OWNER_UX PASS.
+[Четыре native before и исходные proof carriers](../../evidence/smial_trading_core_operational_closure_v1/review-970e1176.json)
+сохраняют эти verdicts: valid funding raw0 прерывал run до old EXIT;
+vendor router array прерывал его после original B attempt/request/quota;
+повреждённый SWITCH оставлял ложный READY при common ingress DENY;
+backup до A→B и cut после switch теряли исходный switch event, поэтому
+ACK/RESUME B не возвращал допустимый ENTER. Unrestored exact B был positive.
+Ремонт использует существующие typed input/response boundaries, common managed
+lineage owner и исходные switch/CAS events в native recovery. Указатель current
+entry не становится новой authority, старые obligations сохраняются отдельно.
+Исторический 176/99/2/24+NAV2 и OWNER_UX PASS не заменяют новые whole proof,
+consumer/clock/cold operator evidence и все четыре final reviews.
+
+[Current bounded repair](../../evidence/smial_trading_core_operational_closure_v1/review-970-native-boundary-recovery-remediation.json)
+прошёл14 targeted native checks за55.836607s. Raw0 отказ локализован до
+claim; request/mint/raw validation после claim сохраняет исходные pending и
+quota. Array/object router, mode и feeMint дают существующий typed отказ.
+Tick/status используют ту же managed lineage проверку, что admission/attempt:
+current SWITCH conflict запрещает entries, но не превращает проверенный old
+inventory в UNKNOWN и не мешает его EXIT. Native cross-snapshot recovery
+сохраняет точные исходные switch/CAS events: ACK оставляет pause, явный RESUME
+позволяет eligible B OPEN, A выходит по исходному обязательству.
+Malformed/conflicting switch cuts отказаны атомарно; старый carrier без switch
+events совместим только при уже сохранённой exact цепочке. Первый after FAIL
+из-за неверного producer fixture сохранён; corrected native producer отдельно
+зафиксирован. Whole proof и четыре review-роли этим targeted receipt не заявлены.
+
 [Исходный S08/S13 report](../smial_trading_continuity_v1/REPORT.md) сохраняет
 REPAIR_PARTIAL_BLOCKED своего scope. Negative same-ID V2 не стал positive.
 D1 явно заменил текущий operational successor критерий на разные accepted
@@ -174,7 +202,7 @@ V1 identities; новый A/B native proof проверяет именно эт�
 
 | Класс | Остаток |
 |---|---|
-| SOFTWARE_GAP/EVIDENCE_GAP | Known critical gaps: 0 after native repairs/proof. Required-review verdict, exact inventory и delivery остаются отдельным обязательным gate |
+| SOFTWARE_GAP/EVIDENCE_GAP | По завершённым current native proof известных critical software gaps=0. Raw-unit-zero, malformed postclaim response, truthful current SWITCH health и post-backup successor recovery имеют native after. Required-review verdict, exact inventory и delivery остаются отдельным обязательным gate |
 | CONFIG_REQUIRED | Real eligible strategy, scope/runtime/source, explicit model/envelope/TTL/limits, timely funding producer/cadence |
 | EXTERNAL_UNVERIFIED | Real quote latency/schema/route/quota/credentials, target-host supervision, independent ledger custody; separate owner operation |
 | NOT_CONFIGURED | Scientific monitor/degrade thresholds; software health не experiment policy |
@@ -210,28 +238,28 @@ before/after и прежний scoped review PASS сохранены в
 purpose lifecycle-маршрута: IDs, вопросы, ссылки и authority сохранены; новый
 размер 16349 bytes, прямой semantic consumer module — 15 PASS.
 
-Peak suite process RSS: 147210240 bytes (140.39 MiB). Native 14-day producer
+Peak suite process RSS: 147591168 bytes (140.75 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.1966–0.2683s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.2113–0.3043s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04646–0.05003 |
-| 1000 | 364544 | 0.04610–0.05042 |
-| 4000 | 843776 | 0.04525–0.05009 |
+| 0 | 204800 | 0.04950–0.05655 |
+| 1000 | 364544 | 0.04637–0.05165 |
+| 4000 | 843776 | 0.04840–0.05766 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 980 | 0.000515 |
+| 1 outstanding | 980 | 0.000663 |
 | 100 proved terminal | 78430 | 0.015224 |
-| 1000 proved terminal | 774540 | 0.153898 |
-| 1000 terminal + 12000 unrelated events | 774560 | 0.152157 |
+| 1000 proved terminal | 774540 | 0.159074 |
+| 1000 terminal + 12000 unrelated events | 774560 | 0.155868 |
 
-Native history preparation: 13.445s.
+Native history preparation: 13.083s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.
@@ -240,11 +268,14 @@ SQL работа растёт линейно с числом terminal positions;
 объёмов/host throughput. Process kill проверен; power-loss/hardware tolerance
 не заявляется. Heartbeat health ограничен явным progress TTL.
 Каждый fixture имеет собственную Git producer identity; compact regeneration
-заменяет тяжёлые datasets. Все proof-owned roots удалены; loopback egress hits0,
+заменяет тяжёлые datasets. Все текущие proof-owned roots удалены; loopback egress hits0,
 secret sentinel не прочитан/сохранён, non-target SHA unchanged.
 [Cleanup receipt](../../evidence/smial_trading_core_operational_closure_v1/cleanup.json)
 связывает измерения и invariants. Shared cache/.venv, рабочие данные/чужие roots,
 branches и immutable provider registry не были cleanup targets.
+Путь fixture прерванного исторического whole run не сохранён: его global
+absence остаётся UNKNOWN. Исторический marker count не подменяет проверку
+отсутствия текущих owned fixtures; неизвестные чужие временные каталоги не удаляют.
 
 Rollback accepted history запрещён. Ordinary1.1 store требует compatible
 binary: pause entries, drain/reconcile retained obligations, native backup/

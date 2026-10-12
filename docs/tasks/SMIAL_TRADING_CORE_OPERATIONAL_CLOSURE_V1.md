@@ -261,3 +261,29 @@ the existing local asset input and aligns tick/status with the existing policy
 owner, preserving old exits, refusal/no-resend, legacy and fatal store behavior.
 ARCH review was interrupted before verdict; OWNER was not performed on this
 blocked inventory. All four final roles must run freshly after this repair.
+
+Frozen970e1176 four-role review returned actual CODE/GOAL/ARCH P1 NOT_READY
+and OWNER_UX PASS. Native code witnesses show valid funding raw-unit zero
+stopping run before old EXIT, and malformed vendor router array stopping the
+same run after original pending attempt/request/quota. Native GOAL proves
+corrupt current SWITCH can falsely project READY despite common ingress DENY.
+Independent packet-only ARCH proves backup-before-successor/cut-after-successor
+loses original switch lineage: ACK/RESUME points to B but shared ingress denies
+its eligible ENTER; unrestored B positive control opens. Preserve exact before
+and five successful historical proof carriers at their recorded pins.
+One bounded replan closes these existing software boundaries with finite typed
+input/response refusals, common managed lineage readback, and exact original
+switch/CAS events through existing complete-cut recovery. Do not synthesize
+switch authority from current pointer, weaken guards, erase original pending,
+fabricate UNKNOWN for verified old inventory, or widen science/external scope.
+Valid restore fences, ACK pause, legacy carriers and atomic refusals remain.
+After source freeze rerun current outcome/consumer/clock/cold operator proofs
+and all four isolated P0/P1 roles; no historical PASS is promoted to readiness.
+
+Bounded repair completed its 14 scoped native checks in 55.836607s on frozen
+source pins. Preserve the actual initial after fixture failure and corrected
+native producer in review-970-native-boundary-recovery-remediation.json.
+The original switch chain, not a reconstructed current pointer, now supports
+cross-snapshot ACK/pause/explicit RESUME and eligible successor entry.
+Full affected outcome/consumers/clock/cold proof and four fresh isolated roles
+remain required for this candidate; the owner PATCH grants no merge authority.

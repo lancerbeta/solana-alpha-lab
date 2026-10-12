@@ -229,6 +229,8 @@ class OperatingDriverTests(unittest.TestCase):
                 "operating_bindings":[{"activation":store.get_execution_event(bot["activation_epoch_id"]),
                     "binding":store.get_execution_event("OPERATING-"+bot["activation_epoch_id"]),
                     "profile":store.get_execution_event("PROFILE-"+bot["activation_epoch_id"])} for bot in store.bots() if bot["mode"]=="SHADOW"],
+                "operating_switches":[event for event in store.filtered_execution_events(event_type="OPERATING_SWITCH_COMMITTED")
+                    if event["payload"].get("mode")=="SHADOW"],
                 "controls":[{"bot_instance_id":bot["bot_instance_id"],"status":bot["status"],"entries_paused":bool(bot["entries_paused"])}
                     for bot in store.bots() if bot["mode"]=="SHADOW"]}
             return {**cut,"cut_sha256":sha256_of(cut)}
@@ -1034,6 +1036,43 @@ class OperatingDriverTests(unittest.TestCase):
             "corrupt_policy": "ACTION_REQUIRED", "original_inventory_status": "KNOWN",
             "db_wal_bytes_unchanged_by_native_json_human_readback": True,
             "old_exit_after_policy_corruption": "RECONCILED", "pending_attempts": 0}
+
+    def test_current_switch_conflict_blocks_readiness_without_unknown_original_inventory_or_exit_starvation(self):
+        self.start_operating()
+        self.coordinator.tick()
+        original = self.runner.readback()["positions"][0]
+        with closing(PaperPlaneStore(self.runner.store_path)) as writer:
+            event = writer.filtered_execution_events(event_type="OPERATING_SWITCH_COMMITTED")[-1]
+            damaged = {**event["payload"], "epoch_id": "ACTIVATION-EPOCH-WRONG"}
+            writer._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(damaged), event["event_id"]))
+            tick = self.coordinator.tick()
+            self.assertFalse(tick["entries_enabled"])
+            self.assertEqual(tick["attempts"], 0)
+            paths = [self.runner.store_path, Path(str(self.runner.store_path) + "-wal"), Path(str(self.runner.store_path) + "-shm")]
+            before = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}
+            native = self.coordinator.status()
+            cli = self.invoke("status", as_of="2026-10-05T12:40:00Z")
+            for view in (native, cli):
+                self.assertEqual(view["status"], "ACTION_REQUIRED")
+                self.assertFalse(view["entries_enabled"])
+                self.assertFalse(view["integrity_verified"])
+                self.assertEqual(view["operating_configuration_status"], "OPERATING_SWITCH_STATE_CONFLICT")
+                self.assertEqual(view["inventory"]["inventory_status"], "KNOWN")
+                self.assertTrue(view["exit_reconciliation_healthy"])
+                self.assertEqual(view["next_safe_action"], "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING")
+                self.assertEqual(view["next_safe_command"], "readback --mode PAPER")
+            self.assertEqual({path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}, before)
+            self.assertEqual(writer.positions(), [original])
+        self.source.tick(datetime(2026, 10, 5, 13, 5, tzinfo=UTC))
+        self.now = datetime(2026, 10, 5, 13, 10, tzinfo=UTC)
+        self.coordinator.run(ticks=2)
+        final = self.runner.readback()["positions"][0]
+        self.assertEqual(final["state"], "RECONCILED")
+        self.assertEqual(final["position_id"], original["position_id"])
+        self.assertFalse(self.coordinator.status()["entries_enabled"])
+        self.metrics = {"typed_reason": native["operating_configuration_status"], "tick_entries_enabled": tick["entries_enabled"],
+            "status": native["status"], "inventory_status": "KNOWN", "original_exit": final["state"],
+            "db_wal_shm_unchanged_by_readback": True, "original_position_id": final["position_id"]}
 
     def test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit(self):
         from solana_alpha_lab.factory import trading_runtime_policy as policy_owner

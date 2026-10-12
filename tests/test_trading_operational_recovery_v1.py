@@ -627,6 +627,8 @@ class OperationalRecoveryTests(unittest.TestCase):
                 # result, but this process receives an unreadable response.
                 # The engine must not invent nonfill or resend this attempt.
                 return {"status": 200, "body": b"{", "url": ENDPOINT + "?" + urlencode(raw)}
+            if damage == "postclaim-router" and raw["outputMint"] == closure_fixture.synth_mint("GrantB"):
+                body["router"] = []
             return {"status": 200, "body": json.dumps(body).encode(), "url": ENDPOINT + "?" + urlencode(raw)}
         self.coordinator.quote_adapter = adapter(grant_a, first_profile)
         with patch("solana_alpha_lab.factory.trading_adapters.http_quote", side_effect=wire):
@@ -653,7 +655,7 @@ class OperationalRecoveryTests(unittest.TestCase):
             self.coordinator.activate(epoch_id=self.epoch, at="2026-10-05T12:55:00Z", profile=self.profile,
                 switch_key="ENTRY-GRANT-BLOCKER-B", expected_current_epoch=first_epoch)
             grant_b = self.scoped_grant(self.epoch, self.runner.strategy["spec_sha256"],
-                expires="2026-10-05T15:00:00Z" if damage in {"postclaim", "asset-array"} else "2026-10-05T12:54:00Z")
+                expires="2026-10-05T15:00:00Z" if damage in {"postclaim", "postclaim-router", "asset-array", "funding-zero"} else "2026-10-05T12:54:00Z")
             selected = [adapter(grant_a, first_profile)] + ([adapter(grant_b, self.profile)] if damage != "missing" else [])
             coordinator = TradingCoordinator(self.runner, mode="SHADOW", clock=lambda: self.now, quote_adapters=selected)
             original_pid = os.getpid()
@@ -667,8 +669,14 @@ class OperationalRecoveryTests(unittest.TestCase):
                 self.now = datetime(2026, 10, 5, 13, 10, tzinfo=UTC)
             asset_path = self.source.data_root / "assets.json"
             original_assets = asset_path.read_bytes()
+            funding_path = self.source.data_root / "funding.json"
+            original_funding = funding_path.read_bytes()
             if damage == "asset-array":
                 asset_path.write_text("[]", encoding="utf-8")
+            elif damage == "funding-zero":
+                funding = json.loads(original_funding)
+                funding.update(decimals=0, unit_price_usd="1000")
+                funding_path.write_text(json.dumps(funding), encoding="utf-8")
             try:
                 with patch("solana_alpha_lab.factory.trading_coordinator.time.sleep", side_effect=advance):
                     result = coordinator.run(ticks=3)
@@ -683,7 +691,7 @@ class OperationalRecoveryTests(unittest.TestCase):
             rows = {row["activation_epoch_id"]: row for row in self.runner.readback()["positions"]}
             self.assertEqual(rows[first_epoch]["state"], "RECONCILED")
             self.assertEqual(rows[first_epoch]["position_id"], original["positions"][0]["position_id"])
-            if damage == "postclaim":
+            if damage in {"postclaim", "postclaim-router"}:
                 self.assertEqual(rows[self.epoch]["state"], "ATTEMPTING")
                 self.assertEqual(len(calls), 3)
                 claims = self.claims(self.runner)
@@ -692,7 +700,8 @@ class OperationalRecoveryTests(unittest.TestCase):
                 view = coordinator.status()
                 self.assertEqual(view["pending_attempts"], 1)
                 self.assertEqual(view["inventory"]["inventory_status"], "UNKNOWN")
-                self.assertIn("QUOTE_RESPONSE_SCHEMA_INVALID", {row["reason"] for row in view["entry_blockers"]})
+                postclaim_reason = "QUOTE_ROUTE_IDENTITY_INVALID" if damage == "postclaim-router" else "QUOTE_RESPONSE_SCHEMA_INVALID"
+                self.assertIn(postclaim_reason, {row["reason"] for row in view["entry_blockers"]})
                 with closing(PaperPlaneStore(self.runner.store_path, readonly=True)) as store:
                     attempt = store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED", position_ids=[rows[self.epoch]["position_id"]])[0]
                     request = store.get_execution_event("REQUEST-" + attempt["event_id"])
@@ -725,7 +734,7 @@ class OperationalRecoveryTests(unittest.TestCase):
                     "B_after_bad_response": "ATTEMPTING_PENDING_ORIGINAL", "B_attempts": 1, "B_grant_claims": 1,
                     "fake_http_calls": 3, "callback_original_clock": "2026-10-05T12:55:00Z", "same_request_after_callback": True,
                     "callback_result": "LANDED_SUCCESS", "B_after_callback": "OPEN", "pending_after_callback": 0,
-                    "resends": 0, "fabricated_nonfills": 0}
+                    "resends": 0, "fabricated_nonfills": 0, "entry_reason": postclaim_reason}
             self.assertEqual(rows[self.epoch]["state"], "WATCHED")
             self.assertEqual(len(self.runner.readback()["modeled_attempts"]), 2)
             self.assertEqual(self.runner.readback()["modeled_attempts"][0], original["modeled_attempts"][0])
@@ -744,7 +753,7 @@ class OperationalRecoveryTests(unittest.TestCase):
             self.assertEqual(view["status"], "ACTION_REQUIRED")
             self.assertTrue(view["exit_reconciliation_healthy"])
             self.assertFalse(view["entries_enabled"])
-            entry_reason = "EXECUTION_ASSET_IDENTITY_INVALID" if damage == "asset-array" else "QUOTE_EXTERNAL_AUTHORITY_REQUIRED"
+            entry_reason = "EXECUTION_ASSET_IDENTITY_INVALID" if damage == "asset-array" else "QUOTE_RAW_AMOUNT_ZERO" if damage == "funding-zero" else "QUOTE_EXTERNAL_AUTHORITY_REQUIRED"
             self.assertIn(entry_reason, {row["reason"] for row in view["entry_blockers"]})
             self.assertEqual(view["inventory"]["inventory_status"], "KNOWN")
             self.assertEqual(view["next_safe_action"], "CHECK_EXECUTION_QUOTE_INPUTS" if damage == "asset-array"
@@ -753,6 +762,8 @@ class OperationalRecoveryTests(unittest.TestCase):
             # fresh activation. Its expired signal must not become a new effect.
             if damage == "asset-array":
                 asset_path.write_bytes(original_assets)
+            elif damage == "funding-zero":
+                funding_path.write_bytes(original_funding)
             else:
                 grant_b = self.scoped_grant(self.epoch, self.runner.strategy["spec_sha256"])
                 coordinator.quote_adapters[("SHADOW", self.epoch)] = adapter(grant_b, self.profile)
@@ -778,6 +789,12 @@ class OperationalRecoveryTests(unittest.TestCase):
 
     def test_invalid_successor_asset_array_keeps_same_native_run_servicing_future_origin_exit(self):
         self.metrics = self.entry_grant_blocker_over_future_origin_exit("asset-array")
+
+    def test_valid_successor_funding_raw_zero_keeps_future_original_exit_without_preclaim_effect(self):
+        self.metrics = self.entry_grant_blocker_over_future_origin_exit("funding-zero")
+
+    def test_unhashable_postclaim_router_keeps_original_pending_callback_and_future_exit_without_resend(self):
+        self.metrics = self.entry_grant_blocker_over_future_origin_exit("postclaim-router")
 
     def test_current_asset_file_shapes_are_typed_before_native_claim_or_credential(self):
         self.start_operating(mode="SHADOW")
@@ -1814,6 +1831,102 @@ class OperationalRecoveryTests(unittest.TestCase):
         with closing(PaperPlaneStore(self.runner.store_path, readonly=True)) as store:
             self.assertEqual(store.filtered_execution_events(event_type="ADAPTER_REQUEST_BOUND"), [])
         self.metrics = {"sqlite_writer_hold_seconds": 1.4, "entry_ttl_seconds": 30, "expired_attempts": 0}
+
+    def test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit(self):
+        self.start_operating(mode="SHADOW", envelope_limits={"max_outstanding_positions": 2, "max_outstanding_cost_basis_usd": "60"})
+        ledger, plan = self.wire_files([{"outAmount": "10000000000000"}, {"outAmount": "10000000000000"}, {"outAmount": "330000000"}])
+        self.coordinator.quote_adapter = RecordingQuoteAdapter(ledger, json.loads(plan.read_text()))
+        self.coordinator.tick()
+        original = self.runner.readback()["positions"][0]
+        old_epoch, old_source, old_profile = self.epoch, self.source, self.profile
+        backup = self.data / "backups/switch-lineage.sqlite"
+        self.coordinator.backup(destination_relative="backups/switch-lineage.sqlite")
+        self.prepare(operating=True, suffix="-B", negative=True, exit_point="E3600")
+        start = datetime(2026, 10, 5, 12, 16, 6, tzinfo=UTC)
+        feed = closure_fixture.EpisodeScenario(self.data / "recovery-successor-source", start=start, stops=start + timedelta(hours=3))
+        mint = closure_fixture.synth_mint("RecoveryB")
+        obj = closure_fixture.token_object(mint, price=.000003, liquidity=10000, holders=66)
+        closure_fixture.nominate(feed.market, start, {"toptraded": [obj], "toptrending": [obj]})
+        feed.market.series[mint] = lambda now: closure_fixture.token_object(mint, price=.000003, liquidity=10000,
+            holders=60 if now >= datetime(2026, 10, 5, 12, 50, tzinfo=UTC) else 66)
+        for at in (start, datetime(2026, 10, 5, 12, 25, tzinfo=UTC), datetime(2026, 10, 5, 12, 50, tzinfo=UTC)):
+            feed.tick(at)
+        self.source, self.mint = feed, mint
+        self.now = datetime(2026, 10, 5, 12, 55, tzinfo=UTC)
+        self.profile = {**old_profile, "source": {"root": str(feed.data_root),
+            "file": "observation_schedule_state.sqlite", "schedule_sha256": feed.schedule["schedule_sha256"], "activation_id": feed.activation_id}}
+        self.quote_inputs(at="2026-10-05T12:55:00Z")
+        self.coordinator = TradingCoordinator(self.runner, mode="SHADOW", clock=lambda: self.now)
+        self.coordinator.activate(epoch_id=self.epoch, at="2026-10-05T12:55:00Z", profile=self.profile,
+            switch_key="EXACT-LINEAGE-B", expected_current_epoch=old_epoch)
+        cut = self.production_cut(backup, effects=self.ledger_receipts(ledger))
+        self.assertEqual(len(cut["operating_switches"]), 2)
+        runner, coordinator = self.restored(backup, suffix="exact-lineage-restored",
+            adapter=RecordingQuoteAdapter(ledger, json.loads(plan.read_text())))
+        denied = []
+        for alteration in ("OLD_CUT_MISSING", "EMPTY", "CAS", "CONFLICT"):
+            bad = copy.deepcopy(cut)
+            if alteration == "OLD_CUT_MISSING":
+                del bad["operating_switches"]
+            elif alteration == "EMPTY":
+                bad["operating_switches"] = []
+            elif alteration == "CAS":
+                bad["operating_switches"][-1]["payload"]["expected_current_epoch"] = "ACTIVATION-EPOCH-WRONG"
+            else:
+                bad["operating_switches"][0]["event_id"] = "SWITCH-" + "f" * 64
+            bad["cut_sha256"] = sha256_of({key: value for key, value in bad.items() if key != "cut_sha256"})
+            with closing(PaperPlaneStore(runner.store_path, readonly=True)) as observer:
+                before = list(observer._conn.iterdump())
+            with self.assertRaisesRegex(PaperPlaneError, "^RECOVERY_(OPERATING_BINDING_INVALID|BINDING_CONTENT_CONFLICT)$"):
+                coordinator.reconcile_cut(bad)
+            with closing(PaperPlaneStore(runner.store_path, readonly=True)) as observer:
+                self.assertEqual(list(observer._conn.iterdump()), before)
+            self.assertTrue(coordinator.status()["restore_guard"])
+            self.assertEqual(len(self.ledger_receipts(ledger)), 1)
+            denied.append(alteration)
+        coordinator.reconcile_cut(cut)
+        self.assertTrue(coordinator.reconcile_cut(cut)["idempotent"])
+        after_cut = coordinator.status()
+        self.assertEqual(after_cut["next_safe_action"], "ACKNOWLEDGE_RESTORED_INVENTORY")
+        self.assertEqual(after_cut["inventory"]["inventory_status"], "KNOWN")
+        # Genuine older cut is accepted only after exact native history exists.
+        legacy = {key: value for key, value in cut.items() if key not in {"operating_switches", "cut_sha256"}}
+        legacy["cut_sha256"] = sha256_of(legacy)
+        coordinator.reconcile_cut(legacy)
+        self.acknowledge(coordinator, legacy)
+        self.assertTrue(all(bot["entries_paused"] for bot in coordinator.status()["instances"]))
+        bot = next(bot for bot in coordinator.status()["instances"] if bot["activation_epoch_id"] == self.epoch)
+        runner.command({"command_type": "RESUME_NEW_ENTRIES", "idempotency_key": "RESUME-EXACT-B", "bot_instance_id": bot["bot_instance_id"]})
+        tick = coordinator.tick()
+        self.metrics = {"successor_tick": tick, "admission_reasons": [row["payload"]["reason_code"] for row in runner.readback()["admission_refusals"]]}
+        rows = {row["activation_epoch_id"]: row for row in runner.readback()["positions"]}
+        self.assertEqual(rows[self.epoch]["state"], "OPEN")
+        self.assertEqual(tick["attempts"], 1)
+        self.assertTrue(tick["entries_enabled"])
+        with closing(PaperPlaneStore(runner.store_path, readonly=True)) as observer:
+            self.assertEqual(observer.filtered_execution_events(event_type="OPERATING_SWITCH_COMMITTED"), cut["operating_switches"])
+        coordinator.reconcile_cut(cut)
+        coordinator.tick()
+        self.assertEqual(len(self.ledger_receipts(ledger)), 2)
+        old_source.tick(datetime(2026, 10, 5, 13, 5, tzinfo=UTC))
+        self.now = datetime(2026, 10, 5, 13, 10, tzinfo=UTC)
+        funding_path = old_source.data_root / "funding.json"
+        funding = json.loads(funding_path.read_text())
+        funding.update(observed_at="2026-10-05T13:10:00Z", available_at="2026-10-05T13:10:00Z")
+        funding_path.write_text(json.dumps(funding), encoding="utf-8")
+        coordinator.run(ticks=2)
+        final = {row["activation_epoch_id"]: row for row in runner.readback()["positions"]}
+        self.assertEqual(final[old_epoch]["state"], "RECONCILED")
+        self.assertEqual(final[old_epoch]["position_id"], original["position_id"])
+        self.assertEqual(len(self.ledger_receipts(ledger)), 3)
+        self.metrics = {"original_switch_events_retained_exact": True, "atomic_lineage_denials": denied,
+            "old_cut_missing_lineage": "DENIED", "old_cut_exact_retained_history": "ACCEPTED",
+            "restore_ack": "PASS_CONTROLS_PAUSED", "explicit_resume_B": "OPEN", "B_attempts": 1,
+            "original_A_exit": "RECONCILED", "wire_calls": 3, "resends": 0, "cut_repeat": "IDEMPOTENT",
+            "cut_as_of": cut["as_of"], "generation": cut["current_entry"]["generation"],
+            "switch_rows": [{"event_id": event["event_id"], "created_at": event["created_at"],
+                "payload_sha256": sha256_of(event["payload"]), "epoch_id": event["payload"]["epoch_id"],
+                "expected_current_epoch": event["payload"]["expected_current_epoch"]} for event in cut["operating_switches"]]}
 
     def test_restore_without_effects_imports_successor_binding_and_generation_paused(self):
         self.start_operating(mode="SHADOW")

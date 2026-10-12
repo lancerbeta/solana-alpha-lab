@@ -41627,7 +41627,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/trading_coordinator.py
   integrity:
     kind: sha256
-    sha256: 8f5959bee54d9d0937b7585b5e4f8bb317075171b2bdb8205ab14361bf801732
+    sha256: 00481ccb35501e46e9fc69bc006e42adbad5318a61d452b6cc807d24d680b944
   access:
     mode: read_only
     method: file
@@ -41664,7 +41664,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/trading_adapters.py
   integrity:
     kind: sha256
-    sha256: 06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc
+    sha256: cf6fa566e491d68aeee5c059228fc2385b2884c23c297aa6905f00f3606c8e05
   access:
     mode: read_only
     method: file
@@ -41738,7 +41738,7 @@ records:
     repository_path: tests/test_trading_core_operational_closure_v1.py
   integrity:
     kind: sha256
-    sha256: b30eb201cf0d60fd9a0a9d4233aff5b5808eec1847ae27b34eebc6ab72bef15b
+    sha256: 08537cd9ff1bc77b071602f913fda93859a478b4dbfb390da75d16a1a5656370
   access:
     mode: read_only
     method: file
@@ -41774,7 +41774,7 @@ records:
     repository_path: tests/test_trading_operational_adapters_v1.py
   integrity:
     kind: sha256
-    sha256: ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b
+    sha256: 3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9
   access:
     mode: read_only
     method: file
@@ -41847,7 +41847,7 @@ records:
     repository_path: docs/tasks/SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: 30d99234fa93d214d873c7ac89c8e41dfe6d97266241160528b5f52c3409bb66
+    sha256: a967b4011b480a54bd6b30af9e0183d344ae5adf3d4f3b42b54f788581f53b4d
   access:
     mode: read_only
     method: file
@@ -41884,7 +41884,7 @@ records:
     repository_path: docs/reports/smial_trading_core_operational_closure_v1/REPORT.md
   integrity:
     kind: sha256
-    sha256: af8d47dc9a4e86af8736396b749dca52f98979878b9a72a9ef5ea5fff30be162
+    sha256: 2513c0db9d9c0bc6003a0c8bdda00d87f989b7e138f6dd6721b13334344f25ad
   access:
     mode: read_only
     method: file
@@ -41921,7 +41921,7 @@ records:
     repository_path: tests/test_trading_operational_recovery_v1.py
   integrity:
     kind: sha256
-    sha256: 4303996707afefe1d6459fc59be35fbca79bdbbcba4cec25a945fe12a651c4df
+    sha256: 87d93d28c6b9115c378e878306f5199e3c49a633722fde145fafc38e2f71f280
   access:
     mode: read_only
     method: file

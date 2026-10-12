@@ -78,6 +78,19 @@ class AdapterTests(unittest.TestCase):
         self.assertNotIn("quantity_sold", unknown)
         self.assertEqual(refused["outcome"], "REJECTED_BEFORE_SEND")
 
+    def test_route_and_fee_json_shapes_are_existing_typed_refusals(self):
+        request = frozen_request()
+        metrics = []
+        for field, reason in (("router", "QUOTE_ROUTE_IDENTITY_INVALID"), ("mode", "QUOTE_ROUTE_IDENTITY_INVALID"),
+                              ("feeMint", "QUOTE_FEE_SEMANTICS_UNKNOWN")):
+            for value in ([], {}, None, True, 1):
+                with self.subTest(field=field, value=value), self.assertRaisesRegex(ValueError, "^" + reason + "$"):
+                    self.adapter(wire(request, **{field: value})).dispatch({"attempt_id": "A", "side": "ENTRY"}, request, as_of=AT)
+                metrics.append({"field": field, "shape": type(value).__name__, "reason": reason})
+        result, _ = self.adapter().dispatch({"attempt_id": "A", "side": "ENTRY"}, request, as_of=AT)
+        self.assertEqual(result["outcome"], "LANDED_SUCCESS")
+        self.metrics = {"typed_shapes": metrics, "valid_neighbor": result["outcome"]}
+
     def test_C03_C14_input_clock_and_denominator_guards(self):
         row = {"mint": FUNDING, "decimals": 9, "unit_price_usd": "100", "observed_at": AT, "available_at": AT}
         self.assertEqual(checked_observation(row, mint=FUNDING, as_of=AT, max_age_seconds=60)["unit_price_usd"], "100")
