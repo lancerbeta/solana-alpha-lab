@@ -288,8 +288,11 @@ class TradingContinuityRunner:
         if record is None or record["event_type"] != "SOURCE_DECISION_PRODUCED":
             raise PaperPlaneError("SOURCE_DECISION_PROVENANCE_MISSING")
         packet = record["payload"]
-        provenance = packet.get("provenance") or {}
-        decision = packet.get("decision") or {}
+        if (not isinstance(packet, dict) or not isinstance(packet.get("provenance"), dict)
+            or not isinstance(packet.get("decision"), dict)):
+            raise PaperPlaneError("SOURCE_DECISION_PROVENANCE_CONFLICT")
+        provenance = packet["provenance"]
+        decision = packet["decision"]
         digest = sha256_of(provenance)
         if (packet.get("provenance_sha256") != digest
             or canonical_spec_sha256(decision) != position.get("signal_decision_sha256")

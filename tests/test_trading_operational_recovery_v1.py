@@ -8,6 +8,7 @@ import hashlib
 import io
 from decimal import Decimal
 import json
+import os
 import shutil
 import sqlite3
 import threading
@@ -56,6 +57,193 @@ class OperationalRecoveryTests(unittest.TestCase):
     wire_files = closure_fixture.OperatingDriverTests.wire_files
     ledger_receipts = closure_fixture.OperatingDriverTests.ledger_receipts
     recovery_cut = closure_fixture.OperatingDriverTests.recovery_cut
+
+    def two_native_open_positions(self, *, mode="PAPER"):
+        activate=TradingCoordinator.activate
+        def expand(coordinator,**kwargs):
+            kwargs["profile"]["envelope"].update(max_outstanding_positions=2,max_outstanding_cost_basis_usd="60")
+            return activate(coordinator,**kwargs)
+        with patch.object(TradingCoordinator,"activate",new=expand):
+            self.start_operating(mode=mode)
+        ledger=None
+        if mode=="SHADOW":
+            ledger,plan=self.wire_files([{"outAmount":"10000000000000"},{"outAmount":"10000000000000"},
+                {"outAmount":"330000000"},{"outAmount":"330000000"}])
+            self.coordinator.quote_adapter=RecordingQuoteAdapter(ledger,json.loads(plan.read_text()))
+        first=self.epoch
+        self.coordinator.tick()
+        self.coordinator.activate(epoch_id=first+"-OTHER",at="2026-10-05T12:40:00Z",profile=self.profile,
+            switch_key="BACKUP-ORIGIN-HEALTHY-NEIGHBOR",expected_current_epoch=first)
+        self.coordinator.tick()
+        self.assertEqual([p["state"] for p in self.runner.readback()["positions"]],["OPEN","OPEN"])
+        self.source.tick(datetime(2026,10,5,13,5,tzinfo=UTC))
+        self.now=datetime(2026,10,5,13,10,tzinfo=UTC)
+        if mode=="SHADOW":
+            self.quote_inputs(at="2026-10-05T13:10:00Z")
+        return first,ledger
+
+    def test_backup_all_final_artifact_collisions_preserve_owned_non_targets_before_write(self):
+        self.start_operating()
+        results=[]
+        for index,suffix in enumerate(("",".json","-journal","-wal","-shm")):
+            for kind in ("regular","hardlink"):
+                with self.subTest(suffix=suffix,kind=kind):
+                    target=self.data/"backups"/(str(index)+"-"+kind+".sqlite")
+                    target.parent.mkdir(exist_ok=True)
+                    artifact=target if not suffix else type(target)(str(target)+suffix)
+                    victim=self.root/("synthetic-victim-"+str(index)+"-"+kind+".txt")
+                    victim.write_bytes(b"SYNTHETIC_NON_TARGET_MUST_REMAIN_UNCHANGED")
+                    if kind=="hardlink":
+                        os.link(victim,artifact)
+                    else:
+                        artifact.write_bytes(victim.read_bytes())
+                    before=artifact.read_bytes()
+                    with self.assertRaisesRegex(PaperPlaneError,"BACKUP_DESTINATION_MUST_BE_NEW|OPERATING_CHILD_ALIAS_FORBIDDEN"):
+                        self.coordinator.backup(destination_relative=target.relative_to(self.data).as_posix())
+                    self.assertEqual(victim.read_bytes(),b"SYNTHETIC_NON_TARGET_MUST_REMAIN_UNCHANGED")
+                    self.assertEqual(artifact.read_bytes(),before)
+                    if suffix:
+                        self.assertFalse(target.exists())
+                    self.assertEqual(list(target.parent.glob(".native-backup-*")),[])
+                    results.append({"suffix":suffix,"kind":kind,"denied":True,"nontarget_unchanged":True})
+        self.metrics={"artifact_collisions":results,"native_destination_writes":0}
+
+    def test_backup_exclusive_sidecar_race_and_native_failure_remove_only_reserved_outputs(self):
+        self.start_operating()
+        target=self.data/"backups/race.sqlite"
+        victim=self.root/"synthetic-race-victim.txt"
+        victim.write_bytes(b"SYNTHETIC_NON_TARGET")
+        native_open=os.open
+        def race(path,flags,*args,**kwargs):
+            if str(path)==str(target)+".json":
+                os.link(victim,path)
+            return native_open(path,flags,*args,**kwargs)
+        with patch("solana_alpha_lab.factory.trading_coordinator.os.open",side_effect=race):
+            with self.assertRaisesRegex(PaperPlaneError,"BACKUP_DESTINATION_MUST_BE_NEW"):
+                self.coordinator.backup(destination_relative="backups/race.sqlite")
+        self.assertFalse(target.exists())
+        self.assertEqual(victim.read_bytes(),b"SYNTHETIC_NON_TARGET")
+        self.assertEqual(type(target)(str(target)+".json").read_bytes(),b"SYNTHETIC_NON_TARGET")
+        native_connect=sqlite3.connect
+        def fail_staging(database,*args,**kwargs):
+            if str(database).endswith("snapshot.sqlite"):
+                raise RuntimeError("SYNTHETIC_NATIVE_BACKUP_FAILURE")
+            return native_connect(database,*args,**kwargs)
+        with patch("solana_alpha_lab.factory.trading_coordinator.sqlite3.connect",side_effect=fail_staging):
+            with self.assertRaisesRegex(RuntimeError,"SYNTHETIC_NATIVE_BACKUP_FAILURE"):
+                self.coordinator.backup(destination_relative="backups/native-failure.sqlite")
+        self.assertEqual(list(target.parent.glob("native-failure.sqlite*")),[])
+        self.assertEqual(list(target.parent.glob(".native-backup-*")),[])
+        manifest=self.coordinator.backup(destination_relative="backups/standalone.sqlite")
+        standalone=target.parent/"standalone.sqlite"
+        self.assertEqual(hashlib.sha256(standalone.read_bytes()).hexdigest(),manifest["database_sha256"])
+        self.assertEqual({p.name for p in target.parent.glob("standalone.sqlite*")},{"standalone.sqlite","standalone.sqlite.json"})
+        runner,coordinator=self.restored(standalone,mode="PAPER")
+        self.assertTrue(coordinator.status()["restore_guard"])
+        with closing(sqlite3.connect(standalone.as_uri()+"?mode=ro",uri=True)) as connection:
+            self.assertEqual(connection.execute("PRAGMA journal_mode").fetchone()[0],"delete")
+        self.metrics={"sidecar_race":"DENY_NON_TARGET_UNCHANGED","native_failure":"OWNED_OUTPUTS_REMOVED",
+            "standalone_backup_restore":"PASS","final_auxiliary_files":0}
+
+    def test_malformed_origin_shapes_are_typed_readonly_and_do_not_starve_healthy_due_exit(self):
+        first,_=self.two_native_open_positions()
+        with closing(PaperPlaneStore(self.runner.store_path,readonly=True)) as store:
+            original_position=next(p for p in store.positions() if p["activation_epoch_id"]==first)
+            original=store.get_execution_event("SRC-"+original_position["signal_decision_id"])
+        variants=[("packet",value) for value in (None,7,[],False)]
+        for field in ("decision","provenance"):
+            for value in (None,7,[],False,0,{}):
+                body=copy.deepcopy(original["payload"])
+                body[field]=value
+                variants.append((field,body))
+        for field,bad in variants:
+            with self.subTest(field=field,shape=type(bad).__name__):
+                with closing(PaperPlaneStore(self.runner.store_path)) as store:
+                    store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?",(json.dumps(bad),original["event_id"]))
+                    with self.assertRaisesRegex(PaperPlaneError,"SOURCE_DECISION_PROVENANCE_CONFLICT"):
+                        self.runner.for_epoch(first)._origin(store,original_position)
+                self.coordinator.tick()
+                def database_bytes():
+                    return {p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in
+                        (self.runner.store_path,type(self.runner.store_path)(str(self.runner.store_path)+"-wal")) if p.is_file()}
+                # Keep the native WAL lifecycle pinned while measuring the
+                # read-only consumer; SHM reader locks are not DB/WAL content.
+                with closing(PaperPlaneStore(self.runner.store_path)):
+                    before=database_bytes()
+                    view=self.coordinator.status()
+                    self.assertEqual(database_bytes(),before)
+                self.assertEqual(view["status"],"ACTION_REQUIRED")
+                self.assertEqual(view["inventory"]["inventory_status"],"UNKNOWN")
+                self.assertIn("SOURCE_DECISION_PROVENANCE_CONFLICT",{x["reason"] for x in view["incidents"] if x["active"]})
+                positions={p["activation_epoch_id"]:p for p in self.runner.readback()["positions"]}
+                self.assertEqual(positions[first]["state"],"OPEN")
+                self.assertEqual(positions[first+"-OTHER"]["state"],"RECONCILED")
+                with closing(PaperPlaneStore(self.runner.store_path,readonly=True)) as store:
+                    self.assertEqual(store.get_execution_event(original["event_id"])["payload"],bad)
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?",(json.dumps(original["payload"]),original["event_id"]))
+        self.coordinator.tick()
+        self.assertEqual([p["state"] for p in self.runner.readback()["positions"]],["RECONCILED","RECONCILED"])
+        self.assertEqual(self.coordinator.status()["status"],"READY")
+        self.metrics={"shape_variants":len(variants),"healthy_neighbor":"RECONCILED","status_db_wal_readonly":True,
+            "exact_original_restore":"READY"}
+
+    def test_malformed_original_capture_and_callback_quarantine_without_resend_or_neighbor_starvation(self):
+        first,ledger=self.two_native_open_positions(mode="SHADOW")
+        def stop(point):
+            if point=="AFTER_RESULT_CAPTURE":
+                raise RuntimeError("SYNTHETIC_STOP_AFTER_ORIGINAL_CAPTURE")
+        self.coordinator.fault=stop
+        with self.assertRaisesRegex(RuntimeError,"SYNTHETIC_STOP_AFTER_ORIGINAL_CAPTURE"):
+            self.coordinator.tick()
+        self.coordinator.fault=lambda point:None
+        with closing(PaperPlaneStore(self.runner.store_path,readonly=True)) as store:
+            capture=store.filtered_execution_events(event_type="ADAPTER_RESULT_CAPTURED")[-1]
+            attempt=store.get_execution_event(capture["event_id"].removeprefix("CAPTURE-"))
+        bodies=[None,7,[],False]
+        for field in ("result","provenance"):
+            body=copy.deepcopy(capture["payload"])
+            body[field]=[]
+            body["capture_sha256"]=sha256_of({k:v for k,v in body.items() if k!="capture_sha256"})
+            bodies.append(body)
+        for bad in bodies:
+            with self.subTest(capture_shape=type(bad).__name__):
+                with closing(PaperPlaneStore(self.runner.store_path)) as store:
+                    store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?",(json.dumps(bad),capture["event_id"]))
+                self.coordinator.tick()
+                view=self.coordinator.status()
+                self.assertEqual(view["status"],"ACTION_REQUIRED")
+                self.assertEqual(view["pending_attempts"],1)
+                self.assertEqual(view["inventory"]["inventory_status"],"UNKNOWN")
+                self.assertIn("ADAPTER_CAPTURE_INTEGRITY_CONFLICT",{x["reason"] for x in view["incidents"] if x["active"]})
+                self.assertEqual(len(self.ledger_receipts(ledger)),4)
+                with closing(PaperPlaneStore(self.runner.store_path,readonly=True)) as store:
+                    self.assertEqual(store.get_execution_event(capture["event_id"])["payload"],bad)
+                rows={p["activation_epoch_id"]:p for p in self.runner.readback()["positions"]}
+                self.assertEqual(rows[first]["state"],"EXITING")
+                self.assertEqual(rows[first+"-OTHER"]["state"],"RECONCILED")
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?",(json.dumps(capture["payload"]),capture["event_id"]))
+            store._conn.execute("UPDATE execution_events SET payload_json='null' WHERE event_id=?",(attempt["event_id"],))
+        self.coordinator.tick()
+        self.assertIn("RECOVERY_ATTEMPT_CONTENT_CONFLICT",{x["reason"] for x in self.coordinator.status()["incidents"] if x["active"]})
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?",(json.dumps(attempt["payload"]),attempt["event_id"]))
+        inbox=self.data/"result-inbox"
+        inbox.mkdir(exist_ok=True)
+        callback=inbox/(attempt["event_id"]+".json")
+        for bad in (None,7,[],{"attempt_id":attempt["event_id"],"result_id":"SYNTHETIC","outcome":[],"observed_at":"2026-10-05T13:10:00Z"}):
+            callback.write_text(json.dumps(bad),encoding="utf-8")
+            self.coordinator.tick()
+            self.assertEqual(self.coordinator.status()["pending_attempts"],1)
+            self.assertEqual(len(self.ledger_receipts(ledger)),4)
+        callback.unlink()
+        self.coordinator.tick()
+        self.assertEqual([p["state"] for p in self.runner.readback()["positions"]],["RECONCILED","RECONCILED"])
+        self.assertEqual(self.coordinator.status()["status"],"READY")
+        self.assertEqual(len(self.ledger_receipts(ledger)),4)
+        self.metrics={"capture_variants":len(bodies),"callback_variants":4,"malformed_attempt":"TYPED_QUARANTINE",
+            "fake_quote_effects":4,"repeated_http_calls":0,"healthy_neighbor":"RECONCILED","original_capture_restore":"READY"}
 
     def empty_ledger(self):
         ledger, _ = self.wire_files()

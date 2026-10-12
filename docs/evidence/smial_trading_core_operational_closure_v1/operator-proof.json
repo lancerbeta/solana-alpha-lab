@@ -8,7 +8,7 @@
     "unowned_resources_touched": false
   },
   "credential_reads": false,
-  "elapsed_seconds": 17.053819,
+  "elapsed_seconds": 17.854684,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "external_cut_basis": "No process or effect invoked after backup before export/restore; independent absence assertion effects []; donor CLI exports frozen bindings/controls/current state.",
   "final_state": {
@@ -29,6 +29,7 @@
     "sha256": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f"
   },
   "grant_roster_assessment": {
+    "current_candidate_retested": false,
     "evidence_file_sha256": "de6e91bdaf20122b7cd9574af41d9801a93b1bfa07335fd7594bbde755b4b851",
     "evidence_path": "docs/evidence/smial_trading_core_operational_closure_v1/review-nonfill-grant-remediation.json",
     "native_help_command": "uv run --locked --managed-python python -B scripts/trading_continuity.py --help",
@@ -38,6 +39,7 @@
     "operator_provider_calls": 0,
     "operator_roster_effect_journey_executed": false,
     "parser_action": "append",
+    "prior_readonly_assessment_retained": true,
     "repeatable_flag": "--quote-grant",
     "reviewed_native_tests": [
       {
@@ -108,12 +110,14 @@
         "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_separate_original_quote_grants_close_predecessor_and_admit_successor_with_cold_quota"
       }
     ],
-    "status": "PASS_READONLY_GRAMMAR_AND_CURRENT_NATIVE_EVIDENCE"
+    "status": "HISTORICAL_NATIVE_EVIDENCE_NOT_REEXECUTED_IN_CURRENT_JOURNEY"
   },
   "health_semantics": {
     "actual_os_supervision_verified": false,
+    "backup_destination_family_boundary_documented": true,
     "graceful_shutdown_may_retain_recent_heartbeat_until_ttl": true,
     "grant_expiry_preclaim_vs_postclaim_boundary_documented": true,
+    "malformed_origin_typed_recovery_boundary_documented": true,
     "observed_physical_clock_boundary_documented": true,
     "observed_runtime_exercised_in_operator_journey": false,
     "optional_policy_absence_is_strategy_only": true,
@@ -147,7 +151,7 @@
       "SIGDEC-49A9CF1A18E9BC5241317E274C7C0F34D2613AE7CD68AA524D87FAEDB3A5C809"
     ],
     "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
-    "backup_database_sha256": "887bde667af7aedd1179bd9cc29fa7b2488f055f2f8d557664f6e9198f303449",
+    "backup_database_sha256": "6fcc8af481873f8446b597c89c5618427a3d4ab52f8756edc2c47ee634a9826d",
     "bot_instance_id": "BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
     "inventory_sha256_before_ack": "33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746",
     "position_ids": [
@@ -155,7 +159,7 @@
     ],
     "source_episode_id": "EP-705da8cd8881c5f381f5d4e9a6b6ee37",
     "strategy_id": "STRAT-CONTINUITY-SYNTH-001-C22-FROZEN",
-    "strategy_sha256": "e59dd1ddd05031b1c7f626917dd22f1e1445c40a044c22ebc99839f2820355f2"
+    "strategy_sha256": "7df9a00751b91015d9fc0d22d853e2c52c64a3d7361aa724ea204efc4a352c49"
   },
   "independence": "ISOLATED_OPERATOR_WITH_EXACT_CONTRACT_DIFF_RUNBOOK",
   "journey_status": "PASS",
@@ -163,13 +167,20 @@
   "manual_binding_construction": false,
   "manual_token_json": false,
   "network_calls": false,
-  "observed_at_utc": "2026-10-12T04:47:34.189657Z",
+  "observed_at_utc": "2026-10-12T05:41:41.139299Z",
   "provider_calls": false,
-  "readonly_canary_contract": "Exact DB/nonempty WAL bytes; only ABSENT/zero-byte WAL auxiliary coordination allowed",
+  "readonly_canary_contract": "Exact DB/nonempty WAL bytes; only ABSENT/zero-byte WAL and SHM read-lock auxiliary coordination allowed",
   "readonly_status_canaries_verified": true,
   "readonly_status_canary_count": 5,
   "recovery_cut": {
     "all_bindings_exported_by_cli": true,
+    "backup_artifact_family_after_native_backup": {
+      "": true,
+      "-journal": false,
+      "-shm": false,
+      "-wal": false,
+      ".json": true
+    },
     "configuration_readback": {
       "envelope_chain_exact": true,
       "later_local_authority_extension_exercised": false,
@@ -181,11 +192,11 @@
       "post_backup_configuration_change_exercised": false,
       "readonly_business_bytes_unchanged": true,
       "readonly_canary_after": {
-        "paper_plane.sqlite": "20cb5042b5e93e3dfc2bb0e66db3ea7919cfaf8c33be692816bbd41d4bb29328",
+        "paper_plane.sqlite": "c167c8b92da47347ff8b29089da3fac2e49a1b3fb208a397bfa06868d3b9191a",
         "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       "readonly_canary_before": {
-        "paper_plane.sqlite": "20cb5042b5e93e3dfc2bb0e66db3ea7919cfaf8c33be692816bbd41d4bb29328",
+        "paper_plane.sqlite": "c167c8b92da47347ff8b29089da3fac2e49a1b3fb208a397bfa06868d3b9191a",
         "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       "runtime_policy_configuration_state": "NOT_CONFIGURED_STRATEGY_ONLY"
@@ -258,28 +269,33 @@
   "schema_version": "1.0",
   "semantic_navigation": {
     "authority_granted": false,
-    "catalog_integrity_sha256": "1b6dd4359d1faa3705c8244a3dc4fd0d1c01dbfea00872bd7fd89001d780c5ed",
+    "catalog_integrity_sha256": "389be0b2c3f0e247e766b4fe14c0734a95c3a2682a0e9678773e44da3ca94a9a",
     "catalog_record_status": "IMPLEMENTED_UNVERIFIED",
     "catalog_status_is_not_product_acceptance": true,
+    "elapsed_seconds": 21.40002,
     "gaps": [],
     "network_required": false,
-    "observed_at_utc": "2026-10-12T04:54:38.731124Z",
+    "observed_at_utc": "2026-10-12T05:47:10.388811Z",
     "operator_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001",
     "operator_asset_ids": [
       "DOC-TRADING-CONTINUITY-OFFLINE-001"
     ],
     "read_only": true,
     "readback_anchors": {
-      "catalog/assets/core.yaml": "31a14d37a45d044f111fca0d917f06cf532117e4e8fed2795a08a10d778f9ffb",
+      "catalog/assets/core.yaml": "4bb52efe1d3d73fc03e15f86298dcc0e5c2d63c36fa9e3e1fb5a9293987daec4",
       "configs/factory_semantic_operability_v1.yaml": "8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83",
-      "docs/FACTORY_SEMANTIC_MAP.md": "2fbf4e7edce8c53b83ccec0f837ff49eef706d72448b9fe89ea8e4ab11ae35a6"
+      "docs/FACTORY_SEMANTIC_MAP.md": "2fbf4e7edce8c53b83ccec0f837ff49eef706d72448b9fe89ea8e4ab11ae35a6",
+      "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "389be0b2c3f0e247e766b4fe14c0734a95c3a2682a0e9678773e44da3ca94a9a",
+      "docs/reports/smial_trading_core_operational_closure_v1/REPORT.md": "5d45973f185c151696251c384abcde715939072371593ceec51ec30219ecb53a"
     },
     "readback_execution": "LOCKED_MANAGED_PYTHON_NATIVE_CLI_SUBPROCESSES",
     "repository_path": "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md",
     "resolve_asset_command": "uv run --locked --managed-python python -B scripts/catalog_cli.py resolve-asset DOC-TRADING-CONTINUITY-OFFLINE-001 --json",
+    "resolve_asset_elapsed_seconds": 21.246936,
     "resolve_asset_exit_code": 0,
-    "resolve_asset_output_sha256": "b1136de7c9782d7980cae8947a4e4200437abde36c0d4e0333a5863f5b88d5df",
+    "resolve_asset_output_sha256": "adae6eafffe0be67a568b3c9433198f267a6a5520061016406b77abfaa6b9bef",
     "resolve_route_command": "uv run --locked --managed-python python -B scripts/catalog_cli.py resolve-route SEM-OWNER-LIFECYCLE --json",
+    "resolve_route_elapsed_seconds": 21.394979,
     "resolve_route_exit_code": 0,
     "resolve_route_output_sha256": "fa40c40ea3e6b85e5ccc29acbf75e293d74d8431a36b261788a7c28ab6f2fd7a",
     "route_id": "SEM-OWNER-LIFECYCLE",
@@ -294,7 +310,7 @@
   "source_line_endings": "LF",
   "source_pins": {
     "configs/factory_semantic_operability_v1.yaml": "8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83",
-    "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "1b6dd4359d1faa3705c8244a3dc4fd0d1c01dbfea00872bd7fd89001d780c5ed",
+    "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "389be0b2c3f0e247e766b4fe14c0734a95c3a2682a0e9678773e44da3ca94a9a",
     "scripts/trading_continuity.py": "9694d0b589b0fd560e250324bd7cef07c547ec8b6e8c137d471f028a6083538b",
     "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
     "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
@@ -302,12 +318,12 @@
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
     "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
     "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "2346559e835010c47e21e0d9bd2b4c7877aa698da33831e417d5d02cb8556d4b",
-    "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "3df6051d8eac666b6f8e63bc32d6df26cffc786d7a8bb0dec67014001079f915",
+    "src/solana_alpha_lab/factory/trading_runner.py": "6d110b3cb314f4171a3406f134dd77cbb0237d6541020628791f698370f23b59",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
     "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
     "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
-    "tests/test_trading_operational_recovery_v1.py": "0a9d1205477107de71b542afb31974faa76f51ce524efff2a46017cb27972597"
+    "tests/test_trading_operational_recovery_v1.py": "90d60cb77cfc31d74d0ae26a16f831a5a9fb40d64a88e2de015777e5b86ee3fe"
   },
   "source_pins_unchanged": true,
   "steps": [
@@ -344,9 +360,9 @@
       "mode": "PAPER",
       "runtime_scope": "DONOR",
       "sequence": 2,
-      "stdout_sha256": "36b32201e11b57a2e39839a950a5f23d22f0c9d2f21f69ad4ca52828330a5c82",
+      "stdout_sha256": "2054decc1eb259e9a90acd5b3e458176f402686194e8662f050176c79456dd2c",
       "strategy_id": "STRAT-CONTINUITY-SYNTH-001-C22-FROZEN",
-      "strategy_sha256": "e59dd1ddd05031b1c7f626917dd22f1e1445c40a044c22ebc99839f2820355f2"
+      "strategy_sha256": "7df9a00751b91015d9fc0d22d853e2c52c64a3d7361aa724ea204efc4a352c49"
     },
     {
       "activation_created": false,
@@ -396,12 +412,12 @@
       "progress_moving": true,
       "readonly_store_canary": {
         "after": {
-          "paper_plane.sqlite": "95161544885f3cd51651e1c338879944292f2f700e5299ae9594cb25a326bb70",
+          "paper_plane.sqlite": "73e4a758c2a7c0bce6d99be75debf823694a5161c2c2f21d00d2cb717a5b813e",
           "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         "allowed_empty_wal_coordination": true,
         "before": {
-          "paper_plane.sqlite": "95161544885f3cd51651e1c338879944292f2f700e5299ae9594cb25a326bb70",
+          "paper_plane.sqlite": "73e4a758c2a7c0bce6d99be75debf823694a5161c2c2f21d00d2cb717a5b813e",
           "paper_plane.sqlite-wal": "ABSENT"
         },
         "business_bytes_unchanged": true,
@@ -417,7 +433,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "READY",
-      "stdout_sha256": "3cde1e83050b63c0ebc7a3c0116a02a070c8883ead63957879c05ae2058d427a"
+      "stdout_sha256": "12962bb59ab6741de4f03cee0bf5a2724ccad0a340d5c17e15da5fc982cf439a"
     },
     {
       "arguments": {
@@ -446,12 +462,12 @@
       "mode": "PAPER",
       "readonly_store_canary": {
         "after": {
-          "paper_plane.sqlite": "c8b117d812196d003ed28fc55f26ad090d9f84d2a45471a96cec524ba66dca11",
+          "paper_plane.sqlite": "bf08bab4303f81ec95991ce955e17911649113b1c26048e509cfd50d47baa427",
           "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         "allowed_empty_wal_coordination": true,
         "before": {
-          "paper_plane.sqlite": "c8b117d812196d003ed28fc55f26ad090d9f84d2a45471a96cec524ba66dca11",
+          "paper_plane.sqlite": "bf08bab4303f81ec95991ce955e17911649113b1c26048e509cfd50d47baa427",
           "paper_plane.sqlite-wal": "ABSENT"
         },
         "business_bytes_unchanged": true,
@@ -467,13 +483,13 @@
         "destination": "backups/c22.sqlite"
       },
       "command": "backup",
-      "database_sha256": "887bde667af7aedd1179bd9cc29fa7b2488f055f2f8d557664f6e9198f303449",
+      "database_sha256": "6fcc8af481873f8446b597c89c5618427a3d4ab52f8756edc2c47ee634a9826d",
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
       "runtime_scope": "DONOR",
       "sequence": 7,
-      "stdout_sha256": "2423e5d7f9b323c187af441ac0698a07a8dabeab07542e49c1c2c4992fd4f962"
+      "stdout_sha256": "20edb358974c14626954934b65b8b65c44b9e4ffe1c971653aefb0383d63dc22"
     },
     {
       "arguments": {
@@ -525,14 +541,14 @@
         "input": "external-cut-input.json"
       },
       "command": "seal-cut",
-      "cut_sha256": "07483ed001ddd9fade9086eda6e3babf718563c47cd0f7cebf52419a3cbde888",
+      "cut_sha256": "90df5db4105c324ae329e4f89e8b27348064f720e0f76224e595ce241e5b31ba",
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
       "runtime_scope": "RESTORED",
       "sequence": 11,
       "status": "CUT_VERIFIED_AND_SEALED",
-      "stdout_sha256": "46d9033d10c9f386c8a2e10d2c871d08c43076bb0fb09ccdcac6ad09e0f45aa2"
+      "stdout_sha256": "bb30429f6554e5750dc06cb3ad82784b9085385bef458b2d505353d44425685e"
     },
     {
       "arguments": {
@@ -582,12 +598,12 @@
       "progress_moving": true,
       "readonly_store_canary": {
         "after": {
-          "paper_plane.sqlite": "5746281275b9e38802a664c955e0aa6b42146d47a15531be8827c34f4feda900",
+          "paper_plane.sqlite": "3674edf2638bdbfd3836a64eac15c26677b217c66439f7e971600d0c67c6b136",
           "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         "allowed_empty_wal_coordination": true,
         "before": {
-          "paper_plane.sqlite": "5746281275b9e38802a664c955e0aa6b42146d47a15531be8827c34f4feda900",
+          "paper_plane.sqlite": "3674edf2638bdbfd3836a64eac15c26677b217c66439f7e971600d0c67c6b136",
           "paper_plane.sqlite-wal": "ABSENT"
         },
         "business_bytes_unchanged": true,
@@ -603,7 +619,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "ACTION_REQUIRED",
-      "stdout_sha256": "94401e1cf12cfc86e25f0c13ad20cf3d583974869a2949617f8ea9d2a1f594d1"
+      "stdout_sha256": "28afe7379f6bd2c48d3cfd04aa4d9c33e638bdaf76526e361d63f2fa11e3fdef"
     },
     {
       "arguments": {
@@ -617,12 +633,12 @@
       "mode": "PAPER",
       "readonly_store_canary": {
         "after": {
-          "paper_plane.sqlite": "5746281275b9e38802a664c955e0aa6b42146d47a15531be8827c34f4feda900",
+          "paper_plane.sqlite": "3674edf2638bdbfd3836a64eac15c26677b217c66439f7e971600d0c67c6b136",
           "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         "allowed_empty_wal_coordination": false,
         "before": {
-          "paper_plane.sqlite": "5746281275b9e38802a664c955e0aa6b42146d47a15531be8827c34f4feda900",
+          "paper_plane.sqlite": "3674edf2638bdbfd3836a64eac15c26677b217c66439f7e971600d0c67c6b136",
           "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         "business_bytes_unchanged": true,
@@ -681,12 +697,12 @@
       "progress_moving": true,
       "readonly_store_canary": {
         "after": {
-          "paper_plane.sqlite": "65837d464776b53e3ca7606621c27bfd5a2a79151635fc7d78fe918edeb071d4",
+          "paper_plane.sqlite": "86e291a466d9f2f9c8878a90c40602028b5943aa045b89d7f87214cfad28453c",
           "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
         "allowed_empty_wal_coordination": true,
         "before": {
-          "paper_plane.sqlite": "65837d464776b53e3ca7606621c27bfd5a2a79151635fc7d78fe918edeb071d4",
+          "paper_plane.sqlite": "86e291a466d9f2f9c8878a90c40602028b5943aa045b89d7f87214cfad28453c",
           "paper_plane.sqlite-wal": "ABSENT"
         },
         "business_bytes_unchanged": true,
@@ -702,7 +718,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "READY",
-      "stdout_sha256": "7da09e28b32635f754c47e2e7df31569240632927fecca6a14851532aac27639"
+      "stdout_sha256": "2e057bc28711bd12bf6f58a0a558b58430045c6b7c5e65279f85607e566fd034"
     },
     {
       "arguments": {
@@ -744,7 +760,7 @@
       "runtime_scope": "RESTORED",
       "sequence": 19,
       "status": "RUNNING",
-      "stdout_sha256": "6297488edb9eafaf026738f5a77fd3444db68634e710e5c89a621a5dde58077d"
+      "stdout_sha256": "086e591e4751417370eac12a9c9c5b946334f875147a8da8ddf68857abd1192f"
     },
     {
       "arguments": {

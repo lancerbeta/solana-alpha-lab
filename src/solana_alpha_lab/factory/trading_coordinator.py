@@ -527,8 +527,16 @@ class TradingCoordinator:
         row = (attempt_id,)
         # One damaged obligation cannot starve unrelated proven old exits.
         event = store.get_execution_event(row[0])
+        if event is None or event["event_type"] != "MODELED_ATTEMPT_STARTED":
+            raise PaperPlaneError("MODELED_ATTEMPT_MISSING")
         attempt = event["payload"]
+        if (not isinstance(attempt, dict) or attempt.get("attempt_id") != row[0]
+            or attempt.get("position_id") != event["position_id"] or attempt.get("mode") != self.mode
+            or not isinstance(attempt.get("side"), str) or attempt["side"] not in {"ENTRY", "EXIT"}):
+            raise PaperPlaneError("RECOVERY_ATTEMPT_CONTENT_CONFLICT")
         position = store.get_position(event["position_id"])
+        if position is None:
+            raise PaperPlaneError("POSITION_NOT_FOUND")
         bound = self.runner.for_epoch(position["activation_epoch_id"])
         bound._origin(store, position)
         if attempt["side"] == "EXIT" and position.get("exit_decision_id"):
@@ -542,21 +550,33 @@ class TradingCoordinator:
         callback = exact_child(inbox, row[0] + ".json", exists=False)
         if callback.is_file():
             result = json.loads(callback.read_text(encoding="utf-8"))
+            if not isinstance(result, dict):
+                raise PaperPlaneError("MODELED_RESULT_OBJECT_REQUIRED")
         elif captured:
             body = captured["payload"]
-            if sha256_of({key: value for key, value in body.items() if key != "capture_sha256"}) != body.get("capture_sha256"):
+            if (not isinstance(body, dict) or not isinstance(body.get("result"), dict)
+                or not isinstance(body.get("provenance"), dict)
+                or sha256_of({key: value for key, value in body.items() if key != "capture_sha256"}) != body.get("capture_sha256")):
                 raise PaperPlaneError("ADAPTER_CAPTURE_INTEGRITY_CONFLICT")
             result = captured["payload"]["result"]
         elif self.mode == "PAPER":
             request = store.get_execution_event("REQUEST-" + row[0])
             if request is None:
                 raise PaperPlaneError("ADAPTER_REQUEST_BINDING_MISSING")
+            if not isinstance(request["payload"], dict):
+                raise PaperPlaneError("ADAPTER_REQUEST_INTEGRITY_CONFLICT")
             result = PaperModelAdapter(self._profile(store, position["activation_epoch_id"])["model"]).reconcile(attempt, request["payload"], as_of=at)
         else:
             # A callback ledger can supply the original uncertain identity.
             # No HTTP resend. The same inbox API is available after restore.
             result = None
         if result is not None:
+            if (any(not isinstance(result.get(key), str) for key in ("attempt_id", "result_id", "outcome", "observed_at"))
+                or any(key in result and result[key] is not None and not isinstance(result[key], str)
+                       for key in ("schema_version", "fee_semantics", "quantity_unit"))):
+                raise PaperPlaneError("MODELED_RESULT_INVALID")
+            if result["attempt_id"] != row[0]:
+                raise PaperPlaneError("RECOVERY_ATTEMPT_IDENTITY_CONFLICT")
             bound.result(result)
         if store.get_execution_event("FINAL-" + row[0]) is None:
             self._incident(store, row[0], "ATTEMPT_RECONCILIATION_REQUIRED", at)
@@ -864,27 +884,78 @@ class TradingCoordinator:
             store.close()
 
     def backup(self, *, destination_relative):
-        target = exact_child(self.runner.data_root, destination_relative, exists=False)
-        if target.exists():
-            raise PaperPlaneError("BACKUP_DESTINATION_MUST_BE_NEW")
-        target.parent.mkdir(parents=True, exist_ok=True)
-        store = self.runner._store(readonly=True)
-        try:
-            replica = sqlite3.connect(target)
-            try:
-                store._conn.backup(replica)
-                if replica.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
-                    raise PaperPlaneError("BACKUP_INTEGRITY_FAILED")
-            finally:
-                replica.close()
-        finally:
-            store.close()
         import hashlib
-        manifest = {"schema_version": "1.0", "database_sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
+        import tempfile
+        target = exact_child(self.runner.data_root, destination_relative, exists=False)
+        manifest_path = target.with_suffix(target.suffix + ".json")
+        # SQLite's native destination also writes/unlinks auxiliary paths.
+        # Validate the entire final write set before creating any artifact.
+        for path in (target, manifest_path, *(Path(str(target)+suffix) for suffix in ("-journal", "-wal", "-shm"))):
+            exact_child(self.runner.data_root, path.relative_to(self.runner.data_root), exists=False)
+            if path.exists():
+                raise PaperPlaneError("BACKUP_DESTINATION_MUST_BE_NEW")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
+        created, handles, complete = {}, [], False
+        try:
+            # Reserve both outputs exclusively. SQLite never opens these final
+            # names, so an auxiliary alias cannot receive a backup write.
+            for path in (target, manifest_path):
+                try:
+                    fd = os.open(path, flags, 0o600)
+                except FileExistsError:
+                    raise PaperPlaneError("BACKUP_DESTINATION_MUST_BE_NEW") from None
+                created[path] = os.fstat(fd)
+                handles.append(os.fdopen(fd, "wb"))
+            with tempfile.TemporaryDirectory(prefix=".native-backup-", dir=target.parent) as staging:
+                staged = Path(staging) / "snapshot.sqlite"
+                store = self.runner._store(readonly=True)
+                try:
+                    replica = sqlite3.connect(staged)
+                    try:
+                        store._conn.backup(replica)
+                        # Publish a standalone native DB, with no retained WAL.
+                        if replica.execute("PRAGMA journal_mode=DELETE").fetchone()[0] != "delete":
+                            raise PaperPlaneError("BACKUP_INTEGRITY_FAILED")
+                        if replica.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+                            raise PaperPlaneError("BACKUP_INTEGRITY_FAILED")
+                    finally:
+                        replica.close()
+                finally:
+                    store.close()
+                digest = hashlib.sha256()
+                with staged.open("rb") as source:
+                    while chunk := source.read(1024 * 1024):
+                        handles[0].write(chunk)
+                        digest.update(chunk)
+                manifest = {"schema_version": "1.0", "database_sha256": digest.hexdigest(),
                     "mode": self.mode, "schema": "smial.operating-native-backup",
                     "restore_policy": "RECONCILIATION_BEFORE_NEW_EFFECTS", "frozen_bindings_in_database": True}
-        target.with_suffix(target.suffix + ".json").write_text(json.dumps(manifest, sort_keys=True) + "\n", encoding="utf-8")
-        return manifest
+                handles[1].write((json.dumps(manifest, sort_keys=True)+"\n").encode("utf-8"))
+            for handle in handles:
+                handle.flush()
+                os.fsync(handle.fileno())
+            for path, original in created.items():
+                exact_child(self.runner.data_root, path.relative_to(self.runner.data_root))
+                current = path.stat()
+                if (current.st_dev, current.st_ino, current.st_nlink) != (original.st_dev, original.st_ino, 1):
+                    raise PaperPlaneError("OPERATING_CHILD_ALIAS_FORBIDDEN")
+            for suffix in ("-journal", "-wal", "-shm"):
+                auxiliary = exact_child(self.runner.data_root, str(target.relative_to(self.runner.data_root))+suffix, exists=False)
+                if auxiliary.exists():
+                    raise PaperPlaneError("BACKUP_DESTINATION_MUST_BE_NEW")
+            complete = True
+            return manifest
+        finally:
+            for handle in handles:
+                handle.close()
+            if not complete:
+                # Only remove this invocation's exact reserved file identity.
+                for path, original in created.items():
+                    if path.exists() and not path.is_symlink():
+                        current = path.stat()
+                        if (current.st_dev, current.st_ino, current.st_nlink) == (original.st_dev, original.st_ino, 1):
+                            path.unlink()
 
     def export_recovery_cut(self, *, backup_path, effects, external_cut_id, as_of):
         """Export coherent local evidence; external completeness remains explicit."""

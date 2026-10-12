@@ -156,3 +156,14 @@ attempt/FINAL/result release proofs and existing scoped adapter/grant owners.
 No grant issuance, operational configuration, new registry or external action.
 Preserve actual CODE/ARCH NOT_READY and GOAL PASS for that frozen head; require
 native before/after and fresh exact-inventory review after both repairs.
+
+Frozen 1cdf0003 CODE/GOAL/ARCH reviews returned actual NOT_READY: native backup
+could overwrite an existing hardlinked manifest/SQLite auxiliary artifact;
+malformed original JSON could crash tick/status and starve healthy old EXIT.
+Bound the same backup owner to all five final artifacts before any write,
+exclusive reservations and private native SQLite staging with standalone copy.
+Validate original JSON shapes in existing origin/capture/attempt owners;
+quarantine the exact affected obligation without resend or fabricated closure.
+No new schema, state owner, dependency, product decision or external authority.
+Preserve native before/after and actual role verdicts; require fresh whole
+outcome, cold operator and all four isolated exact-inventory reviews.

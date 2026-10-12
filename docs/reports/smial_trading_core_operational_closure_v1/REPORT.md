@@ -59,6 +59,8 @@ Original attached MD byte-for-byte находится в source-contract.md; е�
 | REVIEW_PARTIAL_DISPATCH_COUNTEREXAMPLE | Partial remainder 6M→9M давал UNKNOWN, но следующий EXIT принимал повреждённый остаток и показывал READY с 5M/$15 вместо 2M/$6 | Original indexed cumulative quantity/cost/fee proof до inputs, transactional claim и result acceptance; повреждённая позиция удерживается, здоровые old EXIT продолжаются |
 | REVIEW_ENTRY_NONFILL_COUNTEREXAMPLE | Valid ENTRY1.1 NO_ROUTE освобождал reservation, но два ticks/cold status сохраняли permanent EXIT_INVENTORY_WITNESS_CONFLICT | Original definitive nonfill/release proof до закрытия incident; positive/UNKNOWN/EXIT quantity guards сохраняются |
 | REVIEW_GRANTED_SHADOW_SUCCESSOR_COUNTEREXAMPLE | Single B grant создавал A EXIT attempt и расходовал B quota до scope rejection; оба A/B grants доступны | Один ordinary caller выбирает отдельно разрешённый grant по origin epoch/strategy до attempt/quota; A-oldEXIT/B-newENTRY используют собственные profiles/caps |
+| REVIEW_BACKUP_ARTIFACT_COUNTEREXAMPLE | Native backup менял чужие bytes через hardlinked .json/-shm; SQLite также удалял existing -journal/-wal aliases | Все пять final artifacts проверяются до записи; exclusive reservations, private SQLite staging, standalone copy и cleanup только собственных identities |
+| REVIEW_ORIGINAL_JSON_COUNTEREXAMPLE | Scalar/null/list original origin или capture ломал tick/status и оставлял healthy due EXIT открытым | Typed shape validation и quarantine исходного обязательства; damaged bytes/pending UNKNOWN сохранены, healthy old EXIT закрывается без resend |
 | DELIVERY_PIN_COUNTEREXAMPLE | Необязательное изменение domain-policy prose нарушало исторический TASK30 SHA | Policy/TASK30 сохранены буквально; этот task pin registry-011 остаётся explicit, gate exceptions не добавлены |
 
 Baseline failures для новых capabilities не выдуманы. Reviewer before traces
@@ -73,7 +75,7 @@ packet через current native source/store owners. Это проверка п
 
 ## C01–C24
 
-Native automated status: PASS, 146 tests, 532.545884s; source bytes до/после
+Native automated status: PASS, 150 tests, 543.360276s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -102,12 +104,12 @@ test_trading_operational_recovery_v1; engines: continuity/obligations/adapters.
 | C10 | Cold loader без spec/strategy/ResearchStore; retained origin/time exit; unrelated history bounded |
 | C11 | Failed→UNKNOWN same-ID→partial 4m/2m remainder; overfill/conflict deny; exact quantity/fee conservation |
 | C12 | 400 definitive nonfill vs timeout UNKNOWN; old obligation retained; UNKNOWN no resend |
-| C13 | Body/clock/hash/capture corruption detected before consume; preserved origin/result and rollback |
+| C13 | Body/clock/hash/capture corruption и malformed original JSON typed before consume; preserved origin/result and rollback |
 | C14 | Real parser/lowest fake wire; raw units/mint/amount/schema/router/null transaction guards; quote fee once |
-| C15 | Actual OS process lock/kill + independent controls; corrupt A не starves healthy B due EXIT |
+| C15 | Actual OS process lock/kill + independent controls; corrupt/malformed A не starves healthy B due EXIT |
 | C16 | Independent status alive/fresh/moving/integrity/exits; no false READY; recovered input cause inactive, audit retained; unresolved neighbors stay active |
 | C17 | WAL-aware current snapshot; DB/WAL fingerprints unchanged by GET; missing/corrupt state typed |
-| C18 | Native backup+fresh root/process; external ledger не откатывается; complete admission/exit/switch/pending/quota/current configuration cut, no authority rollback |
+| C18 | Guarded standalone native backup+fresh root/process; no existing artifact overwrite; external ledger не откатывается; complete admission/exit/switch/pending/quota/current configuration cut, no authority rollback |
 | C19 | Actual research/spec/raw removal; frozen minimal closure/retained metadata; legacy no fabrication/forward recovery |
 | C20 | Literal full $2.87/$2.85, partial $1.07/$1.06; embedded quote fee separate; UNKNOWN/floor/no combined money |
 | C21 | Native producer 14 virtual days; 0/1000/4000 history; measured tick/RSS/disk;14 identities/28 attempts |
@@ -155,28 +157,28 @@ real strategy promotion не установлены. Там, где NOT_IMPLEMEN
 
 ## Resources, rollback, delivery
 
-Peak suite process RSS: 146464768 bytes (139.68 MiB). Native 14-day producer
+Peak suite process RSS: 146202624 bytes (139.43 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.2031–0.2788s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.2042–0.2372s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04673–0.05021 |
-| 1000 | 364544 | 0.05550–0.06587 |
-| 4000 | 843776 | 0.04526–0.05840 |
+| 0 | 204800 | 0.04780–0.05155 |
+| 1000 | 364544 | 0.04868–0.07710 |
+| 4000 | 843776 | 0.04694–0.05338 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 840 | 0.000414 |
-| 100 proved terminal | 78270 | 0.021573 |
-| 1000 proved terminal | 774410 | 0.158040 |
-| 1000 terminal + 12000 unrelated events | 774410 | 0.161292 |
+| 1 outstanding | 840 | 0.000470 |
+| 100 proved terminal | 78270 | 0.015927 |
+| 1000 proved terminal | 774410 | 0.166968 |
+| 1000 terminal + 12000 unrelated events | 774410 | 0.167824 |
 
-Native history preparation: 13.994s.
+Native history preparation: 13.907s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.

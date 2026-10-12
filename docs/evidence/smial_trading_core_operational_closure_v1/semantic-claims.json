@@ -17,12 +17,12 @@
   {
     "claim": "Pause/STOP/DRAIN, missing active strategy and damaged current bindings block new entries while retained original closure lets healthy old obligations exit and reconcile independently.",
     "claim_id": "C4",
-    "scope": "Frozen original spec, decision, recipe, native metadata and provenance; per-obligation corruption including partial projection remains a typed gap without fabricated closure or another quote effect, while healthy neighboring old EXIT obligations continue."
+    "scope": "Frozen original spec, decision, recipe, native metadata and provenance; per-obligation corruption including partial projection remains a typed gap without fabricated closure or another quote effect, while healthy neighboring old EXIT obligations continue. Original origin/capture/attempt JSON shape corruption is typed and isolated per obligation; original damaged bytes/pending UNKNOWN are retained without resend while healthy neighboring old EXIT continues."
   },
   {
     "claim": "Native backup and fresh restore preserve original attempts, accepted result history, known cost floors, pending clocks, controls, consumed quota and complete current operating-envelope/runtime-policy chains; pending UNKNOWN is never resent, and a recovery fence requires complete-cut authority reconciliation plus explicit inventory ACK.",
     "claim_id": "C5",
-    "scope": "Synthetic native SQLite/subprocess fault evidence. Post-backup restrictions cannot be replaced by softer backup settings; missing or conflicting configuration retains the fence. Complete cut is an explicit externally asserted ledger boundary with selfhash/inventory checks, not cryptographic authentication, chain reconciliation or hardware power-loss proof. Definitive ENTRY1.1 nonfill validates exact original release and closes only its proved incident; positive inventory, corrupt witnesses and UNKNOWN retain the original guards."
+    "scope": "Synthetic native SQLite/subprocess fault evidence. Post-backup restrictions cannot be replaced by softer backup settings; missing or conflicting configuration retains the fence. Complete cut is an explicit externally asserted ledger boundary with selfhash/inventory checks, not cryptographic authentication, chain reconciliation or hardware power-loss proof. Definitive ENTRY1.1 nonfill validates exact original release and closes only its proved incident; positive inventory, corrupt witnesses and UNKNOWN retain the original guards. Backup guards the DB, manifest and all three SQLite auxiliaries before writes; exclusive reservations and private native staging produce a standalone snapshot, preserve existing artifacts and remove only this invocation own reserved identities on failure."
   },
   {
     "claim": "Adapters enforce raw amount/mint/schema/TTL/grant/call-cap boundaries and literal full/partial quantity and cost conservation, with external funding observation kept separate from asset price.",

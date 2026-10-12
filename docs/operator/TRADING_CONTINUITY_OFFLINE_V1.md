@@ -207,6 +207,11 @@ CLI reconcile --mode PAPER --input complete-external-cut.json
 CLI ack-restore --mode PAPER --input complete-external-cut.json --inventory-sha256 <exact-current-inventory-sha256> --as-of <UTC>
 ```
 
+Для backup выбери новую destination family: сам файл и его `.json`,
+`-journal`, `-wal`, `-shm` должны отсутствовать. Существующий файл или alias
+вызывает отказ до записи; такой отказ не даёт права удалять чужие artifacts.
+Успешный backup содержит standalone DB и manifest, без зависимости от WAL.
+
 Каждый вызов использует свой exact runtime. Backup — native SQLite snapshot
 с manifest/hash и frozen dependency closure. Future source observations не
 входят в этот cut. Restore требует fresh marked root, проверяет snapshot и
@@ -221,7 +226,12 @@ revisions с committed heads, включая изменения после backu
 original identities/clocks/lineage без нового configure; более позднее
 валидное локальное продолжение цепочки сохраняется, конфликт не перезаписывается.
 Receipt удерживает исходную reservation и verified
-originating closure, зафиксированную до эффекта. Так восстанавливается даже
+originating closure, зафиксированную до эффекта. Невалидная JSON-форма origin,
+attempt, capture или callback удерживает исходное обязательство в typed UNKNOWN:
+исходные bytes сохраняются, uncertain SHADOW не resend, здоровые соседние
+old EXIT продолжаются. Восстановление использует совместимый backup,
+complete cut, reconciliation и ACK; ручная правка DB не является recovery.
+Так восстанавливается даже
 позиция, которой ещё не было в backup. Выходные receipts импортируют исходный
 EXIT packet/binding; новый send не выполняется. Cut применяется одним CLI
 вызовом; повтор идемпотентен, content conflict запрещён. Naked inventory ACK
