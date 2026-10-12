@@ -136,3 +136,13 @@ Current canonical provider binding resolves to registry-011 and is pinned
 explicitly by this task context. Preserve the historical domain-policy bytes
 and TASK30 receipt; policy-wide prose normalization is outside this atom.
 Immutable predecessors and provider grants stay intact.
+
+Implementation replan inside this same authorized atom: frozen 0df9aa7e
+architecture review reproduced a partial EXIT using a corrupted remainder
+despite UNKNOWN readback. Reuse the existing PaperPlane original witnesses
+to verify cumulative quantity/cost/fee projection before EXIT inputs, inside
+attempt creation and at result acceptance. Quarantine the affected obligation
+while healthy originating exits continue. No new state owner, schema/cache,
+dependency, product decision or operational authority; no internal seam is
+deferred to commissioning. Preserve actual role verdicts and native before,
+then require fresh whole-outcome evidence and all four exact-inventory roles.

@@ -259,6 +259,152 @@ def modeled_final_witness_valid(attempt: Mapping[str, Any], final: Mapping[str, 
         return False
 
 
+def assert_quantity_inventory_witness(store: PaperPlaneStore, position: Mapping[str, Any], *,
+                                      pending_attempt_id: str | None = None,
+                                      allow_pending: bool = False, force_quantity: bool = False) -> None:
+    """A mutable remainder is never authority for the next quantity EXIT.
+
+    Fold only this position's existing original final/results and quantity legs.
+    Legacy execution without quantity accounting keeps its released payloads.
+    The caller supplies its read snapshot or immediate claim/result transaction.
+    """
+    events = store.filtered_execution_events(position_ids=[position["position_id"]])
+    quantitative = force_quantity or position.get("entry_fee_semantics") is not None or any(
+        event["event_type"] == "MODELED_EXIT_QUANTITY_LEG"
+        or event["event_type"] == "MODELED_ATTEMPT_FINAL" and isinstance(event["payload"], Mapping)
+           and event["payload"].get("schema_version") == "1.1"
+        or event["event_type"] == "MODELED_RESULT_ACCEPTED" and isinstance(event["payload"], Mapping)
+           and isinstance(event["payload"].get("result"), Mapping)
+           and event["payload"]["result"].get("schema_version") == "1.1" for event in events)
+    if not quantitative:
+        return
+    try:
+        pid, bot = position["position_id"], position["bot_instance_id"]
+        mode = store.get_bot(bot)["mode"]
+        starts = [event for event in events if event["event_type"] == "MODELED_ATTEMPT_STARTED"]
+        attempts = {event["event_id"]: event for event in starts}
+        finals = {event["event_id"]: event for event in events if event["event_type"] == "MODELED_ATTEMPT_FINAL"}
+        observations = {event["event_id"]: event for event in events if event["event_type"] == "MODELED_RESULT_ACCEPTED"}
+        original = _positive_model_decimal(position["qty_dec"], "EXIT_INVENTORY_WITNESS_CONFLICT")
+        legacy = original if position.get("entry_fee_semantics") is None else None
+        for event in observations.values():
+            attempt = attempts.get(event["payload"]["result"]["attempt_id"])
+            if attempt is None or not modeled_final_witness_valid(attempt, None, event, mode=mode,
+                    legacy_original_quantity=legacy, original_position=position):
+                raise ValueError()
+        if any(event["event_id"].removeprefix("FINAL-") not in attempts for event in finals.values()):
+            raise ValueError()
+        entry = [event for event in starts if event["payload"]["side"] == "ENTRY"]
+        if len(entry) != 1:
+            raise ValueError()
+        terminal = finals["FINAL-" + entry[0]["event_id"]]
+        accepted = observations[terminal["payload"]["result_event_id"]]
+        if not modeled_final_witness_valid(entry[0], terminal, accepted, mode=mode,
+                legacy_original_quantity=legacy, original_position=position):
+            raise ValueError()
+        filled = accepted["payload"]["result"]
+        if filled["outcome"] not in {"LANDED_SUCCESS", "PARTIAL"}:
+            raise ValueError()
+        notional = _positive_model_decimal(filled["filled_notional_usd"], "EXIT_INVENTORY_WITNESS_CONFLICT")
+        if (Decimal(position["entered_notional_usd_dec"]) != notional
+            or Decimal(position["entry_price_dec"]) != Decimal(filled["unit_price_usd"])):
+            raise ValueError()
+        fee_bps = _bound_entry_fee_bps(position, int(position["fee_bps"]))
+        entry_fee = (Decimal("0") if filled.get("fee_semantics") == "INCLUDED_IN_UNIT_PRICE" else
+                     (notional * Decimal(fee_bps) / Decimal("10000")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+        native_entry = [event for event in events if event["event_type"] in {"PAPER_SIMULATION_OBSERVED", "SHADOW_EXECUTABLE_OBSERVED"}
+                        and event["payload"].get("side") == "ENTRY"]
+        if len(native_entry) != 1 or native_entry[0]["bot_instance_id"] != bot or native_entry[0]["position_id"] != pid:
+            raise ValueError()
+        source_entry = native_entry[0]["payload"]
+        for key, value in (("qty_dec", original), ("entry_price_dec", Decimal(filled["unit_price_usd"])),
+                           ("entry_gross_notional_usd_dec", notional), ("entry_fee_usd_dec", entry_fee)):
+            if Decimal(source_entry[key]) != value:
+                raise ValueError()
+        if Decimal(position["entry_fee_usd_dec"]) != entry_fee or source_entry["mode"] != mode:
+            raise ValueError()
+        remainder, proceeds, exit_fees, allocated_fee = original, Decimal("0"), Decimal("0"), Decimal("0")
+        gross, net = Decimal("0"), Decimal("0")
+        legs = {event["event_id"]: event for event in events if event["event_type"] == "MODELED_EXIT_QUANTITY_LEG"}
+        consumed = set()
+        for attempt in starts:
+            body = attempt["payload"]
+            if body["side"] != "EXIT":
+                continue
+            if body.get("remaining_quantity") is not None:
+                if Decimal(body["remaining_quantity"]) != remainder or body.get("quantity_unit") != "TOKEN_UNITS":
+                    raise ValueError()
+            elif legacy is None or remainder != original:
+                raise ValueError()
+            final = finals.get("FINAL-" + attempt["event_id"])
+            if final is None:
+                if not (allow_pending or pending_attempt_id == attempt["event_id"]):
+                    raise ValueError()
+                if any(event["payload"]["result"]["outcome"] != "UNKNOWN_REQUIRES_RECONCILIATION"
+                       for event in observations.values() if event["payload"]["result"]["attempt_id"] == attempt["event_id"]):
+                    raise ValueError()
+                continue
+            accepted = observations[final["payload"]["result_event_id"]]
+            if not modeled_final_witness_valid(attempt, final, accepted, mode=mode,
+                    legacy_original_quantity=legacy, original_position=position):
+                raise ValueError()
+            result = accepted["payload"]["result"]
+            if result["outcome"] not in {"LANDED_SUCCESS", "PARTIAL"}:
+                continue
+            modern = result.get("schema_version") == "1.1"
+            sold = Decimal(result["quantity_sold"]) if modern else remainder
+            remaining = Decimal(result["remaining_quantity"]) if modern else Decimal("0")
+            if sold + remaining != remainder:
+                raise ValueError()
+            semantics = result.get("fee_semantics", "SEPARATE_MODELED_FEE")
+            price = Decimal(result["unit_price_usd"])
+            leg_proceeds = (price * sold).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            leg_fee = (Decimal("0") if semantics == "INCLUDED_IN_UNIT_PRICE" else
+                       (leg_proceeds * Decimal(fee_bps) / Decimal("10000")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+            proceeds += leg_proceeds
+            exit_fees += leg_fee
+            cost = notional * remaining / original
+            next_fee = (entry_fee * (original - remaining) / original).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            next_gross = (proceeds - (notional - cost)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            next_net = (next_gross - next_fee - exit_fees).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            if modern:
+                leg = legs.get("LEG-" + accepted["event_id"])
+            else:
+                matches = [event for event in legs.values() if event["event_id"] not in consumed
+                    and event["payload"]["request"]["quantity_sold"] == format(sold, "f")
+                    and event["payload"]["request"]["remaining_quantity"] == format(remaining, "f")]
+                leg = matches[0] if len(matches) == 1 else None
+            if leg is None or leg["position_id"] != pid or leg["bot_instance_id"] != bot:
+                raise ValueError()
+            clock = result["observed_at"] if modern else leg["created_at"]
+            expected = {"schema_version": "1.1", "request": {"quantity_sold": format(sold, "f"),
+                "remaining_quantity": format(remaining, "f"), "unit_price_usd": format(price, "f"),
+                "fee_semantics": semantics, "observed_at": clock, "mode": mode}, "quantity_unit": "TOKEN_UNITS",
+                "proceeds_usd": format(leg_proceeds, "f"), "exit_fee_usd": format(leg_fee, "f"),
+                "allocated_entry_fee_total_usd": format(next_fee, "f"), "allocated_entry_fee_usd": format(next_fee - allocated_fee, "f"),
+                "realized_gross_pnl_usd": format(next_gross - gross, "f"), "realized_trade_net_usd": format(next_net - net, "f"),
+                "remaining_cost_basis_usd": format(cost, "f"), "realized_trade_net_total_usd": format(next_net, "f"), "evidence_class": mode + "_MODEL"}
+            if leg["created_at"] != clock or leg["payload"] != expected:
+                raise ValueError()
+            consumed.add(leg["event_id"])
+            remainder, allocated_fee, gross, net = remaining, next_fee, next_gross, next_net
+        if consumed != set(legs):
+            raise ValueError()
+        if position.get("remaining_qty_dec") is not None:
+            for key, value in (("remaining_qty_dec", remainder), ("remaining_cost_basis_usd_dec", notional * remainder / original),
+                               ("remaining_entry_fee_usd_dec", entry_fee - allocated_fee)):
+                if Decimal(position[key]) != value:
+                    raise ValueError()
+        elif position.get("entry_fee_semantics") is not None or consumed:
+            raise ValueError()
+        for key, value in (("exit_notional_usd_dec", proceeds), ("exit_fee_usd_dec", exit_fees),
+                           ("realized_gross_pnl_usd_dec", gross), ("realized_net_pnl_usd_dec", net)):
+            if (position.get(key) is None and consumed) or position.get(key) is not None and Decimal(position[key]) != value:
+                raise ValueError()
+    except (KeyError, TypeError, ValueError, ArithmeticError, AttributeError, PaperPlaneError):
+        raise PaperPlaneError("EXIT_INVENTORY_WITNESS_CONFLICT") from None
+
+
 def _sql_modeled_final_witness(*values: Any) -> int:
     try:
         keys = ("event_type", "event_id", "bot_instance_id", "position_id", "created_at", "payload")
@@ -2498,6 +2644,7 @@ def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str
         elif state not in {"EXIT_REQUIRED", "EXITING", "UNRESOLVED"}:
             raise PaperPlaneError("EXIT_ATTEMPT_REQUIRES_ORIGINATING_EXIT")
         if side == "EXIT":
+            assert_quantity_inventory_witness(store, position)
             if position.get("entry_price_dec") is None:
                 raise PaperPlaneError("EXIT_ATTEMPT_REQUIRES_ENTRY_RECONCILIATION")
             clocks = [decision_at]
@@ -2570,6 +2717,12 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
         if attempt is None or attempt["event_type"] != "MODELED_ATTEMPT_STARTED":
             raise PaperPlaneError("MODELED_ATTEMPT_UNRESOLVED")
         bound = attempt["payload"]
+        position = store.get_position(bound["position_id"])
+        if position is None:
+            raise PaperPlaneError("POSITION_NOT_FOUND")
+        if bound["side"] == "EXIT":
+            assert_quantity_inventory_witness(store, position, pending_attempt_id=attempt["event_id"],
+                force_quantity=version == "1.1" and positive)
         if _parse_utc(str(result["observed_at"])) < _parse_utc(bound["as_of"]):
             raise PaperPlaneError("MODELED_RESULT_CLOCK_INVALID")
         rid = "RESULT-" + canonical_spec_sha256({"result_id": result["result_id"]}).upper()

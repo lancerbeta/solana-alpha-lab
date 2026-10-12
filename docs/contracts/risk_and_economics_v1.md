@@ -221,6 +221,17 @@ the final leg consumes the exact residual fee, so total allocation equals
 the original entry fee. Partial realized rows and residual open marks are
 separate, without a settled/full-return headline or mixed-mode aggregation.
 
+Before another quantity EXIT, the existing PaperPlane owner verifies
+the current remainder and accumulated cost/fee/proceeds/net against indexed
+original accepted entry and ordered EXIT witnesses. Readback and dispatch
+share this proof. The same check runs inside attempt creation and EXIT result
+acceptance transactions. A corrupt partial projection cannot become new
+inventory authority through another attempt: retain typed UNKNOWN, the
+original quantities and any pending result, without another quote effect.
+Healthy neighboring originating obligations continue independently. No
+new truth table, cache or schema is introduced. An exact restored original
+witness/projection may resume through the same validated ordinary path.
+
 Literal synthetic oracle: 10M units at `$0.000003` enter for `$30` plus
 `$0.06` fee. Exit 4M at `$0.0000033` gives `$13.20` proceeds and `$0.03`
 fee, retaining 6M units and `$18` cost basis. Exit the final 6M at

@@ -12,7 +12,7 @@ from pathlib import Path
 
 from solana_alpha_lab.factory.trading_runner import TradingContinuityRunner
 from solana_alpha_lab.factory.trading_adapters import PaperModelAdapter, JupiterQuoteAdapter, raw_amount, checked_observation
-from solana_alpha_lab.factory.paper_plane import PRE_ATTEMPT_STATES, accept_exit_decision
+from solana_alpha_lab.factory.paper_plane import PRE_ATTEMPT_STATES, accept_exit_decision, assert_quantity_inventory_witness
 from solana_alpha_lab.factory.paper_shadow_commands import maybe_finish_drain, apply_operator_command
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
@@ -273,6 +273,12 @@ class TradingCoordinator:
                 (at, key))
 
     def _inputs(self, bound, store, position, profile, side, at):
+        if side == "EXIT":
+            # Readback health is not send authority. Verify the same indexed
+            # accounting proof again inside the atomic claim owner below.
+            with store.read_snapshot():
+                position = store.get_position(position["position_id"])
+                assert_quantity_inventory_witness(store, position)
         origin = bound._origin(store, position)
         admission = origin["provenance"]["origin_admission"]
         point = bound.recipe["decision_point"] if side == "ENTRY" else bound.recipe["target"]["exit_point"]
@@ -398,6 +404,15 @@ class TradingCoordinator:
             request["entry_send_valid_until"] = render_utc(parse_utc(decision_at)+timedelta(seconds=bound.strategy["signal_input"]["max_age_seconds"])) if side=="ENTRY" else None
             if parse_utc(at)>parse_utc(request["observation_valid_until"]):
                 request["unit_price_usd"]=None
+            if side == "EXIT" and self.mode == "SHADOW":
+                current = store.get_position(position["position_id"])
+                quantity = current.get("remaining_qty_dec") if current.get("remaining_qty_dec") is not None else current["qty_dec"]
+                # A real original result may arrive between request preparation
+                # and this claim. Its smaller proved inventory cannot authorize
+                # the previously prepared larger raw quote request.
+                if (Decimal(request["remaining_quantity"]) != Decimal(quantity)
+                    or int(request["amount"]) > int(raw_amount(quantity, request["input_decimals"]))):
+                    raise PaperPlaneError("EXIT_INVENTORY_WITNESS_CONFLICT")
             from solana_alpha_lab.factory.paper_plane import begin_modeled_attempt
             attempt = begin_modeled_attempt(store, position_id=position["position_id"], side=side, mode=self.mode,
                 attempt_key=key, decision_at=decision_at, max_age_seconds=bound.strategy["signal_input"]["max_age_seconds"], as_of=at)
@@ -510,6 +525,10 @@ class TradingCoordinator:
             return False
         else:
             store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND active=1", (at, row[0]))
+            proved = store.get_position(position["position_id"])
+            assert_quantity_inventory_witness(store, proved)
+            store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND reason='EXIT_INVENTORY_WITNESS_CONFLICT' AND active=1",
+                (at, position["position_id"]))
             return True
 
     def tick(self):
@@ -706,6 +725,7 @@ class TradingCoordinator:
                     try:
                         bound = self.runner.for_epoch(position["activation_epoch_id"])
                         bound._origin(store, position)
+                        assert_quantity_inventory_witness(store, position, allow_pending=True)
                         if position.get("exit_decision_id"):
                             bound._exit_origin(store, position)
                             expected = True

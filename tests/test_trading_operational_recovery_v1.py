@@ -106,6 +106,208 @@ class OperationalRecoveryTests(unittest.TestCase):
             external_cut_id="INDEPENDENT-SYNTHETIC-DELAYED-CUT", as_of=self.now.isoformat().replace("+00:00", "Z"))
         return {**cut, "cut_sha256": sha256_of(cut)}
 
+    def partial_shadow(self):
+        self.start_operating(mode="SHADOW", exit_cap="4000000000000")
+        ledger, plan = self.wire_files([{"outAmount": "10000000000000"}, {"outAmount": "120000000"},
+                                      {"outAmount": "132000000"}, {"outAmount": "60000000"}])
+        self.coordinator.quote_adapter = RecordingQuoteAdapter(ledger, json.loads(plan.read_text()))
+        self.coordinator.tick()
+        self.source.tick(datetime(2026, 10, 5, 13, 5, tzinfo=UTC))
+        self.now = datetime(2026, 10, 5, 13, 10, tzinfo=UTC)
+        self.quote_inputs(at="2026-10-05T13:10:00Z")
+        self.coordinator.tick()
+        original = self.runner.readback()["positions"][0]
+        self.assertEqual(Decimal(original["remaining_qty_dec"]), Decimal("6000000"))
+        self.assertEqual(Decimal(original["remaining_cost_basis_usd_dec"]), Decimal("18"))
+        return ledger, original
+
+    def test_partial_projection_damage_blocks_ordinary_quote_until_truthful_restoration(self):
+        metrics = []
+        for field, bad in (("remaining_qty_dec", "9000000"), ("remaining_cost_basis_usd_dec", "99"),
+                           ("realized_net_pnl_usd_dec", "99")):
+            with self.subTest(field=field):
+                case = OperationalRecoveryTests()
+                case.setUp()
+                try:
+                    ledger, original = case.partial_shadow()
+                    before = case.runner.readback()
+                    with closing(PaperPlaneStore(case.runner.store_path)) as store:
+                        with store.immediate_write():
+                            store._conn.execute("UPDATE positions SET " + field + "=? WHERE position_id=?", (bad, original["position_id"]))
+                    case.coordinator.run(ticks=2)
+                    view = case.coordinator.status()
+                    self.assertEqual(view["status"], "ACTION_REQUIRED")
+                    self.assertEqual(view["inventory"]["inventory_status"], "UNKNOWN")
+                    self.assertEqual(view["inventory"]["position_count"], 1)
+                    self.assertIsNone(view["inventory"]["outstanding_cost_basis_usd"])
+                    self.assertEqual(len(case.ledger_receipts(ledger)), 2)
+                    self.assertEqual(case.runner.readback()["modeled_attempts"], before["modeled_attempts"])
+                    self.assertEqual(case.runner.readback()["modeled_results"], before["modeled_results"])
+                    self.assertIn("EXIT_INVENTORY_WITNESS_CONFLICT", {row["reason"] for row in view["incidents"] if row["active"]})
+                    with closing(PaperPlaneStore(case.runner.store_path)) as store:
+                        self.assertEqual(store.get_position(original["position_id"])[field], bad)
+                        with store.immediate_write():
+                            store._conn.execute("UPDATE positions SET " + field + "=? WHERE position_id=?", (original[field], original["position_id"]))
+                    case.coordinator.tick()
+                    next_partial = case.runner.readback()["positions"][0]
+                    self.assertEqual(Decimal(next_partial["remaining_qty_dec"]), Decimal("2000000"))
+                    self.assertEqual(Decimal(next_partial["remaining_cost_basis_usd_dec"]), Decimal("6"))
+                    self.assertEqual(Decimal(next_partial["realized_net_pnl_usd_dec"]), Decimal("1.20"))
+                    self.assertEqual(Decimal(case.ledger_receipts(ledger)[-1]["attempt"]["remaining_quantity"]), Decimal("6000000"))
+                    case.coordinator.tick()
+                    final = case.runner.readback()["positions"][0]
+                    self.assertEqual(final["state"], "RECONCILED")
+                    self.assertEqual(Decimal(final["remaining_qty_dec"]), 0)
+                    self.assertEqual(Decimal(final["remaining_cost_basis_usd_dec"]), 0)
+                    self.assertEqual(Decimal(final["remaining_entry_fee_usd_dec"]), 0)
+                    self.assertEqual(Decimal(final["realized_net_pnl_usd_dec"]), Decimal("1.20"))
+                    self.assertEqual(case.coordinator.status()["status"], "READY")
+                    self.assertEqual(len(case.ledger_receipts(ledger)), 4)
+                    metrics.append({"damaged": field, "denied_extra_quotes": 0, "restored_second_partial_quantity": "2000000",
+                        "restored_second_partial_cost_usd": "6", "terminal_net_usd": "1.20"})
+                finally:
+                    case.tearDown()
+        self.metrics = {"cases": metrics}
+
+    def test_native_projection_race_between_preflight_and_claim_denies_before_attempt(self):
+        ledger, original = self.partial_shadow()
+        before = self.runner.readback()
+        native_inputs = self.coordinator._inputs
+        reached = []
+
+        def corrupt_after_preflight(*args):
+            request = native_inputs(*args)
+            if args[-2] == "EXIT":
+                reached.append(request["remaining_quantity"])
+                with closing(PaperPlaneStore(self.runner.store_path)) as writer:
+                    with writer.immediate_write():
+                        writer._conn.execute("UPDATE positions SET remaining_qty_dec='9000000' WHERE position_id=?", (original["position_id"],))
+            return request
+
+        with patch.object(self.coordinator, "_inputs", side_effect=corrupt_after_preflight):
+            self.coordinator.tick()
+        self.assertEqual([Decimal(value) for value in reached], [Decimal("6000000")])
+        self.assertEqual(self.runner.readback()["modeled_attempts"], before["modeled_attempts"])
+        self.assertEqual(self.runner.readback()["modeled_results"], before["modeled_results"])
+        self.assertEqual(len(self.ledger_receipts(ledger)), 2)
+        self.assertEqual(self.coordinator.status()["inventory"]["inventory_status"], "UNKNOWN")
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            with store.immediate_write():
+                store._conn.execute("UPDATE positions SET remaining_qty_dec=? WHERE position_id=?",
+                    (original["remaining_qty_dec"], original["position_id"]))
+            stale_request = native_inputs(self.runner.for_epoch(original["activation_epoch_id"]), store, original,
+                self.profile, "EXIT", "2026-10-05T13:10:00Z")
+        # A genuine ordinary result now consumes another 4M. The older request
+        # is internally intact, but its 6M reservation cannot send against 2M.
+        self.coordinator.tick()
+        self.assertEqual(Decimal(self.runner.readback()["positions"][0]["remaining_qty_dec"]), Decimal("2000000"))
+        original_attempts = self.runner.readback()["modeled_attempts"]
+        with patch.object(self.coordinator, "_inputs", return_value=stale_request):
+            self.coordinator.tick()
+        self.assertEqual(self.runner.readback()["modeled_attempts"], original_attempts)
+        self.assertEqual(len(self.ledger_receipts(ledger)), 3)
+        self.coordinator.tick()
+        self.assertEqual(len(self.ledger_receipts(ledger)), 4)
+        self.assertEqual(self.runner.readback()["positions"][0]["state"], "RECONCILED")
+        self.metrics = {"preflight_proved_quantity": "6000000", "native_writer_mutation": "9000000",
+            "new_committed_attempts_while_corrupt": 0, "new_quote_effects_while_corrupt": 0, "atomic_claim_guard": "DENY",
+            "genuine_result_reduces_quantity_to": "2000000", "stale_larger_request_extra_quotes": 0}
+
+    def test_native_projection_race_after_claim_retains_original_capture_without_resend(self):
+        ledger, original = self.partial_shadow()
+        before = self.runner.readback()
+        adapter = self.coordinator.quote_adapter
+        native_dispatch = adapter.dispatch
+        captured = []
+
+        def corrupt_after_effect(*args, **kwargs):
+            result, proof = native_dispatch(*args, **kwargs)
+            captured.append(result)
+            with closing(PaperPlaneStore(self.runner.store_path)) as writer:
+                with writer.immediate_write():
+                    writer._conn.execute("UPDATE positions SET entered_notional_usd_dec='31' WHERE position_id=?", (original["position_id"],))
+            return result, proof
+
+        with patch.object(adapter, "dispatch", side_effect=corrupt_after_effect):
+            self.coordinator.tick()
+        damaged = self.runner.readback()
+        self.assertEqual(damaged["modeled_results"], before["modeled_results"])
+        self.assertEqual(len(damaged["modeled_attempts"]), len(before["modeled_attempts"]) + 1)
+        pending = damaged["modeled_attempts"][-1]["payload"]
+        self.assertEqual(Decimal(pending["remaining_quantity"]), Decimal("6000000"))
+        self.assertEqual(damaged["positions"][0]["state"], "EXITING")
+        self.assertEqual(len(self.ledger_receipts(ledger)), 3)
+        self.coordinator.run(ticks=2)
+        self.assertEqual(self.runner.readback()["modeled_results"], before["modeled_results"])
+        self.assertEqual(len(self.ledger_receipts(ledger)), 3)
+        self.assertEqual(self.coordinator.status()["pending_attempts"], 1)
+        self.assertEqual(self.coordinator.status()["inventory"]["inventory_status"], "UNKNOWN")
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            retained = store.get_execution_event("CAPTURE-" + pending["attempt_id"])
+            self.assertEqual(retained["payload"]["result"], captured[0])
+            with store.immediate_write():
+                store._conn.execute("UPDATE positions SET entered_notional_usd_dec=? WHERE position_id=?",
+                    (original["entered_notional_usd_dec"], original["position_id"]))
+        self.coordinator.tick()
+        receipts = self.ledger_receipts(ledger)
+        self.assertEqual(len(receipts), 4)
+        self.assertEqual(len({row["attempt"]["attempt_id"] for row in receipts}), 4)
+        self.assertEqual(sum(row["attempt"]["attempt_id"] == pending["attempt_id"] for row in receipts), 1)
+        restored = self.runner.readback()
+        self.assertIn(captured[0], [event["payload"]["result"] for event in restored["modeled_results"]])
+        self.assertEqual(restored["positions"][0]["state"], "RECONCILED")
+        self.assertEqual(Decimal(restored["positions"][0]["realized_net_pnl_usd_dec"]), Decimal("1.20"))
+        self.assertEqual(self.coordinator.status()["status"], "READY")
+        self.metrics = {"original_claim_quantity": "6000000", "corrupt_original_entry_cost_usd": "31",
+            "unaccepted_capture_retained": True, "pending_attempts_while_corrupt": 1,
+            "repeat_original_quote_effects": 0, "truthful_restoration_terminal_net_usd": "1.20"}
+
+    def test_partial_original_result_damage_blocks_quote_and_healthy_neighbor_continues(self):
+        native_activate = TradingCoordinator.activate
+
+        def two_positions(coordinator, **kwargs):
+            kwargs["profile"]["envelope"].update(max_outstanding_positions=2, max_outstanding_cost_basis_usd="60")
+            return native_activate(coordinator, **kwargs)
+
+        with patch.object(TradingCoordinator, "activate", new=two_positions):
+            self.start_operating(mode="SHADOW", exit_cap="4000000000000")
+        first_epoch = self.epoch
+        ledger, plan = self.wire_files([{"outAmount": "10000000000000"}, {"outAmount": "10000000000000"},
+            {"outAmount": "120000000"}, {"outAmount": "120000000"}, {"outAmount": "132000000"}, {"outAmount": "60000000"}])
+        self.coordinator.quote_adapter = RecordingQuoteAdapter(ledger, json.loads(plan.read_text()))
+        self.coordinator.tick()
+        second_epoch = first_epoch + "-OTHER"
+        self.coordinator.activate(epoch_id=second_epoch, at="2026-10-05T12:40:00Z", profile=self.profile,
+            switch_key="SECOND-PARTIAL-CANDIDATE", expected_current_epoch=first_epoch)
+        self.coordinator.tick()
+        self.source.tick(datetime(2026, 10, 5, 13, 5, tzinfo=UTC))
+        self.now = datetime(2026, 10, 5, 13, 10, tzinfo=UTC)
+        self.quote_inputs(at="2026-10-05T13:10:00Z")
+        self.coordinator.tick()
+        positions = {row["activation_epoch_id"]: row for row in self.runner.readback()["positions"]}
+        self.assertTrue(all(Decimal(row["remaining_qty_dec"]) == Decimal("6000000") for row in positions.values()))
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            results = store.filtered_execution_events(event_type="MODELED_RESULT_ACCEPTED", position_ids=[positions[first_epoch]["position_id"]])
+            original = results[-1]
+            damaged = copy.deepcopy(original["payload"])
+            damaged["result"]["quantity_sold"] = "1"
+            with store.immediate_write():
+                store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(damaged), original["event_id"]))
+        self.coordinator.tick()
+        self.coordinator.tick()
+        after = {row["activation_epoch_id"]: row for row in self.runner.readback()["positions"]}
+        self.assertEqual(Decimal(after[first_epoch]["remaining_qty_dec"]), Decimal("6000000"))
+        self.assertEqual(after[second_epoch]["state"], "RECONCILED")
+        self.assertEqual(Decimal(after[second_epoch]["realized_net_pnl_usd_dec"]), Decimal("1.20"))
+        view = self.coordinator.status()
+        self.assertEqual(view["inventory"]["position_count"], 1)
+        self.assertEqual(view["inventory"]["inventory_status"], "UNKNOWN")
+        self.assertEqual(len(self.ledger_receipts(ledger)), 6)
+        bad_quotes = [row for row in self.ledger_receipts(ledger) if row["attempt"]["position_id"] == positions[first_epoch]["position_id"]]
+        self.assertEqual(len(bad_quotes), 2)
+        self.metrics = {"corrupt_original_result_extra_quotes": 0, "healthy_other_exit": "RECONCILED",
+            "healthy_terminal_net_usd": "1.20", "unknown_position_count": 1}
+
     def test_transient_exit_funding_recovers_without_stale_active_incident(self):
         metrics = []
         for damage in ("MISSING", "MALFORMED", "STALE"):

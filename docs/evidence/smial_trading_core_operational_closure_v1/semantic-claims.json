@@ -12,12 +12,12 @@
   {
     "claim": "A versioned explicit per-mode envelope accounts for all outstanding obligations across epochs without automatic shrink; UNKNOWN frees no capacity and missing configuration cannot become READY.",
     "claim_id": "C3",
-    "scope": "One canonical PaperPlane inventory and existing admission/risk owners; this is modeled obligation accounting, not equity or wallet truth."
+    "scope": "One canonical PaperPlane inventory and existing admission/risk owners. Indexed original cumulative quantity/cost/fee witnesses fence corrupt partial projections before EXIT inputs, inside attempt creation and result acceptance; UNKNOWN cannot become new inventory authority through another attempt. This is modeled obligation accounting, not equity or wallet truth."
   },
   {
     "claim": "Pause/STOP/DRAIN, missing active strategy and damaged current bindings block new entries while retained original closure lets healthy old obligations exit and reconcile independently.",
     "claim_id": "C4",
-    "scope": "Frozen original spec, decision, recipe, native metadata and provenance; per-obligation corruption remains a typed gap without fabricated closure."
+    "scope": "Frozen original spec, decision, recipe, native metadata and provenance; per-obligation corruption including partial projection remains a typed gap without fabricated closure or another quote effect, while healthy neighboring old EXIT obligations continue."
   },
   {
     "claim": "Native backup and fresh restore preserve original attempts, accepted result history, known cost floors, pending clocks, controls, consumed quota and complete current operating-envelope/runtime-policy chains; pending UNKNOWN is never resent, and a recovery fence requires complete-cut authority reconciliation plus explicit inventory ACK.",
@@ -27,7 +27,7 @@
   {
     "claim": "Adapters enforce raw amount/mint/schema/TTL/grant/call-cap boundaries and literal full/partial quantity and cost conservation, with external funding observation kept separate from asset price.",
     "claim_id": "C6",
-    "scope": "Real stdlib Jupiter quote-only GET/parser code with lowest HTTP boundary replaced in tests. No production provider call or credentials; a quote is never an actual chain fill and non-null transaction is denied."
+    "scope": "Real stdlib Jupiter quote-only GET/parser code with lowest HTTP boundary replaced in tests. Conservation is checked against original accepted cumulative witnesses, including corruption between preflight, transactional claim and result acceptance. No production provider call or credentials; a quote is never an actual chain fill and non-null transaction is denied."
   },
   {
     "claim": "Cold independent operator CLI, current read-only status, bounded virtual-history/resource probes and owned fixture cleanup verify the declared software outcome.",

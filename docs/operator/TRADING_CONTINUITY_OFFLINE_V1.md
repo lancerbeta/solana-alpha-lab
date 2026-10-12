@@ -279,6 +279,14 @@ Migration additive; legacy NULL provenance остаётся typed gap. Стар�
 Не удаляй DB ради возврата старой версии. Frozen evidence удерживается до
 закрытия/выяснения всех originating obligations; current files не нужны.
 
+Повреждённый partial remainder/cost/fee/PnL не разрешает следующую EXIT
+попытку. Current readback и automatic dispatch сверяют исходные принятые
+quantity events; проверка повторяется под native transaction. Позиция
+сохраняет UNKNOWN и исходную obligation, здоровые соседние old EXIT работают.
+Проверяй original accepted witnesses и сохранённый recovery cut; не исправляй
+остаток под желаемый лимит и не создавай новый result для снятия UNKNOWN.
+Возобновление допустимо после доказанного восстановления исходной lineage.
+
 ## Самодостаточный proof и cleanup
 
 ```text

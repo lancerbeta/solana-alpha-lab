@@ -14,6 +14,7 @@ from solana_alpha_lab.factory.application import FactoryApplication
 from solana_alpha_lab.factory.paper_plane import (
     PaperPlaneError, PaperPlaneStore, accept_signal_decision_outcome,
     begin_modeled_attempt, accept_modeled_result,
+    assert_quantity_inventory_witness,
 )
 from solana_alpha_lab.factory.paper_shadow_operations import build_operations_projection
 from solana_alpha_lab.factory.risk_economics import compose_risk_economics
@@ -138,6 +139,87 @@ class OperatingObligationsTests(StoreCase):
             self.assertEqual(obligation_summary(reader, mode="PAPER")["position_count"], 0)
         finally:
             reader.close()
+
+    def test_quantity_result_acceptance_rejects_corrupt_original_or_cumulative_projection(self):
+        metrics = []
+        damages = [("qty_dec", "9000000"), ("entry_price_dec", "0.000004"),
+            ("entered_notional_usd_dec", "31"), ("entry_fee_usd_dec", "99"),
+            ("remaining_qty_dec", "9000000"), ("remaining_cost_basis_usd_dec", "99"),
+            ("remaining_entry_fee_usd_dec", "99"), ("exit_notional_usd_dec", "99"),
+            ("exit_fee_usd_dec", "99"), ("realized_gross_pnl_usd_dec", "99"),
+            ("realized_net_pnl_usd_dec", "99"), ("entry_fee_semantics", None)]
+        for number, (field, value) in enumerate(damages):
+            with self.subTest(field=field):
+                store = self.store("projection-" + str(number) + ".sqlite")
+                self.envelope(store)
+                pid = self.entry(store, key="SIGDEC-PROJECTION-" + str(number))
+                self.close_request(store, pid, "close-" + str(number))
+                first = self.attempt(store, pid, "EXIT", "exit1")
+                accept_modeled_result(store, result=self.exit_result(first["attempt_id"], "partial-" + str(number)))
+                pending = self.attempt(store, pid, "EXIT", "exit2")
+                original = store.get_position(pid)
+                next_result = self.exit_result(pending["attempt_id"], "next-" + str(number), sold="4000000", remaining="2000000")
+                with store.immediate_write():
+                    store._conn.execute("UPDATE positions SET " + field + "=? WHERE position_id=?", (value, pid))
+                damaged = store.get_position(pid)
+                journal = store.execution_events()
+                with self.assertRaisesRegex(PaperPlaneError, "^EXIT_INVENTORY_WITNESS_CONFLICT$"):
+                    accept_modeled_result(store, result=next_result)
+                self.assertEqual(store.get_position(pid), damaged)
+                self.assertEqual(store.execution_events(), journal)
+                self.assertIsNone(store.get_execution_event("FINAL-" + pending["attempt_id"]))
+                with store.immediate_write():
+                    store._conn.execute("UPDATE positions SET " + field + "=? WHERE position_id=?", (original[field], pid))
+                restored = accept_modeled_result(store, result=next_result)["position"]
+                self.assertEqual(Decimal(restored["remaining_qty_dec"]), Decimal("2000000"))
+                self.assertEqual(Decimal(restored["remaining_cost_basis_usd_dec"]), Decimal("6"))
+                final_attempt = self.attempt(store, pid, "EXIT", "exit3")
+                final = accept_modeled_result(store, result=self.exit_result(final_attempt["attempt_id"], "final-" + str(number),
+                    sold="2000000", remaining="0", price="0.000003", cost="0", outcome="LANDED_SUCCESS"))["position"]
+                self.assertEqual(Decimal(final["remaining_cost_basis_usd_dec"]), 0)
+                self.assertEqual(Decimal(final["remaining_entry_fee_usd_dec"]), 0)
+                self.assertEqual(Decimal(final["realized_net_pnl_usd_dec"]), Decimal("2.27"))
+                metrics.append({"damaged": field, "acceptance": "DENY", "new_accepted_events": 0,
+                    "truthful_restoration_terminal_net_usd": "2.27"})
+        self.metrics = {"cases": metrics}
+
+    def test_modern_entry_witness_cannot_be_hidden_by_nulling_quantity_projection_flags(self):
+        store = self.store()
+        self.envelope(store)
+        pid = self.entry(store)
+        self.close_request(store, pid, "close")
+        with store.immediate_write():
+            store._conn.execute("UPDATE positions SET entry_fee_semantics=NULL, remaining_qty_dec=NULL, remaining_cost_basis_usd_dec=NULL, remaining_entry_fee_usd_dec=NULL WHERE position_id=?", (pid,))
+        before = store.execution_events()
+        with self.assertRaisesRegex(PaperPlaneError, "^EXIT_INVENTORY_WITNESS_CONFLICT$"):
+            self.attempt(store, pid, "EXIT", "flag-bypass")
+        self.assertEqual(store.execution_events(), before)
+        self.metrics = {"modern_origin_retained": True, "mutable_flags_null": True, "new_attempts": 0}
+
+    def test_genuine_v1_0_entry_then_v1_1_partial_and_full_preserves_original_payload(self):
+        store = self.store()
+        self.envelope(store)
+        pid = self.admission(store, "SIGDEC-LEGACY-PARTIAL")["position_id"]
+        attempt = self.attempt(store, pid)
+        original = {"attempt_id": attempt["attempt_id"], "result_id": "legacy-partial-entry",
+            "outcome": "LANDED_SUCCESS", "observed_at": T0, "unit_price_usd": "0.000003",
+            "filled_notional_usd": "30", "chargeable_cost_usd": "0"}
+        accept_modeled_result(store, result=original)
+        native_entry = store.filtered_execution_events(event_type="MODELED_RESULT_ACCEPTED")[0]
+        self.assertEqual(native_entry["payload"]["result"], original)
+        self.close_request(store, pid, "close")
+        first = self.attempt(store, pid, "EXIT", "exit1")
+        self.assertNotIn("remaining_quantity", first)
+        accept_modeled_result(store, result=self.exit_result(first["attempt_id"], "legacy-partial"))
+        second = self.attempt(store, pid, "EXIT", "exit2")
+        self.assertEqual(Decimal(second["remaining_quantity"]), Decimal("6000000"))
+        final = accept_modeled_result(store, result=self.exit_result(second["attempt_id"], "legacy-final",
+            sold="6000000", remaining="0", price="0.000003", cost="0", outcome="LANDED_SUCCESS"))["position"]
+        self.assertEqual(final["state"], "RECONCILED")
+        self.assertEqual(Decimal(final["realized_net_pnl_usd_dec"]), Decimal("1.07"))
+        self.assertEqual(store.get_execution_event(native_entry["event_id"]), native_entry)
+        self.metrics = {"legacy_original_payload_unchanged": True, "partial_quantity": "6000000",
+            "terminal_net_usd": "1.07"}
 
     def test_unknown_exit_retains_inventory_and_blocks_overlapping_attempt(self):
         store = self.store()
@@ -614,6 +696,7 @@ class OperatingObligationsTests(StoreCase):
             try:
                 read_operating_envelope(store, "PAPER")
                 summary = obligation_summary(store, mode="PAPER")
+                assert_quantity_inventory_witness(store, store.get_position(pid), allow_pending=True)
             finally:
                 store._conn.set_progress_handler(None, 0)
             self.assertEqual(summary["position_count"], 1)

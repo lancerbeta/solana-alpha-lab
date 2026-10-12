@@ -1,0 +1,117 @@
+{
+  "additional_native_regressions": {
+    "CODE_REVIEWER": {
+      "elapsed_seconds": 21.965104,
+      "owned_roots": "ABSENT",
+      "status": "PASS",
+      "tests": 3
+    },
+    "GOAL_DOD_CRITIC": {
+      "elapsed_seconds": [
+        5.217849,
+        11.496546,
+        4.208405
+      ],
+      "owned_roots": "ABSENT",
+      "status": "PASS",
+      "tests": 3
+    },
+    "OWNER_UX_CRITIC": {
+      "additional_tests": 0,
+      "method": "Independent current 23-command receipt and frozen identity verification; no repeated journey"
+    }
+  },
+  "all_74_candidate_source_bytes_unchanged_during_review": true,
+  "credential_reads": 0,
+  "diff_sha256": "4207c19af8b5b4e47e8d7645cc8f6d90648e468f9a630a8ceb31a72167da078d",
+  "expected_base": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "financial_effects": 0,
+  "implementation_blobs": 74,
+  "local_full_gate_executed": false,
+  "native_counterexamples": {
+    "corrupt_partial_remaining_becomes_new_exit_authority": {
+      "accepted_original_remaining_cost_usd": "18.00",
+      "accepted_original_remaining_quantity": 6000000,
+      "before_next_tick": {
+        "inventory_status": "UNKNOWN",
+        "status": "ACTION_REQUIRED"
+      },
+      "corruption": "ONLY positions.remaining_qty_dec 6000000 -> 9000000",
+      "entry_attempt": "ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+      "failed_sandbox_fixture_root": "ABSENT",
+      "first_exit_sold_quantity": 4000000,
+      "immutable_history_expected": {
+        "realized_trade_net_embedded_fees_usd": "1.20",
+        "remaining_cost_usd": "6.00",
+        "remaining_quantity": 2000000
+      },
+      "incorrect_native_projection": {
+        "realized_trade_net_embedded_fees_usd": "10.20",
+        "remaining_cost_usd": "15.00",
+        "remaining_quantity": 5000000,
+        "status": "READY"
+      },
+      "incorrect_new_attempt": "ATTEMPT-6CF8E28DCFBE0850D75E984EB604F04085E1670AADD69BB344551F1B7D6BFC9C",
+      "incorrect_new_attempt_key": "ORDINARY-EXIT-3",
+      "incorrect_new_result": "QUOTE-ATTEMPT-6CF8E28DCFBE0850D75E984EB604F04085E1670AADD69BB344551F1B7D6BFC9C",
+      "initial_cost_usd": "30.00",
+      "initial_elapsed_seconds": "UNKNOWN_NOT_MEASURED",
+      "initial_output_sha256": "f40285a196f245f4bcd882f7aa9c1b251658a1b8534506e001803f0b6a90cfd3",
+      "initial_quantity": 10000000,
+      "method": "Two fresh disposable native SHADOW fixtures through ordinary coordinator and production quote parser, lowest fake transport only; original accepted events and independent ledger receipts unchanged",
+      "next_attempt_remaining_quantity": 9000000,
+      "next_exit_sold_quantity": 4000000,
+      "original_partial_attempt": "ATTEMPT-90B329D2C77934CEDA9D30D40E29A752D05DAB8392D380565927E0F2289A15E1",
+      "owned_roots": "ABSENT",
+      "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE",
+      "repro_elapsed_seconds": 3.317457,
+      "repro_output_sha256": "725ac1b39e00193bcb359f89796333de64e0bcac7a2497e5a2ab881c809d91f1"
+    }
+  },
+  "observed_head": "0df9aa7e8cf199cbddf3b97ca7effe63f12fafbd",
+  "packet_fingerprint_sha256": "c602fb59b1229e935ae17f8c62624ebc1c265e6965fabe8de0db6e225787650c",
+  "provider_calls": 0,
+  "receipt_sha256": "316795b36e8fc71366c4d0cac0ce9a8158ff7187e7528a6574bf0bab0dee1e22",
+  "reviewed_bindings_sha256": "cbb9f1d01e678e8879d379c1ced7d2844badd3fc43b80a3801268132cdd6c049",
+  "reviewed_inventory_sha256": "27fe6eb1b91508079fed79fcb193841178159801653f11e951a0b164fb23210e",
+  "reviews": [
+    {
+      "findings": [
+        "NO_ACTIONABLE_FINDINGS",
+        "PRIOR_CURRENT_POLICY_FALSE_READY_REPAIRED_AND_INDEPENDENTLY_VERIFIED",
+        "REQUIRED_REVIEW_PLAN_COMPLETE"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "P1 IMPLEMENTATION_DEFECT + AUTHORITY_WIDENING: corrupt partial remaining quantity becomes authority through the next ordinary EXIT; current inventory UNKNOWN is not enforced at dispatch and accepted result masks original quantity/cost conflict as READY.",
+        "C3/C4/C6/C7 semantic FAIL; reuse existing original attempt/FINAL/result witness validator before inputs/claim, again inside native attempt transaction and at result acceptance; quarantine only the corrupt obligation, continue healthy old exits.",
+        "Existing corruption readback regression lacks the following ordinary tick; actual native counterexample preserved. D1-D4 and full accepted outcome remain unchanged.",
+        "packet_fingerprint_sha256=c602fb59b1229e935ae17f8c62624ebc1c265e6965fabe8de0db6e225787650c; PACKET_INFORMATION_PATH/PROCESS_OBLIGATION; model diversity UNPROVEN."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY"
+    }
+  ],
+  "schema": "smial.trading-operational-frozen-review-history",
+  "schema_version": "1.0",
+  "scope": "Actual frozen role verdicts; three scoped PASS do not supersede the architecture counterexample or establish aggregate readiness",
+  "source_pins": {
+    "src/solana_alpha_lab/factory/paper_plane.py": "a8c2563d6a01ccf9c035cea404647a247e6cb6e4beb3144c56c379054b5e9f0b",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "55a9fed452edaa55afbe6e73aed91531a65b7e40c294d8130078be11f8c917bf",
+    "tests/test_trading_operational_obligations_v1.py": "c884f384117eebb0624723d2bf771564db1446e76eba2dafa85a4780e694c16c"
+  },
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1"
+}

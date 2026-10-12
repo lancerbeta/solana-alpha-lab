@@ -5,7 +5,7 @@
     "secret_canary_absent": true
   },
   "cash_spend": 0,
-  "checked_test_roots": 132,
+  "checked_test_roots": 139,
   "credential_reads": 0,
   "deployment": 0,
   "interrupted_review_run": {
@@ -13,13 +13,13 @@
     "native_fixture_markers_remaining": 0,
     "processes": "ABSENT"
   },
-  "peak_rss_bytes": 146341888,
+  "peak_rss_bytes": 146903040,
   "power_loss_or_hardware_tolerance": "NOT_CLAIMED",
   "process_measurement": "PEAK_SUITE_PROCESS_RSS",
   "proof_fixture_roots": "ABSENT",
-  "proof_receipt_sha256": "cd42ed2f9a46223b3001a0e168a65dbdedd609c442192e989f4a4b10a6fcfa1d",
+  "proof_receipt_sha256": "41705f2f07e760584b7aa3e1e7c8a9ee48fe94b0d43337289a9bea61cc20bdce",
   "provider_calls": 0,
-  "receipt_sha256": "407b97c6c7aa0a1ea554b21cc83b48c39060ac90f88589d0ad76e2b578f3baea",
+  "receipt_sha256": "2f84ca94bc36a9731f45ebc3f6438a506b51d72074cdcee21c85e0b61bbc036b",
   "review_scratch": "OWNED_EPHEMERAL_REMOVE_AFTER_FINAL_REVIEW",
   "schema": "smial.operating-proof-cleanup",
   "schema_version": "1.0",
