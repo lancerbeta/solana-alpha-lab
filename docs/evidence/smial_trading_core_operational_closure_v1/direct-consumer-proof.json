@@ -1,9 +1,14 @@
 {
   "check_scope": "TARGETED_DIRECT_CONSUMERS",
+  "cleanup": {
+    "owned_root_count": 94,
+    "owned_roots_absent": true,
+    "tracking": "ALL_TEMPORARYDIRECTORY_CREATED_DURING_NATIVE_CONSUMER_RUN"
+  },
   "code_unchanged_during_execution": true,
-  "completed_at": "2026-10-11T23:19:53.276940Z",
+  "completed_at": "2026-10-12T00:41:54.888251Z",
   "credential_reads": false,
-  "elapsed_seconds": 24.294885,
+  "elapsed_seconds": 23.6353,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "expected_failure_test_ids": [],
   "failed_test_ids": [],
@@ -23,18 +28,19 @@
   "output_bytes": 16575,
   "output_encoding": "UTF-8",
   "output_scope": "UNITTEST_STREAM_AND_CAPTURED_STDOUT_STDERR",
-  "output_sha256": "2abb32f214bd883c11e57b6248357faf4515f43f99fd440ba66ca5a900f8ed05",
+  "output_sha256": "58a5d1bec97622eba63f9e3a87ab15dcf10101719b219074927578f3794ba3c0",
   "provider_calls": false,
   "python_downloads": "never",
-  "receipt_sha256": "11974b9cd0d12708c0166b675fb9541b65f550acfa6f1149226c706362f75667",
+  "receipt_sha256": "567f7dda1fba1376d78c1bc0df9c323206451e5cde36e0ff42a5808ce7a71f10",
   "schema": "smial.operating-direct-consumer-proof",
   "schema_version": "1.0",
   "skipped_test_ids": [],
   "source_change_paths": [],
+  "source_hash_basis": "EXACT_FROZEN_WORKING_BYTES_LF",
   "source_pins_after": {
     "scripts/factory_paper_shadow_operator_smoke.py": "f4678f7ba8511f1ffe9ebf2f839528bb8932d6c810883dc3c73187a0940fbade",
     "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
-    "scripts/trading_continuity.py": "1d87130bea4f9fdd85eda0569f2d607e5f30d07d420466191c69008736ba294e",
+    "scripts/trading_continuity.py": "116c804dde1fa1e6bccf1fb612e6f6e1ce1645d6cd9fd2c95f1ced173f1380cd",
     "src/solana_alpha_lab/__init__.py": "4334522e7db488900dea03cee86247bd38a57d9b9ef40b287550392f5955a97f",
     "src/solana_alpha_lab/catalog_discovery.py": "6054ae80e2d828ba8cef3631d60647d14e488b7fccebd29a4edda0b9795f0784",
     "src/solana_alpha_lab/contracts/__init__.py": "7e904c1850f227784282a9320d42cc172b788241129de08fce48d279c705d8ce",
@@ -49,7 +55,6 @@
     "src/solana_alpha_lab/factory/discovery_evidence_release.py": "36c2825848df6adb593e1d047b54f2958f161faef47bc61cf9a9c5279c75358c",
     "src/solana_alpha_lab/factory/early_market_panel_field_semantics.py": "4d556063d1dec495852eb818e8e4155f743ae00996b461d0642d9476f4f3e4e4",
     "src/solana_alpha_lab/factory/early_market_panel_importer.py": "5ef0bed72b0baa58108ff01884a5462a0141912203fe3c8b6ff53c23a7439f39",
-    "src/solana_alpha_lab/factory/episode_decision.py": "7bb12ff16952de23535cb926fbd65a7b7e2a8de6e879b16bac449ee35674af3e",
     "src/solana_alpha_lab/factory/experiment_spec.py": "6bff053c5d458f6e33929cec67bb88ce9a13bf9979d59364ab6eb425ccc29cac",
     "src/solana_alpha_lab/factory/external_heartbeat.py": "0f59fad9778c3de6bda6079202bfba01e134aba72b27714e50e4eac1523a1928",
     "src/solana_alpha_lab/factory/friction_veto.py": "04f2410de383306b520f29dfe2121cd8b5f88c9b2c993b44a7331aa33f78f1b7",
@@ -76,7 +81,7 @@
     "src/solana_alpha_lab/factory/owner_language.py": "a65008f623f7cd1d8b3ce7176fa8548d321e1fb84b0d49226d2991e099f82771",
     "src/solana_alpha_lab/factory/owner_review_cursor.py": "2c88e95f06aaf4d2a6dbb1a27c7b6cc602800317bf28fd91a6b0a13f8cdec948",
     "src/solana_alpha_lab/factory/owner_surface.py": "d64230d9de541d1ce3d3cc4aaf351b7c23522b2f85f2e53f3291e2c0fa6a60e9",
-    "src/solana_alpha_lab/factory/paper_plane.py": "75f2aa8e10fd40e1c2dd4ad1519bcf2826c3cbc80988461349d158f32d97b4cd",
+    "src/solana_alpha_lab/factory/paper_plane.py": "a8c2563d6a01ccf9c035cea404647a247e6cb6e4beb3144c56c379054b5e9f0b",
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
     "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
     "src/solana_alpha_lab/factory/pit_data_truth_canonicalization.py": "922e26dee0132b074fe46476d3351dcb7d54fe4eb9b9fd64f338f161921127c8",
@@ -95,11 +100,10 @@
     "src/solana_alpha_lab/factory/system_operability.py": "4bbf2dcafbe2a4f931d47d729e798b0c881859f88f0b3e232f0c572eb22792c7",
     "src/solana_alpha_lab/factory/t0_friction_screen.py": "732f14a309ea7bc2b0181dcb5abcb6d5ef7bf732fb0b2fc53459e12f3bda0506",
     "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py": "351a253ccf5eec73094158d2e1895948ec96e7ede6e57369cda80eac1113ae7c",
-    "src/solana_alpha_lab/factory/trading_adapters.py": "595b4c1b0910ca5cdddca0a247158713ecac27208fab0701933506185a1683f3",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "a544edd945c49b4da904e0218af0f3a2ff0a60fcfbfc4c1de3856b0f6d203ab1",
+    "src/solana_alpha_lab/factory/trading_adapters.py": "cdc3518032eaeb16becc469285c6bb9bb4ec9ef82a6c19d6cca51c615f4feaea",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "ec539eb399df90ceb2fea4718611178bbe6b923c842da9fd4053c350a5a66ed6",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
-    "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
-    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8690e7fd4b1412dc5462e614b84ea8cc57f90f6451d6568fce2273023faf0e1d",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "756f3445602e41800b320a1d136ab0040de1c4ad9d5b8c6a5d6768de5d6d42fe",
     "src/solana_alpha_lab/factory/visual_os.py": "31deb0ca63a29a9961bc5ae75bd51f3cb666ae74523befdc88bd8c1d0473da7c",
     "src/solana_alpha_lab/factory/workbench.py": "3a59bcf2bd4951784b401bcbd250b4e99ee7f68be423964832760f1649f0218e",
     "src/solana_alpha_lab/factory_semantic_operability.py": "26e34c0c1f9bb219e7e5d7c3f24ab685cb925f4dc9dc6ee2489a3407773741c0",
@@ -129,6 +133,8 @@
     "tests/test_paper_shadow_accounting_and_control_v1.py": "6c6e378c24e6f5854fed946b2349bb558be380034bb0b7c7743561369edbcf09",
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_risk_and_economics_v1.py": "6d0742193f5fd20ec9a660074a826561b9f0b27e443b09efee11c880c9681a2e",
+    "tests/test_trading_core_operational_closure_v1.py": "f129183124181537508ae19b2a6d9919df7af1147424aad15c86bf3f622b6aa2",
+    "tests/test_trading_operational_obligations_v1.py": "c884f384117eebb0624723d2bf771564db1446e76eba2dafa85a4780e694c16c",
     "tests/test_trading_operations_workbench_v2.py": "0764f3652f042d2306e70defc3de3462d3c4ff5606f24bef048d8c34d49e7a32",
     "tests/test_trading_runtime_admission_concurrency_v1.py": "8f863f65b6448beec1406538e220efc43f03df2096631888eb72bebbd6a8dcae",
     "tests/test_trading_runtime_policy_backup_restore_v1.py": "ff3e2e96ecbf089274385640606bd7b43eb7d730035bf08624bdfe76305c38e3",
@@ -137,7 +143,7 @@
   "source_pins_before": {
     "scripts/factory_paper_shadow_operator_smoke.py": "f4678f7ba8511f1ffe9ebf2f839528bb8932d6c810883dc3c73187a0940fbade",
     "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
-    "scripts/trading_continuity.py": "1d87130bea4f9fdd85eda0569f2d607e5f30d07d420466191c69008736ba294e",
+    "scripts/trading_continuity.py": "116c804dde1fa1e6bccf1fb612e6f6e1ce1645d6cd9fd2c95f1ced173f1380cd",
     "src/solana_alpha_lab/__init__.py": "4334522e7db488900dea03cee86247bd38a57d9b9ef40b287550392f5955a97f",
     "src/solana_alpha_lab/catalog_discovery.py": "6054ae80e2d828ba8cef3631d60647d14e488b7fccebd29a4edda0b9795f0784",
     "src/solana_alpha_lab/contracts/__init__.py": "7e904c1850f227784282a9320d42cc172b788241129de08fce48d279c705d8ce",
@@ -152,7 +158,6 @@
     "src/solana_alpha_lab/factory/discovery_evidence_release.py": "36c2825848df6adb593e1d047b54f2958f161faef47bc61cf9a9c5279c75358c",
     "src/solana_alpha_lab/factory/early_market_panel_field_semantics.py": "4d556063d1dec495852eb818e8e4155f743ae00996b461d0642d9476f4f3e4e4",
     "src/solana_alpha_lab/factory/early_market_panel_importer.py": "5ef0bed72b0baa58108ff01884a5462a0141912203fe3c8b6ff53c23a7439f39",
-    "src/solana_alpha_lab/factory/episode_decision.py": "7bb12ff16952de23535cb926fbd65a7b7e2a8de6e879b16bac449ee35674af3e",
     "src/solana_alpha_lab/factory/experiment_spec.py": "6bff053c5d458f6e33929cec67bb88ce9a13bf9979d59364ab6eb425ccc29cac",
     "src/solana_alpha_lab/factory/external_heartbeat.py": "0f59fad9778c3de6bda6079202bfba01e134aba72b27714e50e4eac1523a1928",
     "src/solana_alpha_lab/factory/friction_veto.py": "04f2410de383306b520f29dfe2121cd8b5f88c9b2c993b44a7331aa33f78f1b7",
@@ -179,7 +184,7 @@
     "src/solana_alpha_lab/factory/owner_language.py": "a65008f623f7cd1d8b3ce7176fa8548d321e1fb84b0d49226d2991e099f82771",
     "src/solana_alpha_lab/factory/owner_review_cursor.py": "2c88e95f06aaf4d2a6dbb1a27c7b6cc602800317bf28fd91a6b0a13f8cdec948",
     "src/solana_alpha_lab/factory/owner_surface.py": "d64230d9de541d1ce3d3cc4aaf351b7c23522b2f85f2e53f3291e2c0fa6a60e9",
-    "src/solana_alpha_lab/factory/paper_plane.py": "75f2aa8e10fd40e1c2dd4ad1519bcf2826c3cbc80988461349d158f32d97b4cd",
+    "src/solana_alpha_lab/factory/paper_plane.py": "a8c2563d6a01ccf9c035cea404647a247e6cb6e4beb3144c56c379054b5e9f0b",
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
     "src/solana_alpha_lab/factory/paper_shadow_operations.py": "d25b8280e1f1426a018b1e50fdd843f0a620f43ff05e5bb13cf80bbe71c1a429",
     "src/solana_alpha_lab/factory/pit_data_truth_canonicalization.py": "922e26dee0132b074fe46476d3351dcb7d54fe4eb9b9fd64f338f161921127c8",
@@ -198,11 +203,10 @@
     "src/solana_alpha_lab/factory/system_operability.py": "4bbf2dcafbe2a4f931d47d729e798b0c881859f88f0b3e232f0c572eb22792c7",
     "src/solana_alpha_lab/factory/t0_friction_screen.py": "732f14a309ea7bc2b0181dcb5abcb6d5ef7bf732fb0b2fc53459e12f3bda0506",
     "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py": "351a253ccf5eec73094158d2e1895948ec96e7ede6e57369cda80eac1113ae7c",
-    "src/solana_alpha_lab/factory/trading_adapters.py": "595b4c1b0910ca5cdddca0a247158713ecac27208fab0701933506185a1683f3",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "a544edd945c49b4da904e0218af0f3a2ff0a60fcfbfc4c1de3856b0f6d203ab1",
+    "src/solana_alpha_lab/factory/trading_adapters.py": "cdc3518032eaeb16becc469285c6bb9bb4ec9ef82a6c19d6cca51c615f4feaea",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "ec539eb399df90ceb2fea4718611178bbe6b923c842da9fd4053c350a5a66ed6",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
-    "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
-    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8690e7fd4b1412dc5462e614b84ea8cc57f90f6451d6568fce2273023faf0e1d",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "756f3445602e41800b320a1d136ab0040de1c4ad9d5b8c6a5d6768de5d6d42fe",
     "src/solana_alpha_lab/factory/visual_os.py": "31deb0ca63a29a9961bc5ae75bd51f3cb666ae74523befdc88bd8c1d0473da7c",
     "src/solana_alpha_lab/factory/workbench.py": "3a59bcf2bd4951784b401bcbd250b4e99ee7f68be423964832760f1649f0218e",
     "src/solana_alpha_lab/factory_semantic_operability.py": "26e34c0c1f9bb219e7e5d7c3f24ab685cb925f4dc9dc6ee2489a3407773741c0",
@@ -232,640 +236,808 @@
     "tests/test_paper_shadow_accounting_and_control_v1.py": "6c6e378c24e6f5854fed946b2349bb558be380034bb0b7c7743561369edbcf09",
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_risk_and_economics_v1.py": "6d0742193f5fd20ec9a660074a826561b9f0b27e443b09efee11c880c9681a2e",
+    "tests/test_trading_core_operational_closure_v1.py": "f129183124181537508ae19b2a6d9919df7af1147424aad15c86bf3f622b6aa2",
+    "tests/test_trading_operational_obligations_v1.py": "c884f384117eebb0624723d2bf771564db1446e76eba2dafa85a4780e694c16c",
     "tests/test_trading_operations_workbench_v2.py": "0764f3652f042d2306e70defc3de3462d3c4ff5606f24bef048d8c34d49e7a32",
     "tests/test_trading_runtime_admission_concurrency_v1.py": "8f863f65b6448beec1406538e220efc43f03df2096631888eb72bebbd6a8dcae",
     "tests/test_trading_runtime_policy_backup_restore_v1.py": "ff3e2e96ecbf089274385640606bd7b43eb7d730035bf08624bdfe76305c38e3",
     "tests/test_trading_runtime_policy_v1.py": "d35fcd1f19958684a2a2888abc67deea435e6a9d4827d632e22187f30a31b8ac"
   },
-  "source_snapshot_file_count": 1053,
-  "started_at": "2026-10-11T23:19:28.687787Z",
+  "source_snapshot_file_count": 1590,
+  "source_snapshot_sha256_after": "730521d9d89f68313c2b0ee313759bf99a98496743cc57f44ad9e60008fefece",
+  "source_snapshot_sha256_before": "730521d9d89f68313c2b0ee313759bf99a98496743cc57f44ad9e60008fefece",
+  "started_at": "2026-10-12T00:41:31.252951Z",
   "status": "PASS",
   "tests": [
     {
-      "duration_seconds": 0.081469,
+      "duration_seconds": 0.088767,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_crash_after_allow_retry_keeps_binding"
     },
     {
-      "duration_seconds": 0.083664,
+      "duration_seconds": 0.075858,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_policy_apply_and_enter_do_not_mix_revisions"
     },
     {
-      "duration_seconds": 0.085699,
+      "duration_seconds": 0.075794,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_same_signal_retry_one_position"
     },
     {
-      "duration_seconds": 0.066473,
+      "duration_seconds": 0.060829,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_shared_store_two_threads_one_remaining_slot"
     },
     {
-      "duration_seconds": 0.083676,
+      "duration_seconds": 0.083024,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_two_distinct_enters_one_remaining_slot"
     },
     {
-      "duration_seconds": 2.1e-05,
+      "duration_seconds": 2.5e-05,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 0,
       "status": "PASS",
       "test": "test_trading_runtime_policy_backup_restore_v1.TradingRuntimePolicyBackupRestoreTests.test_paper_plane_sqlite_is_a_mutable_backup_source"
     },
     {
-      "duration_seconds": 0.052032,
+      "duration_seconds": 0.067093,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_policy_backup_restore_v1.TradingRuntimePolicyBackupRestoreTests.test_policy_revision_survives_file_copy_restore"
     },
     {
-      "duration_seconds": 0.081103,
+      "duration_seconds": 0.050969,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_as_of_is_required"
     },
     {
-      "duration_seconds": 0.060924,
+      "duration_seconds": 0.06019,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_exit_decision_version_must_match_the_position"
     },
     {
-      "duration_seconds": 0.067624,
+      "duration_seconds": 0.05982,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_future_decision_is_rejected_beyond_skew"
     },
     {
-      "duration_seconds": 0.067262,
+      "duration_seconds": 0.063171,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_one_id_binds_one_body"
     },
     {
-      "duration_seconds": 0.07425,
+      "duration_seconds": 0.071393,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_position_lineage_is_queryable_from_the_store"
     },
     {
-      "duration_seconds": 0.054188,
+      "duration_seconds": 0.0516,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_strategy_spec_drift_fails_closed"
     },
     {
-      "duration_seconds": 0.067936,
+      "duration_seconds": 0.063521,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_cancel_rules"
     },
     {
-      "duration_seconds": 0.068747,
+      "duration_seconds": 0.064567,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_cancelled_intent_releases_its_entry_slot"
     },
     {
-      "duration_seconds": 0.067847,
+      "duration_seconds": 0.061169,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_close_all_cancels_pre_attempt_and_skips_in_flight"
     },
     {
-      "duration_seconds": 0.060073,
+      "duration_seconds": 0.061356,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_close_position_cancels_a_pre_attempt_intent"
     },
     {
-      "duration_seconds": 0.202113,
+      "duration_seconds": 0.19615,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_consumers_treat_cancelled_as_settled_without_pnl"
     },
     {
-      "duration_seconds": 0.059572,
+      "duration_seconds": 0.059312,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_entry_fill_is_bound_to_the_admission"
     },
     {
-      "duration_seconds": 0.120344,
+      "duration_seconds": 0.130543,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_retry_never_fills_an_in_flight_attempt"
     },
     {
-      "duration_seconds": 0.059164,
+      "duration_seconds": 0.067494,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_stale_resume_cancels_the_reserved_intent"
     },
     {
-      "duration_seconds": 0.059357,
+      "duration_seconds": 0.063162,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_stop_bot_cancels_pre_attempt_intents_and_reaches_stopped"
     },
     {
-      "duration_seconds": 0.241498,
+      "duration_seconds": 0.242808,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_stops_cancel_reserved_intents_instead_of_opening_them"
     },
     {
-      "duration_seconds": 0.980167,
+      "duration_seconds": 0.91992,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_lifecycle_and_http_read_the_same_live_position_owner"
     },
     {
-      "duration_seconds": 0.054665,
+      "duration_seconds": 0.049034,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_missing_and_corrupt_source_never_bootstraps_or_all_clears"
     },
     {
-      "duration_seconds": 0.087832,
+      "duration_seconds": 0.084247,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_non_wal_compatibility_is_readonly_without_business_writes"
     },
     {
-      "duration_seconds": 0.092233,
+      "duration_seconds": 0.088937,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_one_projection_snapshot_and_next_request_freshness"
     },
     {
-      "duration_seconds": 1.534037,
+      "duration_seconds": 1.529305,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_os_denies_source_access_without_bootstrap_or_stale_fallback"
     },
     {
-      "duration_seconds": 0.922177,
+      "duration_seconds": 0.922709,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_overlapping_http_gets_do_not_close_each_others_reader"
     },
     {
-      "duration_seconds": 0.218992,
+      "duration_seconds": 0.214533,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_public_live_wal_position_policy_and_next_read_two_repetitions"
     },
     {
-      "duration_seconds": 0.100722,
+      "duration_seconds": 0.098779,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_read_failure_does_not_reuse_success_or_infer_empty_runtime"
     },
     {
-      "duration_seconds": 0.062067,
+      "duration_seconds": 0.057968,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_accept_fill_is_atomic_with_intent_events"
     },
     {
-      "duration_seconds": 0.103102,
+      "duration_seconds": 0.10219,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_accounting_fixture_projection_scalars_survive_event_reorder"
     },
     {
-      "duration_seconds": 0.409621,
+      "duration_seconds": 0.385894,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_close_request_serializes_with_concurrent_exit_fill"
     },
     {
-      "duration_seconds": 3.244264,
+      "duration_seconds": 3.062845,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_close_vs_exit_race_never_regresses_or_duplicates"
     },
     {
-      "duration_seconds": 0.073579,
+      "duration_seconds": 0.085388,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_concurrent_same_signal_accept_writes_intent_events_once"
     },
     {
-      "duration_seconds": 0.058793,
+      "duration_seconds": 0.063846,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_entry_fill_is_atomic_with_its_event"
     },
     {
-      "duration_seconds": 0.058992,
+      "duration_seconds": 0.059657,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_execution_events_are_returned_in_causal_order"
     },
     {
-      "duration_seconds": 0.066415,
+      "duration_seconds": 0.061775,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_exit_fill_is_atomic_with_its_events"
     },
     {
-      "duration_seconds": 0.059762,
+      "duration_seconds": 0.058717,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_operator_command_is_atomic_with_its_record"
     },
     {
-      "duration_seconds": 0.058984,
+      "duration_seconds": 0.059831,
       "metrics": {},
       "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_unresolved_exit_is_atomic_with_its_reconciliation_event"
     },
     {
-      "duration_seconds": 2.649058,
+      "duration_seconds": 2.668651,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a1_absent_source"
     },
     {
-      "duration_seconds": 0.063332,
+      "duration_seconds": 0.059303,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a2_paper_reconciliation"
     },
     {
-      "duration_seconds": 0.080492,
+      "duration_seconds": 0.072568,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a3_a4_paper_and_shadow_separate"
     },
     {
-      "duration_seconds": 0.087501,
+      "duration_seconds": 0.073907,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a5_different_strategy_versions"
     },
     {
-      "duration_seconds": 0.086522,
+      "duration_seconds": 0.076824,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a6_accounting_conflict_excludes_row"
     },
     {
-      "duration_seconds": 0.071827,
+      "duration_seconds": 0.065325,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a7_known_exact_zero"
     },
     {
-      "duration_seconds": 0.000232,
+      "duration_seconds": 0.000188,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 0,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_home_has_no_fourth_economics_domain"
     },
     {
-      "duration_seconds": 0.39194,
+      "duration_seconds": 0.31026,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_i1_exit_required_not_all_risk_clear"
     },
     {
-      "duration_seconds": 0.072966,
+      "duration_seconds": 0.069406,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_m1_m2_open_mark_fees"
     },
     {
-      "duration_seconds": 0.067959,
+      "duration_seconds": 0.062996,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_m4_missing_mark_as_of"
     },
     {
-      "duration_seconds": 0.084835,
+      "duration_seconds": 0.074201,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_m5_m6_legacy_mark_components"
     },
     {
-      "duration_seconds": 5.436545,
+      "duration_seconds": 5.133008,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_o_owner_nonclaims_and_get_purity"
     },
     {
-      "duration_seconds": 0.169512,
+      "duration_seconds": 0.165142,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 2,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_p_path_metrics"
     },
     {
-      "duration_seconds": 0.422191,
+      "duration_seconds": 0.350193,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_r2_r3_at_and_over_limit"
     },
     {
-      "duration_seconds": 0.457155,
+      "duration_seconds": 0.34116,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_r_declared_entry_limit"
     },
     {
-      "duration_seconds": 0.494617,
+      "duration_seconds": 0.482623,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 0,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_semantic_route_reused"
     },
     {
-      "duration_seconds": 0.087762,
+      "duration_seconds": 0.071902,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_x_exposure_named_and_separate"
     },
     {
-      "duration_seconds": 0.144463,
+      "duration_seconds": 0.126653,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 2,
       "status": "PASS",
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_absent_policy_keeps_bot_local_strategy_version_max_open"
     },
     {
-      "duration_seconds": 0.074171,
+      "duration_seconds": 0.073522,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_absent_policy_preserves_strategy_only_paper_and_shadow"
     },
     {
-      "duration_seconds": 0.000956,
+      "duration_seconds": 0.000688,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 0,
       "status": "PASS",
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_capability_phrase_is_not_a_runtime_value"
     },
     {
-      "duration_seconds": 0.060043,
+      "duration_seconds": 0.046831,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_check_classifies_tightening"
     },
     {
-      "duration_seconds": 0.089979,
+      "duration_seconds": 0.070944,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_entry_stop_and_revision_semantics"
     },
     {
-      "duration_seconds": 0.081221,
+      "duration_seconds": 0.06537,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_invalid_policy_blocks_new_entry_exit_continues"
     },
     {
-      "duration_seconds": 0.07918,
+      "duration_seconds": 0.068815,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_missing_strategy_id_fail_closes_family_notional_cap"
     },
     {
-      "duration_seconds": 0.077623,
+      "duration_seconds": 0.076737,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_paper_shadow_isolation_and_live_denied"
     },
     {
-      "duration_seconds": 0.076212,
+      "duration_seconds": 0.06451,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_position_and_notional_caps"
     },
     {
-      "duration_seconds": 0.059159,
+      "duration_seconds": 0.055781,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_readonly_get_does_not_create_or_apply"
     },
     {
-      "duration_seconds": 0.077213,
+      "duration_seconds": 0.063906,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_sizing_min_and_no_headroom_shrink"
     },
     {
-      "duration_seconds": 0.081447,
+      "duration_seconds": 0.072756,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_unknown_open_risk_blocks_historical_does_not"
     },
     {
-      "duration_seconds": 0.068938,
+      "duration_seconds": 0.067553,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_valid_policy_resume_without_frozen_binding_fails_closed"
     },
     {
-      "duration_seconds": 0.104999,
+      "duration_seconds": 0.089812,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_decimal_fixture_pnl_streak_drawdown"
     },
     {
-      "duration_seconds": 0.077628,
+      "duration_seconds": 0.069614,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_entry_fee_required_and_no_terminal_resurrect"
     },
     {
-      "duration_seconds": 3.3e-05,
+      "duration_seconds": 3.4e-05,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 0,
       "status": "PASS",
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_loss_streak_unknown_when_latest_unknown"
     },
     {
-      "duration_seconds": 0.09842,
+      "duration_seconds": 0.091478,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_pause_close_all_stop_drain_idempotent"
     },
     {
-      "duration_seconds": 0.085426,
+      "duration_seconds": 0.071517,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_pause_resume_happy_path"
     },
     {
-      "duration_seconds": 0.073188,
+      "duration_seconds": 0.063815,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_shadow_evidence_class_separate"
     },
     {
-      "duration_seconds": 0.211269,
+      "duration_seconds": 0.391572,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 0,
       "status": "PASS",
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_smoke_script_pass"
     },
     {
-      "duration_seconds": 0.074374,
+      "duration_seconds": 0.059853,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_activation_epoch_separates_bots"
     },
     {
-      "duration_seconds": 0.067393,
+      "duration_seconds": 0.061634,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_closed_enter_returns_real_state"
     },
     {
-      "duration_seconds": 0.005238,
+      "duration_seconds": 0.005453,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 0,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_decision_schemas_validate"
     },
     {
-      "duration_seconds": 0.063806,
+      "duration_seconds": 0.072939,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_enter_opens_through_canonical_signal"
     },
     {
-      "duration_seconds": 0.070594,
+      "duration_seconds": 0.059878,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_enter_rejects_epoch_mismatch_on_existing_signal"
     },
     {
-      "duration_seconds": 0.073906,
+      "duration_seconds": 0.059525,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_exit_decision_advances_without_fill_claim"
     },
     {
-      "duration_seconds": 0.071241,
+      "duration_seconds": 0.058557,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_exit_rejects_epoch_mismatch"
     },
     {
-      "duration_seconds": 0.068824,
+      "duration_seconds": 0.054211,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_future_available_enter_forbidden"
     },
     {
-      "duration_seconds": 0.084412,
+      "duration_seconds": 0.082363,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_legacy_v1_0_loads_and_behaves"
     },
     {
-      "duration_seconds": 0.069446,
+      "duration_seconds": 0.054165,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_missing_activation_fails_closed"
     },
     {
-      "duration_seconds": 0.183436,
+      "duration_seconds": 0.161751,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 3,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_non_enter_actions_do_not_open"
     },
     {
-      "duration_seconds": 0.072662,
+      "duration_seconds": 0.05625,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_resume_incomplete_enter_lifecycle"
     },
     {
-      "duration_seconds": 0.072767,
+      "duration_seconds": 0.069441,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_same_mint_distinct_signal_ids"
     },
     {
-      "duration_seconds": 0.063651,
+      "duration_seconds": 0.058582,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_same_signal_idempotent"
     },
     {
-      "duration_seconds": 0.056673,
+      "duration_seconds": 0.056461,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_shadow_mode_uses_shadow_executable"
     },
     {
-      "duration_seconds": 0.063382,
+      "duration_seconds": 0.062538,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_sqlite_migration_idempotent_on_legacy_reopen"
     },
     {
-      "duration_seconds": 0.119163,
+      "duration_seconds": 0.123086,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 2,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_stale_signal_and_max_open_enforced"
     },
     {
-      "duration_seconds": 0.073886,
+      "duration_seconds": 0.072775,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 1,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_two_structurally_different_producers_same_interface"
     },
     {
-      "duration_seconds": 0.006284,
+      "duration_seconds": 0.006419,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 0,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_v1_1_path_does_not_call_signal_kind_for"
     },
     {
-      "duration_seconds": 0.011116,
+      "duration_seconds": 0.011367,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 0,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_v1_1_rejects_feature_fields"
     },
     {
-      "duration_seconds": 0.013322,
+      "duration_seconds": 0.012633,
       "metrics": {},
+      "owned_root_absent": true,
+      "owned_root_count": 0,
       "status": "PASS",
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_v1_1_schema_accepts_candidates_without_feature_names"
     }

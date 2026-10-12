@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import copy
+import json
 import threading
+import time
 from decimal import Decimal
 from unittest.mock import patch
 
@@ -155,6 +157,108 @@ class OperatingObligationsTests(StoreCase):
         self.assertEqual(obligation_summary(store, mode="PAPER")["position_count"], 0)
         self.assertIsNone(build_operations_projection(store)["modeled_net_after_additional_costs_usd"])
 
+    def test_natural_terminal_release_requires_intact_final_result_chain(self):
+        for state in ("NONFILL", "FLAT"):
+            for damage in ("FINAL-EMPTY", "FINAL-MISSING", "RESULT-EMPTY", "RESULT-MISSING", "RESULT-NULL", "OUTCOME-CONFLICT", "CLOCK-CONFLICT", "FINAL-INVALID-JSON", "FINAL-FOREIGN-BOT", "RESULT-ID-CONFLICT", "ATTEMPT-MISSING", "FINAL-UNHASHABLE-REFERENCE", "RESULT-NONFINITE", "RESULT-QUANTITY-CONFLICT", "ALL-MODELED-MISSING", "ENTRY-QUANTITY-CONFLICT", "ENTRY-NEAR-ROUNDING-QUANTITY", "ENTRY-NOTIONAL-CLASS-CONFLICT", "ENTRY-WRONG-SIDE-FIELD", "ENTRY-REMAINDER-WRONG-SIDE", "EXIT-WRONG-SIDE-FIELDS", "EXIT-NOTIONAL-WRONG-SIDE", "ATTEMPT-QUANTITY-CONFLICT", "ATTEMPT-QUANTITY-UNIT-CONFLICT"):
+                if state == "NONFILL" and damage.startswith(("ENTRY-", "EXIT-", "ATTEMPT-QUANTITY")):
+                    continue
+                with self.subTest(state=state, damage=damage):
+                    store = self.store(state + "-" + damage + ".sqlite")
+                    self.envelope(store, money="90")
+                    key = "SIGDEC-RELEASE-" + state + "-" + damage
+                    if state == "NONFILL":
+                        pid = self.admission(store, key)["position_id"]
+                        attempt = self.attempt(store, pid)
+                        accept_modeled_result(store, result={"attempt_id": attempt["attempt_id"],
+                            "result_id": key + "-RESULT", "outcome": "NO_ROUTE", "observed_at": T0})
+                    else:
+                        pid = self.entry(store, key=key)
+                        self.close_request(store, pid, "close")
+                        attempt = self.attempt(store, pid, "EXIT", "full-exit")
+                        accept_modeled_result(store, result=self.exit_result(attempt["attempt_id"], key + "-RESULT",
+                            sold="10000000", remaining="0", cost="0", outcome="LANDED_SUCCESS"))
+                    natural = store.get_position(pid)
+                    self.assertEqual(obligation_summary(store, mode="PAPER")["position_count"], 0)
+                    final_id = "FINAL-" + attempt["attempt_id"]
+                    result_id = store.get_execution_event(final_id)["payload"]["result_event_id"]
+                    event_id = final_id if damage.startswith("FINAL") else result_id
+                    if damage == "ALL-MODELED-MISSING":
+                        store._conn.execute("DELETE FROM execution_events WHERE position_id=? AND event_type IN ('MODELED_ATTEMPT_STARTED','MODELED_ATTEMPT_FINAL','MODELED_RESULT_ACCEPTED')", (pid,))
+                    elif damage.startswith("ATTEMPT-QUANTITY"):
+                        payload = store.get_execution_event(attempt["attempt_id"])["payload"]
+                        payload["remaining_quantity" if damage == "ATTEMPT-QUANTITY-CONFLICT" else "quantity_unit"] = "1" if damage == "ATTEMPT-QUANTITY-CONFLICT" else "FOREIGN_UNITS"
+                        store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(payload), attempt["attempt_id"]))
+                    elif damage.startswith(("ENTRY-", "EXIT-")) or damage == "RESULT-QUANTITY-CONFLICT":
+                        target = next(e for e in store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED", position_ids=[pid])
+                            if e["payload"]["side"] == "ENTRY") if damage.startswith("ENTRY-") else store.get_execution_event(attempt["attempt_id"])
+                        target_result_id = store.get_execution_event("FINAL-" + target["event_id"])["payload"]["result_event_id"]
+                        payload = store.get_execution_event(target_result_id)["payload"]
+                        changes = {"quantity_filled": "1"} if damage == "ENTRY-QUANTITY-CONFLICT" else {"quantity_filled": "9999999"} if damage == "ENTRY-NEAR-ROUNDING-QUANTITY" else {"filled_notional_usd": "29.999999"} if damage == "ENTRY-NOTIONAL-CLASS-CONFLICT" else {"remaining_quantity": "0"} if damage == "ENTRY-REMAINDER-WRONG-SIDE" else {"quantity_filled": "1", "filled_notional_usd": "30"} if damage == "EXIT-WRONG-SIDE-FIELDS" else {"filled_notional_usd": None} if damage == "EXIT-NOTIONAL-WRONG-SIDE" else {"quantity_sold": "1"}
+                        payload["result"].update(changes)
+                        store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(payload), target_result_id))
+                    elif damage == "ATTEMPT-MISSING":
+                        store._conn.execute("DELETE FROM execution_events WHERE event_id=?", (attempt["attempt_id"],))
+                    elif damage.endswith("MISSING"):
+                        store._conn.execute("DELETE FROM execution_events WHERE event_id=?", (event_id,))
+                    elif damage == "FINAL-FOREIGN-BOT":
+                        store._conn.execute("UPDATE execution_events SET bot_instance_id='BOT-FOREIGN' WHERE event_id=?", (final_id,))
+                    elif damage == "CLOCK-CONFLICT":
+                        store._conn.execute("UPDATE execution_events SET created_at='2026-09-03T12:10:01Z' WHERE event_id=?", (event_id,))
+                    elif damage == "OUTCOME-CONFLICT":
+                        payload = store.get_execution_event(result_id)["payload"]
+                        payload["result"]["outcome"] = "UNKNOWN_REQUIRES_RECONCILIATION"
+                        store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(payload), result_id))
+                    elif damage == "FINAL-UNHASHABLE-REFERENCE":
+                        payload = store.get_execution_event(final_id)["payload"]
+                        payload["result_event_id"] = {}
+                        store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(payload), final_id))
+                    elif damage in {"RESULT-ID-CONFLICT", "RESULT-NONFINITE"}:
+                        payload = store.get_execution_event(result_id)["payload"]
+                        payload["result"]["result_id" if damage == "RESULT-ID-CONFLICT" else "chargeable_cost_usd"] = "foreign-result" if damage == "RESULT-ID-CONFLICT" else "NaN"
+                        store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(payload), result_id))
+                    else:
+                        raw = "null" if damage == "RESULT-NULL" else "{" if damage == "FINAL-INVALID-JSON" else "{}"
+                        store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (raw, event_id))
+                    self.assertEqual(store.get_position(pid), natural)
+                    reader = PaperPlaneStore(store.path, readonly=True)
+                    try:
+                        summary = obligation_summary(reader, mode="PAPER")
+                    finally:
+                        reader.close()
+                    self.assertEqual(summary["position_count"], 1)
+                    self.assertEqual(summary["inventory_status"], "UNKNOWN")
+                    self.assertEqual(summary["known_cost_basis_floor_usd"], "30")
+                    denied = self.admission(store, key + "-AFTER")
+                    self.assertEqual(denied["reason_code"], "OUTSTANDING_OBLIGATIONS_UNKNOWN")
+                    self.assertEqual(store.get_position(pid), natural)
+
+    def test_natural_unattempted_cancel_releases_only_with_original_pre_attempt_witness(self):
+        for damage in (None, "MISSING", "EMPTY", "FROM-ATTEMPTING"):
+            with self.subTest(damage=damage):
+                store = self.store("unattempted-" + str(damage) + ".sqlite")
+                self.envelope(store, money="90")
+                pid = self.admission(store, "SIGDEC-NATURAL-CANCEL-" + str(damage).upper())["position_id"]
+                natural = store.cancel_entry_intent(pid, reason_code="ENTRIES_PAUSED")
+                self.assertIsNone(natural["qty_dec"])
+                self.assertEqual(natural["remaining_qty_dec"], "0")
+                self.assertEqual(store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED", position_ids=[pid]), [])
+                event = next(iter(store.filtered_execution_events(event_type="ENTRY_INTENT_CANCELLED", position_ids=[pid])))
+                if damage == "MISSING":
+                    store._conn.execute("DELETE FROM execution_events WHERE event_id=?", (event["event_id"],))
+                elif damage is not None:
+                    payload = {} if damage == "EMPTY" else {**event["payload"], "from_state": "ATTEMPTING"}
+                    store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(payload), event["event_id"]))
+                reader = PaperPlaneStore(store.path, readonly=True)
+                try:
+                    summary = obligation_summary(reader, mode="PAPER")
+                finally:
+                    reader.close()
+                self.assertEqual(summary["position_count"], 0 if damage is None else 1)
+                self.assertEqual(summary["inventory_status"], "KNOWN" if damage is None else "UNKNOWN")
+                admitted = self.admission(store, "SIGDEC-AFTER-NATURAL-CANCEL-" + str(damage).upper())
+                self.assertEqual(admitted["reason_code"], "VERTICAL_ENTER" if damage is None else "OUTSTANDING_OBLIGATIONS_UNKNOWN")
+                self.assertEqual(store.get_position(pid), natural)
+
     def test_nonfill_frees_capacity_but_unknown_cost_stays_economic(self):
         store = self.store()
         self.envelope(store)
@@ -164,6 +268,38 @@ class OperatingObligationsTests(StoreCase):
         self.assertEqual(obligation_summary(store, mode="PAPER")["position_count"], 0)
         self.assertEqual(build_operations_projection(store)["modeled_attempt_costs"]["additional_cost_status"], "UNKNOWN")
         self.assertIsNotNone(self.admission(store, "SIGDEC-AFTER-NONFILL")["position_id"])
+
+    def test_v1_0_native_complete_result_chain_still_releases_capacity(self):
+        for exit_version in ("1.0", "1.1"):
+            with self.subTest(exit_version=exit_version):
+                store = self.store("legacy-entry-exit-" + exit_version + ".sqlite")
+                self.envelope(store, money="90")
+                pid = self.admission(store, "SIGDEC-V10-FULL-RELEASE")["position_id"]
+                entry = self.attempt(store, pid)
+                accept_modeled_result(store, result={"attempt_id": entry["attempt_id"], "result_id": "v10-complete-entry",
+                    "outcome": "LANDED_SUCCESS", "observed_at": T0, "unit_price_usd": "0.000003",
+                    "filled_notional_usd": "30", "chargeable_cost_usd": "0"})
+                self.close_request(store, pid, "v10-close")
+                exit_attempt = self.attempt(store, pid, "EXIT", "v10-exit")
+                result = {"attempt_id": exit_attempt["attempt_id"], "result_id": "v10-complete-exit",
+                    "outcome": "LANDED_SUCCESS", "observed_at": T0, "unit_price_usd": "0.0000033", "chargeable_cost_usd": "0"}
+                if exit_version == "1.1":
+                    result = self.exit_result(exit_attempt["attempt_id"], "v10-complete-exit", sold="10000000", remaining="0", cost="0", outcome="LANDED_SUCCESS")
+                accept_modeled_result(store, result=result)
+                reader = PaperPlaneStore(store.path, readonly=True)
+                try:
+                    self.assertEqual(obligation_summary(reader, mode="PAPER")["position_count"], 0)
+                finally:
+                    reader.close()
+                rid = store.get_execution_event("FINAL-" + entry["attempt_id"])["payload"]["result_event_id"]
+                payload = store.get_execution_event(rid)["payload"]
+                original = json.dumps(payload)
+                payload["result"]["filled_notional_usd"] = "31"
+                store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (json.dumps(payload), rid))
+                self.assertEqual(obligation_summary(store, mode="PAPER")["inventory_status"], "UNKNOWN")
+                self.assertEqual(self.admission(store, "SIGDEC-DURING-CORRUPT-V10")["reason_code"], "OUTSTANDING_OBLIGATIONS_UNKNOWN")
+                store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?", (original, rid))
+                self.assertEqual(self.admission(store, "SIGDEC-AFTER-V10-FULL-RELEASE")["reason_code"], "VERTICAL_ENTER")
 
     def test_v1_1_entry_preserves_raw_quote_quantity_and_included_fee(self):
         store = self.store()
@@ -412,7 +548,6 @@ class OperatingObligationsTests(StoreCase):
         accept_modeled_result(nonfill_store, result={"attempt_id": attempt["attempt_id"],
             "result_id": "nonfill-to-corrupt", "outcome": "NO_ROUTE", "observed_at": T0})
         nonfill_store._conn.execute("UPDATE execution_events SET payload_json='{}' WHERE event_type='MODELED_ATTEMPT_FINAL'")
-        nonfill_store._conn.execute("UPDATE positions SET remaining_qty_dec=NULL")
         summary = obligation_summary(nonfill_store, mode="PAPER")
         self.assertEqual(summary["position_count"], 1)
         self.assertEqual(summary["inventory_status"], "UNKNOWN")
@@ -472,30 +607,51 @@ class OperatingObligationsTests(StoreCase):
             steps = 0
             def step():
                 nonlocal steps
-                steps += 1
+                steps += 10
                 return 0
-            store._conn.set_progress_handler(step, 1)
+            started = time.perf_counter()
+            store._conn.set_progress_handler(step, 10)
             try:
                 read_operating_envelope(store, "PAPER")
                 summary = obligation_summary(store, mode="PAPER")
             finally:
                 store._conn.set_progress_handler(None, 0)
             self.assertEqual(summary["position_count"], 1)
-            return steps
+            self.assertEqual(summary["inventory_status"], "KNOWN")
+            return {"sqlite_steps": steps, "elapsed_seconds": time.perf_counter() - started}
         before = measure()
+        # Use native model transitions: row-only terminal shapes are not proofs.
+        preparation_started = time.perf_counter()
+        for number in range(1000):
+            key = f"SIGDEC-HISTORY-{number}"
+            historical = self.admission(store, key, ordinary=False)["position_id"]
+            attempt = self.attempt(store, historical)
+            if number % 2:
+                accept_modeled_result(store, result={"attempt_id": attempt["attempt_id"], "result_id": key + "-NONFILL",
+                    "outcome": "NO_ROUTE", "observed_at": T0})
+            else:
+                accept_modeled_result(store, result={"attempt_id": attempt["attempt_id"], "result_id": key + "-ENTRY",
+                    "outcome": "LANDED_SUCCESS", "observed_at": T0, "unit_price_usd": "0.000003",
+                    "filled_notional_usd": "30", "chargeable_cost_usd": "0"})
+                self.close_request(store, historical, key + "-CLOSE")
+                exit_attempt = self.attempt(store, historical, "EXIT", "full-exit")
+                accept_modeled_result(store, result=self.exit_result(exit_attempt["attempt_id"], key + "-EXIT",
+                    sold="10000000", remaining="0", cost="0", outcome="LANDED_SUCCESS"))
+            if number == 99:
+                after_100_releases = measure()
+        preparation_seconds = time.perf_counter() - preparation_started
+        after_releases = measure()
         with store.immediate_write():
-            store._conn.executemany("""INSERT INTO positions(position_id,bot_instance_id,mint,state,qty_dec,
-                exit_notional_usd_dec,pnl_evidence_class,remaining_qty_dec,remaining_cost_basis_usd_dec,
-                remaining_entry_fee_usd_dec) VALUES (?,?,?,'RECONCILED','10000000','31.20',
-                'PAPER_RECONCILED_MODEL','0','0','0')""",
-                [(f"POS-HISTORICAL-{number}", bot, "SYNTHETIC") for number in range(4000)])
             store._conn.executemany("""INSERT INTO execution_events(event_id,event_type,bot_instance_id,
-                position_id,created_at,payload_json) VALUES (?,'MODELED_RESULT_ACCEPTED',?,?,?,'{}')""",
-                [(f"EVT-HISTORICAL-{number}", bot, f"POS-HISTORICAL-{number % 4000}", T0) for number in range(12000)])
-            store._conn.executemany("""INSERT INTO positions(position_id,bot_instance_id,mint,state,
-                remaining_qty_dec,remaining_cost_basis_usd_dec,remaining_entry_fee_usd_dec)
-                VALUES (?,?,?,'CANCELLED','0','0','0')""",
-                [(f"POS-DEFINITIVE-NONFILL-{number}", bot, "SYNTHETIC") for number in range(2000)])
+                position_id,created_at,payload_json) VALUES (?,'UNRELATED_SYNTHETIC_HISTORY',?,NULL,?,'{}')""",
+                [(f"EVT-HISTORICAL-{number}", bot, T0) for number in range(12000)])
         after = measure()
-        self.assertLess(after, before * 2 + 100, f"SQLite steps grew from {before} to {after}")
+        self.assertLess(after_100_releases["sqlite_steps"] - before["sqlite_steps"], 100 * 10000)
+        self.assertLess(after_releases["sqlite_steps"] - after_100_releases["sqlite_steps"], 900 * 10000)
+        self.assertLess(after["sqlite_steps"], after_releases["sqlite_steps"] * 1.05 + 1000)
+        self.assertLess(after["elapsed_seconds"], 2)
+        type(self).last_readback_metrics = {"native_valid_terminal_positions": 1000, "unrelated_journal_events": 12000,
+            "native_history_preparation_seconds": preparation_seconds, "before": before, "after_100_valid_releases": after_100_releases,
+            "after_1000_valid_releases": after_releases, "after_unrelated_journal": after}
+        self.metrics = type(self).last_readback_metrics
         self.assertEqual(len(store.filtered_execution_events(event_type="ORDINARY_OPERATING_ENVELOPE_CONFIGURED")), 1)

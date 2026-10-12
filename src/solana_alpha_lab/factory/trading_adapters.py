@@ -49,7 +49,7 @@ def decimal_value(value, *, positive=True):
 
 
 def checked_observation(raw, *, mint, as_of, max_age_seconds):
-    if raw.get("mint") != mint or type(raw.get("decimals")) is not int or not 0 <= raw["decimals"] <= 18:
+    if not isinstance(raw, dict) or raw.get("mint") != mint or type(raw.get("decimals")) is not int or not 0 <= raw["decimals"] <= 18:
         raise PaperPlaneError("EXECUTION_ASSET_IDENTITY_INVALID")
     now = parse_utc(as_of)
     observed, available = parse_utc(raw["observed_at"]), parse_utc(raw["available_at"])

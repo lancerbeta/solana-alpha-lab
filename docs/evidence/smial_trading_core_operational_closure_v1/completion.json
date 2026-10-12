@@ -1,1 +1,7 @@
-{"status":"NOT_READY","task_id":"SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1","reason":"BOOTSTRAP_NOT_EXECUTED"}
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "status": "NOT_READY",
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "reason": "BOOTSTRAP_NOT_EXECUTED"
+}

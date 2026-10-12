@@ -28,7 +28,8 @@
       ],
       "executed_test_ids": [
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_C02_C03_C05_C06_native_loop_full_money_oracle",
-        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer"
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_check_rejects_missing_or_invalid_operating_limits_readonly"
       ],
       "status": "PASS"
     },
@@ -94,10 +95,12 @@
     "C08": {
       "additional_evidence": [],
       "executed_test_ids": [
-        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_shared_predecessor_reservation_and_no_auto_shrink",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_corrupt_remainder_or_final_never_frees_capacity",
         "test_trading_operational_obligations_v1.OperatingObligationsTests.test_modes_independent_and_concurrent_reservations_serialized",
-        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_unknown_exit_retains_inventory_and_blocks_overlapping_attempt",
-        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_corrupt_remainder_or_final_never_frees_capacity"
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_terminal_release_requires_intact_final_result_chain",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_unattempted_cancel_releases_only_with_original_pre_attempt_witness",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_shared_predecessor_reservation_and_no_auto_shrink",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_unknown_exit_retains_inventory_and_blocks_overlapping_attempt"
       ],
       "status": "PASS"
     },
@@ -125,10 +128,13 @@
     "C11": {
       "additional_evidence": [],
       "executed_test_ids": [
-        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_literal_partial_accounting_oracle_replay_and_cold_readback",
-        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_quantity_overfill_units_and_crash_are_atomic",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C11_C12_shadow_failure_unknown_partial_remainder_drain",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_corrupt_remainder_or_final_never_frees_capacity",
         "test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_fee_allocation_and_leg_pnl_conserve_on_three_exits",
-        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C11_C12_shadow_failure_unknown_partial_remainder_drain"
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_quantity_overfill_units_and_crash_are_atomic",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_literal_partial_accounting_oracle_replay_and_cold_readback",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_terminal_release_requires_intact_final_result_chain",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_unattempted_cancel_releases_only_with_original_pre_attempt_witness"
       ],
       "status": "PASS"
     },
@@ -144,10 +150,13 @@
     "C13": {
       "additional_evidence": [],
       "executed_test_ids": [
-        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C13_captured_body_corruption_retains_unknown_no_effect",
         "test_trading_continuity_v1.OrdinarySourceTests.test_origin_decision_clock_corruption_refuses_without_effect",
         "test_trading_continuity_v1.OrdinarySourceTests.test_origin_exit_clock_corruption_refuses_without_effect",
         "test_trading_continuity_v1.OrdinarySourceTests.test_origin_exit_source_admission_corruption_refuses_without_effect",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C13_captured_body_corruption_retains_unknown_no_effect",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_corrupt_remainder_or_final_never_frees_capacity",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_terminal_release_requires_intact_final_result_chain",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_unattempted_cancel_releases_only_with_original_pre_attempt_witness",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_hash_conflict_denies_before_quote_effect"
       ],
       "status": "PASS"
@@ -176,7 +185,9 @@
       "executed_test_ids": [
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C15_C16_pause_during_live_lock_survives_restart",
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_virtual_two_weeks_history_sizes_and_incident_bound",
-        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_active_successor_profile_failure_does_not_starve_predecessor_exit"
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_active_successor_profile_failure_does_not_starve_predecessor_exit",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_missing_or_corrupt_envelope_never_ready",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_shadow_quote_inputs_are_current_readonly_health"
       ],
       "status": "PASS"
     },
@@ -244,8 +255,7 @@
     },
     "C23": {
       "additional_evidence": [
-        "cleanup.json: canaries/immutable_bindings/proof_fixture_roots",
-        "canary-rename-proof.json: same C23 actually repeated after local-variable rename"
+        "cleanup.json: canaries/immutable_bindings/proof_fixture_roots"
       ],
       "executed_test_ids": [
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C23_actual_egress_secret_and_non_target_canaries",
@@ -269,6 +279,14 @@
   },
   "claims_scope": "Exact explicit PAPER/SHADOW operating profile, OPPORTUNITY_EPISODES accepted V1 and FROZEN_TIME_EXIT; synthetic software proof only",
   "evidence_class": "SYNTHETIC_OFFLINE",
+  "native_review_counterexamples": [
+    "review-510e6701.json",
+    "review-readiness-before.json",
+    "review-terminal-release-before.json",
+    "review-terminal-quantity-before.json",
+    "review-preflight-before.json",
+    "review-ack-readback-before.json"
+  ],
   "non_claims": [
     "NO_CANONICAL_DONE_OR_OWNER_SEMANTIC_ACCEPTANCE",
     "NO_REAL_RUNTIME_OR_PROVIDER_ACTIVATION",
@@ -277,21 +295,38 @@
   ],
   "receipt_files": {
     "canary-rename-proof.json": "e2449ad9084c695b74c50dbc1249db839f525547e4bd516024b50bad83ec056b",
-    "cleanup.json": "632d4e4fed687c72d11078e310319d45db2e488f7375357e84de839535e52dc1",
-    "clock-proof.json": "346a016b59d1541b18d5b4752ba4c015aa7dd24d2b692832fa049242350cf32b",
-    "direct-consumer-proof.json": "c8df261e81cefb63788dbfe4f6d108e5072c89e70a4650be8f4987498fc18bf1",
+    "cleanup.json": "058a2d71ed0694c44df4b9dc39b02087e90b70df3154990f299ab2db81144f25",
+    "clock-proof.json": "1d612cfe2c6d168c0315e17d659d0000e050143fa1d4ef1f70a13e35aaf0c5ae",
+    "direct-consumer-proof.json": "f285bacd3176ee60910504f753fbe8ae669e12889ddf4276bd11f7b9ac51a46a",
     "eof-normalization-proof.json": "67794cb24f7cfa69dc63451a2ac1e8d321489e528316f65d2c12abc78ae8c232",
-    "executed-tests.json": "2899d525617851033c62149e4bf0be5d4e4df389ae971a7790ec17c3169ef297",
-    "operator-proof.json": "b11acd8db40927d16bde857e9581317116d4952fed8f2f7e29aff8cea2515d0c",
+    "executed-tests.json": "8d54be35878eabded8aa7d12e3fb5f97f269d8553f683b681e906cfb44d85965",
+    "interim-before-ack-readback.json": "2a9d23db087c39dc5335287ee1252f4b8afa91f96760a59f8c55aff46369140f",
+    "interim-before-final-review.json": "2899d525617851033c62149e4bf0be5d4e4df389ae971a7790ec17c3169ef297",
+    "interim-clock-before-final-review.json": "346a016b59d1541b18d5b4752ba4c015aa7dd24d2b692832fa049242350cf32b",
+    "interim-consumers-before-final-review.json": "c8df261e81cefb63788dbfe4f6d108e5072c89e70a4650be8f4987498fc18bf1",
+    "interim-operator-before-final-review.json": "b11acd8db40927d16bde857e9581317116d4952fed8f2f7e29aff8cea2515d0c",
+    "operator-proof.json": "385a5a825de0466f62382cefd4ff54a76e7b53eb30193d67f5e572230557b96a",
+    "review-510e6701.json": "7c5df920cab16a539ce58b5e4fc7692454b8bcd32739d57f5a5bd21695cf3f09",
+    "review-ack-readback-before.json": "2874502e20049e4034baf076bbf0522d9a29d3649cf470c5ebd660527813c528",
+    "review-preflight-before.json": "71889f2a8b6dbcd8120d03795776124dbcae700236c4fef74aa31a07a633c663",
+    "review-readiness-before.json": "71d3e0bb6141a324c6726c281ce71c6d06deec602f3901b49c16d3d6659bd2eb",
+    "review-terminal-quantity-before.json": "9143b463e15fb0583ef19c09faa228ba998dd5ab61251d5105047fb2260f4629",
+    "review-terminal-release-before.json": "cbd0d3cefd2ed43027bf0bacbc45e48a4f18f3f997031cf0bf53a3a976405b50",
     "source-contract.md": "addc05071197efb3462771b52f5699170d54061656efeda0b7f48e52bdb0f0b7"
   },
-  "receipt_sha256": "15b737e3ae9bf06d1623385918dda57f4f7a53f5d599d07fb44d461b3c86a00e",
+  "receipt_sha256": "ca8780006633760a43534ffabdece36f4621887ec21addd41080d4b0da849c2e",
   "schema": "smial.operating-closure-coverage",
   "schema_version": "1.0",
-  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
-  "tested_to_candidate_byte_equivalence": [
+  "superseded_pre_remediation_history": [
+    "interim-before-final-review.json",
+    "interim-consumers-before-final-review.json",
+    "interim-operator-before-final-review.json",
+    "interim-clock-before-final-review.json",
+    "interim-before-ack-readback.json",
     "eof-normalization-proof.json",
     "canary-rename-proof.json"
   ],
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "tested_to_candidate_byte_equivalence": [],
   "verdict": "PASS"
 }

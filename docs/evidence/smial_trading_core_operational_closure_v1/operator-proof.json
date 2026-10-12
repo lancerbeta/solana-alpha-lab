@@ -1,4 +1,6 @@
 {
+  "additional_readonly_configuration_diagnostic_count": 1,
+  "base_journey_command_count": 22,
   "business_stages": "NATIVE_TRADING_CONTINUITY_CLI_ONLY",
   "cleanup": {
     "owned_root_absent": true,
@@ -6,7 +8,7 @@
     "unowned_resources_touched": false
   },
   "credential_reads": false,
-  "elapsed_seconds": 17.241568,
+  "elapsed_seconds": 17.849823,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "external_cut_basis": "No process or effect invoked after backup before export/restore; independent absence assertion effects []; donor CLI exports frozen bindings/controls/current state.",
   "final_state": {
@@ -36,7 +38,7 @@
       "RESULT-EC53044AC7E8546E440DEE907A8C4895A416872A969EF355EAE040C8778A12E0"
     ],
     "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
-    "backup_database_sha256": "7ad77180f1c44e9c400bbfec0f532afe732bce363fed0d30553ab75ec6334223",
+    "backup_database_sha256": "f40788f871a34e8bd4e6ab41bac50214c59499f90e5f209e7c138069529a4279",
     "bot_instance_id": "BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
     "inventory_sha256_before_ack": "33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746",
     "position_ids": [
@@ -44,7 +46,7 @@
     ],
     "source_episode_id": "EP-705da8cd8881c5f381f5d4e9a6b6ee37",
     "strategy_id": "STRAT-CONTINUITY-SYNTH-001-C22-FROZEN",
-    "strategy_sha256": "80076af81934479de5423cd8a35322671d4159985ea19063afeca34e83fbefde"
+    "strategy_sha256": "635ef04c513028f659bfa7547e0718a077a83eb3ea86e449f10439e05d5408a0"
   },
   "independence": "ISOLATED_OPERATOR_WITH_EXACT_CONTRACT_DIFF_RUNBOOK",
   "journey_status": "PASS",
@@ -52,6 +54,7 @@
   "manual_binding_construction": false,
   "manual_token_json": false,
   "network_calls": false,
+  "observed_at_utc": "2026-10-12T00:44:30.035875Z",
   "provider_calls": false,
   "recovery_cut": {
     "all_bindings_exported_by_cli": true,
@@ -79,23 +82,25 @@
     "schema": "smial.operating-external-recovery-cut",
     "schema_version": "1.0"
   },
+  "restore_phase_action_command_coherent": true,
   "role": "OWNER_UX_CRITIC",
   "schema": "smial.cold-operator-cli-proof",
   "schema_version": "1.0",
   "semantic_navigation": {
     "authority_granted": false,
-    "catalog_integrity_sha256": "b96dba7f18d134c251b17b02d33334206598613a84d64bbc928e56979ee08404",
+    "catalog_integrity_sha256": "dee80313dcb18d70d984735c4946932e66403894d3258418b7a6b439b2c7b432",
     "catalog_record_status": "IMPLEMENTED_UNVERIFIED",
     "catalog_status_is_not_product_acceptance": true,
+    "gaps": [],
     "network_required": false,
-    "observed_at_utc": "2026-10-11T23:34:18.871533Z",
+    "observed_at_utc": "2026-10-12T00:53:11.062715Z",
     "operator_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001",
     "operator_asset_ids": [
       "DOC-TRADING-CONTINUITY-OFFLINE-001"
     ],
     "read_only": true,
     "readback_anchors": {
-      "catalog/assets/core.yaml": "66acb962e864e987eded527a54e8b1cba038955ca325861ab143d23d4926486b",
+      "catalog/assets/core.yaml": "3b5206dc05b0d5d0fb9e022215122717fb4a7a133cab9910431baab02057b096",
       "configs/factory_semantic_operability_v1.yaml": "8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83",
       "docs/FACTORY_SEMANTIC_MAP.md": "2fbf4e7edce8c53b83ccec0f837ff49eef706d72448b9fe89ea8e4ab11ae35a6"
     },
@@ -105,23 +110,26 @@
     "resolve_route_command": "uv run --locked --managed-python python -B scripts/catalog_cli.py resolve-route SEM-OWNER-LIFECYCLE --json",
     "resolve_route_exit_code": 0,
     "route_id": "SEM-OWNER-LIFECYCLE",
+    "runtime_resolution_mode": "NONE",
+    "safe_cli_entry": "uv run --locked --managed-python python -B scripts/trading_continuity.py check --repository-root <exact-repo> --data-root <exact-marked-runtime> --mode PAPER --strategy <exact-strategy-relative-path> --profile <runtime-relative-profile>",
+    "safe_cli_entry_creates_activation": false,
     "secrets_required": false,
     "source_pin_matches_catalog": true,
     "status": "PASS"
   },
   "source_pins": {
     "configs/factory_semantic_operability_v1.yaml": "8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83",
-    "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "b96dba7f18d134c251b17b02d33334206598613a84d64bbc928e56979ee08404",
-    "scripts/trading_continuity.py": "1d87130bea4f9fdd85eda0569f2d607e5f30d07d420466191c69008736ba294e",
+    "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "dee80313dcb18d70d984735c4946932e66403894d3258418b7a6b439b2c7b432",
+    "scripts/trading_continuity.py": "116c804dde1fa1e6bccf1fb612e6f6e1ce1645d6cd9fd2c95f1ced173f1380cd",
     "src/solana_alpha_lab/factory/episode_decision.py": "7bb12ff16952de23535cb926fbd65a7b7e2a8de6e879b16bac449ee35674af3e",
     "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
-    "src/solana_alpha_lab/factory/paper_plane.py": "75f2aa8e10fd40e1c2dd4ad1519bcf2826c3cbc80988461349d158f32d97b4cd",
+    "src/solana_alpha_lab/factory/paper_plane.py": "a8c2563d6a01ccf9c035cea404647a247e6cb6e4beb3144c56c379054b5e9f0b",
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
     "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
-    "src/solana_alpha_lab/factory/trading_adapters.py": "595b4c1b0910ca5cdddca0a247158713ecac27208fab0701933506185a1683f3",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "a544edd945c49b4da904e0218af0f3a2ff0a60fcfbfc4c1de3856b0f6d203ab1",
+    "src/solana_alpha_lab/factory/trading_adapters.py": "cdc3518032eaeb16becc469285c6bb9bb4ec9ef82a6c19d6cca51c615f4feaea",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "ec539eb399df90ceb2fea4718611178bbe6b923c842da9fd4053c350a5a66ed6",
     "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
-    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8690e7fd4b1412dc5462e614b84ea8cc57f90f6451d6568fce2273023faf0e1d"
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "756f3445602e41800b320a1d136ab0040de1c4ad9d5b8c6a5d6768de5d6d42fe"
   },
   "source_pins_unchanged": true,
   "steps": [
@@ -158,9 +166,9 @@
       "mode": "PAPER",
       "runtime_scope": "DONOR",
       "sequence": 2,
-      "stdout_sha256": "b002e1b4609b5917cd021b7f834e6f78b1cbcc6844fd553171a4c1f5c4706376",
+      "stdout_sha256": "5e3a9e817ab1493ee816f55dbad341838c243204f40beaf64fc210ab6287e3c1",
       "strategy_id": "STRAT-CONTINUITY-SYNTH-001-C22-FROZEN",
-      "strategy_sha256": "80076af81934479de5423cd8a35322671d4159985ea19063afeca34e83fbefde"
+      "strategy_sha256": "635ef04c513028f659bfa7547e0718a077a83eb3ea86e449f10439e05d5408a0"
     },
     {
       "activation_created": false,
@@ -182,9 +190,15 @@
         "as_of": "2026-10-05T12:40:00Z"
       },
       "command": "status",
+      "envelope_status": "VALID",
+      "execution_input_status": "PAPER_NATIVE_PREFIX",
       "exit_code": 0,
+      "exit_reconciliation_healthy": true,
       "expected_exit_code": 0,
       "generation": 1,
+      "input_fresh": true,
+      "input_reason": "SOURCE_FRESH",
+      "integrity_verified": true,
       "inventory": {
         "inventory_status": "KNOWN",
         "outstanding_cost_basis_usd": "30.0",
@@ -193,12 +207,18 @@
       },
       "inventory_sha256": "33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746",
       "mode": "PAPER",
+      "next_safe_action": "NONE",
       "next_safe_command": "status --mode PAPER --format human",
+      "operating_configuration_status": "VALID",
+      "process_alive": true,
+      "progress_moving": true,
       "restore_guard": false,
       "runtime_scope": "DONOR",
       "sequence": 4,
+      "source_fresh": true,
+      "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "READY",
-      "stdout_sha256": "de8e511de449cdfac118c9ce9fad1b367bc176d838fed6e3e6b8daaf7d54d792"
+      "stdout_sha256": "bbf1067c72ad7cf58c737d5472d22e64ca25d6e1f5b865c7288734eea049a0a2"
     },
     {
       "arguments": {
@@ -223,25 +243,25 @@
       "command": "status",
       "exit_code": 0,
       "expected_exit_code": 0,
-      "human": "PAPER · READY · epoch ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN\nНа 2026-10-05T12:40:00Z · последний tick: 2026-10-05T12:40:00Z\nПроцесс: True · источник: SOURCE_FRESH (2026-10-05T12:35:01Z) · прогресс: True\nОбязательства: 1 · стоимость: 30.0 USD · pending attempts: 0\nЦелостность: True · restore fence: False · earliest overdue: NONE\nInventory SHA256: 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746\nBot BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN · RUNNING · entries paused: True\nPosition POS-SIG-SIGDEC-49A9CF1A18E9BC5241317E274C7C0F34D2613AE7CD68AA524D87FAEDB3A5C809 · OPEN · remaining: 10000000.00000000\nДалее: CLI status --mode PAPER --format human (с теми же repository/data/scope flags)",
+      "human": "PAPER · READY · epoch ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN\nНа 2026-10-05T12:40:00Z · последний tick: 2026-10-05T12:40:00Z\nПроцесс: True · источник: SOURCE_FRESH (2026-10-05T12:35:01Z) · прогресс: True\nОбщий лимит: VALID · входы исполнения: PAPER_NATIVE_PREFIX\nОбязательства: 1 · стоимость: 30.0 USD · pending attempts: 0\nЦелостность: True · restore fence: False · earliest overdue: NONE\nInventory SHA256: 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746\nBot BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN · RUNNING · entries paused: True\nPosition POS-SIG-SIGDEC-49A9CF1A18E9BC5241317E274C7C0F34D2613AE7CD68AA524D87FAEDB3A5C809 · OPEN · remaining: 10000000.00000000\nДалее: CLI status --mode PAPER --format human (с теми же repository/data/scope flags)",
       "mode": "PAPER",
       "runtime_scope": "DONOR",
       "sequence": 6,
       "status": "HUMAN_STATUS_RENDERED",
-      "stdout_sha256": "88b2a4aeff6329e1ad5569634c203a99df2127b184b738b84fbb8a5e7614756d"
+      "stdout_sha256": "2e67bdeb71adbb113abfba32321c284bac6448c4b7f272f423129c493c5fd300"
     },
     {
       "arguments": {
         "destination": "backups/c22.sqlite"
       },
       "command": "backup",
-      "database_sha256": "7ad77180f1c44e9c400bbfec0f532afe732bce363fed0d30553ab75ec6334223",
+      "database_sha256": "f40788f871a34e8bd4e6ab41bac50214c59499f90e5f209e7c138069529a4279",
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
       "runtime_scope": "DONOR",
       "sequence": 7,
-      "stdout_sha256": "d2334a8d12bc04ac6c9d59435ddf7838e11cfeab1957b967ce595f6e680437be"
+      "stdout_sha256": "270c48b4569bd026319bb6463921229636679c4d30712f4af6f6360a96beefe0"
     },
     {
       "arguments": {
@@ -293,14 +313,14 @@
         "input": "external-cut-input.json"
       },
       "command": "seal-cut",
-      "cut_sha256": "28baaabde3b95898748e405070cee6f4a03494d8762aac3561867d27ee60454a",
+      "cut_sha256": "2177458cfaf6c44d2eaeeb0ca2b4cdcce5175d027017ae807cbb8d83210f42fe",
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
       "runtime_scope": "RESTORED",
       "sequence": 11,
       "status": "CUT_VERIFIED_AND_SEALED",
-      "stdout_sha256": "f543463213e9125e6329398fbb2c394aec913c0365a6c9cb752d530c1e2fcdda"
+      "stdout_sha256": "d5911724002276b38be8b2c6aa2613c2e7487b4cafab69f6e963244da597b940"
     },
     {
       "arguments": {
@@ -322,9 +342,15 @@
         "as_of": "2026-10-05T12:40:00Z"
       },
       "command": "status",
+      "envelope_status": "VALID",
+      "execution_input_status": "PAPER_NATIVE_PREFIX",
       "exit_code": 0,
+      "exit_reconciliation_healthy": true,
       "expected_exit_code": 0,
       "generation": 1,
+      "input_fresh": true,
+      "input_reason": "SOURCE_FRESH",
+      "integrity_verified": true,
       "inventory": {
         "inventory_status": "KNOWN",
         "outstanding_cost_basis_usd": "30.0",
@@ -333,12 +359,18 @@
       },
       "inventory_sha256": "33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746",
       "mode": "PAPER",
+      "next_safe_action": "ACKNOWLEDGE_RESTORED_INVENTORY",
       "next_safe_command": "ack-restore --mode PAPER --input complete-external-cut.json --inventory-sha256 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746 --as-of 2026-10-05T12:40:00Z",
+      "operating_configuration_status": "VALID",
+      "process_alive": true,
+      "progress_moving": true,
       "restore_guard": true,
       "runtime_scope": "RESTORED",
       "sequence": 13,
+      "source_fresh": true,
+      "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "ACTION_REQUIRED",
-      "stdout_sha256": "c71a6fa5e0c4b773c0c78645b69ac183d4dbd48dc4fb3f1ef74ae3a26298e0dc"
+      "stdout_sha256": "f4312ace40d64da26fd74af2eb9b31086c253c0bb82c2d523a50e95856ef9df8"
     },
     {
       "arguments": {
@@ -348,12 +380,12 @@
       "command": "status",
       "exit_code": 0,
       "expected_exit_code": 0,
-      "human": "PAPER · ACTION_REQUIRED · epoch ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN\nНа 2026-10-05T12:40:00Z · последний tick: 2026-10-05T12:40:00Z\nПроцесс: True · источник: SOURCE_FRESH (2026-10-05T12:35:01Z) · прогресс: True\nОбязательства: 1 · стоимость: 30.0 USD · pending attempts: 0\nЦелостность: True · restore fence: True · earliest overdue: NONE\nInventory SHA256: 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746\nBot BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN · RUNNING · entries paused: True\nPosition POS-SIG-SIGDEC-49A9CF1A18E9BC5241317E274C7C0F34D2613AE7CD68AA524D87FAEDB3A5C809 · OPEN · remaining: 10000000.00000000\nДалее: CLI ack-restore --mode PAPER --input complete-external-cut.json --inventory-sha256 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746 --as-of 2026-10-05T12:40:00Z (с теми же repository/data/scope flags)",
+      "human": "PAPER · ACTION_REQUIRED · epoch ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN\nНа 2026-10-05T12:40:00Z · последний tick: 2026-10-05T12:40:00Z\nПроцесс: True · источник: SOURCE_FRESH (2026-10-05T12:35:01Z) · прогресс: True\nОбщий лимит: VALID · входы исполнения: PAPER_NATIVE_PREFIX\nОбязательства: 1 · стоимость: 30.0 USD · pending attempts: 0\nЦелостность: True · restore fence: True · earliest overdue: NONE\nInventory SHA256: 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746\nBot BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN · RUNNING · entries paused: True\nPosition POS-SIG-SIGDEC-49A9CF1A18E9BC5241317E274C7C0F34D2613AE7CD68AA524D87FAEDB3A5C809 · OPEN · remaining: 10000000.00000000\nДалее: CLI ack-restore --mode PAPER --input complete-external-cut.json --inventory-sha256 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746 --as-of 2026-10-05T12:40:00Z (с теми же repository/data/scope flags)",
       "mode": "PAPER",
       "runtime_scope": "RESTORED",
       "sequence": 14,
       "status": "HUMAN_STATUS_RENDERED",
-      "stdout_sha256": "7216b1afc008cc37647d0add2b4d3bfdd5ff653cd7ac4c925c71e496449baedc"
+      "stdout_sha256": "b3352f59d26adcc26b2bd479d7e17e6e5489cd5f98022acf368444b7d18a8a87"
     },
     {
       "arguments": {
@@ -375,9 +407,15 @@
         "as_of": "2026-10-05T12:40:00Z"
       },
       "command": "status",
+      "envelope_status": "VALID",
+      "execution_input_status": "PAPER_NATIVE_PREFIX",
       "exit_code": 0,
+      "exit_reconciliation_healthy": true,
       "expected_exit_code": 0,
       "generation": 1,
+      "input_fresh": true,
+      "input_reason": "SOURCE_FRESH",
+      "integrity_verified": true,
       "inventory": {
         "inventory_status": "KNOWN",
         "outstanding_cost_basis_usd": "30.0",
@@ -386,12 +424,18 @@
       },
       "inventory_sha256": "33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746",
       "mode": "PAPER",
+      "next_safe_action": "NONE",
       "next_safe_command": "status --mode PAPER --format human",
+      "operating_configuration_status": "VALID",
+      "process_alive": true,
+      "progress_moving": true,
       "restore_guard": false,
       "runtime_scope": "RESTORED",
       "sequence": 16,
+      "source_fresh": true,
+      "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "READY",
-      "stdout_sha256": "3a530fd9cce6a1efbc34dd21012f5953913fe9a5a5213b2b42c6fc877ddfef3e"
+      "stdout_sha256": "c69da5156dfde06369728c616b82f99aac7f2bc7202fa1b04f9115a4ee39e68c"
     },
     {
       "arguments": {
@@ -433,7 +477,7 @@
       "runtime_scope": "RESTORED",
       "sequence": 19,
       "status": "RUNNING",
-      "stdout_sha256": "c1db431c4f3504c63d02bba12d701b970052ad302b01577565efa9aa1158549b"
+      "stdout_sha256": "15c67fef6aec305418851cba2fce74ed643c0d66cd0cf33db137f127b21118c5"
     },
     {
       "arguments": {
@@ -447,6 +491,7 @@
       "expected_exit_code": 2,
       "human": "Действие заблокировано · EXECUTION_QUOTE_INPUT_NOT_PRESENT\nДалее: Подготовь указанный в quote profile файл funding observation внутри source.root и повтори check.",
       "mode": "SHADOW",
+      "reason_code": "EXECUTION_QUOTE_INPUT_NOT_PRESENT",
       "runtime_scope": "DONOR",
       "sequence": 20,
       "status": "BLOCKED",
@@ -482,11 +527,31 @@
       "expected_exit_code": 2,
       "human": "Действие заблокировано · EXECUTION_OBSERVATION_STALE_OR_FUTURE\nДалее: Обнови своевременное наблюдение в exact source; затем повтори check. UNKNOWN не освобождает обязательства.",
       "mode": "SHADOW",
+      "reason_code": "EXECUTION_OBSERVATION_STALE_OR_FUTURE",
       "runtime_scope": "DONOR",
       "sequence": 22,
       "status": "BLOCKED",
       "stdout_sha256": "dff7ca0de5239f6927e2e30a59f2358478d3881cd813a1d140b4c689b78201bc"
+    },
+    {
+      "arguments": {
+        "as_of": "2026-10-05T12:40:00Z",
+        "format": "human",
+        "profile": "bad-envelope-profile.json",
+        "strategy": "configs/strategies/continuity_synth-C22-FROZEN.yaml"
+      },
+      "command": "check",
+      "exit_code": 2,
+      "expected_exit_code": 2,
+      "human": "Действие заблокировано · CONFIGURATION_REQUIRED\nДалее: Укажи явно разрешённые max_outstanding_positions и max_outstanding_cost_basis_usd в envelope профиля; затем повтори check.",
+      "mode": "PAPER",
+      "reason_code": "CONFIGURATION_REQUIRED",
+      "runtime_scope": "DONOR",
+      "sequence": 23,
+      "status": "BLOCKED",
+      "stdout_sha256": "69e2a469a9898d49eb9d884becb62f2cc11432cfe0aa48b79ad117cdb6ef332b"
     }
   ],
-  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1"
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "total_command_count": 23
 }

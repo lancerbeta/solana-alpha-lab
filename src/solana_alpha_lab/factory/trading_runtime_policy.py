@@ -13,7 +13,7 @@ from typing import Any, Mapping
 
 import yaml
 
-from solana_alpha_lab.factory.paper_plane import OPEN_RISK_STATES, PRE_ATTEMPT_STATES, PaperPlaneStore
+from solana_alpha_lab.factory.paper_plane import OPEN_RISK_STATES, PRE_ATTEMPT_STATES, PaperPlaneStore, modeled_final_witness_valid, unattempted_cancel_witness_valid
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 
 SCHEMA = "smial.trading-runtime-policy"
@@ -634,22 +634,43 @@ def obligation_summary(store: PaperPlaneStore, *, mode: str,
     if mode not in SUPPORTED_MODES:
         raise TradingRuntimePolicyError("OPERATING_ENVELOPE_MODE_INVALID")
     positions = [position for position in store.obligation_positions(mode) if position["position_id"] != exclude_position_id]
+    positions_by_id = {position["position_id"]: position for position in positions}
+    legacy_candidates = {position["position_id"]: position.get("qty_dec") for position in positions if position.get("entry_fee_semantics") is None}
     events = store.filtered_execution_events(position_ids=[position["position_id"] for position in positions])
     attempts_by_position: dict[str, list[dict[str, Any]]] = {}
+    modeled_by_position: dict[str, list[dict[str, Any]]] = {}
+    cancellations_by_position: dict[str, list[dict[str, Any]]] = {}
     for event in events:
+        if event["event_type"] in {"MODELED_ATTEMPT_STARTED", "MODELED_ATTEMPT_FINAL", "MODELED_RESULT_ACCEPTED"}:
+            modeled_by_position.setdefault(event["position_id"], []).append(event)
         if event["event_type"] == "MODELED_ATTEMPT_STARTED":
             attempts_by_position.setdefault(event["position_id"], []).append(event)
+        if event["event_type"] == "ENTRY_INTENT_CANCELLED":
+            cancellations_by_position.setdefault(event["position_id"], []).append(event)
     results = {event["event_id"]: event for event in events if event["event_type"] == "MODELED_RESULT_ACCEPTED"}
     finals = {}
+    attempts_by_id = {event["event_id"]: event for events_for_position in attempts_by_position.values() for event in events_for_position}
+    legacy_quantities = {}
+    for event in results.values():
+        payload = event["payload"]
+        result = payload.get("result") if isinstance(payload, Mapping) else None
+        if not isinstance(result, Mapping) or result.get("schema_version") is not None or result.get("outcome") not in ("LANDED_SUCCESS", "PARTIAL"):
+            continue
+        attempt = attempts_by_id.get(result.get("attempt_id")) if isinstance(result.get("attempt_id"), str) else None
+        if attempt is not None and isinstance(attempt["payload"], Mapping) and attempt["payload"].get("side") == "ENTRY":
+            if event["position_id"] in legacy_candidates:
+                legacy_quantities[event["position_id"]] = legacy_candidates[event["position_id"]]
     for event in events:
         if event["event_type"] != "MODELED_ATTEMPT_FINAL":
             continue
         payload = event["payload"]
-        if not isinstance(payload, Mapping) or payload.get("outcome") not in {
+        if not isinstance(payload, Mapping) or not isinstance(payload.get("outcome"), str) or payload.get("outcome") not in {
             "NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED", "LANDED_SUCCESS", "PARTIAL"}:
             continue
-        result = results.get(payload.get("result_event_id"))
-        if result is not None and (result["payload"].get("result") or {}).get("attempt_id") == event["event_id"].removeprefix("FINAL-"):
+        result = results.get(payload.get("result_event_id")) if isinstance(payload.get("result_event_id"), str) else None
+        attempt = attempts_by_id.get(event["event_id"].removeprefix("FINAL-"))
+        if result is not None and attempt is not None and modeled_final_witness_valid(attempt, event, result, mode=mode,
+                legacy_original_quantity=legacy_quantities.get(attempt["position_id"]), original_position=positions_by_id.get(attempt["position_id"])):
             finals[event["event_id"]] = event
     rows = []
     total = Decimal("0")
@@ -668,17 +689,35 @@ def obligation_summary(store: PaperPlaneStore, *, mode: str,
         quantity = _as_decimal(position.get("remaining_qty_dec") if has_remainder else position.get("qty_dec"))
         state = str(position.get("state"))
         entry_finals = [finals["FINAL-" + e["event_id"]]["payload"].get("outcome") for e in attempts
-                        if e["payload"].get("side") == "ENTRY" and "FINAL-" + e["event_id"] in finals]
+                        if isinstance(e["payload"], Mapping) and e["payload"].get("side") == "ENTRY" and "FINAL-" + e["event_id"] in finals]
         definitive_nonfill = any(value in {"NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED"}
                                  for value in entry_finals)
         flat = state == "RECONCILED" and position.get("exit_notional_usd_dec") not in {None, ""} and position.get("pnl_evidence_class") in {
             "PAPER_RECONCILED_MODEL", "SHADOW_RECONCILED_QUOTE_MODEL"} and (_as_decimal(position.get("qty_dec")) or Decimal("0")) > 0 and (
                 not has_remainder or quantity == 0 and _as_decimal(position.get("remaining_cost_basis_usd_dec")) == 0
                 and _as_decimal(position.get("remaining_entry_fee_usd_dec")) == 0)
-        unattempted_cancel = state == "CANCELLED" and not attempts and quantity is None
-        if not unresolved_attempts and (flat or definitive_nonfill and quantity is None or unattempted_cancel):
+        modeled_events = modeled_by_position.get(pid, [])
+        corrupt_modeled_events = any(
+            event["event_id"] not in finals if event["event_type"] == "MODELED_ATTEMPT_FINAL" else
+            not isinstance(event["payload"], Mapping) or not isinstance(event["payload"].get("result"), Mapping)
+            or not isinstance(event["payload"]["result"].get("attempt_id"), str)
+            or event["payload"]["result"]["attempt_id"] not in attempts_by_id
+            or not modeled_final_witness_valid(attempts_by_id[event["payload"]["result"]["attempt_id"]], None, event, mode=mode,
+                legacy_original_quantity=legacy_quantities.get(pid), original_position=position)
+            for event in modeled_events if event["event_type"] in {"MODELED_ATTEMPT_FINAL", "MODELED_RESULT_ACCEPTED"})
+        exit_proof = any(isinstance(e["payload"], Mapping) and e["payload"].get("side") == "EXIT"
+            and finals.get("FINAL-" + e["event_id"], {}).get("payload", {}).get("outcome") == "LANDED_SUCCESS" for e in attempts)
+        exit_proof = exit_proof and (not position.get("ordinary_operating") or any(value in {"LANDED_SUCCESS", "PARTIAL"} for value in entry_finals))
+        flat = flat and (exit_proof or not position.get("ordinary_operating") and not modeled_events)
+        nonfill = definitive_nonfill and position.get("qty_dec") is None and position.get("entry_price_dec") is None and quantity in {None, Decimal("0")}
+        unattempted_cancel = (state == "CANCELLED" and not modeled_events and position.get("qty_dec") is None
+            and position.get("entry_price_dec") is None and quantity in {None, Decimal("0")}
+            and all(position.get(field) is None or _as_decimal(position[field]) == 0
+                for field in ("remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec"))
+            and any(unattempted_cancel_witness_valid(position, event) for event in cancellations_by_position.get(pid, [])))
+        if not unresolved_attempts and not corrupt_modeled_events and (flat or nonfill or unattempted_cancel):
             continue
-        row_unknown = position_mode is None or bool(unresolved_attempts) or state in {"UNKNOWN", "ATTEMPTING"}
+        row_unknown = position_mode is None or bool(unresolved_attempts) or corrupt_modeled_events or state in {"UNKNOWN", "ATTEMPTING", "CANCELLED", "RECONCILED"}
         if state not in PRE_ATTEMPT_STATES and (quantity is None or quantity <= 0):
             row_unknown = True
         if state == "UNRESOLVED" and (not attempts or unresolved_attempts):

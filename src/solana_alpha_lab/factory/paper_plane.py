@@ -157,6 +157,204 @@ _KNOWN_RELEASED_SQL = f"""({_KNOWN_FLAT_SQL}) OR (state='CANCELLED'
 _OBLIGATION_CANDIDATE_SQL = f"NOT ({_KNOWN_RELEASED_SQL})"
 
 
+def modeled_final_witness_valid(attempt: Mapping[str, Any], final: Mapping[str, Any] | None,
+                                accepted: Mapping[str, Any], *, mode: str,
+                                legacy_original_quantity: Any = None,
+                                original_position: Mapping[str, Any] | None = None) -> bool:
+    """Validate original provenance; a missing final validates an observation only."""
+    try:
+        body, terminal, payload = attempt["payload"], final["payload"] if final is not None else {}, accepted["payload"]
+        if not all(isinstance(value, Mapping) for value in (body, terminal, payload)):
+            return False
+        result = payload.get("result")
+        if not isinstance(result, Mapping):
+            return False
+        allowed = {"attempt_id", "result_id", "outcome", "observed_at", "unit_price_usd", "filled_notional_usd", "chargeable_cost_usd"}
+        if result.get("schema_version") == "1.1":
+            allowed |= {"schema_version", "quantity_filled", "quantity_sold", "quantity_unit", "remaining_quantity", "fee_semantics"}
+        if set(result) - allowed or set(payload) != {"result", "evidence_class", "chargeable_cost_status"}:
+            return False
+        identity = {key: body[key] for key in ("position_id", "side", "mode", "attempt_key")}
+        aid = "ATTEMPT-" + canonical_spec_sha256(identity).upper()
+        rid = "RESULT-" + canonical_spec_sha256({"result_id": result["result_id"]}).upper()
+        outcome = result["outcome"]
+        if (mode not in {"PAPER", "SHADOW"} or body["mode"] != mode or body["side"] not in {"ENTRY", "EXIT"}
+            or attempt["event_type"] != "MODELED_ATTEMPT_STARTED" or attempt["event_id"] != aid or body["attempt_id"] != aid
+            or accepted["event_type"] != "MODELED_RESULT_ACCEPTED" or accepted["event_id"] != rid
+            or result["attempt_id"] != aid
+            or outcome not in {"NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED", "LANDED_SUCCESS", "PARTIAL", "UNKNOWN_REQUIRES_RECONCILIATION"}
+            or any(event["position_id"] != body["position_id"] or event["bot_instance_id"] != attempt["bot_instance_id"]
+                for event in ((final, accepted) if final is not None else (accepted,)))
+            or attempt["position_id"] != body["position_id"]
+            or payload.get("evidence_class") != body["evidence_class"]
+            or body["evidence_class"] != ("PAPER_MODEL" if mode == "PAPER" else "SHADOW_QUOTE_MODEL")
+            or not isinstance(result["result_id"], str) or not 0 < len(result["result_id"]) <= 120
+            or attempt["created_at"] != body["as_of"] or accepted["created_at"] != result["observed_at"]
+            or _parse_utc(result["observed_at"]) < _parse_utc(body["as_of"])):
+            return False
+        version = result.get("schema_version", "1.0")
+        if version not in {"1.0", "1.1"}:
+            return False
+        if final is not None and (outcome == "UNKNOWN_REQUIRES_RECONCILIATION"
+                or final["event_type"] != "MODELED_ATTEMPT_FINAL" or final["event_id"] != "FINAL-" + aid
+                or final["created_at"] != result["observed_at"]
+                or terminal != {"outcome": outcome, "result_event_id": rid,
+                    **({"schema_version": "1.1"} if version == "1.1" else {})}):
+            return False
+        cost = result.get("chargeable_cost_usd")
+        if payload.get("chargeable_cost_status") != ("KNOWN" if cost is not None else "UNKNOWN"):
+            return False
+        if cost is not None:
+            _positive_model_decimal(cost, "MODELED_RESULT_COST_INVALID", allow_zero=True)
+        positive = outcome in {"LANDED_SUCCESS", "PARTIAL"}
+        if not positive:
+            return all(result.get(key) is None for key in ("unit_price_usd", "filled_notional_usd", "quantity_filled", "quantity_sold", "remaining_quantity"))
+        price = _positive_model_decimal(result.get("unit_price_usd"), "MODELED_FILL_DETAILS_INVALID")
+        if body["side"] == "ENTRY":
+            notional = _positive_model_decimal(result.get("filled_notional_usd"), "MODELED_FILL_DETAILS_INVALID")
+            if original_position is not None:
+                original_qty = _positive_model_decimal(original_position.get("qty_dec"), "MODELED_QUANTITY_INVALID")
+                admitted = _positive_model_decimal(original_position.get("admitted_entry_notional_usd_dec"), "MODELED_FILL_DETAILS_INVALID")
+                if (price != _positive_model_decimal(original_position.get("entry_price_dec"), "MODELED_FILL_DETAILS_INVALID")
+                    or notional != _positive_model_decimal(original_position.get("entered_notional_usd_dec"), "MODELED_FILL_DETAILS_INVALID")
+                    or notional > admitted or (outcome == "PARTIAL") != (notional < admitted)):
+                    return False
+                quantity = (_positive_model_decimal(result.get("quantity_filled"), "MODELED_QUANTITY_INVALID") if version == "1.1"
+                    else (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP))
+                if quantity != original_qty or version == "1.1" and result.get("fee_semantics") != original_position.get("entry_fee_semantics"):
+                    return False
+            if version == "1.0" and legacy_original_quantity is not None:
+                original = _positive_model_decimal(legacy_original_quantity, "MODELED_QUANTITY_INVALID")
+                if (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP) != original:
+                    return False
+        if version == "1.1":
+            if result.get("quantity_unit") != "TOKEN_UNITS" or result.get("fee_semantics") not in {"SEPARATE_MODELED_FEE", "INCLUDED_IN_UNIT_PRICE"}:
+                return False
+            quantity = _positive_model_decimal(result.get("quantity_filled" if body["side"] == "ENTRY" else "quantity_sold"), "MODELED_QUANTITY_INVALID")
+            if body["side"] == "ENTRY":
+                if "quantity_sold" in result or "remaining_quantity" in result:
+                    return False
+                if (price * quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP) != notional.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP):
+                    return False
+            if body["side"] == "EXIT":
+                if "quantity_filled" in result or "filled_notional_usd" in result:
+                    return False
+                remainder = _positive_model_decimal(result.get("remaining_quantity"), "MODELED_QUANTITY_INVALID", allow_zero=True)
+                if body.get("remaining_quantity") is None:
+                    # v1.0 entry has no quantity reservation in its first EXIT
+                    # attempt; its retained immutable entry quantity is the bound.
+                    if "quantity_unit" in body:
+                        return False
+                    original = _positive_model_decimal(legacy_original_quantity, "MODELED_QUANTITY_INVALID")
+                else:
+                    if body.get("quantity_unit") != "TOKEN_UNITS":
+                        return False
+                    original = _positive_model_decimal(body["remaining_quantity"], "MODELED_QUANTITY_INVALID")
+                if quantity + remainder != original or (outcome == "PARTIAL") != (remainder > 0):
+                    return False
+        elif body["side"] == "EXIT" and (outcome != "LANDED_SUCCESS" or result.get("filled_notional_usd") is not None):
+            return False
+        return True
+    except (KeyError, TypeError, ValueError, ArithmeticError, PaperPlaneError):
+        return False
+
+
+def _sql_modeled_final_witness(*values: Any) -> int:
+    try:
+        keys = ("event_type", "event_id", "bot_instance_id", "position_id", "created_at", "payload")
+        events = [dict(zip(keys, values[offset:offset + 6])) for offset in (0, 6, 12)]
+        for offset, event in enumerate(events):
+            if offset == 1 and event["event_id"] is None:
+                events[offset] = None
+            else:
+                event["payload"] = json.loads(event["payload"])
+        return int(modeled_final_witness_valid(*events, mode=values[18], legacy_original_quantity=values[19],
+            original_position=json.loads(values[20])))
+    except (TypeError, ValueError):
+        return 0
+
+
+def unattempted_cancel_witness_valid(position: Mapping[str, Any], event: Mapping[str, Any]) -> bool:
+    """Only an original cancellation from a pre-attempt state proves no send."""
+    try:
+        payload = event["payload"]
+        return (isinstance(payload, Mapping) and event["event_type"] == "ENTRY_INTENT_CANCELLED"
+            and event["position_id"] == position["position_id"] and event["bot_instance_id"] == position["bot_instance_id"]
+            and isinstance(payload.get("from_state"), str) and payload["from_state"] in PRE_ATTEMPT_STATES
+            and isinstance(payload.get("cancel_reason_code"), str) and payload["cancel_reason_code"] in CANCEL_REASONS
+            and payload["cancel_reason_code"] == position.get("cancel_reason_code"))
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def _sql_unattempted_cancel_witness(pid: Any, bot: Any, reason: Any, event_type: Any,
+                                  event_bot: Any, event_pid: Any, raw: Any) -> int:
+    try:
+        return int(unattempted_cancel_witness_valid(
+            {"position_id": pid, "bot_instance_id": bot, "cancel_reason_code": reason},
+            {"event_type": event_type, "bot_instance_id": event_bot, "position_id": event_pid, "payload": json.loads(raw)}))
+    except (TypeError, ValueError):
+        return 0
+
+
+_LEGACY_QUANTITY_SQL = """CASE WHEN positions.entry_fee_semantics IS NULL AND EXISTS(
+    SELECT 1 FROM execution_events la JOIN execution_events lr ON la.event_id=
+        json_extract(CASE WHEN json_valid(lr.payload_json) THEN lr.payload_json ELSE '{}' END,'$.result.attempt_id')
+    WHERE la.position_id=positions.position_id AND la.event_type='MODELED_ATTEMPT_STARTED'
+    AND json_extract(CASE WHEN json_valid(la.payload_json) THEN la.payload_json ELSE '{}' END,'$.side')='ENTRY'
+    AND lr.position_id=positions.position_id AND lr.event_type='MODELED_RESULT_ACCEPTED'
+    AND json_extract(CASE WHEN json_valid(lr.payload_json) THEN lr.payload_json ELSE '{}' END,'$.result.schema_version') IS NULL
+    AND json_extract(CASE WHEN json_valid(lr.payload_json) THEN lr.payload_json ELSE '{}' END,'$.result.outcome') IN ('LANDED_SUCCESS','PARTIAL'))
+    THEN positions.qty_dec ELSE NULL END"""
+_ORIGINAL_ENTRY_SQL = """json_object('qty_dec',positions.qty_dec,'entry_price_dec',positions.entry_price_dec,
+    'entered_notional_usd_dec',positions.entered_notional_usd_dec,'entry_fee_semantics',positions.entry_fee_semantics,
+    'admitted_entry_notional_usd_dec',positions.admitted_entry_notional_usd_dec)"""
+_FINAL_WITNESS_JOIN_SQL = f"""execution_events f JOIN execution_events r ON r.event_id=
+    json_extract(CASE WHEN json_valid(f.payload_json) THEN f.payload_json ELSE '{{}}' END,'$.result_event_id')
+    WHERE f.event_id='FINAL-'||a.event_id AND a.bot_instance_id=positions.bot_instance_id
+    AND modeled_final_witness_v1(a.event_type,a.event_id,a.bot_instance_id,a.position_id,a.created_at,a.payload_json,
+        f.event_type,f.event_id,f.bot_instance_id,f.position_id,f.created_at,f.payload_json,
+        r.event_type,r.event_id,r.bot_instance_id,r.position_id,r.created_at,r.payload_json,bot_instances.mode,
+        {_LEGACY_QUANTITY_SQL},{_ORIGINAL_ENTRY_SQL})=1"""
+_ALL_ATTEMPTS_FINAL_SQL = f"""NOT EXISTS(SELECT 1 FROM execution_events a
+    WHERE a.position_id=positions.position_id AND a.event_type='MODELED_ATTEMPT_STARTED'
+    AND NOT EXISTS(SELECT 1 FROM {_FINAL_WITNESS_JOIN_SQL}))"""
+_NO_MODELED_EVENTS_SQL = """NOT EXISTS(SELECT 1 FROM execution_events e WHERE e.position_id=positions.position_id
+    AND e.event_type IN ('MODELED_ATTEMPT_STARTED','MODELED_ATTEMPT_FINAL','MODELED_RESULT_ACCEPTED'))"""
+_UNATTEMPTED_CANCEL_PROOF_SQL = f"""({_NO_MODELED_EVENTS_SQL}) AND EXISTS(SELECT 1 FROM execution_events c
+    WHERE c.position_id=positions.position_id AND c.event_type='ENTRY_INTENT_CANCELLED'
+    AND unattempted_cancel_witness_v1(positions.position_id,positions.bot_instance_id,positions.cancel_reason_code,
+        c.event_type,c.bot_instance_id,c.position_id,c.payload_json)=1)"""
+_NO_ORPHAN_MODELED_EVENTS_SQL = f"""NOT EXISTS(SELECT 1 FROM execution_events e
+    WHERE e.position_id=positions.position_id AND (
+        (e.event_type='MODELED_ATTEMPT_FINAL' AND NOT EXISTS(SELECT 1 FROM execution_events a
+            WHERE a.position_id=positions.position_id AND e.event_id='FINAL-'||a.event_id
+            AND a.event_type='MODELED_ATTEMPT_STARTED' AND EXISTS(SELECT 1 FROM {_FINAL_WITNESS_JOIN_SQL})))
+        OR (e.event_type='MODELED_RESULT_ACCEPTED' AND NOT EXISTS(SELECT 1 FROM execution_events a
+            WHERE a.event_id=json_extract(CASE WHEN json_valid(e.payload_json) THEN e.payload_json ELSE '{{}}' END,'$.result.attempt_id')
+            AND a.position_id=positions.position_id AND a.bot_instance_id=positions.bot_instance_id
+            AND modeled_final_witness_v1(a.event_type,a.event_id,a.bot_instance_id,a.position_id,a.created_at,a.payload_json,
+                NULL,NULL,NULL,NULL,NULL,NULL,e.event_type,e.event_id,e.bot_instance_id,e.position_id,e.created_at,e.payload_json,bot_instances.mode,
+                {_LEGACY_QUANTITY_SQL},{_ORIGINAL_ENTRY_SQL})=1))))"""
+_PROVED_RELEASE_SQL = f"""({_ALL_ATTEMPTS_FINAL_SQL}) AND ({_NO_ORPHAN_MODELED_EVENTS_SQL}) AND (
+    (state='CANCELLED' AND (EXISTS(SELECT 1 FROM execution_events a
+        WHERE a.position_id=positions.position_id AND a.event_type='MODELED_ATTEMPT_STARTED'
+        AND json_extract(CASE WHEN json_valid(a.payload_json) THEN a.payload_json ELSE '{{}}' END,'$.side')='ENTRY'
+        AND EXISTS(SELECT 1 FROM {_FINAL_WITNESS_JOIN_SQL}
+            AND json_extract(CASE WHEN json_valid(f.payload_json) THEN f.payload_json ELSE '{{}}' END,'$.outcome') IN ('NO_ROUTE','REJECTED_BEFORE_SEND','DROPPED_OR_EXPIRED_NOT_PROCESSED','LANDED_FAILED')))
+        OR ({_UNATTEMPTED_CANCEL_PROOF_SQL})))
+    OR (state='RECONCILED' AND (EXISTS(SELECT 1 FROM execution_events a
+        WHERE a.position_id=positions.position_id AND a.event_type='MODELED_ATTEMPT_STARTED'
+        AND json_extract(CASE WHEN json_valid(a.payload_json) THEN a.payload_json ELSE '{{}}' END,'$.side')='EXIT'
+        AND EXISTS(SELECT 1 FROM {_FINAL_WITNESS_JOIN_SQL} AND json_extract(CASE WHEN json_valid(f.payload_json) THEN f.payload_json ELSE '{{}}' END,'$.outcome')='LANDED_SUCCESS')
+        AND (COALESCE(ordinary_operating,0)=0 OR EXISTS(SELECT 1 FROM execution_events a
+            WHERE a.position_id=positions.position_id AND a.event_type='MODELED_ATTEMPT_STARTED'
+            AND json_extract(CASE WHEN json_valid(a.payload_json) THEN a.payload_json ELSE '{{}}' END,'$.side')='ENTRY'
+            AND EXISTS(SELECT 1 FROM {_FINAL_WITNESS_JOIN_SQL}
+                AND json_extract(CASE WHEN json_valid(f.payload_json) THEN f.payload_json ELSE '{{}}' END,'$.outcome') IN ('LANDED_SUCCESS','PARTIAL')))))
+        OR (COALESCE(ordinary_operating,0)=0 AND {_NO_MODELED_EVENTS_SQL}))))"""
+
+
 def _now() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
@@ -258,6 +456,8 @@ def _connect_sqlite(path: Path, *, readonly: bool) -> sqlite3.Connection:
         conn.isolation_level = None
         conn.execute("PRAGMA busy_timeout=5000")
     conn.row_factory = sqlite3.Row
+    conn.create_function("modeled_final_witness_v1", 21, _sql_modeled_final_witness, deterministic=True)
+    conn.create_function("unattempted_cancel_witness_v1", 7, _sql_unattempted_cancel_witness, deterministic=True)
     if readonly:
         try:
             # Validate actual source access now, so discovery can report an
@@ -718,8 +918,8 @@ class PaperPlaneStore:
         return [dict(row) for row in rows]
 
     def obligation_positions(self, mode: str) -> list[dict[str, Any]]:
-        """Indexed candidates; no scan/parse of completed history on ordinary ticks."""
-        predicate = (_OBLIGATION_CANDIDATE_SQL if "remaining_qty_dec" in _table_columns(self._conn, "positions")
+        """Terminal rows require live indexed witnesses, never a cached release."""
+        predicate = (f"({_OBLIGATION_CANDIDATE_SQL}) OR NOT ({_PROVED_RELEASE_SQL})" if "remaining_qty_dec" in _table_columns(self._conn, "positions")
                      else "1=1")  # Pre-migration readonly legacy compatibility.
         rows = self._conn.execute(f"""SELECT positions.*, bot_instances.mode AS obligation_mode
             FROM positions LEFT JOIN bot_instances USING(bot_instance_id)

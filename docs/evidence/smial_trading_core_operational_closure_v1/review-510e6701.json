@@ -1,0 +1,61 @@
+{
+  "after_evidence": "Fresh whole-outcome receipts and new exact inventory required; this old review is not final PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MODEL_DIVERSITY_PROVEN",
+    "NO_BASELINE_OR_LIVE_COUNTEREXAMPLE_CLAIM"
+  ],
+  "observed_head": "510e6701c5f282f904b9f8e33591ca2b1b5df6b1",
+  "packet_fingerprint_sha256": "507f89c9d6f59127e2ce0bad1ef61612f2ddd76b5aa2f4b04c6002674f1ef02f",
+  "receipt_sha256": "3b262f1487d3f31ab844188944bbae02a4c521e08c895cedd687ee813934e68a",
+  "reviewed_bindings_sha256": "c9a50083e16b86d278984cfb586a08a49ef2cbe361c68df7e144809234d37bfb",
+  "reviewed_inventory_sha256": "dba1add701ee1afc51e12ac0a611e0e6afcd3ec01f33c12a8116d344c3ea17b9",
+  "reviews": [
+    {
+      "executed_checks": [
+        "Exact55 committed/working bindings and diff",
+        "472 source pins including9 explicit bridges",
+        "EOF AST/location/marshal and C23 three-reference before reconstruction",
+        "Current semantic route/card readback"
+      ],
+      "material_findings": [
+        "G1_ENVELOPE_READINESS: READY ignores missing/corrupt durable operating envelope; D2/C16/C24/C3"
+      ],
+      "native_failure_probe": "PLANNED_FALSIFIER_NOT_EXECUTED_BY_GOAL_CRITIC",
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY"
+    },
+    {
+      "executed_checks": [
+        "Canonical packet fingerprint, exactdiff/task/evidenceSHA",
+        "Mandatory scientific/PIT/execution/UNKNOWN/authority premise questions"
+      ],
+      "material_findings": [
+        "F1_ENVELOPE_READINESS",
+        "F2_TERMINAL_PREFILTER_RELEASE_WITHOUT_VALID_WITNESS"
+      ],
+      "native_failure_probe": "PLANNED_FALSIFIERS_NOT_EXECUTED_BY_ARCHITECTURE_CRITIC",
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY"
+    },
+    {
+      "executed_checks": [
+        "Exact55 committed/working bindings, candidate diff",
+        "472 source pins9 bridge applications, current receipt selfhashes/13semanticrefs",
+        "NativePAPER envelope corrupt+missing falseREADY1.997671s ownedrootABSENT",
+        "NativeSHADOW fundingmissing falseREADY2.330284s ownedrootABSENT"
+      ],
+      "material_findings": [
+        "F1_ENVELOPE_READINESS",
+        "F3_SHADOW_CURRENT_EXECUTION_INPUT_READINESS"
+      ],
+      "native_failure_probe": "EXECUTED_NATIVE_SYNTHETIC_PROVIDER0_ATTEMPTS0",
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY"
+    }
+  ],
+  "schema": "smial.frozen-review-remediation-ledger",
+  "schema_version": "1.0",
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "verdict": "NOT_READY"
+}

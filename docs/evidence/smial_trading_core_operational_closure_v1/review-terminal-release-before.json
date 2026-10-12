@@ -1,0 +1,163 @@
+{
+  "code_unchanged_during_probe": true,
+  "credential_reads": false,
+  "elapsed_seconds": 0.140061,
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "fixture_observed_at": "2026-09-03T12:10:00Z",
+  "followup_reproductions": [
+    {
+      "elapsed_seconds": 0.154444,
+      "evidence_class": "SYNTHETIC_OFFLINE",
+      "observations": [
+        {
+          "actual_inventory_status": "UNKNOWN",
+          "actual_new_admission_position_present": false,
+          "actual_new_admission_reason": "OUTSTANDING_OBLIGATIONS_UNKNOWN",
+          "actual_position_count": 1,
+          "actual_witness_valid": null,
+          "case": "UNATTEMPTED_CANCEL",
+          "counterexample_reproduced": true,
+          "expected_new_admission_position_present": true,
+          "expected_position_count": 0,
+          "native_state": "CANCELLED",
+          "natural_residual_quantity": "0"
+        },
+        {
+          "actual_inventory_status": "KNOWN",
+          "actual_new_admission_position_present": true,
+          "actual_new_admission_reason": "VERTICAL_ENTER",
+          "actual_position_count": 0,
+          "actual_witness_valid": true,
+          "case": "EXIT_QUANTITY_CONFLICT",
+          "counterexample_reproduced": true,
+          "expected_new_admission_position_present": false,
+          "expected_position_count": 1,
+          "native_state": "RECONCILED",
+          "natural_residual_quantity": "0"
+        }
+      ],
+      "owned_roots_absent": true,
+      "procedure": "Native ordinary admission then cancel_entry_intent ENTRIES_PAUSED; native v1.1 full ENTRY/EXIT then change only accepted EXIT quantity_sold to 1. No position UPDATE. Read obligations and attempt successor admission.",
+      "source_pins_after": {
+        "src/solana_alpha_lab/factory/paper_plane.py": "06c372d2cba4d2a27f59f25c3f7ab3b8216d60e05187b304a36e22e131002da4",
+        "src/solana_alpha_lab/factory/trading_runtime_policy.py": "4f77d8464ed6a8fb70c83779ed5b3009e64515cc6f9db7b5a3af4f2c51c9dbd3",
+        "tests/test_trading_operational_obligations_v1.py": "d4edfc7b77ccbdbd232da415a02827a566d1f7aa61fef83b7568107d8aeec28c"
+      },
+      "source_pins_before": {
+        "src/solana_alpha_lab/factory/paper_plane.py": "06c372d2cba4d2a27f59f25c3f7ab3b8216d60e05187b304a36e22e131002da4",
+        "src/solana_alpha_lab/factory/trading_runtime_policy.py": "4f77d8464ed6a8fb70c83779ed5b3009e64515cc6f9db7b5a3af4f2c51c9dbd3",
+        "tests/test_trading_operational_obligations_v1.py": "d4edfc7b77ccbdbd232da415a02827a566d1f7aa61fef83b7568107d8aeec28c"
+      },
+      "source_unchanged": true
+    },
+    {
+      "elapsed_seconds": 0.09437,
+      "evidence_class": "SYNTHETIC_OFFLINE",
+      "observations": [
+        {
+          "actual_inventory_status": "KNOWN",
+          "actual_position_count": 0,
+          "actual_witness_valid": true,
+          "case": "ENTRY-QUANTITY-CONFLICT",
+          "counterexample_reproduced": true,
+          "expected_position_count": 1
+        },
+        {
+          "actual_inventory_status": "KNOWN",
+          "actual_position_count": 0,
+          "actual_witness_valid": true,
+          "case": "ENTRY-WRONG-SIDE-FIELD",
+          "counterexample_reproduced": true,
+          "expected_position_count": 1
+        },
+        {
+          "actual_inventory_status": "KNOWN",
+          "actual_position_count": 0,
+          "actual_witness_valid": true,
+          "case": "EXIT-WRONG-SIDE-FIELDS",
+          "counterexample_reproduced": true,
+          "expected_position_count": 1
+        }
+      ],
+      "owned_roots_absent": true,
+      "procedure": "Native full v1.1 ENTRY/EXIT. Change only accepted original ENTRY quantity or wrong-side ENTRY/EXIT fields; restore original payload between variants. No position UPDATE.",
+      "source_pins_after": {
+        "src/solana_alpha_lab/factory/paper_plane.py": "06c372d2cba4d2a27f59f25c3f7ab3b8216d60e05187b304a36e22e131002da4",
+        "src/solana_alpha_lab/factory/trading_runtime_policy.py": "4f77d8464ed6a8fb70c83779ed5b3009e64515cc6f9db7b5a3af4f2c51c9dbd3",
+        "tests/test_trading_operational_obligations_v1.py": "d4edfc7b77ccbdbd232da415a02827a566d1f7aa61fef83b7568107d8aeec28c"
+      },
+      "source_pins_before": {
+        "src/solana_alpha_lab/factory/paper_plane.py": "06c372d2cba4d2a27f59f25c3f7ab3b8216d60e05187b304a36e22e131002da4",
+        "src/solana_alpha_lab/factory/trading_runtime_policy.py": "4f77d8464ed6a8fb70c83779ed5b3009e64515cc6f9db7b5a3af4f2c51c9dbd3",
+        "tests/test_trading_operational_obligations_v1.py": "d4edfc7b77ccbdbd232da415a02827a566d1f7aa61fef83b7568107d8aeec28c"
+      },
+      "source_unchanged": true
+    }
+  ],
+  "head_sha": "510e6701c5f282f904b9f8e33591ca2b1b5df6b1",
+  "live_authority": false,
+  "observations": [
+    {
+      "actual_corrupt_inventory_status": "KNOWN",
+      "actual_corrupt_position_count": 0,
+      "actual_new_admission_position_present": true,
+      "actual_new_envelope_decision": "ALLOW",
+      "case": "NONFILL",
+      "counterexample_reproduced": true,
+      "expected_admission_reason": "OUTSTANDING_OBLIGATIONS_UNKNOWN",
+      "expected_inventory_status": "UNKNOWN",
+      "expected_position_count": 1,
+      "legitimate_released_count": 0,
+      "natural_position": {
+        "entry_price_dec": null,
+        "position_id": "POS-SIG-SIGDEC-BEFORE-NONFILL",
+        "qty_dec": null,
+        "remaining_cost_basis_usd_dec": "0",
+        "remaining_entry_fee_usd_dec": "0",
+        "remaining_qty_dec": "0",
+        "state": "CANCELLED"
+      },
+      "positions_not_rewritten": true
+    },
+    {
+      "actual_corrupt_inventory_status": "KNOWN",
+      "actual_corrupt_position_count": 0,
+      "actual_new_admission_position_present": true,
+      "actual_new_envelope_decision": "ALLOW",
+      "case": "FLAT",
+      "counterexample_reproduced": true,
+      "expected_admission_reason": "OUTSTANDING_OBLIGATIONS_UNKNOWN",
+      "expected_inventory_status": "UNKNOWN",
+      "expected_position_count": 1,
+      "legitimate_released_count": 0,
+      "natural_position": {
+        "entry_price_dec": "0.000003",
+        "position_id": "POS-SIG-SIGDEC-BEFORE-FLAT",
+        "qty_dec": "10000000",
+        "remaining_cost_basis_usd_dec": "0",
+        "remaining_entry_fee_usd_dec": "0.00",
+        "remaining_qty_dec": "0",
+        "state": "RECONCILED"
+      },
+      "positions_not_rewritten": true
+    }
+  ],
+  "original_receipt_sha256": "88e4637096169324a90de1f750d2ccb6ba1f9032d00c4e82f975eb495c287d17",
+  "owned_root_absent": true,
+  "procedure": "Native admission/attempt/result; corrupt only original FINAL payload to {}; never UPDATE positions. Read obligations/enforce envelope/attempt new native admission.",
+  "provider_calls": false,
+  "receipt_sha256": "0dc3164c57df04001cee555a5e71ccdaddd8050629bd16d728506772705a03af",
+  "schema": "smial.review-terminal-release-before",
+  "schema_version": "1.0",
+  "source_pins_after": {
+    "src/solana_alpha_lab/factory/paper_plane.py": "75f2aa8e10fd40e1c2dd4ad1519bcf2826c3cbc80988461349d158f32d97b4cd",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8690e7fd4b1412dc5462e614b84ea8cc57f90f6451d6568fce2273023faf0e1d",
+    "tests/test_trading_operational_obligations_v1.py": "063ae541e5d3fc30d4926fe5bf03eeaef2deb8160866b70558a7bae11692ef83"
+  },
+  "source_pins_before": {
+    "src/solana_alpha_lab/factory/paper_plane.py": "75f2aa8e10fd40e1c2dd4ad1519bcf2826c3cbc80988461349d158f32d97b4cd",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8690e7fd4b1412dc5462e614b84ea8cc57f90f6451d6568fce2273023faf0e1d",
+    "tests/test_trading_operational_obligations_v1.py": "063ae541e5d3fc30d4926fe5bf03eeaef2deb8160866b70558a7bae11692ef83"
+  },
+  "status": "REPRODUCED"
+}

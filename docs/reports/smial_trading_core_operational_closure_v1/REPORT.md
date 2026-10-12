@@ -46,6 +46,11 @@ Original attached MD byte-for-byte находится в source-contract.md; е�
 | REVIEW_NATIVE_COUNTEREXAMPLE | Missing/corrupt current B profile/binding starved old A EXIT | Old obligations first; B entries disabled; cold status keeps typed gap |
 | REVIEW_NATIVE_COUNTEREXAMPLE | Later cut clock заменял pending result; export пропускал known result | Original pending clock, omission/conflict denial |
 | REVIEW_NATIVE_COUNTEREXAMPLE | Latest UNKNOWN total стирал known $0.25 при restore | All original accepted observations/IDs/clocks replayed through accounting owner |
+| EXACT_REVIEW_COUNTEREXAMPLE | READY при missing/corrupt envelope или missing/stale/future/corrupt SHADOW funding | Current readonly readiness требует VALID envelope и свежие проверенные execution inputs |
+| EXACT_REVIEW_COUNTEREXAMPLE | SQL скрывал естественные CANCELLED/RECONCILED с потерянным FINAL/result | Indexed terminal witness validation; повреждение сохраняет UNKNOWN и запрет admission |
+| REMEDIATION_COUNTEREXAMPLE | Отмена до попытки удерживала лимит; противоречивый sold/remnant освобождал его | Natural unattempted cancel освобождается; result количества сверяются с original attempt |
+| OWNER_UX_COUNTEREXAMPLE | CLI check принимал missing/invalid D2 envelope limits | Shared owner validation до activation, пять native readonly cases |
+| OWNER_UX_COUNTEREXAMPLE | После reconcile action ещё предлагал reconcile при верной ACK-команде | Readback использует один phase predicate для action/command; native restore и cold CLI повторены |
 
 Baseline failures для новых capabilities не выдуманы. Reviewer before traces
 относятся к changing implementation bytes; они не приписываются base #396.
@@ -54,18 +59,12 @@ Baseline failures для новых capabilities не выдуманы. Reviewer
 
 ## C01–C24
 
-Native automated status: PASS, 116 tests, 381.488962s; source bytes до/после
-совпадают, owned roots ABSENT. Exact test IDs, durations, source pins и root
-absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
-После proof staged-diff hook потребовал убрать один лишний LF в EOF
-coordinator. [EOF equivalence](../../evidence/smial_trading_core_operational_closure_v1/eof-normalization-proof.json)
-связывает original tested hash и final hash: AST со всеми location attributes
-и compiled code object совпадают byte-for-byte. Исходные test pins сохранены;
-runtime rerun ради этого пробела не объявлен. Exact-head CI остаётся обязательным.
-Secret scan затем выявил локальную переменную synthetic sentinel с именем
-secret. Она переименована в canary (три references внутри одного C23);
-[актуальный C23 повторён: PASS](../../evidence/smial_trading_core_operational_closure_v1/canary-rename-proof.json).
-Остальные source bytes тестового файла совпадают; secret scan PASS без обхода hook.
+Native automated status: PASS, 122 tests, 400.829198s; source bytes до/после
+совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
+source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
+Final runtime proof повторён полностью после material review repairs. Ранние
+EOF/canary equivalence и 116-test receipts сохранены как superseded history;
+они не подменяют текущий native proof.
 
 Дополнительно: [99 direct consumers](../../evidence/smial_trading_core_operational_closure_v1/direct-consumer-proof.json),
 [independent cold operator](../../evidence/smial_trading_core_operational_closure_v1/operator-proof.json),
@@ -102,7 +101,8 @@ test_trading_operational_recovery_v1; engines: continuity/obligations/adapters.
 | C23 | Actual loopback egress hits0, secret sentinel not read/stored, non-target SHA unchanged, roots ABSENT |
 | C24 | D1 historical mapping; separate software/science/runtime/delivery/financial and explicit live ledger |
 
-C22 независимый оператор уже прошёл cold PAPER CLI до RECONCILED:2 original
+C22: 22 ordinary CLI stages + 1 readonly limit diagnostic. Независимый оператор
+прошёл cold PAPER CLI до RECONCILED:2 original
 attempts/results, exact inventory SHA, pause preserved after ACK. Он не
 составлял bindings/per-token outcomes вручную. SHADOW missing/stale funding
 preflight даёт typed refusal и русский next step. Это synthetic software
@@ -141,18 +141,32 @@ real strategy promotion не установлены. Там, где NOT_IMPLEMEN
 
 ## Resources, rollback, delivery
 
-Peak suite process RSS: 123162624 bytes (117.46 MiB). Native 14-day producer
+Peak suite process RSS: 146284544 bytes (139.51 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.1924–0.2887s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.2023–0.2407s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04294–0.04847 |
-| 1000 | 364544 | 0.04401–0.05123 |
-| 4000 | 843776 | 0.04403–0.05023 |
+| 0 | 204800 | 0.04781–0.05306 |
+| 1000 | 364544 | 0.04797–0.11176 |
+| 4000 | 843776 | 0.04883–0.05454 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
+Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
+
+| Native readback scope | SQLite steps | Elapsed, s |
+|---|---:|---:|
+| 1 outstanding | 630 | 0.000284 |
+| 100 proved terminal | 78070 | 0.015571 |
+| 1000 proved terminal | 774200 | 0.156420 |
+| 1000 terminal + 12000 unrelated events | 774200 | 0.166564 |
+
+Native history preparation: 13.441s.
+SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
+Индекс ограничивает чтение соответствующими событиями, посторонний journal
+не перечитывается целиком. Кэш release и новая competing truth schema не созданы.
+
 Это bounded synthetic measurements на данном процессе, не обещание любых
 объёмов/host throughput. Process kill проверен; power-loss/hardware tolerance
 не заявляется. Heartbeat health ограничен явным progress TTL.

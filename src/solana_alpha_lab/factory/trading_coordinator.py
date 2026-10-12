@@ -47,6 +47,14 @@ def normalize_profile(profile, *, recipe, mode):
         raise PaperPlaneError("OPERATING_PROFILE_INVALID")
     if profile["network_authorized"] is not False:
         raise PaperPlaneError("PROFILE_CANNOT_GRANT_NETWORK_AUTHORITY")
+    from solana_alpha_lab.factory.trading_runtime_policy import normalize_operating_envelope, TradingRuntimePolicyError
+    if not isinstance(profile["envelope"], dict):
+        raise PaperPlaneError("OPERATING_ENVELOPE_INVALID")
+    try:
+        normalize_operating_envelope(profile["envelope"], mode=mode)
+    except TradingRuntimePolicyError as exc:
+        code = "CONFIGURATION_REQUIRED" if str(exc) == "CONFIGURATION_REQUIRED" else "OPERATING_ENVELOPE_INVALID"
+        raise PaperPlaneError(code) from None
     for field in ("batch_size", "source_max_age_seconds", "progress_max_age_seconds", "observation_max_age_seconds"):
         if type(profile[field]) is not int or not 0 < profile[field] <= 1000000:
             raise PaperPlaneError("OPERATING_PROFILE_LIMIT_INVALID")
@@ -92,7 +100,7 @@ def check_execution_inputs(profile, *, as_of):
             if not isinstance(metadata,dict) or not metadata:
                 raise PaperPlaneError("EXECUTION_ASSET_METADATA_REQUIRED")
             for mint,asset in metadata.items():
-                if asset.get("mint")!=mint or type(asset.get("decimals")) is not int or not 0<=asset["decimals"]<=18:
+                if not isinstance(asset,dict) or asset.get("mint")!=mint or type(asset.get("decimals")) is not int or not 0<=asset["decimals"]<=18:
                     raise PaperPlaneError("EXECUTION_ASSET_IDENTITY_INVALID")
                 if not parse_utc(asset["observed_at"])<=parse_utc(asset["available_at"])<=parse_utc(as_of):
                     raise PaperPlaneError("EXECUTION_OBSERVATION_STALE_OR_FUTURE")
@@ -707,10 +715,24 @@ class TradingCoordinator:
                 source_age = None if observed_source_latest is None else (parse_utc(at) - parse_utc(observed_source_latest)).total_seconds()
                 fresh = profile is not None and source_available and source_age is not None and 0 <= source_age <= profile["source_max_age_seconds"]
                 input_reason = "OPERATING_PROFILE_UNAVAILABLE_OR_CORRUPT" if profile is None else "SOURCE_UNAVAILABLE" if not source_available else "SOURCE_CLOCK_FROM_FUTURE" if source_age is not None and source_age < 0 else "SOURCE_STALE" if not fresh else "SOURCE_FRESH"
+                envelope = read_operating_envelope(store, self.mode)
+                envelope_valid = envelope["status"] == "VALID"
+                execution_input_status = "OPERATING_PROFILE_UNAVAILABLE_OR_CORRUPT"
+                if profile is not None:
+                    try:
+                        execution_input_status = check_execution_inputs(profile, as_of=at)["execution_input_status"]
+                    except PaperPlaneError as exc:
+                        execution_input_status = str(exc)
+                    except (OSError, ValueError, TypeError, KeyError):
+                        execution_input_status = "EXECUTION_QUOTE_INPUT_INVALID"
+                execution_inputs_verified = execution_input_status in {"PAPER_NATIVE_PREFIX", "QUOTE_INPUTS_VERIFIED"}
+                if fresh and not execution_inputs_verified:
+                    input_reason = execution_input_status
                 exit_blocked = any(row["active"] and not row["incident_key"].startswith("SOURCE-") for row in incidents)
-                healthy = not integrity and not exit_blocked and alive and moving and fresh and not unresolved and inventory["inventory_status"] == "KNOWN" and not state["restore_guard"]
+                healthy = envelope_valid and execution_inputs_verified and not integrity and not exit_blocked and alive and moving and fresh and not unresolved and inventory["inventory_status"] == "KNOWN" and not state["restore_guard"]
                 restored_cut = store._conn.execute("SELECT event_id FROM execution_events WHERE event_type='RESTORE_EXTERNAL_CUT_RECONCILED' AND json_extract(payload_json,'$.mode')=? ORDER BY rowid DESC LIMIT 1", (self.mode,)).fetchone()
-                restore_next = "ack-restore --mode "+self.mode+" --input complete-external-cut.json --inventory-sha256 "+sha256_of(inventory)+" --as-of "+at if restored_cut and not unresolved and not integrity and inventory["inventory_status"]=="KNOWN" else "reconcile --mode "+self.mode+" --input complete-external-cut.json"
+                restore_ready_for_ack = bool(restored_cut and not unresolved and not integrity and inventory["inventory_status"]=="KNOWN")
+                restore_next = "ack-restore --mode "+self.mode+" --input complete-external-cut.json --inventory-sha256 "+sha256_of(inventory)+" --as-of "+at if restore_ready_for_ack else "reconcile --mode "+self.mode+" --input complete-external-cut.json"
                 from solana_alpha_lab.factory.paper_shadow_operations import position_pnl_view, _modeled_attempt_costs
                 recent = [dict(row) for row in store._conn.execute("SELECT p.* FROM positions p JOIN bot_instances b USING(bot_instance_id) WHERE b.mode=? ORDER BY p.rowid DESC LIMIT 100", (self.mode,))]
                 by_position = {}
@@ -729,17 +751,19 @@ class TradingCoordinator:
                     "as_of": at, "store": "paper_plane.sqlite", "activation_epoch_id": state["epoch_id"],
                     "generation":state["generation"],"inventory_sha256":sha256_of(inventory),
                     "profile_sha256": None if profile is None else sha256_of(profile), "process_alive": alive,
-                    "input_fresh": fresh, "input_reason":input_reason,"source_available": source_available, "source_latest_at": observed_source_latest, "last_tick_at":tick,"progress_moving": moving,
+                    "input_fresh": fresh and execution_inputs_verified, "source_fresh": fresh,
+                    "execution_input_status": execution_input_status,
+                    "input_reason":input_reason,"source_available": source_available, "source_latest_at": observed_source_latest, "last_tick_at":tick,"progress_moving": moving,
                     "integrity_verified": not integrity, "exit_reconciliation_healthy": not exit_blocked and unresolved == 0 and inventory["inventory_status"] == "KNOWN",
                     "restore_guard": bool(state["restore_guard"]), "inventory": inventory,
-                    "envelope": read_operating_envelope(store, self.mode), "instances": bots,
+                    "envelope": envelope, "operating_configuration_status": envelope["status"], "instances": bots,
                     "pending_attempts": unresolved, "due_work": pending[0], "earliest_overdue": pending[1],
                     "last_completed_work": state["last_work_id"], "incidents": incidents, "integrity_gaps": integrity,
                     "economics": economics, "economics_coverage": "RECENT_100_POSITION_ROWS_PER_MODE",
                     "complete_execution_readback": "trading_continuity.py readback", "netreturn_status": "NOT_ESTABLISHED", "owner_fcf_status": "NOT_AVAILABLE",
                     "scientific_monitoring_thresholds": "NOT_CONFIGURED",
-                    "next_safe_action": "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING" if unresolved or integrity or state["restore_guard"] else "CHECK_PROCESS_SOURCE_AND_PROFILE" if not healthy else "NONE",
-                    "next_safe_command": restore_next if state["restore_guard"] else "readback --mode "+self.mode if unresolved or integrity or exit_blocked else "run --mode "+self.mode+" --ticks 1" if not fresh else "run --mode "+self.mode if not alive else "status --mode "+self.mode+" --format human",
+                    "next_safe_action": "ACKNOWLEDGE_RESTORED_INVENTORY" if state["restore_guard"] and restore_ready_for_ack else "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING" if unresolved or integrity or state["restore_guard"] else "VERIFY_OPERATING_ENVELOPE" if not envelope_valid else "CHECK_EXECUTION_QUOTE_INPUTS" if not execution_inputs_verified else "CHECK_PROCESS_SOURCE_AND_PROFILE" if not healthy else "NONE",
+                    "next_safe_command": restore_next if state["restore_guard"] else "readback --mode "+self.mode if unresolved or integrity or exit_blocked or not envelope_valid or not execution_inputs_verified else "run --mode "+self.mode+" --ticks 1" if not fresh else "run --mode "+self.mode if not alive else "status --mode "+self.mode+" --format human",
                     "live_authority": False, "financial_authority": False}
         finally:
             store.close()

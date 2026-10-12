@@ -229,6 +229,7 @@ def main(argv=None) -> int:
             print(f"{result['mode']} · {result['status']} · epoch {result['activation_epoch_id']}\n"
                 f"На {result['as_of']} · последний tick: {result['last_tick_at'] or 'NONE'}\n"
                 f"Процесс: {result['process_alive']} · источник: {result['input_reason']} ({result['source_latest_at'] or 'NONE'}) · прогресс: {result['progress_moving']}\n"
+                f"Общий лимит: {result['operating_configuration_status']} · входы исполнения: {result['execution_input_status']}\n"
                 f"Обязательства: {inventory['position_count']} · стоимость: {inventory['outstanding_cost_basis_usd'] if inventory['outstanding_cost_basis_usd'] is not None else 'UNKNOWN'} USD · pending attempts: {result['pending_attempts']}\n"
                 f"Целостность: {result['integrity_verified']} · restore fence: {result['restore_guard']} · earliest overdue: {result['earliest_overdue'] or 'NONE'}\n"
                 f"Inventory SHA256: {result['inventory_sha256']}")
@@ -265,6 +266,8 @@ def main(argv=None) -> int:
                 "ATTEMPT_RECONCILIATION_REQUIRED": "RECONCILE_SAME_ATTEMPT_BEFORE_RETRY"}.get(code, next_action)
         if args.format=="human":
             guidance={"EXECUTION_QUOTE_INPUT_NOT_PRESENT":"Подготовь указанный в quote profile файл funding observation внутри source.root и повтори check.",
+                "CONFIGURATION_REQUIRED":"Укажи явно разрешённые max_outstanding_positions и max_outstanding_cost_basis_usd в envelope профиля; затем повтори check.",
+                "OPERATING_ENVELOPE_INVALID":"Проверь структуру и версию envelope профиля; затем повтори check. Общий лимит не становится unlimited.",
                 "EXECUTION_OBSERVATION_STALE_OR_FUTURE":"Обнови своевременное наблюдение в exact source; затем повтори check. UNKNOWN не освобождает обязательства.",
                 "RESTORE_COMPLETE_EXTERNAL_CUT_REQUIRED":"Получи полный независимый cut, проверь seal-cut и выполни reconcile; fence остаётся.",
                 "QUOTE_EXTERNAL_AUTHORITY_REQUIRED":"Quote provider не разрешён; для внешнего вызова нужен отдельный exact grant.",

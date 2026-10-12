@@ -313,6 +313,7 @@ class OperatingDriverTests(unittest.TestCase):
         self.assertFalse(outcome["new_effects_enabled"])
         coordinator = TradingCoordinator(runner, mode="SHADOW", clock=lambda: self.now)
         self.assertTrue(coordinator.status()["restore_guard"])
+        self.assertEqual(coordinator.status()["next_safe_action"], "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING")
         accepted = coordinator.reconcile_restored_effect(receipt)
         self.assertFalse(accepted["send_permitted"])
         self.assertTrue(coordinator.reconcile_restored_effect(receipt)["idempotent"])
@@ -321,6 +322,9 @@ class OperatingDriverTests(unittest.TestCase):
         self.assertEqual(Decimal(summary["outstanding_cost_basis_usd"]), Decimal("30"))
         cut=self.recovery_cut(ledger,self.data / "backups/pre-effect.sqlite")
         coordinator.reconcile_cut(cut)
+        after_cut = coordinator.status()
+        self.assertEqual(after_cut["next_safe_action"], "ACKNOWLEDGE_RESTORED_INVENTORY")
+        self.assertTrue(after_cut["next_safe_command"].startswith("ack-restore --mode SHADOW "))
         coordinator.acknowledge_restore(expected_inventory_sha256=sha256_of(summary), as_of="2026-10-05T12:40:00Z",cut=cut)
         self.assertFalse(coordinator.status()["restore_guard"])
         self.assertEqual(len(self.ledger_receipts(ledger)), 1)
@@ -621,6 +625,90 @@ class OperatingDriverTests(unittest.TestCase):
         self.assertEqual(self.invoke("readback")["modeled_attempts"], [])
         with closing(sqlite3.connect(self.runner.store_path.resolve().as_uri()+"?mode=ro",uri=True)) as observer:
             self.assertEqual(observer.execute("SELECT status FROM ordinary_work").fetchone()[0], "SKIPPED_STALE")
+
+    def test_C01_check_rejects_missing_or_invalid_operating_limits_readonly(self):
+        self.start_operating(negative=True)
+        original = self.profile["envelope"]
+        target = self.data / "bad-profile.json"
+        with closing(sqlite3.connect(self.runner.store_path)) as writer:
+            writer.execute("SELECT COUNT(*) FROM positions").fetchone()
+            files = [self.runner.store_path, Path(str(self.runner.store_path) + "-wal")]
+            before = [hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None for path in files]
+            for kind in ("NULL", "MISSING_COUNT", "MISSING_MONEY", "BOOLEAN_COUNT", "WRONG_MODE"):
+                with self.subTest(kind=kind):
+                    envelope = None if kind == "NULL" else dict(original)
+                    if kind == "MISSING_COUNT":
+                        envelope.pop("max_outstanding_positions")
+                    elif kind == "MISSING_MONEY":
+                        envelope.pop("max_outstanding_cost_basis_usd")
+                    elif kind == "BOOLEAN_COUNT":
+                        envelope["max_outstanding_positions"] = True
+                    elif kind == "WRONG_MODE":
+                        envelope["mode"] = "SHADOW"
+                    target.write_text(json.dumps({**self.profile, "envelope": envelope}), encoding="utf-8")
+                    result = self.invoke("check", strategy=True, expect=2, profile="bad-profile.json",
+                        mode="PAPER", as_of="2026-10-05T12:40:00Z")
+                    self.assertEqual(result["status"], "BLOCKED")
+                    self.assertNotEqual(result["reason_code"], "OFFLINE_INPUT_SHAPE_INVALID")
+            self.assertEqual(before, [hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None for path in files])
+
+    def test_C16_missing_or_corrupt_envelope_never_ready(self):
+        self.start_operating(negative=True)
+        self.coordinator.tick()
+        self.assertEqual(self.coordinator.status()["status"], "READY")
+        with closing(sqlite3.connect(self.runner.store_path)) as writer:
+            original = writer.execute("SELECT event_id,payload_json FROM execution_events WHERE event_type='ORDINARY_OPERATING_ENVELOPE_CONFIGURED'").fetchone()
+            for variant, reason in (("CORRUPT", "OPERATING_ENVELOPE_INVALID"), ("MISSING", "CONFIGURATION_REQUIRED")):
+                with self.subTest(variant=variant):
+                    if variant == "CORRUPT":
+                        writer.execute("UPDATE execution_events SET payload_json='{}' WHERE event_id=?", (original[0],))
+                    else:
+                        writer.execute("DELETE FROM execution_events WHERE event_id=?", (original[0],))
+                    writer.commit()
+                    paths = [self.runner.store_path, Path(str(self.runner.store_path)+"-wal")]
+                    before = {p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in paths if p.exists()}
+                    fresh = TradingCoordinator(TradingContinuityRunner(self.root,data_root=self.data), mode="PAPER", clock=lambda:self.now)
+                    view = fresh.status()
+                    self.assertEqual({p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in paths if p.exists()}, before)
+                    self.assertEqual(view["envelope"]["status"], reason)
+                    self.assertEqual(view["status"], "ACTION_REQUIRED")
+                    self.assertEqual(view["operating_configuration_status"], reason)
+                    self.assertEqual(view["next_safe_action"], "VERIFY_OPERATING_ENVELOPE")
+                    self.assertEqual(view["next_safe_command"], "readback --mode PAPER")
+                    self.assertTrue(view["exit_reconciliation_healthy"])
+
+    def test_C16_shadow_quote_inputs_are_current_readonly_health(self):
+        self.start_operating(mode="SHADOW",negative=True)
+        self.coordinator.tick()
+        self.assertEqual(self.coordinator.status()["status"], "READY")
+        funding = Path(self.profile["source"]["root"])/self.profile["quote"]["funding_observation_file"]
+        original = json.loads(funding.read_text(encoding="utf-8"))
+        with closing(sqlite3.connect(self.runner.store_path)) as writer:
+            writer.execute("SELECT COUNT(*) FROM execution_events").fetchone()
+            for variant, reason in (("MISSING", "EXECUTION_QUOTE_INPUT_NOT_PRESENT"), ("STALE", "EXECUTION_OBSERVATION_STALE_OR_FUTURE"), ("FUTURE", "EXECUTION_OBSERVATION_STALE_OR_FUTURE"), ("CORRUPT", "EXECUTION_ASSET_IDENTITY_INVALID")):
+                with self.subTest(variant=variant):
+                    if variant == "MISSING":
+                        funding.unlink()
+                    elif variant == "CORRUPT":
+                        funding.write_text("null",encoding="utf-8")
+                    else:
+                        body = dict(original)
+                        body["observed_at"] = body["available_at"] = "2026-10-05T11:00:00Z" if variant == "STALE" else "2026-10-05T12:41:00Z"
+                        funding.write_text(json.dumps(body),encoding="utf-8")
+                    paths = [self.runner.store_path, Path(str(self.runner.store_path)+"-wal")]
+                    before = {p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in paths if p.exists()}
+                    fresh = TradingCoordinator(TradingContinuityRunner(self.root,data_root=self.data), mode="SHADOW", clock=lambda:self.now)
+                    view = fresh.status()
+                    self.assertEqual({p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in paths if p.exists()}, before)
+                    self.assertEqual(view["status"], "ACTION_REQUIRED")
+                    self.assertEqual(view["execution_input_status"], reason)
+                    self.assertEqual(view["input_reason"], reason)
+                    self.assertFalse(view["input_fresh"])
+                    self.assertTrue(view["source_fresh"])
+                    self.assertTrue(view["exit_reconciliation_healthy"])
+                    self.assertEqual(view["next_safe_action"], "CHECK_EXECUTION_QUOTE_INPUTS")
+                    self.assertEqual(view["next_safe_command"], "readback --mode SHADOW")
+                    funding.write_text(json.dumps(original),encoding="utf-8")
 
     def test_C09_C15_C16_pause_during_live_lock_survives_restart(self):
         self.start_operating()

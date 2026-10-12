@@ -1,0 +1,44 @@
+{
+  "elapsed_seconds": 5.066239,
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "observation_binding": "UNCOMMITTED_SOURCE_PINS_NOT_COMMITTED_HEAD",
+  "owned_root_absent": true,
+  "probes": [
+    {
+      "actual_status": "PROFILE_VERIFIED",
+      "case": "NULL",
+      "expected_status": "BLOCKED"
+    },
+    {
+      "actual_status": "PROFILE_VERIFIED",
+      "case": "MISSING_COUNT",
+      "expected_status": "BLOCKED"
+    },
+    {
+      "actual_status": "PROFILE_VERIFIED",
+      "case": "MISSING_MONEY",
+      "expected_status": "BLOCKED"
+    },
+    {
+      "actual_status": "PROFILE_VERIFIED",
+      "case": "BOOLEAN_COUNT",
+      "expected_status": "BLOCKED"
+    },
+    {
+      "actual_status": "PROFILE_VERIFIED",
+      "case": "WRONG_MODE",
+      "expected_status": "BLOCKED"
+    }
+  ],
+  "provider_calls": 0,
+  "readonly_database_wal_unchanged": true,
+  "receipt_sha256": "aa59ba9fb7d1cc7c597feecab27c07100903ff9e475ee806eb262563164b2ac9",
+  "schema": "smial.operating-native-preflight-counterexample",
+  "schema_version": "1.0",
+  "source_pins": {
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "295b7d78e79cc5e0b3b2bfbe4111178ea5cdbdebdd8aa26f9309ff3f42d08f19"
+  },
+  "source_unchanged": true,
+  "status": "REPRODUCED",
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1"
+}

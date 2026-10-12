@@ -144,6 +144,16 @@ work_moving, integrity_verified и exit_obligations_healthy, pause/drain,
 current epoch, outstanding inventory и earliest overdue work.
 Ожидание будущего exit point не считается зависанием. UNKNOWN, missing/corrupt
 binding или отсутствие процесса не превращаются в healthy.
+READY также требует VALID для текущего общего operating envelope и проверенных
+входов исполнения. Для SHADOW status заново читает funding/asset inputs и их
+clocks: missing, stale, future или повреждённый вход даёт ACTION_REQUIRED с
+точным execution_input_status. source_fresh и input_fresh показаны отдельно.
+Повреждённый/отсутствующий envelope показывает operating_configuration_status
+и VERIFY_OPERATING_ENVELOPE; quote gap — CHECK_EXECUTION_QUOTE_INPUTS. Первое
+безопасное действие — readonly readback, затем проверка собственного profile
+через описанный CLI check. Это не разрешение менять рабочие настройки.
+Здоровье исходных выходов остаётся отдельным показателем: проблема текущих
+entry inputs не превращается в отказ обслуживания здорового старого риска.
 
 Economics в status ограничены последними 100 position rows каждого mode;
 полный linked readback — `CLI readback`. Trade PnL, дополнительные model costs,
