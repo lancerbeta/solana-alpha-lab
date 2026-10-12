@@ -612,6 +612,9 @@ class TradingCoordinator:
         position = store.get_position(event["position_id"])
         if position is None:
             raise PaperPlaneError("POSITION_NOT_FOUND")
+        if any(not isinstance(position.get(key), str) or not position[key] for key in (
+                "activation_epoch_id", "signal_decision_id", "bot_instance_id", "position_id", "mint")):
+            raise PaperPlaneError("OPERATING_BINDING_INTEGRITY_CONFLICT")
         bound = self.runner.for_epoch(position["activation_epoch_id"])
         bound._origin(store, position)
         if attempt["side"] == "EXIT" and position.get("exit_decision_id"):

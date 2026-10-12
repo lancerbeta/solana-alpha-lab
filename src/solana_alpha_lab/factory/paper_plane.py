@@ -147,9 +147,9 @@ _KNOWN_FLAT_SQL = """state='RECONCILED' AND exit_notional_usd_dec IS NOT NULL
     AND pnl_evidence_class IN ('PAPER_RECONCILED_MODEL','SHADOW_RECONCILED_QUOTE_MODEL')
     AND qty_dec IS NOT NULL AND json_valid(qty_dec) AND CAST(qty_dec AS REAL)>0
     AND (remaining_qty_dec IS NULL OR (
-        remaining_qty_dec IN ('0','0.0','0.00')
-        AND remaining_cost_basis_usd_dec IS NOT NULL AND remaining_cost_basis_usd_dec IN ('0','0.0','0.00')
-        AND remaining_entry_fee_usd_dec IS NOT NULL AND remaining_entry_fee_usd_dec IN ('0','0.0','0.00')))"""
+        remaining_qty_dec IN ('0','0.0','0.00','0.00000000')
+        AND remaining_cost_basis_usd_dec IS NOT NULL AND remaining_cost_basis_usd_dec IN ('0','0.0','0.00','0.00000000')
+        AND remaining_entry_fee_usd_dec IS NOT NULL AND remaining_entry_fee_usd_dec IN ('0','0.0','0.00','0.00000000')))"""
 _KNOWN_RELEASED_SQL = f"""({_KNOWN_FLAT_SQL}) OR (state='CANCELLED'
     AND qty_dec IS NULL AND entry_price_dec IS NULL AND remaining_qty_dec IS NOT NULL AND remaining_qty_dec IN ('0','0.0','0.00')
     AND remaining_cost_basis_usd_dec IS NOT NULL AND remaining_cost_basis_usd_dec IN ('0','0.0','0.00')
@@ -259,10 +259,41 @@ def modeled_final_witness_valid(attempt: Mapping[str, Any], final: Mapping[str, 
         return False
 
 
+def _native_legacy_entry_witness_valid(position: Mapping[str, Any], events: list[dict[str, Any]], *, mode: str) -> bool:
+    """A native public fill has its own original intent, never a missing modeled ENTRY."""
+    try:
+        if mode not in {"PAPER", "SHADOW"} or position.get("entry_fee_semantics") is not None:
+            return False
+        entries = [event for event in events if event["event_type"] in {
+            "PAPER_SIMULATION_OBSERVED", "SHADOW_EXECUTABLE_OBSERVED"}]
+        intents = [event for event in events if event["event_type"] == "EXECUTION_INTENT_CREATED"]
+        if len(entries) != 1 or len(intents) != 1 or any(
+                event["event_type"] == "MODELED_ATTEMPT_STARTED" and event["payload"].get("side") == "ENTRY"
+                for event in events):
+            return False
+        entry, intent = entries[0], intents[0]
+        source, body = entry["payload"], intent["payload"]
+        if (entry["event_type"] != ("PAPER_SIMULATION_OBSERVED" if mode == "PAPER" else "SHADOW_EXECUTABLE_OBSERVED")
+            or source["side"] != "ENTRY" or source["mode"] != mode or body["mode"] != mode
+            or body["signal_kind"] != ("SIMULATED_FILL" if mode == "PAPER" else "SHADOW_EXECUTABLE")
+            or any(event["position_id"] != position["position_id"] or event["bot_instance_id"] != position["bot_instance_id"]
+                   for event in (entry, intent))
+            or _identity_fields(source) != _identity_fields(position)
+            or body.get("action") != "ENTER"
+            or any(body.get(key) != value for key, value in _identity_fields(position).items())):
+            return False
+        return all(_positive_model_decimal(position[field], "EXIT_INVENTORY_WITNESS_CONFLICT", allow_zero=field == "entry_fee_usd_dec")
+            == _positive_model_decimal(source[original], "EXIT_INVENTORY_WITNESS_CONFLICT", allow_zero=field == "entry_fee_usd_dec")
+            for field, original in (("qty_dec", "qty_dec"), ("entry_price_dec", "entry_price_dec"),
+                ("entered_notional_usd_dec", "entry_gross_notional_usd_dec"), ("entry_fee_usd_dec", "entry_fee_usd_dec")))
+    except (KeyError, TypeError, ValueError, ArithmeticError, AttributeError, PaperPlaneError):
+        return False
+
+
 def _native_legacy_inventory_witness_valid(position: Mapping[str, Any], events: list[dict[str, Any]], *, mode: str) -> bool:
     """Released native full inventory/release, from its original observations."""
     try:
-        if mode not in {"PAPER", "SHADOW"} or position.get("entry_fee_semantics") is not None:
+        if not _native_legacy_entry_witness_valid(position, events, mode=mode):
             return False
         pid, bot = position["position_id"], position["bot_instance_id"]
         entries = [event for event in events if event["event_type"] in {
@@ -315,17 +346,37 @@ def _native_legacy_inventory_witness_valid(position: Mapping[str, Any], events: 
         return False
 
 
-def _sql_native_legacy_inventory_witness(position_raw: Any, events_raw: Any, mode: Any) -> int:
+def _sql_native_legacy_inventory_witness(position_raw: Any, events_raw: Any, mode: Any, *, entry_only: bool = False) -> int:
     try:
         events = json.loads(events_raw)
         for event in events:
             event["payload"] = json.loads(event.pop("payload_json"))
-        return int(_native_legacy_inventory_witness_valid(json.loads(position_raw), events, mode=mode))
-    except (TypeError, ValueError, KeyError):
+        position = json.loads(position_raw)
+        if not _native_legacy_entry_witness_valid(position, events, mode=mode):
+            return 0
+        if not entry_only:
+            _assert_quantity_inventory_witness(position, events, mode=mode)
+        return 1
+    except (TypeError, ValueError, KeyError, PaperPlaneError):
         return 0
 
 
+def _sql_native_legacy_entry_witness(position_raw: Any, events_raw: Any, mode: Any) -> int:
+    return _sql_native_legacy_inventory_witness(position_raw, events_raw, mode, entry_only=True)
+
+
 def assert_quantity_inventory_witness(store: PaperPlaneStore, position: Mapping[str, Any], *,
+                                      pending_attempt_id: str | None = None,
+                                      allow_pending: bool = False, force_quantity: bool = False) -> None:
+    events = store.filtered_execution_events(position_ids=[position["position_id"]])
+    bot = store.get_bot(position["bot_instance_id"])
+    if bot is None:
+        raise PaperPlaneError("EXIT_INVENTORY_WITNESS_CONFLICT")
+    _assert_quantity_inventory_witness(position, events, mode=bot["mode"],
+        pending_attempt_id=pending_attempt_id, allow_pending=allow_pending, force_quantity=force_quantity)
+
+
+def _assert_quantity_inventory_witness(position: Mapping[str, Any], events: list[dict[str, Any]], *, mode: str,
                                       pending_attempt_id: str | None = None,
                                       allow_pending: bool = False, force_quantity: bool = False) -> None:
     """A mutable remainder is never authority for the next quantity EXIT.
@@ -334,11 +385,9 @@ def assert_quantity_inventory_witness(store: PaperPlaneStore, position: Mapping[
     Legacy execution without quantity accounting keeps its released payloads.
     The caller supplies its read snapshot or immediate claim/result transaction.
     """
-    events = store.filtered_execution_events(position_ids=[position["position_id"]])
     quantitative = force_quantity or position.get("entry_fee_semantics") is not None or (
-        position.get("qty_dec") is not None and (position.get("ordinary_operating") or any(
-            event["event_type"] == "MODELED_ATTEMPT_STARTED" and isinstance(event["payload"], Mapping)
-            and event["payload"].get("side") == "ENTRY" for event in events))) or any(
+        position.get("qty_dec") is not None and any(
+            event["event_type"] == "MODELED_ATTEMPT_STARTED" for event in events)) or any(
         event["event_type"] == "MODELED_EXIT_QUANTITY_LEG"
         or event["event_type"] == "MODELED_ATTEMPT_FINAL" and isinstance(event["payload"], Mapping)
            and event["payload"].get("schema_version") == "1.1"
@@ -349,7 +398,6 @@ def assert_quantity_inventory_witness(store: PaperPlaneStore, position: Mapping[
         return
     try:
         pid, bot = position["position_id"], position["bot_instance_id"]
-        mode = store.get_bot(bot)["mode"]
         if not quantitative:
             if not _native_legacy_inventory_witness_valid(position, events, mode=mode):
                 raise ValueError()
@@ -396,16 +444,23 @@ def assert_quantity_inventory_witness(store: PaperPlaneStore, position: Mapping[
         if any(event["event_id"].removeprefix("FINAL-") not in attempts for event in finals.values()):
             raise ValueError()
         entry = [event for event in starts if event["payload"]["side"] == "ENTRY"]
-        if len(entry) != 1:
+        native_entry_basis = not entry
+        if native_entry_basis:
+            if not _native_legacy_entry_witness_valid(position, events, mode=mode):
+                raise ValueError()
+            filled = {"filled_notional_usd": position["entered_notional_usd_dec"],
+                      "unit_price_usd": position["entry_price_dec"]}
+        elif len(entry) != 1:
             raise ValueError()
-        terminal = finals["FINAL-" + entry[0]["event_id"]]
-        accepted = observations[terminal["payload"]["result_event_id"]]
-        if not modeled_final_witness_valid(entry[0], terminal, accepted, mode=mode,
-                legacy_original_quantity=legacy, original_position=position):
-            raise ValueError()
-        filled = accepted["payload"]["result"]
-        if filled["outcome"] not in {"LANDED_SUCCESS", "PARTIAL"}:
-            raise ValueError()
+        else:
+            terminal = finals["FINAL-" + entry[0]["event_id"]]
+            accepted = observations[terminal["payload"]["result_event_id"]]
+            if not modeled_final_witness_valid(entry[0], terminal, accepted, mode=mode,
+                    legacy_original_quantity=legacy, original_position=position):
+                raise ValueError()
+            filled = accepted["payload"]["result"]
+            if filled["outcome"] not in {"LANDED_SUCCESS", "PARTIAL"}:
+                raise ValueError()
         notional = _positive_model_decimal(filled["filled_notional_usd"], "EXIT_INVENTORY_WITNESS_CONFLICT")
         if (Decimal(position["entered_notional_usd_dec"]) != notional
             or Decimal(position["entry_price_dec"]) != Decimal(filled["unit_price_usd"])):
@@ -457,7 +512,7 @@ def assert_quantity_inventory_witness(store: PaperPlaneStore, position: Mapping[
             modern = result.get("schema_version") == "1.1"
             sold = Decimal(result["quantity_sold"]) if modern else remainder
             remaining = Decimal(result["remaining_quantity"]) if modern else Decimal("0")
-            if sold + remaining != remainder:
+            if sold + remaining != remainder or native_entry_basis and remaining != 0:
                 raise ValueError()
             semantics = result.get("fee_semantics", "SEPARATE_MODELED_FEE")
             price = Decimal(result["unit_price_usd"])
@@ -564,6 +619,16 @@ def _sql_unattempted_cancel_witness(pid: Any, bot: Any, reason: Any, event_type:
         return 0
 
 
+_NATIVE_LEGACY_POSITION_SQL = "json_object(" + ",".join("'" + field + "',positions." + field for field in (
+    "position_id", "bot_instance_id", "signal_decision_id", "strategy_id", "strategy_version_label", "reason_code", "activation_epoch_id", "mint", "state",
+    "qty_dec", "entry_price_dec", "entered_notional_usd_dec", "entry_fee_usd_dec", "entry_fee_semantics", "fee_bps", "admitted_fee_bps",
+    "admitted_entry_notional_usd_dec", "remaining_qty_dec", "remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec", "exit_price_dec", "exit_fee_usd_dec",
+    "exit_notional_usd_dec", "realized_gross_pnl_usd_dec", "realized_net_pnl_usd_dec", "pnl_evidence_class")) + ")"
+_NATIVE_LEGACY_EVENTS_SQL = """(SELECT json_group_array(json_object('event_type',ne.event_type,'event_id',ne.event_id,
+    'position_id',ne.position_id,'bot_instance_id',ne.bot_instance_id,'created_at',ne.created_at,'payload_json',ne.payload_json))
+    FROM execution_events ne WHERE ne.position_id=positions.position_id)"""
+_NATIVE_LEGACY_ENTRY_SQL = f"native_legacy_entry_witness_v1({_NATIVE_LEGACY_POSITION_SQL},{_NATIVE_LEGACY_EVENTS_SQL},bot_instances.mode)=1"
+_NATIVE_LEGACY_RELEASE_SQL = f"native_legacy_inventory_witness_v1({_NATIVE_LEGACY_POSITION_SQL},{_NATIVE_LEGACY_EVENTS_SQL},bot_instances.mode)=1"
 _LEGACY_QUANTITY_SQL = """CASE WHEN positions.entry_fee_semantics IS NULL AND EXISTS(
     SELECT 1 FROM execution_events la JOIN execution_events lr ON la.event_id=
         json_extract(CASE WHEN json_valid(lr.payload_json) THEN lr.payload_json ELSE '{}' END,'$.result.attempt_id')
@@ -572,7 +637,7 @@ _LEGACY_QUANTITY_SQL = """CASE WHEN positions.entry_fee_semantics IS NULL AND EX
     AND lr.position_id=positions.position_id AND lr.event_type='MODELED_RESULT_ACCEPTED'
     AND json_extract(CASE WHEN json_valid(lr.payload_json) THEN lr.payload_json ELSE '{}' END,'$.result.schema_version') IS NULL
     AND json_extract(CASE WHEN json_valid(lr.payload_json) THEN lr.payload_json ELSE '{}' END,'$.result.outcome') IN ('LANDED_SUCCESS','PARTIAL'))
-    THEN positions.qty_dec ELSE NULL END"""
+    THEN positions.qty_dec WHEN """ + _NATIVE_LEGACY_ENTRY_SQL + " THEN positions.qty_dec ELSE NULL END"
 _ORIGINAL_ENTRY_SQL = """json_object('qty_dec',positions.qty_dec,'entry_price_dec',positions.entry_price_dec,
     'entered_notional_usd_dec',positions.entered_notional_usd_dec,'entry_fee_semantics',positions.entry_fee_semantics,
     'admitted_entry_notional_usd_dec',positions.admitted_entry_notional_usd_dec)"""
@@ -603,17 +668,6 @@ _NO_ORPHAN_MODELED_EVENTS_SQL = f"""NOT EXISTS(SELECT 1 FROM execution_events e
             AND modeled_final_witness_v1(a.event_type,a.event_id,a.bot_instance_id,a.position_id,a.created_at,a.payload_json,
                 NULL,NULL,NULL,NULL,NULL,NULL,e.event_type,e.event_id,e.bot_instance_id,e.position_id,e.created_at,e.payload_json,bot_instances.mode,
                 {_LEGACY_QUANTITY_SQL},{_ORIGINAL_ENTRY_SQL})=1))))"""
-_NATIVE_LEGACY_POSITION_SQL = "json_object(" + ",".join("'" + field + "',positions." + field for field in (
-    "position_id", "bot_instance_id", "signal_decision_id", "strategy_id", "strategy_version_label", "reason_code", "activation_epoch_id", "mint", "state",
-    "qty_dec", "entry_price_dec", "entered_notional_usd_dec", "entry_fee_usd_dec", "entry_fee_semantics", "fee_bps", "admitted_fee_bps",
-    "remaining_qty_dec", "remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec", "exit_price_dec", "exit_fee_usd_dec",
-    "exit_notional_usd_dec", "realized_gross_pnl_usd_dec", "realized_net_pnl_usd_dec", "pnl_evidence_class")) + ")"
-_NATIVE_LEGACY_RELEASE_SQL = f"""native_legacy_inventory_witness_v1({_NATIVE_LEGACY_POSITION_SQL},
-    (SELECT json_group_array(json_object('event_type',ne.event_type,'position_id',ne.position_id,
-        'bot_instance_id',ne.bot_instance_id,'created_at',ne.created_at,'payload_json',ne.payload_json))
-    FROM execution_events ne WHERE ne.position_id=positions.position_id
-    AND ne.event_type IN ('PAPER_SIMULATION_OBSERVED','SHADOW_EXECUTABLE_OBSERVED',
-        'PAPER_EXIT_OBSERVED','SHADOW_EXIT_EXECUTABLE_OBSERVED')),bot_instances.mode)=1"""
 _PROVED_RELEASE_SQL = f"""({_ALL_ATTEMPTS_FINAL_SQL}) AND ({_NO_ORPHAN_MODELED_EVENTS_SQL}) AND (
     (state='CANCELLED' AND (EXISTS(SELECT 1 FROM execution_events a
         WHERE a.position_id=positions.position_id AND a.event_type='MODELED_ATTEMPT_STARTED'
@@ -630,7 +684,7 @@ _PROVED_RELEASE_SQL = f"""({_ALL_ATTEMPTS_FINAL_SQL}) AND ({_NO_ORPHAN_MODELED_E
             AND json_extract(CASE WHEN json_valid(a.payload_json) THEN a.payload_json ELSE '{{}}' END,'$.side')='ENTRY'
             AND EXISTS(SELECT 1 FROM {_FINAL_WITNESS_JOIN_SQL}
                 AND json_extract(CASE WHEN json_valid(f.payload_json) THEN f.payload_json ELSE '{{}}' END,'$.outcome') IN ('LANDED_SUCCESS','PARTIAL')))))
-        OR (COALESCE(ordinary_operating,0)=0 AND {_NO_MODELED_EVENTS_SQL} AND {_NATIVE_LEGACY_RELEASE_SQL}))))"""
+        OR ({_NATIVE_LEGACY_RELEASE_SQL}))))"""
 
 
 def _now() -> str:
@@ -737,6 +791,7 @@ def _connect_sqlite(path: Path, *, readonly: bool) -> sqlite3.Connection:
     conn.create_function("modeled_final_witness_v1", 21, _sql_modeled_final_witness, deterministic=True)
     conn.create_function("unattempted_cancel_witness_v1", 7, _sql_unattempted_cancel_witness, deterministic=True)
     conn.create_function("native_legacy_inventory_witness_v1", 3, _sql_native_legacy_inventory_witness, deterministic=True)
+    conn.create_function("native_legacy_entry_witness_v1", 3, _sql_native_legacy_entry_witness, deterministic=True)
     if readonly:
         try:
             # Validate actual source access now, so discovery can report an
@@ -3170,6 +3225,9 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
                 remaining = _positive_model_decimal(result.get("remaining_quantity"), "MODELED_QUANTITY_INVALID", allow_zero=True)
                 if (outcome == "PARTIAL") != (remaining > 0):
                     raise PaperPlaneError("MODELED_EXIT_AMOUNT_CLASS_CONFLICT")
+                if remaining and _native_legacy_entry_witness_valid(position,
+                        store.filtered_execution_events(position_ids=[bound["position_id"]]), mode=bound["mode"]):
+                    raise PaperPlaneError("PARTIAL_EXIT_MODEL_UNSUPPORTED")
                 store.apply_quantity_exit_fill(position_id=bound["position_id"], mode=bound["mode"],
                     quantity_sold=str(result.get("quantity_sold")), remaining_quantity=str(remaining),
                     exit_unit_price_usd=str(result.get("unit_price_usd")), fee_semantics=str(result["fee_semantics"]),

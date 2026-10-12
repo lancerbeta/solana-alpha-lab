@@ -669,6 +669,88 @@ class OperatingDriverTests(unittest.TestCase):
         legacy = self.runner.activate(epoch_id="ACTIVATION-EPOCH-LEGACY-NEIGHBOR", mode="PAPER", at="2026-10-05T12:40:00Z")
         self.assertFalse(legacy["idempotent"])
 
+    def _prove_managed_native_fill_originating_exit(self, mode):
+        from solana_alpha_lab.factory.paper_plane import accept_signal_decision_outcome, assert_quantity_inventory_witness
+        from solana_alpha_lab.factory.trading_runtime_policy import obligation_summary, enforce_operating_envelope
+        from scripts.prove_trading_core_operational_closure import RecordingQuoteAdapter
+        self.start_operating(mode=mode)
+        packet = self.runner.episode(source_relative="source/observation_schedule_state.sqlite",
+            episode_id=self.source.admissions()[0]["episode_id"], epoch_id=self.epoch, mode=mode, as_of="2026-10-05T12:40:00Z")
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            admitted = accept_signal_decision_outcome(self.root, store, strategy=self.runner.strategy,
+                signal_decision=packet["decision"], known_activation_epochs={self.epoch}, mode=mode, as_of="2026-10-05T12:40:00Z")
+            pid = admitted["position_id"]
+            self.assertTrue(admitted["opened"])
+            original = store.apply_paper_entry_fill(position_id=pid, entry_unit_price_usd="0.000003",
+                entry_gross_notional_usd="30", fee_bps=20, mode=mode)
+            self.assertEqual(original["ordinary_operating"], 1)
+            before = store.execution_events()
+            self.assertFalse(any(event["event_type"].startswith("MODELED_") for event in before))
+            self.assertEqual(len([event for event in before if event["event_type"] == "EXECUTION_INTENT_CREATED"]), 1)
+            assert_quantity_inventory_witness(store, original)
+            self.assertEqual(obligation_summary(store, mode=mode)["outstanding_cost_basis_usd"], "30")
+            self.assertEqual(enforce_operating_envelope(store, mode=mode, admitted_notional_usd="30")["decision"], "DENIED")
+            replay = accept_signal_decision_outcome(self.root, store, strategy=self.runner.strategy,
+                signal_decision=packet["decision"], known_activation_epochs={self.epoch}, mode=mode, as_of="2026-10-05T12:40:00Z")
+            self.assertTrue(replay["idempotent"])
+            self.assertEqual(store.execution_events(), before)
+        self.source.tick(datetime(2026, 10, 5, 13, 5, tzinfo=UTC))
+        self.now = datetime(2026, 10, 5, 13, 10, tzinfo=UTC)
+        ledger = None
+        if mode == "SHADOW":
+            ledger, plan = self.wire_files([{"outAmount": "330000000"}])
+            self.quote_inputs(at="2026-10-05T13:10:00Z")
+            self.coordinator.quote_adapter = RecordingQuoteAdapter(ledger, json.loads(plan.read_text()))
+        self.assertEqual(self.coordinator.run(ticks=2)["status"], "GRACEFUL_SHUTDOWN")
+        with closing(PaperPlaneStore(self.runner.store_path, readonly=True)) as store:
+            final = store.get_position(pid)
+            self.assertEqual(final["state"], "RECONCILED", self.coordinator.status())
+            assert_quantity_inventory_witness(store, final)
+            summary = obligation_summary(store, mode=mode)
+            self.assertEqual(summary["inventory_status"], "KNOWN")
+            self.assertEqual(summary["position_count"], 0)
+            self.assertEqual(summary["outstanding_cost_basis_usd"], "0")
+            self.assertEqual(store.obligation_positions(mode), [])
+            self.assertEqual(enforce_operating_envelope(store, mode=mode, admitted_notional_usd="30")["decision"], "ALLOW")
+            attempts = store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED", position_ids=[pid])
+            self.assertEqual([event["payload"]["side"] for event in attempts], ["EXIT"])
+            self.assertEqual(len(store.filtered_execution_events(event_type="MODELED_ATTEMPT_FINAL", position_ids=[pid])), 1)
+            journal = store.execution_events()
+        self.coordinator.run(ticks=1)
+        with closing(PaperPlaneStore(self.runner.store_path, readonly=True)) as store:
+            self.assertEqual(store.execution_events(), journal)
+        if ledger is not None:
+            self.assertEqual(len(self.ledger_receipts(ledger)), 1)
+        self.metrics = {"mode": mode, "original_native_entry": 1, "modeled_entry": 0,
+            "modeled_exit": 1, "state": "RECONCILED", "inventory_status": "KNOWN", "released_cost_basis_usd": "30",
+            "attempts_unchanged_after_repeat": True, "synthetic_quote_calls": int(ledger is not None)}
+
+    def test_managed_native_public_paper_fill_retains_original_full_exit_and_cap_release(self):
+        self._prove_managed_native_fill_originating_exit("PAPER")
+
+    def test_managed_native_public_shadow_fill_retains_original_full_exit_and_cap_release(self):
+        self._prove_managed_native_fill_originating_exit("SHADOW")
+
+    def test_missing_modeled_entry_cannot_be_reclassified_as_native_public_fill(self):
+        from solana_alpha_lab.factory.paper_plane import PaperPlaneError, assert_quantity_inventory_witness
+        from solana_alpha_lab.factory.trading_runtime_policy import obligation_summary, enforce_operating_envelope
+        self.start_operating()
+        self.coordinator.tick()
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            position = store.positions()[0]
+            self.assertIsNone(position["entry_fee_semantics"])
+            self.assertEqual(len(store.filtered_execution_events(event_type="PAPER_SIMULATION_OBSERVED")), 1)
+            self.assertEqual(store.filtered_execution_events(event_type="EXECUTION_INTENT_CREATED"), [])
+            store._conn.execute("DELETE FROM execution_events WHERE position_id=? AND event_type IN ('MODELED_ATTEMPT_STARTED','MODELED_ATTEMPT_FINAL','MODELED_RESULT_ACCEPTED')", (position["position_id"],))
+            with self.assertRaisesRegex(PaperPlaneError, "^EXIT_INVENTORY_WITNESS_CONFLICT$"):
+                assert_quantity_inventory_witness(store, position)
+            summary = obligation_summary(store, mode="PAPER")
+            self.assertEqual(summary["inventory_status"], "UNKNOWN")
+            self.assertEqual(Decimal(summary["known_cost_basis_floor_usd"]), Decimal("30"))
+            self.assertEqual(enforce_operating_envelope(store, mode="PAPER", admitted_notional_usd="30")["decision"], "DENIED")
+        self.metrics = {"damaged_modeled_entry": "UNKNOWN", "known_cost_basis_floor_usd": "30",
+            "native_intent_absent": True, "new_entry_permission": "DENIED"}
+
     def test_native_unmodeled_legacy_projection_cannot_free_managed_cap(self):
         from solana_alpha_lab.factory.paper_plane import (
             PaperPlaneError, accept_signal_decision, assert_quantity_inventory_witness,

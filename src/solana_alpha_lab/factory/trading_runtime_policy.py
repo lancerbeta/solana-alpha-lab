@@ -16,7 +16,7 @@ import yaml
 from solana_alpha_lab.factory.paper_plane import (
     OPEN_RISK_STATES, PRE_ATTEMPT_STATES, PaperPlaneError, PaperPlaneStore,
     assert_quantity_inventory_witness, modeled_final_witness_valid,
-    unattempted_cancel_witness_valid,
+    unattempted_cancel_witness_valid, _native_legacy_entry_witness_valid,
 )
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 
@@ -751,10 +751,12 @@ def obligation_summary(store: PaperPlaneStore, *, mode: str,
     positions_by_id = {position["position_id"]: position for position in positions}
     legacy_candidates = {position["position_id"]: position.get("qty_dec") for position in positions if position.get("entry_fee_semantics") is None}
     events = store.filtered_execution_events(position_ids=[position["position_id"] for position in positions])
+    original_events_by_position: dict[str, list[dict[str, Any]]] = {}
     attempts_by_position: dict[str, list[dict[str, Any]]] = {}
     modeled_by_position: dict[str, list[dict[str, Any]]] = {}
     cancellations_by_position: dict[str, list[dict[str, Any]]] = {}
     for event in events:
+        original_events_by_position.setdefault(event["position_id"], []).append(event)
         if event["event_type"] in {"MODELED_ATTEMPT_STARTED", "MODELED_ATTEMPT_FINAL", "MODELED_RESULT_ACCEPTED"}:
             modeled_by_position.setdefault(event["position_id"], []).append(event)
         if event["event_type"] == "MODELED_ATTEMPT_STARTED":
@@ -764,7 +766,9 @@ def obligation_summary(store: PaperPlaneStore, *, mode: str,
     results = {event["event_id"]: event for event in events if event["event_type"] == "MODELED_RESULT_ACCEPTED"}
     finals = {}
     attempts_by_id = {event["event_id"]: event for events_for_position in attempts_by_position.values() for event in events_for_position}
-    legacy_quantities = {}
+    native_legacy_quantities = {position["position_id"]: position["qty_dec"] for position in positions
+        if _native_legacy_entry_witness_valid(position, original_events_by_position.get(position["position_id"], []), mode=mode)}
+    legacy_quantities = dict(native_legacy_quantities)
     for event in results.values():
         payload = event["payload"]
         result = payload.get("result") if isinstance(payload, Mapping) else None
@@ -821,8 +825,9 @@ def obligation_summary(store: PaperPlaneStore, *, mode: str,
             for event in modeled_events if event["event_type"] in {"MODELED_ATTEMPT_FINAL", "MODELED_RESULT_ACCEPTED"})
         exit_proof = any(isinstance(e["payload"], Mapping) and e["payload"].get("side") == "EXIT"
             and finals.get("FINAL-" + e["event_id"], {}).get("payload", {}).get("outcome") == "LANDED_SUCCESS" for e in attempts)
-        exit_proof = exit_proof and (not position.get("ordinary_operating") or any(value in {"LANDED_SUCCESS", "PARTIAL"} for value in entry_finals))
-        flat = flat and (exit_proof or not position.get("ordinary_operating") and not modeled_events)
+        exit_proof = exit_proof and (not position.get("ordinary_operating") or pid in native_legacy_quantities
+            or any(value in {"LANDED_SUCCESS", "PARTIAL"} for value in entry_finals))
+        flat = flat and (exit_proof or (not position.get("ordinary_operating") or pid in native_legacy_quantities) and not modeled_events)
         nonfill = definitive_nonfill and position.get("qty_dec") is None and position.get("entry_price_dec") is None and quantity in {None, Decimal("0")}
         unattempted_cancel = (state == "CANCELLED" and not modeled_events and position.get("qty_dec") is None
             and position.get("entry_price_dec") is None and quantity in {None, Decimal("0")}

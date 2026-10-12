@@ -29686,7 +29686,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: 0473f46914a0406e52ebe1d22fecee1c2c74ec91f8b98f095c128205d69be5f6}
+  integrity: {kind: sha256, sha256: 492447ca810175823ebcd5a267c69b7b13c8b091db94f149d8efe2a65b885710}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -37281,7 +37281,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: OWNER_TRADING_OPERABILITY_FOUNDATION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/trading_runtime_policy.py', repository_path: src/solana_alpha_lab/factory/trading_runtime_policy.py}
-  integrity: {kind: sha256, sha256: 8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a}
+  integrity: {kind: sha256, sha256: bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-RUNTIME-POLICY-001}
@@ -41627,7 +41627,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/trading_coordinator.py
   integrity:
     kind: sha256
-    sha256: 467b0355cf405631c4f2eac0139aecfea7c0f9ebea6e39cee3246fda8700367d
+    sha256: 78dc900e17849aab9b55753b9148370914363d3362c7d6aecfca880eb5e25748
   access:
     mode: read_only
     method: file
@@ -41738,7 +41738,7 @@ records:
     repository_path: tests/test_trading_core_operational_closure_v1.py
   integrity:
     kind: sha256
-    sha256: d7da1009592b1c2449cc32f0b8ceb5dd64f4afca17cca982cd6782483e1a4a92
+    sha256: b6502ecf8abe00f949717dbe126ef9e8828368b12ec3db6bc6ac909825935546
   access:
     mode: read_only
     method: file
@@ -41847,7 +41847,7 @@ records:
     repository_path: docs/tasks/SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: 06fe8cb6d7cc49285ee484922d1a7f2fef67ad6ba639cd2ee88bbb979576f8a5
+    sha256: cdeda8b517a03ebc33210aa3606fde7c7f85001d28cd4493f0dbd16f4a88b5bd
   access:
     mode: read_only
     method: file
@@ -41884,7 +41884,7 @@ records:
     repository_path: docs/reports/smial_trading_core_operational_closure_v1/REPORT.md
   integrity:
     kind: sha256
-    sha256: 3c94cfa3174e36d1b0e2892afdfc3842f90e4436c44ffeadb507a7f40ddecf88
+    sha256: 9e3230377639ef3e4f5e19cb3271d68009633eedd3c1dfe2897ea64930e5213a
   access:
     mode: read_only
     method: file
@@ -41921,7 +41921,7 @@ records:
     repository_path: tests/test_trading_operational_recovery_v1.py
   integrity:
     kind: sha256
-    sha256: 06670247cee889a72c57ecdf69a508782b6afcda6ba453d8fc061b5d43f6b1d8
+    sha256: 60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef
   access:
     mode: read_only
     method: file

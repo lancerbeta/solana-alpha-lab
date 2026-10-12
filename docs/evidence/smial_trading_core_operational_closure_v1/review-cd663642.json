@@ -1,0 +1,136 @@
+{
+  "architecture_review": "NOT_EXECUTED_CANDIDATE_ALREADY_BLOCKED_NO_VERDICT_INVENTED",
+  "code_native_before": {
+    "facts": {
+      "control_after": {
+        "healthy_neighbor": "RECONCILED",
+        "original_attempt_unchanged": true,
+        "position": "RECONCILED"
+      },
+      "credential_reads": 0,
+      "damaged_after": {
+        "active_incidents": 0,
+        "healthy_neighbor": "OPEN",
+        "journal_unchanged": true,
+        "original_attempt_unchanged": true,
+        "position": "EXITING"
+      },
+      "elapsed_seconds": 3.802831,
+      "error_type": "TypeError",
+      "native_probes": 2,
+      "native_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "owned_fixture_absent": true,
+      "positive_control": {
+        "activation_created": false,
+        "status": "GRACEFUL_SHUTDOWN",
+        "ticks": 1
+      },
+      "preconditions": {
+        "clock": "2026-10-05T13:10:00Z",
+        "damaged_state": "EXITING",
+        "healthy_state": "OPEN",
+        "pending_side": "EXIT"
+      },
+      "provider_calls": 0,
+      "subprocesses_created": 0
+    },
+    "original_output_sha256": "b3b47d140170b57f5690c978c691a05146a95b31965040d16e11351468d5e503",
+    "probe_source_sha256": "1590d83e9fb7393e3c7c364d8247e6c304ebf6c08cfd3c3eef55787c30b8fb7c"
+  },
+  "expected_base": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "goal_native_before": {
+    "carrier": "ACTUAL_ISOLATED_GOAL_FINDING_ABOVE",
+    "credential_reads": 0,
+    "elapsed_seconds": 7.2329626,
+    "owned_fixture_absent": true,
+    "probe_source_sha256": "9f6a5428f97124b5f572caaf444366d8a1d93b104eaaa56ddb0f59357fe452b9",
+    "provider_calls": 0,
+    "raw_stdout_sha256": "UNKNOWN_NOT_RETAINED"
+  },
+  "head": "cd6636427e50ea3c04e9b3d2140f571a9429022e",
+  "historical_successful_proof_archives": {
+    "interim-cleanup-before-managed-native-recovery-repair.json": {
+      "carrier": "BYTE_EXACT_FROZEN_GIT_BLOB",
+      "frozen_git_ref": "cd6636427e50ea3c04e9b3d2140f571a9429022e:docs/evidence/smial_trading_core_operational_closure_v1/cleanup.json",
+      "raw_sha256": "7a18561b1980d30528451c5033e5b6a91fe60bbb1117fefb2f0e76402a216194",
+      "receipt_sha256": "c22386d06a5c1b607b712498fc02d75a861420de2bb04d6b410fa45e5671ee56"
+    },
+    "interim-clock-before-managed-native-recovery-repair.json": {
+      "carrier": "BYTE_EXACT_FROZEN_GIT_BLOB",
+      "frozen_git_ref": "cd6636427e50ea3c04e9b3d2140f571a9429022e:docs/evidence/smial_trading_core_operational_closure_v1/clock-proof.json",
+      "raw_sha256": "d50fd6af0ca856907ea959b86ded95914c79dde6e64fa12ccd63de0eae2b2189",
+      "receipt_sha256": "e35cb68ae068d4aa2087874d783981740cde9966aa96f16a469ee72444952730"
+    },
+    "interim-consumers-before-managed-native-recovery-repair.json": {
+      "carrier": "BYTE_EXACT_FROZEN_GIT_BLOB",
+      "frozen_git_ref": "cd6636427e50ea3c04e9b3d2140f571a9429022e:docs/evidence/smial_trading_core_operational_closure_v1/direct-consumer-proof.json",
+      "raw_sha256": "f6ed4519a3d07baef40908117b6291ba1aad05395432afde046fd2de7bfb78cf",
+      "receipt_sha256": "be166d39df3cf8864d89f20b508b2fd2843c23f7a4f56d60e7c00131c940a9b4"
+    },
+    "interim-operator-before-managed-native-recovery-repair.json": {
+      "carrier": "BYTE_EXACT_FROZEN_GIT_BLOB",
+      "frozen_git_ref": "cd6636427e50ea3c04e9b3d2140f571a9429022e:docs/evidence/smial_trading_core_operational_closure_v1/operator-proof.json",
+      "raw_sha256": "7d8a4a9ed483399b58bbae86aa444c67dad5f283a4f5f4291d601056ec5646fa",
+      "receipt_sha256": "cd6a7d2989f64c2d315d83872b49adb6c27ce75ff25b9131d1d8711bc1ebd2fd"
+    },
+    "interim-suite-before-managed-native-recovery-repair.json": {
+      "carrier": "BYTE_EXACT_FROZEN_GIT_BLOB",
+      "frozen_git_ref": "cd6636427e50ea3c04e9b3d2140f571a9429022e:docs/evidence/smial_trading_core_operational_closure_v1/executed-tests.json",
+      "raw_sha256": "c8620f10eae3370601b0e5462f274e5f27be21de1820f872912e584e8100b81d",
+      "receipt_sha256": "b5da0892dc1d65eab843d72065a3347504a146186bc4e136a9f1a3fd8840db85"
+    }
+  },
+  "receipt_sha256": "1fbf93d9faf518d9a590724d395c050d76f25ba4e7bc3f089795093ab89b1c58",
+  "replan": "Existing PaperPlane accepted managed native-fill witness and coordinator per-obligation originating recovery boundary only; preserve original reconciliation, no-resend, cap safety and shared-store fatal semantics. No new functionality or authority.",
+  "review_sources": {
+    "CODE_REVIEWER": {
+      "carrier": "PARSED_VALUES_EQUIVALENT_UTF8_LF_NO_VERDICT_RETAG",
+      "original_raw_sha256": "b8bb3af2b0ebc758c1fe311079d6dcfa1d350a3f6825c2293353e3deafab99f2"
+    },
+    "GOAL_DOD_CRITIC": {
+      "carrier": "PARSED_VALUES_EQUIVALENT_UTF8_LF_NO_VERDICT_RETAG",
+      "original_raw_sha256": "862511064ab94ad145aece8f9572a6bfcb049dc39e00f5522a4b0492cf95697e"
+    },
+    "OWNER_UX_CRITIC": {
+      "carrier": "PARSED_VALUES_EQUIVALENT_UTF8_LF_NO_VERDICT_RETAG",
+      "original_raw_sha256": "99ec4d68bf590088d322ae4c40d770042c5d0d1e58634a93a682ae1c826c1903"
+    }
+  },
+  "reviewed_bindings_sha256": "93c76fb6ddb5f4cf530ceb9acecee4d25c8142474118f3581ebae9a82364ce9a",
+  "reviewed_inventory_sha256": "e2c02684c782cd41e66dcfe0df852475b1b11ae752addf2d0b8be5cddba2df2b",
+  "reviews": [
+    {
+      "findings": [
+        "P1: src/solana_alpha_lab/factory/trading_coordinator.py:595,615,686,1504 — повреждённая originating identity одной pending позиции останавливает весь ordinary run до здоровых EXIT. Native existing OperationalRecoveryTests.two_native_open_positions(PAPER), штатный AFTER_ATTEMPT_COMMIT EXIT: изменение только affected positions.activation_epoch_id=NULL приводит for_epoch(None) к runner без strategy (trading_runner.py:93,103,197), затем _origin обращается к self.strategy (trading_runner.py:303); TypeError проходит вне recovery boundary. run(ticks=2) прекращается, due здоровый сосед остаётся OPEN, active incidents=0, original attempt и journal unchanged. Exact identity restore + native run(ticks=1) даёт обе RECONCILED без изменения исходной attempt. Исправить в existing origin/recovery owner: проверять originating identity перед for_epoch, возвращать typed per-obligation conflict, карантинировать только повреждённую pending и продолжать здоровые originating EXIT; shared-store failure должен оставаться fatal. Добавить bounded native regression на lost originating identity с healthy due neighbor и intact original positive control.",
+        "Frozen review identity: head=cd6636427e50ea3c04e9b3d2140f571a9429022e; base=ba87f8e339d5cc3aa55322801ae56e3f92369446; reviewed_bindings_sha256=93c76fb6ddb5f4cf530ceb9acecee4d25c8142474118f3581ebae9a82364ce9a; reviewed_inventory_sha256=e2c02684c782cd41e66dcfe0df852475b1b11ae752addf2d0b8be5cddba2df2b; 159 bindings/162 changed paths; current binding hash mismatches=0; isolated exact-contract/diff/direct-consumer CODE review; no source/test/product/docs/CI mutation, no full local gate, no merge approval.",
+        "Native minimum falsifier: local/smial-operational-closure-delivery/code-final-cd66-scratch/native-probe.py; script_sha256=1590d83e9fb7393e3c7c364d8247e6c304ebf6c08cfd3c3eef55787c30b8fb7c; native_probes=2; elapsed_seconds=3.802831; captured_native_stdout_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; compact_probe_output_sha256=b3b47d140170b57f5690c978c691a05146a95b31965040d16e11351468d5e503; owned_fixture_absent=true; provider_calls=0; credential_reads=0; subprocesses_created=0; peak_rss_bytes=UNKNOWN. Initial sandbox/cache setup attempts did not execute the behavioral falsifier; completed native probe ran through the existing locked managed toolchain outside that sandbox restriction. Retained scratch contains only marked minimal reproducer/output, no DB/WAL/SHM or live processes. Fresh recorded outcome 186 PASS/674.051268s and consumers 99 PASS/24.387915s were read as supporting evidence; they do not discharge this reproduced P1."
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "Isolated exact-contract review: head=cd6636427e50ea3c04e9b3d2140f571a9429022e; base=ba87f8e339d5cc3aa55322801ae56e3f92369446; reviewed_bindings_sha256=93c76fb6ddb5f4cf530ceb9acecee4d25c8142474118f3581ebae9a82364ce9a; reviewed_inventory_sha256=e2c02684c782cd41e66dcfe0df852475b1b11ae752addf2d0b8be5cddba2df2b. All159 current raw-file bindings match; diff162 paths. Current186 affected tests,99 direct consumers,2 clock probes and24 cold CLI plus2 navigation receipts retain matching dependency pins; these counts do not close the native gap below. No full local gate, other reviewer output, provider/credential/deploy/signer/money or merge action was used.",
+        "P1 F-A/C09/C19: supported managed public admission accepts a native legacy fill that its own ordinary originating-EXIT consumer cannot service. Minimum native falsifier used unchanged OperatingDriverTests.start_operating PAPER fixture and genuine source packet: runner.episode creates WATCHED; accept_signal_decision_outcome with omitted skip_fill/ordinary_operating returns opened=true,state=OPEN; native apply_paper_entry_fill persists original OPEN30/quantity10000000/fee0.06, ordinary_operating=1, native ENTRY1, MODELED attempts0. No SQL insertion or projection corruption. obligation_summary immediately becomes UNKNOWN with retained floor30. At original E3600 due13:10, coordinator.tick keeps EXIT_REQUIRED/exit_notional=NULL and creates0 attempts; status reports ACTION_REQUIRED, integrity_verified=false, exit_reconciliation_healthy=false, exact typed EXIT_INVENTORY_WITNESS_CONFLICT. The independent ordinary-only positive control closes RECONCILED with2 attempts. Cause: paper_plane.py:2798 and2864 accept/mark the native fill, but assert_quantity_inventory_witness at338 selects the modeled fold solely from ordinary_operating and at399 requires a MODELED ENTRY absent from this accepted native history; begin_modeled_attempt at3021 refuses the old EXIT. Contract trading_runtime_policy_v1.md:147 explicitly includes public legacy APIs on managed modes; this is an accepted internal ingress/consumer mismatch, not external commissioning or malformed input. Existing coverage native-legacy proofs exercise the no-MODELED fill before managed activation and do not cover this managed-created neighbor. Source/test bytes remained frozen; probe elapsed7.2329626s, probe_source_sha256=9f6a5428f97124b5f572caaf444366d8a1d93b104eaaa56ddb0f59357fe452b9. First sandbox attempt did not reach product path; authorised isolated rerun reached the native owners. Both probe fixture roots were absent after native teardown; owned marked scratch removed after retaining this compact reproduction. Runtime/live/financial readiness and owner merge acceptance remain outside this verdict."
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "ISOLATED_READ_ONLY_P0_P1_REVIEW: unresolved P0/P1 owner-operability gaps were not found in the exact SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1 plus SMIAL_PR398_OPERATING_BOUNDARY_PATCH_V1 contract and candidate diff. Other critic verdicts and implementation transcripts were not consulted. Pending CI/readiness/owner phrase remain separate delivery gates; this verdict grants no merge or runtime authority.",
+        "IDENTITY: head=cd6636427e50ea3c04e9b3d2140f571a9429022e; base=ba87f8e339d5cc3aa55322801ae56e3f92369446; reviewed_bindings_sha256=93c76fb6ddb5f4cf530ceb9acecee4d25c8142474118f3581ebae9a82364ce9a; reviewed_inventory_sha256=e2c02684c782cd41e66dcfe0df852475b1b11ae752addf2d0b8be5cddba2df2b; bindings=159; changed_paths=162; review.diff_sha256=d5157becb9fce7c6ed693f79e49b107ee2612a7f83f0be6a8ff1a7769542ab84. Head stayed unchanged and git status --short was empty after native execution and cleanup.",
+        "OWNER_JOURNEY_EVIDENCE: docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md:16,88,146,171,215 describes init/profile/check/explicit activation/run/status, pause/drain/switch, native backup/export-cut/fresh restore/seal-cut/reconcile/ACK, retained pause and explicit RESUME. scripts/trading_continuity.py:23,148,176,201,241 implements those commands and Russian human status. src/solana_alpha_lab/factory/trading_coordinator.py:676,868,1464,1499 separates entry-local failure, old EXIT service, current readiness and ACK controls. UNKNOWN never grants capacity or resend. The source contract keeps all C01-C24 mandatory and distinguishes software readiness, scientific eligibility, operational configuration and externally gated commissioning.",
+        "NATIVE_PROBE_1_PASS: existing OperatingDriverTests.test_current_switch_conflict_blocks_readiness_without_unknown_original_inventory_or_exit_starvation executed in 4.260469 seconds; output_sha256=7ffda2be66b7bfb4157498026b29bb67d2d1a755612e61c3723726f7020de5be. Corrupt SWITCH projects ACTION_REQUIRED, entries_enabled=false, integrity_verified=false, OPERATING_SWITCH_STATE_CONFLICT and readback --mode PAPER; original inventory remains KNOWN, readonly DB/WAL/SHM bytes stay unchanged, original EXIT reaches RECONCILED.",
+        "NATIVE_PROBE_2_PASS: existing OperatingDriverTests.test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit executed in 5.069674 seconds; output_sha256=d67cd47cc76c6a2fbd277e57152824a7ed3730cc6d9ff56f4b603d2c1a763d84. Disabled-entry policy produces zero new attempts, ACTION_REQUIRED and VERIFY_RUNTIME_POLICY in native JSON and Russian human CLI; policy and KNOWN inventory remain truthful, DB/WAL/SHM readback bytes stay unchanged, original old EXIT reaches RECONCILED without enabling entries.",
+        "NATIVE_PROBE_3_PASS: existing OperationalRecoveryTests.test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit executed in 8.684020 seconds; output_sha256=57ff4eb6828101d8422e29443f8521ac1e7f2cc618ea8f820be1cada22f43f8f. Eight damaged or incomplete lineage cuts refuse atomically; original switch events remain exact. ACK preserves paused controls, explicit RESUME opens B with one attempt, original A EXIT reaches RECONCILED, synthetic wire_calls=3 and resends=0. Complete cut replay is idempotent.",
+        "EXECUTION_LIMITS_AND_ACTUAL_FAILURES: the initial locked-runtime bootstrap failed before native tests; the own helper then required its repository import path correction. Three sandbox fixture setups subsequently returned DATA_ROOT_UNAVAILABLE before the target seams, total=0.414060 seconds, output_sha256=f03b767370ed1d1c786cd39f3f77935c427b2ef2237148d1b8ace6d6b2895c5d,dfbeb417c424ed500c179772b72e9f20c14a243ae7fd675f6d774da216db9711,eedc875b2ced21eabbd4723ede1662d1aff742fcc33cc0e9d1b1ed2f14da0fcf. Those attempts do not establish native product behavior. The identical three existing checks then passed outside sandbox in 18.015825 seconds. Native report_sha256=3c3688b810c5ab8827de3c785d65e5c8d2a2b7f37004521b5faf4196ae7ce85f; own probe_script_sha256=f70a1ada3361c9c148b8c3777e65488415c4e87f37562861b5344bdfbda8612c. Full repository gate and providers/credentials/deploy/signer/money were not executed; runtime/live health remains UNKNOWN.",
+        "COLD_EVIDENCE_SCOPE_AND_CLEANUP: docs/evidence/smial_trading_core_operational_closure_v1/operator-proof.json records 24 cold CLI commands plus 2 final semantic navigation commands, retained SQLite integer pause=1 after ACK, explicit RESUME and 5 readonly canaries with unchanged source/context pins. These receipts were examined as candidate evidence, not promoted automatically to this review PASS. Own marked scratch local/smial-operational-closure-delivery/owner-final-cd66-scratch was verified inside its allowed delivery parent without reparse points, then removed: 7 files,10082 bytes; native fixture children absent=true; own helper processes running=0; scratch absent=true. No tracked/product/test/source/CI files changed, no unowned cleanup or full local gate ran. Only this result JSON remains."
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.frozen-independent-review-history",
+  "schema_version": "1.0"
+}

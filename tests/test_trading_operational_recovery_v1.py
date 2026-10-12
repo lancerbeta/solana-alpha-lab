@@ -324,6 +324,42 @@ class OperationalRecoveryTests(unittest.TestCase):
         self.metrics={"sidecar_race":"DENY_NON_TARGET_UNCHANGED","native_failure":"OWNED_OUTPUTS_REMOVED",
             "standalone_backup_restore":"PASS","final_auxiliary_files":0}
 
+    def test_missing_pending_origin_identity_isolated_without_stopping_healthy_exit_or_resend(self):
+        self.two_native_open_positions()
+        def loss(point):
+            if point == "AFTER_ATTEMPT_COMMIT":
+                raise RuntimeError("SYNTHETIC_PROCESS_LOSS")
+        self.coordinator.fault = loss
+        with self.assertRaisesRegex(RuntimeError, "SYNTHETIC_PROCESS_LOSS"):
+            self.coordinator.tick()
+        self.coordinator.fault = lambda _: None
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            attempt = store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED")[-1]
+            pid = attempt["position_id"]
+            self.assertEqual(attempt["payload"]["side"], "EXIT")
+            original = store.get_position(pid)
+            neighbor = next(p for p in store.positions() if p["position_id"] != pid)
+            retained = store.filtered_execution_events(position_ids=[pid])
+            store._conn.execute("UPDATE positions SET activation_epoch_id=NULL WHERE position_id=?", (pid,))
+        result = self.coordinator.run(ticks=2)
+        self.assertEqual(result["status"], "GRACEFUL_SHUTDOWN")
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            self.assertEqual(store.get_position(pid)["state"], "EXITING")
+            self.assertEqual(store.get_position(neighbor["position_id"])["state"], "RECONCILED")
+            self.assertEqual(store.get_execution_event(attempt["event_id"]), attempt)
+            self.assertEqual(store.filtered_execution_events(position_ids=[pid]), retained)
+            incidents = store._conn.execute("SELECT reason FROM ordinary_incidents WHERE incident_key=? AND active=1", (attempt["event_id"],)).fetchall()
+            self.assertEqual([row[0] for row in incidents], ["OPERATING_BINDING_INTEGRITY_CONFLICT"])
+            store._conn.execute("UPDATE positions SET activation_epoch_id=? WHERE position_id=?", (original["activation_epoch_id"], pid))
+        self.coordinator.run(ticks=1)
+        with closing(PaperPlaneStore(self.runner.store_path, readonly=True)) as store:
+            self.assertEqual([p["state"] for p in store.positions()], ["RECONCILED", "RECONCILED"])
+            self.assertEqual(store.get_execution_event(attempt["event_id"]), attempt)
+            self.assertEqual(store._conn.execute("SELECT COUNT(*) FROM ordinary_incidents WHERE incident_key=? AND active=1", (attempt["event_id"],)).fetchone()[0], 0)
+            self.assertEqual(len(store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED")), 4)
+        self.metrics = {"damaged_origin": "QUARANTINED", "healthy_neighbor": "RECONCILED",
+            "run_ticks": 2, "exact_identity_restore": "RECONCILED", "original_attempt_unchanged": True, "resends": 0}
+
     def test_malformed_origin_shapes_are_typed_readonly_and_do_not_starve_healthy_due_exit(self):
         first,_=self.two_native_open_positions()
         with closing(PaperPlaneStore(self.runner.store_path,readonly=True)) as store:

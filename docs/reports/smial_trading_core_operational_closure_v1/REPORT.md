@@ -1,11 +1,9 @@
 # SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1
 
-VERDICT: ENGINEERING_PASS_CANDIDATE_PENDING_EXACT_DELIVERY_GATES. Обычный software outcome подтверждён свежими186 native tests, 99 consumers,2 clock probes и24 cold CLI этапами на текущих байтах.
-Исходные F-A/F-B и последующие P1 воспроизведены через native paths и закрыты
-в существующих owners. Historical NOT_READY/PASS/FAIL сохранены с исходными
-pins; они не подменяют текущий proof. Четыре свежие isolated P0/P1 роли,
-exact-head CI/readiness и отдельная owner phrase остаются delivery gates.
-Owner acceptance, рабочая activation и merge этим отчётом не предоставляются.
+VERDICT: ENGINEERING_PASS_CANDIDATE_PENDING_EXACT_DELIVERY_GATES.
+Текущие байты: 190 native tests (721.266124s), 99 consumers (23.877297s), два clock probes и24 cold CLI этапа.
+Оба cd663642 P1 закрыты existing-owner repair и10 адресными регрессиями; original witnesses, no-resend, cap safety и fatal shared-store boundary сохранены.
+Один финальный комплект четырёх независимых P0/P1 reviews, exact-head CI/readiness и отдельная owner phrase остаются gates.
 Base: `ba87f8e339d5cc3aa55322801ae56e3f92369446`; exact content fingerprint,
 review inventory и CI связываются Delivery Harness. Green local tests не
 являются owner acceptance либо merge authority.
@@ -80,7 +78,7 @@ packet через current native source/store owners. Это проверка п
 
 ## C01–C24
 
-Native automated status: PASS, 186 tests, 674.051268s; source bytes до/после
+Native automated status: PASS, 190 tests, 721.266124s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -141,94 +139,19 @@ native BEFORE/AFTER исполнены отдельно и имеют собст
 | F-A: caller-controlled operating scope | Один и тот же B ENTER: ordinary отказал при A=$30/cap=$30; default/False public path создал B и разрешил attempt, raw liabilities=$60. Genuine restored EXIT также разрешил fresh attempt до ACK | PaperPlane derives managed scope from durable state/profile/switch; shared admission/attempt and runner use retained activation/binding guard. B reservation отсутствует, raw liabilities=$30; restored fresh ENTRY/EXIT запрещены без request/quota delta. Original replay/result/cut/ACK и genuine legacy сохранены |
 | F-B: локальный entry failure прекращал continuous run | Реальный missing/expired B grant checker прерывал run до следующего тика; malformed source JSON и retained request array прерывали healthy old EXIT service | Coordinator isolates expected entry/source/position failures by stage. Same run/PID/3 ticks закрывает A original EXIT, B preclaim имеет0attempt/0quota. Postclaim B сохраняет1original pending attempt/request/quota; original callback reconciles без resend. Shared-store failure остаётся fatal/atomic |
 
-Measured evidence: [managed boundary](../../evidence/smial_trading_core_operational_closure_v1/review-operating-boundary-remediation.json),
-[continuous failure isolation](../../evidence/smial_trading_core_operational_closure_v1/review-source-shape-isolation-remediation.json),
-[coherent inventory](../../evidence/smial_trading_core_operational_closure_v1/review-coherent-inventory-remediation.json).
-Frozen9ee three actual NOT_READY reviews остаются historical; missing OWNER
-review не выдуман. Intermediate guard также пропускал direct attempt при
-удалённом original activation event: actual before/after сохранены, common
-lineage owner исправлен. Прерванный whole run не PASS. C23 отдельно сохранил
-FAIL старого exit-code oracle; новый scoped blocker меняет ожидаемый результат
-run, а egress0/secret/non-target invariants остаются строгими.
-Следующий whole snapshot выполнил172 tests и сохранил10 FAIL subcases в4
-existing recovery methods: все ожидали exception вместо требуемого scoped
-entry blocker. Этот FAIL сохранён LF carrier с неизменными JSON values/native selfhash;
-original capture raw SHA отмечен отдельно. Consumer oracles
-уточняются с независимыми raw reasons и прежними zero-effect/pending guards.
-После PATCH source/test bytes заморожены для общего proof и новых четырёх
-изолированных P0/P1 reviews. Рабочая authority этим PATCH не расширена.
+Measured native F-A/F-B и предыдущие review verdicts доступны через [compact history](../../evidence/smial_trading_core_operational_closure_v1/history.json) с exact frozen Git refs/raw/self hashes.
+Исходный F-A reproducer сохранён в review-operating-boundary-remediation.json; F-B проверяют current native source/entry/postclaim recovery regressions.
+Последние cd663642 CODE/GOAL NOT_READY и OWNER PASS остаются историческими; ARCH для заблокированного candidate не исполнялся.
+P1 native public managed fill: genuine original EXECUTION_INTENT_CREATED+ENTRY допускают original full EXIT и освобождение лимита. Удалённый MODELED ENTRY без genuine native intent остаётся UNKNOWN; новая legacy partial feature не добавлена.
+P1 pending origin identity: missing identity даёт typed scoped integrity incident, healthy neighbor EXIT завершается; после восстановления identity original pending attempt reconciles без resend.
+Полные прошлые snapshots/dialogues не нужны текущим gates. Ordinary deletions сохраняют Git history; compaction.json фиксирует before и обязательных consumers.
 
-Frozen7b56 native CODE/GOAL probes затем выявили два P1 в тех же границах:
-массив вместо B asset map завершал run до будущего A EXIT; valid policy с
-new_entries_enabled=false запрещала admission, но tick/status показывали
-entries_enabled=true и READY. [Actual before и review history](../../evidence/smial_trading_core_operational_closure_v1/review-7b56df88.json)
-сохраняют исходные pins и UNKNOWN отсутствующих измерений. Исторический PASS
-172/99/2/24+NAV2 не доказывает закрытие этих находок. Ремонт ограничен проверкой
-существующего asset input и проекцией действующего policy permission; старые
-EXIT, исходные pending/result, legacy и fatal store не меняют смысла.
-ARCH был прерван до verdict, OWNER на blocked inventory не запускался;
-финальные четыре роли проверяют новые bytes независимо.
-
-Frozen970e1176 дал actual CODE/GOAL/ARCH NOT_READY и OWNER_UX PASS.
-[Четыре native before и исходные proof carriers](../../evidence/smial_trading_core_operational_closure_v1/review-970e1176.json)
-сохраняют эти verdicts: valid funding raw0 прерывал run до old EXIT;
-vendor router array прерывал его после original B attempt/request/quota;
-повреждённый SWITCH оставлял ложный READY при common ingress DENY;
-backup до A→B и cut после switch теряли исходный switch event, поэтому
-ACK/RESUME B не возвращал допустимый ENTER. Unrestored exact B был positive.
-Ремонт использует существующие typed input/response boundaries, common managed
-lineage owner и исходные switch/CAS events в native recovery. Указатель current
-entry не становится новой authority, старые obligations сохраняются отдельно.
-Исторический 176/99/2/24+NAV2 и OWNER_UX PASS не заменяют новые whole proof,
-consumer/clock/cold operator evidence и все четыре final reviews.
-
-[Current bounded repair](../../evidence/smial_trading_core_operational_closure_v1/review-970-native-boundary-recovery-remediation.json)
-прошёл14 targeted native checks за55.836607s. Raw0 отказ локализован до
-claim; request/mint/raw validation после claim сохраняет исходные pending и
-quota. Array/object router, mode и feeMint дают существующий typed отказ.
-Tick/status используют ту же managed lineage проверку, что admission/attempt:
-current SWITCH conflict запрещает entries, но не превращает проверенный old
-inventory в UNKNOWN и не мешает его EXIT. Native cross-snapshot recovery
-сохраняет точные исходные switch/CAS events: ACK оставляет pause, явный RESUME
-позволяет eligible B OPEN, A выходит по исходному обязательству.
-Malformed/conflicting switch cuts отказаны атомарно; старый carrier без switch
-events совместим только при уже сохранённой exact цепочке. Первый after FAIL
-из-за неверного producer fixture сохранён; corrected native producer отдельно
-зафиксирован. Whole proof и четыре review-роли этим targeted receipt не заявлены.
-
-Frozen27a9 четыре isolated P0/P1 роли дали actual NOT_READY. CODE native
-изменил только initial SWITCH.expected_current_epoch и получил OPEN; GOAL/OWNER
-изменили только original SWITCH.strategy_sha256 и получили ENTER DENIED при
-false READY. Packet-only ARCH использовал genuine PAPER v1.0: original entry
-$30/10M, cap$40, без EXIT; remaining1M/$3/fee$0.01 при неизменённом original
-journal превратил новый$30 из DENIED в ALLOW. Дополнительный effect не выполнялся.
-Before carriers и пять exact historical27a9 proofs сохранены отдельно.
-
-Общий PaperPlane verifier теперь сверяет полную original SWITCH/CAS/count/
-generation/activation/binding/profile цепочку для live ingress, health и cold
-recovery. Health проверяет original strategy независимо от caller SHA.
-Native initialization допускает только свой staged current activation/binding;
-previous chain обязательна, отказ атомарен. Original witness validation также
-проверяет присутствующие native v1.0 quantity/cost/fee остатки: неподтверждённый
-остаток даёт UNKNOWN и не освобождает envelope headroom. Старый повреждённый
-origin может штатно получить EXIT_REQUIRED после своего EXIT decision, но
-нового EXIT attempt/request/result нет; здоровый сосед завершается.
-Genuine unmanaged legacy сохраняет original packet/replay. В общем managed envelope
-его positive inventory требует original native ENTRY/full EXIT; отсутствующее
-подтверждение остаётся UNKNOWN, без нового modeled journal или legacy partial feature. Native modeled v1.0 с
-absent/null остатком, original replay/full terminal и partial-v1.1 сохранены.
-Targeted21/21 PASS за56.597423s; реальные Decimal-format и EXIT_REQUIRED oracle
-FAIL сохранены в [remediation](../../evidence/smial_trading_core_operational_closure_v1/review-27a9-common-lineage-remediation.json).
-Этот targeted receipt не заменяет свежий whole outcome либо четыре review-роли.
-
-[Исходный S08/S13 report](../smial_trading_continuity_v1/REPORT.md) сохраняет
-REPAIR_PARTIAL_BLOCKED своего scope. Negative same-ID V2 не стал positive.
 D1 явно заменил текущий operational successor критерий на разные accepted
 V1 identities; новый A/B native proof проверяет именно этот outcome.
 
 | Класс | Остаток |
 |---|---|
-| SOFTWARE_GAP/EVIDENCE_GAP | Mandatory C01–C24 и operating PATCH закрыты current native proof. Original SWITCH/CAS и modeled/native legacy ENTRY/full EXIT проверяются общими owners; unsupported projections удерживают UNKNOWN и exposure floor. Targeted22 и final whole proof имеют отдельные exact pins. Historical185 PASS и failed186 clock oracle не retagged. Fresh four-role review и live exact-head CI/readiness обязательны до owner phrase |
+| SOFTWARE_GAP/EVIDENCE_GAP | Mandatory C01–C24 и operating PATCH закрыты current native proof. Original SWITCH/CAS и modeled/native legacy ENTRY/full EXIT проверяются общими owners; unsupported projections удерживают UNKNOWN и exposure floor. Final targeted10 и whole190 имеют отдельные exact pins; historical22 находится по frozen Git ref. Historical185 PASS и failed186 clock oracle не retagged. Fresh four-role review и live exact-head CI/readiness обязательны до owner phrase |
 | CONFIG_REQUIRED | Real eligible strategy, scope/runtime/source, explicit model/envelope/TTL/limits, timely funding producer/cadence |
 | EXTERNAL_UNVERIFIED | Real quote latency/schema/route/quota/credentials, target-host supervision, independent ledger custody; separate owner operation |
 | NOT_CONFIGURED | Scientific monitor/degrade thresholds; software health не experiment policy |
@@ -264,28 +187,28 @@ before/after и прежний scoped review PASS сохранены в
 purpose lifecycle-маршрута: IDs, вопросы, ссылки и authority сохранены; новый
 размер 16349 bytes, прямой semantic consumer module — 15 PASS.
 
-Peak suite process RSS: 147189760 bytes (140.37 MiB). Native 14-day producer
+Peak suite process RSS: 150978560 bytes (143.98 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.2061–0.2363s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.1988–0.2839s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04984–0.05295 |
-| 1000 | 364544 | 0.04702–0.05773 |
-| 4000 | 843776 | 0.04746–0.05248 |
+| 0 | 204800 | 0.04607–0.05052 |
+| 1000 | 364544 | 0.04569–0.05417 |
+| 4000 | 843776 | 0.04766–0.05334 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 1010 | 0.000639 |
-| 100 proved terminal | 78460 | 0.015540 |
-| 1000 proved terminal | 774570 | 0.157062 |
-| 1000 terminal + 12000 unrelated events | 774590 | 0.181779 |
+| 1 outstanding | 1200 | 0.000573 |
+| 100 proved terminal | 96260 | 0.020679 |
+| 1000 proved terminal | 950780 | 0.222476 |
+| 1000 terminal + 12000 unrelated events | 950790 | 0.228342 |
 
-Native history preparation: 13.360s.
+Native history preparation: 13.778s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.
@@ -320,8 +243,8 @@ original native ENTRY/full EXIT проверяются до освобожден
 включая SQL terminal predicate. Неподтверждённые base/remaining/terminal
 проекции сохраняют UNKNOWN и исходный exposure floor. Genuine all-NULL replay
 и полный EXIT сохранены; новая legacy partial functionality не добавлена.
-22 scoped native checks PASS за60.2148304s на стабильных16 pins; это targeted
-repair evidence, отдельно от итогового whole proof и четырёх review verdicts.
+Historical22 scoped checks сохранены по frozen Git ref. Current10 адресных
+регрессий PASS за27.752812s; whole190 и четыре review verdicts имеют собственные bindings.
 
 Прямое решение owner задаёт60 минут на каждый CI job только для #398 и его
 обычного merge в main. Другие PR/main сохраняют прежние бюджеты. Если native
