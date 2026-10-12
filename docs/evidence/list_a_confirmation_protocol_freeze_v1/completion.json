@@ -41,14 +41,14 @@
     "unresolved_safety_or_truth_conflict": false
   },
   "factory_fit": {
-    "path": "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\factory-fit.json",
+    "path": "docs/evidence/list_a_confirmation_protocol_freeze_v1/factory-fit.json",
     "sha256": "a6fa770f9ab4cda77c6f69dc10252b18bb8f6fb8c360f46629d395f224ff9f25",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_51_CONTRACT_MODEL_NATIVE_SEAM_CHECKS_AND_COLD_CONSUMER_5_REFUSALS",
     "independent_review": {
-      "path": "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\independent-review.json",
+      "path": "docs/evidence/list_a_confirmation_protocol_freeze_v1/independent-review.json",
       "sha256": "7563b1b47b84f756f763a6f43dee94b3a571495bec62f8d27a137255f733e13e",
       "verdict": "PASS"
     },
