@@ -29,7 +29,8 @@
       "executed_test_ids": [
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_C02_C03_C05_C06_native_loop_full_money_oracle",
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_check_rejects_missing_or_invalid_operating_limits_readonly",
-        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer"
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_cli_repeated_quote_grant_paths_bind_original_profiles_and_reject_conflicting_scope"
       ],
       "status": "PASS"
     },
@@ -92,7 +93,8 @@
       "additional_evidence": [],
       "executed_test_ids": [
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_C08_C09_positive_successor_and_old_exit",
-        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer"
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_separate_original_quote_grants_close_predecessor_and_admit_successor_with_cold_quota"
       ],
       "status": "PASS"
     },
@@ -118,6 +120,7 @@
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_configuration_restore_preserves_later_local_authority_and_detects_damage",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_post_restore_drain_with_inventory_survives_older_complete_cut",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_post_restore_stop_survives_older_complete_cut",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_separate_original_quote_grants_close_predecessor_and_admit_successor_with_cold_quota",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_sqlite_writer_wait_cannot_authorize_entry_after_ttl"
       ],
       "status": "PASS"
@@ -148,8 +151,11 @@
         "test_trading_operational_obligations_v1.OperatingObligationsTests.test_quantity_result_acceptance_rejects_corrupt_original_or_cumulative_projection",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_projection_race_after_claim_retains_original_capture_without_resend",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_projection_race_between_preflight_and_claim_denies_before_attempt",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_nonfill_corrupt_witness_remains_active_and_truthful_restore_recovers",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_original_result_damage_blocks_quote_and_healthy_neighbor_continues",
-        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_projection_damage_blocks_ordinary_quote_until_truthful_restoration"
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_projection_damage_blocks_ordinary_quote_until_truthful_restoration",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_unknown_entry_recovery_keeps_original_pending_identity_without_quote_resend"
       ],
       "status": "PASS"
     },
@@ -160,7 +166,10 @@
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C11_C12_shadow_failure_unknown_partial_remainder_drain",
         "test_trading_operational_adapters_v1.AdapterTests.test_C12_timeout_unknown_rejection_definitive_not_flat",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_projection_race_after_claim_retains_original_capture_without_resend",
-        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_recovered_funding_with_unknown_exit_keeps_attempt_and_inventory_fence"
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_nonfill_corrupt_witness_remains_active_and_truthful_restore_recovers",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_recovered_funding_with_unknown_exit_keeps_attempt_and_inventory_fence",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_unknown_entry_recovery_keeps_original_pending_identity_without_quote_resend"
       ],
       "status": "PASS"
     },
@@ -181,6 +190,7 @@
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_projection_race_after_claim_retains_original_capture_without_resend",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_projection_race_between_preflight_and_claim_denies_before_attempt",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_hash_conflict_denies_before_quote_effect",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_nonfill_corrupt_witness_remains_active_and_truthful_restore_recovers",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_original_result_damage_blocks_quote_and_healthy_neighbor_continues",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_projection_damage_blocks_ordinary_quote_until_truthful_restoration"
       ],
@@ -189,10 +199,14 @@
     "C14": {
       "additional_evidence": [],
       "executed_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C14_nondivisible_raw_funding_adapter_accepts_partial",
         "test_trading_operational_adapters_v1.AdapterTests.test_C04_C14_fee_in_quote_raw_units_literal_oracle",
         "test_trading_operational_adapters_v1.AdapterTests.test_C14_C23_negative_wire_shapes_before_persistence",
-        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C14_nondivisible_raw_funding_adapter_accepts_partial",
-        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_authored_vendor_witness_boolean_decimals_denied_before_quote_effect"
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_authored_vendor_witness_boolean_decimals_denied_before_quote_effect",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_cli_repeated_quote_grant_paths_bind_original_profiles_and_reject_conflicting_scope",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_invalid_quote_scope_and_expiry_deny_before_native_attempt_and_credential",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_quote_expiry_rechecked_at_atomic_claim_and_last_http_boundary",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_separate_original_quote_grants_close_predecessor_and_admit_successor_with_cold_quota"
       ],
       "status": "PASS"
     },
@@ -217,10 +231,13 @@
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_virtual_two_weeks_history_sizes_and_incident_bound",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_active_successor_profile_failure_does_not_starve_predecessor_exit",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_corrupt_exit_request_stays_unknown_until_exact_owner_witness_restored",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_nonfill_corrupt_witness_remains_active_and_truthful_restore_recovers",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_original_result_damage_blocks_quote_and_healthy_neighbor_continues",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_projection_damage_blocks_ordinary_quote_until_truthful_restoration",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_recovered_funding_with_unknown_exit_keeps_attempt_and_inventory_fence",
-        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_transient_exit_funding_recovers_without_stale_active_incident"
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_transient_exit_funding_recovers_without_stale_active_incident",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_unknown_entry_recovery_keeps_original_pending_identity_without_quote_resend"
       ],
       "status": "PASS"
     },
@@ -300,8 +317,11 @@
       ],
       "executed_test_ids": [
         "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C17_current_runtime_policy_health_preserves_known_inventory_and_old_exit",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_nonfill_corrupt_witness_remains_active_and_truthful_restore_recovers",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart",
         "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_projection_damage_blocks_ordinary_quote_until_truthful_restoration",
-        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_transient_exit_funding_recovers_without_stale_active_incident"
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_transient_exit_funding_recovers_without_stale_active_incident",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_unknown_entry_recovery_keeps_original_pending_identity_without_quote_resend"
       ],
       "status": "PASS"
     },
@@ -310,10 +330,14 @@
         "cleanup.json: canaries/immutable_bindings/proof_fixture_roots"
       ],
       "executed_test_ids": [
-        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C23_actual_egress_secret_and_non_target_canaries",
-        "test_trading_continuity_v1.OrdinarySourceTests.test_store_hardlink_canary_refused_before_writable_effect",
         "test_trading_continuity_v1.OrdinarySourceTests.test_cli_live_and_unowned_root_fail_before_effect",
-        "test_trading_continuity_v1.OrdinarySourceTests.test_windows_rooted_and_drive_relative_source_paths_refused"
+        "test_trading_continuity_v1.OrdinarySourceTests.test_store_hardlink_canary_refused_before_writable_effect",
+        "test_trading_continuity_v1.OrdinarySourceTests.test_windows_rooted_and_drive_relative_source_paths_refused",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C23_actual_egress_secret_and_non_target_canaries",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_cli_repeated_quote_grant_paths_bind_original_profiles_and_reject_conflicting_scope",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_invalid_quote_scope_and_expiry_deny_before_native_attempt_and_credential",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_quote_expiry_rechecked_at_atomic_claim_and_last_http_boundary",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_separate_original_quote_grants_close_predecessor_and_admit_successor_with_cold_quota"
       ],
       "status": "PASS"
     },
@@ -345,7 +369,9 @@
     "review-7ebf809f.json",
     "review-policy-clock-remediation.json",
     "review-0df9aa7e.json",
-    "review-partial-dispatch-remediation.json"
+    "review-partial-dispatch-remediation.json",
+    "review-4a327869.json",
+    "review-nonfill-grant-remediation.json"
   ],
   "non_claims": [
     "NO_CANONICAL_DONE_OR_OWNER_SEMANTIC_ACCEPTANCE",
@@ -355,29 +381,33 @@
   ],
   "receipt_files": {
     "canary-rename-proof.json": "e2449ad9084c695b74c50dbc1249db839f525547e4bd516024b50bad83ec056b",
-    "cleanup.json": "1e54be3ffc57bf8616466f5266c7cac67f7e55fbeec6f3c3db0e193e79f702d1",
-    "clock-proof.json": "508af1952da99946c8f4ba5fbe1128d8e255c1711e371472664c45cb14675f68",
-    "direct-consumer-proof.json": "ceb13c77fa5cbccc415281ce50f2712d9882351702f27e8a4bd9ac9fd2cbff7d",
+    "cleanup.json": "39cc82563720b45de96a60f277db45c10c35c1fcc419c08a872acbca0543cde0",
+    "clock-proof.json": "40cacca5d87e61baac4990d389667a1cb7e9eb6cd83190dc2e766a1b60281dba",
+    "direct-consumer-proof.json": "2ef9e96cb13ed8707cc25abd81ec2dc6ecb41839fa337cdae9f6952c6d52cc03",
     "eof-normalization-proof.json": "67794cb24f7cfa69dc63451a2ac1e8d321489e528316f65d2c12abc78ae8c232",
-    "executed-tests.json": "ed616a2c70256361efbdd2eff2e2cd384042267d4e4552bc82d5c7aadb2616ce",
+    "executed-tests.json": "826d064afd5a159f8efd1ac39d1be0cd4994039574d2b489ff6dddc885207e96",
     "interim-before-ack-readback.json": "2a9d23db087c39dc5335287ee1252f4b8afa91f96760a59f8c55aff46369140f",
     "interim-before-envelope-incident-repair.json": "f480fb50ba39d4e82a959b589765289618a59a8089ed84f31f354e2464a94a3b",
     "interim-before-final-review.json": "2899d525617851033c62149e4bf0be5d4e4df389ae971a7790ec17c3169ef297",
     "interim-before-legacy-replay.json": "8d54be35878eabded8aa7d12e3fb5f97f269d8553f683b681e906cfb44d85965",
+    "interim-before-nonfill-grant-repair.json": "ed616a2c70256361efbdd2eff2e2cd384042267d4e4552bc82d5c7aadb2616ce",
     "interim-before-partial-dispatch-repair.json": "c20e0176e0e50443895ac3d72e3cd4ffb836842fd8a0ca2863dd5e50bd70fe39",
     "interim-before-policy-clock-repair.json": "a29055ee3d97f4d1f35c92ea49f52cbc746ee7a7e866692fe96e6fec4560a87d",
     "interim-clock-before-final-review.json": "346a016b59d1541b18d5b4752ba4c015aa7dd24d2b692832fa049242350cf32b",
     "interim-consumers-before-final-review.json": "c8df261e81cefb63788dbfe4f6d108e5072c89e70a4650be8f4987498fc18bf1",
     "interim-operator-before-final-review.json": "b11acd8db40927d16bde857e9581317116d4952fed8f2f7e29aff8cea2515d0c",
-    "operator-proof.json": "1b26bbf871aaf0babd9f3fbc9789391b751ed8ad9155fda870c76aed0fa19b60",
+    "operator-proof.json": "837ed19e4d3a2a0e9c6feea969c8c6587518454df32cc1bce4d1a1ca1bdce74f",
+    "operator-readonly-oracle-interim.json": "309799c051e0dceae20029835fe1b78b5970db6faba54fbff556a2853b565207",
     "review-0df9aa7e.json": "1d7bc3b12180a72119372128abdea0fc8e996249d522ac5a21aeb215d474c335",
     "review-0f1c30b3.json": "955899f42ad10d72c61a8f1b9860b84d1a29101c85d2b36cb1406a4a10c36fff",
+    "review-4a327869.json": "c2ad860fb6c32ec071dc1b126d3cfc1ed0a08bf875c4aa1eb41b20c5062186b5",
     "review-510e6701.json": "7c5df920cab16a539ce58b5e4fc7692454b8bcd32739d57f5a5bd21695cf3f09",
     "review-7ebf809f.json": "1dbbdaaa399a370ceee0956e23dc9591cb3ce0671045d7048b3b779c7204d441",
     "review-ack-readback-before.json": "2874502e20049e4034baf076bbf0522d9a29d3649cf470c5ebd660527813c528",
     "review-envelope-incident-remediation.json": "c6127547ab9f8d4467d250e009f02a0a06f277c8f4f6e98855ef893abc880b64",
     "review-fd9169be.json": "08d1eb15dcc799ba1feff26e4fc53947977f8a63faab76bce3a8e3545015f57c",
     "review-legacy-identity-before.json": "4cfc797dbb3d3a326e1286cce24e37a4e81c22c321708cbcafa3b034ff4c6163",
+    "review-nonfill-grant-remediation.json": "de6e91bdaf20122b7cd9574af41d9801a93b1bfa07335fd7594bbde755b4b851",
     "review-partial-dispatch-remediation.json": "f08ffae18e46c96426d10687dd0157d7bd98a6d78d0f247e86160fa5b6bf6305",
     "review-policy-clock-remediation.json": "8399ba3412fb6ab57d93902e7eb0946ce8264adec2ae3a42af857acdd3aeae77",
     "review-preflight-before.json": "71889f2a8b6dbcd8120d03795776124dbcae700236c4fef74aa31a07a633c663",
@@ -386,7 +416,7 @@
     "review-terminal-release-before.json": "cbd0d3cefd2ed43027bf0bacbc45e48a4f18f3f997031cf0bf53a3a976405b50",
     "source-contract.md": "addc05071197efb3462771b52f5699170d54061656efeda0b7f48e52bdb0f0b7"
   },
-  "receipt_sha256": "47479bd9577e5a5bfb723d3d7e70133231d7b7341c8d6cb9d3328a5ab2a3ad49",
+  "receipt_sha256": "abd50e8985455c88b8aca0800d99b4574bc3cc6d1eaf34449c6d7675bb828acf",
   "schema": "smial.operating-closure-coverage",
   "schema_version": "1.0",
   "superseded_pre_remediation_history": [
@@ -400,7 +430,9 @@
     "interim-before-policy-clock-repair.json",
     "interim-before-partial-dispatch-repair.json",
     "eof-normalization-proof.json",
-    "canary-rename-proof.json"
+    "canary-rename-proof.json",
+    "interim-before-nonfill-grant-repair.json",
+    "operator-readonly-oracle-interim.json"
   ],
   "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
   "tested_to_candidate_byte_equivalence": [],

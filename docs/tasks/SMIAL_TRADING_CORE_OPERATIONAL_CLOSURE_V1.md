@@ -146,3 +146,13 @@ while healthy originating exits continue. No new state owner, schema/cache,
 dependency, product decision or operational authority; no internal seam is
 deferred to commissioning. Preserve actual role verdicts and native before,
 then require fresh whole-outcome evidence and all four exact-inventory roles.
+
+The subsequent frozen 4a327869 review found two required internal seams:
+valid schema1.1 definitive ENTRY nonfill must finish recovery without being
+mistaken for positive inventory; ordinary SHADOW must select separately
+authorized existing grants by originating epoch/strategy before attempt/quota
+claim, so A-oldEXIT and B-newENTRY coexist in one caller. Reuse native original
+attempt/FINAL/result release proofs and existing scoped adapter/grant owners.
+No grant issuance, operational configuration, new registry or external action.
+Preserve actual CODE/ARCH NOT_READY and GOAL PASS for that frozen head; require
+native before/after and fresh exact-inventory review after both repairs.

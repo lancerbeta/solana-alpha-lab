@@ -104,12 +104,26 @@ mode envelope одной транзакцией. `run` использует со
 PAPER использует timely observation model. SHADOW использует production
 Jupiter quote parser; quote никогда не объявляется actual fill. Без отдельного
 external grant provider вызов запрещён. Для будущего разрешённого OBSERVED
-SHADOW CLI принимает `--quote-grant <runtime-relative-file>` и
+SHADOW CLI принимает повторяемый `--quote-grant <runtime-relative-file>` и
 `--credential-env <existing-variable-name>`. Grant связывает registry-011 SHA,
 route, epoch, strategy SHA, срок, call cap и запрет финансовой/signing authority.
-Credentials читаются только после проверки grant, а call claim сохраняется
-до HTTP. Используется единственный GET `/swap/v2/order` без taker/transaction;
+Для одновременно обслуживаемых A/B передаются отдельные ранее разрешённые
+grant paths одним запуском. Caller выбирает grant по mode, originating epoch и
+strategy SHA позиции; старый A EXIT использует A profile и A quota, новый B ENTRY
+— B profile и B quota. Single grant остаётся совместимым. Конфликтующие duplicate scope,
+Уже выявленный до claim missing/wrong/expired grant или исчерпанный durable cap отказывают до новой
+attempt/quote claim; новая identity не переносит чужую quota.
+Credentials читаются только после проверки выбранного grant, а call claim
+сохраняется до HTTP. Срок проверяется ещё раз непосредственно перед HTTP;
+Если срок истёк после committed claim, HTTP запрещён, а исходная pending
+identity сохраняется для reconciliation без resend. Используется единственный GET `/swap/v2/order` без taker/transaction;
 redirect/retry запрещены. Этот atom такой вызов не выполняет.
+
+Подтверждённый ENTRY nonfill освобождает reservation. Recovery проверяет
+исходные attempt/FINAL/accepted result и нулевой остаток, затем снимает только
+подтверждённый incident. Valid schema1.1 NO_ROUTE не оставляет вечную аварийную
+запись. Повреждённый witness или UNKNOWN требует прежнего reconciliation;
+не исправлять статус ручной сменой position state или заполнением quantity.
 
 ## Управление и смена стратегии
 

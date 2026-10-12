@@ -1,0 +1,261 @@
+{
+  "additional_readonly_configuration_diagnostic_count": 1,
+  "base_journey_command_count": 22,
+  "business_stages": "NATIVE_TRADING_CONTINUITY_CLI_ONLY",
+  "cleanup": {
+    "owned_root_absent": true,
+    "shared_cache_or_environment_deleted": false,
+    "unowned_resources_touched": false
+  },
+  "credential_reads": false,
+  "elapsed_seconds": 5.115371,
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "external_cut_basis": "No process or effect invoked after backup before export/restore; independent absence assertion effects []; donor CLI exports frozen bindings/controls/current state.",
+  "failure_type": "AssertionError",
+  "fixture_generator": {
+    "path": "tests/test_trading_continuity_v1.py",
+    "purpose": "synthetic source/science environment preparation only",
+    "sha256": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f"
+  },
+  "grant_roster_assessment": {
+    "evidence_file_sha256": "de6e91bdaf20122b7cd9574af41d9801a93b1bfa07335fd7594bbde755b4b851",
+    "evidence_path": "docs/evidence/smial_trading_core_operational_closure_v1/review-nonfill-grant-remediation.json",
+    "native_help_command": "uv run --locked --managed-python python -B scripts/trading_continuity.py --help",
+    "native_help_exit_code": 0,
+    "native_help_verified": true,
+    "operator_credential_reads": 0,
+    "operator_provider_calls": 0,
+    "operator_roster_effect_journey_executed": false,
+    "parser_action": "append",
+    "repeatable_flag": "--quote-grant",
+    "reviewed_native_tests": [
+      {
+        "metrics": {
+          "attempts": 0,
+          "conflicting_duplicate": "DENY",
+          "credential_reads": 0,
+          "fake_http_calls": 0,
+          "identical_duplicate": "ONE_SCOPE",
+          "preclaim_denials": 6,
+          "quote_claims": 0
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_invalid_quote_scope_and_expiry_deny_before_native_attempt_and_credential"
+      },
+      {
+        "metrics": {
+          "credential_reads": 0,
+          "fake_http_calls": 0,
+          "postclaim_expired_attempts": 1,
+          "preclaim_expired_attempts": 0
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_quote_expiry_rechecked_at_atomic_claim_and_last_http_boundary"
+      },
+      {
+        "metrics": {
+          "conflicting_scope": "DENY_BEFORE_WRITE",
+          "credential_reads": 0,
+          "fake_http_calls": 0,
+          "original_profile_bounds": [
+            [
+              1,
+              8192
+            ],
+            [
+              2,
+              4096
+            ]
+          ],
+          "repeat_paths": 2
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_cli_repeated_quote_grant_paths_bind_original_profiles_and_reject_conflicting_scope"
+      },
+      {
+        "metrics": {
+          "claims_A": 2,
+          "claims_B": 1,
+          "cold_repeat_calls": 0,
+          "fake_http_calls": 3,
+          "healthy_A_exit_with_invalid_B": "RECONCILED",
+          "invalid_B": "DENY_WITH_NO_ATTEMPT_OR_CLAIM",
+          "origin_epochs": [
+            "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+            "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B"
+          ],
+          "profile_bounds_A": [
+            1,
+            8192
+          ],
+          "profile_bounds_B": [
+            2,
+            4096
+          ]
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_separate_original_quote_grants_close_predecessor_and_admit_successor_with_cold_quota"
+      }
+    ],
+    "status": "PASS_READONLY_GRAMMAR_AND_CURRENT_NATIVE_EVIDENCE"
+  },
+  "health_semantics": {
+    "actual_os_supervision_verified": false,
+    "graceful_shutdown_may_retain_recent_heartbeat_until_ttl": true,
+    "grant_expiry_preclaim_vs_postclaim_boundary_documented": true,
+    "observed_physical_clock_boundary_documented": true,
+    "observed_runtime_exercised_in_operator_journey": false,
+    "optional_policy_absence_is_strategy_only": true,
+    "partial_corruption_probe_repeated_in_operator_journey": false,
+    "partial_witness_recovery_boundary_documented": true,
+    "process_alive_basis": "RECENT_HEARTBEAT_TTL_ESTIMATE",
+    "ready_basis": "SOFTWARE_SNAPSHOT",
+    "runbook_boundary_verified": true
+  },
+  "independence": "ISOLATED_OPERATOR_WITH_EXACT_CONTRACT_DIFF_RUNBOOK",
+  "journey_status": "FAIL",
+  "live_authority": false,
+  "manual_binding_construction": false,
+  "manual_token_json": false,
+  "network_calls": false,
+  "observed_at_utc": "2026-10-12T04:43:00.180823Z",
+  "provider_calls": false,
+  "role": "OWNER_UX_CRITIC",
+  "schema": "smial.cold-operator-cli-proof",
+  "schema_version": "1.0",
+  "semantic_navigation": {
+    "reason": "FINAL_CATALOG_SYNC_READBACK_NOT_YET_EXECUTED",
+    "route_id": "SEM-OWNER-LIFECYCLE",
+    "status": "PENDING_FINAL_GENERATED_SYNC"
+  },
+  "source_hash_basis": "RAW_UTF8_BYTES_SHA256",
+  "source_line_endings": "LF",
+  "source_pins": {
+    "configs/factory_semantic_operability_v1.yaml": "8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83",
+    "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "1b6dd4359d1faa3705c8244a3dc4fd0d1c01dbfea00872bd7fd89001d780c5ed",
+    "scripts/trading_continuity.py": "9694d0b589b0fd560e250324bd7cef07c547ec8b6e8c137d471f028a6083538b",
+    "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+    "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+    "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+    "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+    "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "2346559e835010c47e21e0d9bd2b4c7877aa698da33831e417d5d02cb8556d4b",
+    "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
+    "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
+    "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
+    "tests/test_trading_operational_recovery_v1.py": "0a9d1205477107de71b542afb31974faa76f51ce524efff2a46017cb27972597"
+  },
+  "source_pins_unchanged": true,
+  "steps": [
+    {
+      "activation_created": false,
+      "arguments": {
+        "as_of": "2026-10-05T12:40:00Z",
+        "profile": "profile.json",
+        "strategy": "configs/strategies/continuity_synth-C22-FROZEN.yaml"
+      },
+      "command": "check",
+      "execution_input_status": "PAPER_NATIVE_PREFIX",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "mode": "PAPER",
+      "runtime_scope": "DONOR",
+      "sequence": 1,
+      "status": "PROFILE_VERIFIED",
+      "stdout_sha256": "2f43e6a183c077d7dd6701fb05de6757b89ee0b5f8b6cf1577446300b61a908a"
+    },
+    {
+      "arguments": {
+        "as_of": "2026-10-01T00:00:00Z",
+        "epoch": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
+        "profile": "profile.json",
+        "strategy": "configs/strategies/continuity_synth-C22-FROZEN.yaml",
+        "switch_key": "C22-INITIAL"
+      },
+      "command": "operating-activate",
+      "epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "generation": 1,
+      "mode": "PAPER",
+      "runtime_scope": "DONOR",
+      "sequence": 2,
+      "stdout_sha256": "f93216df8a0cfefd50d44f8327cc29a5a4faaea7b10d2ecb48911e4d77bc2b19",
+      "strategy_id": "STRAT-CONTINUITY-SYNTH-001-C22-FROZEN",
+      "strategy_sha256": "095980559a1628271f9c99310d8cc1ea080b8e82255bedf2cf1f30288eafcc6a"
+    },
+    {
+      "activation_created": false,
+      "arguments": {
+        "as_of": "2026-10-05T12:40:00Z",
+        "ticks": 1
+      },
+      "command": "run",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "mode": "PAPER",
+      "runtime_scope": "DONOR",
+      "sequence": 3,
+      "status": "GRACEFUL_SHUTDOWN",
+      "stdout_sha256": "762edb18cb87b479e098a9fe076d27b1a0666892ba586fd3b1dcab6246bbafbb"
+    },
+    {
+      "arguments": {
+        "as_of": "2026-10-05T12:40:00Z"
+      },
+      "command": "status",
+      "envelope_head": {
+        "envelope_sha256": "8f178c9dbc52dfba21d34c093feac26da3273ecdd1a18a2d0e22b2cc09f2a7b7",
+        "revision": 1
+      },
+      "envelope_status": "VALID",
+      "execution_input_status": "PAPER_NATIVE_PREFIX",
+      "exit_code": 0,
+      "exit_reconciliation_healthy": true,
+      "expected_exit_code": 0,
+      "generation": 1,
+      "input_fresh": true,
+      "input_reason": "SOURCE_FRESH",
+      "integrity_verified": true,
+      "inventory": {
+        "inventory_status": "KNOWN",
+        "outstanding_cost_basis_usd": "30.0",
+        "pending_attempt_count": 0,
+        "position_count": 1
+      },
+      "inventory_sha256": "33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746",
+      "mode": "PAPER",
+      "next_safe_action": "NONE",
+      "next_safe_command": "status --mode PAPER --format human",
+      "operating_configuration_status": "VALID",
+      "process_alive": true,
+      "progress_moving": true,
+      "readonly_store_canary": {
+        "after": {
+          "paper_plane.sqlite": "379e7c45c32596f4a47a2cf21380d57caff50a78f007ccc96e7c0dc7ad9bb804",
+          "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "before": {
+          "paper_plane.sqlite": "379e7c45c32596f4a47a2cf21380d57caff50a78f007ccc96e7c0dc7ad9bb804",
+          "paper_plane.sqlite-wal": "ABSENT"
+        },
+        "unchanged": false
+      },
+      "restore_guard": false,
+      "runtime_policy_revision": null,
+      "runtime_policy_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "runtime_policy_status": "NOT_CONFIGURED_STRATEGY_ONLY",
+      "runtime_policy_verified": true,
+      "runtime_scope": "DONOR",
+      "sequence": 4,
+      "source_fresh": true,
+      "source_latest_at": "2026-10-05T12:35:01Z",
+      "status": "READY",
+      "stdout_sha256": "6671548620d5fc59c1c27385f55f5f54274c204a0e5e3d79373946af4cde1e38"
+    }
+  ],
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "total_command_count": 23
+}

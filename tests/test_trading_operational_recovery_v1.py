@@ -1,9 +1,11 @@
 """Native lock/restore proofs, with synthetic source bytes and lowest HTTP seam."""
 from __future__ import annotations
 
-from contextlib import closing
+from contextlib import closing, redirect_stdout
 from datetime import UTC, datetime, timedelta
 import copy
+import hashlib
+import io
 from decimal import Decimal
 import json
 import shutil
@@ -20,6 +22,7 @@ from solana_alpha_lab.factory.hfic_research_scope import sha256_of
 from solana_alpha_lab.factory.paper_plane import PaperPlaneError, PaperPlaneStore
 from solana_alpha_lab.factory.trading_adapters import (
     ENDPOINT, REGISTRY_PATH, ROUTE_ID, JupiterQuoteAdapter,
+    verified_quote_grant,
 )
 from solana_alpha_lab.factory.trading_coordinator import TradingCoordinator, restore_native_backup
 from solana_alpha_lab.factory.trading_runner import TradingContinuityRunner
@@ -120,6 +123,339 @@ class OperationalRecoveryTests(unittest.TestCase):
         self.assertEqual(Decimal(original["remaining_qty_dec"]), Decimal("6000000"))
         self.assertEqual(Decimal(original["remaining_cost_basis_usd_dec"]), Decimal("18"))
         return ledger, original
+
+    def pending_entry(self):
+        self.start_operating(mode="SHADOW")
+        self.coordinator.quote_adapter = RecordingQuoteAdapter(self.empty_ledger(), [])
+        def stop(point):
+            if point == "AFTER_ATTEMPT_COMMIT":
+                raise RuntimeError("SYNTHETIC_STOP_BEFORE_EFFECT")
+        self.coordinator.fault = stop
+        with self.assertRaisesRegex(RuntimeError, "SYNTHETIC_STOP_BEFORE_EFFECT"):
+            self.coordinator.tick()
+        self.coordinator.fault = lambda _point: None
+        self.coordinator.tick()
+        return self.runner.readback()["modeled_attempts"][0]["event_id"]
+
+    def original_callback(self, attempt_id, *, outcome, version="1.1"):
+        result = {"attempt_id":attempt_id, "result_id":"SYNTHETIC-NONFILL-"+outcome,
+            "outcome":outcome, "observed_at":"2026-10-05T12:40:00Z", "chargeable_cost_usd":"0"}
+        if version == "1.1":
+            result["schema_version"] = version
+        inbox = self.data / "result-inbox"
+        inbox.mkdir(exist_ok=True)
+        (inbox / (attempt_id+".json")).write_text(json.dumps(result), encoding="utf-8")
+        return result
+
+    def test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart(self):
+        outcomes = [("1.1", outcome) for outcome in ("NO_ROUTE", "REJECTED_BEFORE_SEND",
+            "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED")] + [("1.0", "NO_ROUTE")]
+        observations = []
+        for version, outcome in outcomes:
+            with self.subTest(version=version, outcome=outcome):
+                case = OperationalRecoveryTests(methodName=self._testMethodName)
+                case.setUp()
+                try:
+                    aid = case.pending_entry()
+                    original = case.original_callback(aid, outcome=outcome, version=version)
+                    case.coordinator.tick()
+                    case.coordinator.tick()
+                    case.coordinator.tick()
+                    cold_runner = TradingContinuityRunner(case.root, data_root=case.data)
+                    cold = TradingCoordinator(cold_runner, mode="SHADOW", clock=lambda:case.now)
+                    view, readback = cold.status(), cold_runner.readback()
+                    self.assertEqual(view["status"], "READY")
+                    self.assertTrue(view["integrity_verified"])
+                    self.assertTrue(view["exit_reconciliation_healthy"])
+                    self.assertEqual(view["inventory"]["inventory_status"], "KNOWN")
+                    self.assertEqual(view["inventory"]["position_count"], 0)
+                    self.assertEqual(view["pending_attempts"], 0)
+                    self.assertEqual(len(readback["modeled_attempts"]), 1)
+                    self.assertEqual(readback["modeled_results"][0]["payload"]["result"], original)
+                    self.assertEqual(readback["positions"][0]["state"], "CANCELLED")
+                    with closing(PaperPlaneStore(cold_runner.store_path, readonly=True)) as store:
+                        incidents = store._conn.execute("SELECT reason,active FROM ordinary_incidents WHERE incident_key=?", (aid,)).fetchall()
+                    self.assertEqual([(row[0],row[1]) for row in incidents], [("ATTEMPT_RECONCILIATION_REQUIRED",0)])
+                    observations.append({"version":version,"outcome":outcome,"status":view["status"],"attempts":1,"pending":0})
+                finally:
+                    case.tearDown()
+        self.metrics = {"cases":observations,"quote_effects":0}
+
+    def test_nonfill_corrupt_witness_remains_active_and_truthful_restore_recovers(self):
+        from solana_alpha_lab.factory.paper_plane import assert_quantity_inventory_witness
+        aid = self.pending_entry()
+        self.original_callback(aid, outcome="NO_ROUTE")
+        original_result = self.runner.result
+        originals = {}
+        def accept_then_damage(result):
+            accepted = original_result(result)
+            with closing(PaperPlaneStore(self.runner.store_path)) as store:
+                final = store.get_execution_event("FINAL-"+aid)
+                originals["final"] = final
+                store._conn.execute("UPDATE execution_events SET payload_json='{}' WHERE event_id=?", (final["event_id"],))
+            return accepted
+        with patch.object(self.runner, "for_epoch", return_value=self.runner), patch.object(self.runner, "result", side_effect=accept_then_damage):
+            self.coordinator.tick()
+        self.assertEqual(self.coordinator.status()["status"], "ACTION_REQUIRED")
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            position = store.positions()[0]
+            with self.assertRaisesRegex(PaperPlaneError,"EXIT_INVENTORY_WITNESS_CONFLICT"):
+                assert_quantity_inventory_witness(store, position)
+            store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?",
+                (json.dumps(originals["final"]["payload"]), "FINAL-"+aid))
+            accepted=store.get_execution_event(originals["final"]["payload"]["result_event_id"])
+            damaged=copy.deepcopy(accepted["payload"])
+            damaged["result"]["quantity_filled"]="1"
+            store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?",
+                (json.dumps(damaged),accepted["event_id"]))
+        self.coordinator.tick()
+        self.assertEqual(self.coordinator.status()["status"],"ACTION_REQUIRED")
+        self.assertEqual(self.coordinator.status()["inventory"]["inventory_status"],"UNKNOWN")
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?",
+                (json.dumps(accepted["payload"]),accepted["event_id"]))
+            for field, value in (("remaining_qty_dec","1"),("entry_fee_usd_dec",".01"),("entered_notional_usd_dec","30")):
+                store._conn.execute("UPDATE positions SET "+field+"=? WHERE position_id=?", (value,position["position_id"]))
+                with self.assertRaisesRegex(PaperPlaneError,"EXIT_INVENTORY_WITNESS_CONFLICT"):
+                    assert_quantity_inventory_witness(store,store.positions()[0])
+                store._conn.execute("UPDATE positions SET "+field+"=? WHERE position_id=?", (position[field],position["position_id"]))
+        self.coordinator.tick()
+        self.coordinator.tick()
+        self.assertEqual(self.coordinator.status()["status"], "READY")
+        self.assertEqual(len(self.runner.readback()["modeled_attempts"]),1)
+        self.metrics={"damaged_final":"ACTION_REQUIRED","damaged_result":"UNKNOWN_ACTION_REQUIRED",
+            "damaged_caches":3,"truthful_restore":"READY","quote_effects":0}
+
+    def scoped_grant(self, epoch, strategy_sha, *, calls_max=10, expires="2026-10-05T15:00:00Z"):
+        path = self.root / REGISTRY_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(closure_fixture.ROOT / REGISTRY_PATH, path)
+        grant = {"quote_calls_authorized":True,"route_id":ROUTE_ID,"endpoint":ENDPOINT,
+            "registry_path":REGISTRY_PATH,"registry_sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
+            "mode":"SHADOW","activation_epoch_id":epoch,"strategy_sha256":strategy_sha,
+            "signing_authorized":False,"financial_authority":False,"calls_max":calls_max,"expires_at":expires}
+        return verified_quote_grant(self.root,{**grant,"grant_sha256":sha256_of(grant)})
+
+    def test_unknown_entry_recovery_keeps_original_pending_identity_without_quote_resend(self):
+        aid=self.pending_entry()
+        original=self.original_callback(aid,outcome="UNKNOWN_REQUIRES_RECONCILIATION")
+        self.coordinator.tick()
+        self.coordinator.tick()
+        cold=TradingCoordinator(TradingContinuityRunner(self.root,data_root=self.data),mode="SHADOW",clock=lambda:self.now)
+        self.assertEqual(cold.status()["pending_attempts"],1)
+        self.assertEqual(cold.status()["inventory"]["inventory_status"],"UNKNOWN")
+        self.assertEqual(cold.status()["status"],"ACTION_REQUIRED")
+        view=self.runner.readback()
+        self.assertEqual(len(view["modeled_attempts"]),1)
+        self.assertEqual(view["modeled_results"][0]["payload"]["result"],original)
+        self.assertEqual(view["positions"][0]["state"],"UNKNOWN")
+        self.metrics={"pending":1,"attempts":1,"fake_http_calls":0}
+
+    def test_invalid_quote_scope_and_expiry_deny_before_native_attempt_and_credential(self):
+        self.start_operating(mode="SHADOW")
+        reads,calls=[],[]
+        grant=self.scoped_grant(self.epoch,self.runner.strategy["spec_sha256"])
+        for change in ({"mode":"PAPER"},{"activation_epoch_id":"ACTIVATION-EPOCH-WRONG"},
+            {"strategy_sha256":"b"*64},{"expires_at":"2026-10-05T12:39:59Z"},{"calls_max":0},None):
+            with self.subTest(change=change):
+                body={k:v for k,v in grant.items() if k!="grant_sha256"}
+                if change is not None:
+                    body.update(change)
+                    candidate=verified_quote_grant(self.root,{**body,"grant_sha256":sha256_of(body)})
+                else:
+                    candidate=None
+                self.coordinator.quote_adapter=JupiterQuoteAdapter(timeout_seconds=1,max_response_bytes=8192,
+                    grant=candidate,credential_supplier=lambda:reads.append(True))
+                with patch("solana_alpha_lab.factory.trading_adapters.http_quote",side_effect=lambda *a,**k:calls.append(True)):
+                    with self.assertRaisesRegex(PaperPlaneError,"QUOTE_EXTERNAL_AUTHORITY_REQUIRED"):
+                        self.coordinator.tick()
+                self.assertEqual(self.runner.readback()["modeled_attempts"],[])
+                self.assertEqual(self.claims(self.runner),[])
+                self.assertEqual(reads,[])
+                self.assertEqual(calls,[])
+        valid=JupiterQuoteAdapter(timeout_seconds=1,max_response_bytes=8192,grant=grant,credential_supplier=lambda:None)
+        conflict={**grant,"calls_max":11}
+        conflict["grant_sha256"]=sha256_of({k:v for k,v in conflict.items() if k!="grant_sha256"})
+        other=JupiterQuoteAdapter(timeout_seconds=1,max_response_bytes=8192,grant=conflict,credential_supplier=lambda:None)
+        with self.assertRaisesRegex(PaperPlaneError,"QUOTE_GRANT_SELECTION_CONFLICT"):
+            TradingCoordinator(self.runner,mode="SHADOW",quote_adapters=[valid,other])
+        self.assertEqual(len(TradingCoordinator(self.runner,mode="SHADOW",quote_adapters=[valid,valid]).quote_adapters),1)
+        self.metrics={"preclaim_denials":6,"conflicting_duplicate":"DENY","identical_duplicate":"ONE_SCOPE",
+            "attempts":0,"quote_claims":0,"credential_reads":0,"fake_http_calls":0}
+
+    def test_quote_expiry_rechecked_at_atomic_claim_and_last_http_boundary(self):
+        for seam in ("BEFORE_CLAIM","AFTER_ATTEMPT_COMMIT"):
+            with self.subTest(seam=seam):
+                case=OperationalRecoveryTests(methodName=self._testMethodName)
+                case.setUp()
+                try:
+                    case.start_operating(mode="SHADOW")
+                    grant=case.scoped_grant(case.epoch,case.runner.strategy["spec_sha256"],expires="2026-10-05T12:40:00Z")
+                    reads,calls=[],[]
+                    case.coordinator.quote_adapter=JupiterQuoteAdapter(timeout_seconds=1,max_response_bytes=8192,
+                        grant=grant,credential_supplier=lambda:reads.append(True))
+                    if seam=="BEFORE_CLAIM":
+                        inputs=case.coordinator._inputs
+                        def prepare_then_expire(*args):
+                            result=inputs(*args)
+                            case.now+=timedelta(seconds=1)
+                            return result
+                        context=patch.object(case.coordinator,"_inputs",side_effect=prepare_then_expire)
+                    else:
+                        context=patch.object(case.coordinator,"fault",side_effect=lambda point:setattr(case,"now",case.now+timedelta(seconds=1))
+                            if point=="AFTER_ATTEMPT_COMMIT" else None)
+                    with context,patch("solana_alpha_lab.factory.trading_adapters.http_quote",side_effect=lambda *a,**k:calls.append(True)):
+                        with self.assertRaisesRegex(PaperPlaneError,"QUOTE_EXTERNAL_AUTHORITY_REQUIRED"):
+                            case.coordinator.tick()
+                    expected=0 if seam=="BEFORE_CLAIM" else 1
+                    self.assertEqual(len(case.runner.readback()["modeled_attempts"]),expected)
+                    self.assertEqual(len(case.claims(case.runner)),expected)
+                    self.assertEqual(reads,[])
+                    self.assertEqual(calls,[])
+                    if expected:
+                        case.coordinator.tick()
+                        self.assertEqual(case.coordinator.status()["pending_attempts"],1)
+                        self.assertEqual(case.coordinator.status()["inventory"]["inventory_status"],"UNKNOWN")
+                        self.assertEqual(len(case.claims(case.runner)),1)
+                finally:
+                    case.tearDown()
+        self.metrics={"preclaim_expired_attempts":0,"postclaim_expired_attempts":1,"credential_reads":0,"fake_http_calls":0}
+
+    def test_cli_repeated_quote_grant_paths_bind_original_profiles_and_reject_conflicting_scope(self):
+        from scripts import trading_continuity as cli
+        self.start_operating(mode="SHADOW")
+        first_epoch,first_runner,first_profile=self.epoch,self.runner,copy.deepcopy(self.profile)
+        grant_a=self.scoped_grant(first_epoch,first_runner.strategy["spec_sha256"])
+        self.prepare(operating=True,suffix="-B",negative=True,exit_point="E3600")
+        second_profile=copy.deepcopy(first_profile)
+        second_profile["quote"].update(timeout_seconds=2,max_response_bytes=4096)
+        self.coordinator=TradingCoordinator(self.runner,mode="SHADOW",clock=lambda:self.now)
+        self.coordinator.activate(epoch_id=self.epoch,at="2026-10-05T12:40:00Z",profile=second_profile,
+            switch_key="CLI-REPEAT-GRANTS",expected_current_epoch=first_epoch)
+        grant_b=self.scoped_grant(self.epoch,self.runner.strategy["spec_sha256"])
+        for filename,grant in (("grant-a.json",grant_a),("grant-b.json",grant_b)):
+            (self.data/filename).write_text(json.dumps(grant),encoding="utf-8")
+        (self.data/"operating_runtime.json").write_text(json.dumps({"schema":"smial.operating-runtime",
+            "schema_version":"1.0","evidence_class":"OBSERVED"}),encoding="utf-8")
+        argv=["tick","--repository-root",str(self.root),"--data-root",str(self.data),"--scope-root",str(self.root/"local"),
+            "--mode","SHADOW","--credential-env","SYNTHETIC_UNUSED","--quote-grant","grant-a.json","--quote-grant","grant-b.json"]
+        with (patch("solana_alpha_lab.factory.trading_coordinator.datetime",wraps=datetime) as physical,
+                patch("solana_alpha_lab.factory.trading_adapters.JupiterQuoteAdapter",wraps=JupiterQuoteAdapter) as constructor):
+            physical.now.return_value=self.now
+            output=io.StringIO()
+            with redirect_stdout(output):
+                code=cli.main(argv)
+            self.assertEqual(code,0,output.getvalue())
+            configured=[call.kwargs for call in constructor.call_args_list if call.kwargs.get("grant")]
+            self.assertEqual([(c["grant"]["activation_epoch_id"],c["timeout_seconds"],c["max_response_bytes"]) for c in configured],
+                [(first_epoch,1,8192),(self.epoch,2,4096)])
+        conflict={**grant_a,"calls_max":11}
+        conflict["grant_sha256"]=sha256_of({k:v for k,v in conflict.items() if k!="grant_sha256"})
+        (self.data/"grant-conflict.json").write_text(json.dumps(conflict),encoding="utf-8")
+        with closing(PaperPlaneStore(self.runner.store_path,readonly=True)) as store:
+            before=store.execution_events()
+        output=io.StringIO()
+        with redirect_stdout(output):
+            code=cli.main(argv+["--quote-grant","grant-conflict.json"])
+        self.assertEqual(code,2)
+        self.assertEqual(json.loads(output.getvalue())["reason_code"],"QUOTE_GRANT_SELECTION_CONFLICT")
+        with closing(PaperPlaneStore(self.runner.store_path,readonly=True)) as store:
+            self.assertEqual(store.execution_events(),before)
+        self.assertEqual(self.runner.readback()["modeled_attempts"],[])
+        self.assertEqual(self.claims(self.runner),[])
+        self.metrics={"repeat_paths":2,"original_profile_bounds":[[1,8192],[2,4096]],"conflicting_scope":"DENY_BEFORE_WRITE",
+            "credential_reads":0,"fake_http_calls":0}
+
+    def test_separate_original_quote_grants_close_predecessor_and_admit_successor_with_cold_quota(self):
+        self.start_operating(mode="SHADOW")
+        first_runner, first_epoch, first_source, first_profile = self.runner, self.epoch, self.source, copy.deepcopy(self.profile)
+        grant_a = self.scoped_grant(first_epoch, first_runner.strategy["spec_sha256"])
+        credential_reads, calls = [], []
+        def adapter(grant, profile):
+            return JupiterQuoteAdapter(timeout_seconds=profile["quote"]["timeout_seconds"],
+                max_response_bytes=profile["quote"]["max_response_bytes"], grant=grant,
+                credential_supplier=lambda:credential_reads.append(grant["grant_sha256"]))
+        def fake_http(raw, **limits):
+            self.assertIsNone(limits["api_key"])
+            calls.append({"request":dict(raw),"timeout_seconds":limits["timeout_seconds"],"max_response_bytes":limits["max_response_bytes"]})
+            output = "330000000" if raw["inputMint"] != first_profile["quote"]["funding_mint"] else "10000000000000"
+            body = {"transaction":None,"inputMint":raw["inputMint"],"outputMint":raw["outputMint"],
+                "inAmount":raw["amount"],"outAmount":output,"router":"metis","mode":"ultra",
+                "feeBps":20,"feeMint":raw["outputMint"],"requestId":"SYNTHETIC-SCOPED-"+str(len(calls))}
+            return {"status":200,"body":json.dumps(body).encode(),"url":ENDPOINT+"?"+urlencode(raw)}
+        self.coordinator.quote_adapter=adapter(grant_a,first_profile)
+        with patch("solana_alpha_lab.factory.trading_adapters.http_quote",side_effect=fake_http):
+            self.coordinator.tick()
+            first_position=first_runner.readback()["positions"][0]
+            self.assertEqual(first_position["state"],"OPEN")
+            self.prepare(operating=True,suffix="-B",negative=True,exit_point="E3600")
+            start=datetime(2026,10,5,12,16,6,tzinfo=UTC)
+            feed=closure_fixture.EpisodeScenario(self.data/"successor-source",start=start,stops=start+timedelta(hours=3))
+            blocked,new=closure_fixture.synth_mint("DeniedB"),closure_fixture.synth_mint("NewB")
+            obj=closure_fixture.token_object(blocked,price=.000003,liquidity=10000,holders=66)
+            closure_fixture.nominate(feed.market,start,{"toptraded":[obj],"toptrending":[obj]})
+            feed.market.series[blocked]=lambda now:closure_fixture.token_object(blocked,price=.000003,liquidity=10000,
+                holders=60 if now>=datetime(2026,10,5,12,50,tzinfo=UTC) else 66)
+            feed.tick(start)
+            feed.tick(datetime(2026,10,5,12,25,tzinfo=UTC))
+            self.profile={**copy.deepcopy(first_profile),"source":{"root":str(feed.data_root),"file":"observation_schedule_state.sqlite",
+                "schedule_sha256":feed.schedule["schedule_sha256"],"activation_id":feed.activation_id}}
+            self.profile["quote"].update(timeout_seconds=2,max_response_bytes=4096)
+            self.source,self.mint=feed,blocked
+            self.now=datetime(2026,10,5,12,41,tzinfo=UTC)
+            self.quote_inputs(at="2026-10-05T12:41:00Z")
+            self.coordinator=TradingCoordinator(self.runner,mode="SHADOW",clock=lambda:self.now)
+            switched=self.coordinator.activate(epoch_id=self.epoch,at="2026-10-05T12:41:00Z",profile=self.profile,
+                switch_key="SCOPED-GRANTS-B",expected_current_epoch=first_epoch)
+            self.assertEqual(switched["generation"],2)
+            grant_b=self.scoped_grant(self.epoch,self.runner.strategy["spec_sha256"],calls_max=1)
+            invalid_b={**grant_b,"strategy_sha256":"b"*64}
+            invalid_b["grant_sha256"]=sha256_of({k:v for k,v in invalid_b.items() if k!="grant_sha256"})
+            cold_runner=TradingContinuityRunner(self.root,data_root=self.data)
+            cold=TradingCoordinator(cold_runner,mode="SHADOW",clock=lambda:self.now,
+                quote_adapters=[adapter(grant_a,first_profile),adapter(invalid_b,self.profile)])
+            first_source.tick(datetime(2026,10,5,13,5,tzinfo=UTC))
+            self.now=datetime(2026,10,5,13,10,tzinfo=UTC)
+            (first_source.data_root/"funding.json").write_text(json.dumps({"mint":first_profile["quote"]["funding_mint"],
+                "decimals":9,"unit_price_usd":"100","observed_at":"2026-10-05T13:10:00Z","available_at":"2026-10-05T13:10:00Z"}),encoding="utf-8")
+            cold.tick()
+            self.assertEqual(cold_runner.readback()["positions"][0]["state"],"RECONCILED")
+            later=datetime(2026,10,5,13,16,6,tzinfo=UTC)
+            row=closure_fixture.token_object(new,price=.000003,liquidity=10000,holders=66)
+            closure_fixture.nominate(feed.market,later,{"toptraded":[row],"toptrending":[row]})
+            feed.market.series[new]=lambda now:closure_fixture.token_object(new,price=.000003,liquidity=10000,
+                holders=60 if now>=datetime(2026,10,5,13,50,tzinfo=UTC) else 66)
+            for tick in (later,datetime(2026,10,5,13,25,tzinfo=UTC),datetime(2026,10,5,13,50,tzinfo=UTC)):
+                feed.tick(tick)
+            self.now=datetime(2026,10,5,13,55,tzinfo=UTC)
+            self.mint=new
+            self.quote_inputs(at="2026-10-05T13:55:00Z")
+            with self.assertRaisesRegex(PaperPlaneError,"QUOTE_EXTERNAL_AUTHORITY_REQUIRED"):
+                cold.tick()
+            self.assertEqual(len(cold_runner.readback()["modeled_attempts"]),2)
+            self.assertEqual(len(self.claims(cold_runner)),2)
+            self.assertEqual(len(calls),2)
+            cold=TradingCoordinator(cold_runner,mode="SHADOW",clock=lambda:self.now,
+                quote_adapters=[adapter(grant_a,first_profile),adapter(grant_b,self.profile)])
+            cold.tick()
+            view=cold_runner.readback()
+            self.assertEqual({(p["activation_epoch_id"],p["state"]) for p in view["positions"]},
+                {(first_epoch,"RECONCILED"),(self.epoch,"OPEN")})
+            claims=self.claims(cold_runner)
+            self.assertEqual([sum(c["payload"]["grant_sha256"]==g["grant_sha256"] for c in claims) for g in (grant_a,grant_b)],[2,1])
+            self.assertEqual(len(calls),3)
+            self.assertEqual([(c["timeout_seconds"],c["max_response_bytes"]) for c in calls],[(1,8192),(1,8192),(2,4096)])
+            restart=TradingCoordinator(TradingContinuityRunner(self.root,data_root=self.data),mode="SHADOW",clock=lambda:self.now,
+                quote_adapters=[adapter(grant_a,first_profile),adapter(grant_b,self.profile)])
+            restart.tick()
+            self.assertEqual(self.claims(cold_runner),claims)
+            self.assertEqual(len(calls),3)
+            with closing(PaperPlaneStore(cold_runner.store_path,readonly=True)) as store:
+                with self.assertRaisesRegex(PaperPlaneError,"QUOTE_CALL_CAP_EXHAUSTED"):
+                    restart._quote_quota(store,restart.quote_adapters[("SHADOW",self.epoch)])
+            self.metrics={"claims_A":2,"claims_B":1,"fake_http_calls":3,"cold_repeat_calls":0,
+                "origin_epochs":[first_epoch,self.epoch],"profile_bounds_A":[1,8192],"profile_bounds_B":[2,4096],
+                "invalid_B":"DENY_WITH_NO_ATTEMPT_OR_CLAIM","healthy_A_exit_with_invalid_B":"RECONCILED"}
 
     def test_partial_projection_damage_blocks_ordinary_quote_until_truthful_restoration(self):
         metrics = []

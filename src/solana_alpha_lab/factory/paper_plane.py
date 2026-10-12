@@ -285,6 +285,34 @@ def assert_quantity_inventory_witness(store: PaperPlaneStore, position: Mapping[
         attempts = {event["event_id"]: event for event in starts}
         finals = {event["event_id"]: event for event in events if event["event_type"] == "MODELED_ATTEMPT_FINAL"}
         observations = {event["event_id"]: event for event in events if event["event_type"] == "MODELED_RESULT_ACCEPTED"}
+        if position["qty_dec"] is None:
+            # A definitive original ENTRY nonfill proves no inventory. It has
+            # no positive entry from which a quantity EXIT can be derived.
+            if (position["state"] != "CANCELLED" or not starts or len(finals) != len(starts)
+                or any(event["payload"]["side"] != "ENTRY" for event in starts)
+                or any(event["event_type"] in {"PAPER_SIMULATION_OBSERVED", "SHADOW_EXECUTABLE_OBSERVED", "MODELED_EXIT_QUANTITY_LEG"}
+                       for event in events)):
+                raise ValueError()
+            if any(position.get(key) is not None for key in ("entry_price_dec", "entered_notional_usd_dec",
+                    "entry_gross_notional_usd_dec", "entry_fee_usd_dec", "entry_fee_semantics", "exit_notional_usd_dec",
+                    "exit_fee_usd_dec", "realized_gross_pnl_usd_dec", "realized_net_pnl_usd_dec")):
+                raise ValueError()
+            for key in ("remaining_qty_dec", "remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec"):
+                if _positive_model_decimal(position[key], "EXIT_INVENTORY_WITNESS_CONFLICT", allow_zero=True) != 0:
+                    raise ValueError()
+            for event in observations.values():
+                attempt = attempts.get(event["payload"]["result"]["attempt_id"])
+                if attempt is None or not modeled_final_witness_valid(attempt, None, event, mode=mode,
+                        original_position=position):
+                    raise ValueError()
+            for attempt in starts:
+                final = finals["FINAL-" + attempt["event_id"]]
+                accepted = observations[final["payload"]["result_event_id"]]
+                if (not modeled_final_witness_valid(attempt, final, accepted, mode=mode, original_position=position)
+                    or accepted["payload"]["result"]["outcome"] not in {
+                        "NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED"}):
+                    raise ValueError()
+            return
         original = _positive_model_decimal(position["qty_dec"], "EXIT_INVENTORY_WITNESS_CONFLICT")
         legacy = original if position.get("entry_fee_semantics") is None else None
         for event in observations.values():

@@ -8,7 +8,7 @@
     "unowned_resources_touched": false
   },
   "credential_reads": false,
-  "elapsed_seconds": 17.668221,
+  "elapsed_seconds": 17.053819,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "external_cut_basis": "No process or effect invoked after backup before export/restore; independent absence assertion effects []; donor CLI exports frozen bindings/controls/current state.",
   "final_state": {
@@ -28,9 +28,92 @@
     "purpose": "synthetic source/science environment preparation only",
     "sha256": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f"
   },
+  "grant_roster_assessment": {
+    "evidence_file_sha256": "de6e91bdaf20122b7cd9574af41d9801a93b1bfa07335fd7594bbde755b4b851",
+    "evidence_path": "docs/evidence/smial_trading_core_operational_closure_v1/review-nonfill-grant-remediation.json",
+    "native_help_command": "uv run --locked --managed-python python -B scripts/trading_continuity.py --help",
+    "native_help_exit_code": 0,
+    "native_help_verified": true,
+    "operator_credential_reads": 0,
+    "operator_provider_calls": 0,
+    "operator_roster_effect_journey_executed": false,
+    "parser_action": "append",
+    "repeatable_flag": "--quote-grant",
+    "reviewed_native_tests": [
+      {
+        "metrics": {
+          "attempts": 0,
+          "conflicting_duplicate": "DENY",
+          "credential_reads": 0,
+          "fake_http_calls": 0,
+          "identical_duplicate": "ONE_SCOPE",
+          "preclaim_denials": 6,
+          "quote_claims": 0
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_invalid_quote_scope_and_expiry_deny_before_native_attempt_and_credential"
+      },
+      {
+        "metrics": {
+          "credential_reads": 0,
+          "fake_http_calls": 0,
+          "postclaim_expired_attempts": 1,
+          "preclaim_expired_attempts": 0
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_quote_expiry_rechecked_at_atomic_claim_and_last_http_boundary"
+      },
+      {
+        "metrics": {
+          "conflicting_scope": "DENY_BEFORE_WRITE",
+          "credential_reads": 0,
+          "fake_http_calls": 0,
+          "original_profile_bounds": [
+            [
+              1,
+              8192
+            ],
+            [
+              2,
+              4096
+            ]
+          ],
+          "repeat_paths": 2
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_cli_repeated_quote_grant_paths_bind_original_profiles_and_reject_conflicting_scope"
+      },
+      {
+        "metrics": {
+          "claims_A": 2,
+          "claims_B": 1,
+          "cold_repeat_calls": 0,
+          "fake_http_calls": 3,
+          "healthy_A_exit_with_invalid_B": "RECONCILED",
+          "invalid_B": "DENY_WITH_NO_ATTEMPT_OR_CLAIM",
+          "origin_epochs": [
+            "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+            "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B"
+          ],
+          "profile_bounds_A": [
+            1,
+            8192
+          ],
+          "profile_bounds_B": [
+            2,
+            4096
+          ]
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_separate_original_quote_grants_close_predecessor_and_admit_successor_with_cold_quota"
+      }
+    ],
+    "status": "PASS_READONLY_GRAMMAR_AND_CURRENT_NATIVE_EVIDENCE"
+  },
   "health_semantics": {
     "actual_os_supervision_verified": false,
     "graceful_shutdown_may_retain_recent_heartbeat_until_ttl": true,
+    "grant_expiry_preclaim_vs_postclaim_boundary_documented": true,
     "observed_physical_clock_boundary_documented": true,
     "observed_runtime_exercised_in_operator_journey": false,
     "optional_policy_absence_is_strategy_only": true,
@@ -64,7 +147,7 @@
       "SIGDEC-49A9CF1A18E9BC5241317E274C7C0F34D2613AE7CD68AA524D87FAEDB3A5C809"
     ],
     "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
-    "backup_database_sha256": "bd6e7d5c50e02ab136987c8404ef9af33542fedd3a28118d4f41b54c06d479e2",
+    "backup_database_sha256": "887bde667af7aedd1179bd9cc29fa7b2488f055f2f8d557664f6e9198f303449",
     "bot_instance_id": "BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
     "inventory_sha256_before_ack": "33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746",
     "position_ids": [
@@ -72,7 +155,7 @@
     ],
     "source_episode_id": "EP-705da8cd8881c5f381f5d4e9a6b6ee37",
     "strategy_id": "STRAT-CONTINUITY-SYNTH-001-C22-FROZEN",
-    "strategy_sha256": "b97af7282401a28b6ff679e3580dea0dcad092d6934edeacfac72a2f11879b8c"
+    "strategy_sha256": "e59dd1ddd05031b1c7f626917dd22f1e1445c40a044c22ebc99839f2820355f2"
   },
   "independence": "ISOLATED_OPERATOR_WITH_EXACT_CONTRACT_DIFF_RUNBOOK",
   "journey_status": "PASS",
@@ -80,8 +163,11 @@
   "manual_binding_construction": false,
   "manual_token_json": false,
   "network_calls": false,
-  "observed_at_utc": "2026-10-12T03:45:25.905748Z",
+  "observed_at_utc": "2026-10-12T04:47:34.189657Z",
   "provider_calls": false,
+  "readonly_canary_contract": "Exact DB/nonempty WAL bytes; only ABSENT/zero-byte WAL auxiliary coordination allowed",
+  "readonly_status_canaries_verified": true,
+  "readonly_status_canary_count": 5,
   "recovery_cut": {
     "all_bindings_exported_by_cli": true,
     "configuration_readback": {
@@ -93,6 +179,15 @@
       "new_configuration_events_created_during_recovery": false,
       "policy_chain_exact": true,
       "post_backup_configuration_change_exercised": false,
+      "readonly_business_bytes_unchanged": true,
+      "readonly_canary_after": {
+        "paper_plane.sqlite": "20cb5042b5e93e3dfc2bb0e66db3ea7919cfaf8c33be692816bbd41d4bb29328",
+        "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "readonly_canary_before": {
+        "paper_plane.sqlite": "20cb5042b5e93e3dfc2bb0e66db3ea7919cfaf8c33be692816bbd41d4bb29328",
+        "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "runtime_policy_configuration_state": "NOT_CONFIGURED_STRATEGY_ONLY"
     },
     "effect_count": 0,
@@ -163,19 +258,19 @@
   "schema_version": "1.0",
   "semantic_navigation": {
     "authority_granted": false,
-    "catalog_integrity_sha256": "fcf22145391c987c89f2016abf02f4de201cebd9001b199874a0f25b26b6181b",
+    "catalog_integrity_sha256": "1b6dd4359d1faa3705c8244a3dc4fd0d1c01dbfea00872bd7fd89001d780c5ed",
     "catalog_record_status": "IMPLEMENTED_UNVERIFIED",
     "catalog_status_is_not_product_acceptance": true,
     "gaps": [],
     "network_required": false,
-    "observed_at_utc": "2026-10-12T03:53:00.365941Z",
+    "observed_at_utc": "2026-10-12T04:54:38.731124Z",
     "operator_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001",
     "operator_asset_ids": [
       "DOC-TRADING-CONTINUITY-OFFLINE-001"
     ],
     "read_only": true,
     "readback_anchors": {
-      "catalog/assets/core.yaml": "04bb8b7f7d9ba6a9f1b86dee6158af0734a6d9e5ed1362f86731e0a48fcc4c1f",
+      "catalog/assets/core.yaml": "31a14d37a45d044f111fca0d917f06cf532117e4e8fed2795a08a10d778f9ffb",
       "configs/factory_semantic_operability_v1.yaml": "8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83",
       "docs/FACTORY_SEMANTIC_MAP.md": "2fbf4e7edce8c53b83ccec0f837ff49eef706d72448b9fe89ea8e4ab11ae35a6"
     },
@@ -183,7 +278,7 @@
     "repository_path": "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md",
     "resolve_asset_command": "uv run --locked --managed-python python -B scripts/catalog_cli.py resolve-asset DOC-TRADING-CONTINUITY-OFFLINE-001 --json",
     "resolve_asset_exit_code": 0,
-    "resolve_asset_output_sha256": "92e5125e564da10aefa06a3f882dc34152087209dfe38e445c2b4114432177e1",
+    "resolve_asset_output_sha256": "b1136de7c9782d7980cae8947a4e4200437abde36c0d4e0333a5863f5b88d5df",
     "resolve_route_command": "uv run --locked --managed-python python -B scripts/catalog_cli.py resolve-route SEM-OWNER-LIFECYCLE --json",
     "resolve_route_exit_code": 0,
     "resolve_route_output_sha256": "fa40c40ea3e6b85e5ccc29acbf75e293d74d8431a36b261788a7c28ab6f2fd7a",
@@ -195,22 +290,24 @@
     "source_pin_matches_catalog": true,
     "status": "PASS"
   },
+  "source_hash_basis": "RAW_UTF8_BYTES_SHA256",
+  "source_line_endings": "LF",
   "source_pins": {
     "configs/factory_semantic_operability_v1.yaml": "8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83",
-    "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "fcf22145391c987c89f2016abf02f4de201cebd9001b199874a0f25b26b6181b",
-    "scripts/trading_continuity.py": "edfed7a8a9bdc8957b3fbdcdf57bc10dd3a17ac151402a9ea3c617516dc248d1",
+    "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "1b6dd4359d1faa3705c8244a3dc4fd0d1c01dbfea00872bd7fd89001d780c5ed",
+    "scripts/trading_continuity.py": "9694d0b589b0fd560e250324bd7cef07c547ec8b6e8c137d471f028a6083538b",
     "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
     "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
-    "src/solana_alpha_lab/factory/paper_plane.py": "8faeb669b0e5fa1b687883711b8bdf0f53f7fe2b7ff6181bdd2ebeb4a91f4929",
+    "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
     "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
-    "src/solana_alpha_lab/factory/trading_adapters.py": "cdc3518032eaeb16becc469285c6bb9bb4ec9ef82a6c19d6cca51c615f4feaea",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "e81663fe16eb23e80efa942c2945aa6d9f0e08d27427c8b3129d1b7c9a8e9eb8",
+    "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "2346559e835010c47e21e0d9bd2b4c7877aa698da33831e417d5d02cb8556d4b",
     "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
     "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
     "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
-    "tests/test_trading_operational_recovery_v1.py": "c554531d86328df0086629ef051975540b75720ae038b5e5a5627615ec29d4ba"
+    "tests/test_trading_operational_recovery_v1.py": "0a9d1205477107de71b542afb31974faa76f51ce524efff2a46017cb27972597"
   },
   "source_pins_unchanged": true,
   "steps": [
@@ -247,9 +344,9 @@
       "mode": "PAPER",
       "runtime_scope": "DONOR",
       "sequence": 2,
-      "stdout_sha256": "6df2f3a7cd75cccc715fb77e574f8648befe63c0982a7273edc238ee2026324f",
+      "stdout_sha256": "36b32201e11b57a2e39839a950a5f23d22f0c9d2f21f69ad4ca52828330a5c82",
       "strategy_id": "STRAT-CONTINUITY-SYNTH-001-C22-FROZEN",
-      "strategy_sha256": "b97af7282401a28b6ff679e3580dea0dcad092d6934edeacfac72a2f11879b8c"
+      "strategy_sha256": "e59dd1ddd05031b1c7f626917dd22f1e1445c40a044c22ebc99839f2820355f2"
     },
     {
       "activation_created": false,
@@ -297,6 +394,19 @@
       "operating_configuration_status": "VALID",
       "process_alive": true,
       "progress_moving": true,
+      "readonly_store_canary": {
+        "after": {
+          "paper_plane.sqlite": "95161544885f3cd51651e1c338879944292f2f700e5299ae9594cb25a326bb70",
+          "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "allowed_empty_wal_coordination": true,
+        "before": {
+          "paper_plane.sqlite": "95161544885f3cd51651e1c338879944292f2f700e5299ae9594cb25a326bb70",
+          "paper_plane.sqlite-wal": "ABSENT"
+        },
+        "business_bytes_unchanged": true,
+        "physical_state_unchanged": false
+      },
       "restore_guard": false,
       "runtime_policy_revision": null,
       "runtime_policy_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -307,7 +417,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "READY",
-      "stdout_sha256": "20da7e7253212b06fc4702e2aae73186faf7017ff073e6a753ccfe9a3058abcc"
+      "stdout_sha256": "3cde1e83050b63c0ebc7a3c0116a02a070c8883ead63957879c05ae2058d427a"
     },
     {
       "arguments": {
@@ -334,6 +444,19 @@
       "expected_exit_code": 0,
       "human": "PAPER · READY · epoch ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN\nНа 2026-10-05T12:40:00Z · последний tick: 2026-10-05T12:40:00Z\nПроцесс: True · источник: SOURCE_FRESH (2026-10-05T12:35:01Z) · прогресс: True\nКонфигурация: VALID · входы исполнения: PAPER_NATIVE_PREFIX\nПолитика входов: NOT_CONFIGURED_STRATEGY_ONLY · revision: NONE · SHA256: 0000000000000000000000000000000000000000000000000000000000000000\nОбязательства: 1 · стоимость: 30.0 USD · pending attempts: 0\nЦелостность: True · restore fence: False · earliest overdue: NONE\nInventory SHA256: 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746\nBot BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN · RUNNING · entries paused: True\nPosition POS-SIG-SIGDEC-49A9CF1A18E9BC5241317E274C7C0F34D2613AE7CD68AA524D87FAEDB3A5C809 · OPEN · remaining: 10000000.00000000\nДалее: CLI status --mode PAPER --format human (с теми же repository/data/scope flags)",
       "mode": "PAPER",
+      "readonly_store_canary": {
+        "after": {
+          "paper_plane.sqlite": "c8b117d812196d003ed28fc55f26ad090d9f84d2a45471a96cec524ba66dca11",
+          "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "allowed_empty_wal_coordination": true,
+        "before": {
+          "paper_plane.sqlite": "c8b117d812196d003ed28fc55f26ad090d9f84d2a45471a96cec524ba66dca11",
+          "paper_plane.sqlite-wal": "ABSENT"
+        },
+        "business_bytes_unchanged": true,
+        "physical_state_unchanged": false
+      },
       "runtime_scope": "DONOR",
       "sequence": 6,
       "status": "HUMAN_STATUS_RENDERED",
@@ -344,13 +467,13 @@
         "destination": "backups/c22.sqlite"
       },
       "command": "backup",
-      "database_sha256": "bd6e7d5c50e02ab136987c8404ef9af33542fedd3a28118d4f41b54c06d479e2",
+      "database_sha256": "887bde667af7aedd1179bd9cc29fa7b2488f055f2f8d557664f6e9198f303449",
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
       "runtime_scope": "DONOR",
       "sequence": 7,
-      "stdout_sha256": "33ece0d01311126d750b69720c7e3400fc01de358a677b65fe83797b3795c830"
+      "stdout_sha256": "2423e5d7f9b323c187af441ac0698a07a8dabeab07542e49c1c2c4992fd4f962"
     },
     {
       "arguments": {
@@ -402,14 +525,14 @@
         "input": "external-cut-input.json"
       },
       "command": "seal-cut",
-      "cut_sha256": "23bf237ed70fa06091d0dc62e90137d815d8bf593f841b2f288b89bf32ff5751",
+      "cut_sha256": "07483ed001ddd9fade9086eda6e3babf718563c47cd0f7cebf52419a3cbde888",
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
       "runtime_scope": "RESTORED",
       "sequence": 11,
       "status": "CUT_VERIFIED_AND_SEALED",
-      "stdout_sha256": "33f4468afa657bc416c949cc1721b7c91c6a6608a2a1038e83aea8f7887b920a"
+      "stdout_sha256": "46d9033d10c9f386c8a2e10d2c871d08c43076bb0fb09ccdcac6ad09e0f45aa2"
     },
     {
       "arguments": {
@@ -457,6 +580,19 @@
       "operating_configuration_status": "VALID",
       "process_alive": true,
       "progress_moving": true,
+      "readonly_store_canary": {
+        "after": {
+          "paper_plane.sqlite": "5746281275b9e38802a664c955e0aa6b42146d47a15531be8827c34f4feda900",
+          "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "allowed_empty_wal_coordination": true,
+        "before": {
+          "paper_plane.sqlite": "5746281275b9e38802a664c955e0aa6b42146d47a15531be8827c34f4feda900",
+          "paper_plane.sqlite-wal": "ABSENT"
+        },
+        "business_bytes_unchanged": true,
+        "physical_state_unchanged": false
+      },
       "restore_guard": true,
       "runtime_policy_revision": null,
       "runtime_policy_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -467,7 +603,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "ACTION_REQUIRED",
-      "stdout_sha256": "0795ba76811b346d47ed390ee05beee7d29de65b74acc6ee9892fe986feda595"
+      "stdout_sha256": "94401e1cf12cfc86e25f0c13ad20cf3d583974869a2949617f8ea9d2a1f594d1"
     },
     {
       "arguments": {
@@ -479,6 +615,19 @@
       "expected_exit_code": 0,
       "human": "PAPER · ACTION_REQUIRED · epoch ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN\nНа 2026-10-05T12:40:00Z · последний tick: 2026-10-05T12:40:00Z\nПроцесс: True · источник: SOURCE_FRESH (2026-10-05T12:35:01Z) · прогресс: True\nКонфигурация: VALID · входы исполнения: PAPER_NATIVE_PREFIX\nПолитика входов: NOT_CONFIGURED_STRATEGY_ONLY · revision: NONE · SHA256: 0000000000000000000000000000000000000000000000000000000000000000\nОбязательства: 1 · стоимость: 30.0 USD · pending attempts: 0\nЦелостность: True · restore fence: True · earliest overdue: NONE\nInventory SHA256: 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746\nBot BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN · RUNNING · entries paused: True\nPosition POS-SIG-SIGDEC-49A9CF1A18E9BC5241317E274C7C0F34D2613AE7CD68AA524D87FAEDB3A5C809 · OPEN · remaining: 10000000.00000000\nДалее: CLI ack-restore --mode PAPER --input complete-external-cut.json --inventory-sha256 33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746 --as-of 2026-10-05T12:40:00Z (с теми же repository/data/scope flags)",
       "mode": "PAPER",
+      "readonly_store_canary": {
+        "after": {
+          "paper_plane.sqlite": "5746281275b9e38802a664c955e0aa6b42146d47a15531be8827c34f4feda900",
+          "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "allowed_empty_wal_coordination": false,
+        "before": {
+          "paper_plane.sqlite": "5746281275b9e38802a664c955e0aa6b42146d47a15531be8827c34f4feda900",
+          "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "business_bytes_unchanged": true,
+        "physical_state_unchanged": true
+      },
       "runtime_scope": "RESTORED",
       "sequence": 14,
       "status": "HUMAN_STATUS_RENDERED",
@@ -530,6 +679,19 @@
       "operating_configuration_status": "VALID",
       "process_alive": true,
       "progress_moving": true,
+      "readonly_store_canary": {
+        "after": {
+          "paper_plane.sqlite": "65837d464776b53e3ca7606621c27bfd5a2a79151635fc7d78fe918edeb071d4",
+          "paper_plane.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "allowed_empty_wal_coordination": true,
+        "before": {
+          "paper_plane.sqlite": "65837d464776b53e3ca7606621c27bfd5a2a79151635fc7d78fe918edeb071d4",
+          "paper_plane.sqlite-wal": "ABSENT"
+        },
+        "business_bytes_unchanged": true,
+        "physical_state_unchanged": false
+      },
       "restore_guard": false,
       "runtime_policy_revision": null,
       "runtime_policy_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -540,7 +702,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "READY",
-      "stdout_sha256": "ccb2435a4a193defdf9ae6f41ec56221f017916ede467d1c9ba074221c2a529f"
+      "stdout_sha256": "7da09e28b32635f754c47e2e7df31569240632927fecca6a14851532aac27639"
     },
     {
       "arguments": {
@@ -582,7 +744,7 @@
       "runtime_scope": "RESTORED",
       "sequence": 19,
       "status": "RUNNING",
-      "stdout_sha256": "b2744cc3c4bea4e509d4518c557d69fcc7de09b049199f5a341e9a015924315c"
+      "stdout_sha256": "6297488edb9eafaf026738f5a77fd3444db68634e710e5c89a621a5dde58077d"
     },
     {
       "arguments": {
@@ -657,6 +819,14 @@
       "stdout_sha256": "69e2a469a9898d49eb9d884becb62f2cc11432cfe0aa48b79ad117cdb6ef332b"
     }
   ],
+  "superseded_operator_oracle": {
+    "actual_cli_steps": 4,
+    "correction": "Require exact database bytes and exact nonempty WAL bytes; allow only ABSENT versus zero-byte WAL; preserve physical before/after states.",
+    "path": "docs/evidence/smial_trading_core_operational_closure_v1/operator-readonly-oracle-interim.json",
+    "raw_file_sha256": "309799c051e0dceae20029835fe1b78b5970db6faba54fbff556a2853b565207",
+    "reason": "SUPPLEMENTAL_ORACLE_REJECTED_ALLOWED_NATIVE_EMPTY_WAL_CREATION",
+    "status": "FAIL"
+  },
   "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
   "total_command_count": 23
 }

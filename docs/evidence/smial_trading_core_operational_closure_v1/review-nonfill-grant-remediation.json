@@ -1,0 +1,628 @@
+{
+  "after": {
+    "cleanup": {
+      "all_absent": true,
+      "owned_fixture_roots": 31
+    },
+    "elapsed_seconds": 95.694165,
+    "errors": 0,
+    "evidence_class": "SYNTHETIC_OFFLINE",
+    "failures": 0,
+    "financial_effects": 0,
+    "live_authority": false,
+    "output_sha256": "1bf6b72c5e48f79faef2e07d2ecefed4c0784a8347bc2f412d1ec4511e4183dd",
+    "provider_calls": 0,
+    "receipt_sha256": "ede410e020af821451877365ea5376b5082ffa5b48e32c5e8d10780ffabca912",
+    "scope": "PROPORTIONAL_CHANGED_BEHAVIOR_AND_DIRECT_NEIGHBORS_NOT_WHOLE_GATE",
+    "skips": 0,
+    "source_pins": {
+      "scripts/trading_continuity.py": "9694d0b589b0fd560e250324bd7cef07c547ec8b6e8c137d471f028a6083538b",
+      "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+      "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "2346559e835010c47e21e0d9bd2b4c7877aa698da33831e417d5d02cb8556d4b",
+      "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
+      "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+      "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
+      "tests/test_trading_operational_recovery_v1.py": "0a9d1205477107de71b542afb31974faa76f51ce524efff2a46017cb27972597"
+    },
+    "source_pins_before": {
+      "scripts/trading_continuity.py": "9694d0b589b0fd560e250324bd7cef07c547ec8b6e8c137d471f028a6083538b",
+      "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+      "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "2346559e835010c47e21e0d9bd2b4c7877aa698da33831e417d5d02cb8556d4b",
+      "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
+      "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+      "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
+      "tests/test_trading_operational_recovery_v1.py": "0a9d1205477107de71b542afb31974faa76f51ce524efff2a46017cb27972597"
+    },
+    "source_snapshot_before_sha256": "ad1ae87e6eb87065b22b23ca7649e056cc3f3c69c43534f6d3d724b45afed870",
+    "source_snapshot_file_count": 1599,
+    "source_snapshot_sha256": "ad1ae87e6eb87065b22b23ca7649e056cc3f3c69c43534f6d3d724b45afed870",
+    "source_unchanged": true,
+    "status": "PASS",
+    "test_count": 25,
+    "tests": [
+      {
+        "elapsed_seconds": 13.003683,
+        "metrics": {
+          "cases": [
+            {
+              "attempts": 1,
+              "outcome": "NO_ROUTE",
+              "pending": 0,
+              "status": "READY",
+              "version": "1.1"
+            },
+            {
+              "attempts": 1,
+              "outcome": "REJECTED_BEFORE_SEND",
+              "pending": 0,
+              "status": "READY",
+              "version": "1.1"
+            },
+            {
+              "attempts": 1,
+              "outcome": "DROPPED_OR_EXPIRED_NOT_PROCESSED",
+              "pending": 0,
+              "status": "READY",
+              "version": "1.1"
+            },
+            {
+              "attempts": 1,
+              "outcome": "LANDED_FAILED",
+              "pending": 0,
+              "status": "READY",
+              "version": "1.1"
+            },
+            {
+              "attempts": 1,
+              "outcome": "NO_ROUTE",
+              "pending": 0,
+              "status": "READY",
+              "version": "1.0"
+            }
+          ],
+          "quote_effects": 0
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart"
+      },
+      {
+        "elapsed_seconds": 2.864259,
+        "metrics": {
+          "damaged_caches": 3,
+          "damaged_final": "ACTION_REQUIRED",
+          "damaged_result": "UNKNOWN_ACTION_REQUIRED",
+          "quote_effects": 0,
+          "truthful_restore": "READY"
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_nonfill_corrupt_witness_remains_active_and_truthful_restore_recovers"
+      },
+      {
+        "elapsed_seconds": 2.701978,
+        "metrics": {
+          "attempts": 1,
+          "fake_http_calls": 0,
+          "pending": 1
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_unknown_entry_recovery_keeps_original_pending_identity_without_quote_resend"
+      },
+      {
+        "elapsed_seconds": 2.776643,
+        "metrics": {
+          "attempts": 0,
+          "conflicting_duplicate": "DENY",
+          "credential_reads": 0,
+          "fake_http_calls": 0,
+          "identical_duplicate": "ONE_SCOPE",
+          "preclaim_denials": 6,
+          "quote_claims": 0
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_invalid_quote_scope_and_expiry_deny_before_native_attempt_and_credential"
+      },
+      {
+        "elapsed_seconds": 5.003126,
+        "metrics": {
+          "credential_reads": 0,
+          "fake_http_calls": 0,
+          "postclaim_expired_attempts": 1,
+          "preclaim_expired_attempts": 0
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_quote_expiry_rechecked_at_atomic_claim_and_last_http_boundary"
+      },
+      {
+        "elapsed_seconds": 3.522395,
+        "metrics": {
+          "conflicting_scope": "DENY_BEFORE_WRITE",
+          "credential_reads": 0,
+          "fake_http_calls": 0,
+          "original_profile_bounds": [
+            [
+              1,
+              8192
+            ],
+            [
+              2,
+              4096
+            ]
+          ],
+          "repeat_paths": 2
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_cli_repeated_quote_grant_paths_bind_original_profiles_and_reject_conflicting_scope"
+      },
+      {
+        "elapsed_seconds": 6.923938,
+        "metrics": {
+          "claims_A": 2,
+          "claims_B": 1,
+          "cold_repeat_calls": 0,
+          "fake_http_calls": 3,
+          "healthy_A_exit_with_invalid_B": "RECONCILED",
+          "invalid_B": "DENY_WITH_NO_ATTEMPT_OR_CLAIM",
+          "origin_epochs": [
+            "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+            "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B"
+          ],
+          "profile_bounds_A": [
+            1,
+            8192
+          ],
+          "profile_bounds_B": [
+            2,
+            4096
+          ]
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_separate_original_quote_grants_close_predecessor_and_admit_successor_with_cold_quota"
+      },
+      {
+        "elapsed_seconds": 10.979149,
+        "metrics": {
+          "cases": [
+            {
+              "damaged": "remaining_qty_dec",
+              "denied_extra_quotes": 0,
+              "restored_second_partial_cost_usd": "6",
+              "restored_second_partial_quantity": "2000000",
+              "terminal_net_usd": "1.20"
+            },
+            {
+              "damaged": "remaining_cost_basis_usd_dec",
+              "denied_extra_quotes": 0,
+              "restored_second_partial_cost_usd": "6",
+              "restored_second_partial_quantity": "2000000",
+              "terminal_net_usd": "1.20"
+            },
+            {
+              "damaged": "realized_net_pnl_usd_dec",
+              "denied_extra_quotes": 0,
+              "restored_second_partial_cost_usd": "6",
+              "restored_second_partial_quantity": "2000000",
+              "terminal_net_usd": "1.20"
+            }
+          ]
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_projection_damage_blocks_ordinary_quote_until_truthful_restoration"
+      },
+      {
+        "elapsed_seconds": 3.845913,
+        "metrics": {
+          "corrupt_original_result_extra_quotes": 0,
+          "healthy_other_exit": "RECONCILED",
+          "healthy_terminal_net_usd": "1.20",
+          "unknown_position_count": 1
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_original_result_damage_blocks_quote_and_healthy_neighbor_continues"
+      },
+      {
+        "elapsed_seconds": 3.703494,
+        "metrics": {
+          "corrupt_original_entry_cost_usd": "31",
+          "original_claim_quantity": "6000000",
+          "pending_attempts_while_corrupt": 1,
+          "repeat_original_quote_effects": 0,
+          "truthful_restoration_terminal_net_usd": "1.20",
+          "unaccepted_capture_retained": true
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_projection_race_after_claim_retains_original_capture_without_resend"
+      },
+      {
+        "elapsed_seconds": 3.448622,
+        "metrics": {
+          "fresh_adapter_calls": 0,
+          "original_claims": 1,
+          "provider_calls": 0,
+          "restored_claims": 1,
+          "synthetic_http_calls": 1
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_consumed_quote_grant_and_exit_cannot_resend"
+      },
+      {
+        "elapsed_seconds": 2.738146,
+        "metrics": {
+          "ack_denied": true,
+          "known_fills": 0,
+          "original_pending_attempts": 1,
+          "repeated_http_calls": 0,
+          "restored_claims": 1,
+          "synthetic_effects_without_result": 1
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_pending_quote_claim_restores_unknown_without_manufacturing_result_or_resend"
+      },
+      {
+        "elapsed_seconds": 3.060704,
+        "metrics": {},
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_later_shadow_pending_cut_accepts_original_earlier_definitive_receipt"
+      },
+      {
+        "elapsed_seconds": 0.000198,
+        "metrics": {},
+        "status": "PASS",
+        "test": "tests.test_trading_operational_adapters_v1.AdapterTests.test_C04_C14_fee_in_quote_raw_units_literal_oracle"
+      },
+      {
+        "elapsed_seconds": 0.000453,
+        "metrics": {},
+        "status": "PASS",
+        "test": "tests.test_trading_operational_adapters_v1.AdapterTests.test_C14_C23_negative_wire_shapes_before_persistence"
+      },
+      {
+        "elapsed_seconds": 7.1e-05,
+        "metrics": {},
+        "status": "PASS",
+        "test": "tests.test_trading_operational_adapters_v1.AdapterTests.test_C12_timeout_unknown_rejection_definitive_not_flat"
+      },
+      {
+        "elapsed_seconds": 4.1e-05,
+        "metrics": {},
+        "status": "PASS",
+        "test": "tests.test_trading_operational_adapters_v1.AdapterTests.test_C03_C14_input_clock_and_denominator_guards"
+      },
+      {
+        "elapsed_seconds": 0.743012,
+        "metrics": {
+          "cases": [
+            {
+              "acceptance": "DENY",
+              "damaged": "qty_dec",
+              "new_accepted_events": 0,
+              "truthful_restoration_terminal_net_usd": "2.27"
+            },
+            {
+              "acceptance": "DENY",
+              "damaged": "entry_price_dec",
+              "new_accepted_events": 0,
+              "truthful_restoration_terminal_net_usd": "2.27"
+            },
+            {
+              "acceptance": "DENY",
+              "damaged": "entered_notional_usd_dec",
+              "new_accepted_events": 0,
+              "truthful_restoration_terminal_net_usd": "2.27"
+            },
+            {
+              "acceptance": "DENY",
+              "damaged": "entry_fee_usd_dec",
+              "new_accepted_events": 0,
+              "truthful_restoration_terminal_net_usd": "2.27"
+            },
+            {
+              "acceptance": "DENY",
+              "damaged": "remaining_qty_dec",
+              "new_accepted_events": 0,
+              "truthful_restoration_terminal_net_usd": "2.27"
+            },
+            {
+              "acceptance": "DENY",
+              "damaged": "remaining_cost_basis_usd_dec",
+              "new_accepted_events": 0,
+              "truthful_restoration_terminal_net_usd": "2.27"
+            },
+            {
+              "acceptance": "DENY",
+              "damaged": "remaining_entry_fee_usd_dec",
+              "new_accepted_events": 0,
+              "truthful_restoration_terminal_net_usd": "2.27"
+            },
+            {
+              "acceptance": "DENY",
+              "damaged": "exit_notional_usd_dec",
+              "new_accepted_events": 0,
+              "truthful_restoration_terminal_net_usd": "2.27"
+            },
+            {
+              "acceptance": "DENY",
+              "damaged": "exit_fee_usd_dec",
+              "new_accepted_events": 0,
+              "truthful_restoration_terminal_net_usd": "2.27"
+            },
+            {
+              "acceptance": "DENY",
+              "damaged": "realized_gross_pnl_usd_dec",
+              "new_accepted_events": 0,
+              "truthful_restoration_terminal_net_usd": "2.27"
+            },
+            {
+              "acceptance": "DENY",
+              "damaged": "realized_net_pnl_usd_dec",
+              "new_accepted_events": 0,
+              "truthful_restoration_terminal_net_usd": "2.27"
+            },
+            {
+              "acceptance": "DENY",
+              "damaged": "entry_fee_semantics",
+              "new_accepted_events": 0,
+              "truthful_restoration_terminal_net_usd": "2.27"
+            }
+          ]
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_quantity_result_acceptance_rejects_corrupt_original_or_cumulative_projection"
+      },
+      {
+        "elapsed_seconds": 0.060168,
+        "metrics": {
+          "modern_origin_retained": true,
+          "mutable_flags_null": true,
+          "new_attempts": 0
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_modern_entry_witness_cannot_be_hidden_by_nulling_quantity_projection_flags"
+      },
+      {
+        "elapsed_seconds": 0.061961,
+        "metrics": {
+          "legacy_original_payload_unchanged": true,
+          "partial_quantity": "6000000",
+          "terminal_net_usd": "1.07"
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_genuine_v1_0_entry_then_v1_1_partial_and_full_preserves_original_payload"
+      },
+      {
+        "elapsed_seconds": 2.763558,
+        "metrics": {},
+        "status": "PASS",
+        "test": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_terminal_release_requires_intact_final_result_chain"
+      },
+      {
+        "elapsed_seconds": 0.0642,
+        "metrics": {},
+        "status": "PASS",
+        "test": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_nonfill_frees_capacity_but_unknown_cost_stays_economic"
+      },
+      {
+        "elapsed_seconds": 14.150315,
+        "metrics": {
+          "after_1000_valid_releases": {
+            "elapsed_seconds": 0.17621689999941736,
+            "sqlite_steps": 774410
+          },
+          "after_100_valid_releases": {
+            "elapsed_seconds": 0.015578899998217821,
+            "sqlite_steps": 78270
+          },
+          "after_unrelated_journal": {
+            "elapsed_seconds": 0.207314100000076,
+            "sqlite_steps": 774410
+          },
+          "before": {
+            "elapsed_seconds": 0.00041880000208038837,
+            "sqlite_steps": 840
+          },
+          "native_history_preparation_seconds": 13.653231300006155,
+          "native_valid_terminal_positions": 1000,
+          "unrelated_journal_events": 12000
+        },
+        "status": "PASS",
+        "test": "tests.test_trading_operational_obligations_v1.OperatingObligationsTests.test_readback_cost_is_bounded_by_outstanding_scope_not_historical_journal"
+      },
+      {
+        "elapsed_seconds": 9.336783,
+        "metrics": {},
+        "status": "PASS",
+        "test": "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_C08_C09_positive_successor_and_old_exit"
+      },
+      {
+        "elapsed_seconds": 3.324867,
+        "metrics": {},
+        "status": "PASS",
+        "test": "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_C04_deadline_and_stale_do_not_backdate"
+      }
+    ]
+  },
+  "authority": {
+    "financial_effects": 0,
+    "live_authority": false,
+    "provider_calls": 0,
+    "real_credential_values_read": 0,
+    "synthetic_credential_suppliers": "Return None; production scope checks executed; only lowest http_quote fake"
+  },
+  "before": {
+    "architecture_grant_counterexample": {
+      "actual": {
+        "final_elapsed_seconds": 4.30644,
+        "final_output_sha256": "20ee137df61dc73f50fc3fe5610a814ec84a28100919ae97da123c7b90b8de3c",
+        "http_calls": 1,
+        "incorrect_new_grant_claim_for_old_exit": true,
+        "initial_elapsed_seconds": 4.189253,
+        "initial_output_sha256": "da94cddca52fee7a8ad98641769e9075e40cc57d3c5615bef32255c7df48b7e7",
+        "inventory_status": "UNKNOWN",
+        "method": "Both synthetic A/B grants available and production-verified; A opened by production adapter; accepted B switch generation2; two ordinary ticks with B adapter; only lowest http_quote faked",
+        "old_grant_remaining_calls": 9,
+        "old_grant_unexpired": true,
+        "old_position_state": "EXITING",
+        "owned_roots": "ABSENT",
+        "pending_attempts": 1,
+        "result_count": 1,
+        "status": "ACTION_REQUIRED"
+      },
+      "measurement_owner": "ARCHITECTURE_CRITIC_NOT_THIS_WORKER",
+      "source": "docs/evidence/smial_trading_core_operational_closure_v1/review-4a327869.json",
+      "source_raw_sha256": "c2ad860fb6c32ec071dc1b126d3cfc1ed0a08bf875c4aa1eb41b20c5062186b5",
+      "source_receipt_sha256": "f2f0f5e643cd85c623d998a8ad4dae2dadf5bccec7cda4364ffaf89469177e23"
+    },
+    "independent_nonfill": {
+      "cleanup": [
+        {
+          "owned_fixture_root_absent": true
+        }
+      ],
+      "credential_reads": false,
+      "elapsed_seconds": 2.798872,
+      "errors": 0,
+      "evidence_class": "SYNTHETIC_OFFLINE",
+      "failures": 1,
+      "live_authority": false,
+      "measurement": "INDEPENDENT_NEW_NATIVE_BEFORE_NOT_RETROACTIVE_CODE_REVIEW_MEASUREMENT",
+      "observations": [
+        {
+          "accepted_original_callback": true,
+          "active_incidents": [
+            {
+              "incident_key": "ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+              "reason": "EXIT_INVENTORY_WITNESS_CONFLICT"
+            }
+          ],
+          "attempt_id": "ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+          "before_callback_pending_attempts": 1,
+          "case": "ORIGINAL_ENTRY_V1_1_NO_ROUTE_RECOVERY",
+          "exit_reconciliation_healthy": false,
+          "fake_quote_effects": 0,
+          "fault_reached": [
+            "AFTER_ATTEMPT_COMMIT"
+          ],
+          "final_original_outcome": "NO_ROUTE",
+          "integrity_verified": false,
+          "inventory_position_count": 0,
+          "inventory_status": "KNOWN",
+          "modeled_attempt_count": 1,
+          "modeled_result_count": 1,
+          "original_callback": {
+            "attempt_id": "ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+            "chargeable_cost_usd": "0",
+            "observed_at": "2026-10-05T12:40:00Z",
+            "outcome": "NO_ROUTE",
+            "result_id": "SYNTHETIC-NONFILL-NO-ROUTE",
+            "schema_version": "1.1"
+          },
+          "pending_attempts": 0,
+          "position_state": "CANCELLED",
+          "status_after_two_further_ticks_and_cold_observer": "ACTION_REQUIRED"
+        }
+      ],
+      "output_scope": "ACTUAL_UNITTEST_FAILURE_STREAM_AND_CAPTURED_NATIVE_STDOUT_STDERR_NO_RAW_TRACE_IN_RECEIPT",
+      "output_sha256": "6d0c918753694e9836c607a757add10d38b160222c548b43a0053de50928bc74",
+      "prior_code_review_counterexample_measurement": "UNKNOWN_NOT_SEPARATELY_CAPTURED",
+      "procedure": [
+        "locked offline managed uv Python -B stdin",
+        "native OperatingRecovery fixture SHADOW activation",
+        "fault AFTER_ATTEMPT_COMMIT before any effect, then ordinary tick establishes original pending incident",
+        "write original attempt-bound schema1.1 NO_ROUTE callback; ordinary tick accepts it",
+        "two further ordinary ticks and cold native observer/readback; assert READY and capture actual failure",
+        "tearDown and verify fixture root absent"
+      ],
+      "provider_calls": false,
+      "receipt_sha256": "9282d22656ddb9a8da8d7425b8b6c8f3dd0b4cf4563cb4e0e1af75b98e83eaeb",
+      "schema": "smial.nonfill-grant-remediation-before",
+      "schema_version": "1.0",
+      "skips": 0,
+      "source_pins_after": {
+        "src/solana_alpha_lab/factory/paper_plane.py": "8faeb669b0e5fa1b687883711b8bdf0f53f7fe2b7ff6181bdd2ebeb4a91f4929",
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "e81663fe16eb23e80efa942c2945aa6d9f0e08d27427c8b3129d1b7c9a8e9eb8",
+        "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
+        "tests/test_trading_operational_recovery_v1.py": "c554531d86328df0086629ef051975540b75720ae038b5e5a5627615ec29d4ba"
+      },
+      "source_pins_before": {
+        "src/solana_alpha_lab/factory/paper_plane.py": "8faeb669b0e5fa1b687883711b8bdf0f53f7fe2b7ff6181bdd2ebeb4a91f4929",
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "e81663fe16eb23e80efa942c2945aa6d9f0e08d27427c8b3129d1b7c9a8e9eb8",
+        "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
+        "tests/test_trading_operational_recovery_v1.py": "c554531d86328df0086629ef051975540b75720ae038b5e5a5627615ec29d4ba"
+      },
+      "source_unchanged": true,
+      "status": "FAIL_REPRODUCED",
+      "test_count": 1
+    },
+    "observed_head": "4a327869b5a439c938e2bccb97079c25883e4168",
+    "source_pins": {
+      "src/solana_alpha_lab/factory/paper_plane.py": "8faeb669b0e5fa1b687883711b8bdf0f53f7fe2b7ff6181bdd2ebeb4a91f4929",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "e81663fe16eb23e80efa942c2945aa6d9f0e08d27427c8b3129d1b7c9a8e9eb8",
+      "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
+      "tests/test_trading_operational_recovery_v1.py": "c554531d86328df0086629ef051975540b75720ae038b5e5a5627615ec29d4ba"
+    },
+    "status": "FAIL_REPRODUCED"
+  },
+  "cleanup": {
+    "all_native_fixture_roots_absent": true,
+    "native_fixture_roots": 31,
+    "owned_scratch_removal": "ABSENT_AFTER_EXACT_SCOPE_MARKER_BYTE_AND_REPARSE_CHECKS",
+    "removed_owned_scratch": [
+      {
+        "absent": true,
+        "bytes": 3741,
+        "files": 1,
+        "name": "accounting-nonfill-before-20261012"
+      },
+      {
+        "absent": true,
+        "bytes": 29208,
+        "files": 3,
+        "name": "accounting-nonfill-grant-checks"
+      }
+    ],
+    "unowned_roots": "NOT_TOUCHED"
+  },
+  "collector_bootstrap": {
+    "fixture_roots_created": 0,
+    "product_counterexample": false,
+    "status": "IMPORT_PATH_ERROR_CORRECTED_BEFORE_NATIVE_RUN"
+  },
+  "decision_delta": [
+    "Original definitive ENTRY nonfill validates complete original FINAL/result and exact zero/no-native-fill projection before closing only recovered incident.",
+    "Original positive quantity and cumulative partial witnesses remain required; damaged history stays UNKNOWN until truthful original bytes restored.",
+    "Exact grant selection mode+originating epoch+strategy before attempt and atomic per-grant quota claim; last physical expiry check before HTTP.",
+    "CLI repeat --quote-grant runtime-relative paths uses each original committed profile; one path compatible; conflicting duplicate epoch denied, identical exact grant deduplicated."
+  ],
+  "receipt_sha256": "d261998160be16609dbe4e45058c9b23b4d1b3bc16ef8da74e746279c0b7db4d",
+  "residual_unmeasured": {
+    "real_provider_or_host_behavior": "UNKNOWN_NOT_MEASURED",
+    "whole_project_gate": "NOT_RUN"
+  },
+  "schema": "smial.nonfill-grant-remediation",
+  "schema_version": "1.0",
+  "scope": "BOUNDED_EXISTING_OWNERS_SYNTHETIC_OFFLINE_NATIVE_REPAIR_NOT_WHOLE_GATE",
+  "source_pins": {
+    "scripts/trading_continuity.py": "9694d0b589b0fd560e250324bd7cef07c547ec8b6e8c137d471f028a6083538b",
+    "src/solana_alpha_lab/factory/paper_plane.py": "56b7fce9f1cbef8b091e9081e147eb09572408a9d66e742d2948d1fbbf41d43d",
+    "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "2346559e835010c47e21e0d9bd2b4c7877aa698da33831e417d5d02cb8556d4b",
+    "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
+    "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+    "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
+    "tests/test_trading_operational_recovery_v1.py": "0a9d1205477107de71b542afb31974faa76f51ce524efff2a46017cb27972597"
+  },
+  "status": "PASS",
+  "validation": {
+    "elapsed_seconds": 95.694165,
+    "errors": 0,
+    "failures": 0,
+    "fresh_whole_suite": "ROOT_OWNED_NOT_CLAIMED",
+    "native_tests": 25,
+    "output_sha256": "1bf6b72c5e48f79faef2e07d2ecefed4c0784a8347bc2f412d1ec4511e4183dd",
+    "skips": 0,
+    "source_snapshot_file_count": 1599,
+    "source_snapshot_sha256": "ad1ae87e6eb87065b22b23ca7649e056cc3f3c69c43534f6d3d724b45afed870",
+    "whole_gate": "NOT_RUN"
+  }
+}

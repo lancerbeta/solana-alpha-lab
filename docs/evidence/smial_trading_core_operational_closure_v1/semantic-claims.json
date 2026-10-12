@@ -7,7 +7,7 @@
   {
     "claim": "An atomic successor switch between distinct accepted scientific identities A@V1 and B@V1 enables one entry bot per mode while retaining A obligations and original exits.",
     "claim_id": "C2",
-    "scope": "Owner accepted D1-D3 for this atom. Same scientific ID V2 remains denied; historical S08/S13 and original scientific evidence retain their prior meanings."
+    "scope": "Owner accepted D1-D3 for this atom. Same scientific ID V2 remains denied; historical S08/S13 and original scientific evidence retain their prior meanings. Ordinary SHADOW consumes separately authorized existing A/B grants in one caller. Exact originating epoch/strategy selects its own profile and grant before attempt/quota claim; persistent quotas remain per original grant SHA."
   },
   {
     "claim": "A versioned explicit per-mode envelope accounts for all outstanding obligations across epochs without automatic shrink; UNKNOWN frees no capacity and missing configuration cannot become READY.",
@@ -22,12 +22,12 @@
   {
     "claim": "Native backup and fresh restore preserve original attempts, accepted result history, known cost floors, pending clocks, controls, consumed quota and complete current operating-envelope/runtime-policy chains; pending UNKNOWN is never resent, and a recovery fence requires complete-cut authority reconciliation plus explicit inventory ACK.",
     "claim_id": "C5",
-    "scope": "Synthetic native SQLite/subprocess fault evidence. Post-backup restrictions cannot be replaced by softer backup settings; missing or conflicting configuration retains the fence. Complete cut is an explicit externally asserted ledger boundary with selfhash/inventory checks, not cryptographic authentication, chain reconciliation or hardware power-loss proof."
+    "scope": "Synthetic native SQLite/subprocess fault evidence. Post-backup restrictions cannot be replaced by softer backup settings; missing or conflicting configuration retains the fence. Complete cut is an explicit externally asserted ledger boundary with selfhash/inventory checks, not cryptographic authentication, chain reconciliation or hardware power-loss proof. Definitive ENTRY1.1 nonfill validates exact original release and closes only its proved incident; positive inventory, corrupt witnesses and UNKNOWN retain the original guards."
   },
   {
     "claim": "Adapters enforce raw amount/mint/schema/TTL/grant/call-cap boundaries and literal full/partial quantity and cost conservation, with external funding observation kept separate from asset price.",
     "claim_id": "C6",
-    "scope": "Real stdlib Jupiter quote-only GET/parser code with lowest HTTP boundary replaced in tests. Conservation is checked against original accepted cumulative witnesses, including corruption between preflight, transactional claim and result acceptance. No production provider call or credentials; a quote is never an actual chain fill and non-null transaction is denied."
+    "scope": "Real stdlib Jupiter quote-only GET/parser code with lowest HTTP boundary replaced in tests. Conservation is checked against original accepted cumulative witnesses, including corruption between preflight, transactional claim and result acceptance. No production provider call or credentials; a quote is never an actual chain fill and non-null transaction is denied. Granted successor evidence exercises the production authority branch with only lowest http_quote replaced; Missing, wrong, expired, conflicting duplicate-scope or exhausted grants already detected at preflight/atomic claim deny before new attempt/claim. Expiry after committed claim denies HTTP while retaining the original pending UNKNOWN identity without resend. Software support issues no grants."
   },
   {
     "claim": "Cold independent operator CLI, current read-only status, bounded virtual-history/resource probes and owned fixture cleanup verify the declared software outcome.",

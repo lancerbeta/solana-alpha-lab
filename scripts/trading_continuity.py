@@ -46,7 +46,7 @@ def main(argv=None) -> int:
     parser.add_argument("--inventory-sha256")
     parser.add_argument("--external-cut-id")
     parser.add_argument("--complete-after-backup",action="store_true",help="Explicit independent-ledger completeness assertion for export-cut")
-    parser.add_argument("--quote-grant", help="Runtime-relative exact external quote authority; software task grants none")
+    parser.add_argument("--quote-grant", action="append", help="Repeatable runtime-relative exact quote authority; software task grants none")
     parser.add_argument("--credential-env", help="Explicit existing credential variable name; never a value")
     parser.add_argument("--format", choices=("json", "human"), default="json")
     parser.add_argument("--evidence-class", choices=("SYNTHETIC_OFFLINE", "OBSERVED"))
@@ -97,14 +97,20 @@ def main(argv=None) -> int:
                 # OBSERVED activation/cut timestamps remain original metadata;
                 # current input freshness always uses the physical owner clock.
                 clock = lambda: parse_utc(args.as_of)
-            quote_adapter = None
+            quote_adapters = None
             if args.quote_grant:
                 if args.command not in {"run", "tick"} or args.mode != "SHADOW" or runner.evidence_class != "OBSERVED":
                     raise PaperPlaneError("QUOTE_EXTERNAL_AUTHORITY_REQUIRED")
                 if not args.credential_env or not re.fullmatch(r"[A-Z][A-Z0-9_]{2,80}", args.credential_env):
                     raise PaperPlaneError("QUOTE_CREDENTIAL_CONFIGURATION_REQUIRED")
                 from solana_alpha_lab.factory.trading_adapters import verified_quote_grant, JupiterQuoteAdapter
-                grant = verified_quote_grant(args.repository_root, read_input(args.quote_grant))
+                grants = [verified_quote_grant(args.repository_root, read_input(path)) for path in args.quote_grant]
+                by_epoch = {}
+                for grant in grants:
+                    scope = (grant.get("mode"), grant.get("activation_epoch_id"))
+                    if scope in by_epoch and by_epoch[scope] != grant:
+                        raise PaperPlaneError("QUOTE_GRANT_SELECTION_CONFLICT")
+                    by_epoch[scope] = grant
                 import os
                 def credential_supplier():
                     value = os.environ.get(args.credential_env)
@@ -114,15 +120,20 @@ def main(argv=None) -> int:
                 # Read bounds from the committed profile, never an implicit default.
                 store = runner._store(readonly=True)
                 try:
-                    row = store._conn.execute("SELECT epoch_id FROM ordinary_state WHERE mode=?", (args.mode,)).fetchone()
-                    if row is None:
+                    if store._conn.execute("SELECT 1 FROM ordinary_state WHERE mode=?", (args.mode,)).fetchone() is None:
                         raise PaperPlaneError("ORDINARY_ACTIVATION_REQUIRED")
-                    cfg = TradingCoordinator(runner, mode=args.mode)._profile(store, row[0])["quote"]
+                    quote_adapters = []
+                    observer = TradingCoordinator(runner, mode=args.mode)
+                    for grant in by_epoch.values():
+                        bound = runner.for_epoch(grant["activation_epoch_id"])
+                        if grant.get("mode") != args.mode or grant.get("strategy_sha256") != bound.strategy["spec_sha256"]:
+                            raise PaperPlaneError("QUOTE_EXTERNAL_AUTHORITY_REQUIRED")
+                        cfg = observer._profile(store, grant["activation_epoch_id"])["quote"]
+                        quote_adapters.append(JupiterQuoteAdapter(timeout_seconds=cfg["timeout_seconds"], max_response_bytes=cfg["max_response_bytes"],
+                            grant=grant, credential_supplier=credential_supplier))
                 finally:
                     store.close()
-                quote_adapter = JupiterQuoteAdapter(timeout_seconds=cfg["timeout_seconds"], max_response_bytes=cfg["max_response_bytes"],
-                    grant=grant, credential_supplier=credential_supplier)
-            ordinary = TradingCoordinator(runner, mode=args.mode, clock=clock, quote_adapter=quote_adapter)
+            ordinary = TradingCoordinator(runner, mode=args.mode, clock=clock, quote_adapters=quote_adapters)
             if args.command == "load":
                 if runner.strategy is None:
                     raise PaperPlaneError("EXACT_STRATEGY_PATH_REQUIRED")

@@ -57,6 +57,8 @@ Original attached MD byte-for-byte находится в source-contract.md; е�
 | REVIEW_CURRENT_POLICY_COUNTEREXAMPLE | Existing policy owner возвращал RUNTIME_POLICY_INVALID, cold native/CLI status — READY/VALID/NONE | Same snapshot/shared current-policy validator; typed policy status/revision/SHA/action, optional strategy-only отсутствие сохранено, original inventory/EXIT независимы |
 | REVIEW_CURRENT_CLOCK_COUNTEREXAMPLE | OBSERVED status/check с --as-of или clock-file считали старый fixture clock текущим и показывали READY | Physical-clock boundary на current health/input checks; synthetic virtual time и original activation/cut metadata сохранены |
 | REVIEW_PARTIAL_DISPATCH_COUNTEREXAMPLE | Partial remainder 6M→9M давал UNKNOWN, но следующий EXIT принимал повреждённый остаток и показывал READY с 5M/$15 вместо 2M/$6 | Original indexed cumulative quantity/cost/fee proof до inputs, transactional claim и result acceptance; повреждённая позиция удерживается, здоровые old EXIT продолжаются |
+| REVIEW_ENTRY_NONFILL_COUNTEREXAMPLE | Valid ENTRY1.1 NO_ROUTE освобождал reservation, но два ticks/cold status сохраняли permanent EXIT_INVENTORY_WITNESS_CONFLICT | Original definitive nonfill/release proof до закрытия incident; positive/UNKNOWN/EXIT quantity guards сохраняются |
+| REVIEW_GRANTED_SHADOW_SUCCESSOR_COUNTEREXAMPLE | Single B grant создавал A EXIT attempt и расходовал B quota до scope rejection; оба A/B grants доступны | Один ordinary caller выбирает отдельно разрешённый grant по origin epoch/strategy до attempt/quota; A-oldEXIT/B-newENTRY используют собственные profiles/caps |
 | DELIVERY_PIN_COUNTEREXAMPLE | Необязательное изменение domain-policy prose нарушало исторический TASK30 SHA | Policy/TASK30 сохранены буквально; этот task pin registry-011 остаётся explicit, gate exceptions не добавлены |
 
 Baseline failures для новых capabilities не выдуманы. Reviewer before traces
@@ -71,7 +73,7 @@ packet через current native source/store owners. Это проверка п
 
 ## C01–C24
 
-Native automated status: PASS, 139 tests, 495.192026s; source bytes до/после
+Native automated status: PASS, 146 tests, 532.545884s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -153,28 +155,28 @@ real strategy promotion не установлены. Там, где NOT_IMPLEMEN
 
 ## Resources, rollback, delivery
 
-Peak suite process RSS: 146903040 bytes (140.10 MiB). Native 14-day producer
+Peak suite process RSS: 146464768 bytes (139.68 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.2003–0.2847s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.2031–0.2788s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04584–0.04939 |
-| 1000 | 364544 | 0.04549–0.05382 |
-| 4000 | 843776 | 0.04581–0.05253 |
+| 0 | 204800 | 0.04673–0.05021 |
+| 1000 | 364544 | 0.05550–0.06587 |
+| 4000 | 843776 | 0.04526–0.05840 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 840 | 0.000445 |
-| 100 proved terminal | 78270 | 0.016304 |
-| 1000 proved terminal | 774410 | 0.163209 |
-| 1000 terminal + 12000 unrelated events | 774410 | 0.159168 |
+| 1 outstanding | 840 | 0.000414 |
+| 100 proved terminal | 78270 | 0.021573 |
+| 1000 proved terminal | 774410 | 0.158040 |
+| 1000 terminal + 12000 unrelated events | 774410 | 0.161292 |
 
-Native history preparation: 13.507s.
+Native history preparation: 13.994s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.

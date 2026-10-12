@@ -232,6 +232,14 @@ Healthy neighboring originating obligations continue independently. No
 new truth table, cache or schema is introduced. An exact restored original
 witness/projection may resume through the same validated ordinary path.
 
+Definitive ENTRY nonfill is a released reservation, not positive inventory.
+Recovery proves the original attempt/FINAL/accepted result, including identity,
+side, outcome, clocks and provenance, and the natural zero-residual position
+before closing its incident. A schema1.1 nonfill must not require positive
+quantity. Merely changing state to CANCELLED is insufficient: corrupt original
+witnesses, possible inventory, positive execution legs and UNKNOWN remain fenced.
+An EXIT nonfill preserves its originating inventory and quantity checks.
+
 Literal synthetic oracle: 10M units at `$0.000003` enter for `$30` plus
 `$0.06` fee. Exit 4M at `$0.0000033` gives `$13.20` proceeds and `$0.03`
 fee, retaining 6M units and `$18` cost basis. Exit the final 6M at

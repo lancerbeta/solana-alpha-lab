@@ -26,6 +26,8 @@ REGISTRY_PATH = "configs/provider_route_capability_registry_v11.yaml"
 
 def verified_quote_grant(root, raw):
     """Public authority bytes only. This never opens a credential or provider."""
+    if not isinstance(raw, dict):
+        raise PaperPlaneError("QUOTE_GRANT_INTEGRITY_CONFLICT")
     import yaml
     registry = yaml.safe_load((root / REGISTRY_PATH).read_text(encoding="utf-8"))
     route = next((item for item in registry["routes"] if item["route_id"] == ROUTE_ID), None)
@@ -119,6 +121,28 @@ class JupiterQuoteAdapter:
         self.credential_supplier = credential_supplier
         self.calls = 0
 
+    def validate_authority(self, request, *, as_of):
+        """Check exact grant scope before a durable attempt or credential IO."""
+        if self.transport is not None:
+            return
+        grant = self.grant or {}
+        try:
+            if (grant.get("grant_sha256") != sha256_of({k:v for k,v in grant.items() if k!="grant_sha256"})
+                or grant.get("quote_calls_authorized") is not True or grant.get("route_id") != ROUTE_ID
+                or grant.get("endpoint") != ENDPOINT or grant.get("registry_path") != REGISTRY_PATH
+                or grant.get("mode") != "SHADOW" or grant.get("activation_epoch_id") != request["activation_epoch_id"]
+                or grant.get("strategy_sha256") != request["strategy_sha256"]
+                or grant.get("signing_authorized") is not False or grant.get("financial_authority") is not False
+                or type(grant.get("calls_max")) is not int or not 0 < grant["calls_max"] <= 1000000
+                or parse_utc(as_of) > parse_utc(grant["expires_at"])):
+                raise ValueError()
+        except (KeyError, TypeError, ValueError, AttributeError):
+            raise PaperPlaneError("QUOTE_EXTERNAL_AUTHORITY_REQUIRED") from None
+        if self.calls >= grant["calls_max"]:
+            raise PaperPlaneError("QUOTE_CALL_CAP_EXHAUSTED")
+        if self.credential_supplier is None:
+            raise PaperPlaneError("QUOTE_CREDENTIAL_CONFIGURATION_REQUIRED")
+
     def dispatch(self, attempt, request, *, as_of):
         as_of = self.result_clock() if getattr(self,"result_clock",None) else as_of
         if request.get("entry_send_valid_until") and parse_utc(as_of)>parse_utc(request["entry_send_valid_until"]):
@@ -139,17 +163,7 @@ class JupiterQuoteAdapter:
             raise PaperPlaneError("QUOTE_DECIMALS_INVALID")
         credential = None
         if self.transport is None:
-            grant = self.grant or {}
-            if (grant.get("quote_calls_authorized") is not True or grant.get("route_id") != ROUTE_ID
-                or grant.get("endpoint") != ENDPOINT or grant.get("registry_path") != REGISTRY_PATH
-                or grant.get("mode") != "SHADOW" or grant.get("activation_epoch_id") != request["activation_epoch_id"]
-                or grant.get("strategy_sha256") != request["strategy_sha256"]
-                or grant.get("signing_authorized") is not False or grant.get("financial_authority") is not False
-                or type(grant.get("calls_max")) is not int or not 0 < grant["calls_max"] <= 1000000 or self.calls >= grant["calls_max"]
-                or parse_utc(as_of) > parse_utc(grant["expires_at"])):
-                raise PaperPlaneError("QUOTE_EXTERNAL_AUTHORITY_REQUIRED")
-            if self.credential_supplier is None:
-                raise PaperPlaneError("QUOTE_CREDENTIAL_CONFIGURATION_REQUIRED")
+            self.validate_authority(request, as_of=as_of)
             credential = self.credential_supplier()
         # Credential acquisition can itself block. Check physical validity at
         # the last reversible boundary immediately before the one HTTP call.

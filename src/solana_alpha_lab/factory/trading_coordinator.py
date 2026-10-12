@@ -154,12 +154,45 @@ def single_writer(runner):
 
 
 class TradingCoordinator:
-    def __init__(self, runner, *, mode, clock=None, quote_adapter=None, fault=None):
+    def __init__(self, runner, *, mode, clock=None, quote_adapter=None, quote_adapters=None, fault=None):
         if mode not in {"PAPER", "SHADOW"}:
             raise PaperPlaneError("LIVE_ROUTE_FORBIDDEN")
         self.runner, self.mode = runner, mode
         self.clock = clock or (lambda: datetime.now(UTC))
         self.quote_adapter, self.fault = quote_adapter, fault or (lambda _point: None)
+        if quote_adapter is not None and quote_adapters is not None:
+            raise PaperPlaneError("QUOTE_GRANT_SELECTION_CONFLICT")
+        self.quote_adapters = {}
+        for adapter in quote_adapters or ():
+            grant = adapter.grant or {}
+            key = (grant.get("mode"), grant.get("activation_epoch_id"))
+            if key in self.quote_adapters:
+                old = self.quote_adapters[key].grant
+                if old != grant:
+                    raise PaperPlaneError("QUOTE_GRANT_SELECTION_CONFLICT")
+                continue
+            self.quote_adapters[key] = adapter
+
+    def _quote_for_origin(self, position, profile, at):
+        adapter = self.quote_adapter
+        if self.quote_adapters:
+            adapter = self.quote_adapters.get((self.mode, position["activation_epoch_id"]))
+            if adapter is None:
+                raise PaperPlaneError("QUOTE_EXTERNAL_AUTHORITY_REQUIRED")
+        if adapter is None:
+            cfg = profile["quote"]
+            adapter = JupiterQuoteAdapter(timeout_seconds=cfg["timeout_seconds"], max_response_bytes=cfg["max_response_bytes"])
+        adapter.validate_authority({"activation_epoch_id":position["activation_epoch_id"],
+            "strategy_sha256":position["strategy_spec_sha256"]}, as_of=at)
+        return adapter
+
+    def _quote_quota(self, store, adapter):
+        if adapter.transport is None:
+            grant = adapter.grant
+            used = store._conn.execute("SELECT COUNT(*) FROM execution_events WHERE event_type='QUOTE_CALL_CLAIMED' AND json_extract(payload_json,'$.grant_sha256')=?",
+                (grant["grant_sha256"],)).fetchone()[0]
+            if used >= grant["calls_max"]:
+                raise PaperPlaneError("QUOTE_CALL_CAP_EXHAUSTED")
 
     def activate(self, *, epoch_id, at, profile, switch_key, expected_current_epoch=None):
         from solana_alpha_lab.factory.trading_runtime_policy import configure_operating_envelope, read_operating_envelope
@@ -372,6 +405,10 @@ class TradingCoordinator:
         guarded = store._conn.execute("SELECT restore_guard FROM ordinary_state WHERE mode=?", (self.mode,)).fetchone()
         if guarded and guarded[0]:
             raise PaperPlaneError("RESTORE_RECONCILIATION_REQUIRED")
+        adapter = None
+        if self.mode == "SHADOW":
+            adapter = self._quote_for_origin(position, profile, render_utc(self.clock()))
+            self._quote_quota(store, adapter)
         # Request is prepared without a write transaction or HTTP; it is frozen
         # with attempt before effect, not re-created on restart from latest data.
         request = self._inputs(bound, store, position, profile, side, at)
@@ -400,6 +437,9 @@ class TradingCoordinator:
             if side == "EXIT" and position.get("exit_decision_id"):
                 decision_at = bound._exit_origin(store, position)["decision"]["decision_at"]
             at = render_utc(self.clock())
+            if adapter is not None:
+                adapter.validate_authority(request, as_of=at)
+                self._quote_quota(store, adapter)
             request["result_at"] = render_utc(parse_utc(at)+timedelta(seconds=profile["model"]["latency_seconds"]))
             request["entry_send_valid_until"] = render_utc(parse_utc(decision_at)+timedelta(seconds=bound.strategy["signal_input"]["max_age_seconds"])) if side=="ENTRY" else None
             if parse_utc(at)>parse_utc(request["observation_valid_until"]):
@@ -442,28 +482,18 @@ class TradingCoordinator:
                 (json.dumps(request,sort_keys=True),"REQUEST-"+attempt["attempt_id"]))
             if side == "EXIT":
                 self._clear_exit_incidents(store, position, bound, at)
+            if adapter is not None and adapter.transport is None:
+                # Scope and quota are validated under the same native claim
+                # transaction. A later crash spends this grant's slot only.
+                store.append_execution_event(event_type="QUOTE_CALL_CLAIMED", event_id="QUOTE-CALL-" + attempt["attempt_id"],
+                    bot_instance_id=position["bot_instance_id"], position_id=position["position_id"],
+                    payload={"grant_sha256":adapter.grant["grant_sha256"], "attempt_id":attempt["attempt_id"]}, created_at=at)
         self.fault("AFTER_ATTEMPT_COMMIT")
         if self.mode == "PAPER":
             result = PaperModelAdapter(profile["model"]).reconcile(attempt, request, as_of=at)
             if result is not None:
                 bound.result(result)
         else:
-            cfg = profile["quote"]
-            adapter = self.quote_adapter or JupiterQuoteAdapter(timeout_seconds=cfg["timeout_seconds"], max_response_bytes=cfg["max_response_bytes"])
-            if adapter.transport is None:
-                grant = adapter.grant or {}
-                grant_id = grant.get("grant_sha256")
-                if not grant_id:
-                    raise PaperPlaneError("QUOTE_EXTERNAL_AUTHORITY_REQUIRED")
-                with store.immediate_write():
-                    # A committed claim consumes quota even if the process dies
-                    # before HTTP. Restart never resets the bounded call grant.
-                    used = store._conn.execute("SELECT COUNT(*) FROM execution_events WHERE event_type='QUOTE_CALL_CLAIMED' AND json_extract(payload_json,'$.grant_sha256')=?", (grant_id,)).fetchone()[0]
-                    if type(grant.get("calls_max")) is not int or used >= grant["calls_max"]:
-                        raise PaperPlaneError("QUOTE_CALL_CAP_EXHAUSTED")
-                    store.append_execution_event(event_type="QUOTE_CALL_CLAIMED", event_id="QUOTE-CALL-" + attempt["attempt_id"],
-                        bot_instance_id=position["bot_instance_id"], position_id=position["position_id"],
-                        payload={"grant_sha256": grant_id, "attempt_id": attempt["attempt_id"]}, created_at=at)
             adapter.result_clock = lambda:render_utc(self.clock())
             result, proof = adapter.dispatch(attempt, request, as_of=at)
             self.fault("AFTER_ADAPTER_EFFECT")
@@ -478,7 +508,11 @@ class TradingCoordinator:
         return True
 
     def _recover(self, store, at):
-        pending = store._conn.execute("SELECT e.event_id FROM execution_events e JOIN bot_instances b ON b.bot_instance_id=e.bot_instance_id WHERE e.event_type='MODELED_ATTEMPT_STARTED' AND b.mode=? AND NOT EXISTS(SELECT 1 FROM execution_events f WHERE f.event_id='FINAL-'||e.event_id)", (self.mode,)).fetchall()
+        pending = store._conn.execute("""SELECT e.event_id FROM execution_events e JOIN bot_instances b ON b.bot_instance_id=e.bot_instance_id
+            WHERE e.event_type='MODELED_ATTEMPT_STARTED' AND b.mode=? AND (
+                NOT EXISTS(SELECT 1 FROM execution_events f WHERE f.event_id='FINAL-'||e.event_id)
+                OR EXISTS(SELECT 1 FROM ordinary_incidents i WHERE i.incident_key=e.event_id AND i.active=1
+                    AND i.reason='EXIT_INVENTORY_WITNESS_CONFLICT'))""", (self.mode,)).fetchall()
         healthy = True
         for row in pending:
             try:
@@ -499,6 +533,10 @@ class TradingCoordinator:
         bound._origin(store, position)
         if attempt["side"] == "EXIT" and position.get("exit_decision_id"):
             bound._exit_origin(store, position)
+        if store.get_execution_event("FINAL-" + row[0]) is not None:
+            # An active proof incident may survive a committed final. Recheck
+            # its original journal; a callback is not a second acceptance.
+            return self._finish_recovered_attempt(store, position, row[0], at)
         captured = store.get_execution_event("CAPTURE-" + row[0])
         inbox = exact_child(self.runner.data_root, "result-inbox", exists=False)
         callback = exact_child(inbox, row[0] + ".json", exists=False)
@@ -524,12 +562,15 @@ class TradingCoordinator:
             self._incident(store, row[0], "ATTEMPT_RECONCILIATION_REQUIRED", at)
             return False
         else:
-            store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND active=1", (at, row[0]))
-            proved = store.get_position(position["position_id"])
-            assert_quantity_inventory_witness(store, proved)
-            store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND reason='EXIT_INVENTORY_WITNESS_CONFLICT' AND active=1",
-                (at, position["position_id"]))
-            return True
+            return self._finish_recovered_attempt(store, position, row[0], at)
+
+    def _finish_recovered_attempt(self, store, position, attempt_id, at):
+        proved = store.get_position(position["position_id"])
+        assert_quantity_inventory_witness(store, proved)
+        store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND active=1", (at, attempt_id))
+        store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND reason='EXIT_INVENTORY_WITNESS_CONFLICT' AND active=1",
+            (at, position["position_id"]))
+        return True
 
     def tick(self):
         with single_writer(self.runner):
