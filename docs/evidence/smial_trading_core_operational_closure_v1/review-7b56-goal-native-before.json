@@ -1,0 +1,98 @@
+{
+  "base": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "capture_raw_sha256": "7f8f9339a3cd2cc0c20ede49d7163eb24b6e1027de29a489b2827cfddac37026",
+  "cleanup": {
+    "owned_marked_scratch_absent": true,
+    "owned_native_fixture_absent": true,
+    "probe_script_written": false,
+    "scratch_scope": "local/smial-goal-7b56-readiness-falsifier",
+    "shared_roots_removed": false
+  },
+  "command": "uv run --locked --managed-python --offline python -B -",
+  "elapsed_scope": "Tool reported wall time including command invocation; not native-only timer",
+  "facts_sha256": "b5230e327fb5c211a8d5f75632bd5275c26517e6979eaf46c22bcf06185fd3dc",
+  "head": "7b56df887d3adb543de43dd2bf28c93c29c86114",
+  "identities": {
+    "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001",
+    "idempotency_key": "ISOLATED-GOAL-READINESS-FALSIFIER",
+    "mode": "PAPER",
+    "policy_revision": 1,
+    "policy_sha256": "UNKNOWN_NOT_CAPTURED",
+    "position_id": "UNKNOWN_NOT_CAPTURED"
+  },
+  "initial_failed_probe": {
+    "native_result_claimed": false,
+    "owned_empty_temp_directory_absent_after_verified_nonrecursive_cleanup": true,
+    "terminal": "SANDBOX_FIXTURE_SETUP_PERMISSION_ERROR_GUARD_NOT_REACHED"
+  },
+  "inline_locator": "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.start_operating + trading_runtime_policy.apply_policy + TradingCoordinator.tick/status",
+  "limits": [
+    "No whole suite/local full gate rerun",
+    "No native provider/credential/runtime/science/merge check",
+    "No raw stdout hash or native-only elapsed time inferred"
+  ],
+  "native_elapsed_seconds": "UNKNOWN_NOT_INSTRUMENTED",
+  "native_facts": {
+    "attempt_count": 0,
+    "coordinator_blob_sha256": "f8aa35c78592afe84f5747f31d5d0df54cdc82439ec3f26d360948be0a4c7d0a",
+    "head": "7b56df887d3adb543de43dd2bf28c93c29c86114",
+    "native_policy_new_entries_enabled": false,
+    "native_policy_status": "VALID",
+    "refusal_reasons": [
+      "BLOCK_NEW_ENTRIES_DISABLED"
+    ],
+    "status": {
+      "entries_enabled": true,
+      "integrity_verified": true,
+      "next_safe_action": "NONE",
+      "process_alive": true,
+      "progress_moving": true,
+      "runtime_policy_revision": 1,
+      "runtime_policy_status": "VALID",
+      "status": "READY"
+    },
+    "tick": {
+      "as_of": "2026-10-05T12:40:00Z",
+      "attempts": 0,
+      "decisions": 1,
+      "discovered": 1,
+      "entries_enabled": true,
+      "epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001",
+      "exits": 0,
+      "mode": "PAPER",
+      "reconciliation_healthy": true,
+      "source_status": "AVAILABLE",
+      "status": "TICK_COMPLETE"
+    }
+  },
+  "output_basis": "Parsed tool output retained exactly as native_facts; canonical parsed facts hash is separate from raw stdout hash",
+  "output_sha256": "UNKNOWN_RAW_STDOUT_BYTES_NOT_RETAINED",
+  "publication_carrier": "UTF8_LF; original native facts and facts_sha256 unchanged; original capture CRLF raw SHA retained separately.",
+  "receipt_sha256": "25425ca3da9a85a246417db7373eece96fbdb107d51bfac41d78713eed886c64",
+  "repair_required": "Make tick/status entry permission reflect the existing effective runtime-policy enabled flag while preserving known intentional PAUSE/STOP/restore semantics and originating exit service.",
+  "reviewed_bindings_sha256": "02ca588f189ec7d678e37ef2dabcae8133422a12ea3e55b9cbe991e04b93b399",
+  "reviewed_inventory_sha256": "13fdf3093025659d878904b785cbf66aa0928131916f4dc75a07f8582c26fc05",
+  "role": "GOAL_DOD_CRITIC",
+  "schema": "smial.isolated-goal-native-before",
+  "schema_version": "1.0",
+  "scope": "C16/PATCH_B4 truth of ordinary operator policy/readiness, synthetic PAPER only",
+  "setup": [
+    "Existing OperatingDriverTests.setUp and start_operating on marker-owned disposable native source/research/PaperPlane fixture",
+    "Original synthetic time 2026-10-05T12:40:00Z",
+    "Existing policy.apply_policy with candidate new_entries_enabled=false, genesis expected hash, original owner phrase confined to synthetic DB, patched existing policy _now clock",
+    "One original coordinator.tick, original coordinator.status and independent PaperPlaneStore readonly policy readback; no mocked admission/coordinator/status"
+  ],
+  "severity": "P1",
+  "source_pin_basis": "112 frozen implementation Git blob hashes independently matched before probe",
+  "source_pins": {
+    "src/solana_alpha_lab/factory/paper_plane.py": "64c6a497f72aa0f3e03749ed413dab2ebf87c8ee22e9fd407b87adec23b398e1",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "f8aa35c78592afe84f5747f31d5d0df54cdc82439ec3f26d360948be0a4c7d0a",
+    "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
+    "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+    "tests/test_trading_core_operational_closure_v1.py": "2af253219ad2a99d183d015797f887eec0d4778fd58cb407799270551d15d673"
+  },
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "tool_wall_time_seconds": 12.1,
+  "verdict": "NOT_READY"
+}

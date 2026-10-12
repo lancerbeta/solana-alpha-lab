@@ -251,3 +251,13 @@ entry failures became retained blockers; only that outcome assertion changes,
 with egress, secret, non-target, noattempt/noquota and LIVE refusal kept strict.
 Final source/test freeze precedes whole proof, direct consumers, independent
 clock/cold operator, exact four-role review and unchanged delivery gates.
+
+Frozen7b56 CODE and GOAL returned actual P1 NOT_READY: a successor asset JSON
+array escaped the existing input boundary and stopped native run before old
+EXIT; a valid disabled-entry runtime policy still projected READY/entries
+enabled while native admission correctly refused. Native before facts and
+historical successful proofs retain exact recorded pins. Replan only validates
+the existing local asset input and aligns tick/status with the existing policy
+owner, preserving old exits, refusal/no-resend, legacy and fatal store behavior.
+ARCH review was interrupted before verdict; OWNER was not performed on this
+blocked inventory. All four final roles must run freshly after this repair.

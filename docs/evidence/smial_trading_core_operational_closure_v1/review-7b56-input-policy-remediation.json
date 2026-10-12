@@ -1,0 +1,806 @@
+{
+  "actual_after_oracle_failures_and_corrections": [
+    {
+      "capture_sha256": "f2f3cd910982a3ab4443019e6e9d019efb73a789de5544fbac4a87cb449adf15",
+      "classification": "NARROW_TEST_ORACLE_CORRECTION",
+      "correction": "Keep existing grant cases exact; the asset case uses existing CHECK_EXECUTION_QUOTE_INPUTS.",
+      "elapsed_seconds": 6.407894,
+      "failed_rows": [
+        {
+          "elapsed_seconds": 5.730018,
+          "error_trace_sha256": [
+            "c375d38a1343a028a495fd046f3fb9970d0c2120cc692213358d64b8e17cd27e"
+          ],
+          "fixture_children_remaining": 0,
+          "metrics": {
+            "attempt_count": 2,
+            "clock_advances": 2,
+            "fake_http_calls": 2,
+            "grant": "asset-array",
+            "positions": [
+              {
+                "epoch": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+                "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE",
+                "state": "RECONCILED"
+              },
+              {
+                "epoch": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B",
+                "position_id": "POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+                "state": "WATCHED"
+              }
+            ],
+            "quote_claims": 2,
+            "same_process": true
+          },
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "run_count": 1,
+          "status": "FAIL",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_invalid_successor_asset_array_keeps_same_native_run_servicing_future_origin_exit"
+        }
+      ],
+      "reason": "INHERITED_GRANT_ACTION_ORACLE_AT_ASSET_FAILURE",
+      "source_pins_after_run": {
+        "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+        "scripts/trading_continuity.py": "ba9615ae37886197b52a394415989427b182a33976d03b1985868d2f36f597dd",
+        "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+        "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+        "src/solana_alpha_lab/factory/paper_plane.py": "64c6a497f72aa0f3e03749ed413dab2ebf87c8ee22e9fd407b87adec23b398e1",
+        "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+        "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+        "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "8f5959bee54d9d0937b7585b5e4f8bb317075171b2bdb8205ab14361bf801732",
+        "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+        "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
+        "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+        "tests/test_trading_core_operational_closure_v1.py": "b30eb201cf0d60fd9a0a9d4233aff5b5808eec1847ae27b34eebc6ab72bef15b",
+        "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+        "tests/test_trading_operational_obligations_v1.py": "3ff23c730986ea55cf969d7743641e4e77cde25df8631d765ce33d7dd02df0d4",
+        "tests/test_trading_operational_recovery_v1.py": "7493b85417f58317177fabfbaa182c6b1e6a9bf84673cf6324a1f8ae7efc549d"
+      },
+      "source_pins_before_run": {
+        "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+        "scripts/trading_continuity.py": "ba9615ae37886197b52a394415989427b182a33976d03b1985868d2f36f597dd",
+        "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+        "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+        "src/solana_alpha_lab/factory/paper_plane.py": "64c6a497f72aa0f3e03749ed413dab2ebf87c8ee22e9fd407b87adec23b398e1",
+        "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+        "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+        "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "8f5959bee54d9d0937b7585b5e4f8bb317075171b2bdb8205ab14361bf801732",
+        "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+        "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
+        "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+        "tests/test_trading_core_operational_closure_v1.py": "b30eb201cf0d60fd9a0a9d4233aff5b5808eec1847ae27b34eebc6ab72bef15b",
+        "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+        "tests/test_trading_operational_obligations_v1.py": "3ff23c730986ea55cf969d7743641e4e77cde25df8631d765ce33d7dd02df0d4",
+        "tests/test_trading_operational_recovery_v1.py": "7493b85417f58317177fabfbaa182c6b1e6a9bf84673cf6324a1f8ae7efc549d"
+      }
+    },
+    {
+      "capture_sha256": "acd84c46e4411031579be00a8194187bf51dbf118ce3604d3975974027daa5d6",
+      "classification": "NARROW_TEST_ORACLE_CORRECTION",
+      "correction": "Fix existing operations _now only in the synthetic fatal-store test; compare all readback fields unchanged.",
+      "elapsed_seconds": 19.205483,
+      "failed_rows": [
+        {
+          "elapsed_seconds": 2.353429,
+          "error_trace_sha256": [
+            "90db9f52fc2b550e93185b10686bf96bbee17db714128cfeab2c699ffa9043b9"
+          ],
+          "fixture_children_remaining": 0,
+          "metrics": null,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "run_count": 1,
+          "status": "FAIL",
+          "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_shared_store_failure_remains_fatal_and_atomic_in_ordinary_run"
+        }
+      ],
+      "reason": "INHERITED_READBACK_PHYSICAL_AS_OF_CROSSED_SECOND",
+      "source_pins_after_run": {
+        "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+        "scripts/trading_continuity.py": "ba9615ae37886197b52a394415989427b182a33976d03b1985868d2f36f597dd",
+        "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+        "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+        "src/solana_alpha_lab/factory/paper_plane.py": "64c6a497f72aa0f3e03749ed413dab2ebf87c8ee22e9fd407b87adec23b398e1",
+        "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+        "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+        "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "8f5959bee54d9d0937b7585b5e4f8bb317075171b2bdb8205ab14361bf801732",
+        "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+        "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
+        "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+        "tests/test_trading_core_operational_closure_v1.py": "b30eb201cf0d60fd9a0a9d4233aff5b5808eec1847ae27b34eebc6ab72bef15b",
+        "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+        "tests/test_trading_operational_obligations_v1.py": "3ff23c730986ea55cf969d7743641e4e77cde25df8631d765ce33d7dd02df0d4",
+        "tests/test_trading_operational_recovery_v1.py": "56022891071f9e6e9b680706eebb9116856af5e56370a1a5cb2f68c516e5024e"
+      },
+      "source_pins_before_run": {
+        "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+        "scripts/trading_continuity.py": "ba9615ae37886197b52a394415989427b182a33976d03b1985868d2f36f597dd",
+        "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+        "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+        "src/solana_alpha_lab/factory/paper_plane.py": "64c6a497f72aa0f3e03749ed413dab2ebf87c8ee22e9fd407b87adec23b398e1",
+        "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+        "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+        "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+        "src/solana_alpha_lab/factory/trading_coordinator.py": "8f5959bee54d9d0937b7585b5e4f8bb317075171b2bdb8205ab14361bf801732",
+        "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+        "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
+        "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+        "tests/test_trading_core_operational_closure_v1.py": "b30eb201cf0d60fd9a0a9d4233aff5b5808eec1847ae27b34eebc6ab72bef15b",
+        "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+        "tests/test_trading_operational_obligations_v1.py": "3ff23c730986ea55cf969d7743641e4e77cde25df8631d765ce33d7dd02df0d4",
+        "tests/test_trading_operational_recovery_v1.py": "56022891071f9e6e9b680706eebb9116856af5e56370a1a5cb2f68c516e5024e"
+      }
+    }
+  ],
+  "after": {
+    "actual_command": [
+      "uv",
+      "run",
+      "--offline",
+      "--locked",
+      "--managed-python",
+      "python",
+      "-B",
+      "local/input-policy-boundary-repair-7b56/run-focused.py"
+    ],
+    "elapsed_basis": "perf_counter over selected native fixtures including setup/teardown and direct CLI consumers",
+    "elapsed_seconds": 49.12165,
+    "native_pid": 68628,
+    "output_hash_basis": "Exact durable UTF-8 LF JSON native-after rows, durations and source pins; raw pipe stdout bytes were not retained.",
+    "output_sha256": "a11fda109788cbf1dec475fd04e65e6113dd64e08cd9f689745a1e274d3369c8",
+    "passed_test_count": 11,
+    "raw_pipe_stdout_sha256": "UNKNOWN_NOT_RETAINED",
+    "reproduce_selected_tests_argv": [
+      "uv",
+      "run",
+      "--offline",
+      "--locked",
+      "--managed-python",
+      "python",
+      "-B",
+      "-m",
+      "unittest",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_invalid_successor_asset_array_keeps_same_native_run_servicing_future_origin_exit",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_current_asset_file_shapes_are_typed_before_native_claim_or_credential",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_current_witness_outer_shape_is_typed_before_native_claim",
+      "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_shared_store_failure_remains_fatal_and_atomic_in_ordinary_run",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_metadata_survives_source_deletion_for_due_exit",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_hash_conflict_denies_before_quote_effect",
+      "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C17_current_runtime_policy_health_preserves_known_inventory_and_old_exit",
+      "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_missing_or_corrupt_envelope_never_ready",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_expired_and_missing_successor_grants_keep_same_native_run_servicing_future_origin_exit",
+      "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_postclaim_entry_response_failure_keeps_original_pending_and_future_old_exit_in_same_run"
+    ],
+    "runtime_environment": {
+      "PYTHONIOENCODING": "utf-8",
+      "UV_CACHE_DIR": "EXPLICIT_SHARED_UV_CACHE"
+    },
+    "sandbox": "Exact scoped escalation after sandbox DATA_ROOT_UNAVAILABLE in native fixture setup; no guard bypass.",
+    "selected_test_count": 11,
+    "source_pins_after_run": {
+      "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+      "scripts/trading_continuity.py": "ba9615ae37886197b52a394415989427b182a33976d03b1985868d2f36f597dd",
+      "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+      "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+      "src/solana_alpha_lab/factory/paper_plane.py": "64c6a497f72aa0f3e03749ed413dab2ebf87c8ee22e9fd407b87adec23b398e1",
+      "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+      "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+      "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "8f5959bee54d9d0937b7585b5e4f8bb317075171b2bdb8205ab14361bf801732",
+      "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+      "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
+      "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+      "tests/test_trading_core_operational_closure_v1.py": "b30eb201cf0d60fd9a0a9d4233aff5b5808eec1847ae27b34eebc6ab72bef15b",
+      "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+      "tests/test_trading_operational_obligations_v1.py": "3ff23c730986ea55cf969d7743641e4e77cde25df8631d765ce33d7dd02df0d4",
+      "tests/test_trading_operational_recovery_v1.py": "4303996707afefe1d6459fc59be35fbca79bdbbcba4cec25a945fe12a651c4df"
+    },
+    "source_pins_before_run": {
+      "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+      "scripts/trading_continuity.py": "ba9615ae37886197b52a394415989427b182a33976d03b1985868d2f36f597dd",
+      "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+      "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+      "src/solana_alpha_lab/factory/paper_plane.py": "64c6a497f72aa0f3e03749ed413dab2ebf87c8ee22e9fd407b87adec23b398e1",
+      "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+      "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+      "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "8f5959bee54d9d0937b7585b5e4f8bb317075171b2bdb8205ab14361bf801732",
+      "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+      "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
+      "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+      "tests/test_trading_core_operational_closure_v1.py": "b30eb201cf0d60fd9a0a9d4233aff5b5808eec1847ae27b34eebc6ab72bef15b",
+      "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+      "tests/test_trading_operational_obligations_v1.py": "3ff23c730986ea55cf969d7743641e4e77cde25df8631d765ce33d7dd02df0d4",
+      "tests/test_trading_operational_recovery_v1.py": "4303996707afefe1d6459fc59be35fbca79bdbbcba4cec25a945fe12a651c4df"
+    },
+    "source_pins_unchanged_by_run": true,
+    "tests": [
+      {
+        "elapsed_seconds": 5.947973,
+        "error_trace_sha256": [],
+        "fixture_children_remaining": 0,
+        "metrics": {
+          "A_grant_claims": 2,
+          "B_attempt_rows": [],
+          "B_credential_reads": 0,
+          "B_grant_claims": 0,
+          "B_preclaim_attempts": 0,
+          "B_preclaim_quote_claims": 0,
+          "B_request_rows": [],
+          "B_requests": 0,
+          "clock_advances": 2,
+          "clock_crossed_origin_exit_due": true,
+          "entry_reason": "EXECUTION_ASSET_IDENTITY_INVALID",
+          "exit_health_with_entry_blocker": true,
+          "fake_http_calls": 2,
+          "grant": "asset-array",
+          "incident_audit_retained": true,
+          "inventory_with_entry_blocker": "KNOWN",
+          "native_run_ticks": 3,
+          "original_A": "RECONCILED",
+          "position_rows": [
+            {
+              "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+              "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE",
+              "state": "RECONCILED"
+            },
+            {
+              "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B",
+              "position_id": "POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+              "state": "WATCHED"
+            }
+          ],
+          "quote_claim_rows": [
+            {
+              "event_id": "QUOTE-CALL-ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+              "payload": {
+                "attempt_id": "ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+                "grant_sha256": "4ca75ae265538380b2141a0d8e26d583cef7092946173237866eed46dd78d568"
+              },
+              "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE"
+            },
+            {
+              "event_id": "QUOTE-CALL-ATTEMPT-90B329D2C77934CEDA9D30D40E29A752D05DAB8392D380565927E0F2289A15E1",
+              "payload": {
+                "attempt_id": "ATTEMPT-90B329D2C77934CEDA9D30D40E29A752D05DAB8392D380565927E0F2289A15E1",
+                "grant_sha256": "4ca75ae265538380b2141a0d8e26d583cef7092946173237866eed46dd78d568"
+              },
+              "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE"
+            }
+          ],
+          "retained_incident": {
+            "active": 1,
+            "first_at": "2026-10-05T12:55:00Z",
+            "incident_key": "ENTRY-SHADOW-POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+            "last_changed_at": "2026-10-05T12:55:00Z",
+            "occurrences": 1,
+            "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+          },
+          "same_process": true,
+          "signal_stale_after_dependency_repair_no_effect": true
+        },
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "run_count": 1,
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_invalid_successor_asset_array_keeps_same_native_run_servicing_future_origin_exit"
+      },
+      {
+        "elapsed_seconds": 3.129512,
+        "error_trace_sha256": [],
+        "fixture_children_remaining": 0,
+        "metrics": {
+          "attempts": 0,
+          "credential_reads": 0,
+          "fake_http_calls": 0,
+          "quote_claims": 0,
+          "requests": 0,
+          "typed_inputs": [
+            {
+              "input": "missing",
+              "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+            },
+            {
+              "input": "json",
+              "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+            },
+            {
+              "input": "array",
+              "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+            },
+            {
+              "input": "missing-mint",
+              "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+            },
+            {
+              "input": "row-array",
+              "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+            },
+            {
+              "input": "missing-decimals",
+              "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+            },
+            {
+              "input": "boolean-decimals",
+              "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+            },
+            {
+              "input": "wrong-mint",
+              "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+            },
+            {
+              "input": "missing-time",
+              "reason": "EXECUTION_OBSERVATION_STALE_OR_FUTURE"
+            },
+            {
+              "input": "invalid-time",
+              "reason": "EXECUTION_OBSERVATION_STALE_OR_FUTURE"
+            },
+            {
+              "input": "future-time",
+              "reason": "EXECUTION_OBSERVATION_STALE_OR_FUTURE"
+            }
+          ]
+        },
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "run_count": 1,
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_current_asset_file_shapes_are_typed_before_native_claim_or_credential"
+      },
+      {
+        "elapsed_seconds": 2.310026,
+        "error_trace_sha256": [],
+        "fixture_children_remaining": 0,
+        "metrics": {
+          "attempts": 0,
+          "fake_http_calls": 0,
+          "quote_claims": 0,
+          "requests": 0,
+          "witness_shapes": [
+            "ARRAY",
+            "INVALID_JSON"
+          ]
+        },
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "run_count": 1,
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_current_witness_outer_shape_is_typed_before_native_claim"
+      },
+      {
+        "elapsed_seconds": 4.692907,
+        "error_trace_sha256": [],
+        "fixture_children_remaining": 0,
+        "metrics": {
+          "db_wal_shm_bytes_unchanged_by_native_json_human_readback": true,
+          "disabled_new_attempts": 0,
+          "disabled_status": {
+            "entries_enabled": false,
+            "integrity_verified": true,
+            "next_safe_action": "VERIFY_RUNTIME_POLICY",
+            "next_safe_command": "readback --mode PAPER",
+            "runtime_policy_revision": 3,
+            "runtime_policy_sha256": "8ab8c19a4aac662510c74630f4973f72befa7b05d0b7eb1e55a200eaf2f679ce",
+            "runtime_policy_status": "VALID",
+            "runtime_policy_verified": true,
+            "status": "ACTION_REQUIRED"
+          },
+          "disabled_tick": {
+            "as_of": "2026-10-05T12:40:00Z",
+            "attempts": 0,
+            "decisions": 1,
+            "discovered": 1,
+            "entries_enabled": false,
+            "epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001",
+            "exits": 0,
+            "mode": "PAPER",
+            "reconciliation_healthy": true,
+            "source_status": "AVAILABLE",
+            "status": "TICK_COMPLETE"
+          },
+          "explicit_enabled_tick_entries_enabled": true,
+          "native_exit_run_ticks": 2,
+          "old_exit_under_disabled_policy": "RECONCILED",
+          "old_position_identity_retained": true,
+          "policy_remains_owner_disabled": true,
+          "refusal_reason": "BLOCK_NEW_ENTRIES_DISABLED"
+        },
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "run_count": 1,
+        "status": "PASS",
+        "test": "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit"
+      },
+      {
+        "elapsed_seconds": 2.370447,
+        "error_trace_sha256": [],
+        "fixture_children_remaining": 0,
+        "metrics": {
+          "new_attempts": 0,
+          "new_effects": 0,
+          "readback_unchanged": true,
+          "shared_discovery_write": "FATAL",
+          "shared_store": "FATAL"
+        },
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "run_count": 1,
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_shared_store_failure_remains_fatal_and_atomic_in_ordinary_run"
+      },
+      {
+        "elapsed_seconds": 2.868795,
+        "error_trace_sha256": [],
+        "fixture_children_remaining": 0,
+        "metrics": null,
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "run_count": 1,
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_metadata_survives_source_deletion_for_due_exit"
+      },
+      {
+        "elapsed_seconds": 2.123103,
+        "error_trace_sha256": [],
+        "fixture_children_remaining": 0,
+        "metrics": {
+          "attempts": 0,
+          "entries_enabled": false,
+          "entry_reason": "EXECUTION_ASSET_WITNESS_INTEGRITY_CONFLICT",
+          "fake_http_calls": 0,
+          "quote_claims": 0,
+          "requests": 0,
+          "results": 0,
+          "tick_status": "TICK_COMPLETE"
+        },
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "run_count": 1,
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_hash_conflict_denies_before_quote_effect"
+      },
+      {
+        "elapsed_seconds": 4.453772,
+        "error_trace_sha256": [],
+        "fixture_children_remaining": 0,
+        "metrics": {
+          "corrupt_policy": "ACTION_REQUIRED",
+          "db_wal_bytes_unchanged_by_native_json_human_readback": true,
+          "old_exit_after_policy_corruption": "RECONCILED",
+          "optional_absent_policy": "READY_STRATEGY_ONLY",
+          "original_inventory_status": "KNOWN",
+          "pending_attempts": 0,
+          "valid_policy": "READY"
+        },
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "run_count": 1,
+        "status": "PASS",
+        "test": "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C17_current_runtime_policy_health_preserves_known_inventory_and_old_exit"
+      },
+      {
+        "elapsed_seconds": 2.360201,
+        "error_trace_sha256": [],
+        "fixture_children_remaining": 0,
+        "metrics": null,
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "run_count": 1,
+        "status": "PASS",
+        "test": "tests.test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_missing_or_corrupt_envelope_never_ready"
+      },
+      {
+        "elapsed_seconds": 11.910726,
+        "error_trace_sha256": [],
+        "fixture_children_remaining": 0,
+        "metrics": {
+          "cases": [
+            {
+              "A_grant_claims": 2,
+              "B_attempt_rows": [],
+              "B_credential_reads": 0,
+              "B_grant_claims": 0,
+              "B_preclaim_attempts": 0,
+              "B_preclaim_quote_claims": 0,
+              "B_request_rows": [],
+              "B_requests": 0,
+              "clock_advances": 2,
+              "clock_crossed_origin_exit_due": true,
+              "entry_reason": "QUOTE_EXTERNAL_AUTHORITY_REQUIRED",
+              "exit_health_with_entry_blocker": true,
+              "fake_http_calls": 2,
+              "grant": "expired",
+              "incident_audit_retained": true,
+              "inventory_with_entry_blocker": "KNOWN",
+              "native_run_ticks": 3,
+              "original_A": "RECONCILED",
+              "position_rows": [
+                {
+                  "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+                  "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE",
+                  "state": "RECONCILED"
+                },
+                {
+                  "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B",
+                  "position_id": "POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+                  "state": "WATCHED"
+                }
+              ],
+              "quote_claim_rows": [
+                {
+                  "event_id": "QUOTE-CALL-ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+                  "payload": {
+                    "attempt_id": "ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+                    "grant_sha256": "70f58fc40b3634eb5883d15c815b69383816c8e1a6a516e518c214f77729de8b"
+                  },
+                  "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE"
+                },
+                {
+                  "event_id": "QUOTE-CALL-ATTEMPT-90B329D2C77934CEDA9D30D40E29A752D05DAB8392D380565927E0F2289A15E1",
+                  "payload": {
+                    "attempt_id": "ATTEMPT-90B329D2C77934CEDA9D30D40E29A752D05DAB8392D380565927E0F2289A15E1",
+                    "grant_sha256": "70f58fc40b3634eb5883d15c815b69383816c8e1a6a516e518c214f77729de8b"
+                  },
+                  "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE"
+                }
+              ],
+              "retained_incident": {
+                "active": 1,
+                "first_at": "2026-10-05T12:55:00Z",
+                "incident_key": "ENTRY-SHADOW-POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+                "last_changed_at": "2026-10-05T12:55:00Z",
+                "occurrences": 1,
+                "reason": "QUOTE_EXTERNAL_AUTHORITY_REQUIRED"
+              },
+              "same_process": true,
+              "signal_stale_after_dependency_repair_no_effect": true
+            },
+            {
+              "A_grant_claims": 2,
+              "B_attempt_rows": [],
+              "B_credential_reads": 0,
+              "B_grant_claims": 0,
+              "B_preclaim_attempts": 0,
+              "B_preclaim_quote_claims": 0,
+              "B_request_rows": [],
+              "B_requests": 0,
+              "clock_advances": 2,
+              "clock_crossed_origin_exit_due": true,
+              "entry_reason": "QUOTE_EXTERNAL_AUTHORITY_REQUIRED",
+              "exit_health_with_entry_blocker": true,
+              "fake_http_calls": 2,
+              "grant": "missing",
+              "incident_audit_retained": true,
+              "inventory_with_entry_blocker": "KNOWN",
+              "native_run_ticks": 3,
+              "original_A": "RECONCILED",
+              "position_rows": [
+                {
+                  "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+                  "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE",
+                  "state": "RECONCILED"
+                },
+                {
+                  "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B",
+                  "position_id": "POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+                  "state": "WATCHED"
+                }
+              ],
+              "quote_claim_rows": [
+                {
+                  "event_id": "QUOTE-CALL-ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+                  "payload": {
+                    "attempt_id": "ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+                    "grant_sha256": "16bed838d878182e00f643e55d2654a857c91721c492fc2e8fb04cf2a7e83432"
+                  },
+                  "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE"
+                },
+                {
+                  "event_id": "QUOTE-CALL-ATTEMPT-90B329D2C77934CEDA9D30D40E29A752D05DAB8392D380565927E0F2289A15E1",
+                  "payload": {
+                    "attempt_id": "ATTEMPT-90B329D2C77934CEDA9D30D40E29A752D05DAB8392D380565927E0F2289A15E1",
+                    "grant_sha256": "16bed838d878182e00f643e55d2654a857c91721c492fc2e8fb04cf2a7e83432"
+                  },
+                  "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE"
+                }
+              ],
+              "retained_incident": {
+                "active": 1,
+                "first_at": "2026-10-05T12:55:00Z",
+                "incident_key": "ENTRY-SHADOW-POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+                "last_changed_at": "2026-10-05T12:55:00Z",
+                "occurrences": 1,
+                "reason": "QUOTE_EXTERNAL_AUTHORITY_REQUIRED"
+              },
+              "same_process": true,
+              "signal_stale_after_dependency_repair_no_effect": true
+            }
+          ],
+          "last_case": {
+            "attempt_count": 2,
+            "clock_advances": 2,
+            "fake_http_calls": 2,
+            "grant": "missing",
+            "positions": [
+              {
+                "epoch": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+                "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE",
+                "state": "RECONCILED"
+              },
+              {
+                "epoch": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B",
+                "position_id": "POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+                "state": "WATCHED"
+              }
+            ],
+            "quote_claims": 2,
+            "same_process": true
+          }
+        },
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "run_count": 1,
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_expired_and_missing_successor_grants_keep_same_native_run_servicing_future_origin_exit"
+      },
+      {
+        "elapsed_seconds": 6.277671,
+        "error_trace_sha256": [],
+        "fixture_children_remaining": 0,
+        "metrics": {
+          "B_after_bad_response": "ATTEMPTING_PENDING_ORIGINAL",
+          "B_after_callback": "OPEN",
+          "B_attempts": 1,
+          "B_grant_claims": 1,
+          "callback_original_clock": "2026-10-05T12:55:00Z",
+          "callback_result": "LANDED_SUCCESS",
+          "fabricated_nonfills": 0,
+          "fake_http_calls": 3,
+          "native_run_ticks": 3,
+          "original_A": "RECONCILED",
+          "pending_after_callback": 0,
+          "resends": 0,
+          "same_process": true,
+          "same_request_after_callback": true
+        },
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "run_count": 1,
+        "status": "PASS",
+        "test": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests.test_postclaim_entry_response_failure_keeps_original_pending_and_future_old_exit_in_same_run"
+      }
+    ]
+  },
+  "before": {
+    "before_reexecuted_by_worker": false,
+    "code": {
+      "capture_raw_sha256": "53f7ebf382b696ff580bd62d9adac0bc2aaca7fc6cf0b9b79c43c6c5929b8f76",
+      "elapsed_basis": "functions.exec wall time displayed for the successful native command; rounded tool display, not separately measured loop time.",
+      "elapsed_seconds": 16.2,
+      "error_type": "TypeError",
+      "exception_message_sha256": "ef3238019ade4bde7dd339050ddeb2074f7f99eb7c0722ebc5d07e1da3ed9314",
+      "file_sha256": "09d6c129109758ca20903337a8c393b03b393246abca4a9e5dc2d73765a992ae",
+      "native_only_elapsed_seconds": "UNKNOWN_NOT_CAPTURED",
+      "observed": {
+        "A_future_exit_executed": false,
+        "B_fake_http_calls": 0,
+        "B_new_attempts": 0,
+        "B_new_quota_claims": 0,
+        "attempt_count": 1,
+        "clock_advances": 0,
+        "fake_http_calls": 1,
+        "positions": [
+          {
+            "epoch": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+            "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE",
+            "state": "OPEN"
+          },
+          {
+            "epoch": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B",
+            "position_id": "POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+            "state": "WATCHED"
+          }
+        ],
+        "process_pid": null,
+        "quote_claims": 1,
+        "run_ticks_completed": null,
+        "run_ticks_requested": 3,
+        "same_process": true,
+        "shared_store_readback": "AVAILABLE"
+      },
+      "path": "docs/evidence/smial_trading_core_operational_closure_v1/review-7b56-code-native-before.json",
+      "raw_stdout_sha256": null,
+      "receipt_sha256": "9aeed1654ed3933493446106d55d8d7a91ca8e81a0219245aebb592c732a87e4"
+    },
+    "goal": {
+      "capture_raw_sha256": "7f8f9339a3cd2cc0c20ede49d7163eb24b6e1027de29a489b2827cfddac37026",
+      "elapsed_basis": "Tool reported wall time including command invocation; not native-only timer",
+      "elapsed_seconds": 12.1,
+      "facts_sha256": "b5230e327fb5c211a8d5f75632bd5275c26517e6979eaf46c22bcf06185fd3dc",
+      "file_sha256": "4a7fd9711a58edadda7a3005641e4ed82d73fef5e0b4debe9c64e744ba35ad8a",
+      "native_facts": {
+        "attempt_count": 0,
+        "coordinator_blob_sha256": "f8aa35c78592afe84f5747f31d5d0df54cdc82439ec3f26d360948be0a4c7d0a",
+        "head": "7b56df887d3adb543de43dd2bf28c93c29c86114",
+        "native_policy_new_entries_enabled": false,
+        "native_policy_status": "VALID",
+        "refusal_reasons": [
+          "BLOCK_NEW_ENTRIES_DISABLED"
+        ],
+        "status": {
+          "entries_enabled": true,
+          "integrity_verified": true,
+          "next_safe_action": "NONE",
+          "process_alive": true,
+          "progress_moving": true,
+          "runtime_policy_revision": 1,
+          "runtime_policy_status": "VALID",
+          "status": "READY"
+        },
+        "tick": {
+          "as_of": "2026-10-05T12:40:00Z",
+          "attempts": 0,
+          "decisions": 1,
+          "discovered": 1,
+          "entries_enabled": true,
+          "epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001",
+          "exits": 0,
+          "mode": "PAPER",
+          "reconciliation_healthy": true,
+          "source_status": "AVAILABLE",
+          "status": "TICK_COMPLETE"
+        }
+      },
+      "native_only_elapsed_seconds": "UNKNOWN_NOT_INSTRUMENTED",
+      "path": "docs/evidence/smial_trading_core_operational_closure_v1/review-7b56-goal-native-before.json",
+      "raw_stdout_sha256": "UNKNOWN_RAW_STDOUT_BYTES_NOT_RETAINED"
+    },
+    "source_pins_before_remediation": {
+      "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+      "scripts/trading_continuity.py": "ba9615ae37886197b52a394415989427b182a33976d03b1985868d2f36f597dd",
+      "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+      "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+      "src/solana_alpha_lab/factory/paper_plane.py": "64c6a497f72aa0f3e03749ed413dab2ebf87c8ee22e9fd407b87adec23b398e1",
+      "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+      "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+      "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+      "src/solana_alpha_lab/factory/trading_coordinator.py": "f8aa35c78592afe84f5747f31d5d0df54cdc82439ec3f26d360948be0a4c7d0a",
+      "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+      "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
+      "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+      "tests/test_trading_core_operational_closure_v1.py": "2af253219ad2a99d183d015797f887eec0d4778fd58cb407799270551d15d673",
+      "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
+      "tests/test_trading_operational_obligations_v1.py": "3ff23c730986ea55cf969d7743641e4e77cde25df8631d765ce33d7dd02df0d4",
+      "tests/test_trading_operational_recovery_v1.py": "0cc00588ba0e546aa404f129caa6c1298911a8d6b6b51b81bf632adbb7b1e458"
+    }
+  },
+  "cleanup": {
+    "owned_fixture_children_remaining": 0,
+    "owned_marked_scratch_relative": "local/input-policy-boundary-repair-7b56",
+    "owned_scratch_removed": true,
+    "remaining_owned_test_processes": 0,
+    "repository_git_mutations": 0,
+    "resolved_within_workspace_and_no_reparse_verified": true,
+    "shared_roots_removed": false
+  },
+  "expected_base": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "limitations": [
+    "Scoped synthetic native remediation and direct consumers; no whole-module/full-repository gate, CI or Git/GitHub work.",
+    "Existing native before unknown fields remain unknown; no repeated before execution.",
+    "No actual provider/credential/runtime/science/merge/financial authority."
+  ],
+  "patch_id": "SMIAL_PR398_OPERATING_BOUNDARY_PATCH_V1",
+  "receipt_sha256": "1f730b0b2bbf3dc3ff7706cc4cb572439718f924aeab2077c270023a908bba1e",
+  "repair": {
+    "asset_boundary": "Validate local file/witness outer shape, mint/decimals, fields and timestamps at _inputs before attempt/request/quota/credential/effect. Use existing finite ENTRY_INPUT_BLOCKERS.",
+    "nonowned_pinned_sources_changed": 0,
+    "original_exit_boundary": "Preserve original retained metadata and its hash/source/identity checks; no whole-loop exception catch or shared-store/path-guard relaxation.",
+    "owned_source_paths": [
+      "src/solana_alpha_lab/factory/trading_coordinator.py",
+      "tests/test_trading_core_operational_closure_v1.py",
+      "tests/test_trading_operational_recovery_v1.py"
+    ],
+    "policy_owner_auto_enabled": false,
+    "policy_projection": "Resolve current native policy for tick/status entry permission. Valid false remains verified but entries disabled/ACTION_REQUIRED with existing VERIFY_RUNTIME_POLICY and readback. Native admission authority is unchanged."
+  },
+  "reviewed_before_head": "7b56df887d3adb543de43dd2bf28c93c29c86114",
+  "reviewed_bindings_sha256": "02ca588f189ec7d678e37ef2dabcae8133422a12ea3e55b9cbe991e04b93b399",
+  "reviewed_inventory_sha256": "13fdf3093025659d878904b785cbf66aa0928131916f4dc75a07f8582c26fc05",
+  "schema": "smial.trading-core-input-policy-remediation",
+  "schema_version": "1.0",
+  "status": "PASS_SCOPED_REMEDIATION_NATIVE_AFTER",
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1"
+}

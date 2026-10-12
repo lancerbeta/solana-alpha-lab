@@ -1035,6 +1035,83 @@ class OperatingDriverTests(unittest.TestCase):
             "db_wal_bytes_unchanged_by_native_json_human_readback": True,
             "old_exit_after_policy_corruption": "RECONCILED", "pending_attempts": 0}
 
+    def test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit(self):
+        from solana_alpha_lab.factory import trading_runtime_policy as policy_owner
+        self.start_operating()
+        with closing(PaperPlaneStore(self.runner.store_path)) as writer:
+            def apply(enabled, previous, key):
+                with patch.object(policy_owner, "_now", return_value="2026-10-05T12:40:00Z"):
+                    return policy_owner.apply_policy(ROOT, writer, mode="PAPER",
+                        candidate_raw={"new_entries_enabled": enabled}, expected_current_sha256=previous,
+                        idempotency_key=key, owner_authorization_phrase="AUTHORIZE PAPER SHADOW TRADING RUNTIME POLICY APPLY",
+                        reason="SYNTHETIC_POLICY_PERMISSION_PROJECTION")
+            disabled = apply(False, "0" * 64, "PROJECTION-DISABLED")
+            tick = self.coordinator.tick()
+            self.assertFalse(tick["entries_enabled"])
+            self.assertEqual(tick["attempts"], 0)
+            self.assertEqual(self.runner.readback()["modeled_attempts"], [])
+            refusals = writer.filtered_execution_events(event_type="SIGNAL_ADMISSION_DENIED")
+            self.assertIn("BLOCK_NEW_ENTRIES_DISABLED", {row["payload"]["reason_code"] for row in refusals})
+            false_tick = dict(tick)
+            enabled = apply(True, disabled["policy_sha256"], "PROJECTION-EXPLICITLY-ENABLED")
+            positive_tick = self.coordinator.tick()
+            self.assertTrue(positive_tick["entries_enabled"])
+            self.assertEqual(positive_tick["attempts"], 1)
+            self.assertEqual(self.coordinator.status()["status"], "READY")
+            original = writer.positions()[0]
+            self.assertEqual(original["state"], "OPEN")
+            disabled_again = apply(False, enabled["policy_sha256"], "PROJECTION-DISABLED-WITH-ORIGINAL")
+            self.assertFalse(self.coordinator.tick()["entries_enabled"])
+            writer._conn.execute("PRAGMA wal_autocheckpoint=0")
+            paths = [self.runner.store_path, Path(str(self.runner.store_path) + "-wal"),
+                     Path(str(self.runner.store_path) + "-shm")]
+            before = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}
+            native = self.coordinator.status()
+            cli = self.invoke("status", as_of="2026-10-05T12:40:00Z")
+            for view in (native, cli):
+                self.assertEqual(view["status"], "ACTION_REQUIRED")
+                self.assertFalse(view["entries_enabled"])
+                self.assertEqual(view["runtime_policy_status"], "VALID")
+                self.assertEqual(view["runtime_policy_sha256"], disabled_again["policy_sha256"])
+                self.assertTrue(view["runtime_policy_verified"])
+                self.assertTrue(view["integrity_verified"])
+                self.assertEqual(view["inventory"]["inventory_status"], "KNOWN")
+                self.assertTrue(view["exit_reconciliation_healthy"])
+                self.assertEqual(view["next_safe_action"], "VERIFY_RUNTIME_POLICY")
+                self.assertEqual(view["next_safe_command"], "readback --mode PAPER")
+            human = subprocess.run([sys.executable, "-B", str(ROOT / "scripts/trading_continuity.py"),
+                "status", "--repository-root", str(self.root), "--data-root", str(self.data),
+                "--as-of", "2026-10-05T12:40:00Z", "--format", "human"], capture_output=True, timeout=30)
+            self.assertEqual(human.returncode, 0)
+            text = human.stdout.decode("utf-8")
+            self.assertIn("PAPER · ACTION_REQUIRED", text)
+            self.assertIn("новые входы разрешены: False", text)
+            self.assertIn("Следующее безопасное действие: VERIFY_RUNTIME_POLICY", text)
+            self.assertNotIn("PAPER · READY", text)
+            self.assertEqual({path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}, before)
+            self.assertEqual(writer.positions(), [original])
+            self.assertFalse(policy_owner.resolve_current_policy(writer, "PAPER")["policy"]["new_entries_enabled"])
+        self.source.tick(datetime(2026, 10, 5, 13, 5, tzinfo=UTC))
+        self.now = datetime(2026, 10, 5, 13, 10, tzinfo=UTC)
+        result = self.coordinator.run(ticks=2)
+        final = self.runner.readback()
+        view = self.coordinator.status()
+        self.assertEqual(final["positions"][0]["state"], "RECONCILED")
+        self.assertEqual(final["positions"][0]["position_id"], original["position_id"])
+        self.assertEqual(len(final["modeled_attempts"]), 2)
+        self.assertFalse(view["entries_enabled"])
+        self.assertEqual(view["inventory"]["inventory_status"], "KNOWN")
+        self.assertTrue(view["exit_reconciliation_healthy"])
+        self.assertEqual(view["runtime_policy_sha256"], disabled_again["policy_sha256"])
+        self.metrics = {"disabled_tick": false_tick, "disabled_status": {key: native[key] for key in
+            ("status", "entries_enabled", "runtime_policy_status", "runtime_policy_revision", "runtime_policy_sha256",
+             "runtime_policy_verified", "integrity_verified", "next_safe_action", "next_safe_command")},
+            "refusal_reason": "BLOCK_NEW_ENTRIES_DISABLED", "disabled_new_attempts": 0,
+            "explicit_enabled_tick_entries_enabled": positive_tick["entries_enabled"],
+            "db_wal_shm_bytes_unchanged_by_native_json_human_readback": True,
+            "old_exit_under_disabled_policy": "RECONCILED", "old_position_identity_retained": True,
+            "policy_remains_owner_disabled": True, "native_exit_run_ticks": result["ticks"]}
+
     def test_C03_C17_observed_current_health_denies_virtual_clocks_readonly(self):
         from scripts.prove_trading_core_operational_closure import RecordingQuoteAdapter
         self.start_operating(mode="SHADOW")

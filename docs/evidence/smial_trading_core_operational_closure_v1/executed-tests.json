@@ -1,13 +1,13 @@
 {
   "code_unchanged_during_execution": true,
   "credential_reads": false,
-  "elapsed_seconds": 615.651358,
+  "elapsed_seconds": 628.937259,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "failed_test_ids": [],
   "live_authority": false,
-  "peak_rss_bytes": 146710528,
+  "peak_rss_bytes": 147210240,
   "provider_calls": false,
-  "receipt_sha256": "cbe07645a29d840f388982dfc04e75f43a481912cc093745e323087cd3c5c27b",
+  "receipt_sha256": "689f222a68c11b80caf1496a88312ec650294cd194a848b23bd04a16a00271dc",
   "schema": "smial.operating-software-proof",
   "schema_version": "1.0",
   "source_pins": {
@@ -19,37 +19,37 @@
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
     "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
     "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "f8aa35c78592afe84f5747f31d5d0df54cdc82439ec3f26d360948be0a4c7d0a",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "8f5959bee54d9d0937b7585b5e4f8bb317075171b2bdb8205ab14361bf801732",
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "8d227177cf037eb28553f094d6af149fe63826ae271e4782410e8a427846e46a",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "2af253219ad2a99d183d015797f887eec0d4778fd58cb407799270551d15d673",
+    "tests/test_trading_core_operational_closure_v1.py": "b30eb201cf0d60fd9a0a9d4233aff5b5808eec1847ae27b34eebc6ab72bef15b",
     "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
     "tests/test_trading_operational_obligations_v1.py": "3ff23c730986ea55cf969d7743641e4e77cde25df8631d765ce33d7dd02df0d4",
-    "tests/test_trading_operational_recovery_v1.py": "0cc00588ba0e546aa404f129caa6c1298911a8d6b6b51b81bf632adbb7b1e458"
+    "tests/test_trading_operational_recovery_v1.py": "4303996707afefe1d6459fc59be35fbca79bdbbcba4cec25a945fe12a651c4df"
   },
   "status": "PASS",
   "tests": [
     {
-      "duration_seconds": 6.4203,
+      "duration_seconds": 6.385402,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_C02_C03_C05_C06_native_loop_full_money_oracle"
     },
     {
-      "duration_seconds": 5.068227,
+      "duration_seconds": 4.947914,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_check_rejects_missing_or_invalid_operating_limits_readonly"
     },
     {
-      "duration_seconds": 3.240168,
+      "duration_seconds": 3.190537,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_C04_deadline_and_stale_do_not_backdate"
     },
     {
-      "duration_seconds": 11.33203,
+      "duration_seconds": 11.113869,
       "metrics": {
         "db_wal_bytes_unchanged": true,
         "new_quote_effects": 0,
@@ -65,19 +65,19 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_C17_observed_current_health_denies_virtual_clocks_readonly"
     },
     {
-      "duration_seconds": 2.799031,
+      "duration_seconds": 2.920083,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_late_input_unknown_is_not_healed_by_publication"
     },
     {
-      "duration_seconds": 2.736773,
+      "duration_seconds": 2.712087,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_list_only_same_driver"
     },
     {
-      "duration_seconds": 3.981226,
+      "duration_seconds": 3.989506,
       "metrics": {
         "fresh_physical_input_switch": "PASS",
         "observed_stale_activation_denials": 2,
@@ -88,59 +88,59 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_observed_activation_timestamp_does_not_override_freshness_clock"
     },
     {
-      "duration_seconds": 2.834175,
+      "duration_seconds": 2.785622,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C04_exact_stream_sets_equal_timestamps_pagination"
     },
     {
-      "duration_seconds": 4.292165,
+      "duration_seconds": 4.08852,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C04_late_physical_source_insert_survives_restart"
     },
     {
-      "duration_seconds": 4.995989,
+      "duration_seconds": 4.932655,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_C15_real_loss_after_admission"
     },
     {
-      "duration_seconds": 4.731512,
+      "duration_seconds": 4.668819,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_real_loss_after_capture_no_duplicate_effect"
     },
     {
-      "duration_seconds": 4.797909,
+      "duration_seconds": 4.901443,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_real_loss_after_claim_paper_reconciles"
     },
     {
-      "duration_seconds": 5.455994,
+      "duration_seconds": 5.462058,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C12_real_loss_after_quote_effect_no_resend"
     },
     {
-      "duration_seconds": 6.366116,
+      "duration_seconds": 6.470232,
       "metrics": {
         "baseline_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
         "cases": [
           {
-            "decision_sha256": "e251cea6b3ca75e25f5e0f1fe8442cbb435146eedb4d4e8f559a06ca7b3ebedf",
+            "decision_sha256": "2e80aa02312741f771d2704a490580e9ce89ab10086a66852e310fdabed8efb5",
             "journal_count": 5,
             "position_count": 1,
-            "provenance_sha256": "8cad4b3c83cf94e6a17fc2d4251c3b4835af4008912bcc6220f0bf97c7f68a5a",
+            "provenance_sha256": "78ff19e98f00707e1f57cda32493fe6ceb1f7b2c239f3ee04213ac1cec44f672",
             "replay_new_journal_events": 0,
             "runtime_execution": "absent"
           },
           {
-            "decision_sha256": "ffde4c57035a9b8f13cedade9b92703206f7adb2875d498a107ca54c974448a9",
+            "decision_sha256": "be3f06c4d059de6155a65480c673cc9e5e639a29ec7d5a88a47cf62aa6e42dbb",
             "journal_count": 5,
             "position_count": 1,
-            "provenance_sha256": "a4e45c6dd6ef4a6fb391bb075e532b472bc76d6bc76745216c5e89d253818f0b",
+            "provenance_sha256": "b32a99a70b646e2ed2e0bb08e5d02ebbed705b05e4d683b53780886cbc48e574",
             "replay_new_journal_events": 0,
             "runtime_execution": "explicit-null"
           },
@@ -157,67 +157,106 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C06_C19_frozen_base_episode_replay_preserves_identity_and_payload"
     },
     {
-      "duration_seconds": 9.001997,
+      "duration_seconds": 8.8434,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_C08_C09_positive_successor_and_old_exit"
     },
     {
-      "duration_seconds": 4.514998,
+      "duration_seconds": 4.40621,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer"
     },
     {
-      "duration_seconds": 5.80488,
+      "duration_seconds": 5.656787,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C11_C12_shadow_failure_unknown_partial_remainder_drain"
     },
     {
-      "duration_seconds": 6.391832,
+      "duration_seconds": 6.331193,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C15_C16_pause_during_live_lock_survives_restart"
     },
     {
-      "duration_seconds": 2.528453,
+      "duration_seconds": 2.51051,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_cached_tick_clock_cannot_authorize_expired_entry"
     },
     {
-      "duration_seconds": 5.321976,
+      "duration_seconds": 5.360776,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C10_C14_C15_C17_frozen_controls_and_observer_without_research"
     },
     {
-      "duration_seconds": 4.11411,
+      "duration_seconds": 4.131208,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C13_captured_body_corruption_retains_unknown_no_effect"
     },
     {
-      "duration_seconds": 2.659478,
+      "duration_seconds": 2.644067,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C14_nondivisible_raw_funding_adapter_accepts_partial"
     },
     {
-      "duration_seconds": 2.229722,
+      "duration_seconds": 2.19128,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_missing_or_corrupt_envelope_never_ready"
     },
     {
-      "duration_seconds": 2.336554,
+      "duration_seconds": 2.273693,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_shadow_quote_inputs_are_current_readonly_health"
     },
     {
-      "duration_seconds": 4.323433,
+      "duration_seconds": 4.437373,
+      "metrics": {
+        "db_wal_shm_bytes_unchanged_by_native_json_human_readback": true,
+        "disabled_new_attempts": 0,
+        "disabled_status": {
+          "entries_enabled": false,
+          "integrity_verified": true,
+          "next_safe_action": "VERIFY_RUNTIME_POLICY",
+          "next_safe_command": "readback --mode PAPER",
+          "runtime_policy_revision": 3,
+          "runtime_policy_sha256": "8ab8c19a4aac662510c74630f4973f72befa7b05d0b7eb1e55a200eaf2f679ce",
+          "runtime_policy_status": "VALID",
+          "runtime_policy_verified": true,
+          "status": "ACTION_REQUIRED"
+        },
+        "disabled_tick": {
+          "as_of": "2026-10-05T12:40:00Z",
+          "attempts": 0,
+          "decisions": 1,
+          "discovered": 1,
+          "entries_enabled": false,
+          "epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001",
+          "exits": 0,
+          "mode": "PAPER",
+          "reconciliation_healthy": true,
+          "source_status": "AVAILABLE",
+          "status": "TICK_COMPLETE"
+        },
+        "explicit_enabled_tick_entries_enabled": true,
+        "native_exit_run_ticks": 2,
+        "old_exit_under_disabled_policy": "RECONCILED",
+        "old_position_identity_retained": true,
+        "policy_remains_owner_disabled": true,
+        "refusal_reason": "BLOCK_NEW_ENTRIES_DISABLED"
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit"
+    },
+    {
+      "duration_seconds": 4.28184,
       "metrics": {
         "corrupt_policy": "ACTION_REQUIRED",
         "db_wal_bytes_unchanged_by_native_json_human_readback": true,
@@ -231,34 +270,34 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C17_current_runtime_policy_health_preserves_known_inventory_and_old_exit"
     },
     {
-      "duration_seconds": 2.726773,
+      "duration_seconds": 2.707673,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C17_readonly_current_wal_snapshot_writes_nothing"
     },
     {
-      "duration_seconds": 4.449174,
+      "duration_seconds": 4.336399,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_C19_native_restore_before_effect_independent_ledger"
     },
     {
-      "duration_seconds": 3.126752,
+      "duration_seconds": 3.134932,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_backup_before_due_exit_imports_original_exit_no_repeat"
     },
     {
-      "duration_seconds": 2.777832,
+      "duration_seconds": 2.634781,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_pre_admission_snapshot_complete_cut_no_duplicate"
     },
     {
-      "duration_seconds": 91.718889,
+      "duration_seconds": 91.74411,
       "metrics": {
-        "entry_tick_seconds_max": 0.23163350000686478,
-        "entry_tick_seconds_min": 0.20209479999903124,
+        "entry_tick_seconds_max": 0.26833359999000095,
+        "entry_tick_seconds_min": 0.19664450001437217,
         "modeled_net_literal_oracle_usd": "36.91",
         "native_headroom_guard_preserved": true,
         "native_stream_virtual_days": 14,
@@ -271,7 +310,7 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_native_source_stream_over_virtual_two_weeks"
     },
     {
-      "duration_seconds": 0.524924,
+      "duration_seconds": 0.521164,
       "metrics": {
         "native_headroom_guard_preserved": true,
         "nomination_calls": 0,
@@ -282,7 +321,7 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_source_capacity_guard_stops_before_nomination"
     },
     {
-      "duration_seconds": 3.825035,
+      "duration_seconds": 3.862459,
       "metrics": {
         "bounded_incident_rows": 1,
         "historical_journal_bytes_per_event": 159.744,
@@ -290,20 +329,20 @@
           {
             "database_bytes": 204800,
             "history_events": 0,
-            "tick_seconds_max": 0.04991699999663979,
-            "tick_seconds_min": 0.044916500002727844
+            "tick_seconds_max": 0.050030199985485524,
+            "tick_seconds_min": 0.04646009998396039
           },
           {
             "database_bytes": 364544,
             "history_events": 1000,
-            "tick_seconds_max": 0.05038390000117943,
-            "tick_seconds_min": 0.04611579999618698
+            "tick_seconds_max": 0.05042320000939071,
+            "tick_seconds_min": 0.046096400008536875
           },
           {
             "database_bytes": 843776,
             "history_events": 4000,
-            "tick_seconds_max": 0.05313280000700615,
-            "tick_seconds_min": 0.04441589998896234
+            "tick_seconds_max": 0.05009159998735413,
+            "tick_seconds_min": 0.04525070000090636
           }
         ],
         "owned_cleanup_verified_by_teardown": true,
@@ -314,7 +353,7 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_virtual_two_weeks_history_sizes_and_incident_bound"
     },
     {
-      "duration_seconds": 4.371956,
+      "duration_seconds": 4.446554,
       "metrics": {
         "actual_loopback_egress_hits": 0,
         "exit_reconciliation_healthy": true,
@@ -327,73 +366,73 @@
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C23_actual_egress_secret_and_non_target_canaries"
     },
     {
-      "duration_seconds": 11.435913,
+      "duration_seconds": 11.276715,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A1_A2_default_false_shared_admission_uses_managed_envelope"
     },
     {
-      "duration_seconds": 3.396713,
+      "duration_seconds": 3.327303,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A3_native_restore_fences_new_both_sides_preserves_replay_ack_exit"
     },
     {
-      "duration_seconds": 4.627677,
+      "duration_seconds": 4.581888,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_binding_profile_envelope_corruption_fails_closed_at_direct_owner"
     },
     {
-      "duration_seconds": 2.207087,
+      "duration_seconds": 2.109391,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_genuine_legacy_binding_and_exact_attempt_replay_remain_compatible"
     },
     {
-      "duration_seconds": 4.616429,
+      "duration_seconds": 4.537156,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_missing_corrupt_state_and_legacy_activation_cannot_downgrade"
     },
     {
-      "duration_seconds": 2.86039,
+      "duration_seconds": 2.90784,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_native_switch_failure_rolls_back_all_staged_scope"
     },
     {
-      "duration_seconds": 3.255141,
+      "duration_seconds": 3.214068,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_observed_physical_clock_guard_at_cli_and_direct_owner"
     },
     {
-      "duration_seconds": 8.2e-05,
+      "duration_seconds": 8.4e-05,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_adapters_v1.AdapterTests.test_C03_C14_input_clock_and_denominator_guards"
     },
     {
-      "duration_seconds": 0.00019,
+      "duration_seconds": 0.000195,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_adapters_v1.AdapterTests.test_C04_C14_fee_in_quote_raw_units_literal_oracle"
     },
     {
-      "duration_seconds": 8e-05,
+      "duration_seconds": 8.8e-05,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_adapters_v1.AdapterTests.test_C12_timeout_unknown_rejection_definitive_not_flat"
     },
     {
-      "duration_seconds": 0.000456,
+      "duration_seconds": 0.000467,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_adapters_v1.AdapterTests.test_C14_C23_negative_wire_shapes_before_persistence"
     },
     {
-      "duration_seconds": 0.291108,
+      "duration_seconds": 0.283403,
       "metrics": {
         "basis": "ORIGINAL_CUMULATIVE_INVENTORY_WITNESS",
         "cases": [
@@ -443,7 +482,7 @@
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_coherent_remainder_reduction_requires_original_inventory_before_headroom"
     },
     {
-      "duration_seconds": 0.09684,
+      "duration_seconds": 0.085714,
       "metrics": {
         "admission": "DENIED",
         "concurrent_connections": 2,
@@ -456,19 +495,19 @@
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_concurrent_admission_and_entry_claim_both_deny_coherent_inventory_corruption"
     },
     {
-      "duration_seconds": 0.059526,
+      "duration_seconds": 0.05768,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_configuration_required_and_legacy_unchanged"
     },
     {
-      "duration_seconds": 0.115882,
+      "duration_seconds": 0.12195,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_corrupt_remainder_or_final_never_frees_capacity"
     },
     {
-      "duration_seconds": 0.150274,
+      "duration_seconds": 0.129641,
       "metrics": {
         "cases": [
           {
@@ -496,19 +535,19 @@
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_claim_rechecks_coherent_predecessor_corruption_atomically"
     },
     {
-      "duration_seconds": 0.068384,
+      "duration_seconds": 0.119199,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_fee_allocation_and_leg_pnl_conserve_on_three_exits"
     },
     {
-      "duration_seconds": 0.057314,
+      "duration_seconds": 0.059525,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_price_quantity_notional_conflict_rejected_atomically"
     },
     {
-      "duration_seconds": 0.064124,
+      "duration_seconds": 0.063953,
       "metrics": {
         "legacy_original_payload_unchanged": true,
         "partial_quantity": "6000000",
@@ -518,31 +557,31 @@
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_genuine_v1_0_entry_then_v1_1_partial_and_full_preserves_original_payload"
     },
     {
-      "duration_seconds": 0.062261,
+      "duration_seconds": 0.06183,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_quantity_overfill_units_and_crash_are_atomic"
     },
     {
-      "duration_seconds": 0.455166,
+      "duration_seconds": 0.448525,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_money_preserves_identity_bound_unknown_economics_readback"
     },
     {
-      "duration_seconds": 0.371263,
+      "duration_seconds": 0.363413,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_quantity_preserves_identity_bound_unknown_economics_readback"
     },
     {
-      "duration_seconds": 0.078615,
+      "duration_seconds": 0.077249,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_literal_partial_accounting_oracle_replay_and_cold_readback"
     },
     {
-      "duration_seconds": 0.057799,
+      "duration_seconds": 0.059503,
       "metrics": {
         "modern_origin_retained": true,
         "mutable_flags_null": true,
@@ -552,43 +591,43 @@
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_modern_entry_witness_cannot_be_hidden_by_nulling_quantity_projection_flags"
     },
     {
-      "duration_seconds": 0.09135,
+      "duration_seconds": 0.083891,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_modes_independent_and_concurrent_reservations_serialized"
     },
     {
-      "duration_seconds": 2.829719,
+      "duration_seconds": 2.687603,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_terminal_release_requires_intact_final_result_chain"
     },
     {
-      "duration_seconds": 0.272531,
+      "duration_seconds": 0.261768,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_unattempted_cancel_releases_only_with_original_pre_attempt_witness"
     },
     {
-      "duration_seconds": 0.059288,
+      "duration_seconds": 0.066228,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_nonfill_frees_capacity_but_unknown_cost_stays_economic"
     },
     {
-      "duration_seconds": 0.060139,
+      "duration_seconds": 0.058552,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_partial_entry_raw_rounddown_retains_exact_paid_notional_without_fee_double_count"
     },
     {
-      "duration_seconds": 0.064041,
+      "duration_seconds": 0.064167,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_partial_unknown_retains_realized_leg_and_residual_upper_bound"
     },
     {
-      "duration_seconds": 0.74365,
+      "duration_seconds": 0.729788,
       "metrics": {
         "cases": [
           {
@@ -669,25 +708,25 @@
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_quantity_result_acceptance_rejects_corrupt_original_or_cumulative_projection"
     },
     {
-      "duration_seconds": 13.671011,
+      "duration_seconds": 13.867699,
       "metrics": {
         "after_1000_valid_releases": {
-          "elapsed_seconds": 0.15452240000013262,
+          "elapsed_seconds": 0.1538979000179097,
           "sqlite_steps": 774540
         },
         "after_100_valid_releases": {
-          "elapsed_seconds": 0.01526939999894239,
+          "elapsed_seconds": 0.015223700000206009,
           "sqlite_steps": 78430
         },
         "after_unrelated_journal": {
-          "elapsed_seconds": 0.15670099999988452,
+          "elapsed_seconds": 0.15215720000560395,
           "sqlite_steps": 774560
         },
         "before": {
-          "elapsed_seconds": 0.0005490000039571896,
+          "elapsed_seconds": 0.0005154999962542206,
           "sqlite_steps": 980
         },
-        "native_history_preparation_seconds": 13.244224900001427,
+        "native_history_preparation_seconds": 13.444521099998383,
         "native_valid_terminal_positions": 1000,
         "unrelated_journal_events": 12000
       },
@@ -695,55 +734,55 @@
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_readback_cost_is_bounded_by_outstanding_scope_not_historical_journal"
     },
     {
-      "duration_seconds": 0.057197,
+      "duration_seconds": 0.055812,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_repeat_envelope_cas_corruption_and_attempt_recheck"
     },
     {
-      "duration_seconds": 0.063462,
+      "duration_seconds": 0.063184,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_shared_predecessor_reservation_and_no_auto_shrink"
     },
     {
-      "duration_seconds": 0.068366,
+      "duration_seconds": 0.061674,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_unknown_exit_retains_inventory_and_blocks_overlapping_attempt"
     },
     {
-      "duration_seconds": 0.151444,
+      "duration_seconds": 0.14811,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_0_native_complete_result_chain_still_releases_capacity"
     },
     {
-      "duration_seconds": 0.054317,
+      "duration_seconds": 0.053131,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_0_result_event_payload_and_replay_remain_exact"
     },
     {
-      "duration_seconds": 0.058357,
+      "duration_seconds": 0.057946,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_1_entry_preserves_raw_quote_quantity_and_included_fee"
     },
     {
-      "duration_seconds": 8.011814,
+      "duration_seconds": 7.993272,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_active_successor_binding_failure_does_not_starve_predecessor_exit"
     },
     {
-      "duration_seconds": 7.569748,
+      "duration_seconds": 7.679528,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_active_successor_profile_failure_does_not_starve_predecessor_exit"
     },
     {
-      "duration_seconds": 2.130929,
+      "duration_seconds": 2.161651,
       "metrics": {
         "attempts": 0,
         "entries_enabled": false,
@@ -758,7 +797,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_authored_vendor_witness_boolean_decimals_denied_before_quote_effect"
     },
     {
-      "duration_seconds": 1.923746,
+      "duration_seconds": 1.964918,
       "metrics": {
         "artifact_collisions": [
           {
@@ -828,7 +867,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_backup_all_final_artifact_collisions_preserve_owned_non_targets_before_write"
     },
     {
-      "duration_seconds": 2.050685,
+      "duration_seconds": 2.101171,
       "metrics": {
         "final_auxiliary_files": 0,
         "native_failure": "OWNED_OUTPUTS_REMOVED",
@@ -839,7 +878,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_backup_exclusive_sidecar_race_and_native_failure_remove_only_reserved_outputs"
     },
     {
-      "duration_seconds": 3.306321,
+      "duration_seconds": 3.331651,
       "metrics": {
         "conflicting_scope": "DENY_BEFORE_WRITE",
         "credential_reads": 0,
@@ -860,7 +899,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_cli_repeated_quote_grant_paths_bind_original_profiles_and_reject_conflicting_scope"
     },
     {
-      "duration_seconds": 3.404099,
+      "duration_seconds": 3.299551,
       "metrics": {
         "fresh_adapter_calls": 0,
         "original_claims": 1,
@@ -872,7 +911,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_consumed_quote_grant_and_exit_cannot_resend"
     },
     {
-      "duration_seconds": 5.877574,
+      "duration_seconds": 5.577673,
       "metrics": {
         "controls": [
           "ENVELOPE_REVISION_2_10_USD",
@@ -887,7 +926,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy"
     },
     {
-      "duration_seconds": 3.035794,
+      "duration_seconds": 2.763229,
       "metrics": {
         "known_additional_cost_floor_usd": "0.25",
         "original_http_calls": 1,
@@ -900,7 +939,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_retains_known_cost_floor_before_later_unknown_total"
     },
     {
-      "duration_seconds": 3.742419,
+      "duration_seconds": 3.618163,
       "metrics": {
         "cases": [
           {
@@ -945,7 +984,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_configuration_chain_damage_or_omission_cannot_acknowledge_restore"
     },
     {
-      "duration_seconds": 2.995754,
+      "duration_seconds": 2.887921,
       "metrics": {
         "attempts": 0,
         "conflicting_local_revision": "DENY",
@@ -957,7 +996,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_configuration_restore_preserves_later_local_authority_and_detects_damage"
     },
     {
-      "duration_seconds": 3.471937,
+      "duration_seconds": 3.367361,
       "metrics": {
         "audit_retained": true,
         "corrupt_witness_extra_effects": 0,
@@ -969,42 +1008,205 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_corrupt_exit_request_stays_unknown_until_exact_owner_witness_restored"
     },
     {
-      "duration_seconds": 3.667112,
+      "duration_seconds": 3.325144,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_corrupt_predecessor_binding_does_not_starve_other_due_exit"
     },
     {
-      "duration_seconds": 11.358539,
+      "duration_seconds": 3.011737,
+      "metrics": {
+        "attempts": 0,
+        "credential_reads": 0,
+        "fake_http_calls": 0,
+        "quote_claims": 0,
+        "requests": 0,
+        "typed_inputs": [
+          {
+            "input": "missing",
+            "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+          },
+          {
+            "input": "json",
+            "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+          },
+          {
+            "input": "array",
+            "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+          },
+          {
+            "input": "missing-mint",
+            "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+          },
+          {
+            "input": "row-array",
+            "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+          },
+          {
+            "input": "missing-decimals",
+            "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+          },
+          {
+            "input": "boolean-decimals",
+            "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+          },
+          {
+            "input": "wrong-mint",
+            "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+          },
+          {
+            "input": "missing-time",
+            "reason": "EXECUTION_OBSERVATION_STALE_OR_FUTURE"
+          },
+          {
+            "input": "invalid-time",
+            "reason": "EXECUTION_OBSERVATION_STALE_OR_FUTURE"
+          },
+          {
+            "input": "future-time",
+            "reason": "EXECUTION_OBSERVATION_STALE_OR_FUTURE"
+          }
+        ]
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_current_asset_file_shapes_are_typed_before_native_claim_or_credential"
+    },
+    {
+      "duration_seconds": 2.318924,
+      "metrics": {
+        "attempts": 0,
+        "fake_http_calls": 0,
+        "quote_claims": 0,
+        "requests": 0,
+        "witness_shapes": [
+          "ARRAY",
+          "INVALID_JSON"
+        ]
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_current_witness_outer_shape_is_typed_before_native_claim"
+    },
+    {
+      "duration_seconds": 11.764848,
       "metrics": {
         "cases": [
           {
             "A_grant_claims": 2,
+            "B_attempt_rows": [],
+            "B_credential_reads": 0,
             "B_grant_claims": 0,
             "B_preclaim_attempts": 0,
             "B_preclaim_quote_claims": 0,
+            "B_request_rows": [],
+            "B_requests": 0,
+            "clock_advances": 2,
             "clock_crossed_origin_exit_due": true,
+            "entry_reason": "QUOTE_EXTERNAL_AUTHORITY_REQUIRED",
             "exit_health_with_entry_blocker": true,
             "fake_http_calls": 2,
             "grant": "expired",
+            "incident_audit_retained": true,
             "inventory_with_entry_blocker": "KNOWN",
             "native_run_ticks": 3,
             "original_A": "RECONCILED",
+            "position_rows": [
+              {
+                "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+                "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE",
+                "state": "RECONCILED"
+              },
+              {
+                "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B",
+                "position_id": "POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+                "state": "WATCHED"
+              }
+            ],
+            "quote_claim_rows": [
+              {
+                "event_id": "QUOTE-CALL-ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+                "payload": {
+                  "attempt_id": "ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+                  "grant_sha256": "f8fe3e5552b6c97071985469544c266d122ddbb15f4c02f3b3a21b8c4763957a"
+                },
+                "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE"
+              },
+              {
+                "event_id": "QUOTE-CALL-ATTEMPT-90B329D2C77934CEDA9D30D40E29A752D05DAB8392D380565927E0F2289A15E1",
+                "payload": {
+                  "attempt_id": "ATTEMPT-90B329D2C77934CEDA9D30D40E29A752D05DAB8392D380565927E0F2289A15E1",
+                  "grant_sha256": "f8fe3e5552b6c97071985469544c266d122ddbb15f4c02f3b3a21b8c4763957a"
+                },
+                "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE"
+              }
+            ],
+            "retained_incident": {
+              "active": 1,
+              "first_at": "2026-10-05T12:55:00Z",
+              "incident_key": "ENTRY-SHADOW-POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+              "last_changed_at": "2026-10-05T12:55:00Z",
+              "occurrences": 1,
+              "reason": "QUOTE_EXTERNAL_AUTHORITY_REQUIRED"
+            },
             "same_process": true,
             "signal_stale_after_dependency_repair_no_effect": true
           },
           {
             "A_grant_claims": 2,
+            "B_attempt_rows": [],
+            "B_credential_reads": 0,
             "B_grant_claims": 0,
             "B_preclaim_attempts": 0,
             "B_preclaim_quote_claims": 0,
+            "B_request_rows": [],
+            "B_requests": 0,
+            "clock_advances": 2,
             "clock_crossed_origin_exit_due": true,
+            "entry_reason": "QUOTE_EXTERNAL_AUTHORITY_REQUIRED",
             "exit_health_with_entry_blocker": true,
             "fake_http_calls": 2,
             "grant": "missing",
+            "incident_audit_retained": true,
             "inventory_with_entry_blocker": "KNOWN",
             "native_run_ticks": 3,
             "original_A": "RECONCILED",
+            "position_rows": [
+              {
+                "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+                "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE",
+                "state": "RECONCILED"
+              },
+              {
+                "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B",
+                "position_id": "POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+                "state": "WATCHED"
+              }
+            ],
+            "quote_claim_rows": [
+              {
+                "event_id": "QUOTE-CALL-ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+                "payload": {
+                  "attempt_id": "ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+                  "grant_sha256": "72f3936ba13cee1684b80b3a9b0b772b168b11a1b16352b8141cc85205cf4662"
+                },
+                "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE"
+              },
+              {
+                "event_id": "QUOTE-CALL-ATTEMPT-90B329D2C77934CEDA9D30D40E29A752D05DAB8392D380565927E0F2289A15E1",
+                "payload": {
+                  "attempt_id": "ATTEMPT-90B329D2C77934CEDA9D30D40E29A752D05DAB8392D380565927E0F2289A15E1",
+                  "grant_sha256": "72f3936ba13cee1684b80b3a9b0b772b168b11a1b16352b8141cc85205cf4662"
+                },
+                "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE"
+              }
+            ],
+            "retained_incident": {
+              "active": 1,
+              "first_at": "2026-10-05T12:55:00Z",
+              "incident_key": "ENTRY-SHADOW-POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+              "last_changed_at": "2026-10-05T12:55:00Z",
+              "occurrences": 1,
+              "reason": "QUOTE_EXTERNAL_AUTHORITY_REQUIRED"
+            },
             "same_process": true,
             "signal_stale_after_dependency_repair_no_effect": true
           }
@@ -1034,13 +1236,13 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_expired_and_missing_successor_grants_keep_same_native_run_servicing_future_origin_exit"
     },
     {
-      "duration_seconds": 2.180364,
+      "duration_seconds": 2.368569,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_export_cut_denies_known_after_backup_result_omission_or_conflict"
     },
     {
-      "duration_seconds": 2.697427,
+      "duration_seconds": 2.685548,
       "metrics": {
         "attempts": 0,
         "conflicting_duplicate": "DENY",
@@ -1059,19 +1261,84 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_invalid_quote_scope_and_expiry_deny_before_native_attempt_and_credential"
     },
     {
-      "duration_seconds": 3.064218,
+      "duration_seconds": 5.802719,
+      "metrics": {
+        "A_grant_claims": 2,
+        "B_attempt_rows": [],
+        "B_credential_reads": 0,
+        "B_grant_claims": 0,
+        "B_preclaim_attempts": 0,
+        "B_preclaim_quote_claims": 0,
+        "B_request_rows": [],
+        "B_requests": 0,
+        "clock_advances": 2,
+        "clock_crossed_origin_exit_due": true,
+        "entry_reason": "EXECUTION_ASSET_IDENTITY_INVALID",
+        "exit_health_with_entry_blocker": true,
+        "fake_http_calls": 2,
+        "grant": "asset-array",
+        "incident_audit_retained": true,
+        "inventory_with_entry_blocker": "KNOWN",
+        "native_run_ticks": 3,
+        "original_A": "RECONCILED",
+        "position_rows": [
+          {
+            "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+            "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE",
+            "state": "RECONCILED"
+          },
+          {
+            "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B",
+            "position_id": "POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+            "state": "WATCHED"
+          }
+        ],
+        "quote_claim_rows": [
+          {
+            "event_id": "QUOTE-CALL-ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+            "payload": {
+              "attempt_id": "ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
+              "grant_sha256": "7a8e7fd1dbf001185741919f10a3b79c647322d8dd1b217bb243ca68cf050af2"
+            },
+            "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE"
+          },
+          {
+            "event_id": "QUOTE-CALL-ATTEMPT-90B329D2C77934CEDA9D30D40E29A752D05DAB8392D380565927E0F2289A15E1",
+            "payload": {
+              "attempt_id": "ATTEMPT-90B329D2C77934CEDA9D30D40E29A752D05DAB8392D380565927E0F2289A15E1",
+              "grant_sha256": "7a8e7fd1dbf001185741919f10a3b79c647322d8dd1b217bb243ca68cf050af2"
+            },
+            "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE"
+          }
+        ],
+        "retained_incident": {
+          "active": 1,
+          "first_at": "2026-10-05T12:55:00Z",
+          "incident_key": "ENTRY-SHADOW-POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+          "last_changed_at": "2026-10-05T12:55:00Z",
+          "occurrences": 1,
+          "reason": "EXECUTION_ASSET_IDENTITY_INVALID"
+        },
+        "same_process": true,
+        "signal_stale_after_dependency_repair_no_effect": true
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_invalid_successor_asset_array_keeps_same_native_run_servicing_future_origin_exit"
+    },
+    {
+      "duration_seconds": 3.405542,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_later_paper_cut_preserves_original_pending_model_result_clock"
     },
     {
-      "duration_seconds": 3.004614,
+      "duration_seconds": 2.976624,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_later_shadow_pending_cut_accepts_original_earlier_definitive_receipt"
     },
     {
-      "duration_seconds": 3.232148,
+      "duration_seconds": 3.103321,
       "metrics": {
         "attempts": 2,
         "cli_ticks": 3,
@@ -1087,7 +1354,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_malformed_new_source_json_does_not_stop_ordinary_cli_before_future_old_exit"
     },
     {
-      "duration_seconds": 7.872453,
+      "duration_seconds": 7.829064,
       "metrics": {
         "exact_original_restore": "READY",
         "healthy_neighbor": "RECONCILED",
@@ -1098,7 +1365,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_malformed_origin_shapes_are_typed_readonly_and_do_not_starve_healthy_due_exit"
     },
     {
-      "duration_seconds": 5.811522,
+      "duration_seconds": 5.618997,
       "metrics": {
         "callback_variants": 4,
         "capture_variants": 6,
@@ -1112,7 +1379,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_malformed_original_capture_and_callback_quarantine_without_resend_or_neighbor_starvation"
     },
     {
-      "duration_seconds": 3.625099,
+      "duration_seconds": 3.788757,
       "metrics": {
         "corrupt_original_entry_cost_usd": "31",
         "original_claim_quantity": "6000000",
@@ -1125,7 +1392,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_projection_race_after_claim_retains_original_capture_without_resend"
     },
     {
-      "duration_seconds": 3.536253,
+      "duration_seconds": 3.688315,
       "metrics": {
         "atomic_claim_guard": "DENY",
         "genuine_result_reduces_quantity_to": "2000000",
@@ -1139,7 +1406,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_projection_race_between_preflight_and_claim_denies_before_attempt"
     },
     {
-      "duration_seconds": 2.082291,
+      "duration_seconds": 2.086964,
       "metrics": {
         "attempts": 0,
         "entries_enabled": false,
@@ -1154,13 +1421,13 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_hash_conflict_denies_before_quote_effect"
     },
     {
-      "duration_seconds": 2.821723,
+      "duration_seconds": 2.778716,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_witness_metadata_survives_source_deletion_for_due_exit"
     },
     {
-      "duration_seconds": 2.731584,
+      "duration_seconds": 2.737091,
       "metrics": {
         "damaged_caches": 3,
         "damaged_final": "ACTION_REQUIRED",
@@ -1172,7 +1439,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_nonfill_corrupt_witness_remains_active_and_truthful_restore_recovers"
     },
     {
-      "duration_seconds": 12.558261,
+      "duration_seconds": 12.516529,
       "metrics": {
         "cases": [
           {
@@ -1217,7 +1484,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart"
     },
     {
-      "duration_seconds": 3.673179,
+      "duration_seconds": 3.752972,
       "metrics": {
         "corrupt_original_result_extra_quotes": 0,
         "healthy_other_exit": "RECONCILED",
@@ -1228,7 +1495,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_original_result_damage_blocks_quote_and_healthy_neighbor_continues"
     },
     {
-      "duration_seconds": 10.556902,
+      "duration_seconds": 10.391694,
       "metrics": {
         "cases": [
           {
@@ -1258,7 +1525,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_partial_projection_damage_blocks_ordinary_quote_until_truthful_restoration"
     },
     {
-      "duration_seconds": 2.709119,
+      "duration_seconds": 2.733463,
       "metrics": {
         "ack_denied": true,
         "known_fills": 0,
@@ -1271,19 +1538,19 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_pending_quote_claim_restores_unknown_without_manufacturing_result_or_resend"
     },
     {
-      "duration_seconds": 2.806459,
+      "duration_seconds": 2.803197,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_post_restore_drain_with_inventory_survives_older_complete_cut"
     },
     {
-      "duration_seconds": 2.506177,
+      "duration_seconds": 2.415548,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_post_restore_stop_survives_older_complete_cut"
     },
     {
-      "duration_seconds": 6.010561,
+      "duration_seconds": 6.031096,
       "metrics": {
         "B_after_bad_response": "ATTEMPTING_PENDING_ORIGINAL",
         "B_after_callback": "OPEN",
@@ -1304,7 +1571,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_postclaim_entry_response_failure_keeps_original_pending_and_future_old_exit_in_same_run"
     },
     {
-      "duration_seconds": 4.720381,
+      "duration_seconds": 4.78065,
       "metrics": {
         "cases": [
           {
@@ -1330,7 +1597,7 @@
             "fake_http_calls": 0,
             "original_attempt_id": "ATTEMPT-5435289CE44B7D9A211E51865DD51F252C2DBE1685F1BFF5A4426C985E79C83C",
             "original_pending_recovery": "RETAINED_WITHOUT_RESEND",
-            "original_request_sha256": "31e5b1bc0c87e7fb0169e16363ef766690545f2ba2e9a776f282aae165202ff4",
+            "original_request_sha256": "74d64543a0ffcedcfb09fb14f763b7eec10a925b05e1ecce382f5765aa11d930",
             "quote_claims": 1,
             "requests": 1,
             "results": 0,
@@ -1347,7 +1614,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_quote_expiry_rechecked_at_atomic_claim_and_last_http_boundary"
     },
     {
-      "duration_seconds": 3.202272,
+      "duration_seconds": 3.186005,
       "metrics": {
         "exit_outcome": "UNKNOWN",
         "input_cause_recovered": true,
@@ -1359,7 +1626,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_recovered_funding_with_unknown_exit_keeps_attempt_and_inventory_fence"
     },
     {
-      "duration_seconds": 2.018725,
+      "duration_seconds": 2.045404,
       "metrics": {
         "artifact_cases": 8,
         "destination_collisions": [
@@ -1417,7 +1684,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_all_destination_artifact_collisions_preserve_regular_and_hardlink_bytes"
     },
     {
-      "duration_seconds": 1.997311,
+      "duration_seconds": 2.000035,
       "metrics": {
         "late_auxiliary": "DENY_NON_TARGET_UNCHANGED",
         "native_failure": "ONLY_OWNED_MAIN_REMOVED",
@@ -1428,7 +1695,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_exclusive_reservation_late_auxiliary_and_native_failure_preserve_non_targets"
     },
     {
-      "duration_seconds": 2.257437,
+      "duration_seconds": 2.259312,
       "metrics": {
         "malformed_manifest_shapes": 3,
         "original_sealed_limit": "30",
@@ -1441,13 +1708,13 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_sealed_source_rejects_unsigned_wal_and_preserves_standalone_legacy_lineage"
     },
     {
-      "duration_seconds": 3.561418,
+      "duration_seconds": 3.641359,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_restore_without_effects_imports_successor_binding_and_generation_paused"
     },
     {
-      "duration_seconds": 3.995113,
+      "duration_seconds": 3.955547,
       "metrics": {
         "bad_request": "RETAINED_UNKNOWN_NO_RESEND",
         "clock_crossed_due_time": true,
@@ -1464,7 +1731,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_retained_request_array_quarantines_original_position_without_starving_healthy_exit"
     },
     {
-      "duration_seconds": 8.062155,
+      "duration_seconds": 8.046833,
       "metrics": {
         "cases": [
           {
@@ -1497,7 +1764,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_retained_request_nested_shape_and_hash_conflicts_keep_neighbor_exit_running"
     },
     {
-      "duration_seconds": 6.756664,
+      "duration_seconds": 6.75273,
       "metrics": {
         "claims_A": 2,
         "claims_B": 1,
@@ -1522,7 +1789,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_separate_original_quote_grants_close_predecessor_and_admit_successor_with_cold_quota"
     },
     {
-      "duration_seconds": 2.208374,
+      "duration_seconds": 2.194706,
       "metrics": {
         "new_attempts": 0,
         "new_effects": 0,
@@ -1534,7 +1801,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_shared_store_failure_remains_fatal_and_atomic_in_ordinary_run"
     },
     {
-      "duration_seconds": 12.424148,
+      "duration_seconds": 12.434612,
       "metrics": {
         "cases": [
           {
@@ -1587,7 +1854,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_source_shape_hash_and_identity_conflicts_isolate_page_and_keep_old_exit_service"
     },
     {
-      "duration_seconds": 3.503937,
+      "duration_seconds": 3.660493,
       "metrics": {
         "entry_ttl_seconds": 30,
         "expired_attempts": 0,
@@ -1597,7 +1864,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_sqlite_writer_wait_cannot_authorize_entry_after_ttl"
     },
     {
-      "duration_seconds": 9.507689,
+      "duration_seconds": 9.546933,
       "metrics": {
         "cases": [
           {
@@ -1627,7 +1894,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_transient_exit_funding_recovers_without_stale_active_incident"
     },
     {
-      "duration_seconds": 4.128605,
+      "duration_seconds": 4.104844,
       "metrics": {
         "distinct_restore_acks": 2,
         "each_new_fence": true,
@@ -1643,7 +1910,7 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_two_ordinary_restore_cycles_preserve_original_history_and_each_new_snapshot_fence"
     },
     {
-      "duration_seconds": 2.67576,
+      "duration_seconds": 2.590438,
       "metrics": {
         "attempts": 1,
         "fake_http_calls": 0,
@@ -1653,323 +1920,323 @@
       "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_unknown_entry_recovery_keeps_original_pending_identity_without_quote_resend"
     },
     {
-      "duration_seconds": 0.074203,
+      "duration_seconds": 0.069326,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.ConfirmedBaselineDefects.test_conflicting_entry_result_cannot_rewrite_inventory"
     },
     {
-      "duration_seconds": 0.055949,
+      "duration_seconds": 0.055223,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.ConfirmedBaselineDefects.test_duplicate_entry_result_has_one_accounting_effect"
     },
     {
-      "duration_seconds": 0.062669,
+      "duration_seconds": 0.06412,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.ConfirmedBaselineDefects.test_mixed_mode_projection_has_no_combined_money_headline"
     },
     {
-      "duration_seconds": 0.072314,
+      "duration_seconds": 0.067367,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.ConfirmedBaselineDefects.test_pause_after_admission_before_fill_dominates"
     },
     {
-      "duration_seconds": 0.054092,
+      "duration_seconds": 0.054411,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.ConfirmedBaselineDefects.test_reserved_admission_is_in_operator_entry_count"
     },
     {
-      "duration_seconds": 2.051148,
+      "duration_seconds": 2.043806,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_O1_ordinary_source_to_single_admission"
     },
     {
-      "duration_seconds": 3.308123,
+      "duration_seconds": 3.210175,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_O2_same_mint_other_episode_does_not_inherit_membership"
     },
     {
-      "duration_seconds": 1.945919,
+      "duration_seconds": 2.003269,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_O3_flat_is_not_positive"
     },
     {
-      "duration_seconds": 1.950569,
+      "duration_seconds": 1.931137,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_O4_missing_holder_is_not_zero"
     },
     {
-      "duration_seconds": 1.94326,
+      "duration_seconds": 1.998713,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_O5_membership_unknown_refuses_before_loader"
     },
     {
-      "duration_seconds": 1.730698,
+      "duration_seconds": 1.753525,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_O6_late_input_does_not_heal"
     },
     {
-      "duration_seconds": 2.515895,
+      "duration_seconds": 2.474693,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_O7_O8_restart_and_future_do_not_change_decision"
     },
     {
-      "duration_seconds": 2.183311,
+      "duration_seconds": 2.192957,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_after_commit_exit_result_replay_finishes_drain_once"
     },
     {
-      "duration_seconds": 2.152804,
+      "duration_seconds": 2.119744,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_atomic_fault_and_uncertain_attempt_do_not_resend"
     },
     {
-      "duration_seconds": 0.252143,
+      "duration_seconds": 0.188669,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_cli_live_and_unowned_root_fail_before_effect"
     },
     {
-      "duration_seconds": 2.273833,
+      "duration_seconds": 2.33392,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_cumulative_cost_floor_clock_and_partial_exit_refusal"
     },
     {
-      "duration_seconds": 2.008566,
+      "duration_seconds": 2.048572,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_definitive_failed_result_preserves_cost_and_no_inventory"
     },
     {
-      "duration_seconds": 2.1677,
+      "duration_seconds": 2.166392,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_denial_re_evaluates_after_policy_revision_without_erasing_history"
     },
     {
-      "duration_seconds": 2.171813,
+      "duration_seconds": 2.301794,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_episode_replay_cannot_cancel_attempting_or_unknown"
     },
     {
-      "duration_seconds": 2.065601,
+      "duration_seconds": 1.979434,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_frozen_spec_tamper_and_activation_conflict_cannot_rebind_position"
     },
     {
-      "duration_seconds": 2.102038,
+      "duration_seconds": 2.0948,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_half_cent_tie_is_literal_HALF_UP_in_ordinary_exit"
     },
     {
-      "duration_seconds": 6.240139,
+      "duration_seconds": 6.179832,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_independent_source_action_admission_terminal_sets"
     },
     {
-      "duration_seconds": 2.15171,
+      "duration_seconds": 2.148253,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_late_decision_price_refuses_list_only_without_future_healing"
     },
     {
-      "duration_seconds": 2.571337,
+      "duration_seconds": 2.692605,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_list_only_uses_same_source_owner"
     },
     {
-      "duration_seconds": 1.955293,
+      "duration_seconds": 2.044473,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_missing_decision_price_refuses_list_only"
     },
     {
-      "duration_seconds": 1.980799,
+      "duration_seconds": 1.964713,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_missing_decision_price_refuses_positive_holder_delta"
     },
     {
-      "duration_seconds": 2.390878,
+      "duration_seconds": 2.387066,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_mixed_stream_pause_resume_policy_revision_route_loss_restart_conservation"
     },
     {
-      "duration_seconds": 3.172521,
+      "duration_seconds": 3.139202,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_native_corrupt_and_missing_store_readback_is_typed_no_bootstrap"
     },
     {
-      "duration_seconds": 2.229944,
+      "duration_seconds": 2.176886,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_no_route_exit_preserves_inventory_then_operator_reconciles_and_drains"
     },
     {
-      "duration_seconds": 2.764545,
+      "duration_seconds": 2.757538,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_nonfill_classes_unknown_cost_and_invalid_amounts"
     },
     {
-      "duration_seconds": 2.300621,
+      "duration_seconds": 2.291805,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_admission_real_errors_rollback_source_reservation_and_risk"
     },
     {
-      "duration_seconds": 2.859737,
+      "duration_seconds": 2.869653,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_denied_admission_is_durable_and_idempotent"
     },
     {
-      "duration_seconds": 2.124982,
+      "duration_seconds": 2.120599,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_disabled_policy_replay_cancellation_is_durable"
     },
     {
-      "duration_seconds": 7.201456,
+      "duration_seconds": 7.174133,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_full_chain_decimal_oracle"
     },
     {
-      "duration_seconds": 2.126888,
+      "duration_seconds": 2.1329,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_paused_replay_cancellation_is_durable"
     },
     {
-      "duration_seconds": 2.095652,
+      "duration_seconds": 2.111881,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_ordinary_stale_replay_cancellation_survives_new_connection"
     },
     {
-      "duration_seconds": 2.016845,
+      "duration_seconds": 2.035582,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_origin_decision_clock_corruption_refuses_without_effect"
     },
     {
-      "duration_seconds": 2.75494,
+      "duration_seconds": 2.740645,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_origin_exit_binding_atomic_replay_and_operator_close"
     },
     {
-      "duration_seconds": 2.648801,
+      "duration_seconds": 2.618836,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_origin_exit_clock_corruption_refuses_without_effect"
     },
     {
-      "duration_seconds": 2.495871,
+      "duration_seconds": 2.495809,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_origin_exit_source_admission_corruption_refuses_without_effect"
     },
     {
-      "duration_seconds": 2.691118,
+      "duration_seconds": 2.632888,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_origin_packet_corruption_and_missing_research_refuse_without_effect"
     },
     {
-      "duration_seconds": 2.016433,
+      "duration_seconds": 2.012444,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_pause_between_admission_and_attempt_cancels"
     },
     {
-      "duration_seconds": 2.278648,
+      "duration_seconds": 2.162552,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_restore_pending_inventory_and_policy_in_fresh_root"
     },
     {
-      "duration_seconds": 2.088158,
+      "duration_seconds": 2.027447,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_result_terminal_classes_and_partial_inventory"
     },
     {
-      "duration_seconds": 1.923721,
+      "duration_seconds": 1.92813,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_scientific_producer_requires_own_git_identity"
     },
     {
-      "duration_seconds": 2.703685,
+      "duration_seconds": 2.723163,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_shadow_ordinary_boundary_is_separate_from_paper_and_quote_only"
     },
     {
-      "duration_seconds": 1.848827,
+      "duration_seconds": 1.846305,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_source_publication_preserves_first_visibility_and_replay"
     },
     {
-      "duration_seconds": 1.889777,
+      "duration_seconds": 1.963402,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_store_hardlink_canary_refused_before_writable_effect"
     },
     {
-      "duration_seconds": 2.424606,
+      "duration_seconds": 2.368714,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_unknown_close_delayed_positive_preserves_close_and_negative_clears"
     },
     {
-      "duration_seconds": 2.222528,
+      "duration_seconds": 2.173796,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_unknown_then_delayed_result_is_one_effect_after_restart"
     },
     {
-      "duration_seconds": 2.674889,
+      "duration_seconds": 2.646808,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_version_V2_handoff_boundary_is_explicit_and_V1_exit_survives_list_removal"
     },
     {
-      "duration_seconds": 1.975084,
+      "duration_seconds": 1.895623,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.OrdinarySourceTests.test_windows_rooted_and_drive_relative_source_paths_refused"
     },
     {
-      "duration_seconds": 0.000119,
+      "duration_seconds": 0.000114,
       "metrics": {},
       "owned_root_absent": true,
       "test": "test_trading_continuity_v1.SelectorOracleTests.test_literal_exactly_two_at_least_two_unknown_invalid_and_aliases"
     }
   ],
-  "tests_run": 172
+  "tests_run": 176
 }

@@ -420,9 +420,13 @@ class TradingCoordinator:
                     raise PaperPlaneError("EXECUTION_ASSET_METADATA_INTEGRITY_CONFLICT")
             elif cfg["asset_metadata_file"] is None:
                 import hashlib
-                raw=exact_child(root,admission["witness_raw_body_rel"]).read_bytes()
-                witness=json.loads(raw)
-                if (hashlib.sha256(raw).hexdigest()!=Path(admission["witness_raw_body_rel"]).stem
+                try:
+                    raw=exact_child(root,admission["witness_raw_body_rel"]).read_bytes()
+                    witness=json.loads(raw)
+                except (OSError, ValueError):
+                    raise PaperPlaneError("EXECUTION_ASSET_WITNESS_INTEGRITY_CONFLICT") from None
+                if (not isinstance(witness, dict)
+                    or hashlib.sha256(raw).hexdigest()!=Path(admission["witness_raw_body_rel"]).stem
                     or witness.get("schema")!="smial.opportunity-episode-witness-extract" or witness.get("schema_version")!="1.0"
                     or witness.get("source_response_sha256")!=admission["witness_response_sha256"]
                     or witness.get("object_sha256")!=admission["witness_object_sha256"]):
@@ -434,11 +438,23 @@ class TradingCoordinator:
                     "observed_at":admission["witness_response_received_at"],"available_at":admission["witness_first_reliable_available_at"],
                     "witness_response_sha256":admission["witness_response_sha256"],"witness_object_sha256":admission["witness_object_sha256"]}
             else:
-                asset=json.loads(exact_child(root,cfg["asset_metadata_file"]).read_text(encoding="utf-8"))[position["mint"]]
-            token_decimals = asset["decimals"]
-            if asset.get("mint") != position["mint"] or type(token_decimals) is not int or not 0 <= token_decimals <= 18:
+                try:
+                    metadata=json.loads(exact_child(root,cfg["asset_metadata_file"]).read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    raise PaperPlaneError("EXECUTION_ASSET_IDENTITY_INVALID") from None
+                if not isinstance(metadata, dict):
+                    raise PaperPlaneError("EXECUTION_ASSET_IDENTITY_INVALID")
+                asset=metadata.get(position["mint"])
+            if (not isinstance(asset, dict) or asset.get("mint") != position["mint"]
+                or type(asset.get("decimals")) is not int or not 0 <= asset["decimals"] <= 18):
                 raise PaperPlaneError("EXECUTION_ASSET_IDENTITY_INVALID")
-            if not parse_utc(asset["observed_at"]) <= parse_utc(asset["available_at"]) <= parse_utc(at):
+            token_decimals = asset["decimals"]
+            now = parse_utc(at)
+            try:
+                observed, available = parse_utc(asset.get("observed_at")), parse_utc(asset.get("available_at"))
+            except ValueError:
+                raise PaperPlaneError("EXECUTION_OBSERVATION_STALE_OR_FUTURE") from None
+            if not observed <= available <= now:
                 raise PaperPlaneError("EXECUTION_OBSERVATION_STALE_OR_FUTURE")
             request.update(funding_price_usd=funding["unit_price_usd"], funding_observation_sha256=sha256_of(funding),
                            asset_metadata_sha256=sha256_of(asset),asset_metadata=asset)
@@ -835,9 +851,13 @@ class TradingCoordinator:
                 store._conn.execute("UPDATE ordinary_state SET last_tick_at=?,source_status=?,source_latest_at=? WHERE mode=?", (at, source_status, latest, self.mode))
                 if counts["attempts"] or counts["exits"]:
                     store._conn.execute("UPDATE ordinary_state SET last_progress_at=? WHERE mode=?", (at, self.mode))
+            from solana_alpha_lab.factory.trading_runtime_policy import resolve_current_policy
+            runtime_policy = resolve_current_policy(store, self.mode)
+            policy_enabled = (runtime_policy["status"] == "NOT_CONFIGURED_STRATEGY_ONLY"
+                or runtime_policy["status"] == "VALID" and runtime_policy["policy"]["new_entries_enabled"])
             return {"status": "TICK_COMPLETE", "mode": self.mode, "epoch_id": state["epoch_id"], "as_of": at,
                     "source_status": source_status, "reconciliation_healthy": recovery_healthy,
-                    "entries_enabled": allows_entries and not store._conn.execute("SELECT 1 FROM ordinary_incidents WHERE active=1 AND incident_key LIKE ? LIMIT 1",
+                    "entries_enabled": allows_entries and policy_enabled and not store._conn.execute("SELECT 1 FROM ordinary_incidents WHERE active=1 AND incident_key LIKE ? LIMIT 1",
                         ("ENTRY-" + self.mode + "-%",)).fetchone(), **counts}
         finally:
             store.close()
@@ -922,6 +942,8 @@ class TradingCoordinator:
                 envelope_valid = envelope["status"] == "VALID"
                 runtime_policy = resolve_current_policy(store, self.mode)
                 policy_valid = runtime_policy["status"] in {"VALID", "NOT_CONFIGURED_STRATEGY_ONLY"}
+                policy_enabled = (runtime_policy["status"] == "NOT_CONFIGURED_STRATEGY_ONLY"
+                    or runtime_policy["status"] == "VALID" and runtime_policy["policy"]["new_entries_enabled"])
                 execution_input_status = "OPERATING_PROFILE_UNAVAILABLE_OR_CORRUPT"
                 if profile is not None:
                     try:
@@ -937,10 +959,10 @@ class TradingCoordinator:
                 exit_blocked = any(row["active"] and not row["incident_key"].startswith(("SOURCE-", "ENTRY-")) for row in incidents)
                 active_bot = next((bot for bot in bots if bot["activation_epoch_id"] == state["epoch_id"]), None)
                 entries_enabled = bool(active_bot and active_bot["status"] == "RUNNING" and not active_bot["entries_paused"]
-                    and policy_valid and envelope_valid and execution_inputs_verified and not integrity and not unresolved
+                    and policy_enabled and envelope_valid and execution_inputs_verified and not integrity and not unresolved
                     and inventory["inventory_status"] == "KNOWN" and not state["restore_guard"] and fresh
                     and source_issue is None and not entry_blockers)
-                healthy = policy_valid and envelope_valid and execution_inputs_verified and not integrity and not exit_blocked and not entry_blockers and source_issue is None and alive and moving and fresh and not unresolved and inventory["inventory_status"] == "KNOWN" and not state["restore_guard"]
+                healthy = policy_enabled and envelope_valid and execution_inputs_verified and not integrity and not exit_blocked and not entry_blockers and source_issue is None and alive and moving and fresh and not unresolved and inventory["inventory_status"] == "KNOWN" and not state["restore_guard"]
                 restored_cut = store._conn.execute("SELECT event_id FROM execution_events WHERE event_type='RESTORE_EXTERNAL_CUT_RECONCILED' AND json_extract(payload_json,'$.mode')=? ORDER BY rowid DESC LIMIT 1", (self.mode,)).fetchone()
                 restore_ready_for_ack = bool(restored_cut and policy_valid and envelope_valid and not unresolved and not integrity and inventory["inventory_status"]=="KNOWN")
                 restore_next = "ack-restore --mode "+self.mode+" --input complete-external-cut.json --inventory-sha256 "+sha256_of(inventory)+" --as-of "+at if restore_ready_for_ack else "reconcile --mode "+self.mode+" --input complete-external-cut.json"
@@ -980,8 +1002,8 @@ class TradingCoordinator:
                     "economics": economics, "economics_coverage": "RECENT_100_POSITION_ROWS_PER_MODE",
                     "complete_execution_readback": "trading_continuity.py readback", "netreturn_status": "NOT_ESTABLISHED", "owner_fcf_status": "NOT_AVAILABLE",
                     "scientific_monitoring_thresholds": "NOT_CONFIGURED",
-                    "next_safe_action": "ACKNOWLEDGE_RESTORED_INVENTORY" if state["restore_guard"] and restore_ready_for_ack else "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING" if unresolved or integrity or state["restore_guard"] else "VERIFY_RUNTIME_POLICY" if not policy_valid else "VERIFY_OPERATING_ENVELOPE" if not envelope_valid else "CHECK_EXECUTION_QUOTE_INPUTS" if not execution_inputs_verified else "VERIFY_ORIGINAL_ENTRY_GRANT_OR_INPUT" if entry_blockers else "RESTORE_EXACT_SOURCE_RECORD_WITHOUT_ADVANCING_CURSOR" if source_issue and source_issue["reason"] not in {"SOURCE_STALE", "SOURCE_UNAVAILABLE"} else "CHECK_PROCESS_SOURCE_AND_PROFILE" if not healthy else "NONE",
-                    "next_safe_command": restore_next if state["restore_guard"] else "readback --mode "+self.mode if unresolved or integrity or exit_blocked or entry_blockers or source_issue or not policy_valid or not envelope_valid or not execution_inputs_verified else "run --mode "+self.mode+" --ticks 1" if not fresh else "run --mode "+self.mode if not alive else "status --mode "+self.mode+" --format human",
+                    "next_safe_action": "ACKNOWLEDGE_RESTORED_INVENTORY" if state["restore_guard"] and restore_ready_for_ack else "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING" if unresolved or integrity or state["restore_guard"] else "VERIFY_RUNTIME_POLICY" if not policy_enabled else "VERIFY_OPERATING_ENVELOPE" if not envelope_valid else "CHECK_EXECUTION_QUOTE_INPUTS" if not execution_inputs_verified else "VERIFY_ORIGINAL_ENTRY_GRANT_OR_INPUT" if entry_blockers else "RESTORE_EXACT_SOURCE_RECORD_WITHOUT_ADVANCING_CURSOR" if source_issue and source_issue["reason"] not in {"SOURCE_STALE", "SOURCE_UNAVAILABLE"} else "CHECK_PROCESS_SOURCE_AND_PROFILE" if not healthy else "NONE",
+                    "next_safe_command": restore_next if state["restore_guard"] else "readback --mode "+self.mode if unresolved or integrity or exit_blocked or entry_blockers or source_issue or not policy_enabled or not envelope_valid or not execution_inputs_verified else "run --mode "+self.mode+" --ticks 1" if not fresh else "run --mode "+self.mode if not alive else "status --mode "+self.mode+" --format human",
                     "live_authority": False, "financial_authority": False}
         finally:
             store.close()

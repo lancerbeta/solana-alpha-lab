@@ -1,0 +1,41 @@
+{
+  "archive_scope": "Byte-exact historical successful proofs at recorded source pins; they do not close the new native findings or establish new-source PASS.",
+  "authority": "NO_MERGE_RUNTIME_SCIENCE_OR_EXTERNAL_AUTHORITY",
+  "expected_base": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "head": "7b56df887d3adb543de43dd2bf28c93c29c86114",
+  "packet_fingerprint_sha256": "ef1abc977649ddd957c4721ff5737dabbc15861bddcaba3e1d2b6e35607fe396",
+  "prior_proof_archives": {
+    "interim-cleanup-before-input-policy-repair.json": "08e0ffd0ffe3a62b1e872b0947dceed88c9f9fad0e5438dc2abfbd951c18543b",
+    "interim-clock-before-input-policy-repair.json": "59137045b6d30eb1ddeecf94de2acec18474130557f7b1bd64e15f212c16a670",
+    "interim-consumers-before-input-policy-repair.json": "6af1a94943c79c0df7601a001d6be9c338764ecd53d19b03b723783d4b11b5ca",
+    "interim-operator-before-input-policy-repair.json": "0a20019b64edc6e1abf8460c62eeb5b6c5410d1ee1d0f6dc8970eb0940e24924",
+    "interim-suite-before-input-policy-repair.json": "416e99e5b6f2332e5dc19718d67a1035f3b3f4ec8b969452ead3ec47c5d6eb53"
+  },
+  "receipt_sha256": "3ce960c8737fad458572c558d594f629720332313b1889ff4ce61d7fb9e5650b",
+  "reviewed_bindings_sha256": "02ca588f189ec7d678e37ef2dabcae8133422a12ea3e55b9cbe991e04b93b399",
+  "reviewed_inventory_sha256": "13fdf3093025659d878904b785cbf66aa0928131916f4dc75a07f8582c26fc05",
+  "reviews": [
+    {
+      "finding": "Malformed current successor SHADOW asset metadata escapes the per-entry boundary and terminates ordinary run before a healthy predecessor's future originating EXIT.",
+      "native_before": "review-7b56-code-native-before.json",
+      "role": "CODE_REVIEWER",
+      "severity": "P1",
+      "verdict": "NOT_READY"
+    },
+    {
+      "finding": "Valid new_entries_enabled=false policy refuses native admission but ordinary tick/status report entries_enabled=true, READY and next action NONE.",
+      "native_before": "review-7b56-goal-native-before.json",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "P1",
+      "verdict": "NOT_READY"
+    }
+  ],
+  "roles_without_verdict": {
+    "ARCHITECTURE_CRITIC": "INTERRUPTED_BEFORE_VERDICT: external finding delivered after packet-only launch; no independent verdict accepted. NO_RESOURCES_CREATED, no native probes/writes; 16 source pins unchanged before interruption.",
+    "OWNER_UX_CRITIC": "NOT_PERFORMED_ON_BLOCKED_INVENTORY"
+  },
+  "schema": "smial.frozen-isolated-review-history",
+  "schema_version": "1.0",
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "verdict": "NOT_READY"
+}

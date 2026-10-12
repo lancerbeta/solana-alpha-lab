@@ -653,7 +653,7 @@ class OperationalRecoveryTests(unittest.TestCase):
             self.coordinator.activate(epoch_id=self.epoch, at="2026-10-05T12:55:00Z", profile=self.profile,
                 switch_key="ENTRY-GRANT-BLOCKER-B", expected_current_epoch=first_epoch)
             grant_b = self.scoped_grant(self.epoch, self.runner.strategy["spec_sha256"],
-                expires="2026-10-05T15:00:00Z" if damage == "postclaim" else "2026-10-05T12:54:00Z")
+                expires="2026-10-05T15:00:00Z" if damage in {"postclaim", "asset-array"} else "2026-10-05T12:54:00Z")
             selected = [adapter(grant_a, first_profile)] + ([adapter(grant_b, self.profile)] if damage != "missing" else [])
             coordinator = TradingCoordinator(self.runner, mode="SHADOW", clock=lambda: self.now, quote_adapters=selected)
             original_pid = os.getpid()
@@ -665,6 +665,10 @@ class OperationalRecoveryTests(unittest.TestCase):
             def advance(delay):
                 sleeps.append(delay)
                 self.now = datetime(2026, 10, 5, 13, 10, tzinfo=UTC)
+            asset_path = self.source.data_root / "assets.json"
+            original_assets = asset_path.read_bytes()
+            if damage == "asset-array":
+                asset_path.write_text("[]", encoding="utf-8")
             try:
                 with patch("solana_alpha_lab.factory.trading_coordinator.time.sleep", side_effect=advance):
                     result = coordinator.run(ticks=3)
@@ -729,25 +733,120 @@ class OperationalRecoveryTests(unittest.TestCase):
             self.assertEqual([row["payload"]["grant_sha256"] for row in claims], [grant_a["grant_sha256"], grant_a["grant_sha256"]])
             self.assertEqual(len(calls), 2)
             self.assertEqual(credentials, [grant_a["grant_sha256"], grant_a["grant_sha256"]])
+            with closing(PaperPlaneStore(self.runner.store_path, readonly=True)) as store:
+                b_requests = store.filtered_execution_events(event_type="ADAPTER_REQUEST_BOUND",
+                    position_ids=[rows[self.epoch]["position_id"]])
+                b_attempts = store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED",
+                    position_ids=[rows[self.epoch]["position_id"]])
+            self.assertEqual(b_requests, [])
+            self.assertEqual(b_attempts, [])
             view = coordinator.status()
             self.assertEqual(view["status"], "ACTION_REQUIRED")
             self.assertTrue(view["exit_reconciliation_healthy"])
             self.assertFalse(view["entries_enabled"])
-            self.assertIn("QUOTE_EXTERNAL_AUTHORITY_REQUIRED", {row["reason"] for row in view["entry_blockers"]})
+            entry_reason = "EXECUTION_ASSET_IDENTITY_INVALID" if damage == "asset-array" else "QUOTE_EXTERNAL_AUTHORITY_REQUIRED"
+            self.assertIn(entry_reason, {row["reason"] for row in view["entry_blockers"]})
             self.assertEqual(view["inventory"]["inventory_status"], "KNOWN")
-            self.assertEqual(view["next_safe_action"], "VERIFY_ORIGINAL_ENTRY_GRANT_OR_INPUT")
+            self.assertEqual(view["next_safe_action"], "CHECK_EXECUTION_QUOTE_INPUTS" if damage == "asset-array"
+                else "VERIFY_ORIGINAL_ENTRY_GRANT_OR_INPUT")
             # Restore only B's explicitly granted dependency; no quota reset or
             # fresh activation. Its expired signal must not become a new effect.
-            grant_b = self.scoped_grant(self.epoch, self.runner.strategy["spec_sha256"])
-            coordinator.quote_adapters[("SHADOW", self.epoch)] = adapter(grant_b, self.profile)
+            if damage == "asset-array":
+                asset_path.write_bytes(original_assets)
+            else:
+                grant_b = self.scoped_grant(self.epoch, self.runner.strategy["spec_sha256"])
+                coordinator.quote_adapters[("SHADOW", self.epoch)] = adapter(grant_b, self.profile)
             coordinator.tick()
             self.assertEqual(len(calls), 2)
             self.assertEqual(len(self.claims(self.runner)), 2)
+            self.assertEqual(credentials, [grant_a["grant_sha256"], grant_a["grant_sha256"]])
+            retained_incident = next(row for row in coordinator.status()["incidents"]
+                if row["incident_key"] == "ENTRY-SHADOW-" + rows[self.epoch]["position_id"])
+            self.assertEqual(retained_incident["reason"], entry_reason)
+            self.assertEqual(retained_incident["first_at"], "2026-10-05T12:55:00Z")
         return {"grant": damage, "native_run_ticks": 3, "same_process": True, "clock_crossed_origin_exit_due": True,
             "original_A": "RECONCILED", "B_preclaim_attempts": 0, "B_preclaim_quote_claims": 0,
             "A_grant_claims": 2, "B_grant_claims": 0, "fake_http_calls": 2,
             "exit_health_with_entry_blocker": True, "inventory_with_entry_blocker": "KNOWN",
-            "signal_stale_after_dependency_repair_no_effect": True}
+            "signal_stale_after_dependency_repair_no_effect": True, "entry_reason": entry_reason,
+            "B_credential_reads": 0, "B_requests": 0, "incident_audit_retained": True,
+            "clock_advances": len(sleeps), "position_rows": [{"position_id": row["position_id"],
+                "activation_epoch_id": row["activation_epoch_id"], "state": row["state"]} for row in rows.values()],
+            "B_request_rows": b_requests, "B_attempt_rows": b_attempts,
+            "quote_claim_rows": [{"event_id": row["event_id"], "position_id": row["position_id"],
+                "payload": row["payload"]} for row in claims], "retained_incident": dict(retained_incident)}
+
+    def test_invalid_successor_asset_array_keeps_same_native_run_servicing_future_origin_exit(self):
+        self.metrics = self.entry_grant_blocker_over_future_origin_exit("asset-array")
+
+    def test_current_asset_file_shapes_are_typed_before_native_claim_or_credential(self):
+        self.start_operating(mode="SHADOW")
+        reads, calls = [], []
+        grant = self.scoped_grant(self.epoch, self.runner.strategy["spec_sha256"])
+        self.coordinator.quote_adapter = JupiterQuoteAdapter(timeout_seconds=1, max_response_bytes=8192,
+            grant=grant, credential_supplier=lambda: reads.append(True))
+        asset_path = self.source.data_root / "assets.json"
+        valid = json.loads(asset_path.read_text(encoding="utf-8"))
+        variants = [("missing", None, "EXECUTION_ASSET_IDENTITY_INVALID"),
+            ("json", "{", "EXECUTION_ASSET_IDENTITY_INVALID"),
+            ("array", "[]", "EXECUTION_ASSET_IDENTITY_INVALID"),
+            ("missing-mint", "{}", "EXECUTION_ASSET_IDENTITY_INVALID"),
+            ("row-array", json.dumps({self.mint: []}), "EXECUTION_ASSET_IDENTITY_INVALID")]
+        for label, fields, reason in (("missing-decimals", {"decimals": None}, "EXECUTION_ASSET_IDENTITY_INVALID"),
+                ("boolean-decimals", {"decimals": True}, "EXECUTION_ASSET_IDENTITY_INVALID"),
+                ("wrong-mint", {"mint": closure_fixture.synth_mint("Wrong")}, "EXECUTION_ASSET_IDENTITY_INVALID"),
+                ("missing-time", {"observed_at": None}, "EXECUTION_OBSERVATION_STALE_OR_FUTURE"),
+                ("invalid-time", {"available_at": []}, "EXECUTION_OBSERVATION_STALE_OR_FUTURE"),
+                ("future-time", {"available_at": "2026-10-05T12:41:00Z"}, "EXECUTION_OBSERVATION_STALE_OR_FUTURE")):
+            variants.append((label, json.dumps({self.mint: {**valid[self.mint], **fields}}), reason))
+        reasons = []
+        with patch("solana_alpha_lab.factory.trading_adapters.http_quote", side_effect=lambda *a, **k: calls.append(True)):
+            for label, content, reason in variants:
+                with self.subTest(input=label):
+                    if content is None:
+                        asset_path.unlink()
+                    else:
+                        asset_path.write_text(content, encoding="utf-8")
+                    tick = self.coordinator.tick()
+                    self.assertEqual(tick["status"], "TICK_COMPLETE")
+                    self.assertFalse(tick["entries_enabled"])
+                    view = self.runner.readback()
+                    self.assertEqual(view["modeled_attempts"], [])
+                    self.assertEqual(view["positions"][0]["state"], "WATCHED")
+                    with closing(PaperPlaneStore(self.runner.store_path, readonly=True)) as store:
+                        incident = store._conn.execute("SELECT reason FROM ordinary_incidents WHERE active=1 AND incident_key=?",
+                            ("ENTRY-SHADOW-" + view["positions"][0]["position_id"],)).fetchone()
+                        self.assertEqual(incident["reason"], reason)
+                        self.assertEqual(store.filtered_execution_events(event_type="ADAPTER_REQUEST_BOUND"), [])
+                    reasons.append({"input": label, "reason": reason})
+        self.assertEqual(self.claims(self.runner), [])
+        self.assertEqual(reads, [])
+        self.assertEqual(calls, [])
+        self.metrics = {"typed_inputs": reasons, "attempts": 0, "requests": 0,
+            "quote_claims": 0, "credential_reads": 0, "fake_http_calls": 0}
+
+    def test_current_witness_outer_shape_is_typed_before_native_claim(self):
+        self.witness_operating()
+        ledger, plan = self.wire_files()
+        self.coordinator.quote_adapter = RecordingQuoteAdapter(ledger, json.loads(plan.read_text()))
+        witness = self.source.data_root / self.admission["witness_raw_body_rel"]
+        def corrupt(point):
+            if point == "AFTER_DECISION_COMMIT":
+                witness.write_text("[]", encoding="utf-8")
+        self.coordinator.fault = corrupt
+        for content in ("[]", "{"):
+            if content == "{":
+                witness.write_text(content, encoding="utf-8")
+            tick = self.coordinator.tick()
+            self.assertEqual(tick["status"], "TICK_COMPLETE")
+            self.assertFalse(tick["entries_enabled"])
+        self.assertEqual(self.runner.readback()["modeled_attempts"], [])
+        self.assertEqual(self.claims(self.runner), [])
+        self.assertFalse(ledger.exists())
+        self.assertIn("EXECUTION_ASSET_WITNESS_INTEGRITY_CONFLICT",
+            {row["reason"] for row in self.coordinator.status()["entry_blockers"]})
+        self.metrics = {"witness_shapes": ["ARRAY", "INVALID_JSON"], "attempts": 0,
+            "requests": 0, "quote_claims": 0, "fake_http_calls": 0}
 
     def test_expired_and_missing_successor_grants_keep_same_native_run_servicing_future_origin_exit(self):
         metrics = []
@@ -761,6 +860,7 @@ class OperationalRecoveryTests(unittest.TestCase):
                     self.metrics = {"cases": metrics, "last_case": getattr(case, "metrics", {})}
                     case.tearDown()
 
+    @patch("solana_alpha_lab.factory.paper_shadow_operations._now", new=lambda: "2026-10-05T12:40:00Z")
     def test_shared_store_failure_remains_fatal_and_atomic_in_ordinary_run(self):
         self.start_operating()
         self.coordinator.tick()

@@ -78,7 +78,7 @@ packet через current native source/store owners. Это проверка п
 
 ## C01–C24
 
-Native automated status: PASS, 172 tests, 615.651358s; source bytes до/после
+Native automated status: PASS, 176 tests, 628.937259s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -156,6 +156,17 @@ original capture raw SHA отмечен отдельно. Consumer oracles
 После PATCH source/test bytes заморожены для общего proof и новых четырёх
 изолированных P0/P1 reviews. Рабочая authority этим PATCH не расширена.
 
+Frozen7b56 native CODE/GOAL probes затем выявили два P1 в тех же границах:
+массив вместо B asset map завершал run до будущего A EXIT; valid policy с
+new_entries_enabled=false запрещала admission, но tick/status показывали
+entries_enabled=true и READY. [Actual before и review history](../../evidence/smial_trading_core_operational_closure_v1/review-7b56df88.json)
+сохраняют исходные pins и UNKNOWN отсутствующих измерений. Исторический PASS
+172/99/2/24+NAV2 не доказывает закрытие этих находок. Ремонт ограничен проверкой
+существующего asset input и проекцией действующего policy permission; старые
+EXIT, исходные pending/result, legacy и fatal store не меняют смысла.
+ARCH был прерван до verdict, OWNER на blocked inventory не запускался;
+финальные четыре роли проверяют новые bytes независимо.
+
 [Исходный S08/S13 report](../smial_trading_continuity_v1/REPORT.md) сохраняет
 REPAIR_PARTIAL_BLOCKED своего scope. Negative same-ID V2 не стал positive.
 D1 явно заменил текущий operational successor критерий на разные accepted
@@ -199,28 +210,28 @@ before/after и прежний scoped review PASS сохранены в
 purpose lifecycle-маршрута: IDs, вопросы, ссылки и authority сохранены; новый
 размер 16349 bytes, прямой semantic consumer module — 15 PASS.
 
-Peak suite process RSS: 146710528 bytes (139.91 MiB). Native 14-day producer
+Peak suite process RSS: 147210240 bytes (140.39 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.2021–0.2316s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.1966–0.2683s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04492–0.04992 |
-| 1000 | 364544 | 0.04612–0.05038 |
-| 4000 | 843776 | 0.04442–0.05313 |
+| 0 | 204800 | 0.04646–0.05003 |
+| 1000 | 364544 | 0.04610–0.05042 |
+| 4000 | 843776 | 0.04525–0.05009 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 980 | 0.000549 |
-| 100 proved terminal | 78430 | 0.015269 |
-| 1000 proved terminal | 774540 | 0.154522 |
-| 1000 terminal + 12000 unrelated events | 774560 | 0.156701 |
+| 1 outstanding | 980 | 0.000515 |
+| 100 proved terminal | 78430 | 0.015224 |
+| 1000 proved terminal | 774540 | 0.153898 |
+| 1000 terminal + 12000 unrelated events | 774560 | 0.152157 |
 
-Native history preparation: 13.244s.
+Native history preparation: 13.445s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.

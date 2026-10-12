@@ -1,0 +1,148 @@
+{
+  "capture_raw_sha256": "53f7ebf382b696ff580bd62d9adac0bc2aaca7fc6cf0b9b79c43c6c5929b8f76",
+  "cleanup": {
+    "disposable_fixture_git": "Existing fixture creates its own original-science Git identity; removed with its fixture root.",
+    "fixture_root_removed": true,
+    "owned_scratch_relative": "local/isolated-code-patch-7b56-native-probe",
+    "product_test_docs_mutations": 0,
+    "remaining_owned_processes": 0,
+    "repository_git_mutations": 0,
+    "retained_review_artifact": "local/smial-operational-closure-delivery/code-7b56-native-before.json",
+    "scratch_root_removed": true,
+    "working_tree_readback": "git status --short empty; frozen HEAD unchanged after probe."
+  },
+  "command": {
+    "argv": [
+      "uv",
+      "run",
+      "--offline",
+      "--locked",
+      "--managed-python",
+      "python",
+      "-B",
+      "-"
+    ],
+    "elapsed_basis": "functions.exec wall time displayed for the successful native command; rounded tool display, not separately measured loop time.",
+    "elapsed_seconds": 16.2,
+    "environment": {
+      "PYTHONIOENCODING": "utf-8",
+      "UV_CACHE_DIR": "EXPLICIT_SHARED_UV_CACHE_CONFIGURED_IN_TOOL_CALL"
+    },
+    "minimal_reproducer": [
+      "sys.path[:0] = [str(repo/'src'), str(repo/'tests'), str(repo)]",
+      "from tests.test_trading_operational_recovery_v1 import OperationalRecoveryTests",
+      "from solana_alpha_lab.factory.trading_coordinator import TradingCoordinator",
+      "case = OperationalRecoveryTests(); case.setUp()",
+      "native_run = TradingCoordinator.run",
+      "def corrupt_and_run(coordinator, **kwargs):",
+      "    (case.source.data_root/'assets.json').write_text('[]', encoding='utf-8')",
+      "    return native_run(coordinator, **kwargs)",
+      "with patch.object(TradingCoordinator, 'run', new=corrupt_and_run):",
+      "    case.entry_grant_blocker_over_future_origin_exit('postclaim')",
+      "# Catch only in the outer review probe to record actual native error; finally case.tearDown()."
+    ],
+    "native_subprocess_exit_code": null,
+    "sandbox": "First fixture setup was blocked by sandbox path resolve with DATA_ROOT_UNAVAILABLE. The same bounded native probe was then executed with require_escalated.",
+    "stdin": "Python review probe composed from the existing fixture helpers; no saved script file."
+  },
+  "contract_obligations": [
+    "B1",
+    "B3"
+  ],
+  "exception_message_sha256": "ef3238019ade4bde7dd339050ddeb2074f7f99eb7c0722ebc5d07e1da3ed9314",
+  "expected_base": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "finding": "Malformed current successor SHADOW asset metadata escapes the per-entry boundary and terminates ordinary run before a healthy predecessor's future originating EXIT.",
+  "head": "7b56df887d3adb543de43dd2bf28c93c29c86114",
+  "limitations": [
+    "P0/P1 only, bounded native seams and selected direct consumers; no BigAudit.",
+    "One material native falsifier; no whole suite, full gate, CI or gh operations.",
+    "No raw pipe-byte hash, separately measured native loop elapsed, OS PID or completed tick counter was captured; those values remain UNKNOWN/null.",
+    "Other final critic verdicts and historical completion/factory-fit/independent-review were not consumed as current acceptance.",
+    "No merge, science, runtime, provider or financial authority is granted."
+  ],
+  "native_setup": {
+    "clock": "Existing fixture advances virtual time to A's due exit only at native run sleep. This execution reached zero sleeps.",
+    "envelope": {
+      "max_outstanding_cost_basis_usd": "60",
+      "max_outstanding_positions": 2
+    },
+    "fixture_class": "tests.test_trading_operational_recovery_v1.OperationalRecoveryTests",
+    "grant_precondition": "Both A and B have valid separately scoped grants in this postclaim fixture.",
+    "mutation": "Replace only successor B source assets.json with [] immediately before native TradingCoordinator.run(ticks=3).",
+    "run_wrapper": "The wrapper writes the fixture input and delegates immediately to the saved original TradingCoordinator.run; run, tick, inputs, claim and persistence are native.",
+    "setup_helper": "entry_grant_blocker_over_future_origin_exit('postclaim')",
+    "setup_helper_line": 603,
+    "source_and_science": "Existing source-shaped A/B fixture; genuine separate A and B scientific identities, native SQLite and activation/switch owners.",
+    "transport": "Existing fake lowest http_quote seam; the helper's planned malformed B response is never reached because B fails before attempt/claim/HTTP."
+  },
+  "observed": {
+    "A_future_exit_executed": false,
+    "B_fake_http_calls": 0,
+    "B_new_attempts": 0,
+    "B_new_quota_claims": 0,
+    "attempt_count": 1,
+    "clock_advances": 0,
+    "error_type": "TypeError",
+    "fake_http_calls": 1,
+    "positions": [
+      {
+        "epoch": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-S",
+        "position_id": "POS-SIG-SIGDEC-B199AC0D74D1ECCF327B94FE8EA855BAD0505E2E6BE06CEB51E6A45179FD50CE",
+        "state": "OPEN"
+      },
+      {
+        "epoch": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-B",
+        "position_id": "POS-SIG-SIGDEC-35373599052D305D51C8CB8EC4FFCB70D714B8F3319322E9ADEAB1A27F553029",
+        "state": "WATCHED"
+      }
+    ],
+    "process_pid": null,
+    "quote_claims": 1,
+    "run_ticks_completed": null,
+    "run_ticks_requested": 3,
+    "same_process": true,
+    "shared_store_readback": "AVAILABLE"
+  },
+  "output_hash_basis": "Exact tool-visible one-line JSON stdout text encoded as UTF-8 plus canonical LF; original pipe line ending bytes UNKNOWN.",
+  "output_sha256": "af71452ea2362ebabf270490fe6210b279bce99fd1c6d7866daff4d9dad3e7f7",
+  "patch_id": "SMIAL_PR398_OPERATING_BOUNDARY_PATCH_V1",
+  "publication_policy": "Raw exception text omitted; original capture digest, typed error and actual native facts retained. Output hash remains its explicitly declared original tool-visible canonical-line basis; raw pipe bytes remain UNKNOWN.",
+  "raw_stdout_sha256": null,
+  "receipt_sha256": "9aeed1654ed3933493446106d55d8d7a91ca8e81a0219245aebb592c732a87e4",
+  "repair_request": "Validate the current asset/witness input shape and mint before indexing, return a scoped typed preclaim refusal, and preserve native continuous old-EXIT service. Do not catch sqlite/shared-store failure as healthy continuation.",
+  "reviewed_bindings_sha256": "02ca588f189ec7d678e37ef2dabcae8133422a12ea3e55b9cbe991e04b93b399",
+  "reviewed_inventory_sha256": "13fdf3093025659d878904b785cbf66aa0928131916f4dc75a07f8582c26fc05",
+  "role": "CODE_REVIEWER",
+  "schema": "smial.isolated-code-review-native-falsifier",
+  "schema_version": "1.0",
+  "severity": "P1",
+  "source_evidence": [
+    {
+      "line": 437,
+      "path": "src/solana_alpha_lab/factory/trading_coordinator.py",
+      "seam": "Unvalidated external JSON is indexed by mint directly; assets.json=[] raises TypeError."
+    },
+    {
+      "line": 831,
+      "path": "src/solana_alpha_lab/factory/trading_coordinator.py",
+      "seam": "ENTRY dispatch catches PaperPlaneError only; TypeError/KeyError escape."
+    },
+    {
+      "line": 1441,
+      "path": "src/solana_alpha_lab/factory/trading_coordinator.py",
+      "seam": "Native continuous run propagates the escaped error and stops before sleep/future tick."
+    }
+  ],
+  "source_pins": {
+    "src/solana_alpha_lab/factory/paper_plane.py": "64c6a497f72aa0f3e03749ed413dab2ebf87c8ee22e9fd407b87adec23b398e1",
+    "src/solana_alpha_lab/factory/trading_adapters.py": "06e0312251f7f9812221907be5540927b9d9ed1a6b2b05cb8a36ae2fe4df1efc",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "f8aa35c78592afe84f5747f31d5d0df54cdc82439ec3f26d360948be0a4c7d0a",
+    "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+    "tests/test_opportunity_episodes_harness_v1.py": "6e0c974dc1dde8072e076d0d64c7f544a592ff4c78828448eb606ad06e778dfd",
+    "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+    "tests/test_trading_core_operational_closure_v1.py": "2af253219ad2a99d183d015797f887eec0d4778fd58cb407799270551d15d673",
+    "tests/test_trading_operational_recovery_v1.py": "0cc00588ba0e546aa404f129caa6c1298911a8d6b6b51b81bf632adbb7b1e458"
+  },
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "verdict": "NOT_READY"
+}
