@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/smial_trading_core_operational_closure_v1/factory-fit.json",
-    "sha256": "f89659e59b14901bd5c1be82ca32a77e3f294de831cf5962094308853f9d4bd0",
+    "sha256": "d866c6260e5e217211ce46e6f87e91258d0301fd140b5b28adf7cfd4f3085dce",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -19,7 +19,7 @@
     "catalog/assets/lifecycle.yaml": "2be49c5893f51d8792d84ad0c0122d3c0167c93f3118e256959de125df7cf618",
     "catalog/catalog_manifest.yaml": "76dadcb850b5afe1c556fd0feec48fa144f6f297bb71f16cb67b1d57cce1d2a1",
     "catalog/generated/asset_edges.json": "ac35cb9cb27333f089da81543e39b285eca1260d9bde5122317a98dfc6da06c4",
-    "configs/execution_domain_v1.json": "b166a847c7aaebe4db249ad3b506b2d66c5e518f5ab23b9576a9646735da33c3",
+    "configs/execution_domain_v1.json": "cce7c516dc4c259121c57330ee6ed0fc558f2c6d181ec8c45e40eaafc62f2ece",
     "configs/factory_semantic_operability_v1.yaml": "fad949f339a8623c6d0e2cdab4e515faed86a597039ea687700d5e21ac0ec6ba",
     "docs/PROJECT_MAP.md": "9469056f8263c2271b1b782d414680a2b01a2952497435aca6b045574891313c",
     "docs/contracts/episode_decision_continuity_v1.md": "8c4e176f3a2fe2969a2de66a0685936c460448e71219044ceaf7511cf35e7a3c",
@@ -31,13 +31,14 @@
     "docs/evidence/smial_trading_core_operational_closure_v1/accounting-brief.md": "5faf5fa3dc2deaf8bc058ac723627f5be7cf19d4bda7790ed0abeed52870a7e1",
     "docs/evidence/smial_trading_core_operational_closure_v1/accounting-report.md": "b93ec05c2adc27a7faa891f2dd94464775915d14d09df90e343cbc2d648f3999",
     "docs/evidence/smial_trading_core_operational_closure_v1/ci-atom-hour-budget.json": "f49afe02f47154ad0873608dbbf9c75682aae6ba30a4a4771971c94e8c8c5847",
+    "docs/evidence/smial_trading_core_operational_closure_v1/ci-domain-declaration-repair.json": "59619b671f47d227716e4f6819886cf15afec7db862639e55c6aa5d2be99390b",
     "docs/evidence/smial_trading_core_operational_closure_v1/ci-semantic-capacity-remediation.json": "0510959241a6c25dd62da346be6c14e43d6a1c4229d0392259359a0c2d2106cd",
     "docs/evidence/smial_trading_core_operational_closure_v1/ci-source-capacity-remediation.json": "b81048cdf011d60e1dc6930cd7b6b8064eefcc57b08732c3cc3b80ed56e49174",
     "docs/evidence/smial_trading_core_operational_closure_v1/cleanup.json": "6bb758c766c572eee7c227b4235dee960e67c86ae48433bbc9d8c6eb44a0dfa4",
     "docs/evidence/smial_trading_core_operational_closure_v1/clock-probe-interim-negative.json": "cb0511be6c44b73343f5b323cfe9c28d2def5de01101ee89d2c540959840dcab",
     "docs/evidence/smial_trading_core_operational_closure_v1/clock-proof.json": "487c33ab9f9ff9d1e911bceddb6a4ca92fe547b52bd31799d32a140bfdb7b627",
     "docs/evidence/smial_trading_core_operational_closure_v1/compaction.json": "51abfa06b5288344d737d7d269547e7ab94839930521b8b4eac08d19c5d68be1",
-    "docs/evidence/smial_trading_core_operational_closure_v1/coverage.json": "db4be1c52c491ed700e29635c6b01fb82c07ed8fef014f2f5292cfcc12ad8b4f",
+    "docs/evidence/smial_trading_core_operational_closure_v1/coverage.json": "9ae59afdaf3c6589cd32ba8bc53adceb5a763eb05119f3063c0365fd02ed791b",
     "docs/evidence/smial_trading_core_operational_closure_v1/direct-consumer-proof.json": "84445c4dbcea9b8fed7c765e163186060e7fd2989f7495b4e0d1942b433ad096",
     "docs/evidence/smial_trading_core_operational_closure_v1/executed-tests.json": "3f4fe5be8ca04c33f5db4f947f737ab49b0ea244b130d3a4318c2fbfab03ea14",
     "docs/evidence/smial_trading_core_operational_closure_v1/history.json": "d3e830f6aabef3aa273c81f050e3eb96b40d4bbf93e9fe61479dbe0c844c083d",
@@ -53,7 +54,7 @@
     "docs/evidence/smial_trading_core_operational_closure_v1/review-managed-native-recovery-remediation.json": "0f2b10247dd06ca7b5102026b91c00507332b18014713b73940c5d77b779d27c",
     "docs/evidence/smial_trading_core_operational_closure_v1/review-operating-boundary-remediation.json": "a1511809ffe6ff255365681c0d8e05a48f7e94ee4a8665829c7c50239bb5040c",
     "docs/evidence/smial_trading_core_operational_closure_v1/semantic-claims.json": "aacb14b7782f45e678b2a275f9138eaa26d7f454c6571798edb10876b620af4e",
-    "docs/evidence/smial_trading_core_operational_closure_v1/semantic-evidence.json": "567777cfc4649a1aa549c982b9dc2015607b89bbafb68d7b25be4619d601ed58",
+    "docs/evidence/smial_trading_core_operational_closure_v1/semantic-evidence.json": "6556a4a5fd02460d9b84c55e987204516b4b13f8c7a327d9fdaf4a1d68bbb12c",
     "docs/evidence/smial_trading_core_operational_closure_v1/semantic-non-claims.json": "626cfa05e29aaf975a906d22290ecb857e17084ad0d835dd0e3830efcab606a6",
     "docs/evidence/smial_trading_core_operational_closure_v1/source-contract.md": "addc05071197efb3462771b52f5699170d54061656efeda0b7f48e52bdb0f0b7",
     "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "a1f0dabbc50819b092403fa9b2dda3d4b2f296947d311668de94ad4b148c8dc7",
@@ -115,7 +116,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/smial_trading_core_operational_closure_v1/independent-review.json",
-      "sha256": "e43a78236427730c2ae01726680bceff99e8cc8152679a9de0d015e9a921516a",
+      "sha256": "f63439b24d1375bd246a60e2afbba495a26a4d06c02db4c613c5c82fefc1d0ba",
       "verdict": "PASS"
     },
     "project_checks": [
@@ -130,7 +131,8 @@
       "PASS_GENUINE_NATIVE_ENTRY_ORIGINAL_FULL_EXIT_CAP_RELEASE_AND_MISSING_MODELED_NEGATIVE",
       "PASS_SCOPED_PENDING_ORIGIN_FAILURE_HEALTHY_NEIGHBOR_AND_ORIGINAL_NO_RESEND_RECOVERY",
       "PASS_NO_FRESH_EXIT_EFFECT_ON_MISSING_QUANTITY_AND_STRICT_ORIGINAL_NONFILL_CANCEL_COMPATIBILITY",
-      "PASS_COMPACT_REPRODUCIBLE_EVIDENCE_WITH_IMMUTABLE_HISTORY"
+      "PASS_COMPACT_REPRODUCIBLE_EVIDENCE_WITH_IMMUTABLE_HISTORY",
+      "PASS_EXACT_EXISTING_HASH_DEPENDENCY_DECLARATION_UNCHANGED_VALIDATOR_12_BOUNDARY_CONTROLS"
     ],
     "targeted": "PASS_C01_C24_191_NATIVE_99_CONSUMERS_2_CLOCKS_24_COLD_CLI_13_ADDRESSED_REGRESSIONS"
   }
