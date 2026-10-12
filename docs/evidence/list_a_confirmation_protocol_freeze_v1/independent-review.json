@@ -4,8 +4,8 @@
   "review_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1-INDEPENDENT",
   "as_of": "2026-10-12",
   "task_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "43988d64c879e5ddad12a42aa643532d55059d48daccc037b675193f00f21ecd",
+  "reviewed_inventory_sha256": "1fcbc75d3ac4b8258e830aada08119e982d5998a03fb433b8e2af1b8f21bf8ea",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -14,30 +14,58 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING_ISOLATED_EXACT_INVENTORY_REVIEW"
+        "Isolated read-only /root/freeze_code_review reviewed21implementation blobs and exact delta; no open findings; role plan sufficient",
+        "Original P2 foreign receipt identity independently reproduced; fixed equality guards and both foreign-receipt refusals independently verified; baseline retains BOUND_CONTRACT_NOT_READY",
+        "reviewed_head=b82aa0452a50e199c651644a435f440f01c6a564"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING_ISOLATED_EXACT_INVENTORY_REVIEW"
+        "Isolated read-only /root/freeze_goal_review verified accepted limited design DoD, denominatorF01-F12,51cases and5refusalcanaries, cleanup and one metadata-only resume",
+        "F04-F06 remain PARTIAL; full scientific freeze remains BOUND_CONTRACT_NOT_READY; no empirical/Trading/activation authority",
+        "reviewed_head=b82aa0452a50e199c651644a435f440f01c6a564"
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING_ISOLATED_EXACT_INVENTORY_REVIEW"
+        "Isolated packet+diff-only /root/freeze_arch_review; SEMANTIC_PREMISE=PASS for limited design; all10mandatory questions addressed; no blocking findings",
+        "packet_fingerprint_sha256=39db28c268316ac23a89dc666a836cff455146dd44b24cf216391a086f8ab15f",
+        "Review checked exact diff digest and all9evidence hashes from extracted diff bytes; process execution/data reads not performed; packet-information independence only",
+        "Original P2 receipt/config scientific identity mismatch closed by both equality guards and shape-valid self-rehashed foreign receipt canaries",
+        "Exact implementation may still violate research validity under serial dependence beyond48h or contaminated exposure; general calibration/causality/economic claims explicitly excluded; actual bindings UNBOUND",
+        "Frozen semantic packet retained as compact JSON below; launch validate-launch PASS; model diversity UNPROVEN",
+        "SEMANTIC_PREMISE_PACKET_JSON={\"candidate\":{\"base\":\"ba87f8e339d5cc3aa55322801ae56e3f92369446\",\"diff_sha256\":\"ececff5c7e26b682d7377bb2c77a2627a74b42104f1cad94893789aaf5d238b2\",\"head\":\"b82aa0452a50e199c651644a435f440f01c6a564\"},\"evidence\":[{\"logical_ref\":\"docs\\\\tasks\\\\LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1.md\",\"sha256_or_fingerprint\":\"50f901f694b2d4f0ca618c6e12d28541a6f99ad1fc02df0fa5a806fb233f674d\"},{\"logical_ref\":\"docs\\\\contracts\\\\list_a_chronological_confirmation_v1.md\",\"sha256_or_fingerprint\":\"4be4f46884ed742adbabaf5bb14f7ee37fa84e3a57263adf8162c609c5c94d6c\"},{\"logical_ref\":\"configs\\\\list_a_chronological_confirmation_v1.yaml\",\"sha256_or_fingerprint\":\"4bfd2c80526d617f664e047ffa38f802722c5ca96211aed06992506bbc29be12\"},{\"logical_ref\":\"docs\\\\evidence\\\\list_a_confirmation_protocol_freeze_v1\\\\source-contract.md\",\"sha256_or_fingerprint\":\"4931c4c569fb2630e9b403b33185bd86b9ffe9ff0df06dd9bb0bec41f5040510\"},{\"logical_ref\":\"docs\\\\evidence\\\\list_a_confirmation_protocol_freeze_v1\\\\metadata-bindings.json\",\"sha256_or_fingerprint\":\"c01d47e84443335101e686494321dccf071d3298cddc05ed36cee64a687c889f\"},{\"logical_ref\":\"docs\\\\evidence\\\\list_a_confirmation_protocol_freeze_v1\\\\obligations.json\",\"sha256_or_fingerprint\":\"a66294e84249148178989e278562603631c212072f8acf7507cbf506f1e225be\"},{\"logical_ref\":\"docs\\\\evidence\\\\list_a_confirmation_protocol_freeze_v1\\\\validation.json\",\"sha256_or_fingerprint\":\"1fb0582af78a86a7c5f24c28e8f82f4367636b157fb01c1e1015f7871041bc82\"},{\"logical_ref\":\"docs\\\\evidence\\\\list_a_confirmation_protocol_freeze_v1\\\\cold-readback.json\",\"sha256_or_fingerprint\":\"7c7d1fe5623535081fed7881cc67cdb5a3d882db259b1ee0f5b16522a67872d6\"},{\"logical_ref\":\"docs\\\\evidence\\\\list_a_confirmation_protocol_freeze_v1\\\\cleanup.json\",\"sha256_or_fingerprint\":\"d0f97b48523b1b6ce0d2572b31bfcfee53aa49306903f2841b23ca4ca60f9267\"}],\"independence\":{\"claim_scope\":\"PACKET_INFORMATION_PATH\",\"context_isolated\":true,\"implementation_transcript_seen\":false,\"launch_isolation\":\"PROCESS_OBLIGATION\",\"model_diversity\":\"UNPROVEN\",\"model_diversity_identity\":null,\"packet_bound\":true,\"readonly\":true},\"non_claims\":[\"NO_EMPIRICAL_ALPHA_OR_EFFECT\",\"NO_FULL_BOUND_FREEZE\",\"NO_SCIENTIFIC_LOOK\",\"NO_PRODUCTION_CONFIRMER_OR_RESERVATION_WRITER\",\"NO_GENERAL_BOOTSTRAP_CALIBRATION_THEOREM\",\"NO_UNCONDITIONAL_CAUSAL_OR_TRADING_CLAIM\",\"NO_NEW_ACCESS_ACTIVATION_OR_SPEND\",\"MODEL_DIVERSITY_UNPROVEN\",\"NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY\"],\"packet_fingerprint_sha256\":\"39db28c268316ac23a89dc666a836cff455146dd44b24cf216391a086f8ab15f\",\"questions\":[\"HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG\",\"WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE\",\"IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL\",\"IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE\",\"DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY\",\"DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING\",\"IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER\",\"WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE\",\"WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM\",\"WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS\"],\"review\":{\"architecture_owner\":\"ARCHITECTURE_CRITIC\",\"profile\":\"SEMANTIC_PREMISE\",\"risk_dimensions\":[\"SCIENTIFIC_ESTIMAND\",\"EVIDENCE_ADMISSIBILITY\",\"PIT_OR_AVAILABILITY_SEMANTICS\",\"UNKNOWN_VS_NEGATIVE_EVIDENCE\",\"OWNER_AUTHORITY_SEMANTICS\"]},\"schema\":\"smial.semantic-premise-review-packet\",\"schema_version\":\"1.0\",\"semantic_claims\":[{\"claim\":\"Accepted D01-D08 design is unambiguous and future-consuming; actual terminal remains BOUND_CONTRACT_NOT_READY\",\"claim_id\":\"LIMITED_DESIGN\",\"scope\":\"One contract/config, not empirical result or production confirmer\"},{\"claim\":\"Canonical existing root and sealed parameter metadata inspected through value-skipping projection; no numeric price/target state decoding or writers\",\"claim_id\":\"METADATA_READ_SCOPE\",\"scope\":\"Exact metadata readset and source-native safe seams; exposure/current protection remain unresolved\"},{\"claim\":\"Episode-weighted conditional observational A-minus-complement contrast, crossed24/48h bootstrap screens and leave-one rules; no general95percent coverage or causal/economic claim\",\"claim_id\":\"INFERENTIAL_LIMITS\",\"scope\":\"Owner accepted baseline design; dependence assumptions and missingness limits explicit\"},{\"claim\":\"One inventoried source forbidden for confirmatory reuse,24mint/2-2block potential upper bounds below30; no approved sample or complete exposure/protection\",\"claim_id\":\"ACTUAL_BINDING_GAP\",\"scope\":\"Exact known local corpus snapshot; not global absence or negative market result\"},{\"claim\":\"Required code/goal/architecture reviews; no material runtime operator flow changed; static evidence readout only\",\"claim_id\":\"REVIEW_SCOPE\",\"scope\":\"Limited contract atom and current repository review triggers\"}],\"task\":{\"task_contract_sha256\":\"50f901f694b2d4f0ca618c6e12d28541a6f99ad1fc02df0fa5a806fb233f674d\",\"task_id\":\"LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1\"}}"
       ]
     }
   ],
-  "verdict": "NOT_READY",
+  "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "MODEL_DIVERSITY_UNPROVEN",
     "NO_EMPIRICAL_ACCEPTANCE"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P2: receipt core/sample digest lacked equality to recomputed config; independently observed shape-valid foreign receipt with recomputed self identity accepted. Closed by two equality guards and two targeted canaries. Prior inventory=ff625032a498846aec72b88202687a5d1100e64a499e333c26da4d3d56835a9d; prior packet=0668113b818da2bb1223c8dddd293e2304ae13fffe5e1ca0d16a71875c9cb87f",
+      "observed_head": "5a03ec83ad260e7a57be31284c6c848967948fd5",
+      "resolved_by_head": "b82aa0452a50e199c651644a435f440f01c6a564"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P2: receipt core/sample digest lacked equality to recomputed config; independently observed shape-valid foreign receipt with recomputed self identity accepted. Closed by two equality guards and two targeted canaries. Prior inventory=ff625032a498846aec72b88202687a5d1100e64a499e333c26da4d3d56835a9d; prior packet=0668113b818da2bb1223c8dddd293e2304ae13fffe5e1ca0d16a71875c9cb87f",
+      "observed_head": "5a03ec83ad260e7a57be31284c6c848967948fd5",
+      "resolved_by_head": "b82aa0452a50e199c651644a435f440f01c6a564"
+    }
   ]
 }

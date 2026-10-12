@@ -9,7 +9,29 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": [],
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "f57c70eb3e57ff1248a6b4ec756933dd838457dda3a0983bc2205c8e06bc6e87",
+    "catalog/assets/lifecycle.yaml": "713140fc13e8b622c9200a06762a486027cf6a23f2696c835366d407c0361b4b",
+    "catalog/catalog_manifest.yaml": "87745dec9dfd60415d0cbc3b707a3d33956dd582c1601bee9802dab85aa1e329",
+    "catalog/generated/asset_edges.json": "cccb6c2516c129c3a85921919d22dc34d709a211e9c981208c92b3c5b58e6b8b",
+    "configs/list_a_chronological_confirmation_v1.yaml": "4bfd2c80526d617f664e047ffa38f802722c5ca96211aed06992506bbc29be12",
+    "docs/PROJECT_MAP.md": "9e3231813eac197faecac07eca231ffe01bea0b5e99514ab93c513ad6946d60d",
+    "docs/contracts/list_a_chronological_confirmation_v1.md": "4be4f46884ed742adbabaf5bb14f7ee37fa84e3a57263adf8162c609c5c94d6c",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/.gitattributes": "3573f11485f6a65d5310162d0880d5c0f3d1ea1e2336674858e6ea7e8382c21c",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/READOUT.md": "fd5cf837ea0b20da147e20aea106d711088b7793e9bc0da89c4092def33da86e",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/cleanup.json": "d0f97b48523b1b6ce0d2572b31bfcfee53aa49306903f2841b23ca4ca60f9267",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/cold-readback.json": "7c7d1fe5623535081fed7881cc67cdb5a3d882db259b1ee0f5b16522a67872d6",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/focused-checks.json": "579fd5b30990a0e6aa4c1823b661cea03550830c20455de3e5ecac4f482ecdec",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/freeze-receipt.json": "30ea287348b7700bce52227b3781b00d6592c168841041ad43dc747477695d8f",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/metadata-bindings.json": "c01d47e84443335101e686494321dccf071d3298cddc05ed36cee64a687c889f",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/obligations.json": "a66294e84249148178989e278562603631c212072f8acf7507cbf506f1e225be",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/probe_metadata.py": "4751b985567797adb208f5f038bb0e52dd27dc293dc70e310490699ed847f47a",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md": "4931c4c569fb2630e9b403b33185bd86b9ffe9ff0df06dd9bb0bec41f5040510",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-inventory.json": "4c9f84c7c9334a0005a60dddd77b9b6f3feb06f1ab38400d3175051c2be811b6",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/validation.json": "1fb0582af78a86a7c5f24c28e8f82f4367636b157fb01c1e1015f7871041bc82",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/verify_contract.py": "caa30e1c29f61b73422b4be3e699c7c0f9b76ae238b3642377befe5d3723b469",
+    "docs/tasks/LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1.md": "50f901f694b2d4f0ca618c6e12d28541a6f99ad1fc02df0fa5a806fb233f674d"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -20,15 +42,15 @@
   },
   "factory_fit": {
     "path": "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\factory-fit.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "a6fa770f9ab4cda77c6f69dc10252b18bb8f6fb8c360f46629d395f224ff9f25",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_51_CONTRACT_MODEL_NATIVE_SEAM_CHECKS_AND_COLD_CONSUMER_5_REFUSALS",
     "independent_review": {
       "path": "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\independent-review.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "verdict": "NOT_READY"
+      "sha256": "7563b1b47b84f756f763a6f43dee94b3a571495bec62f8d27a137255f733e13e",
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
@@ -38,7 +60,8 @@
       "PASS_COLD_ARTIFACT_CONSUMER_5_REFUSALS",
       "PASS_CATALOG_1969_ASSETS_SCHEMA_RELATIONS_INTEGRITY",
       "PASS_INCREMENTAL_GENERATED_CLOSURE_NOOP",
-      "PASS_ZERO_PRODUCTION_PATH_DIFF"
+      "PASS_ZERO_PRODUCTION_PATH_DIFF",
+      "PASS_ISOLATED_CODE_GOAL_ARCHITECTURE_EXACT_INVENTORY_P2_REMEDIATED"
     ]
   },
   "non_claims": [
@@ -56,7 +79,9 @@
     "real_data_root_writes": 0,
     "research_or_exposure_writes": 0,
     "activation": 0,
-    "spend": 0
+    "spend": 0,
+    "owned_review_scratch_removed": true,
+    "owned_review_scratch_removed_bytes": 482275.0
   },
   "capability_radar_now": "NONE"
 }
