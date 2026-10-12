@@ -1,0 +1,58 @@
+{
+  "actual_linux_before": {
+    "database_and_wal_hashes_equal": true,
+    "elapsed_seconds": 591.205,
+    "errors": 0,
+    "failures": 7,
+    "primary_failing_tests": [
+      "test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit",
+      "test_common_original_switch_lineage_blocks_ingress_and_readiness_before_first_effect",
+      "test_current_switch_conflict_blocks_readiness_without_unknown_original_inventory_or_exit_starvation"
+    ],
+    "shm_baseline_differed_from_first_readonly_index": true,
+    "skipped": 2,
+    "switch_final_positive_failure": "PRECEDING_ASSERTIONS_ABORTED_FIXTURE_REPAIR",
+    "tests_run": 378
+  },
+  "after_linux": "ENFORCED_LIVE_AT_EXACT_HEAD_CI",
+  "ci_ref": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/38306899461/job/115003861607",
+  "contract_ref": "source-contract.md section423: Native WAL coordination is not business write",
+  "current_local": {
+    "clock_probes": 2,
+    "cold_cli_commands": 24,
+    "consumers_tests": 99,
+    "native_suite_tests": 191,
+    "suite_receipt_sha256": "9cc5a1e06c3951fb505d2c57286918c1a6b74ead18b01767888a0615260b0f67",
+    "targeted_receipt_sha256": "61b9f66b64c90ee3c52246860832587f97a3d4438c7f3e3cd23118ca8678f36c",
+    "targeted_tests": 16
+  },
+  "current_test_sha256": "15da7cad481361f2395d59a65f1bcb4e648df851459d510a2d6c8aeb3c902c43",
+  "exact_delta": {
+    "added_fixture_helper": 1,
+    "immutable_or_checkpoint_changes": 0,
+    "oracle_changes": 0,
+    "original_test_ast_unchanged_except_setup": true,
+    "product_or_validator_changes": 0,
+    "readonly_setup_calls": 3,
+    "shm_exclusions": 0
+  },
+  "failed_head": "18594ae2e2c1bb3d083d98d36f3cfa5ff0cb0059",
+  "full_local_gate": "NOT_EXECUTED",
+  "helper_negative": {
+    "action": "DELETE_ONLY_MARKED_OWNED_CACHE_THEN_REAL_CURRENT_99_TEST_RUN",
+    "cause": "OLD_CONSUMER_CACHE_SOURCE_SNAPSHOT_MISMATCH",
+    "product_changes": 0,
+    "tests_executed": 0
+  },
+  "job_id": 115003861607,
+  "official_refs": [
+    "https://sqlite.org/walformat.html",
+    "https://www.sqlite.org/wal.html"
+  ],
+  "old_test_sha256": "f0094ce44ee7b168729cb6686ae2e5070849c19a347b5159624152105d55f0b0",
+  "raw_ci_log_sha256": "2ec97e179ba93e229bf0e947bc42e3b1065e6a208809c81c2a56a31a9f37e099",
+  "receipt_sha256": "af52d677c7a9103c5cae9eeebaed66605ba51bf569abb807ecbd16f54c4b6eec",
+  "run_id": 38306899461,
+  "schema": "smial.readonly-canary-fixture-repair",
+  "status": "LOCAL_NATIVE_PASS_EXACT_LINUX_CI_REQUIRED"
+}

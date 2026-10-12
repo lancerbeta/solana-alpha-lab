@@ -41738,7 +41738,7 @@ records:
     repository_path: tests/test_trading_core_operational_closure_v1.py
   integrity:
     kind: sha256
-    sha256: f0094ce44ee7b168729cb6686ae2e5070849c19a347b5159624152105d55f0b0
+    sha256: 15da7cad481361f2395d59a65f1bcb4e648df851459d510a2d6c8aeb3c902c43
   access:
     mode: read_only
     method: file
@@ -41884,7 +41884,7 @@ records:
     repository_path: docs/reports/smial_trading_core_operational_closure_v1/REPORT.md
   integrity:
     kind: sha256
-    sha256: 5f9a6972e0fa64adf41179cc0793638e4bdfee5497ae3be80d1c456451f536ca
+    sha256: 7372ed2ee9ce868f3a9d58c95c1619f8eba90cb5925fa64b648333e8fe2f04dc
   access:
     mode: read_only
     method: file

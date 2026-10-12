@@ -13,7 +13,7 @@
   ],
   "code_unchanged_during_execution": true,
   "credential_reads": false,
-  "elapsed_seconds": 6.279483,
+  "elapsed_seconds": 6.197051,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "full_local_gate": "NOT_EXECUTED",
   "imported_source_pins": {
@@ -141,7 +141,7 @@
     "tests/test_risk_and_economics_v1.py": "6d0742193f5fd20ec9a660074a826561b9f0b27e443b09efee11c880c9681a2e",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "f0094ce44ee7b168729cb6686ae2e5070849c19a347b5159624152105d55f0b0",
+    "tests/test_trading_core_operational_closure_v1.py": "15da7cad481361f2395d59a65f1bcb4e648df851459d510a2d6c8aeb3c902c43",
     "tests/test_trading_operations_workbench_v2.py": "0764f3652f042d2306e70defc3de3462d3c4ff5606f24bef048d8c34d49e7a32",
     "tests/test_trading_runtime_admission_concurrency_v1.py": "8f863f65b6448beec1406538e220efc43f03df2096631888eb72bebbd6a8dcae",
     "tests/test_trading_runtime_policy_backup_restore_v1.py": "ff3e2e96ecbf089274385640606bd7b43eb7d730035bf08624bdfe76305c38e3",
@@ -159,7 +159,7 @@
   "probes": [
     {
       "attempt_count": 1,
-      "elapsed_seconds": 2.716329,
+      "elapsed_seconds": 2.655595,
       "initial_clock": "2026-10-05T12:40:30Z",
       "last_valid_boundary_verified": true,
       "literal_cutoff": "2026-10-05T12:40:00Z",
@@ -189,7 +189,7 @@
       "backward_error": "OPERATING_CLOCK_REGRESSION",
       "backward_physical_database_family_unchanged": true,
       "backward_positions_events_runtime_unchanged": true,
-      "elapsed_seconds": 2.570081,
+      "elapsed_seconds": 2.549435,
       "forward_clock": "2026-10-05T12:41:00Z",
       "forward_run": {
         "activation_created": false,
@@ -217,7 +217,7 @@
     }
   ],
   "provider_calls": false,
-  "receipt_sha256": "a80c60624b2261312f1f5aeeb040312e0aa3326e657d3ba7c059f8ad6ccd82ff",
+  "receipt_sha256": "ee8a134dada873f5d026a89ff6b0ad257c2e93fe2ddfc8aaa53507d0e57ff040",
   "schema": "smial.ordinary-clock-proof",
   "schema_version": "1.0",
   "source_pins_after": {
@@ -233,7 +233,7 @@
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "f0094ce44ee7b168729cb6686ae2e5070849c19a347b5159624152105d55f0b0",
+    "tests/test_trading_core_operational_closure_v1.py": "15da7cad481361f2395d59a65f1bcb4e648df851459d510a2d6c8aeb3c902c43",
     "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
     "tests/test_trading_operational_obligations_v1.py": "5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880",
     "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
@@ -251,13 +251,13 @@
     "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "f0094ce44ee7b168729cb6686ae2e5070849c19a347b5159624152105d55f0b0",
+    "tests/test_trading_core_operational_closure_v1.py": "15da7cad481361f2395d59a65f1bcb4e648df851459d510a2d6c8aeb3c902c43",
     "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
     "tests/test_trading_operational_obligations_v1.py": "5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880",
     "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
   },
   "source_snapshot_file_count": 1260,
-  "source_snapshot_sha256_after": "800df91611aa710f551797b5755e33dcc954072d0754f5d07b8037e9a4706a8a",
-  "source_snapshot_sha256_before": "800df91611aa710f551797b5755e33dcc954072d0754f5d07b8037e9a4706a8a",
+  "source_snapshot_sha256_after": "52d09e146881a0a1e6cdf992f1e5a23769fb4be201c3c76ea0c45a1fcac37795",
+  "source_snapshot_sha256_before": "52d09e146881a0a1e6cdf992f1e5a23769fb4be201c3c76ea0c45a1fcac37795",
   "status": "PASS"
 }

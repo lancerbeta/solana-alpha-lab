@@ -34,6 +34,13 @@ class OperatingDriverTests(unittest.TestCase):
     tearDown = continuity_fixture.OrdinarySourceTests.tearDown
     prepare = continuity_fixture.OrdinarySourceTests.prepare
 
+    def settle_readonly_canary_fixture(self):
+        # Fixture setup includes SQLite's first readonly WAL-index coordination.
+        # The measured native/CLI reads still must preserve every DB/WAL/SHM byte.
+        with closing(PaperPlaneStore(self.runner.store_path, readonly=True)) as observer:
+            with observer.read_snapshot():
+                observer._conn.execute("SELECT COUNT(*) FROM execution_events").fetchone()
+
     def test_C06_C19_frozen_base_episode_replay_preserves_identity_and_payload(self):
         from solana_alpha_lab.factory import episode_decision
         from solana_alpha_lab.factory.experiment_spec import validate_experiment_document
@@ -1403,6 +1410,7 @@ class OperatingDriverTests(unittest.TestCase):
                     self.assertEqual(packet["decision"]["action"], "ENTER")
                     self.assertEqual(packet["admission"]["reason_code"], "OPERATING_SWITCH_STATE_CONFLICT")
                     paths = [self.runner.store_path, Path(str(self.runner.store_path) + "-wal"), Path(str(self.runner.store_path) + "-shm")]
+                    self.settle_readonly_canary_fixture()
                     before = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}
                     for view in (self.coordinator.status(), self.invoke("status", as_of="2026-10-05T12:40:00Z")):
                         self.assertEqual(view["status"], "ACTION_REQUIRED")
@@ -1468,6 +1476,7 @@ class OperatingDriverTests(unittest.TestCase):
             self.assertFalse(tick["entries_enabled"])
             self.assertEqual(tick["attempts"], 0)
             paths = [self.runner.store_path, Path(str(self.runner.store_path) + "-wal"), Path(str(self.runner.store_path) + "-shm")]
+            self.settle_readonly_canary_fixture()
             before = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}
             native = self.coordinator.status()
             cli = self.invoke("status", as_of="2026-10-05T12:40:00Z")
@@ -1523,6 +1532,7 @@ class OperatingDriverTests(unittest.TestCase):
             writer._conn.execute("PRAGMA wal_autocheckpoint=0")
             paths = [self.runner.store_path, Path(str(self.runner.store_path) + "-wal"),
                      Path(str(self.runner.store_path) + "-shm")]
+            self.settle_readonly_canary_fixture()
             before = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}
             native = self.coordinator.status()
             cli = self.invoke("status", as_of="2026-10-05T12:40:00Z")

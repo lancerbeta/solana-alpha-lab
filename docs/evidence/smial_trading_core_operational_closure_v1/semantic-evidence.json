@@ -5,31 +5,31 @@
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/coverage.json",
-    "sha256_or_fingerprint": "9ae59afdaf3c6589cd32ba8bc53adceb5a763eb05119f3063c0365fd02ed791b"
+    "sha256_or_fingerprint": "439f9ab540834be438eea4d95f6f23bef42782a122b2a6ff4b8c88759bd43fdd"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/executed-tests.json",
-    "sha256_or_fingerprint": "3f4fe5be8ca04c33f5db4f947f737ab49b0ea244b130d3a4318c2fbfab03ea14"
+    "sha256_or_fingerprint": "e818ec0b45dd2fa2e935b95cc21491aabd96edff612a804a2671b58318428164"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/direct-consumer-proof.json",
-    "sha256_or_fingerprint": "84445c4dbcea9b8fed7c765e163186060e7fd2989f7495b4e0d1942b433ad096"
+    "sha256_or_fingerprint": "db1e256c8681b6409f52e1610132f8bfdcfdd039c2c794b51b6595726df3386a"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/operator-proof.json",
-    "sha256_or_fingerprint": "e29be519bf2fc6d3a45185c9626923d048fc4b5c270564684fb250caf72d46c1"
+    "sha256_or_fingerprint": "e69d962740c52b7751bb79e3c205ca81ad1b58265af91cc8fcfa6095b11b1f74"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/clock-proof.json",
-    "sha256_or_fingerprint": "487c33ab9f9ff9d1e911bceddb6a4ca92fe547b52bd31799d32a140bfdb7b627"
+    "sha256_or_fingerprint": "53e0b6d1228343be586663fce6a52c53840457af0b9f57d3baece84e8fab81ce"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/cleanup.json",
-    "sha256_or_fingerprint": "6bb758c766c572eee7c227b4235dee960e67c86ae48433bbc9d8c6eb44a0dfa4"
+    "sha256_or_fingerprint": "337499bc9d5e58af0b69983088ae4a6aab2eaf856f97e464a9d49ee4efa5d8f6"
   },
   {
     "logical_ref": "docs/reports/smial_trading_core_operational_closure_v1/REPORT.md",
-    "sha256_or_fingerprint": "5f9a6972e0fa64adf41179cc0793638e4bdfee5497ae3be80d1c456451f536ca"
+    "sha256_or_fingerprint": "7372ed2ee9ce868f3a9d58c95c1619f8eba90cb5925fa64b648333e8fe2f04dc"
   },
   {
     "logical_ref": "docs/reports/smial_trading_continuity_v1/REPORT.md",
@@ -45,7 +45,7 @@
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/history.json",
-    "sha256_or_fingerprint": "d3e830f6aabef3aa273c81f050e3eb96b40d4bbf93e9fe61479dbe0c844c083d"
+    "sha256_or_fingerprint": "27ae871a212535144d1276d8dbc5ea377fa8c291a9dce8d4c74879f4228d2f79"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/ci-source-capacity-remediation.json",
@@ -73,7 +73,7 @@
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/review-managed-native-recovery-remediation.json",
-    "sha256_or_fingerprint": "0f2b10247dd06ca7b5102026b91c00507332b18014713b73940c5d77b779d27c"
+    "sha256_or_fingerprint": "84278a31bf9b876f6f29f2380497e2c9edcb7cc4e848770bfb43294282773918"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/ci-atom-hour-budget.json",
@@ -89,7 +89,7 @@
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/review-a2cc-quantity-guard.json",
-    "sha256_or_fingerprint": "dd990617ff9da6d45db65a8a46c867c952314dab1a8c4c9165d9deb6e61355fb"
+    "sha256_or_fingerprint": "bc5b3d2f188857417310aa52405ee25b037f5eb350a8854b2810843f09eab6a6"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/quantity-witness-reproducer.py",
@@ -98,5 +98,9 @@
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/ci-domain-declaration-repair.json",
     "sha256_or_fingerprint": "59619b671f47d227716e4f6819886cf15afec7db862639e55c6aa5d2be99390b"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/ci-readonly-canary-repair.json",
+    "sha256_or_fingerprint": "e70bbfd452a0b8282e6294a1da0273c7c01be442e2e722a8ae47734a7a4a327a"
   }
 ]
