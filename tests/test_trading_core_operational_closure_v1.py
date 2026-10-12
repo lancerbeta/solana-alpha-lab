@@ -1075,7 +1075,32 @@ class OperatingDriverTests(unittest.TestCase):
         finally:
             store.close()
 
+    def test_C21_source_capacity_guard_stops_before_nomination(self):
+        source = EpisodeScenario(self.data / "fortnight-capacity-stop", start=self.start,
+            stops=self.start + timedelta(days=14), daily_ceiling=96)
+        row = token_object(self.mint, price=.000003, liquidity=10000, holders=60)
+        nominate(source.market, self.start, {"toptraded": [row], "toptrending": [row]})
+        usage = shutil.disk_usage(self.data)
+        disk = type(usage)(64 * 1024**3, 32 * 1024**3, 32 * 1024**3)
+        with patch("solana_alpha_lab.factory.opportunity_episode_tick.shutil.disk_usage", return_value=disk):
+            result = source.tick(self.start)
+        self.assertEqual(result["stop_reason"], "DRAIN_RESERVE_PRESSURE")
+        self.assertEqual(result["drain_headroom"]["status"], "STOP_NEW_INTAKE")
+        self.assertGreater(result["drain_headroom"]["required_free_bytes"], disk.free)
+        self.assertEqual(result["provider_calls"], 0)
+        self.assertEqual(source.admissions(), [])
+        self.metrics = {"physical_capacity_fixture_free_bytes": disk.free,
+            "required_free_bytes": result["drain_headroom"]["required_free_bytes"],
+            "native_headroom_guard_preserved": True, "nomination_calls": 0}
+
     def test_C21_native_source_stream_over_virtual_two_weeks(self):
+        # The source's conservative fourteen-day reserve exceeds CI disks.
+        # Model only physical capacity; admission and its guard stay native.
+        usage = shutil.disk_usage(self.data)
+        disk = type(usage)(2 * 1024**4, 1024**4, 1024**4)
+        capacity = patch("solana_alpha_lab.factory.opportunity_episode_tick.shutil.disk_usage", return_value=disk)
+        capacity.start()
+        self.addCleanup(capacity.stop)
         self.source = EpisodeScenario(self.data / "fortnight-source", start=self.start,
             stops=self.start + timedelta(days=14), daily_ceiling=96)
         self.start_operating()
@@ -1116,7 +1141,9 @@ class OperatingDriverTests(unittest.TestCase):
         self.assertLess(disk,64*1024**2)
         self.metrics={"native_stream_virtual_days":14,"source_identities":14,"stable_attempts":28,
             "source_plus_runtime_bytes":disk,"entry_tick_seconds_min":min(durations),
-            "entry_tick_seconds_max":max(durations),"modeled_net_literal_oracle_usd":"36.91"}
+            "entry_tick_seconds_max":max(durations),"modeled_net_literal_oracle_usd":"36.91",
+            "physical_capacity_fixture_free_bytes":1024**4,
+            "native_headroom_guard_preserved":True}
 
 
 if __name__ == "__main__":

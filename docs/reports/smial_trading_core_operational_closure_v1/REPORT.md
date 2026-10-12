@@ -78,7 +78,7 @@ packet через current native source/store owners. Это проверка п
 
 ## C01–C24
 
-Native automated status: PASS, 154 tests, 536.079047s; source bytes до/после
+Native automated status: PASS, 155 tests, 537.935065s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -160,28 +160,41 @@ real strategy promotion не установлены. Там, где NOT_IMPLEMEN
 
 ## Resources, rollback, delivery
 
-Peak suite process RSS: 146309120 bytes (139.53 MiB). Native 14-day producer
+Первый exact-head CI `d8ee540f` остановился на C21: первый source admission
+отсутствовал. Native reproduction при 32 GiB подтвердил `DRAIN_RESERVE_PRESSURE`
+до любого nomination call: консервативный резерв четырнадцатидневного fixture
+требует 142188216320 bytes. Свободное место самого CI не было записано — UNKNOWN.
+Положительный synthetic сценарий теперь явно моделирует physical capacity
+1 TiB; отдельный negative проверяет native stop при 32 GiB и ноль calls.
+Production guard и рабочие настройки не изменены. Actual failed CI, native
+before/after и прежний scoped review PASS сохранены в
+[capacity remediation](../../evidence/smial_trading_core_operational_closure_v1/ci-source-capacity-remediation.json).
+Тот же CI выявил semantic overview 16404 bytes при лимите 16384. Сжат только
+purpose lifecycle-маршрута: IDs, вопросы, ссылки и authority сохранены; новый
+размер 16349 bytes, прямой semantic consumer module — 15 PASS.
+
+Peak suite process RSS: 146681856 bytes (139.89 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.1978–0.2536s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.1932–0.2216s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04986–0.05327 |
-| 1000 | 364544 | 0.04745–0.05310 |
-| 4000 | 843776 | 0.04836–0.06353 |
+| 0 | 204800 | 0.04653–0.05165 |
+| 1000 | 364544 | 0.04718–0.05176 |
+| 4000 | 843776 | 0.04533–0.05437 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 840 | 0.000425 |
-| 100 proved terminal | 78270 | 0.014935 |
-| 1000 proved terminal | 774410 | 0.163067 |
-| 1000 terminal + 12000 unrelated events | 774410 | 0.161970 |
+| 1 outstanding | 840 | 0.000434 |
+| 100 proved terminal | 78270 | 0.015511 |
+| 1000 proved terminal | 774410 | 0.155576 |
+| 1000 terminal + 12000 unrelated events | 774410 | 0.157873 |
 
-Native history preparation: 13.218s.
+Native history preparation: 13.088s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.

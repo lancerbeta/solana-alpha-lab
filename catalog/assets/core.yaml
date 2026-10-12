@@ -34621,7 +34621,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: 8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83}
+  integrity: {kind: sha256, sha256: fad949f339a8623c6d0e2cdab4e515faed86a597039ea687700d5e21ac0ec6ba}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -41738,7 +41738,7 @@ records:
     repository_path: tests/test_trading_core_operational_closure_v1.py
   integrity:
     kind: sha256
-    sha256: dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49
+    sha256: 2c9f40b73bc065338f6e9b089d8c26d58f42670fe5994b1f028eedfff69fa4fa
   access:
     mode: read_only
     method: file
@@ -41847,7 +41847,7 @@ records:
     repository_path: docs/tasks/SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: 20926be8ddb0502f4c46f5c9e485062046dbf31e11d25b46532ec4e2eb1ac36d
+    sha256: 1aff7510b1c251bc772ae2527a65e6e1426fa92ba109b36b821956d4be8ff298
   access:
     mode: read_only
     method: file
@@ -41884,7 +41884,7 @@ records:
     repository_path: docs/reports/smial_trading_core_operational_closure_v1/REPORT.md
   integrity:
     kind: sha256
-    sha256: e4637443ce45632052e14843d99aab979ea5a34cc39828ccb64cc960775f242f
+    sha256: 84c806de0202dfe7512628e032ed6379f4da76a376b1458ffb9292fc4a0f038e
   access:
     mode: read_only
     method: file

@@ -1,4 +1,5 @@
 {
+  "captured_output_bytes": 0,
   "captured_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "cleanup": [
     {
@@ -14,10 +15,10 @@
   ],
   "clock_basis": "CONTROLLED_ORDINARY_COORDINATOR_CLOCK",
   "code_unchanged_during_execution": true,
-  "completed_at": "2026-10-12T09:21:26.968428Z",
+  "completed_at": "2026-10-12T10:27:11.868105Z",
   "contract_reference": "source-contract.md section 11.3 / C03 / C04",
   "credential_reads": false,
-  "elapsed_seconds": 4.452612,
+  "elapsed_seconds": 5.749772,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "historical_1599_snapshot_comparison": "UNKNOWN_ALGORITHM_NOT_RETAINED_NO_COMPARISON_CLAIM",
   "imported_source_pins": {
@@ -139,7 +140,7 @@
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49"
+    "tests/test_trading_core_operational_closure_v1.py": "2c9f40b73bc065338f6e9b089d8c26d58f42670fe5994b1f028eedfff69fa4fa"
   },
   "live_authority": false,
   "locked_environment": true,
@@ -149,13 +150,20 @@
   "offline_environment": true,
   "owned_scratch_cleanup": {
     "created_absent": true,
+    "deleted_bytes": 118104,
+    "deleted_file_count": 6,
     "deletion": "POWERSHELL_REMOVE_ITEM_LITERALPATH_EXACT_MARKED_ROOT",
-    "marker_sha256": "ccf9314efa3bffa422a30181b3edc110a1f9071b638e0dba4e6667a54920701d",
-    "relative_path": "local/smial-operational-final-consumers",
+    "marker_sha256": "d699a6b139820084a4d8f6e77f7091c3c44cf34773d147e864940313e68966f2",
+    "relative_path": "local/smial-ci-fixture-proofs",
     "reparse_points": false,
     "status": "ABSENT",
     "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
     "within_repository": true
+  },
+  "prior_receipt_archive": {
+    "byte_exact": true,
+    "path": "docs/evidence/smial_trading_core_operational_closure_v1/interim-clock-before-ci-fixture-repair.json",
+    "raw_sha256": "da45fb9d29cfc78040773dd349ac4c32898a418d69a32cae9554bcdba1e48ad6"
   },
   "probes": [
     {
@@ -176,7 +184,7 @@
         "run_completed": true
       },
       "controlled_clock": "2026-10-05T12:40:30Z",
-      "elapsed_seconds": 2.329948,
+      "elapsed_seconds": 2.416478,
       "limits": {
         "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001",
         "decision_point": "E1800",
@@ -185,7 +193,7 @@
         "request_not_before": "2026-10-05T12:35:00Z",
         "schedule_sha256": "8e0f4eea76207d5b9cf014c535218e513fcf271e9b5b362d3fe0d8ac0bc7d969",
         "source_cutoff": "2026-10-05T12:40:00Z",
-        "strategy_sha256": "1cb040c82500a304d34783d3dc82dce0d51dcd293fcd640c3ab04039a4010996",
+        "strategy_sha256": "beee4049c4e2bdd0d5a9206213d067fd1653281498b6932e23346d66f8183268",
         "t0": "2026-10-05T12:01:15Z"
       },
       "native_decision_at": [
@@ -223,8 +231,8 @@
     {
       "backward": {
         "controlled_clock": "2026-10-05T12:40:00Z",
-        "execution_sha256_after": "d9e0d5ea802c3901576c073bb04c4ee7462cb0437c4840ba6b7079c6631a5517",
-        "execution_sha256_before": "d9e0d5ea802c3901576c073bb04c4ee7462cb0437c4840ba6b7079c6631a5517",
+        "execution_sha256_after": "2d04e41c3cc3b1d832ac79df974485a0f87e5a345fae4b2c30bff3337098b093",
+        "execution_sha256_before": "2d04e41c3cc3b1d832ac79df974485a0f87e5a345fae4b2c30bff3337098b093",
         "persisted_last_tick_at": "2026-10-05T12:41:00Z",
         "persisted_runtime_sha256_after": "9b9d456454bc3f59d83b0be31142057222ffa2c24f42c10d555b2e9bdf352db1",
         "persisted_runtime_sha256_before": "9b9d456454bc3f59d83b0be31142057222ffa2c24f42c10d555b2e9bdf352db1",
@@ -265,7 +273,7 @@
         "last_tick_preserves_forward_clock": true,
         "native_cutoff_matches_literal_oracle": true
       },
-      "elapsed_seconds": 2.122638,
+      "elapsed_seconds": 2.258048,
       "forward": {
         "attempt_count": 0,
         "controlled_clock": "2026-10-05T12:41:00Z",
@@ -293,7 +301,7 @@
         "request_not_before": "2026-10-05T12:35:00Z",
         "schedule_sha256": "8e0f4eea76207d5b9cf014c535218e513fcf271e9b5b362d3fe0d8ac0bc7d969",
         "source_cutoff": "2026-10-05T12:40:00Z",
-        "strategy_sha256": "585da38bdc0a62fd9c39ef465162a0f234dce34219bfec7ff030e17a9f542f3e",
+        "strategy_sha256": "67de32ff17dcd6cf00536454dfacd847851d7ac7981e12ca578111412f508002",
         "t0": "2026-10-05T12:01:15Z"
       },
       "probe": "FORWARD_THEN_BACKWARD_CLOCK",
@@ -309,9 +317,27 @@
     "Read native execution_events, positions, ordinary_state/work/incidents immediately before and after the backward call; require exact equality and OPERATING_CLOCK_REGRESSION.",
     "Call tearDown() for every fixture and verify its disposable root is absent. Only write this evidence receipt."
   ],
+  "procedure_preflight_history": [
+    {
+      "cause": "NATIVE_ACCEPTED_RESULT_NESTED_PAYLOAD_READOUT",
+      "cleanup": "OWNED_FIXTURE_DIRECTORY_EMPTY_BEFORE_ROOT_REMOVAL",
+      "native_fixture_count": 1,
+      "product_source_changes": false,
+      "scope": "RECEIPT_HELPER_ONLY",
+      "status": "HELPER_READOUT_INCOMPLETE"
+    },
+    {
+      "cause": "CANONICAL_TYPED_ERROR_READOUT",
+      "cleanup": "OWNED_FIXTURE_DIRECTORY_EMPTY_BEFORE_ROOT_REMOVAL",
+      "native_fixture_count": 2,
+      "product_source_changes": false,
+      "scope": "RECEIPT_HELPER_ONLY",
+      "status": "HELPER_READOUT_INCOMPLETE"
+    }
+  ],
   "provider_calls": false,
   "python_downloads": "never",
-  "receipt_sha256": "6478878a75ee21e30c5bdd0b1d8e6233aa94ee30a483e7590920d4cc145d61d1",
+  "receipt_sha256": "7c4fa4f79746294f1a90569d5407900cf2c9312d2508003baade6a0d5ad96433",
   "required_current_source_pin_count": 16,
   "schema": "smial.operating-clock-proof",
   "schema_version": "1.0",
@@ -438,7 +464,7 @@
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
+    "tests/test_trading_core_operational_closure_v1.py": "2c9f40b73bc065338f6e9b089d8c26d58f42670fe5994b1f028eedfff69fa4fa",
     "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
     "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
     "tests/test_trading_operational_recovery_v1.py": "524b2bf596df6d61d997e471b921342fb22a1bd70603f0557b9c85e596d3d0ee"
@@ -564,15 +590,20 @@
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
+    "tests/test_trading_core_operational_closure_v1.py": "2c9f40b73bc065338f6e9b089d8c26d58f42670fe5994b1f028eedfff69fa4fa",
     "tests/test_trading_operational_adapters_v1.py": "ff26db20072224418899f928cb2f8c653a3539d3f32a76a2f04b20e1c832966b",
     "tests/test_trading_operational_obligations_v1.py": "95f68c294ddad699fc771338b63a79b2102b9f4dbd93f77d7306fe3f62e5dd66",
     "tests/test_trading_operational_recovery_v1.py": "524b2bf596df6d61d997e471b921342fb22a1bd70603f0557b9c85e596d3d0ee"
   },
   "source_snapshot_algorithm": "git ls-files -z -- src scripts tests; sorted unique repository-relative paths; SHA256 of raw file bytes; aggregate SHA256 of UTF-8 JSON map with sort_keys=true, separators=(comma,colon), ensure_ascii=false",
   "source_snapshot_file_count": 1260,
-  "source_snapshot_sha256_after": "2498db7d061acd05c35b3e5a097b18c09072e34f17289726c2ad0446435b970d",
-  "source_snapshot_sha256_before": "2498db7d061acd05c35b3e5a097b18c09072e34f17289726c2ad0446435b970d",
-  "started_at": "2026-10-12T09:21:22.515797Z",
-  "status": "PASS"
+  "source_snapshot_sha256_after": "9f366b178b50f81676d80bb64bd1013043cbd7108baefaf7abcd8362184ec3db",
+  "source_snapshot_sha256_before": "9f366b178b50f81676d80bb64bd1013043cbd7108baefaf7abcd8362184ec3db",
+  "started_at": "2026-10-12T10:27:06.118351Z",
+  "status": "PASS",
+  "temporary_directory_cleanup": {
+    "owned_root_count": 2,
+    "owned_roots_absent": true,
+    "tracking": "ALL_TEMPORARYDIRECTORY_CREATED_DURING_NATIVE_CLOCK_RUN"
+  }
 }

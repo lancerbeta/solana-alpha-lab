@@ -402,11 +402,10 @@ routes:
 
   - semantic_route_id: SEM-OWNER-LIFECYCLE
     purpose: >-
-      Derived LifecycleProjectionV1 index plus Research Workbench, experiment
-      evidence, StrategyVersion-to-bot lineage, SignalDecision traces, unresolved
-      positions, pause PAPER entries, and PAPER/SHADOW economic interpretation.
-      Distinguishes Git definition from runtime readback. Not source truth, not
-      NetReturn or owner FCF, not live health, grants no authority.
+      Derived LifecycleProjectionV1 and Research Workbench: experiment evidence,
+      StrategyVersion-to-bot lineage, SignalDecision traces, unresolved positions,
+      PAPER pause and PAPER/SHADOW economics. Git definitions require runtime
+      readback. Not source truth, NetReturn, owner FCF or live health; no authority.
     owner_questions:
       - What lifecycle objects currently exist?
       - How are hypothesis, experiment, strategy and position connected?

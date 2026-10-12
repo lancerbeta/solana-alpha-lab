@@ -189,3 +189,18 @@ preserved separately rather than attributed to frozen 08c5ae1e. Append a new
 snapshot-bound event through the same owner, retain every original event/body/
 clock, and bind cut/reconcile/ACK to the current restore. Prove the second ACK
 and originating due EXIT before fresh whole-outcome evidence.
+
+Exact-head CI for d8ee540f failed the fourteen-day C21 source startup with
+an empty first admission. A native 32 GiB capacity reproduction confirmed
+the existing producer guard stops before nomination: its conservative
+fourteen-day fixture reserve is 142188216320 bytes. Actual CI free space
+was not logged and stays UNKNOWN. Keep production storage/admission unchanged;
+explicitly model physical capacity in the positive synthetic scenario and
+prove the low-capacity native stop with zero calls. Preserve that actual CI
+failure and the scoped four-role PASS on 1a617c5f as history. Refresh whole
+native outcome, consumer/clock/operator receipts, four isolated P0/P1 reviews
+and exact-head CI in this same PR; no operational configuration or new grant.
+The same CI's shard4 also proved the semantic overview was 16404 bytes against
+the existing 16384-byte limit. Compress only SEM-OWNER-LIFECYCLE purpose text;
+retain route/question/owner/operator bindings and authority/size boundaries.
+The direct semantic consumer module proves 16349 bytes and 15 PASS tests.
