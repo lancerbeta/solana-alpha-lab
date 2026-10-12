@@ -98,7 +98,10 @@
     "unresolved_safety_or_truth_conflict": false,
     "user_only_activation": false
   },
-  "project_sources_disposition": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT; no cloud-source change. Native readiness at 225271ac347c2ae9b89e6a1f1744a6ff93b894bd denied MERGE_CHECK_FAILED:factory_fit_pass because this field was a string; original Git blob sha256=80b425a107ad10773be7637b56ab8bb1b6e8d532bb7e93cdee69025da94f3f4a; denial sha256=f774cb77fbf5447f3e4ab9a3dbe39a1f623f7855c85e5c40e64f6465830d5438. Corrected only the receipt representation under the existing gate contract."
+  },
   "schema": "smial.delivery-completion-evidence",
   "schema_version": "1.0",
   "side_effects": {
