@@ -68,10 +68,6 @@
     "sha256_or_fingerprint": "4cfc797dbb3d3a326e1286cce24e37a4e81c22c321708cbcafa3b034ff4c6163"
   },
   {
-    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/review-fd9169be.json",
-    "sha256_or_fingerprint": "08d1eb15dcc799ba1feff26e4fc53947977f8a63faab76bce3a8e3545015f57c"
-  },
-  {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/review-0f1c30b3.json",
     "sha256_or_fingerprint": "955899f42ad10d72c61a8f1b9860b84d1a29101c85d2b36cb1406a4a10c36fff"
   },
@@ -126,30 +122,6 @@
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/ci-semantic-capacity-remediation.json",
     "sha256_or_fingerprint": "0510959241a6c25dd62da346be6c14e43d6a1c4229d0392259359a0c2d2106cd"
-  },
-  {
-    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/interim-before-ci-fixture-repair.json",
-    "sha256_or_fingerprint": "32b8c26508cd4d83118f1c3fa6855230a1e50f31bea45d46d6aa7296c01d866d"
-  },
-  {
-    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/interim-consumers-before-ci-fixture-repair.json",
-    "sha256_or_fingerprint": "6aee5ec1d7c53dd130d369fbfa2962d7eb9d9fce646e6ac5235c28094f82a2c9"
-  },
-  {
-    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/interim-clock-before-ci-fixture-repair.json",
-    "sha256_or_fingerprint": "da45fb9d29cfc78040773dd349ac4c32898a418d69a32cae9554bcdba1e48ad6"
-  },
-  {
-    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/interim-operator-before-ci-fixture-repair.json",
-    "sha256_or_fingerprint": "1e70e73c99c700bbbed51a8324f07f4a8508f945bd5944dc13a903286b3bf187"
-  },
-  {
-    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/interim-cleanup-before-ci-fixture-repair.json",
-    "sha256_or_fingerprint": "a7b021a6865c72fe75bd6bb0c565ed0afb3f0963aabcc2f66d259542587b7fba"
-  },
-  {
-    "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/review-1a617c5f.json",
-    "sha256_or_fingerprint": "f15ef4ef929173e3273cb2e0135df2ca911a9c88de8289538fcb29e63db4107e"
   },
   {
     "logical_ref": "docs/evidence/smial_trading_core_operational_closure_v1/review-9ee9fb57.json",
