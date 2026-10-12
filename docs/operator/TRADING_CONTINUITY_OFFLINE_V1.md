@@ -147,8 +147,20 @@ current epoch, outstanding inventory и earliest overdue work.
 true до истечения TTL; READY описывает software snapshot, не работу процесса
 под host supervision. Ожидание будущего exit point не считается зависанием.
 UNKNOWN и missing/corrupt binding не превращаются в healthy.
-READY также требует VALID для текущего общего operating envelope и проверенных
-входов исполнения. Для SHADOW status заново читает funding/asset inputs и их
+READY также требует VALID для текущего общего operating envelope, проверенных
+входов исполнения и допустимой текущей runtime policy — политики входов.
+Она читается через existing policy owner в том же snapshot; status показывает
+runtime_policy_status/revision/sha256. Отсутствующая optional policy имеет
+допустимый NOT_CONFIGURED_STRATEGY_ONLY: действуют исходные strategy limits.
+Повреждённая существующая policy даёт RUNTIME_POLICY_INVALID,
+ACTION_REQUIRED и VERIFY_RUNTIME_POLICY; первый шаг — readonly readback.
+Общая integrity_verified становится false, но доказанное original inventory
+остаётся KNOWN, а исходные EXIT обслуживаются независимо от current policy.
+OBSERVED status/check/tick/run требуют физических часов. --as-of и --clock-file
+на них возвращают OBSERVED_RUNTIME_REQUIRES_PHYSICAL_CLOCK; повторять нужно
+без virtual clock flags. Synthetic fixtures сохраняют virtual time. Исходные
+activation/cut timestamps остаются отдельными metadata; OBSERVED activation
+проверяет свежесть execution inputs по физическому clock. Для SHADOW status заново читает funding/asset inputs и их
 clocks: missing, stale, future или повреждённый вход даёт ACTION_REQUIRED с
 точным execution_input_status. source_fresh и input_fresh показаны отдельно.
 Повреждённый/отсутствующий envelope показывает operating_configuration_status

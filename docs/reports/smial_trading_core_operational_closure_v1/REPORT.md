@@ -54,6 +54,8 @@ Original attached MD byte-for-byte находится в source-contract.md; е�
 | REVIEW_LEGACY_COUNTEREXAMPLE | Legacy recipe/provenance менялись; saved baseline packet конфликтовал, native reservation count 1→2 | Operational поля только при явном runtime_execution; absent/null сохраняют прежний packet, одну позицию и неизменённый journal |
 | REVIEW_CURRENT_AUTHORITY_COUNTEREXAMPLE | Restore терял post-backup tightening $30→$10 и снова разрешал запрещённый вход | Full original envelope/runtime-policy chains и committed heads; missing/conflicting configuration сохраняет fence, later local extension не откатывается |
 | REVIEW_ACTIVE_DIAGNOSIS_COUNTEREXAMPLE | Missing funding ошибочно помечал integrity; после успешного EXIT cold status оставался ACTION_REQUIRED | Отдельный EXIT-input cause закрывается после проверенного восстановления; audit history и unresolved/corrupt neighbors сохранены |
+| REVIEW_CURRENT_POLICY_COUNTEREXAMPLE | Existing policy owner возвращал RUNTIME_POLICY_INVALID, cold native/CLI status — READY/VALID/NONE | Same snapshot/shared current-policy validator; typed policy status/revision/SHA/action, optional strategy-only отсутствие сохранено, original inventory/EXIT независимы |
+| REVIEW_CURRENT_CLOCK_COUNTEREXAMPLE | OBSERVED status/check с --as-of или clock-file считали старый fixture clock текущим и показывали READY | Physical-clock boundary на current health/input checks; synthetic virtual time и original activation/cut metadata сохранены |
 | DELIVERY_PIN_COUNTEREXAMPLE | Необязательное изменение domain-policy prose нарушало исторический TASK30 SHA | Policy/TASK30 сохранены буквально; этот task pin registry-011 остаётся explicit, gate exceptions не добавлены |
 
 Baseline failures для новых capabilities не выдуманы. Reviewer before traces
@@ -68,7 +70,7 @@ packet через current native source/store owners. Это проверка п
 
 ## C01–C24
 
-Native automated status: PASS, 129 tests, 449.758855s; source bytes до/после
+Native automated status: PASS, 132 tests, 470.792323s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -150,28 +152,28 @@ real strategy promotion не установлены. Там, где NOT_IMPLEMEN
 
 ## Resources, rollback, delivery
 
-Peak suite process RSS: 146862080 bytes (140.06 MiB). Native 14-day producer
+Peak suite process RSS: 146341888 bytes (139.56 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.2043–0.2469s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.2051–0.2743s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04632–0.05095 |
-| 1000 | 364544 | 0.04524–0.05103 |
-| 4000 | 843776 | 0.04643–0.05708 |
+| 0 | 204800 | 0.04879–0.05541 |
+| 1000 | 364544 | 0.05169–0.05897 |
+| 4000 | 843776 | 0.04717–0.05530 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 630 | 0.000277 |
-| 100 proved terminal | 78070 | 0.015328 |
-| 1000 proved terminal | 774200 | 0.160879 |
-| 1000 terminal + 12000 unrelated events | 774200 | 0.159756 |
+| 1 outstanding | 630 | 0.000274 |
+| 100 proved terminal | 78070 | 0.015172 |
+| 1000 proved terminal | 774200 | 0.162202 |
+| 1000 terminal + 12000 unrelated events | 774200 | 0.162019 |
 
-Native history preparation: 13.133s.
+Native history preparation: 13.736s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.

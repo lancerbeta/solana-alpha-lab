@@ -230,3 +230,12 @@ replaced by an older cut. Inventory ACK and RESUME cannot substitute current
 configuration reconciliation or restore a less restrictive backup limit.
 
 LIVE cannot resolve TradingRuntimePolicyV1 as authority.
+
+Current ordinary readonly status resolves this same policy owner in its coherent
+snapshot. VALID or intentional NOT_CONFIGURED_STRATEGY_ONLY are acceptable;
+RUNTIME_POLICY_INVALID prevents READY and projects exact policy status/revision/SHA.
+Invalid current policy does not fabricate UNKNOWN for independently verified old
+positions or prevent their originating EXIT. OBSERVED current health uses physical
+clock; synthetic virtual time and original activation/recovery timestamps remain
+separate. Current status/check cannot use --as-of/clock-file to assert historical
+input freshness as present readiness.

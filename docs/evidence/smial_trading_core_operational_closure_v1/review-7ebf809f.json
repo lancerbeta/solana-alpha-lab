@@ -1,0 +1,103 @@
+{
+  "additional_native_regressions": {
+    "ARCHITECTURE_CRITIC": {
+      "elapsed_seconds": 18.643,
+      "status": "PASS",
+      "tests": 5
+    },
+    "CODE_REVIEWER": {
+      "elapsed_seconds": 46.368,
+      "historical_shadow_pin_predicate": [],
+      "status": "PASS",
+      "tests": 13
+    },
+    "GOAL_DOD_CRITIC": {
+      "elapsed_seconds": 29.584,
+      "status": "PASS",
+      "tests": 5
+    }
+  },
+  "all_71_candidate_source_bytes_unchanged_during_review": true,
+  "credential_reads": 0,
+  "diff_sha256": "8190e369e9c1c62cf330fc2da3c44fc266e94b98121b30b2399312e00717a56f",
+  "expected_base": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "financial_effects": 0,
+  "implementation_blobs": 71,
+  "local_full_gate_executed": false,
+  "native_counterexamples": {
+    "historical_clock_in_current_observed_status": {
+      "elapsed_seconds": "UNKNOWN_NOT_MEASURED",
+      "failed_sandbox_setup_root": "ABSENT",
+      "historical_override": "2026-10-05T12:40:00Z",
+      "last_tick_at": "2026-10-05T12:40:00Z",
+      "method": "same native disposable fixture marked OBSERVED, cold CLI status physical clock versus --as-of historical fixture clock",
+      "new_effects": 0,
+      "overridden_input_fresh": true,
+      "overridden_process_alive": true,
+      "overridden_progress_moving": true,
+      "overridden_status": "READY",
+      "owned_fixture_roots": "ABSENT",
+      "physical_clock": "2026-10-12T02:24:06.706087Z",
+      "physical_input_fresh": false,
+      "physical_process_alive": false,
+      "physical_progress_moving": false,
+      "physical_status": "ACTION_REQUIRED",
+      "retained_attempts": 1,
+      "source_latest_at": "2026-10-05T12:35:01Z"
+    },
+    "invalid_current_runtime_policy": {
+      "cli_status": "READY",
+      "code_probe_elapsed_seconds": "UNKNOWN_NOT_MEASURED",
+      "cold_status": "READY",
+      "current_policy_status": "RUNTIME_POLICY_INVALID",
+      "goal_probe_elapsed_seconds": 4.3750713,
+      "integrity_verified": true,
+      "method": "ordinary PAPER activation/tick, synthetic owner policy APPLY, disposable native policy_json corruption to {}, fresh no-strategy coordinator plus real CLI",
+      "next_safe_action": "NONE",
+      "operating_configuration_status": "VALID",
+      "optional_absent_policy": "NOT_CONFIGURED_STRATEGY_ONLY remains valid",
+      "owned_fixture_roots": "ABSENT",
+      "position_count": 1
+    }
+  },
+  "observed_head": "7ebf809f5c0003f729dec583055ffadfb07abe95",
+  "packet_fingerprint_sha256": "2c66a3aae49ca5b7bcd6cad5fe78816d7b0d011f46894e30dd77d41643815cb4",
+  "provider_calls": 0,
+  "receipt_sha256": "159881b1e56eb7a46f0d73e4515dda1de97b28b4e150026ab2e6bfde8c09f5cb",
+  "reviewed_bindings_sha256": "3b47b9b69622b3c31dda5cf445d8314b9985b5bb51fea0f4aa202677340a2b3b",
+  "reviewed_inventory_sha256": "56f90c8ad5da7dc7f4f10b65e85ec905842630499be255e9bb9137c02f711ba1",
+  "reviews": [
+    {
+      "findings": [
+        "P1: current status ignores invalid persisted runtime policy; own cold native probe confirmed READY/VALID/NONE despite RUNTIME_POLICY_INVALID. Same readonly snapshot must use existing policy owner; cold JSON/human status required."
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "C16/C17_INVALID_RUNTIME_POLICY_FALSE_READY; absent optional policy remains valid strategy-only. Original exits must stay independent. This is a required software seam, not future commissioning."
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "SEMANTIC_PREMISE FAIL C7/C16: OBSERVED status --as-of historical time replaces physical clock and asserts current READY despite physically stale source/heartbeat/progress. Implementation authority widening; synthetic virtual clock remains required for tests.",
+        "Other C1-C6 boundaries verified; late publication, quote-model PnL and runtime successor cannot gain PIT/OOS/scientific replacement authority.",
+        "packet_fingerprint_sha256=2c66a3aae49ca5b7bcd6cad5fe78816d7b0d011f46894e30dd77d41643815cb4; PACKET_INFORMATION_PATH/PROCESS_OBLIGATION; model diversity UNPROVEN."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY"
+    }
+  ],
+  "schema": "smial.trading-operational-frozen-review-history",
+  "schema_version": "1.0",
+  "scope": "Actual frozen-content role verdicts and independently executed native counterexamples, not current-candidate PASS",
+  "source_pins": {
+    "scripts/trading_continuity.py": "116c804dde1fa1e6bccf1fb612e6f6e1ce1645d6cd9fd2c95f1ced173f1380cd",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "976864c7f29954569eb748e04c05e38449a9c03a75ec2f1bcc1c071aa08f7a1f",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc"
+  },
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1"
+}

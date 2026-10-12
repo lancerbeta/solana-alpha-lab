@@ -652,6 +652,189 @@ class OperatingDriverTests(unittest.TestCase):
         finally:
             writer.close()
 
+    def test_C17_current_runtime_policy_health_preserves_known_inventory_and_old_exit(self):
+        from solana_alpha_lab.factory import trading_runtime_policy as policy_owner
+        self.start_operating()
+        self.coordinator.run(ticks=1)
+        cold = TradingCoordinator(TradingContinuityRunner(self.root, data_root=self.data),
+            mode="PAPER", clock=lambda: self.now)
+        absent = cold.status()
+        self.assertEqual(absent["status"], "READY")
+        self.assertEqual(absent["runtime_policy_status"], "NOT_CONFIGURED_STRATEGY_ONLY")
+        self.assertIsNone(absent["runtime_policy_revision"])
+        self.assertEqual(absent["runtime_policy_sha256"], "0" * 64)
+        self.assertTrue(absent["runtime_policy_verified"])
+        self.assertEqual(absent["inventory"]["inventory_status"], "KNOWN")
+        writer = PaperPlaneStore(self.runner.store_path)
+        try:
+            with patch.object(policy_owner, "_now", return_value="2026-10-05T12:40:00Z"):
+                applied = policy_owner.apply_policy(ROOT, writer, mode="PAPER",
+                    candidate_raw={"new_entries_enabled": True}, expected_current_sha256="0" * 64,
+                    idempotency_key="READBACK-POLICY", owner_authorization_phrase="AUTHORIZE PAPER SHADOW TRADING RUNTIME POLICY APPLY",
+                    reason="SYNTHETIC_CURRENT_POLICY_READBACK")
+            valid = cold.status()
+            self.assertEqual(valid["status"], "READY")
+            self.assertEqual(valid["runtime_policy_status"], "VALID")
+            self.assertEqual(valid["runtime_policy_revision"], 1)
+            self.assertEqual(valid["runtime_policy_sha256"], applied["policy_sha256"])
+            writer._conn.execute("PRAGMA wal_autocheckpoint=0")
+            writer._conn.execute("UPDATE trading_runtime_policy_revisions SET policy_json='{}' WHERE mode='PAPER'")
+            files = [self.runner.store_path, Path(str(self.runner.store_path) + "-wal")]
+            before = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in files}
+            original_position = writer.positions()[0]
+            owner = policy_owner.resolve_current_policy(writer, "PAPER")
+            self.assertEqual(owner["status"], "RUNTIME_POLICY_INVALID")
+            native = cold.status()
+            cli = self.invoke("status", as_of="2026-10-05T12:40:00Z")
+            for view in (native, cli):
+                self.assertEqual(view["status"], "ACTION_REQUIRED")
+                self.assertEqual(view["runtime_policy_status"], owner["status"])
+                self.assertEqual(view["runtime_policy_revision"], owner["revision"])
+                self.assertEqual(view["runtime_policy_sha256"], owner["policy_sha256"])
+                self.assertFalse(view["runtime_policy_verified"])
+                self.assertFalse(view["integrity_verified"])
+                self.assertEqual(view["operating_configuration_status"], "RUNTIME_POLICY_INVALID")
+                self.assertEqual(view["next_safe_action"], "VERIFY_RUNTIME_POLICY")
+                self.assertEqual(view["next_safe_command"], "readback --mode PAPER")
+                self.assertEqual(view["inventory"], valid["inventory"])
+                self.assertTrue(view["exit_reconciliation_healthy"])
+            human = subprocess.run([sys.executable, "-B", str(ROOT / "scripts/trading_continuity.py"),
+                "status", "--repository-root", str(self.root), "--data-root", str(self.data),
+                "--as-of", "2026-10-05T12:40:00Z", "--format", "human"], capture_output=True, timeout=30)
+            self.assertEqual(human.returncode, 0)
+            text = human.stdout.decode("utf-8")
+            self.assertIn("PAPER · ACTION_REQUIRED", text)
+            self.assertIn("Политика входов: RUNTIME_POLICY_INVALID · revision: 1 · SHA256: " + owner["policy_sha256"], text)
+            self.assertNotIn("PAPER · READY", text)
+            after = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in files}
+            self.assertEqual(after, before)
+            self.assertEqual(writer.positions(), [original_position])
+        finally:
+            writer.close()
+        # The current policy is still damaged; original A's bound EXIT remains
+        # independently executable and must not be converted into UNKNOWN.
+        self.source.tick(datetime(2026, 10, 5, 13, 5, tzinfo=UTC))
+        self.now = datetime(2026, 10, 5, 13, 10, tzinfo=UTC)
+        self.coordinator.run(ticks=2)
+        after_exit = cold.status()
+        self.assertEqual(self.runner.readback()["positions"][0]["state"], "RECONCILED")
+        self.assertEqual(after_exit["inventory"]["position_count"], 0)
+        self.assertEqual(after_exit["inventory"]["inventory_status"], "KNOWN")
+        self.assertEqual(after_exit["pending_attempts"], 0)
+        self.assertTrue(after_exit["exit_reconciliation_healthy"])
+        self.assertEqual(after_exit["runtime_policy_status"], "RUNTIME_POLICY_INVALID")
+        self.assertEqual(after_exit["status"], "ACTION_REQUIRED")
+        self.metrics = {"optional_absent_policy": "READY_STRATEGY_ONLY", "valid_policy": "READY",
+            "corrupt_policy": "ACTION_REQUIRED", "original_inventory_status": "KNOWN",
+            "db_wal_bytes_unchanged_by_native_json_human_readback": True,
+            "old_exit_after_policy_corruption": "RECONCILED", "pending_attempts": 0}
+
+    def test_C03_C17_observed_current_health_denies_virtual_clocks_readonly(self):
+        from scripts.prove_trading_core_operational_closure import RecordingQuoteAdapter
+        self.start_operating(mode="SHADOW")
+        ledger, plan = self.wire_files()
+        self.coordinator.quote_adapter = RecordingQuoteAdapter(ledger, json.loads(plan.read_text()))
+        self.coordinator.run(ticks=1)
+        (self.data / "probe-profile.json").write_text(json.dumps(self.profile), encoding="utf-8")
+        (self.data / "virtual-clock.json").write_text(json.dumps({"as_of": "2026-10-05T12:40:00Z"}), encoding="utf-8")
+
+        def cli(command, *, observed=False, **fields):
+            argv = [sys.executable, "-B", str(ROOT / "scripts/trading_continuity.py"), command,
+                "--repository-root", str(self.root), "--data-root", str(self.data), "--mode", "SHADOW"]
+            if observed:
+                argv += ["--scope-root", str(self.root / "local")]
+            if command == "check":
+                argv += ["--strategy", self.strategy_rel, "--profile", "probe-profile.json"]
+            for key, value in fields.items():
+                argv += ["--" + key.replace("_", "-"), str(value)]
+            result = subprocess.run(argv, capture_output=True, timeout=30)
+            return result.returncode, result.stdout.decode("utf-8")
+
+        # Both virtual forms remain supported for synthetic input fixtures.
+        for command, expected in (("status", "READY"), ("check", "PROFILE_VERIFIED")):
+            for fields in ({"as_of": "2026-10-05T12:40:00Z"}, {"clock_file": "virtual-clock.json"}):
+                code, output = cli(command, **fields)
+                self.assertEqual(code, 0)
+                self.assertEqual(json.loads(output)["status"], expected)
+        # This is a synthetic disposable OBSERVED-boundary fixture. The old
+        # offline marker deliberately remains to prove it cannot authorize a
+        # virtual clock after the runner selected the OBSERVED evidence class.
+        (self.data / "operating_runtime.json").write_text(json.dumps({"schema": "smial.operating-runtime",
+            "schema_version": "1.0", "evidence_class": "OBSERVED"}), encoding="utf-8")
+        writer = PaperPlaneStore(self.runner.store_path)
+        try:
+            writer._conn.execute("PRAGMA wal_autocheckpoint=0")
+            files = [self.runner.store_path, Path(str(self.runner.store_path) + "-wal")]
+            before = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in files}
+            original = writer.execution_events()
+            for command in ("status", "check", "tick", "run"):
+                for fields in ({"as_of": "2026-10-05T12:40:00Z"}, {"clock_file": "virtual-clock.json"}):
+                    code, output = cli(command, observed=True, **fields)
+                    self.assertEqual(code, 2)
+                    result = json.loads(output)
+                    self.assertEqual(result["status"], "BLOCKED")
+                    self.assertEqual(result["reason_code"], "OBSERVED_RUNTIME_REQUIRES_PHYSICAL_CLOCK")
+            physical_before = datetime.now(UTC)
+            code, output = cli("status", observed=True)
+            physical_after = datetime.now(UTC)
+            physical = json.loads(output)
+            self.assertEqual(code, 0)
+            self.assertEqual(physical["status"], "ACTION_REQUIRED")
+            self.assertLessEqual(physical_before, datetime.fromisoformat(physical["as_of"].replace("Z", "+00:00")))
+            self.assertLessEqual(datetime.fromisoformat(physical["as_of"].replace("Z", "+00:00")), physical_after)
+            code, output = cli("check", observed=True)
+            self.assertEqual(code, 2)
+            self.assertEqual(json.loads(output)["reason_code"], "EXECUTION_OBSERVATION_STALE_OR_FUTURE")
+            code, output = cli("status", observed=True, as_of="2026-10-05T12:40:00Z", format="human")
+            self.assertEqual(code, 2)
+            self.assertIn("OBSERVED_RUNTIME_REQUIRES_PHYSICAL_CLOCK", output)
+            self.assertEqual(writer.execution_events(), original)
+            self.assertEqual({path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in files}, before)
+        finally:
+            writer.close()
+        self.assertEqual(len(self.ledger_receipts(ledger)), 1)
+        self.metrics = {"synthetic_virtual_forms_retained": ["as_of", "clock_file"],
+            "observed_virtual_current_health_denials": 8, "physical_status": "ACTION_REQUIRED",
+            "physical_check": "EXECUTION_OBSERVATION_STALE_OR_FUTURE", "db_wal_bytes_unchanged": True,
+            "new_quote_effects": 0}
+
+    def test_C03_observed_activation_timestamp_does_not_override_freshness_clock(self):
+        self.start_operating(mode="SHADOW")
+        (self.data / "probe-profile.json").write_text(json.dumps(self.profile), encoding="utf-8")
+        (self.data / "operating_runtime.json").write_text(json.dumps({"schema": "smial.operating-runtime",
+            "schema_version": "1.0", "evidence_class": "OBSERVED"}), encoding="utf-8")
+
+        def activate(command, epoch, key):
+            completed = subprocess.run([sys.executable, "-B", str(ROOT / "scripts/trading_continuity.py"), command,
+                "--repository-root", str(self.root), "--data-root", str(self.data), "--scope-root", str(self.root / "local"),
+                "--mode", "SHADOW", "--strategy", self.strategy_rel, "--profile", "probe-profile.json",
+                "--epoch", epoch, "--as-of", "2026-10-05T12:40:00Z", "--switch-key", key,
+                "--expected-current-epoch", self.epoch], capture_output=True, timeout=30)
+            return completed.returncode, json.loads(completed.stdout)
+
+        with closing(PaperPlaneStore(self.runner.store_path, readonly=True)) as store:
+            before = store.execution_events()
+        for command in ("operating-activate", "switch"):
+            code, result = activate(command, self.epoch + "-OBSERVED", command)
+            self.assertEqual(code, 2)
+            self.assertEqual(result["reason_code"], "EXECUTION_OBSERVATION_STALE_OR_FUTURE")
+        with closing(PaperPlaneStore(self.runner.store_path, readonly=True)) as store:
+            self.assertEqual(store.execution_events(), before)
+        # Authored disposable funding is fresh at the physical clock. The
+        # explicit historical activation timestamp remains metadata, not the
+        # input-freshness clock; this activation has no quote/provider effect.
+        self.quote_inputs(at=datetime.now(UTC).isoformat().replace("+00:00", "Z"))
+        new_epoch = self.epoch + "-OBSERVED"
+        code, result = activate("switch", new_epoch, "FRESH-PHYSICAL-INPUT")
+        self.assertEqual(code, 0)
+        self.assertEqual(result["epoch_id"], new_epoch)
+        with closing(PaperPlaneStore(self.runner.store_path, readonly=True)) as store:
+            activation = store.get_execution_event(new_epoch)
+            self.assertEqual(activation["created_at"], "2026-10-05T12:40:00Z")
+            self.assertEqual(store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED"), [])
+        self.metrics = {"observed_stale_activation_denials": 2, "fresh_physical_input_switch": "PASS",
+            "original_activation_timestamp_retained": "2026-10-05T12:40:00Z", "quote_effects": 0}
+
     def test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer(self):
         self.start_operating()
         self.coordinator.tick()

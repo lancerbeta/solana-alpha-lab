@@ -86,14 +86,17 @@ def main(argv=None) -> int:
                     raise PaperPlaneError("EXACT_INPUT_REQUIRED")
                 return json.loads(exact_child(runner.data_root, relative).read_text(encoding="utf-8"))
             clock = None
+            if (runner.evidence_class == "OBSERVED" and args.command in {"status", "check", "tick", "run"}
+                and (args.as_of or args.clock_file)):
+                raise PaperPlaneError("OBSERVED_RUNTIME_REQUIRES_PHYSICAL_CLOCK")
             if args.clock_file:
-                if not (runner.data_root / "offline_runtime.json").is_file():
+                if runner.evidence_class != "SYNTHETIC_OFFLINE" or not (runner.data_root / "offline_runtime.json").is_file():
                     raise PaperPlaneError("SYNTHETIC_CLOCK_FORBIDDEN")
                 clock = lambda: parse_utc(read_input(args.clock_file)["as_of"])
-            elif args.as_of:
+            elif args.as_of and runner.evidence_class != "OBSERVED":
+                # OBSERVED activation/cut timestamps remain original metadata;
+                # current input freshness always uses the physical owner clock.
                 clock = lambda: parse_utc(args.as_of)
-            if runner.evidence_class == "OBSERVED" and args.command in {"tick", "run"} and clock is not None:
-                raise PaperPlaneError("OBSERVED_RUNTIME_REQUIRES_PHYSICAL_CLOCK")
             quote_adapter = None
             if args.quote_grant:
                 if args.command not in {"run", "tick"} or args.mode != "SHADOW" or runner.evidence_class != "OBSERVED":
@@ -229,7 +232,8 @@ def main(argv=None) -> int:
             print(f"{result['mode']} · {result['status']} · epoch {result['activation_epoch_id']}\n"
                 f"На {result['as_of']} · последний tick: {result['last_tick_at'] or 'NONE'}\n"
                 f"Процесс: {result['process_alive']} · источник: {result['input_reason']} ({result['source_latest_at'] or 'NONE'}) · прогресс: {result['progress_moving']}\n"
-                f"Общий лимит: {result['operating_configuration_status']} · входы исполнения: {result['execution_input_status']}\n"
+                f"Конфигурация: {result['operating_configuration_status']} · входы исполнения: {result['execution_input_status']}\n"
+                f"Политика входов: {result['runtime_policy_status']} · revision: {result['runtime_policy_revision'] if result['runtime_policy_revision'] is not None else 'NONE'} · SHA256: {result['runtime_policy_sha256']}\n"
                 f"Обязательства: {inventory['position_count']} · стоимость: {inventory['outstanding_cost_basis_usd'] if inventory['outstanding_cost_basis_usd'] is not None else 'UNKNOWN'} USD · pending attempts: {result['pending_attempts']}\n"
                 f"Целостность: {result['integrity_verified']} · restore fence: {result['restore_guard']} · earliest overdue: {result['earliest_overdue'] or 'NONE'}\n"
                 f"Inventory SHA256: {result['inventory_sha256']}")

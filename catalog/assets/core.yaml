@@ -37229,7 +37229,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: OWNER_TRADING_OPERABILITY_FOUNDATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/trading_runtime_policy_v1.md', repository_path: docs/contracts/trading_runtime_policy_v1.md}
-  integrity: {kind: sha256, sha256: 8b7efac0c55709890be68195f553abe3db633667d125a792759a0ba74bb1710c}
+  integrity: {kind: sha256, sha256: b139d020de6bf571c921ac563b5b33593146350b935fdfeb16c757616a9b7af1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-RUNTIME-POLICY-001}
@@ -41391,7 +41391,7 @@ records:
     repository_path: docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md
   integrity:
     kind: sha256
-    sha256: b4ae65b8c624ece16deec00972e0d858ba6dbd2cfcb216902503dcbb1127e5b5
+    sha256: 6ddfd98d1a3763e4aebc8c63cb34b29d6296376e80a08692a53abcc82719c7e0
   access: &id001
     mode: read_only
     method: file
@@ -41514,7 +41514,7 @@ records:
     repository_path: scripts/trading_continuity.py
   integrity:
     kind: sha256
-    sha256: 116c804dde1fa1e6bccf1fb612e6f6e1ce1645d6cd9fd2c95f1ced173f1380cd
+    sha256: edfed7a8a9bdc8957b3fbdcdf57bc10dd3a17ac151402a9ea3c617516dc248d1
   access: *id001
   relations:
   - relation_type: depends_on
@@ -41627,7 +41627,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/trading_coordinator.py
   integrity:
     kind: sha256
-    sha256: 976864c7f29954569eb748e04c05e38449a9c03a75ec2f1bcc1c071aa08f7a1f
+    sha256: 55a9fed452edaa55afbe6e73aed91531a65b7e40c294d8130078be11f8c917bf
   access:
     mode: read_only
     method: file
@@ -41738,7 +41738,7 @@ records:
     repository_path: tests/test_trading_core_operational_closure_v1.py
   integrity:
     kind: sha256
-    sha256: c28992c93da0aae94d0579b14c9f0088000b3a23147098015f11c7cc49355c58
+    sha256: dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49
   access:
     mode: read_only
     method: file
@@ -41884,7 +41884,7 @@ records:
     repository_path: docs/reports/smial_trading_core_operational_closure_v1/REPORT.md
   integrity:
     kind: sha256
-    sha256: 81a6c41b5414328c780c9d08b9e1ce98c3f38b5f187531fc99d77a477b7f24d6
+    sha256: 7da916496797fbc64377886a22ac575576deb04629a41b5a6f2eb1af829651e1
   access:
     mode: read_only
     method: file

@@ -6,9 +6,9 @@
     "tracking": "ALL_TEMPORARYDIRECTORY_CREATED_DURING_NATIVE_CONSUMER_RUN"
   },
   "code_unchanged_during_execution": true,
-  "completed_at": "2026-10-12T02:02:52.083349Z",
+  "completed_at": "2026-10-12T02:39:38.080617Z",
   "credential_reads": false,
-  "elapsed_seconds": 22.231909,
+  "elapsed_seconds": 23.305891,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "expected_failure_test_ids": [],
   "failed_test_ids": [],
@@ -28,10 +28,10 @@
   "output_bytes": 16575,
   "output_encoding": "UTF-8",
   "output_scope": "UNITTEST_STREAM_AND_CAPTURED_STDOUT_STDERR",
-  "output_sha256": "9e186ed118859863fc2de9c4ac34d4e040fa19edea8414cb767cf4c89644882d",
+  "output_sha256": "692a712bf5a8b9df2e3bc06c7b38383525889c3affaa4c791fe93e499332497c",
   "provider_calls": false,
   "python_downloads": "never",
-  "receipt_sha256": "e666dc36701fdb86220966c9e7f2c0f8147db127d3f9696b7b27ee90ebafa92b",
+  "receipt_sha256": "cc25d3615470b85e2d4b3bd4d398afa88b8df3450b1db8f352687cbed76e17f5",
   "schema": "smial.operating-direct-consumer-proof",
   "schema_version": "1.0",
   "skipped_test_ids": [],
@@ -40,7 +40,7 @@
   "source_pins_after": {
     "scripts/factory_paper_shadow_operator_smoke.py": "f4678f7ba8511f1ffe9ebf2f839528bb8932d6c810883dc3c73187a0940fbade",
     "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
-    "scripts/trading_continuity.py": "116c804dde1fa1e6bccf1fb612e6f6e1ce1645d6cd9fd2c95f1ced173f1380cd",
+    "scripts/trading_continuity.py": "edfed7a8a9bdc8957b3fbdcdf57bc10dd3a17ac151402a9ea3c617516dc248d1",
     "src/solana_alpha_lab/__init__.py": "4334522e7db488900dea03cee86247bd38a57d9b9ef40b287550392f5955a97f",
     "src/solana_alpha_lab/catalog_discovery.py": "6054ae80e2d828ba8cef3631d60647d14e488b7fccebd29a4edda0b9795f0784",
     "src/solana_alpha_lab/contracts/__init__.py": "7e904c1850f227784282a9320d42cc172b788241129de08fce48d279c705d8ce",
@@ -103,7 +103,7 @@
     "src/solana_alpha_lab/factory/t0_friction_screen.py": "732f14a309ea7bc2b0181dcb5abcb6d5ef7bf732fb0b2fc53459e12f3bda0506",
     "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py": "351a253ccf5eec73094158d2e1895948ec96e7ede6e57369cda80eac1113ae7c",
     "src/solana_alpha_lab/factory/trading_adapters.py": "cdc3518032eaeb16becc469285c6bb9bb4ec9ef82a6c19d6cca51c615f4feaea",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "976864c7f29954569eb748e04c05e38449a9c03a75ec2f1bcc1c071aa08f7a1f",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "55a9fed452edaa55afbe6e73aed91531a65b7e40c294d8130078be11f8c917bf",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
     "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
@@ -136,7 +136,7 @@
     "tests/test_paper_shadow_accounting_and_control_v1.py": "6c6e378c24e6f5854fed946b2349bb558be380034bb0b7c7743561369edbcf09",
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_risk_and_economics_v1.py": "6d0742193f5fd20ec9a660074a826561b9f0b27e443b09efee11c880c9681a2e",
-    "tests/test_trading_core_operational_closure_v1.py": "c28992c93da0aae94d0579b14c9f0088000b3a23147098015f11c7cc49355c58",
+    "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
     "tests/test_trading_operational_obligations_v1.py": "c884f384117eebb0624723d2bf771564db1446e76eba2dafa85a4780e694c16c",
     "tests/test_trading_operational_recovery_v1.py": "73bafabdc46c3401ce73032500b023c7b586c7b7bf1d26cc87b1494605b1cd3e",
     "tests/test_trading_operations_workbench_v2.py": "0764f3652f042d2306e70defc3de3462d3c4ff5606f24bef048d8c34d49e7a32",
@@ -147,7 +147,7 @@
   "source_pins_before": {
     "scripts/factory_paper_shadow_operator_smoke.py": "f4678f7ba8511f1ffe9ebf2f839528bb8932d6c810883dc3c73187a0940fbade",
     "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
-    "scripts/trading_continuity.py": "116c804dde1fa1e6bccf1fb612e6f6e1ce1645d6cd9fd2c95f1ced173f1380cd",
+    "scripts/trading_continuity.py": "edfed7a8a9bdc8957b3fbdcdf57bc10dd3a17ac151402a9ea3c617516dc248d1",
     "src/solana_alpha_lab/__init__.py": "4334522e7db488900dea03cee86247bd38a57d9b9ef40b287550392f5955a97f",
     "src/solana_alpha_lab/catalog_discovery.py": "6054ae80e2d828ba8cef3631d60647d14e488b7fccebd29a4edda0b9795f0784",
     "src/solana_alpha_lab/contracts/__init__.py": "7e904c1850f227784282a9320d42cc172b788241129de08fce48d279c705d8ce",
@@ -210,7 +210,7 @@
     "src/solana_alpha_lab/factory/t0_friction_screen.py": "732f14a309ea7bc2b0181dcb5abcb6d5ef7bf732fb0b2fc53459e12f3bda0506",
     "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py": "351a253ccf5eec73094158d2e1895948ec96e7ede6e57369cda80eac1113ae7c",
     "src/solana_alpha_lab/factory/trading_adapters.py": "cdc3518032eaeb16becc469285c6bb9bb4ec9ef82a6c19d6cca51c615f4feaea",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "976864c7f29954569eb748e04c05e38449a9c03a75ec2f1bcc1c071aa08f7a1f",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "55a9fed452edaa55afbe6e73aed91531a65b7e40c294d8130078be11f8c917bf",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
     "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
@@ -243,7 +243,7 @@
     "tests/test_paper_shadow_accounting_and_control_v1.py": "6c6e378c24e6f5854fed946b2349bb558be380034bb0b7c7743561369edbcf09",
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_risk_and_economics_v1.py": "6d0742193f5fd20ec9a660074a826561b9f0b27e443b09efee11c880c9681a2e",
-    "tests/test_trading_core_operational_closure_v1.py": "c28992c93da0aae94d0579b14c9f0088000b3a23147098015f11c7cc49355c58",
+    "tests/test_trading_core_operational_closure_v1.py": "dc12bab574476951937a6fc46a7318e4c52c1167f727fc147c3ebebc271c1f49",
     "tests/test_trading_operational_obligations_v1.py": "c884f384117eebb0624723d2bf771564db1446e76eba2dafa85a4780e694c16c",
     "tests/test_trading_operational_recovery_v1.py": "73bafabdc46c3401ce73032500b023c7b586c7b7bf1d26cc87b1494605b1cd3e",
     "tests/test_trading_operations_workbench_v2.py": "0764f3652f042d2306e70defc3de3462d3c4ff5606f24bef048d8c34d49e7a32",
@@ -252,13 +252,13 @@
     "tests/test_trading_runtime_policy_v1.py": "d35fcd1f19958684a2a2888abc67deea435e6a9d4827d632e22187f30a31b8ac"
   },
   "source_snapshot_file_count": 1599,
-  "source_snapshot_sha256_after": "83b46154ed323e37189be474793cb6492c4471a5b0d34f9621fedfa40e54723c",
-  "source_snapshot_sha256_before": "83b46154ed323e37189be474793cb6492c4471a5b0d34f9621fedfa40e54723c",
-  "started_at": "2026-10-12T02:02:28.891387Z",
+  "source_snapshot_sha256_after": "e8e1479dc7cbc3020180ac6761ae2e9738f7cd183a477282be47fd25079110a3",
+  "source_snapshot_sha256_before": "e8e1479dc7cbc3020180ac6761ae2e9738f7cd183a477282be47fd25079110a3",
+  "started_at": "2026-10-12T02:39:13.808104Z",
   "status": "PASS",
   "tests": [
     {
-      "duration_seconds": 0.077247,
+      "duration_seconds": 0.06451,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -266,7 +266,7 @@
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_crash_after_allow_retry_keeps_binding"
     },
     {
-      "duration_seconds": 0.072632,
+      "duration_seconds": 0.088821,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -274,7 +274,7 @@
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_policy_apply_and_enter_do_not_mix_revisions"
     },
     {
-      "duration_seconds": 0.073748,
+      "duration_seconds": 0.074722,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -282,7 +282,7 @@
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_same_signal_retry_one_position"
     },
     {
-      "duration_seconds": 0.059293,
+      "duration_seconds": 0.060961,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -290,7 +290,7 @@
       "test": "test_trading_runtime_admission_concurrency_v1.TradingRuntimeAdmissionConcurrencyTests.test_shared_store_two_threads_one_remaining_slot"
     },
     {
-      "duration_seconds": 0.099926,
+      "duration_seconds": 0.085115,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -306,7 +306,7 @@
       "test": "test_trading_runtime_policy_backup_restore_v1.TradingRuntimePolicyBackupRestoreTests.test_paper_plane_sqlite_is_a_mutable_backup_source"
     },
     {
-      "duration_seconds": 0.049077,
+      "duration_seconds": 0.05042,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -314,7 +314,7 @@
       "test": "test_trading_runtime_policy_backup_restore_v1.TradingRuntimePolicyBackupRestoreTests.test_policy_revision_survives_file_copy_restore"
     },
     {
-      "duration_seconds": 0.076899,
+      "duration_seconds": 0.051424,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -322,7 +322,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_as_of_is_required"
     },
     {
-      "duration_seconds": 0.057838,
+      "duration_seconds": 0.060718,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -330,7 +330,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_exit_decision_version_must_match_the_position"
     },
     {
-      "duration_seconds": 0.0686,
+      "duration_seconds": 0.064367,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -338,7 +338,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_future_decision_is_rejected_beyond_skew"
     },
     {
-      "duration_seconds": 0.063947,
+      "duration_seconds": 0.071995,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -346,7 +346,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_one_id_binds_one_body"
     },
     {
-      "duration_seconds": 0.070118,
+      "duration_seconds": 0.081083,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -354,7 +354,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_position_lineage_is_queryable_from_the_store"
     },
     {
-      "duration_seconds": 0.050405,
+      "duration_seconds": 0.057442,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -362,7 +362,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.DecisionIdentityGateTests.test_strategy_spec_drift_fails_closed"
     },
     {
-      "duration_seconds": 0.062414,
+      "duration_seconds": 0.068332,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -370,7 +370,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_cancel_rules"
     },
     {
-      "duration_seconds": 0.064612,
+      "duration_seconds": 0.067395,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -378,7 +378,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_cancelled_intent_releases_its_entry_slot"
     },
     {
-      "duration_seconds": 0.062824,
+      "duration_seconds": 0.072362,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -386,7 +386,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_close_all_cancels_pre_attempt_and_skips_in_flight"
     },
     {
-      "duration_seconds": 0.055116,
+      "duration_seconds": 0.056996,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -394,7 +394,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_close_position_cancels_a_pre_attempt_intent"
     },
     {
-      "duration_seconds": 0.193004,
+      "duration_seconds": 0.202422,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -402,7 +402,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_consumers_treat_cancelled_as_settled_without_pnl"
     },
     {
-      "duration_seconds": 0.058268,
+      "duration_seconds": 0.067155,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -410,7 +410,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_entry_fill_is_bound_to_the_admission"
     },
     {
-      "duration_seconds": 0.112401,
+      "duration_seconds": 0.121749,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -418,7 +418,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_retry_never_fills_an_in_flight_attempt"
     },
     {
-      "duration_seconds": 0.063594,
+      "duration_seconds": 0.062295,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -426,7 +426,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_stale_resume_cancels_the_reserved_intent"
     },
     {
-      "duration_seconds": 0.056164,
+      "duration_seconds": 0.062035,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -434,7 +434,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_stop_bot_cancels_pre_attempt_intents_and_reaches_stopped"
     },
     {
-      "duration_seconds": 0.224229,
+      "duration_seconds": 0.285358,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -442,7 +442,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.EntryIntentIntegrityTests.test_stops_cancel_reserved_intents_instead_of_opening_them"
     },
     {
-      "duration_seconds": 0.907091,
+      "duration_seconds": 0.924945,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -450,7 +450,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_lifecycle_and_http_read_the_same_live_position_owner"
     },
     {
-      "duration_seconds": 0.055394,
+      "duration_seconds": 0.055591,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -458,7 +458,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_missing_and_corrupt_source_never_bootstraps_or_all_clears"
     },
     {
-      "duration_seconds": 0.116484,
+      "duration_seconds": 0.08828,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -466,7 +466,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_non_wal_compatibility_is_readonly_without_business_writes"
     },
     {
-      "duration_seconds": 0.089023,
+      "duration_seconds": 0.091736,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -474,7 +474,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_one_projection_snapshot_and_next_request_freshness"
     },
     {
-      "duration_seconds": 1.565845,
+      "duration_seconds": 1.52503,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -482,7 +482,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_os_denies_source_access_without_bootstrap_or_stale_fallback"
     },
     {
-      "duration_seconds": 0.9603,
+      "duration_seconds": 0.978691,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -490,7 +490,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_overlapping_http_gets_do_not_close_each_others_reader"
     },
     {
-      "duration_seconds": 0.205192,
+      "duration_seconds": 0.297015,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -498,7 +498,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_public_live_wal_position_policy_and_next_read_two_repetitions"
     },
     {
-      "duration_seconds": 0.101918,
+      "duration_seconds": 0.119067,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -506,7 +506,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.ReadFreshnessTests.test_read_failure_does_not_reuse_success_or_infer_empty_runtime"
     },
     {
-      "duration_seconds": 0.058602,
+      "duration_seconds": 0.073323,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -514,7 +514,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_accept_fill_is_atomic_with_intent_events"
     },
     {
-      "duration_seconds": 0.110732,
+      "duration_seconds": 0.125363,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -522,7 +522,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_accounting_fixture_projection_scalars_survive_event_reorder"
     },
     {
-      "duration_seconds": 0.406913,
+      "duration_seconds": 0.399621,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -530,7 +530,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_close_request_serializes_with_concurrent_exit_fill"
     },
     {
-      "duration_seconds": 2.82926,
+      "duration_seconds": 3.293357,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -538,7 +538,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_close_vs_exit_race_never_regresses_or_duplicates"
     },
     {
-      "duration_seconds": 0.07432,
+      "duration_seconds": 0.087505,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -546,7 +546,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_concurrent_same_signal_accept_writes_intent_events_once"
     },
     {
-      "duration_seconds": 0.059387,
+      "duration_seconds": 0.062656,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -554,7 +554,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_entry_fill_is_atomic_with_its_event"
     },
     {
-      "duration_seconds": 0.056203,
+      "duration_seconds": 0.065485,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -562,7 +562,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_execution_events_are_returned_in_causal_order"
     },
     {
-      "duration_seconds": 0.056403,
+      "duration_seconds": 0.063269,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -570,7 +570,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_exit_fill_is_atomic_with_its_events"
     },
     {
-      "duration_seconds": 0.054802,
+      "duration_seconds": 0.073459,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -578,7 +578,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_operator_command_is_atomic_with_its_record"
     },
     {
-      "duration_seconds": 0.053892,
+      "duration_seconds": 0.064675,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -586,7 +586,7 @@
       "test": "test_paper_shadow_execution_integrity_vertical_v1.WriteIntegrityTests.test_unresolved_exit_is_atomic_with_its_reconciliation_event"
     },
     {
-      "duration_seconds": 2.561551,
+      "duration_seconds": 2.609098,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -594,7 +594,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a1_absent_source"
     },
     {
-      "duration_seconds": 0.068343,
+      "duration_seconds": 0.072351,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -602,7 +602,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a2_paper_reconciliation"
     },
     {
-      "duration_seconds": 0.070917,
+      "duration_seconds": 0.117806,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -610,7 +610,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a3_a4_paper_and_shadow_separate"
     },
     {
-      "duration_seconds": 0.069898,
+      "duration_seconds": 0.082597,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -618,7 +618,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a5_different_strategy_versions"
     },
     {
-      "duration_seconds": 0.075195,
+      "duration_seconds": 0.083167,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -626,7 +626,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a6_accounting_conflict_excludes_row"
     },
     {
-      "duration_seconds": 0.058813,
+      "duration_seconds": 0.067194,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -634,7 +634,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_a7_known_exact_zero"
     },
     {
-      "duration_seconds": 0.000197,
+      "duration_seconds": 0.000182,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
@@ -642,7 +642,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_home_has_no_fourth_economics_domain"
     },
     {
-      "duration_seconds": 0.314048,
+      "duration_seconds": 0.36444,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -650,7 +650,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_i1_exit_required_not_all_risk_clear"
     },
     {
-      "duration_seconds": 0.066667,
+      "duration_seconds": 0.070704,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -658,7 +658,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_m1_m2_open_mark_fees"
     },
     {
-      "duration_seconds": 0.060044,
+      "duration_seconds": 0.069174,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -666,7 +666,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_m4_missing_mark_as_of"
     },
     {
-      "duration_seconds": 0.073127,
+      "duration_seconds": 0.08763,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -674,7 +674,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_m5_m6_legacy_mark_components"
     },
     {
-      "duration_seconds": 4.9998,
+      "duration_seconds": 5.146972,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -682,7 +682,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_o_owner_nonclaims_and_get_purity"
     },
     {
-      "duration_seconds": 0.176332,
+      "duration_seconds": 0.187054,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 2,
@@ -690,7 +690,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_p_path_metrics"
     },
     {
-      "duration_seconds": 0.347977,
+      "duration_seconds": 0.387613,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -698,7 +698,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_r2_r3_at_and_over_limit"
     },
     {
-      "duration_seconds": 0.335379,
+      "duration_seconds": 0.401632,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -706,7 +706,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_r_declared_entry_limit"
     },
     {
-      "duration_seconds": 0.446933,
+      "duration_seconds": 0.53854,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
@@ -714,7 +714,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_semantic_route_reused"
     },
     {
-      "duration_seconds": 0.079204,
+      "duration_seconds": 0.082401,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -722,7 +722,7 @@
       "test": "test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_x_exposure_named_and_separate"
     },
     {
-      "duration_seconds": 0.112977,
+      "duration_seconds": 0.152193,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 2,
@@ -730,7 +730,7 @@
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_absent_policy_keeps_bot_local_strategy_version_max_open"
     },
     {
-      "duration_seconds": 0.059577,
+      "duration_seconds": 0.06921,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -738,7 +738,7 @@
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_absent_policy_preserves_strategy_only_paper_and_shadow"
     },
     {
-      "duration_seconds": 0.000628,
+      "duration_seconds": 0.000844,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
@@ -746,7 +746,7 @@
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_capability_phrase_is_not_a_runtime_value"
     },
     {
-      "duration_seconds": 0.052565,
+      "duration_seconds": 0.052861,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -754,7 +754,7 @@
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_check_classifies_tightening"
     },
     {
-      "duration_seconds": 0.067674,
+      "duration_seconds": 0.067071,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -762,7 +762,7 @@
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_entry_stop_and_revision_semantics"
     },
     {
-      "duration_seconds": 0.062444,
+      "duration_seconds": 0.063768,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -770,7 +770,7 @@
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_invalid_policy_blocks_new_entry_exit_continues"
     },
     {
-      "duration_seconds": 0.061688,
+      "duration_seconds": 0.061728,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -778,7 +778,7 @@
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_missing_strategy_id_fail_closes_family_notional_cap"
     },
     {
-      "duration_seconds": 0.062093,
+      "duration_seconds": 0.066482,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -786,7 +786,7 @@
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_paper_shadow_isolation_and_live_denied"
     },
     {
-      "duration_seconds": 0.064913,
+      "duration_seconds": 0.059873,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -794,7 +794,7 @@
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_position_and_notional_caps"
     },
     {
-      "duration_seconds": 0.05568,
+      "duration_seconds": 0.050558,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -802,7 +802,7 @@
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_readonly_get_does_not_create_or_apply"
     },
     {
-      "duration_seconds": 0.07816,
+      "duration_seconds": 0.063002,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -810,7 +810,7 @@
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_sizing_min_and_no_headroom_shrink"
     },
     {
-      "duration_seconds": 0.078493,
+      "duration_seconds": 0.070102,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -818,7 +818,7 @@
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_unknown_open_risk_blocks_historical_does_not"
     },
     {
-      "duration_seconds": 0.066364,
+      "duration_seconds": 0.058499,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -826,7 +826,7 @@
       "test": "test_trading_runtime_policy_v1.TradingRuntimePolicyTests.test_valid_policy_resume_without_frozen_binding_fails_closed"
     },
     {
-      "duration_seconds": 0.095271,
+      "duration_seconds": 0.083168,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -834,7 +834,7 @@
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_decimal_fixture_pnl_streak_drawdown"
     },
     {
-      "duration_seconds": 0.082082,
+      "duration_seconds": 0.065892,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -842,7 +842,7 @@
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_entry_fee_required_and_no_terminal_resurrect"
     },
     {
-      "duration_seconds": 3.2e-05,
+      "duration_seconds": 2.8e-05,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
@@ -850,7 +850,7 @@
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_loss_streak_unknown_when_latest_unknown"
     },
     {
-      "duration_seconds": 0.098232,
+      "duration_seconds": 0.0794,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -858,7 +858,7 @@
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_pause_close_all_stop_drain_idempotent"
     },
     {
-      "duration_seconds": 0.084061,
+      "duration_seconds": 0.067912,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -866,7 +866,7 @@
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_pause_resume_happy_path"
     },
     {
-      "duration_seconds": 0.067882,
+      "duration_seconds": 0.058137,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -874,7 +874,7 @@
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_shadow_evidence_class_separate"
     },
     {
-      "duration_seconds": 0.204854,
+      "duration_seconds": 0.168548,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
@@ -882,7 +882,7 @@
       "test": "test_paper_shadow_accounting_and_control_v1.PaperShadowAccountingControlTests.test_smoke_script_pass"
     },
     {
-      "duration_seconds": 0.073625,
+      "duration_seconds": 0.065796,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -890,7 +890,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_activation_epoch_separates_bots"
     },
     {
-      "duration_seconds": 0.075126,
+      "duration_seconds": 0.065664,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -898,7 +898,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_closed_enter_returns_real_state"
     },
     {
-      "duration_seconds": 0.00643,
+      "duration_seconds": 0.007002,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
@@ -906,7 +906,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_decision_schemas_validate"
     },
     {
-      "duration_seconds": 0.066395,
+      "duration_seconds": 0.066808,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -914,7 +914,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_enter_opens_through_canonical_signal"
     },
     {
-      "duration_seconds": 0.071354,
+      "duration_seconds": 0.073975,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -922,7 +922,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_enter_rejects_epoch_mismatch_on_existing_signal"
     },
     {
-      "duration_seconds": 0.073612,
+      "duration_seconds": 0.067811,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -930,7 +930,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_exit_decision_advances_without_fill_claim"
     },
     {
-      "duration_seconds": 0.071495,
+      "duration_seconds": 0.059747,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -938,7 +938,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_exit_rejects_epoch_mismatch"
     },
     {
-      "duration_seconds": 0.07419,
+      "duration_seconds": 0.070591,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -946,7 +946,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_future_available_enter_forbidden"
     },
     {
-      "duration_seconds": 0.082874,
+      "duration_seconds": 0.08611,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -954,7 +954,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_legacy_v1_0_loads_and_behaves"
     },
     {
-      "duration_seconds": 0.065142,
+      "duration_seconds": 0.059758,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -962,7 +962,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_missing_activation_fails_closed"
     },
     {
-      "duration_seconds": 0.163253,
+      "duration_seconds": 0.16175,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 3,
@@ -970,7 +970,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_non_enter_actions_do_not_open"
     },
     {
-      "duration_seconds": 0.061108,
+      "duration_seconds": 0.060439,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -978,7 +978,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_resume_incomplete_enter_lifecycle"
     },
     {
-      "duration_seconds": 0.072018,
+      "duration_seconds": 0.060534,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -986,7 +986,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_same_mint_distinct_signal_ids"
     },
     {
-      "duration_seconds": 0.066897,
+      "duration_seconds": 0.059113,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -994,7 +994,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_same_signal_idempotent"
     },
     {
-      "duration_seconds": 0.069427,
+      "duration_seconds": 0.054536,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -1002,7 +1002,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_shadow_mode_uses_shadow_executable"
     },
     {
-      "duration_seconds": 0.074602,
+      "duration_seconds": 0.067245,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -1010,7 +1010,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_sqlite_migration_idempotent_on_legacy_reopen"
     },
     {
-      "duration_seconds": 0.134839,
+      "duration_seconds": 0.115643,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 2,
@@ -1018,7 +1018,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_stale_signal_and_max_open_enforced"
     },
     {
-      "duration_seconds": 0.090786,
+      "duration_seconds": 0.071628,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 1,
@@ -1026,7 +1026,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_two_structurally_different_producers_same_interface"
     },
     {
-      "duration_seconds": 0.00768,
+      "duration_seconds": 0.006084,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
@@ -1034,7 +1034,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_v1_1_path_does_not_call_signal_kind_for"
     },
     {
-      "duration_seconds": 0.014588,
+      "duration_seconds": 0.011369,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
@@ -1042,7 +1042,7 @@
       "test": "test_factory_strategy_execution_boundary_v1.StrategyExecutionBoundaryTests.test_v1_1_rejects_feature_fields"
     },
     {
-      "duration_seconds": 0.014816,
+      "duration_seconds": 0.012054,
       "metrics": {},
       "owned_root_absent": true,
       "owned_root_count": 0,
