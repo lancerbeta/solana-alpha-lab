@@ -1,0 +1,91 @@
+{
+  "all_69_candidate_source_bytes_unchanged": true,
+  "credential_reads": 0,
+  "diff_sha256": "9d33b294343034266794be55297bd8af245e491a64d6b8ecd4cb3baa6c335193",
+  "expected_base": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "financial_effects": 0,
+  "implementation_blobs": 69,
+  "native_counterexamples": {
+    "envelope_authority_rollback": {
+      "backup_max_modeled_cost_usd": 30,
+      "backup_revision": 1,
+      "elapsed_seconds": "UNKNOWN_NOT_MEASURED",
+      "ordinary_after_resume_attempt_count": 1,
+      "ordinary_after_resume_position_state": "OPEN",
+      "original_admission": "DENIED",
+      "original_attempt_count": 0,
+      "owned_fixture_root": "ABSENT",
+      "partial_sandbox_fixture_root": "ABSENT",
+      "post_backup_max_modeled_cost_usd": 10,
+      "post_backup_revision": 2,
+      "recovery_cut_effects": [],
+      "restore_reconcile_and_ack": "ACCEPTED",
+      "restored_admission": "ALLOW",
+      "restored_max_modeled_cost_usd": 30,
+      "restored_revision": 1
+    },
+    "historical_policy_pin": {
+      "actual_output": [
+        "SHADOW_PIN_DRIFT:docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json->delivery-harness/policies/solana-alpha-lab.md"
+      ],
+      "local_full_gate_executed": false,
+      "probe": "repository _preflight_shadow_pin_problems read-only predicate"
+    },
+    "recovered_exit_incident": {
+      "attempt_and_effect_count": 2,
+      "cold_status": "ACTION_REQUIRED",
+      "elapsed_seconds": 3.385035,
+      "exit_reconciliation_healthy": false,
+      "further_ticks": 2,
+      "integrity_verified": false,
+      "inventory_cost": 0,
+      "inventory_count": 0,
+      "ordinary_input_failure": "funding.json absent at due EXIT",
+      "original_exit_position_state": "RECONCILED",
+      "owned_fixture_root": "ABSENT",
+      "pending_attempts": 0,
+      "remaining_qty": 0,
+      "restored_input_fresh": true,
+      "wrong_next_safe_action": "RECONCILE_SAME_ATTEMPT_OR_RESTORE_EXACT_BINDING"
+    }
+  },
+  "observed_head": "0f1c30b3e87fbe1dc0c721a6336d60a59a1ff362",
+  "packet_fingerprint_sha256": "526a26c036653b979c6197e618145f644453b11fea327aeb7524fa39a70499b8",
+  "provider_calls": 0,
+  "receipt_sha256": "2910982c21d9dce6505fc1c4d8661a21fbe57d586731a095e5c7539be1df48b5",
+  "reviewed_bindings_sha256": "eff7b6a38dac1935d53b627a3a417b1c2d8f835e245312ba745bf0c8e27ef370",
+  "reviewed_inventory_sha256": "d496ce18e528017fc966cd4782425fce96baef94bbfaeddf562b8251c656e80d",
+  "reviews": [
+    {
+      "findings": [
+        "P1 DELIVERY_BLOCKER: optional domain-policy registry prose change conflicts with untouched SEPARATE TASK30 historical policy hash. Actual repository shadow-pin predicate returns SHADOW_PIN_DRIFT. Preserve original historical evidence; remove the optional policy delta, while this exact task retains registry-011 context binding."
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "C16_C22_RECOVERED_EXIT_RETAINS_FALSE_ACTIVE_INTEGRITY_INCIDENT: transient missing SHADOW funding creates position-scoped integrity incident. Fresh funding and successful original EXIT restore complete known inventory, but repeated ticks and cold readback keep a false active integrity/exit veto and unnecessary reconcile/restore action. Preserve audit history; recompute active diagnosis after verified recovery."
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "BLOCKER AUTHORITY_WIDENING C3/C5: recovery cut omits post-backup operating-envelope revisions. Backup rev1/$30, explicit tightening rev2/$10, original admission DENIED; fresh restore/cut ACK restores rev1/$30, then RESUME admits one attempt/OPEN. Inventory ACK cannot substitute current envelope authority reconciliation.",
+        "Tests can pass while losing post-backup owner safety configuration; bot flags/quota alone do not prove all current authority or control lineage.",
+        "packet_fingerprint_sha256=526a26c036653b979c6197e618145f644453b11fea327aeb7524fa39a70499b8; PACKET_INFORMATION_PATH; PROCESS_OBLIGATION; model diversity UNPROVEN; no cryptographic reviewer identity."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY"
+    }
+  ],
+  "schema": "smial.trading-operational-frozen-review-history",
+  "schema_version": "1.0",
+  "scope": "Actual frozen-content role verdicts and independently executed native counterexamples; not a passing current-candidate proof.",
+  "source_pins": {
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "ec539eb399df90ceb2fea4718611178bbe6b923c842da9fd4053c350a5a66ed6",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "756f3445602e41800b320a1d136ab0040de1c4ad9d5b8c6a5d6768de5d6d42fe"
+  },
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1"
+}

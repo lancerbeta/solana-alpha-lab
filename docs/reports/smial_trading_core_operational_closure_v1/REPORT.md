@@ -52,6 +52,9 @@ Original attached MD byte-for-byte находится в source-contract.md; е�
 | OWNER_UX_COUNTEREXAMPLE | CLI check принимал missing/invalid D2 envelope limits | Shared owner validation до activation, пять native readonly cases |
 | OWNER_UX_COUNTEREXAMPLE | После reconcile action ещё предлагал reconcile при верной ACK-команде | Readback использует один phase predicate для action/command; native restore и cold CLI повторены |
 | REVIEW_LEGACY_COUNTEREXAMPLE | Legacy recipe/provenance менялись; saved baseline packet конфликтовал, native reservation count 1→2 | Operational поля только при явном runtime_execution; absent/null сохраняют прежний packet, одну позицию и неизменённый journal |
+| REVIEW_CURRENT_AUTHORITY_COUNTEREXAMPLE | Restore терял post-backup tightening $30→$10 и снова разрешал запрещённый вход | Full original envelope/runtime-policy chains и committed heads; missing/conflicting configuration сохраняет fence, later local extension не откатывается |
+| REVIEW_ACTIVE_DIAGNOSIS_COUNTEREXAMPLE | Missing funding ошибочно помечал integrity; после успешного EXIT cold status оставался ACTION_REQUIRED | Отдельный EXIT-input cause закрывается после проверенного восстановления; audit history и unresolved/corrupt neighbors сохранены |
+| DELIVERY_PIN_COUNTEREXAMPLE | Необязательное изменение domain-policy prose нарушало исторический TASK30 SHA | Policy/TASK30 сохранены буквально; этот task pin registry-011 остаётся explicit, gate exceptions не добавлены |
 
 Baseline failures для новых capabilities не выдуманы. Reviewer before traces
 относятся к changing implementation bytes; они не приписываются base #396.
@@ -65,7 +68,7 @@ packet через current native source/store owners. Это проверка п
 
 ## C01–C24
 
-Native automated status: PASS, 123 tests, 428.041017s; source bytes до/после
+Native automated status: PASS, 129 tests, 449.758855s; source bytes до/после
 совпадают с текущим кандидатом, owned roots ABSENT. Exact test IDs, durations,
 source pins и root absence — [executed receipt](../../evidence/smial_trading_core_operational_closure_v1/executed-tests.json).
 Final runtime proof повторён полностью после material review repairs. Ранние
@@ -97,9 +100,9 @@ test_trading_operational_recovery_v1; engines: continuity/obligations/adapters.
 | C13 | Body/clock/hash/capture corruption detected before consume; preserved origin/result and rollback |
 | C14 | Real parser/lowest fake wire; raw units/mint/amount/schema/router/null transaction guards; quote fee once |
 | C15 | Actual OS process lock/kill + independent controls; corrupt A не starves healthy B due EXIT |
-| C16 | Independent status alive/fresh/moving/integrity/exits; no false READY; incidents coalesced |
+| C16 | Independent status alive/fresh/moving/integrity/exits; no false READY; recovered input cause inactive, audit retained; unresolved neighbors stay active |
 | C17 | WAL-aware current snapshot; DB/WAL fingerprints unchanged by GET; missing/corrupt state typed |
-| C18 | Native backup+fresh root/process; external ledger не откатывается; admission/exit/switch/pending/quota cut |
+| C18 | Native backup+fresh root/process; external ledger не откатывается; complete admission/exit/switch/pending/quota/current configuration cut, no authority rollback |
 | C19 | Actual research/spec/raw removal; frozen minimal closure/retained metadata; legacy no fabrication/forward recovery |
 | C20 | Literal full $2.87/$2.85, partial $1.07/$1.06; embedded quote fee separate; UNKNOWN/floor/no combined money |
 | C21 | Native producer 14 virtual days; 0/1000/4000 history; measured tick/RSS/disk;14 identities/28 attempts |
@@ -147,28 +150,28 @@ real strategy promotion не установлены. Там, где NOT_IMPLEMEN
 
 ## Resources, rollback, delivery
 
-Peak suite process RSS: 146526208 bytes (139.74 MiB). Native 14-day producer
+Peak suite process RSS: 146862080 bytes (140.06 MiB). Native 14-day producer
 дал exact14 identities/28 attempts; источник+runtime занимали 10031615 bytes,
-entry tick 0.1990–0.3198s. Synthetic modeled aggregate $36.91 — literal oracle
+entry tick 0.2043–0.2469s. Synthetic modeled aggregate $36.91 — literal oracle
 этого fixture, без profitability/alpha extrapolation.
 
 | Retained history events | DB bytes | Measured tick range, s |
 |---|---:|---:|
-| 0 | 204800 | 0.04699–0.06603 |
-| 1000 | 364544 | 0.04617–0.07581 |
-| 4000 | 843776 | 0.04624–0.05240 |
+| 0 | 204800 | 0.04632–0.05095 |
+| 1000 | 364544 | 0.04524–0.05103 |
+| 4000 | 843776 | 0.04643–0.05708 |
 
 Append-only journal slope:159.744 bytes/event; coalesced incident rows:1.
 Terminal release проверяется по original attempt/FINAL/result на текущем snapshot.
 
 | Native readback scope | SQLite steps | Elapsed, s |
 |---|---:|---:|
-| 1 outstanding | 630 | 0.000413 |
-| 100 proved terminal | 78070 | 0.015268 |
-| 1000 proved terminal | 774200 | 0.169762 |
-| 1000 terminal + 12000 unrelated events | 774200 | 0.159045 |
+| 1 outstanding | 630 | 0.000277 |
+| 100 proved terminal | 78070 | 0.015328 |
+| 1000 proved terminal | 774200 | 0.160879 |
+| 1000 terminal + 12000 unrelated events | 774200 | 0.159756 |
 
-Native history preparation: 13.527s.
+Native history preparation: 13.133s.
 SQL работа растёт линейно с числом terminal positions; O(outstanding) не заявлен.
 Индекс ограничивает чтение соответствующими событиями, посторонний journal
 не перечитывается целиком. Кэш release и новая competing truth schema не созданы.

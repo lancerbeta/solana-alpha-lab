@@ -12,10 +12,10 @@
   ],
   "clock_basis": "CONTROLLED_ORDINARY_COORDINATOR_CLOCK",
   "code_unchanged_during_execution": true,
-  "completed_at": "2026-10-12T01:25:50.931082Z",
+  "completed_at": "2026-10-12T02:04:15.049326Z",
   "contract_reference": "source-contract.md section 11.3 / C03 / C04",
   "credential_reads": false,
-  "elapsed_seconds": 5.354062,
+  "elapsed_seconds": 4.826867,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "live_authority": false,
   "locked_environment": true,
@@ -42,7 +42,7 @@
         "run_completed": true
       },
       "controlled_clock": "2026-10-05T12:40:30Z",
-      "elapsed_seconds": 1.969489,
+      "elapsed_seconds": 2.349295,
       "limits": {
         "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001",
         "decision_point": "E1800",
@@ -51,7 +51,7 @@
         "request_not_before": "2026-10-05T12:35:00Z",
         "schedule_sha256": "8e0f4eea76207d5b9cf014c535218e513fcf271e9b5b362d3fe0d8ac0bc7d969",
         "source_cutoff": "2026-10-05T12:40:00Z",
-        "strategy_sha256": "606220adadd8056ec2aeae3dad35730fa1d536139a7ec5b4b8dd14296d3dd4e7",
+        "strategy_sha256": "f9abafe8f60f01fd0162961b15f5e2e90c3ef3751f779166c1af5c0ce99e05f0",
         "t0": "2026-10-05T12:01:15Z"
       },
       "native_decision_at": [
@@ -89,11 +89,11 @@
     {
       "backward": {
         "controlled_clock": "2026-10-05T12:40:00Z",
-        "execution_sha256_after": "a293f855137ce2ac74b14adfc531ff3423f215b85feb28105f47805584fcac22",
-        "execution_sha256_before": "a293f855137ce2ac74b14adfc531ff3423f215b85feb28105f47805584fcac22",
+        "execution_sha256_after": "d456fb46414ab31a6b358f12612e41f7acaa1f3fd41a4dedbbfdc3fe15a8918d",
+        "execution_sha256_before": "d456fb46414ab31a6b358f12612e41f7acaa1f3fd41a4dedbbfdc3fe15a8918d",
         "persisted_last_tick_at": "2026-10-05T12:41:00Z",
-        "persisted_runtime_sha256_after": "9b9d456454bc3f59d83b0be31142057222ffa2c24f42c10d555b2e9bdf352db1",
-        "persisted_runtime_sha256_before": "9b9d456454bc3f59d83b0be31142057222ffa2c24f42c10d555b2e9bdf352db1",
+        "persisted_runtime_sha256_after": "2d09604ea113be4300abda7ff1492680019412d65eb95c148e9e6978d50d9828",
+        "persisted_runtime_sha256_before": "2d09604ea113be4300abda7ff1492680019412d65eb95c148e9e6978d50d9828",
         "positions_sha256_after": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "positions_sha256_before": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "run": {
@@ -131,7 +131,7 @@
         "last_tick_preserves_forward_clock": true,
         "native_cutoff_matches_literal_oracle": true
       },
-      "elapsed_seconds": 2.028644,
+      "elapsed_seconds": 2.422474,
       "forward": {
         "attempt_count": 0,
         "controlled_clock": "2026-10-05T12:41:00Z",
@@ -159,7 +159,7 @@
         "request_not_before": "2026-10-05T12:35:00Z",
         "schedule_sha256": "8e0f4eea76207d5b9cf014c535218e513fcf271e9b5b362d3fe0d8ac0bc7d969",
         "source_cutoff": "2026-10-05T12:40:00Z",
-        "strategy_sha256": "18607c3e112e64e4d3de5dab6e6a22cd40243b42f51f6b45e57e07ff5232559f",
+        "strategy_sha256": "27bd7ba48d5d1a22c3dff547231b0ae6ea3fb28fcbb29b9e19ba37287abf9772",
         "t0": "2026-10-05T12:01:15Z"
       },
       "probe": "FORWARD_THEN_BACKWARD_CLOCK",
@@ -177,7 +177,7 @@
   ],
   "provider_calls": false,
   "python_downloads": "never",
-  "receipt_sha256": "8a647b9f2bbf5abb5f143d3b3f4ee20444c85de37ac03482b0c56d5b9d392427",
+  "receipt_sha256": "09c2152c6cdd033ddafbad20629953bc71e011bba0a715a18bb5e25c08c3fbd3",
   "schema": "smial.operating-clock-proof",
   "schema_version": "1.0",
   "source_change_paths": [],
@@ -269,10 +269,10 @@
     "src/solana_alpha_lab/factory/t0_friction_screen.py": "732f14a309ea7bc2b0181dcb5abcb6d5ef7bf732fb0b2fc53459e12f3bda0506",
     "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py": "351a253ccf5eec73094158d2e1895948ec96e7ede6e57369cda80eac1113ae7c",
     "src/solana_alpha_lab/factory/trading_adapters.py": "cdc3518032eaeb16becc469285c6bb9bb4ec9ef82a6c19d6cca51c615f4feaea",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "ec539eb399df90ceb2fea4718611178bbe6b923c842da9fd4053c350a5a66ed6",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "976864c7f29954569eb748e04c05e38449a9c03a75ec2f1bcc1c071aa08f7a1f",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
     "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
-    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "756f3445602e41800b320a1d136ab0040de1c4ad9d5b8c6a5d6768de5d6d42fe",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
     "src/solana_alpha_lab/factory/visual_os.py": "31deb0ca63a29a9961bc5ae75bd51f3cb666ae74523befdc88bd8c1d0473da7c",
     "src/solana_alpha_lab/factory/workbench.py": "3a59bcf2bd4951784b401bcbd250b4e99ee7f68be423964832760f1649f0218e",
     "src/solana_alpha_lab/factory_semantic_operability.py": "26e34c0c1f9bb219e7e5d7c3f24ab685cb925f4dc9dc6ee2489a3407773741c0",
@@ -303,8 +303,9 @@
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "25b6b75e9bd250676c03ac92cd8732300aae431a12dc6e0e0e85bd22922987b9",
-    "tests/test_trading_operational_obligations_v1.py": "c884f384117eebb0624723d2bf771564db1446e76eba2dafa85a4780e694c16c"
+    "tests/test_trading_core_operational_closure_v1.py": "c28992c93da0aae94d0579b14c9f0088000b3a23147098015f11c7cc49355c58",
+    "tests/test_trading_operational_obligations_v1.py": "c884f384117eebb0624723d2bf771564db1446e76eba2dafa85a4780e694c16c",
+    "tests/test_trading_operational_recovery_v1.py": "73bafabdc46c3401ce73032500b023c7b586c7b7bf1d26cc87b1494605b1cd3e"
   },
   "source_pins_before": {
     "scripts/observation_schedule.py": "d8205cff11a3e14175080e81759d62ac5560452951032945a22250af58319b68",
@@ -393,10 +394,10 @@
     "src/solana_alpha_lab/factory/t0_friction_screen.py": "732f14a309ea7bc2b0181dcb5abcb6d5ef7bf732fb0b2fc53459e12f3bda0506",
     "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py": "351a253ccf5eec73094158d2e1895948ec96e7ede6e57369cda80eac1113ae7c",
     "src/solana_alpha_lab/factory/trading_adapters.py": "cdc3518032eaeb16becc469285c6bb9bb4ec9ef82a6c19d6cca51c615f4feaea",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "ec539eb399df90ceb2fea4718611178bbe6b923c842da9fd4053c350a5a66ed6",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "976864c7f29954569eb748e04c05e38449a9c03a75ec2f1bcc1c071aa08f7a1f",
     "src/solana_alpha_lab/factory/trading_operations.py": "51b369be9c6537eb0bb87517d98b5d78d8adc7f2fe688bbef298369ddbf73261",
     "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
-    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "756f3445602e41800b320a1d136ab0040de1c4ad9d5b8c6a5d6768de5d6d42fe",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
     "src/solana_alpha_lab/factory/visual_os.py": "31deb0ca63a29a9961bc5ae75bd51f3cb666ae74523befdc88bd8c1d0473da7c",
     "src/solana_alpha_lab/factory/workbench.py": "3a59bcf2bd4951784b401bcbd250b4e99ee7f68be423964832760f1649f0218e",
     "src/solana_alpha_lab/factory_semantic_operability.py": "26e34c0c1f9bb219e7e5d7c3f24ab685cb925f4dc9dc6ee2489a3407773741c0",
@@ -427,12 +428,13 @@
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7",
     "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
-    "tests/test_trading_core_operational_closure_v1.py": "25b6b75e9bd250676c03ac92cd8732300aae431a12dc6e0e0e85bd22922987b9",
-    "tests/test_trading_operational_obligations_v1.py": "c884f384117eebb0624723d2bf771564db1446e76eba2dafa85a4780e694c16c"
+    "tests/test_trading_core_operational_closure_v1.py": "c28992c93da0aae94d0579b14c9f0088000b3a23147098015f11c7cc49355c58",
+    "tests/test_trading_operational_obligations_v1.py": "c884f384117eebb0624723d2bf771564db1446e76eba2dafa85a4780e694c16c",
+    "tests/test_trading_operational_recovery_v1.py": "73bafabdc46c3401ce73032500b023c7b586c7b7bf1d26cc87b1494605b1cd3e"
   },
-  "source_snapshot_file_count": 1590,
-  "source_snapshot_sha256_after": "3e246b291ee74c3365df991807658ecbbed4ecd32c155271ef3370ffbab660ea",
-  "source_snapshot_sha256_before": "3e246b291ee74c3365df991807658ecbbed4ecd32c155271ef3370ffbab660ea",
-  "started_at": "2026-10-12T01:25:45.577016Z",
+  "source_snapshot_file_count": 1599,
+  "source_snapshot_sha256_after": "83b46154ed323e37189be474793cb6492c4471a5b0d34f9621fedfa40e54723c",
+  "source_snapshot_sha256_before": "83b46154ed323e37189be474793cb6492c4471a5b0d34f9621fedfa40e54723c",
+  "started_at": "2026-10-12T02:04:09.588341Z",
   "status": "PASS"
 }

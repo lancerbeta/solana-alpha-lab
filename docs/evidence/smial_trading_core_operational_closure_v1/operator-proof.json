@@ -8,7 +8,7 @@
     "unowned_resources_touched": false
   },
   "credential_reads": false,
-  "elapsed_seconds": 17.904544,
+  "elapsed_seconds": 17.521995,
   "evidence_class": "SYNTHETIC_OFFLINE",
   "external_cut_basis": "No process or effect invoked after backup before export/restore; independent absence assertion effects []; donor CLI exports frozen bindings/controls/current state.",
   "final_state": {
@@ -45,7 +45,7 @@
       "RESULT-EC53044AC7E8546E440DEE907A8C4895A416872A969EF355EAE040C8778A12E0"
     ],
     "activation_epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
-    "backup_database_sha256": "6ec81d22221f51cb40fb8bebb6fff96f9920cb3290bcc721516115fefe024ebc",
+    "backup_database_sha256": "1db255ac1982955a15cacc565927bb92e609a06e68eb2cb5219ed3225249436e",
     "bot_instance_id": "BOT-STRAT-CONTINUITY-SYNTH-001-C22-FROZEN-V1-PAPER-ACTIVATION-EPOCH-CONTINUITY-PAPER-001-C22-FROZEN",
     "inventory_sha256_before_ack": "33a9160d6c0b0c469560ccde4f310f29da3525ad369ef60d4f51878af51b9746",
     "position_ids": [
@@ -53,7 +53,7 @@
     ],
     "source_episode_id": "EP-705da8cd8881c5f381f5d4e9a6b6ee37",
     "strategy_id": "STRAT-CONTINUITY-SYNTH-001-C22-FROZEN",
-    "strategy_sha256": "24c2c5274e065ff0be7a3b13fe2796827fa762caab55c2c5ae4f48beff212b48"
+    "strategy_sha256": "de7085dae815f1b051e42c324128d15a81b841a0d8172d070f58990d3af25e55"
   },
   "independence": "ISOLATED_OPERATOR_WITH_EXACT_CONTRACT_DIFF_RUNBOOK",
   "journey_status": "PASS",
@@ -61,10 +61,20 @@
   "manual_binding_construction": false,
   "manual_token_json": false,
   "network_calls": false,
-  "observed_at_utc": "2026-10-12T01:21:04.159459Z",
+  "observed_at_utc": "2026-10-12T02:08:16.463658Z",
   "provider_calls": false,
   "recovery_cut": {
     "all_bindings_exported_by_cli": true,
+    "configuration_readback": {
+      "envelope_chain_exact": true,
+      "later_local_authority_extension_exercised": false,
+      "method": "INDEPENDENT_SQLITE_MODE_RO_QUERY_ONLY_WAL_AWARE_SNAPSHOT_AFTER_NATIVE_CLI_READBACK",
+      "native_status_envelope_head_preserved": true,
+      "new_configuration_events_created_during_recovery": false,
+      "policy_chain_exact": true,
+      "post_backup_configuration_change_exercised": false,
+      "runtime_policy_configuration_state": "NOT_CONFIGURED_STRATEGY_ONLY"
+    },
     "effect_count": 0,
     "exported_keys": [
       "as_of",
@@ -76,6 +86,7 @@
       "external_cut_id",
       "mode",
       "operating_bindings",
+      "operating_configuration",
       "pending_attempts",
       "quote_claims",
       "result_observations",
@@ -83,6 +94,42 @@
       "schema_version"
     ],
     "operating_binding_count": 1,
+    "operating_configuration": {
+      "envelope_events": [
+        {
+          "bot_instance_id": null,
+          "created_at": "2026-10-01T00:00:00Z",
+          "event_id": "OPERATING-ENVELOPE-PAPER-1",
+          "event_type": "ORDINARY_OPERATING_ENVELOPE_CONFIGURED",
+          "payload": {
+            "envelope": {
+              "basis": "OUTSTANDING_OBLIGATIONS_V1",
+              "max_outstanding_cost_basis_usd": "30",
+              "max_outstanding_positions": 1,
+              "mode": "PAPER",
+              "schema": "smial.ordinary-operating-envelope",
+              "schema_version": "1.0"
+            },
+            "envelope_sha256": "8f178c9dbc52dfba21d34c093feac26da3273ecdd1a18a2d0e22b2cc09f2a7b7",
+            "mode": "PAPER",
+            "previous_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "revision": 1
+          },
+          "position_id": null
+        }
+      ],
+      "envelope_head": {
+        "envelope_sha256": "8f178c9dbc52dfba21d34c093feac26da3273ecdd1a18a2d0e22b2cc09f2a7b7",
+        "revision": 1
+      },
+      "mode": "PAPER",
+      "policy_head": {
+        "policy_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "revision": null
+      },
+      "policy_revisions": [],
+      "schema_version": "1.0"
+    },
     "pending_attempt_count": 0,
     "quote_claim_count": 0,
     "result_observation_count": 0,
@@ -95,19 +142,19 @@
   "schema_version": "1.0",
   "semantic_navigation": {
     "authority_granted": false,
-    "catalog_integrity_sha256": "780e6265c0c193b31e1ac0f27ecfc4fdf6daa212adbeeb168e8f5e816c824476",
+    "catalog_integrity_sha256": "b4ae65b8c624ece16deec00972e0d858ba6dbd2cfcb216902503dcbb1127e5b5",
     "catalog_record_status": "IMPLEMENTED_UNVERIFIED",
     "catalog_status_is_not_product_acceptance": true,
     "gaps": [],
     "network_required": false,
-    "observed_at_utc": "2026-10-12T01:29:52.824995Z",
+    "observed_at_utc": "2026-10-12T02:15:26.321225Z",
     "operator_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001",
     "operator_asset_ids": [
       "DOC-TRADING-CONTINUITY-OFFLINE-001"
     ],
     "read_only": true,
     "readback_anchors": {
-      "catalog/assets/core.yaml": "deee7db77a885ed3c910f60c895778cc5af8a85dfc355e5e674497ea71fc23f7",
+      "catalog/assets/core.yaml": "f0a4883b1bddb9e89c3a9dd511d21fdf483333b961d2fd69c0ce28d33bf85356",
       "configs/factory_semantic_operability_v1.yaml": "8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83",
       "docs/FACTORY_SEMANTIC_MAP.md": "2fbf4e7edce8c53b83ccec0f837ff49eef706d72448b9fe89ea8e4ab11ae35a6"
     },
@@ -126,7 +173,7 @@
   },
   "source_pins": {
     "configs/factory_semantic_operability_v1.yaml": "8658bf35a3b06e5d892966770a86abec7e51258fa4d4c27cbeba7e380b8b7f83",
-    "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "780e6265c0c193b31e1ac0f27ecfc4fdf6daa212adbeeb168e8f5e816c824476",
+    "docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md": "b4ae65b8c624ece16deec00972e0d858ba6dbd2cfcb216902503dcbb1127e5b5",
     "scripts/trading_continuity.py": "116c804dde1fa1e6bccf1fb612e6f6e1ce1645d6cd9fd2c95f1ced173f1380cd",
     "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
     "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
@@ -134,9 +181,11 @@
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
     "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
     "src/solana_alpha_lab/factory/trading_adapters.py": "cdc3518032eaeb16becc469285c6bb9bb4ec9ef82a6c19d6cca51c615f4feaea",
-    "src/solana_alpha_lab/factory/trading_coordinator.py": "ec539eb399df90ceb2fea4718611178bbe6b923c842da9fd4053c350a5a66ed6",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "976864c7f29954569eb748e04c05e38449a9c03a75ec2f1bcc1c071aa08f7a1f",
     "src/solana_alpha_lab/factory/trading_runner.py": "f4e53e04ae3a7d6456821b541e0a1faba8bc42374a117af8eac2c10597fc197c",
-    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "756f3445602e41800b320a1d136ab0040de1c4ad9d5b8c6a5d6768de5d6d42fe"
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "48b9dd8cf8ca0e2efe0f58ab605dfe71fb4c3959d0e6ce6de32cd1af45e266bc",
+    "tests/test_trading_core_operational_closure_v1.py": "c28992c93da0aae94d0579b14c9f0088000b3a23147098015f11c7cc49355c58",
+    "tests/test_trading_operational_recovery_v1.py": "73bafabdc46c3401ce73032500b023c7b586c7b7bf1d26cc87b1494605b1cd3e"
   },
   "source_pins_unchanged": true,
   "steps": [
@@ -173,9 +222,9 @@
       "mode": "PAPER",
       "runtime_scope": "DONOR",
       "sequence": 2,
-      "stdout_sha256": "55f6ba39ebd53df7fcc85e02f7640f61bffb69d710e144d356d0c68fe98024e3",
+      "stdout_sha256": "a6955546ff2dfd88f82bec7711d96390da9dc4b7dd0d20bdedf1384c2e474abe",
       "strategy_id": "STRAT-CONTINUITY-SYNTH-001-C22-FROZEN",
-      "strategy_sha256": "24c2c5274e065ff0be7a3b13fe2796827fa762caab55c2c5ae4f48beff212b48"
+      "strategy_sha256": "de7085dae815f1b051e42c324128d15a81b841a0d8172d070f58990d3af25e55"
     },
     {
       "activation_created": false,
@@ -197,6 +246,10 @@
         "as_of": "2026-10-05T12:40:00Z"
       },
       "command": "status",
+      "envelope_head": {
+        "envelope_sha256": "8f178c9dbc52dfba21d34c093feac26da3273ecdd1a18a2d0e22b2cc09f2a7b7",
+        "revision": 1
+      },
       "envelope_status": "VALID",
       "execution_input_status": "PAPER_NATIVE_PREFIX",
       "exit_code": 0,
@@ -225,7 +278,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "READY",
-      "stdout_sha256": "66ac388218e1d812fedec6ad831c9f1286ffb303bd22a70de1fc03a45e0b029e"
+      "stdout_sha256": "8603dbb80d6eba19e41a875737941168102c00ec0a32ff3faa67de7c606ab865"
     },
     {
       "arguments": {
@@ -262,13 +315,13 @@
         "destination": "backups/c22.sqlite"
       },
       "command": "backup",
-      "database_sha256": "6ec81d22221f51cb40fb8bebb6fff96f9920cb3290bcc721516115fefe024ebc",
+      "database_sha256": "1db255ac1982955a15cacc565927bb92e609a06e68eb2cb5219ed3225249436e",
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
       "runtime_scope": "DONOR",
       "sequence": 7,
-      "stdout_sha256": "63fd1f298723139a8f442804ec15c34f5a18e6576280f17f49bda228c6140c05"
+      "stdout_sha256": "b8454c5a5e580df9ae3fd5c4fb11086395bb8a5a12dba5faa2f761bd1a6b77dc"
     },
     {
       "arguments": {
@@ -320,14 +373,14 @@
         "input": "external-cut-input.json"
       },
       "command": "seal-cut",
-      "cut_sha256": "5c2f65c1f9f7327df6d5c6d83cd575160ee8523b57dbc81fcb1cf924c8399573",
+      "cut_sha256": "ce1ad0b4f73a0948cd53beb64ed5cb9dd3103b085f5f2ef13ff495b91faaf883",
       "exit_code": 0,
       "expected_exit_code": 0,
       "mode": "PAPER",
       "runtime_scope": "RESTORED",
       "sequence": 11,
       "status": "CUT_VERIFIED_AND_SEALED",
-      "stdout_sha256": "5536ce2f942538c5e9f9756078f0ec4942faebd0d444122959a928ad40f0b67d"
+      "stdout_sha256": "95807960548c8a966e442820fc189e9454b733ce99007c908c29e77e8846ec06"
     },
     {
       "arguments": {
@@ -349,6 +402,10 @@
         "as_of": "2026-10-05T12:40:00Z"
       },
       "command": "status",
+      "envelope_head": {
+        "envelope_sha256": "8f178c9dbc52dfba21d34c093feac26da3273ecdd1a18a2d0e22b2cc09f2a7b7",
+        "revision": 1
+      },
       "envelope_status": "VALID",
       "execution_input_status": "PAPER_NATIVE_PREFIX",
       "exit_code": 0,
@@ -377,7 +434,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "ACTION_REQUIRED",
-      "stdout_sha256": "d231a3212497775363669ff9df43e67a2a19a6f24a641d7fb5ea7332c285eed6"
+      "stdout_sha256": "0d36547f431d97b7cf84ab651e4c9dc42d62f88299f734cf0c36972faab57716"
     },
     {
       "arguments": {
@@ -414,6 +471,10 @@
         "as_of": "2026-10-05T12:40:00Z"
       },
       "command": "status",
+      "envelope_head": {
+        "envelope_sha256": "8f178c9dbc52dfba21d34c093feac26da3273ecdd1a18a2d0e22b2cc09f2a7b7",
+        "revision": 1
+      },
       "envelope_status": "VALID",
       "execution_input_status": "PAPER_NATIVE_PREFIX",
       "exit_code": 0,
@@ -442,7 +503,7 @@
       "source_fresh": true,
       "source_latest_at": "2026-10-05T12:35:01Z",
       "status": "READY",
-      "stdout_sha256": "bc10ecbcab67ca5352f3fca7559f30d648e6f9564cc6387ebf9b98975d4bf8ab"
+      "stdout_sha256": "81b31d7279dedab0c625baf4282b3acb0bc7c17203453c91134841145266ecb3"
     },
     {
       "arguments": {
@@ -484,7 +545,7 @@
       "runtime_scope": "RESTORED",
       "sequence": 19,
       "status": "RUNNING",
-      "stdout_sha256": "990852748ec9668315c737f84d1f914d457f3f8462a7e2dcba9e82779b201571"
+      "stdout_sha256": "956ad75c6ef92c0828997584694e1b39ecda56903b90dd3440bfa55ff2967544"
     },
     {
       "arguments": {

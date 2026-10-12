@@ -157,6 +157,10 @@ clocks: missing, stale, future или повреждённый вход даёт
 через описанный CLI check. Это не разрешение менять рабочие настройки.
 Здоровье исходных выходов остаётся отдельным показателем: проблема текущих
 entry inputs не превращается в отказ обслуживания здорового старого риска.
+Transient missing/invalid funding input отмечается отдельно для конкретного
+EXIT. После свежего проверенного input и валидации исходной операции активная
+причина закрывается; строка истории инцидента сохраняется. Повреждённые
+origin/request/capture и UNKNOWN не снимаются общим «recovery successful».
 
 Economics в status ограничены последними 100 position rows каждого mode;
 полный linked readback — `CLI readback`. Trade PnL, дополнительные model costs,
@@ -185,13 +189,19 @@ DB не откатывается. Complete external cut связывает backu
 clock, все original effect receipts после backup, pending attempt/request,
 consumed quote grant claims, current entry epoch/generation, полный control
 set и frozen operating bindings, включая switch без effects после backup.
+Также сохраняются полные исходные operating-envelope events и runtime-policy
+revisions с committed heads, включая изменения после backup. Inventory ACK
+не вправе возвращать старый менее строгий лимит. Reconciliation переносит
+original identities/clocks/lineage без нового configure; более позднее
+валидное локальное продолжение цепочки сохраняется, конфликт не перезаписывается.
 Receipt удерживает исходную reservation и verified
 originating closure, зафиксированную до эффекта. Так восстанавливается даже
 позиция, которой ещё не было в backup. Выходные receipts импортируют исходный
 EXIT packet/binding; новый send не выполняется. Cut применяется одним CLI
 вызовом; повтор идемпотентен, content conflict запрещён. Naked inventory ACK
 отказывает. ACK требует reconciled complete cut, exact known inventory,
-отсутствие pending attempts и проверенные bindings. Все восстановленные bots
+отсутствие pending attempts, проверенные bindings и retained configuration
+chain. Все восстановленные bots
 остаются paused; последующий local STOP/DRAINING не отменяется старым cut.
 Quota claims без response также потребляют grant; pending attempt/request
 восстанавливаются на прежней identity без выдуманного result/clock. Inventory
@@ -206,7 +216,8 @@ authority; software proof использует независимый синте
 вручную. `seal-cut` проверяет данный внешним ledger cut и добавляет canonical
 self-hash, но не доказывает полноту самостоятельно. `export-cut` на
 сохранившемся исходном runtime читает согласованный readonly snapshot и
-экспортирует bindings, controls, quota/pending identities и исходные принятые
+экспортирует bindings, controls, quota/pending identities, полный
+`operating_configuration` и исходные принятые
 result observations с их IDs и physical clocks. Последний UNKNOWN total не
 стирает ранее подтверждённый cost floor. В `--input` он
 принимает один полный массив original external receipts; флаг
@@ -216,24 +227,19 @@ result observations с их IDs и physical clocks. Последний UNKNOWN t
 RECOVERY_KNOWN_RESULT_OMITTED_OR_CONFLICTING: известный факт нельзя спрятать
 за флагом полноты. Сохрани output вне откатываемого
 runtime вместе с независимым ledger до потери источника. После restore
-скопируй input в новый runtime и выполни seal-cut. Если original runtime уже
-утрачен, поля берутся из ранее сохранённого независимого cut. Input имеет эти
-поля (без `cut_sha256`); замени placeholders фактами независимого cut:
+скопируй input в новый runtime и выполни seal-cut. Используй полный original
+output `export-cut`, а не вручную собранную форму по текущим limits. Если
+original runtime уже утрачен, нужен ранее сохранённый независимый complete cut.
 
-```json
-{
-  "schema": "smial.operating-external-recovery-cut", "schema_version": "1.0",
-  "mode": "PAPER", "backup_sha256": "<database_sha256 из backup manifest>",
-  "external_cut_id": "<stable-independent-cut-id>", "as_of": "<cut-UTC>",
-  "completeness": "COMPLETE_AFTER_BACKUP",
-  "effects": [],
-  "result_observations": [],
-  "pending_attempts": [], "quote_claims": [],
-  "operating_bindings": [{"activation": "<original OFFLINE_ACTIVATION_CREATED event object>", "binding": "<original OPERATING_BINDING_COMMITTED event object>", "profile": "<original OPERATING_PROFILE_COMMITTED event object>"}],
-  "current_entry": {"epoch_id": "<actual-current-entry-epoch>", "generation": 1},
-  "controls": [{"bot_instance_id": "<actual-bot-id>", "status": "RUNNING", "entries_paused": true}]
-}
-```
+Обязательный `operating_configuration` v1.0 содержит `mode`, полные
+`envelope_events`, `envelope_head` (`revision`, `envelope_sha256`), исходные
+`policy_revisions` и `policy_head` (`revision`, `policy_sha256`). Сохраняй этот
+объект буквально вместе с остальными полями cut. Отсутствие его в legacy input
+даёт `RESTORE_OPERATING_CONFIGURATION_REQUIRED`; повреждённая/обрезанная,
+чужая или future цепочка — `RESTORE_OPERATING_CONFIGURATION_INVALID`, конфликт
+с локальной lineage — `RESTORE_OPERATING_CONFIGURATION_CONFLICT`. Fence остаётся
+до сверки полноценной исходной конфигурации. Копия старых limits из backup,
+повторный configure, ACK или RESUME не заменяют её.
 
 `effects` — полный упорядоченный массив исходных `{attempt, request, result,
 receipt_sha256}` objects из независимого durable ledger, не новые ручные

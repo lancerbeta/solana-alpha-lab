@@ -597,6 +597,116 @@ def read_operating_envelope(store: PaperPlaneStore, mode: str) -> dict[str, Any]
             else {"status": "VALID", "mode": mode, **current})
 
 
+def validate_operating_configuration(configuration: Any, *, mode: str, as_of: str) -> None:
+    """Validate original configuration chains for a complete external cut.
+
+    This uses the existing envelope and policy identities; recovery does not
+    configure a new value or acquire a second source of policy authority.
+    """
+    from solana_alpha_lab.factory.observation_schedule import parse_utc
+
+    try:
+        if (mode not in SUPPORTED_MODES or not isinstance(configuration, dict)
+            or set(configuration) != {"schema_version", "mode", "envelope_events", "envelope_head",
+                                       "policy_revisions", "policy_head"}
+            or configuration["schema_version"] != "1.0" or configuration["mode"] != mode
+            or not isinstance(configuration["envelope_events"], list)
+            or not isinstance(configuration["policy_revisions"], list)):
+            raise TradingRuntimePolicyError("RESTORE_OPERATING_CONFIGURATION_INVALID")
+        cutoff = parse_utc(as_of)
+        previous = GENESIS_POLICY_SHA256
+        last_clock = None
+        for revision, event in enumerate(configuration["envelope_events"], 1):
+            payload = event["payload"]
+            body = normalize_operating_envelope(payload["envelope"], mode=mode)
+            identity = {"envelope": body, "revision": revision, "previous_sha256": previous}
+            fingerprint = canonical_sha256(identity)
+            clock = parse_utc(event["created_at"])
+            if (set(event) != {"event_id", "event_type", "bot_instance_id", "position_id", "created_at", "payload"}
+                or event["event_type"] != OPERATING_ENVELOPE_EVENT
+                or event["event_id"] != f"OPERATING-ENVELOPE-{mode}-{revision}"
+                or event["bot_instance_id"] is not None or event["position_id"] is not None
+                or payload != {"mode": mode, **identity, "envelope_sha256": fingerprint}
+                or type(payload["revision"]) is not int or clock > cutoff
+                or last_clock is not None and clock < last_clock):
+                raise TradingRuntimePolicyError("RESTORE_OPERATING_CONFIGURATION_INVALID")
+            previous, last_clock = fingerprint, clock
+        if (not configuration["envelope_events"] or configuration["envelope_head"] != {
+            "revision": len(configuration["envelope_events"]), "envelope_sha256": previous}):
+            raise TradingRuntimePolicyError("RESTORE_OPERATING_CONFIGURATION_INVALID")
+        previous = GENESIS_POLICY_SHA256
+        last_clock = None
+        for revision, policy in enumerate(configuration["policy_revisions"], 1):
+            body = normalize_policy_body(policy, mode=mode)
+            expected = attach_revision_identity(body, revision=revision, created_at=policy["created_at"],
+                reason=policy["reason"], previous_policy_sha256=previous)
+            clock = parse_utc(policy["created_at"])
+            if (policy != expected or type(policy["revision"]) is not int or clock > cutoff
+                or last_clock is not None and clock < last_clock):
+                raise TradingRuntimePolicyError("RESTORE_OPERATING_CONFIGURATION_INVALID")
+            previous, last_clock = policy["policy_sha256"], clock
+        if configuration["policy_head"] != {"revision": len(configuration["policy_revisions"]) or None,
+                                               "policy_sha256": previous}:
+            raise TradingRuntimePolicyError("RESTORE_OPERATING_CONFIGURATION_INVALID")
+    except (TradingRuntimePolicyError, KeyError, TypeError, ValueError, AttributeError):
+        raise TradingRuntimePolicyError("RESTORE_OPERATING_CONFIGURATION_INVALID") from None
+
+
+def operating_configuration_snapshot(store: PaperPlaneStore, *, mode: str, as_of: str) -> dict[str, Any]:
+    """Read original bytes in the caller's coherent SQLite snapshot."""
+    envelope = read_operating_envelope(store, mode)
+    policy = resolve_current_policy(store, mode)
+    if envelope["status"] != "VALID" or policy["status"] not in {STATUS_VALID, STATUS_NOT_CONFIGURED}:
+        raise TradingRuntimePolicyError("RESTORE_OPERATING_CONFIGURATION_INVALID")
+    revisions = []
+    for row in reversed(store.runtime_policy_history(mode)):
+        original = store.runtime_policy_by_sha256(mode, row["policy_sha256"])
+        loaded = json.loads(original["policy_json"])
+        if any(loaded.get(key) != row[key] for key in row):
+            raise TradingRuntimePolicyError("RESTORE_OPERATING_CONFIGURATION_INVALID")
+        revisions.append(loaded)
+    configuration = {"schema_version": "1.0", "mode": mode,
+        "envelope_events": [event for event in store.filtered_execution_events(event_type=OPERATING_ENVELOPE_EVENT)
+                            if isinstance(event["payload"], dict) and event["payload"].get("mode") == mode],
+        "envelope_head": {"revision": envelope["revision"], "envelope_sha256": envelope["envelope_sha256"]},
+        "policy_revisions": revisions,
+        "policy_head": {"revision": policy["revision"], "policy_sha256": policy["policy_sha256"]}}
+    validate_operating_configuration(configuration, mode=mode, as_of=as_of)
+    return configuration
+
+
+def retain_operating_configuration(store: PaperPlaneStore, configuration: Any, *, mode: str,
+                                   as_of: str, import_missing: bool = False) -> None:
+    """Require an exact original prefix; retain a verified later local extension.
+
+    The caller owns the transaction. ACK uses this without writes. Conflicting
+    local authority is never overwritten by an older external cut.
+    """
+    validate_operating_configuration(configuration, mode=mode, as_of=as_of)
+    # Later local revisions may be newer than the cut clock. Validate their
+    # original clocks without falsely treating that extension as external data.
+    local_clocks = [event["created_at"] for event in store.filtered_execution_events(event_type=OPERATING_ENVELOPE_EVENT)
+                    if isinstance(event["payload"], dict) and event["payload"].get("mode") == mode]
+    local_clocks += [row["created_at"] for row in store.runtime_policy_history(mode)]
+    from solana_alpha_lab.factory.observation_schedule import parse_utc
+    local_as_of = max([as_of, *local_clocks], key=parse_utc)
+    local = operating_configuration_snapshot(store, mode=mode, as_of=local_as_of)
+    for field in ("envelope_events", "policy_revisions"):
+        required, retained = configuration[field], local[field]
+        if required[:min(len(required), len(retained))] != retained[:min(len(required), len(retained))]:
+            raise TradingRuntimePolicyError("RESTORE_OPERATING_CONFIGURATION_CONFLICT")
+        if len(retained) < len(required):
+            if not import_missing:
+                raise TradingRuntimePolicyError("RESTORE_OPERATING_CONFIGURATION_REQUIRED")
+            for item in required[len(retained):]:
+                if field == "envelope_events":
+                    store.append_execution_event(event_type=item["event_type"], event_id=item["event_id"],
+                        bot_instance_id=item["bot_instance_id"], position_id=item["position_id"],
+                        payload=item["payload"], created_at=item["created_at"])
+                else:
+                    store.append_runtime_policy_revision(item)
+
+
 def configure_operating_envelope(store: PaperPlaneStore, *, mode: str,
                                  candidate_raw: Mapping[str, Any], expected_current_sha256: str,
                                  idempotency_key: str, as_of: str) -> dict[str, Any]:

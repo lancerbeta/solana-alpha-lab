@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from contextlib import closing
 from datetime import UTC, datetime, timedelta
+import copy
 from decimal import Decimal
 import json
 import shutil
@@ -104,6 +105,263 @@ class OperationalRecoveryTests(unittest.TestCase):
         cut = self.coordinator.export_recovery_cut(backup_path=backup, effects=list(effects),
             external_cut_id="INDEPENDENT-SYNTHETIC-DELAYED-CUT", as_of=self.now.isoformat().replace("+00:00", "Z"))
         return {**cut, "cut_sha256": sha256_of(cut)}
+
+    def test_transient_exit_funding_recovers_without_stale_active_incident(self):
+        metrics = []
+        for damage in ("MISSING", "MALFORMED", "STALE"):
+            with self.subTest(funding=damage):
+                case = OperationalRecoveryTests()
+                case.setUp()
+                try:
+                    case.start_operating(mode="SHADOW")
+                    ledger, plan = case.wire_files([{"outAmount": "10000000000000"}, {"outAmount": "330000000"}])
+                    case.coordinator.quote_adapter = RecordingQuoteAdapter(ledger, json.loads(plan.read_text()))
+                    case.coordinator.run(ticks=1)
+                    case.source.tick(datetime(2026, 10, 5, 13, 5, tzinfo=UTC))
+                    case.now = datetime(2026, 10, 5, 13, 10, tzinfo=UTC)
+                    funding = case.source.data_root / "funding.json"
+                    if damage == "MISSING":
+                        funding.unlink()
+                    elif damage == "MALFORMED":
+                        funding.write_text("{", encoding="utf-8")
+                    case.coordinator.tick()
+                    failed = case.coordinator.status()
+                    incident = next(row for row in failed["incidents"] if row["active"] and row["incident_key"].startswith("EXIT-INPUT-"))
+                    self.assertEqual(incident["reason"], "EXECUTION_FUNDING_INPUT_UNAVAILABLE" if damage == "MISSING" else "EXECUTION_FUNDING_INPUT_INVALID")
+                    self.assertEqual(failed["inventory"]["inventory_status"], "KNOWN")
+                    self.assertTrue(failed["integrity_verified"])
+                    self.assertFalse(failed["exit_reconciliation_healthy"])
+                    self.assertEqual(len(case.ledger_receipts(ledger)), 1)
+                    case.quote_inputs(at="2026-10-05T13:10:00Z")
+                    case.coordinator.run(ticks=3)
+                    cold = TradingCoordinator(TradingContinuityRunner(case.root, data_root=case.data),
+                        mode="SHADOW", clock=lambda: case.now)
+                    after = cold.status()
+                    self.assertEqual(after["status"], "READY")
+                    self.assertTrue(after["integrity_verified"])
+                    self.assertTrue(after["exit_reconciliation_healthy"])
+                    self.assertEqual(after["inventory"]["position_count"], 0)
+                    self.assertEqual(after["pending_attempts"], 0)
+                    self.assertEqual(case.runner.readback()["positions"][0]["state"], "RECONCILED")
+                    retained = next(row for row in after["incidents"] if row["incident_key"] == incident["incident_key"])
+                    self.assertEqual(retained["reason"], incident["reason"])
+                    self.assertEqual(retained["first_at"], incident["first_at"])
+                    self.assertEqual(retained["active"], 0)
+                    self.assertEqual(len(case.ledger_receipts(ledger)), 2)
+                    metrics.append({"funding": damage, "after": after["status"], "effects": 2,
+                        "active_exit_input_incidents": 0, "audit_incident_retained": True})
+                finally:
+                    case.tearDown()
+        self.metrics = {"cases": metrics}
+
+    def test_corrupt_exit_request_stays_unknown_until_exact_owner_witness_restored(self):
+        self.start_operating(mode="SHADOW")
+        ledger, plan = self.wire_files([{"outAmount": "10000000000000"}, {"outAmount": "330000000"}])
+        self.coordinator.quote_adapter = RecordingQuoteAdapter(ledger, json.loads(plan.read_text()))
+        self.coordinator.tick()
+        self.source.tick(datetime(2026, 10, 5, 13, 5, tzinfo=UTC))
+        self.now = datetime(2026, 10, 5, 13, 10, tzinfo=UTC)
+        (self.source.data_root / "funding.json").unlink()
+        self.coordinator.tick()
+        self.quote_inputs(at="2026-10-05T13:10:00Z")
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            original = store.filtered_execution_events(event_type="ADAPTER_REQUEST_BOUND")[0]
+            damaged = {**original["payload"], "asset_metadata_sha256": "0" * 64}
+            with store.immediate_write():
+                store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?",
+                    (json.dumps(damaged), original["event_id"]))
+        self.coordinator.tick()
+        self.coordinator.tick()
+        failed = self.coordinator.status()
+        self.assertEqual(failed["status"], "ACTION_REQUIRED")
+        self.assertEqual(failed["inventory"]["inventory_status"], "UNKNOWN")
+        self.assertIsNone(failed["inventory"]["outstanding_cost_basis_usd"])
+        self.assertEqual(Decimal(failed["inventory"]["known_cost_basis_floor_usd"]), Decimal("30"))
+        self.assertFalse(failed["integrity_verified"])
+        self.assertFalse(failed["exit_reconciliation_healthy"])
+        self.assertIn("EXECUTION_ASSET_METADATA_INTEGRITY_CONFLICT", {row["reason"] for row in failed["incidents"] if row["active"]})
+        self.assertEqual(len(self.ledger_receipts(ledger)), 1)
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            with store.immediate_write():
+                store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?",
+                    (json.dumps(original["payload"]), original["event_id"]))
+        self.coordinator.run(ticks=3)
+        self.assertEqual(self.coordinator.status()["status"], "READY")
+        self.assertTrue(all(not row["active"] for row in self.coordinator.status()["incidents"]))
+        self.assertEqual(len(self.ledger_receipts(ledger)), 2)
+        self.metrics = {"damaged_witness": "UNKNOWN", "known_floor_usd": "30",
+            "corrupt_witness_extra_effects": 0, "exact_restored_witness": "READY", "audit_retained": True}
+
+    def test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy(self):
+        from solana_alpha_lab.factory import trading_runtime_policy as policy_owner
+        for control in ("ENVELOPE", "RUNTIME_POLICY"):
+            with self.subTest(control=control):
+                case = OperationalRecoveryTests()
+                case.setUp()
+                try:
+                    case.start_operating(mode="SHADOW")
+                    ledger = case.empty_ledger()
+                    case.coordinator.quote_adapter = RecordingQuoteAdapter(ledger, [{"outAmount": "10000000000000"}])
+                    backup = case.data / "backups/pre-config-revision.sqlite"
+                    case.coordinator.backup(destination_relative="backups/pre-config-revision.sqlite")
+                    with closing(PaperPlaneStore(case.runner.store_path)) as store:
+                        if control == "ENVELOPE":
+                            current = policy_owner.read_operating_envelope(store, "SHADOW")
+                            policy_owner.configure_operating_envelope(store, mode="SHADOW",
+                                candidate_raw={**case.profile["envelope"], "max_outstanding_cost_basis_usd": "10"},
+                                expected_current_sha256=current["envelope_sha256"], idempotency_key="TIGHTER-10",
+                                as_of="2026-10-05T12:40:00Z")
+                        else:
+                            with patch.object(policy_owner, "_now", return_value="2026-10-05T12:40:00Z"):
+                                policy_owner.apply_policy(closure_fixture.ROOT, store, mode="SHADOW",
+                                    candidate_raw={"new_entries_enabled": False}, expected_current_sha256="0" * 64,
+                                    idempotency_key="DISABLE-AFTER-BACKUP",
+                                    owner_authorization_phrase="AUTHORIZE PAPER SHADOW TRADING RUNTIME POLICY APPLY",
+                                    reason="SYNTHETIC_RECOVERY_POLICY")
+                    case.coordinator.tick()
+                    self.assertEqual(case.runner.readback()["modeled_attempts"], [])
+                    cut = case.production_cut(backup)
+                    self.assertEqual(cut["effects"], [])
+                    self.assertEqual(cut["pending_attempts"], [])
+                    runner, coordinator = case.restored(backup, adapter=RecordingQuoteAdapter(ledger, [{"outAmount": "10000000000000"}]))
+                    coordinator.reconcile_cut(cut)
+                    self.assertTrue(coordinator.reconcile_cut(cut)["idempotent"])
+                    case.acknowledge(coordinator, cut)
+                    with closing(PaperPlaneStore(runner.store_path)) as store:
+                        self.assertEqual(policy_owner.operating_configuration_snapshot(store, mode="SHADOW", as_of=cut["as_of"]), cut["operating_configuration"])
+                    bot = coordinator.status()["instances"][0]["bot_instance_id"]
+                    runner.command({"command_type": "RESUME_NEW_ENTRIES", "idempotency_key": "RESTORED-RESUME", "bot_instance_id": bot})
+                    coordinator.run(ticks=2)
+                    self.assertEqual(runner.readback()["modeled_attempts"], [])
+                    self.assertEqual(case.ledger_receipts(ledger), [])
+                    if control == "ENVELOPE":
+                        self.assertEqual(coordinator.status()["envelope"]["revision"], 2)
+                        self.assertEqual(coordinator.status()["envelope"]["envelope"]["max_outstanding_cost_basis_usd"], "10")
+                    else:
+                        with closing(PaperPlaneStore(runner.store_path, readonly=True)) as store:
+                            current = policy_owner.resolve_current_policy(store, "SHADOW")
+                        self.assertEqual(current["revision"], 1)
+                        self.assertFalse(current["policy"]["new_entries_enabled"])
+                finally:
+                    case.tearDown()
+        self.metrics = {"controls": ["ENVELOPE_REVISION_2_10_USD", "RUNTIME_POLICY_ENTRIES_DISABLED"],
+            "original_attempts": 0, "restored_attempts": 0, "external_effects": 0, "idempotent_reconcile": True}
+
+    def test_recovered_funding_with_unknown_exit_keeps_attempt_and_inventory_fence(self):
+        self.start_operating(mode="SHADOW")
+        ledger, plan = self.wire_files([{"outAmount": "10000000000000"}, {"status": 503}])
+        self.coordinator.quote_adapter = RecordingQuoteAdapter(ledger, json.loads(plan.read_text()))
+        self.coordinator.tick()
+        self.source.tick(datetime(2026, 10, 5, 13, 5, tzinfo=UTC))
+        self.now = datetime(2026, 10, 5, 13, 10, tzinfo=UTC)
+        (self.source.data_root / "funding.json").unlink()
+        self.coordinator.tick()
+        self.quote_inputs(at="2026-10-05T13:10:00Z")
+        self.coordinator.run(ticks=3)
+        after = self.coordinator.status()
+        self.assertEqual(after["status"], "ACTION_REQUIRED")
+        self.assertEqual(after["inventory"]["inventory_status"], "UNKNOWN")
+        self.assertEqual(after["pending_attempts"], 1)
+        self.assertFalse(after["exit_reconciliation_healthy"])
+        self.assertEqual(len(self.ledger_receipts(ledger)), 2)
+        self.assertEqual(len(self.runner.readback()["modeled_attempts"]), 2)
+        self.assertEqual(self.runner.readback()["positions"][0]["state"], "UNRESOLVED")
+        self.assertFalse(any(row["active"] for row in after["incidents"] if row["incident_key"].startswith("EXIT-INPUT-")))
+        self.assertIn("ATTEMPT_RECONCILIATION_REQUIRED", {row["reason"] for row in after["incidents"] if row["active"]})
+        self.metrics = {"input_cause_recovered": True, "exit_outcome": "UNKNOWN", "pending_attempts": 1,
+            "repeated_quote_effects": 0, "inventory_status": "UNKNOWN"}
+
+    def test_configuration_chain_damage_or_omission_cannot_acknowledge_restore(self):
+        from solana_alpha_lab.factory import trading_runtime_policy as policy_owner
+        self.start_operating(mode="SHADOW")
+        backup = self.data / "backups/pre-config-negative.sqlite"
+        self.coordinator.backup(destination_relative="backups/pre-config-negative.sqlite")
+        with closing(PaperPlaneStore(self.runner.store_path)) as store:
+            current = policy_owner.read_operating_envelope(store, "SHADOW")
+            policy_owner.configure_operating_envelope(store, mode="SHADOW",
+                candidate_raw={**self.profile["envelope"], "max_outstanding_cost_basis_usd": "10"},
+                expected_current_sha256=current["envelope_sha256"], idempotency_key="TIGHTER-NEGATIVE",
+                as_of="2026-10-05T12:40:00Z")
+            with patch.object(policy_owner, "_now", return_value="2026-10-05T12:40:00Z"):
+                policy_owner.apply_policy(closure_fixture.ROOT, store, mode="SHADOW",
+                    candidate_raw={"new_entries_enabled": False}, expected_current_sha256="0" * 64,
+                    idempotency_key="DISABLE-NEGATIVE", owner_authorization_phrase="AUTHORIZE PAPER SHADOW TRADING RUNTIME POLICY APPLY",
+                    reason="SYNTHETIC_RECOVERY_POLICY")
+        cut = self.production_cut(backup)
+        outcomes = []
+        for damage in ("MISSING", "TRUNCATED_ENVELOPE", "TRUNCATED_POLICY", "HASH", "FOREIGN_MODE", "FUTURE_CLOCK"):
+            with self.subTest(damage=damage):
+                bad = copy.deepcopy(cut)
+                config = bad["operating_configuration"]
+                if damage == "MISSING":
+                    del bad["operating_configuration"]
+                elif damage == "TRUNCATED_ENVELOPE":
+                    config["envelope_events"].pop()
+                elif damage == "TRUNCATED_POLICY":
+                    config["policy_revisions"].clear()
+                elif damage == "HASH":
+                    config["envelope_events"][-1]["payload"]["envelope_sha256"] = "0" * 64
+                elif damage == "FOREIGN_MODE":
+                    config["mode"] = "PAPER"
+                else:
+                    config["policy_revisions"][-1]["created_at"] = "2026-10-05T12:41:00Z"
+                bad["cut_sha256"] = sha256_of({key: value for key, value in bad.items() if key != "cut_sha256"})
+                runner, coordinator = self.restored(backup, suffix="negative-" + damage.lower())
+                expected = "RESTORE_OPERATING_CONFIGURATION_REQUIRED" if damage == "MISSING" else "RESTORE_OPERATING_CONFIGURATION_INVALID"
+                with self.assertRaisesRegex(PaperPlaneError, "^" + expected + "$"):
+                    coordinator.reconcile_cut(bad)
+                with self.assertRaisesRegex(PaperPlaneError, "^" + expected + "$"):
+                    coordinator.acknowledge_restore(expected_inventory_sha256=sha256_of(coordinator.status()["inventory"]), as_of=bad["as_of"], cut=bad)
+                bot = coordinator.status()["instances"][0]["bot_instance_id"]
+                runner.command({"command_type": "RESUME_NEW_ENTRIES", "idempotency_key": "UNSAFE-RESUME", "bot_instance_id": bot})
+                coordinator.tick()
+                self.assertTrue(coordinator.status()["restore_guard"])
+                self.assertEqual(runner.readback()["positions"], [])
+                self.assertEqual(runner.readback()["modeled_attempts"], [])
+                outcomes.append({"damage": damage, "reason": expected, "attempts": 0, "guard": True})
+        self.metrics = {"cases": outcomes}
+
+    def test_configuration_restore_preserves_later_local_authority_and_detects_damage(self):
+        from solana_alpha_lab.factory import trading_runtime_policy as policy_owner
+        self.start_operating(mode="SHADOW")
+        backup = self.data / "backups/pre-config-extension.sqlite"
+        self.coordinator.backup(destination_relative="backups/pre-config-extension.sqlite")
+
+        def configure(runner, amount, key):
+            with closing(PaperPlaneStore(runner.store_path)) as store:
+                current = policy_owner.read_operating_envelope(store, "SHADOW")
+                return policy_owner.configure_operating_envelope(store, mode="SHADOW",
+                    candidate_raw={**self.profile["envelope"], "max_outstanding_cost_basis_usd": amount},
+                    expected_current_sha256=current["envelope_sha256"], idempotency_key=key,
+                    as_of="2026-10-05T12:40:00Z")
+
+        configure(self.runner, "10", "CUT-10")
+        cut = self.production_cut(backup)
+        runner, coordinator = self.restored(backup, suffix="conflicting-local")
+        configure(runner, "20", "LOCAL-20")
+        with self.assertRaisesRegex(PaperPlaneError, "^RESTORE_OPERATING_CONFIGURATION_CONFLICT$"):
+            coordinator.reconcile_cut(cut)
+        self.assertTrue(coordinator.status()["restore_guard"])
+        self.assertEqual(coordinator.status()["envelope"]["envelope"]["max_outstanding_cost_basis_usd"], "20")
+        runner, coordinator = self.restored(backup, suffix="later-local")
+        coordinator.reconcile_cut(cut)
+        extended = configure(runner, "5", "LATER-5")
+        self.assertTrue(coordinator.reconcile_cut(cut)["idempotent"])
+        self.acknowledge(coordinator, cut)
+        self.assertEqual(coordinator.status()["envelope"]["envelope_sha256"], extended["envelope_sha256"])
+        self.assertEqual(coordinator.status()["envelope"]["revision"], 3)
+        runner, coordinator = self.restored(backup, suffix="ack-damage")
+        coordinator.reconcile_cut(cut)
+        with closing(PaperPlaneStore(runner.store_path)) as store:
+            original = store.get_execution_event("OPERATING-ENVELOPE-SHADOW-2")
+            with store.immediate_write():
+                store._conn.execute("UPDATE execution_events SET payload_json='{}' WHERE event_id=?", (original["event_id"],))
+        with self.assertRaisesRegex(PaperPlaneError, "^RESTORE_OPERATING_CONFIGURATION_INVALID$"):
+            self.acknowledge(coordinator, cut)
+        self.assertTrue(coordinator.status()["restore_guard"])
+        self.assertEqual(runner.readback()["modeled_attempts"], [])
+        self.metrics = {"conflicting_local_revision": "DENY", "later_local_revision": 3,
+            "later_cap_preserved_usd": "5", "post_import_damage_ack": "DENY", "attempts": 0}
 
     def test_sqlite_writer_wait_cannot_authorize_entry_after_ttl(self):
         self.start_operating(clock_at=datetime(2026, 10, 5, 12, 40, 29, 750000, tzinfo=UTC))

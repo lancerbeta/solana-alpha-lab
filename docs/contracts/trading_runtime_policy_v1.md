@@ -174,10 +174,12 @@ Existing owner API: `normalize_operating_envelope`,
 `accept_signal_decision_outcome(..., ordinary_operating=True)` adds the atomic
 ordinary check. `begin_modeled_attempt` repeats it for the frozen ordinary
 reservation. No competing inventory table or risk engine is introduced.
-Indexed event-type/position queries read only the envelope revision chain and
-the events of current obligation candidates. A partial index removes proved
-flat historical positions from the ordinary candidate scan. Legacy readonly
-stores without the additive columns retain their compatible read fallback.
+Indexed event-type/position queries read the envelope revision chain and the
+original witnesses of current and terminal position candidates. Terminal
+release requires verified attempt/FINAL/result, so SQL work grows linearly
+with terminal positions; O(outstanding) is not claimed. Unrelated journal
+growth does not require a full journal scan. Legacy readonly stores without
+the additive columns retain their compatible read fallback.
 
 ## 7. Operator path
 
@@ -217,5 +219,14 @@ Policy revisions live inside `paper_plane_state.sqlite`, already on the
 mutable backup source list. Ordinary Workbench/service restart and
 exact-SHA deploy do not reset current policy. Rollback appends; it
 never deletes history.
+
+Cold recovery must retain the current original operating-envelope events and
+runtime-policy revisions, including changes after backup. A complete cut
+binds their full chains and committed heads. Reconciliation preserves exact
+original identities, clocks and lineage; it never re-authorizes an old policy
+through a new configure command. Missing, damaged, foreign or conflicting
+authority retains the restore fence. A valid later local extension is not
+replaced by an older cut. Inventory ACK and RESUME cannot substitute current
+configuration reconciliation or restore a less restrictive backup limit.
 
 LIVE cannot resolve TradingRuntimePolicyV1 as authority.

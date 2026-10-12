@@ -132,5 +132,7 @@ New plugin/connector/MCP/automation/package/service: NONE. Factory Fit FULL_REVI
 NOW: this exact operating closure. WATCH: separately authorized commissioning.
 Readback proved predecessor #396/main CI success. Clean base, one checkout;
 prior task branch retained. All active time gates are resolved/superseded.
-Current canonical provider binding resolves to registry-011. Repair only the
-stale prose pin to 010; immutable predecessors and provider grants stay intact.
+Current canonical provider binding resolves to registry-011 and is pinned
+explicitly by this task context. Preserve the historical domain-policy bytes
+and TASK30 receipt; policy-wide prose normalization is outside this atom.
+Immutable predecessors and provider grants stay intact.

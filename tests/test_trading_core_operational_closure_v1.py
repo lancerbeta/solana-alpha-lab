@@ -209,12 +209,15 @@ class OperatingDriverTests(unittest.TestCase):
             return [json.loads(row[0]) for row in connection.execute("SELECT receipt_json FROM calls ORDER BY call_id")]
 
     def recovery_cut(self,ledger,backup):
+        from solana_alpha_lab.factory.trading_runtime_policy import operating_configuration_snapshot
         store=PaperPlaneStore(self.runner.store_path,readonly=True)
         try:
             state=store._conn.execute("SELECT * FROM ordinary_state WHERE mode='SHADOW'").fetchone()
             cut={"schema":"smial.operating-external-recovery-cut","schema_version":"1.0","mode":"SHADOW",
                 "backup_sha256":hashlib.sha256(backup.read_bytes()).hexdigest(),"external_cut_id":"INDEPENDENT-SYNTHETIC-CUT",
                 "as_of":self.now.isoformat().replace("+00:00","Z"),"completeness":"COMPLETE_AFTER_BACKUP",
+                "operating_configuration":operating_configuration_snapshot(store,mode="SHADOW",
+                    as_of=self.now.isoformat().replace("+00:00","Z")),
                 "effects":self.ledger_receipts(ledger),"current_entry":{"epoch_id":state["epoch_id"],"generation":state["generation"]},
                 "result_observations":[event for event in store.filtered_execution_events(event_type="MODELED_RESULT_ACCEPTED")
                     if event["payload"]["result"]["attempt_id"] in {receipt["attempt"]["attempt_id"] for receipt in self.ledger_receipts(ledger)}],

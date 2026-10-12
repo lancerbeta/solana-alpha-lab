@@ -261,6 +261,17 @@ class TradingCoordinator:
             else:
                 store._conn.execute("INSERT INTO ordinary_incidents VALUES(?,?,?,?,1,1) ON CONFLICT(incident_key) DO UPDATE SET reason=excluded.reason,last_changed_at=excluded.last_changed_at,active=1,occurrences=ordinary_incidents.occurrences+1", (key, reason, at, at))
 
+    def _clear_exit_incidents(self, store, position, bound, at):
+        """Close this position's EXIT causes only after its full path validates."""
+        bound._origin(store, position)
+        if position.get("exit_decision_id"):
+            bound._exit_origin(store, position)
+        # Called after fresh inputs and durable claim validation. A later
+        # UNKNOWN outcome still has its separate attempt/inventory fence.
+        for key in (position["position_id"], "EXIT-INPUT-" + position["position_id"]):
+            store._conn.execute("UPDATE ordinary_incidents SET active=0,last_changed_at=? WHERE incident_key=? AND active=1",
+                (at, key))
+
     def _inputs(self, bound, store, position, profile, side, at):
         origin = bound._origin(store, position)
         admission = origin["provenance"]["origin_admission"]
@@ -293,8 +304,19 @@ class TradingCoordinator:
         if self.mode == "SHADOW":
             cfg = profile["quote"]
             root = Path(profile["source"]["root"])
-            funding = checked_observation(json.loads(exact_child(root, cfg["funding_observation_file"]).read_text(encoding="utf-8")),
-                mint=cfg["funding_mint"], as_of=at, max_age_seconds=profile["observation_max_age_seconds"])
+            try:
+                funding_raw = json.loads(exact_child(root, cfg["funding_observation_file"]).read_text(encoding="utf-8"))
+            except PaperPlaneError:
+                raise
+            except OSError:
+                raise PaperPlaneError("EXECUTION_FUNDING_INPUT_UNAVAILABLE") from None
+            except (ValueError, TypeError):
+                raise PaperPlaneError("EXECUTION_FUNDING_INPUT_INVALID") from None
+            try:
+                funding = checked_observation(funding_raw, mint=cfg["funding_mint"], as_of=at,
+                    max_age_seconds=profile["observation_max_age_seconds"])
+            except (PaperPlaneError, ValueError, TypeError, KeyError):
+                raise PaperPlaneError("EXECUTION_FUNDING_INPUT_INVALID") from None
             request["funding_valid_until"] = render_utc(parse_utc(funding["observed_at"])+timedelta(seconds=profile["observation_max_age_seconds"]))
             entries=store.filtered_execution_events(event_type="ADAPTER_REQUEST_BOUND",position_ids=[position["position_id"]]) if side=="EXIT" else []
             retained=next((event["payload"] for event in entries if event["payload"].get("asset_metadata") and event["payload"].get("outputMint")==position["mint"]),None)
@@ -353,7 +375,7 @@ class TradingCoordinator:
         if parse_utc(at) > parse_utc(request["observation_valid_until"]):
             request["unit_price_usd"] = None
         if self.mode == "SHADOW" and parse_utc(at) > parse_utc(request["funding_valid_until"]):
-            raise PaperPlaneError("EXECUTION_OBSERVATION_STALE_OR_FUTURE")
+            raise PaperPlaneError("EXECUTION_FUNDING_INPUT_INVALID")
         request["result_at"] = render_utc(parse_utc(at)+timedelta(seconds=profile["model"]["latency_seconds"]))
         request["request_sha256"] = sha256_of({k:v for k,v in request.items() if k!="request_sha256"})
         prior = store._conn.execute("SELECT COUNT(*) FROM execution_events WHERE event_type='MODELED_ATTEMPT_STARTED' AND position_id=?", (position["position_id"],)).fetchone()[0]
@@ -382,7 +404,7 @@ class TradingCoordinator:
             if not attempt.get("send_permitted"):
                 return False
             if self.mode=="SHADOW" and parse_utc(at)>parse_utc(request["funding_valid_until"]):
-                raise PaperPlaneError("EXECUTION_OBSERVATION_STALE_OR_FUTURE")
+                raise PaperPlaneError("EXECUTION_FUNDING_INPUT_INVALID")
             request["request_sha256"]=sha256_of({k:v for k,v in request.items() if k!="request_sha256"})
             store.append_execution_event(event_type="ADAPTER_REQUEST_BOUND", event_id="REQUEST-" + attempt["attempt_id"],
                 bot_instance_id=position["bot_instance_id"], position_id=position["position_id"], payload=request, created_at=at)
@@ -403,6 +425,8 @@ class TradingCoordinator:
             # Replace before commit: no effect has consumed the initial request.
             store._conn.execute("UPDATE execution_events SET payload_json=? WHERE event_id=?",
                 (json.dumps(request,sort_keys=True),"REQUEST-"+attempt["attempt_id"]))
+            if side == "EXIT":
+                self._clear_exit_incidents(store, position, bound, at)
         self.fault("AFTER_ATTEMPT_COMMIT")
         if self.mode == "PAPER":
             result = PaperModelAdapter(profile["model"]).reconcile(attempt, request, as_of=at)
@@ -536,7 +560,9 @@ class TradingCoordinator:
                         bound = self.runner.for_epoch(position["activation_epoch_id"])
                         counts["attempts"] += int(self._dispatch(store, bound, position, self._profile(store, position["activation_epoch_id"]), "EXIT", at))
                     except (PaperPlaneError,KeyError,ValueError,TypeError,OSError,sqlite3.Error) as error:
-                        self._incident(store, position["position_id"], str(error) if isinstance(error,PaperPlaneError) else "OPERATING_BINDING_INTEGRITY_CONFLICT", at)
+                        reason = str(error) if isinstance(error,PaperPlaneError) else "OPERATING_BINDING_INTEGRITY_CONFLICT"
+                        key = "EXIT-INPUT-" + position["position_id"] if reason.startswith("EXECUTION_FUNDING_INPUT_") else position["position_id"]
+                        self._incident(store, key, reason, at)
                         recovery_healthy = False
             for bot in store.bots():
                 if bot["mode"] == self.mode and bot["status"] == "DRAINING":
@@ -834,6 +860,7 @@ class TradingCoordinator:
                     "backup_sha256":hashlib.sha256(backup_path.read_bytes()).hexdigest(),"external_cut_id":external_cut_id,
                     "as_of":as_of,"completeness":"COMPLETE_AFTER_BACKUP","effects":effects,
                     "result_observations":result_observations,
+                    "operating_configuration":self._configuration_snapshot(store,as_of),
                     "current_entry":{"epoch_id":state["epoch_id"],"generation":state["generation"]},
                     "operating_bindings":[{"activation":store.get_execution_event(bot["activation_epoch_id"]),
                         "binding":store.get_execution_event("OPERATING-"+bot["activation_epoch_id"]),
@@ -845,6 +872,23 @@ class TradingCoordinator:
                     "controls":[{"bot_instance_id":bot["bot_instance_id"],"status":bot["status"],"entries_paused":bool(bot["entries_paused"])} for bot in bots]}
         finally:
             store.close()
+
+    def _configuration_snapshot(self, store, as_of):
+        from solana_alpha_lab.factory.trading_runtime_policy import operating_configuration_snapshot, TradingRuntimePolicyError
+        try:
+            return operating_configuration_snapshot(store,mode=self.mode,as_of=as_of)
+        except (TradingRuntimePolicyError,KeyError,TypeError,ValueError) as error:
+            raise PaperPlaneError(str(error) if isinstance(error,TradingRuntimePolicyError)
+                                  else "RESTORE_OPERATING_CONFIGURATION_INVALID") from None
+
+    def _retain_configuration(self, store, cut, *, import_missing=False):
+        from solana_alpha_lab.factory.trading_runtime_policy import retain_operating_configuration, TradingRuntimePolicyError
+        try:
+            retain_operating_configuration(store,cut["operating_configuration"],mode=self.mode,
+                as_of=cut["as_of"],import_missing=import_missing)
+        except (TradingRuntimePolicyError,KeyError,TypeError,ValueError) as error:
+            raise PaperPlaneError(str(error) if isinstance(error,TradingRuntimePolicyError)
+                                  else "RESTORE_OPERATING_CONFIGURATION_INVALID") from None
 
     def reconcile_restored_effect(self, receipt, *, pending_only=False, result_observations=()):
         """Import a retained original effect receipt, never authorize a send.
@@ -990,12 +1034,14 @@ class TradingCoordinator:
         try:
             prior=probe.get_execution_event("RECOVERY-CUT-"+cut["cut_sha256"])
             if prior is not None:
+                self._retain_configuration(probe,cut)
                 return {"status":"EXTERNAL_CUT_RECONCILED","idempotent":True,"send_permitted":False}
         finally:
             probe.close()
         store=self.runner._store()
         try:
             with store.immediate_write():
+                self._retain_configuration(store,cut,import_missing=True)
                 for bundle in cut["operating_bindings"]:
                     if set(bundle)!={"activation","binding","profile"}:
                         raise PaperPlaneError("RECOVERY_OPERATING_BINDING_INVALID")
@@ -1072,7 +1118,9 @@ class TradingCoordinator:
             store.close()
 
     def _validate_cut(self,cut):
-        if (set(cut)!={"schema","schema_version","mode","backup_sha256","external_cut_id","as_of","effects","result_observations","current_entry","controls","operating_bindings","quote_claims","pending_attempts","completeness","cut_sha256"}
+        if not isinstance(cut,dict) or "operating_configuration" not in cut:
+            raise PaperPlaneError("RESTORE_OPERATING_CONFIGURATION_REQUIRED")
+        if (set(cut)!={"schema","schema_version","mode","backup_sha256","external_cut_id","as_of","effects","result_observations","operating_configuration","current_entry","controls","operating_bindings","quote_claims","pending_attempts","completeness","cut_sha256"}
             or cut["schema"]!="smial.operating-external-recovery-cut" or cut["schema_version"]!="1.0"
             or cut["mode"]!=self.mode or cut["completeness"]!="COMPLETE_AFTER_BACKUP"
             or not isinstance(cut["external_cut_id"],str) or not cut["external_cut_id"]
@@ -1080,6 +1128,11 @@ class TradingCoordinator:
             or cut["cut_sha256"]!=sha256_of({k:v for k,v in cut.items() if k!="cut_sha256"})):
             raise PaperPlaneError("RESTORE_COMPLETE_EXTERNAL_CUT_REQUIRED")
         parse_utc(cut["as_of"])
+        from solana_alpha_lab.factory.trading_runtime_policy import validate_operating_configuration, TradingRuntimePolicyError
+        try:
+            validate_operating_configuration(cut["operating_configuration"],mode=self.mode,as_of=cut["as_of"])
+        except TradingRuntimePolicyError as error:
+            raise PaperPlaneError(str(error)) from None
         if (set(cut["current_entry"])!={"epoch_id","generation"}
             or len({row["bot_instance_id"] for row in cut["controls"]})!=len(cut["controls"])
             or any(set(row)!={"bot_instance_id","status","entries_paused"} for row in cut["controls"])
@@ -1112,6 +1165,7 @@ class TradingCoordinator:
             with store.immediate_write():
                 if store.get_execution_event("RECOVERY-CUT-"+cut["cut_sha256"]) is None:
                     raise PaperPlaneError("RESTORE_EXTERNAL_CUT_NOT_RECONCILED")
+                self._retain_configuration(store,cut)
                 summary = obligation_summary(store, mode=self.mode)
                 if sha256_of(summary) != expected_inventory_sha256:
                     raise PaperPlaneError("RESTORE_INVENTORY_CHANGED")
