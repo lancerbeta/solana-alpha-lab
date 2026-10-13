@@ -14,7 +14,30 @@
     "reason": "Git is the working context and evidence owner; no cloud export requested."
   },
   "capability_radar_now": "NONE: existing store, writer lease, _Accounting, CLI, release path and locked Python suffice; no new package, connector, service or automation.",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "b939ac6c59aa552678ed0ded000dcba212d1aeeabe1ef9267972e0460a0e263d",
+    "catalog/assets/lifecycle.yaml": "6836351f3e01a994b52ed6f929eb48e1fe10cda04d4133b2dc614d256e718362",
+    "catalog/catalog_manifest.yaml": "cd3b8380f5772e6deabf4f952d987e0c0613d18ce898d4dd17a038c05e726beb",
+    "catalog/generated/asset_edges.json": "0e41ce1bee9542b1133570478246c814034da274e25389cf55397c81fee441f2",
+    "docs/PROJECT_MAP.md": "5febcc859aae91709d199115c6b65f9494fc2816a2bc0482671844f9644d7d10",
+    "docs/contracts/opportunity_episodes_jupiter_v1.md": "adf56eeba789a6472ec388b9a327f9ce03dffd4302aa6efbe17f3e7ee7d7dbd7",
+    "docs/evidence/i3_episode_shared_account_budget_bridge_v1/OPERATE_PACKET.md": "4c415ebf766411368048db62bb59a8a4ae94947517e4f0f65fcaef723d8a2990",
+    "docs/evidence/i3_episode_shared_account_budget_bridge_v1/OWNER_READOUT.md": "e7d77e98f3aea4126c92cfe4bba484da669e721c0e43f51f8e256118cd5e3969",
+    "docs/evidence/i3_episode_shared_account_budget_bridge_v1/proof.json": "38a22590e232417d94f68964d0d364721ad59e77f905e51905c2a8df3664b868",
+    "docs/evidence/i3_episode_shared_account_budget_bridge_v1/semantic-claims.json": "d80131f6309b7557187ae7f58321b490fc01ad29328817c2809beee58be40d91",
+    "docs/evidence/i3_episode_shared_account_budget_bridge_v1/semantic-classification.json": "0bb948bab7a0a784b6f3305fffa7f7713460f243245b37da01be555ca7709b57",
+    "docs/evidence/i3_episode_shared_account_budget_bridge_v1/semantic-evidence.json": "25b7d2a5d9228af3439877fecdc6407039a08c849e7bbb703f6bebe23ecb3e67",
+    "docs/evidence/i3_episode_shared_account_budget_bridge_v1/semantic-non-claims.json": "1088a67dd9e4a3420afb380a3ece116282e949408e1f3980587342c7f1375220",
+    "docs/evidence/i3_episode_shared_account_budget_bridge_v1/source-contract.md": "bd057781cce308b20e0413677a85ad9aad70c3dae5751622f1416062c243c220",
+    "docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md": "c258d5ef6020b2989c475fc621da75aafc62868161619fecee92db5a7248c59f",
+    "docs/tasks/I3_EPISODE_SHARED_ACCOUNT_BUDGET_BRIDGE_V1.md": "741f7384ef59847e38dde6e8a0434214bfca0e462b27dbc97250bb2ac30d2919",
+    "scripts/observation_schedule.py": "10090afda6312774ca6032a141a09939c0ff03a2faece44733b4006fb29a6ee2",
+    "src/solana_alpha_lab/factory/observation_account_budget.py": "bf89cd2329380f19e4a6677b4501d78ea796754e67ba335ba6d48b19b8e0725b",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "fa9ef70692c84d8a4068312b7ec20790721f0e116104178dd8d3bc9d3b9012b9",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "9ea604a5168e79b9ecec505483a379f724d06a32998938e68984fc6bafcaf929",
+    "src/solana_alpha_lab/factory/opportunity_episode_tick.py": "968f46bc194a9b4fc67df8d143c4256f89e707ae0c524ac541958388bab704d0",
+    "tests/test_observation_shared_account_budget_v1.py": "692555b20b0aaa6a8bbe562de90d07839d3f4f66184e5b75d32c09c6ad0f8b38"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -25,14 +48,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/i3_episode_shared_account_budget_bridge_v1/factory-fit.json",
-    "sha256": "PENDING_BIND",
+    "sha256": "bc45a04c8357930a486743dbb612dba093d9c69c8f0dd2b08ae479bb6e2e681d",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_19_SHARED_BUDGET_TESTS_25_MODULE_424_TEST_DIRECT_CONSUMER_REGRESSION_AND_PREFLIGHT_GEOMETRY_REPLAY",
     "independent_review": {
       "path": "docs/evidence/i3_episode_shared_account_budget_bridge_v1/independent-review.json",
-      "sha256": "PENDING_BIND",
+      "sha256": "6058b87cff78ed378fc4419348178a08f415cfd749398afbae7dfa62a11485ce",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
