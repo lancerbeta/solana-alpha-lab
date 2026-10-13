@@ -44,6 +44,9 @@ total 47 episodes / 6,533 pairs. All eight original canonical C1 pins remain
 exact. In the disposable corpus six C1 files remain byte-exact and one C1
 labels file changes only its current-version boolean as C2 becomes current.
 The C1 sealed release manifest is byte-exact.
+The independent row oracle does not compare field values or availability
+timestamps; release/file hashes and the existing release verifier cover bytes,
+while this I1 result makes no new PIT or scientific-validity claim.
 
 With one exact C1 metadata source temporarily absent, and separately with only
 a later grown version present, the public path returned
@@ -70,8 +73,9 @@ the ordinary Forge draft step after P1 capture and P2 consume, then refused
 run then exposed a new test's incorrect assumption that its small synthetic
 fixture contained a day-open `member_unit`; it actually publishes plain member
 files. The corrected vertical test passed on a clean commit in 242.40 seconds;
-the final verifier change requires one more clean-candidate run. Focused
-owner-path/harness tests passed nine cases after the verifier correction. A sampled C2 worker process showed
+after the metadata verifier correction it passed again on a clean commit in
+243.61 seconds. Focused owner-path/harness tests passed nine cases after that
+correction. A sampled C2 worker process showed
 at least 174,604,288 bytes PeakWorkingSet64; this is a lower-bound snapshot,
 not a measured end-to-end peak RSS. End-to-end peak RSS remains `UNKNOWN`.
 
