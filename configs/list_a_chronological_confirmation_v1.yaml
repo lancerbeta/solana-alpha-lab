@@ -1,0 +1,168 @@
+schema: smial.list-a-confirmation-protocol
+schema_version: '1.0'
+protocol_id: LIST_A_CONFIRMATION_PROTOCOL_V1
+status: DESIGN_VALIDATED_BOUND_CONTRACT_NOT_READY
+accepted_meaning_ref: docs/tasks/LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1.md
+protocol_core:
+  purpose: FIRST_PREREGISTERED_TEST
+  development_provenance: UNRESOLVED_NO_EMPIRICAL_DEVELOPMENT_BOUND
+  question:
+    population: OPPORTUNITY_EPISODES
+    hypothesis_kind: LIST_CONTRAST
+    canonical_list_id: JUPITER:toporganicscore:5m
+    membership_time: EPISODE_T0
+    list_definition_sha256: 8a35ad6835c5cd2a6c7fe772002f3c2a4d616d53479297130f88f25e978b48c0
+    list_definition_ref: docs/evidence/list_a_confirmation_protocol_freeze_v1/metadata-bindings.json#/source_witnesses/0/list_a_definition
+    decision_point: E1800
+    target_point: E14400
+    price_field_id: FIELD-USD-PRICE-001
+    estimand: CONDITIONAL_EPISODE_WEIGHTED_PRICE_RELATIVE_CONTRAST
+    contrast: EPISODE_WEIGHTED_MEAN_A_MINUS_ELIGIBLE_COMPLEMENT
+    target_missingness_claim: CONDITIONAL_ON_OBSERVED_TARGETS
+    claim_form: PREDICTIVE_OBSERVATIONAL
+    direction: A_GREATER_THAN_COMPLEMENT
+    delta: '0'
+    universe_rule: EXACT_APPROVED_ADMITTED_EPISODES_WITH_KNOWN_REFERENCED_MEMBERSHIP
+    list_condition:
+      all_of:
+      - JUPITER:toporganicscore:5m
+    coverage_policy: REQUIRE_KNOWN_REFERENCED
+  interpretation:
+    reference_schedule_semantic_sha256: 2bfb07b6862365df825220811b63d20e045e085b9a51ffd24e1a935456df1be0
+    reference_schedule_ref: docs/evidence/list_a_confirmation_protocol_freeze_v1/metadata-bindings.json#/source_witnesses/0
+    sample_is_portable_runtime_universe: false
+    native_query_status: LOGICAL_RULE_DEFINED_FUTURE_PRODUCER_SPEC_NOT_CREATED
+    repeated_mint: PRESERVE_AND_MODEL_DEPENDENCE
+    duplicate_episode: EXACT_COPY_DEDUP_CONFLICT_REFUSE
+    denominator_stages:
+    - ADMITTED
+    - SCOPE_KNOWN
+    - DECISION_ELIGIBLE
+    - TARGET_OBSERVED
+    decision_time_owner: opportunity_episodes.resolve_point.nominal_due
+    target_and_price_owner: hfic_temporal_discovery
+    scope_owner: hfic_research_scope
+  inference:
+    method: CROSSED_CLUSTER_PERCENTILE_BOOTSTRAP
+    cluster_axes:
+    - MINT
+    - CANONICAL_DECISION_TIME_BLOCK
+    time_block_seconds:
+    - 86400
+    - 172800
+    epoch_anchor: '1970-01-01T00:00:00Z'
+    replicates_per_partition: 4096
+    generator: STDLIB_RANDOM_RANDOM_MT19937_RANDRANGE
+    numeric_runtime: CPYTHON_3_13_14_IEEE754_BINARY64_ORDERED_MATH_FSUM
+    serialization: FINITE_JSON_SHORTEST_ROUNDTRIP_NO_EPS_NO_VERDICT_ROUNDING
+    cluster_order: MINT_CANONICAL_LEXICOGRAPHIC_BLOCK_NUMERIC_ASCENDING
+    draw_order: MINT_THEN_TIME_EACH_REPLICATE
+    group_weights: SHARED_MINT_MULTIPLICITY_TIMES_BLOCK_MULTIPLICITY
+    episode_order: CANONICAL_EPISODE_ID_ASCENDING
+    seed_rule: SHA256_PROTOCOL_CORE_COLON_BLOCK_SECONDS_FIRST16_HEX
+    minimum_mints_overall: 30
+    minimum_blocks_overall_each_partition: 30
+    minimum_mints_each_group: 30
+    minimum_blocks_each_group_each_partition: 30
+    target_coverage_min: '0.95'
+    missing_rate_gap_max: '0.05'
+    quantile_method: NEAREST_RANK_1BASED
+    quantiles:
+    - '0.025'
+    - '0.975'
+    empty_replicate_policy: INSUFFICIENT_NO_REROLL
+    leave_one: EACH_MINT_AND_EACH_BLOCK_OF_BOTH_PARTITIONS_POINT_CONTRAST
+    empty_or_nonfinite_leave_one: INSUFFICIENT
+    sensitivity: BOTH_PARTITIONS_AND_ALL_DECLARED_LEAVE_ONE
+    assumptions: CROSSED_RANDOM_EFFECTS_NOT_ARBITRARY_SERIAL_DEPENDENCE
+    calibrated_empirical_coverage_claim: false
+    missing_at_random_claim: false
+  verdict:
+    precedence:
+    - BOUND_CONTRACT_NOT_READY
+    - INVALID_OR_BLOCKED
+    - INSUFFICIENT
+    - SUPPORTED
+    - NOT_SUPPORTED
+    - INCONCLUSIVE
+    supported: L24_GT_DELTA_AND_L48_GT_DELTA_AND_MIN_D_GT_DELTA
+    not_supported: U24_LE_DELTA_AND_U48_LE_DELTA_AND_MAX_D_LE_DELTA
+    otherwise: INCONCLUSIVE_DEPENDENCE_OR_CONCENTRATION
+    supported_terminal: ASSOCIATION_SUPPORTED_CONDITIONAL
+    not_supported_terminal: ASSOCIATION_NOT_SUPPORTED_AT_FROZEN_BOUNDARY
+    global_enum_mutation: false
+  chronology:
+    time_zone: UTC_AWARE
+    interval: HALF_OPEN
+    separation_anchor: MAX_DEV_TARGET_AVAILABLE_OR_DEV_DECISION_PLUS_E
+    comparison: VALIDATION_INFORMATION_START_STRICTLY_GREATER
+    separation_interval: MAX_BOUND_TARGET_T0_HORIZON_PLUS_GRID_LATENESS_VISIBILITY_ONCE
+    first_test_without_development: NO_FAKE_DEV_CLOCKS_EXPOSURE_BOUNDARY_REQUIRED
+    overlap_policy: PURGE_DECLARED_INFORMATION_AND_LABEL_OVERLAP
+    shared_mint_policy: REPORT_DO_NOT_AUTOMATICALLY_PURGE
+    source_selection: EARLIEST_ADMISSIBLE_WITHIN_EXACT_PREACCEPTED_SCOPE_AND_END
+  future_execution_contract:
+    main_allowance: 1
+    adaptive_allowance: 0
+    reserve_before_values: true
+    reservation_identity: EXACT_PROTOCOL_SPEC_QUERY_SOURCE_ROLE_GRANT_EXECUTOR
+    concurrent_evaluators_max: 1
+    crash_policy: RETAIN_ATTEMPTED_POTENTIALLY_EXPOSED_OUTSTANDING_CHARGE
+    completed_replay: READ_SAVED_RESULT_WITHOUT_EVALUATOR
+    unresolved_resume: ORIGINAL_IMMUTABLE_IDENTITIES_OR_BLOCKED
+    current_stricter_protection_recheck: true
+    reuse_exploratory_grant: false
+    value_read_authorized: false
+    activation_authorized: false
+  non_claims:
+  - NO_EMPIRICAL_EFFECT_ESTABLISHED_BY_FREEZE
+  - NO_GENERAL_95_PERCENT_COVERAGE_GUARANTEE
+  - NO_CAUSAL_OR_UNCONDITIONAL_POPULATION_CLAIM
+  - NO_EXECUTABLE_POLICY_QUALIFICATION
+  - NO_PROMOTE_NO_STRATEGY_NO_ACTIVATION
+  source_owners:
+    src/solana_alpha_lab/factory/hfic_research_scope.py:
+      commit: ba87f8e339d5cc3aa55322801ae56e3f92369446
+      git_blob_sha256: 2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a
+    src/solana_alpha_lab/factory/hfic_temporal_discovery.py:
+      commit: ba87f8e339d5cc3aa55322801ae56e3f92369446
+      git_blob_sha256: af898471e64d5beecdb4e6f56caeca7d7cde0ec14fd5e7559634c7b241f0c383
+    src/solana_alpha_lab/factory/opportunity_episodes.py:
+      commit: ba87f8e339d5cc3aa55322801ae56e3f92369446
+      git_blob_sha256: 3565d1dff50b3b4be630ec1ee737c81e4259b247dde702c2327f976cfae837cc
+    src/solana_alpha_lab/factory/observation_schedule.py:
+      commit: ba87f8e339d5cc3aa55322801ae56e3f92369446
+      git_blob_sha256: dff14477838de0d06b5c145650e203d988edd63f84c983d898d2e03be344c6a2
+    src/solana_alpha_lab/factory/live_cohort_schedule_artifact.py:
+      commit: ba87f8e339d5cc3aa55322801ae56e3f92369446
+      git_blob_sha256: b6bd6099d0a12c61fa04960868b888d096038c3db70eabe38585b905d6434dde
+sample_binding:
+  status: UNBOUND
+  source_scope_ref: null
+  sources: []
+  interval_start: null
+  interval_end_exclusive: null
+  exposure_provenance_refs: []
+  protection_refs: []
+  current_protection_check_ref: null
+  chronology_proof_ref: null
+  structural_feasibility_ref: docs/evidence/list_a_confirmation_protocol_freeze_v1/metadata-bindings.json#/source_witnesses
+  metadata_evidence_ref: docs/evidence/list_a_confirmation_protocol_freeze_v1/metadata-bindings.json
+  candidate_set_use: REJECTED_INVENTORY_ONLY_NOT_APPROVED_VALIDATION_SAMPLE
+  missing_bindings:
+  - EXACT_APPROVED_SAMPLE_SCOPE_AND_END
+  - CONFIRMATORY_REUSE_COMPATIBLE_SOURCE_ROLE
+  - SUFFICIENT_POTENTIAL_MINT_AND_TIME_SUPPORT
+  - COMPLETE_SOURCE_EXPOSURE_PROVENANCE
+  - FROZEN_AND_CURRENT_PROTECTION_VALIDATION
+  - ACTUAL_SAMPLE_CHRONOLOGY_AND_QUERY_SPEC_IDENTITY
+  metadata_evidence_sha256: c01d47e84443335101e686494321dccf071d3298cddc05ed36cee64a687c889f
+presentation:
+  owner_language: ru
+  handback: docs/evidence/list_a_confirmation_protocol_freeze_v1/READOUT.md
+fingerprints:
+  protocol_core_sha256: 3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252
+  sample_binding_sha256: 9ce82941a13f4fc415f57d5a79a33ea34ce5b21600a0beff9c57afaee791baf1
+derived_seeds:
+  '86400': 2055296707731192101
+  '172800': 3449030900544075880

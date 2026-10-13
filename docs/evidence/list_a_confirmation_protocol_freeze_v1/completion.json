@@ -1,0 +1,91 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1-LIMITED-DESIGN",
+  "as_of": "2026-10-13",
+  "task_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1",
+  "state_change": "Integrated current main with unchanged scientific core/sample/seeds and historical metadata snapshot; renewed22implementation inventory and three isolated PASS reviews; BOUND_CONTRACT_NOT_READY remains scientific terminal",
+  "base_main": "ad8c9315db8ffa0d22281615571565c41bc1a15b",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "0bb90d9fad7638111e29c99ea8d04f151dff7fed67abe358ef079e6c68dba17b",
+    "catalog/assets/lifecycle.yaml": "9d7ea9fc43e5316669682631d45aa1040f4e269f1f9ba331ad01e89443273aab",
+    "catalog/catalog_manifest.yaml": "13e58374674b039cfa831ba1b3c53e4e94f0f729b145b9d4ff435c6f0e6ff37a",
+    "catalog/generated/asset_edges.json": "ceb682e4f790ce0abfd615395131c4f964183d84b8bb1093f837f1c1b2385fb7",
+    "configs/list_a_chronological_confirmation_v1.yaml": "4bfd2c80526d617f664e047ffa38f802722c5ca96211aed06992506bbc29be12",
+    "docs/PROJECT_MAP.md": "56204cd6518b31f1f9708e06717338eb3b737fd0523e1750e7985dfa140443ad",
+    "docs/contracts/list_a_chronological_confirmation_v1.md": "4be4f46884ed742adbabaf5bb14f7ee37fa84e3a57263adf8162c609c5c94d6c",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/.gitattributes": "3573f11485f6a65d5310162d0880d5c0f3d1ea1e2336674858e6ea7e8382c21c",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/READOUT.md": "ad5842ee1c56052cb89f78af9e2420356ad09bff95f884b1ec24836b50c7969e",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/cleanup.json": "d0f97b48523b1b6ce0d2572b31bfcfee53aa49306903f2841b23ca4ca60f9267",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/cold-readback.json": "7c7d1fe5623535081fed7881cc67cdb5a3d882db259b1ee0f5b16522a67872d6",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/focused-checks.json": "bfe620dc1a3abf4466dbefcc0097759b045e147c665a7e386aa891bf2dfcd18d",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/freeze-receipt.json": "2b7c3f7a7920b888842e2efec319ffbbd0698f14fa832aa011c60d589d2e94af",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/main-refresh.json": "eefa3ecb5c679ca5aacbf8ff0c3e758c696c4a8ee727c99538209bbd7a19d47e",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/metadata-bindings.json": "c01d47e84443335101e686494321dccf071d3298cddc05ed36cee64a687c889f",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/obligations.json": "a66294e84249148178989e278562603631c212072f8acf7507cbf506f1e225be",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/probe_metadata.py": "4751b985567797adb208f5f038bb0e52dd27dc293dc70e310490699ed847f47a",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md": "4931c4c569fb2630e9b403b33185bd86b9ffe9ff0df06dd9bb0bec41f5040510",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-inventory.json": "4c9f84c7c9334a0005a60dddd77b9b6f3feb06f1ab38400d3175051c2be811b6",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/validation.json": "1fb0582af78a86a7c5f24c28e8f82f4367636b157fb01c1e1015f7871041bc82",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/verify_contract.py": "caa30e1c29f61b73422b4be3e699c7c0f9b76ae238b3642377befe5d3723b469",
+    "docs/tasks/LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1.md": "9d3765ecca2aa626351b9eee8957f5bd99df66376c96fc89d7e64d7ec4067d8c"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/list_a_confirmation_protocol_freeze_v1/factory-fit.json",
+    "sha256": "0c05ebc682df23cea726b7e50737389865273ce8729be92c9bb7026e43caf849",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_51_CONTRACT_MODEL_NATIVE_SEAM_CHECKS_AND_COLD_CONSUMER_5_REFUSALS",
+    "independent_review": {
+      "path": "docs/evidence/list_a_confirmation_protocol_freeze_v1/independent-review.json",
+      "sha256": "594e3f71d7eeadd16a11b7759b24c6e83fa6bb1daf9faed08daba2e993ad1e3b",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_HARNESS_STRUCTURE",
+      "PASS_51_FOCUSED_CONTRACT_CASES",
+      "PASS_COLD_ARTIFACT_CONSUMER_5_REFUSALS",
+      "PASS_CATALOG_1978_ASSETS_SCHEMA_RELATIONS_INTEGRITY",
+      "PASS_INCREMENTAL_GENERATED_CLOSURE_NOOP",
+      "PASS_ZERO_PRODUCTION_PATH_DIFF",
+      "PASS_ISOLATED_CODE_GOAL_ARCHITECTURE_EXACT_INVENTORY_P2_REMEDIATED",
+      "PASS_CURRENT_MAIN_INTEGRATION_WITH_UNCHANGED_SCIENTIFIC_IDENTITIES"
+    ]
+  },
+  "non_claims": [
+    "NO_FULL_DATA_BOUND_FREEZE",
+    "NO_SCIENTIFIC_LOOK",
+    "NO_ALPHA_OR_METRIC_OR_SCIENTIFIC_DECISION",
+    "NO_TRADING_CLOSURE_OR_CONFIRMER_IMPLEMENTATION",
+    "NO_ACTIVATION_DEPLOY_OR_SPEND",
+    "NO_BOOTSTRAP_COVERAGE_THEOREM"
+  ],
+  "side_effects": {
+    "market_value_fields_deserialized": 0,
+    "scientific_looks": 0,
+    "provider_calls": 0,
+    "real_data_root_writes": 0,
+    "research_or_exposure_writes": 0,
+    "activation": 0,
+    "spend": 0,
+    "owned_review_scratch_removed": true,
+    "owned_review_scratch_removed_bytes": 482275.0,
+    "owned_refresh_review_scratch_removed": true,
+    "owned_refresh_review_scratch_removed_bytes": 247023
+  },
+  "capability_radar_now": "NONE"
+}

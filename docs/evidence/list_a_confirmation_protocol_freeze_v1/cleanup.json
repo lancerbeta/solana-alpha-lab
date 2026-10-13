@@ -1,0 +1,53 @@
+{
+  "schema": "list-a-freeze-owned-resource-cleanup",
+  "owner": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1",
+  "created_resources": [
+    {
+      "logical_ref": "OWNED_INPUT_EXTRACTION",
+      "baseline_existed": false,
+      "files": 7,
+      "bytes": 150330,
+      "disposition": "REMOVED",
+      "readback": "ABSENT",
+      "deletion_guard": "Exact resolved root; no junction/symlink; all7files single hardlink; native PowerShell"
+    },
+    {
+      "logical_ref": "OWNED_CONTRACT_CANARY_TEMP_ROOTS",
+      "baseline_existed": false,
+      "disposition": "REMOVED",
+      "readback": "ALL_TEMP_DIRECTORIES_ABSENT_AFTER_CONTEXT_EXIT"
+    },
+    {
+      "logical_ref": "ATTACHED_MANAGED_WORKTREE",
+      "baseline_existed": false,
+      "disposition": "RETAIN_ACTIVE_PR_REVIEW_AND_MERGE",
+      "reason": "Contains isolated canonical task artifacts; original dirty checkout untouched"
+    },
+    {
+      "logical_ref": "OWNED_LOCKED_PROJECT_ENVIRONMENT",
+      "baseline_existed": false,
+      "bytes": 169602856,
+      "disposition": "RETAIN_ACTIVE_DELIVERY_TOOLCHAIN",
+      "reason": "Required now by exact-head harness preflight/readiness and separately authorized guarded merge/post-merge readback; remove with worktree after terminal delivery"
+    }
+  ],
+  "processes_or_containers_created": [],
+  "scratch_databases_created": [],
+  "remaining_owned_bytes": 169602856,
+  "remaining_owned_bytes_scope": "Active locked environment measured at cleanup; retained Git checkout/artifacts are separately required review resources, not scratch; no scratch remains",
+  "non_target_preservation": {
+    "scope": "Named local lineage/labels/schedule raw hashes before/after in metadata readset plus zero changes to production paths from expected_base; no global concurrent-state claim",
+    "metadata_readset_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/metadata-bindings.json",
+    "metadata_before_after": "EXACT_MATCH",
+    "original_dirty_checkout": "NO_WRITES_BY_THIS_TASK",
+    "shared_cache_and_original_environment": "NO_DELETE_NO_SETTINGS_CHANGE"
+  },
+  "retained_compact_artifacts": [
+    "accepted source specification once",
+    "contract/config",
+    "small metadata projection with hashes",
+    "compact oracles and cold refusal receipts",
+    "owned evidence-only reproducers"
+  ],
+  "future_disposition": "Temporary review launch packet removed after durable independent verdict retained; managed worktree archived only after merged delivery when no longer needed"
+}

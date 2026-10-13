@@ -1,0 +1,69 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1-INDEPENDENT-REFRESH-20261013",
+  "as_of": "2026-10-13",
+  "task_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1",
+  "reviewed_bindings_sha256": "9d78702a210331c3a2acfe141e3b3231706509e9db3838fe167b8d5989491d8b",
+  "reviewed_inventory_sha256": "c6df23bbce9bd36509b54780aabd21ac52b31dae0b0ce21fd552c59fd07ec5b8",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only /root/freeze_refresh_code: all22 Git/worktree bindings, binary patch and independently recomputed binding/inventory hashes match; no correctness/regression/contract findings",
+        "Six native owner blobs and eight scientific artifacts unchanged; historical metadata and BOUND_CONTRACT_NOT_READY preserved; stateless cold verify PASS and four own delta/core/sample/truncation refusals PASS; own temp removed",
+        "Review-role plan sufficient; three self-bound delivery receipts excluded; reviewed_head=9eaabf0f1a54efc043ed9ed0b9cf8bde81ea4a52"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only /root/freeze_refresh_goal:22 bindings and frozen patch match; limited outcome useful and F01-F12 preserved; no findings",
+        "F04-F06 PARTIAL remain explicit; historical source snapshot and BOUND_CONTRACT_NOT_READY reverified; current main introduces no science authority; core/sample/seeds unchanged",
+        "Review scratch cleanup belongs to parent before readiness; reviewed_head=9eaabf0f1a54efc043ed9ed0b9cf8bde81ea4a52"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated packet+diff-only /root/freeze_refresh_arch; SEMANTIC_PREMISE PASS for LIMITED_DESIGN; all10mandatory questions addressed; no implementation/premise blockers or authority expansion",
+        "packet_fingerprint_sha256=8e2ec2a931a845a02eefb6f40576affc7df2a8610f24b665d3bd77ab74f2e430",
+        "Late targets, stale protection, serial dependence beyond48h and outcome-dependent missingness may pass engineering checks while breaking research validity; stronger inference/untouched/current protection/full confirmer claims remain excluded",
+        "Frozen packet retains exact candidate base/head/diff/evidence fingerprints; launch native validate-launch PASS; PACKET_INFORMATION_PATH only, model diversity UNPROVEN; no source/code execution by architecture critic",
+        "SEMANTIC_PREMISE_PACKET_JSON={\"candidate\":{\"base\":\"ad8c9315db8ffa0d22281615571565c41bc1a15b\",\"diff_sha256\":\"354974fd67e44c812e5d5c6f601292f9e5f184a129e8c9cc9ea9b9067b594d16\",\"head\":\"9eaabf0f1a54efc043ed9ed0b9cf8bde81ea4a52\"},\"evidence\":[{\"logical_ref\":\"docs/tasks/LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1.md\",\"sha256_or_fingerprint\":\"9d3765ecca2aa626351b9eee8957f5bd99df66376c96fc89d7e64d7ec4067d8c\"},{\"logical_ref\":\"docs/contracts/list_a_chronological_confirmation_v1.md\",\"sha256_or_fingerprint\":\"4be4f46884ed742adbabaf5bb14f7ee37fa84e3a57263adf8162c609c5c94d6c\"},{\"logical_ref\":\"configs/list_a_chronological_confirmation_v1.yaml\",\"sha256_or_fingerprint\":\"4bfd2c80526d617f664e047ffa38f802722c5ca96211aed06992506bbc29be12\"},{\"logical_ref\":\"docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md\",\"sha256_or_fingerprint\":\"4931c4c569fb2630e9b403b33185bd86b9ffe9ff0df06dd9bb0bec41f5040510\"},{\"logical_ref\":\"docs/evidence/list_a_confirmation_protocol_freeze_v1/metadata-bindings.json\",\"sha256_or_fingerprint\":\"c01d47e84443335101e686494321dccf071d3298cddc05ed36cee64a687c889f\"},{\"logical_ref\":\"docs/evidence/list_a_confirmation_protocol_freeze_v1/obligations.json\",\"sha256_or_fingerprint\":\"a66294e84249148178989e278562603631c212072f8acf7507cbf506f1e225be\"},{\"logical_ref\":\"docs/evidence/list_a_confirmation_protocol_freeze_v1/validation.json\",\"sha256_or_fingerprint\":\"1fb0582af78a86a7c5f24c28e8f82f4367636b157fb01c1e1015f7871041bc82\"},{\"logical_ref\":\"docs/evidence/list_a_confirmation_protocol_freeze_v1/cold-readback.json\",\"sha256_or_fingerprint\":\"7c7d1fe5623535081fed7881cc67cdb5a3d882db259b1ee0f5b16522a67872d6\"},{\"logical_ref\":\"docs/evidence/list_a_confirmation_protocol_freeze_v1/cleanup.json\",\"sha256_or_fingerprint\":\"d0f97b48523b1b6ce0d2572b31bfcfee53aa49306903f2841b23ca4ca60f9267\"},{\"logical_ref\":\"docs/evidence/list_a_confirmation_protocol_freeze_v1/main-refresh.json\",\"sha256_or_fingerprint\":\"eefa3ecb5c679ca5aacbf8ff0c3e758c696c4a8ee727c99538209bbd7a19d47e\"}],\"independence\":{\"claim_scope\":\"PACKET_INFORMATION_PATH\",\"context_isolated\":true,\"implementation_transcript_seen\":false,\"launch_isolation\":\"PROCESS_OBLIGATION\",\"model_diversity\":\"UNPROVEN\",\"model_diversity_identity\":null,\"packet_bound\":true,\"readonly\":true},\"non_claims\":[\"NO_EMPIRICAL_ALPHA_OR_EFFECT\",\"NO_FULL_BOUND_FREEZE\",\"NO_SCIENTIFIC_LOOK\",\"NO_PRODUCTION_CONFIRMER_OR_RESERVATION_WRITER\",\"NO_GENERAL_BOOTSTRAP_CALIBRATION_THEOREM\",\"NO_UNCONDITIONAL_CAUSAL_OR_TRADING_CLAIM\",\"NO_NEW_ACCESS_ACTIVATION_OR_SPEND\",\"MODEL_DIVERSITY_UNPROVEN\",\"NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY\"],\"packet_fingerprint_sha256\":\"8e2ec2a931a845a02eefb6f40576affc7df2a8610f24b665d3bd77ab74f2e430\",\"questions\":[\"HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG\",\"WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE\",\"IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL\",\"IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE\",\"DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY\",\"DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING\",\"IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER\",\"WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE\",\"WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM\",\"WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS\"],\"review\":{\"architecture_owner\":\"ARCHITECTURE_CRITIC\",\"profile\":\"SEMANTIC_PREMISE\",\"risk_dimensions\":[\"SCIENTIFIC_ESTIMAND\",\"EVIDENCE_ADMISSIBILITY\",\"PIT_OR_AVAILABILITY_SEMANTICS\",\"UNKNOWN_VS_NEGATIVE_EVIDENCE\",\"OWNER_AUTHORITY_SEMANTICS\"]},\"schema\":\"smial.semantic-premise-review-packet\",\"schema_version\":\"1.0\",\"semantic_claims\":[{\"claim\":\"Accepted D01-D08 design is unambiguous and future-consuming; actual terminal remains BOUND_CONTRACT_NOT_READY\",\"claim_id\":\"LIMITED_DESIGN\",\"scope\":\"One contract/config, not empirical result or production confirmer\"},{\"claim\":\"Canonical existing root and sealed parameter metadata inspected through value-skipping projection; no numeric price/target state decoding or writers\",\"claim_id\":\"METADATA_READ_SCOPE\",\"scope\":\"Exact metadata readset and source-native safe seams; exposure/current protection remain unresolved\"},{\"claim\":\"Episode-weighted conditional observational A-minus-complement contrast, crossed24/48h bootstrap screens and leave-one rules; no general95percent coverage or causal/economic claim\",\"claim_id\":\"INFERENTIAL_LIMITS\",\"scope\":\"Owner accepted baseline design; dependence assumptions and missingness limits explicit\"},{\"claim\":\"One inventoried source forbidden for confirmatory reuse,24mint/2-2block potential upper bounds below30; no approved sample or complete exposure/protection\",\"claim_id\":\"ACTUAL_BINDING_GAP\",\"scope\":\"Exact known local corpus snapshot; not global absence or negative market result\"},{\"claim\":\"Required code/goal/architecture reviews; no material runtime operator flow changed; static evidence readout only\",\"claim_id\":\"REVIEW_SCOPE\",\"scope\":\"Limited contract atom and current repository review triggers\"}],\"task\":{\"task_contract_sha256\":\"9d3765ecca2aa626351b9eee8957f5bd99df66376c96fc89d7e64d7ec4067d8c\",\"task_id\":\"LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1\"}}"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_EMPIRICAL_ACCEPTANCE"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P2: receipt core/sample digest lacked equality to recomputed config; independently observed shape-valid foreign receipt with recomputed self identity accepted. Closed by two equality guards and two targeted canaries. Prior inventory=ff625032a498846aec72b88202687a5d1100e64a499e333c26da4d3d56835a9d; prior packet=0668113b818da2bb1223c8dddd293e2304ae13fffe5e1ca0d16a71875c9cb87f",
+      "observed_head": "5a03ec83ad260e7a57be31284c6c848967948fd5",
+      "resolved_by_head": "b82aa0452a50e199c651644a435f440f01c6a564"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P2: receipt core/sample digest lacked equality to recomputed config; independently observed shape-valid foreign receipt with recomputed self identity accepted. Closed by two equality guards and two targeted canaries. Prior inventory=ff625032a498846aec72b88202687a5d1100e64a499e333c26da4d3d56835a9d; prior packet=0668113b818da2bb1223c8dddd293e2304ae13fffe5e1ca0d16a71875c9cb87f",
+      "observed_head": "5a03ec83ad260e7a57be31284c6c848967948fd5",
+      "resolved_by_head": "b82aa0452a50e199c651644a435f440f01c6a564"
+    }
+  ]
+}

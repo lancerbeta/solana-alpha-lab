@@ -1,0 +1,102 @@
+{
+  "scope": "CONTRACT_FREEZE_ARTIFACTS_AND_DIRECT_GENERATED_CONSUMERS",
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "-B",
+        "docs/evidence/list_a_confirmation_protocol_freeze_v1/verify_contract.py",
+        "--seal"
+      ],
+      "status": "PASS",
+      "cases": 51
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "docs/evidence/list_a_confirmation_protocol_freeze_v1/verify_contract.py",
+        "--canaries"
+      ],
+      "status": "PASS",
+      "cold_process": true,
+      "refused_copies": 5,
+      "temp_removed": true
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "scripts/harness_sync.py",
+        "--apply",
+        "--base-ref",
+        "ad8c9315db8ffa0d22281615571565c41bc1a15b"
+      ],
+      "status": "PASS_INCREMENTAL_IMPACTED_CLOSURE_NOOP",
+      "navigation": "UNCHANGED_ON_REPLAY"
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "scripts/validate_catalog.py"
+      ],
+      "status": "PASS",
+      "assets": 1978
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "scripts/delivery_harness.py",
+        "check",
+        "--root",
+        "."
+      ],
+      "status": "PASS",
+      "delivery_gate_ready": true
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "docs/evidence/list_a_confirmation_protocol_freeze_v1/verify_contract.py",
+        "--verify"
+      ],
+      "status": "PASS_COLD_ARTIFACT_CONSUMER",
+      "scientific_terminal": "BOUND_CONTRACT_NOT_READY"
+    }
+  ],
+  "runtime": "existing uv offline locked managed CPython3.13.14 toolchain",
+  "local_full_gate": "NOT_EXECUTED_GUARDED_MERGE_OWNS_FULL_GATE",
+  "production_paths_changed": [],
+  "scientific_look_authorization": false,
+  "market_values": 0,
+  "recovered_mechanical_failures": [
+    {
+      "code": "CANONICAL_EOL_POLICY_AMBIGUOUS",
+      "scope": "New READOUT navigation",
+      "repair": "Explicit LF evidence policy with accepted source bytes preserved"
+    },
+    {
+      "code": "STAGED_DIFF_CHECK_FAILED",
+      "scope": "Prior -text-staged metadata receipt had CRLF; commit denied",
+      "repair": "Normalize own metadata receipt to LF; reseal sample/raw bindings and cold readback; renormalize stage; no source metadata content change"
+    }
+  ],
+  "independent_review_remediation": {
+    "observed_head": "5a03ec83ad260e7a57be31284c6c848967948fd5",
+    "severity": "P2",
+    "roles": [
+      "CODE_REVIEWER",
+      "ARCHITECTURE_CRITIC"
+    ],
+    "finding": "Receipt self identity did not prove equality to config core/sample scientific identity",
+    "repair": "Both explicit domain equality guards and both shape-valid foreign-receipt canaries with recomputed self identity",
+    "baseline_published_artifacts": "CONSISTENT_NO_ACTUAL_FOREIGN_RECEIPT",
+    "positive_baseline": "PASS",
+    "foreign_core_actual": "RECEIPT_CORE_BINDING_MISMATCH",
+    "foreign_sample_actual": "RECEIPT_SAMPLE_BINDING_MISMATCH"
+  },
+  "delivery_refresh_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/main-refresh.json"
+}

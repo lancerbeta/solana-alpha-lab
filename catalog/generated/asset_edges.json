@@ -973,6 +973,11 @@
       "target_asset_id": "CTRL-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"
     },
     {
+      "source_asset_id": "CONFIG-LIST-A-CHRONOLOGICAL-CONFIRMATION-V1",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-FORGE-LIST-AWARE-RESEARCH-SCOPE-001"
+    },
+    {
       "source_asset_id": "CONFIG-MARKET-CONTEXT-DEFINITION-001",
       "relation": "consumes",
       "target_asset_id": "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"
@@ -1606,6 +1611,11 @@
       "source_asset_id": "CONTRACT-CANARY-SPECIFICATION-ONLY-001",
       "relation": "derived_from",
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-LIST-A-CHRONOLOGICAL-CONFIRMATION-V1",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-FORGE-LIST-AWARE-RESEARCH-SCOPE-001"
     },
     {
       "source_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001",
@@ -7396,6 +7406,11 @@
       "source_asset_id": "EVIDENCE-KCDN-ATOM-B-DELIVERY-INDEPENDENT-REVIEW-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-KCDN-ATOM-B-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-LIST-A-CONFIRMATION-PROTOCOL-FREEZE-V1",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-FORGE-LIST-AWARE-RESEARCH-SCOPE-001"
     },
     {
       "source_asset_id": "EVIDENCE-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001",
@@ -17101,6 +17116,11 @@
       "source_asset_id": "STRAT-V-EARLY-NETFLOW-TILT-V1-001",
       "relation": "governed_by",
       "target_asset_id": "SCHEMA-STRATEGY-VERSION-001"
+    },
+    {
+      "source_asset_id": "TASK-LIST-A-CONFIRMATION-PROTOCOL-FREEZE-V1",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-FORGE-LIST-AWARE-RESEARCH-SCOPE-001"
     },
     {
       "source_asset_id": "TASK-SMIAL-TRADING-CONTINUITY-AUDIT-REPAIR-V1",

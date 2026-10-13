@@ -1,0 +1,25 @@
+{
+  "protocol_core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+  "sample_binding_sha256": "9ce82941a13f4fc415f57d5a79a33ea34ce5b21600a0beff9c57afaee791baf1",
+  "result": "BOUND_CONTRACT_NOT_READY",
+  "design": "DESIGN_VALIDATED",
+  "binding_gaps": [
+    "CONFIRMATORY_REUSE_FORBIDDEN",
+    "INSUFFICIENT_POTENTIAL_SUPPORT",
+    "EXACT_APPROVED_SAMPLE_SCOPE_AND_END_NOT_BOUND",
+    "COMPLETE_EXPOSURE_PROVENANCE_NOT_ESTABLISHED",
+    "CURRENT_PROTECTION_NOT_VALIDATED"
+  ],
+  "accepted_task_raw_sha256": "9d3765ecca2aa626351b9eee8957f5bd99df66376c96fc89d7e64d7ec4067d8c",
+  "source_spec_raw_sha256": "4931c4c569fb2630e9b403b33185bd86b9ffe9ff0df06dd9bb0bec41f5040510",
+  "metadata_evidence_raw_sha256": "c01d47e84443335101e686494321dccf071d3298cddc05ed36cee64a687c889f",
+  "validation_sha256": "1fb0582af78a86a7c5f24c28e8f82f4367636b157fb01c1e1015f7871041bc82",
+  "config_raw_sha256": "4bfd2c80526d617f664e047ffa38f802722c5ca96211aed06992506bbc29be12",
+  "contract_raw_sha256": "4be4f46884ed742adbabaf5bb14f7ee37fa84e3a57263adf8162c609c5c94d6c",
+  "market_values_read": 0,
+  "scientific_looks": 0,
+  "runtime_writes": 0,
+  "provider_calls": 0,
+  "future_look_authorized": false,
+  "freeze_receipt_identity_sha256": "6019865d8e69faffa641dd3efb4bcb5405ad4cae314ed7e9b20063c0d98a3058"
+}

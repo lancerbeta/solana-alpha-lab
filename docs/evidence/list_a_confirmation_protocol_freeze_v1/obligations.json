@@ -1,0 +1,228 @@
+{
+  "schema": "list-a-freeze-obligation-receipt",
+  "denominator": 12,
+  "scientific_terminal": "BOUND_CONTRACT_NOT_READY",
+  "full_real_binding_freeze": "BLOCKED",
+  "obligations": [
+    {
+      "id": "F01",
+      "expected": "Exact accepted input/base/native A identity",
+      "actual": "Packet SHA verified; frozen base and A definition match",
+      "status": "PASS",
+      "fidelity": "SEGMENT_PRODUCT_PATH_METADATA",
+      "readback_refs": [
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\validation.json",
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\cold-readback.json"
+      ],
+      "witnesses": [
+        "OWNER_SOURCE_SPEC_HASH_MISMATCH",
+        "NATIVE_MEMBERSHIP_A"
+      ],
+      "source_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md#10"
+    },
+    {
+      "id": "F02",
+      "expected": "A/AB true; B false; UNKNOWN is not complement",
+      "actual": "Native selector A=TRUE AB=TRUE B=FALSE UNKNOWN=UNKNOWN",
+      "status": "PASS",
+      "fidelity": "SEGMENT_PRODUCT_PATH_SYNTHETIC",
+      "readback_refs": [
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\validation.json",
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\cold-readback.json"
+      ],
+      "witnesses": [
+        "NATIVE_MEMBERSHIP_A",
+        "NATIVE_MEMBERSHIP_AB",
+        "NATIVE_MEMBERSHIP_B",
+        "NATIVE_MEMBERSHIP_UNKNOWN"
+      ],
+      "source_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md#10"
+    },
+    {
+      "id": "F03",
+      "expected": "Metadata only; no numeric/target state decoding; denied sources cannot bind",
+      "actual": "Native root/schedule seam; lexical allowlist skips all value/state subtrees; real metadata hashes unchanged",
+      "status": "PASS",
+      "fidelity": "SEGMENT_PRODUCT_PATH_METADATA_AND_CONTRACT_ONLY",
+      "readback_refs": [
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\validation.json",
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\cold-readback.json"
+      ],
+      "witnesses": [
+        "ALLOWLIST_IGNORES_VALUE_TOKENS",
+        "VALUE_TOKEN_ACCESS_LOG"
+      ],
+      "source_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md#10"
+    },
+    {
+      "id": "F04",
+      "expected": "Exposure provenance and current protection required independently of labels",
+      "actual": "Shape-valid UNKNOWN/pending/current protection refusals pass; actual provenance/current protection not validated",
+      "status": "PARTIAL",
+      "fidelity": "CONTRACT_ONLY_REAL_BINDINGS_BLOCKED",
+      "readback_refs": [
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\validation.json",
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\cold-readback.json"
+      ],
+      "witnesses": [
+        "GUARD_exposure",
+        "GUARD_pending",
+        "GUARD_current_protection",
+        "GUARD_confirmatory_reuse_forbidden",
+        "FALSE_HOLDOUT_NOT_UNTOUCHED",
+        "STRICTER_CURRENT_PROTECTION_REFUSED",
+        "POTENTIAL_BLOCK_SCREEN_REFUSED"
+      ],
+      "source_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md#10"
+    },
+    {
+      "id": "F05",
+      "expected": "Frozen source set remains exact; altered hash refused",
+      "actual": "Newer unrelated synthetic source ignored; source hash conflict refused; actual approved set remains UNBOUND",
+      "status": "PARTIAL",
+      "fidelity": "CONTRACT_ONLY_REAL_BINDING_BLOCKED",
+      "readback_refs": [
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\validation.json",
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\cold-readback.json"
+      ],
+      "witnesses": [
+        "NEW_UNRELATED_SOURCE_NO_FROZEN_SET_CHANGE",
+        "EXACT_SOURCE_CHANGED_HASH_REFUSED",
+        "IDENTICAL_EPISODE_COPY_DEDUP",
+        "CONFLICTING_EPISODE_COPY_REFUSED"
+      ],
+      "source_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md#10"
+    },
+    {
+      "id": "F06",
+      "expected": "Strict information boundary; naive time refusal; no fake development",
+      "actual": "Independent 04:35 boundary; equality fails; native naive time fails and E14400 deadline is04:05; actual chronology unbound",
+      "status": "PARTIAL",
+      "fidelity": "MODEL_ONLY_AND_SEGMENT_PRODUCT_PATH_SYNTHETIC",
+      "readback_refs": [
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\validation.json",
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\cold-readback.json"
+      ],
+      "witnesses": [
+        "BOUNDARY_ANCHOR",
+        "STRICT_EQUALITY_REFUSED",
+        "NATIVE_NAIVE_TIME_REFUSED",
+        "NATIVE_TARGET_DEADLINE",
+        "OVERLAP_REFUSED"
+      ],
+      "source_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md#10"
+    },
+    {
+      "id": "F07",
+      "expected": "Potential upper bounds never actual target sufficiency",
+      "actual": "Aligned14day48hblocks=7<30; actual mints<=24<30; 24h/48h possible blocks<=2/2; target coverage not read",
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY_AND_SEGMENT_PRODUCT_PATH_METADATA",
+      "readback_refs": [
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\validation.json",
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\cold-readback.json"
+      ],
+      "witnesses": [
+        "14_DAY_BLOCK_UPPER_ALIGNED",
+        "KNOWN_ACTUAL_UPPER_BELOW_SUPPORT"
+      ],
+      "source_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md#10"
+    },
+    {
+      "id": "F08",
+      "expected": "Episode mean/crossed weighting/ranks deterministic without empirical evaluation",
+      "actual": "Fraction delta +/-1/5; episode weighted3/10;16 crossed choices yield8 valid8empty; ranks103/3994",
+      "status": "PASS",
+      "fidelity": "MODEL_ONLY",
+      "readback_refs": [
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\validation.json",
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\cold-readback.json"
+      ],
+      "witnesses": [
+        "POSITIVE_MEAN",
+        "NEGATIVE_MEAN",
+        "EPISODE_NOT_CLUSTER_WEIGHT",
+        "CROSSED_CHOICES",
+        "SHARED_GROUP_WEIGHT_MEANS",
+        "NEAREST_RANK_1/40",
+        "NEAREST_RANK_39/40"
+      ],
+      "source_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md#10"
+    },
+    {
+      "id": "F09",
+      "expected": "Terminal priority and frozen boundary are exact",
+      "actual": "Supported/negative/inconclusive/insufficient/invalid/unbound table passes; equality zero handled",
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY",
+      "readback_refs": [
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\validation.json",
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\cold-readback.json"
+      ],
+      "witnesses": [
+        "RULE_SUPPORTED",
+        "RULE_NEGATIVE",
+        "RULE_48H_CROSS",
+        "RULE_LEAVE_ONE_ZERO",
+        "RULE_TINY",
+        "RULE_INVALID",
+        "RULE_UNBOUND_PRECEDENCE",
+        "RULE_EMPTY"
+      ],
+      "source_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md#10"
+    },
+    {
+      "id": "F10",
+      "expected": "Core/sample/raw/seed domains distinct; no self reference",
+      "actual": "Reorder stable; delta/block/source changes identity; seeds independently recomputed; raw hash as core refused",
+      "status": "PASS",
+      "fidelity": "CONTRACT_ONLY",
+      "readback_refs": [
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\validation.json",
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\cold-readback.json"
+      ],
+      "witnesses": [
+        "CORE_REORDER_SAME",
+        "MEANING_CHANGE_DIFFERENT_CORE",
+        "BLOCK_CHANGE_DIFFERENT_CORE",
+        "SOURCE_CHANGE_DIFFERENT_SAMPLE",
+        "SEED_INDEPENDENT_BYTES_86400",
+        "SEED_INDEPENDENT_BYTES_172800"
+      ],
+      "source_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md#10"
+    },
+    {
+      "id": "F11",
+      "expected": "Fresh process rereads exact persisted bytes and readiness",
+      "actual": "Fresh process PASS_COLD_ARTIFACT_CONSUMER with BOUND_CONTRACT_NOT_READY;5 altered copies refused, including each foreign receipt digest with recomputed valid self identity",
+      "status": "PASS",
+      "fidelity": "SEGMENT_ARTIFACT_CONSUMER",
+      "readback_refs": [
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\validation.json",
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\cold-readback.json"
+      ],
+      "witnesses": [
+        "cold-readback.json"
+      ],
+      "source_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md#10"
+    },
+    {
+      "id": "F12",
+      "expected": "Durable scoped navigation/cleanup/authority and single resume point",
+      "actual": "Standard incremental generated navigation applied with impacted-closure no-op replay; owned scratch removed; scoped contract-only diff; no runtime/science writer; exact single resume point",
+      "status": "PASS",
+      "fidelity": "DELIVERY_ONLY",
+      "readback_refs": [
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\validation.json",
+        "docs\\evidence\\list_a_confirmation_protocol_freeze_v1\\cold-readback.json"
+      ],
+      "witnesses": [
+        "cleanup.json",
+        "READOUT.md"
+      ],
+      "source_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md#10"
+    }
+  ],
+  "future_confirmer_and_real_science": "NOT_EXECUTED_OUT_OF_SCOPE",
+  "no_percent_science_readiness_claim": true
+}
