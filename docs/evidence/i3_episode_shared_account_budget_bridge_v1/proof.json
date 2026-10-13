@@ -1,0 +1,90 @@
+{
+  "schema": "smial.i3-shared-account-budget-proof",
+  "schema_version": "1.0",
+  "task_id": "I3_EPISODE_SHARED_ACCOUNT_BUDGET_BRIDGE_V1",
+  "evidence_class": "DISPOSABLE_SQLITE_AND_SYNTHETIC_TRANSPORT_NOT_PRODUCTION_COMMISSIONING",
+  "production_provider_calls": 0,
+  "production_writes": 0,
+  "input_falsifier": {
+    "receipt": "local/i3_episode_continuity_preflight_v1/continuity-preflight-receipt.json",
+    "receipt_self_sha256": "4f25a20520716dcc2e6121a8ea92d3992c7bc4dd6a2cd9d57791da0aa55744fa",
+    "named_blocker": "SHARED_PROVIDER_BUDGET_RESETS_ON_ACTIVATION",
+    "before": {"predecessor_gate": "BLOCKED_BUDGET", "successor_gate": null,
+               "predecessor_day_calls": 1200, "successor_day_calls": 4,
+               "predecessor_lifetime_calls": 2000000, "successor_lifetime_calls": 4},
+    "after_unmanaged_store": {"successor_gate": null, "meaning": "default-off: unchanged until commissioning"},
+    "after_commissioned_store": {"successor_gate": "BLOCKED_BUDGET", "budget_scope": "SHARED_ACCOUNT",
+                                 "budget_dimension": "SHARED_DAY_PROVIDER_CALLS", "used": 1204,
+                                 "requested_debit": 1, "limit": 1200, "policy_revision": 1}
+  },
+  "root_cause": "_Accounting loaded day/lifetime counters by (schedule_sha256, activation_id) only; a new activation identity saw empty counters while the account pace was already store-wide.",
+  "risk_matrix": {
+    "suite": "tests/test_observation_shared_account_budget_v1.py",
+    "tests": 16,
+    "result": "PASS",
+    "cases": {
+      "original_falsifier": "test_original_falsifier_unmanaged_reset_then_managed_refusal",
+      "daily_boundary_any_identity": "test_daily_boundary_exactly_one_more_call_from_any_identity",
+      "lifetime_across_day_activation_revision": "test_lifetime_debt_survives_utc_day_activation_and_revision",
+      "credits_registry_cost": "test_credits_exhaust_separately_with_registry_cost",
+      "second_account_and_scope_replacement": "test_second_account_store_is_independent_and_scope_cannot_be_replaced",
+      "native_inherit_and_binding_loss": "test_new_native_activation_inherits_and_binding_loss_fails_closed",
+      "concurrent_last_call_and_stale_snapshot": "test_two_handles_last_debit_at_most_one_allowance_and_no_stale_snapshot",
+      "atomic_day_lifetime_commit": "test_day_and_lifetime_debit_commit_together",
+      "policy_lower_raise_local_bound": "test_policy_lower_raise_keeps_debt_and_local_grant_bound",
+      "commissioning_fresh_stale_restore": "test_commissioning_includes_spend_after_prepare_and_refuses_stale_or_restore",
+      "backup_restore_continuity": "test_backup_copy_restores_same_debt_and_refuses_bypass",
+      "pre_bridge_readonly_schema": "test_readonly_pre_bridge_schema_reads_as_unmanaged",
+      "bounded_gate_cost": "test_shared_gate_cost_is_bounded_index_reads",
+      "replay_new_occurrence_midnight": "test_replay_and_new_occurrence_and_midnight_across_two_activations",
+      "successor_blocked_before_transport_and_start": "test_shared_exhaustion_blocks_successor_before_transport_and_start",
+      "native_late_successor_public_tick": "test_native_late_successor_on_public_tick_shares_one_account"
+    },
+    "oracle": "authored event trace and raw SQL over member rows; transport spy counts sends; production aggregation helper is never the oracle"
+  },
+  "targeted_mutation": {
+    "shared_gate_disabled": {"controls": 5, "failed_or_errored": 5},
+    "default_tick_order_by_hash_only": {"controls": 1, "failed": 1},
+    "reproduce": "monkeypatch _Accounting._shared_gate -> None, or scripts.observation_schedule._tick_candidates_as_of -> sorted by digest; run the named controls"
+  },
+  "regression": {
+    "modules": 23,
+    "tests": 374,
+    "result": "PASS",
+    "scope": "every test module referencing _Accounting, counters, tick_once, the default tick CLI or account_envelope"
+  },
+  "dispatch_geometry_before_after": {
+    "fixture": "preflight joint bucket: 259 A + 40 B due claims, 4 SEARCH, default CLI tick, latency 1s and 8s",
+    "baseline": {"source": "local/i3_episode_continuity_preflight_v1/dispatch-probes.json",
+                 "sha256": "87b289cd3afa5bec6e70f6ef4815bc72faafe8061650c9ecf08045803f3766d4",
+                 "code": "installed 4378c5b82f2dc309ccd629b267affd5d19b34995"},
+    "candidate_managed": {"sha256": "5a40c8dc5f88fba011e1d3a3458d95f925ed0daee39f2be52b73113f8b86ff62",
+                          "members": {"ACT-4744D4017AC4B196": "COMMISSIONING", "ACT-9D3327EB9C791265": "NATIVE_ACTIVATION"}},
+    "candidate_unmanaged": {"sha256": "7e36f5c00d5be8a4ce802ab0bcf857d11edd7ae8052d12ae558720d795ca25e5"},
+    "latency_1s": {"search_request_times_identical": true, "seconds_after_assigned": [16, 20, 24, 28],
+                   "clock_elapsed_seconds": 41.0, "terminal": "TICK_COMPLETE", "shared_day_calls": 7, "sends": 7},
+    "latency_8s": {"search_request_times_identical": true, "seconds_after_assigned": [16, 27, 38, 49],
+                   "clock_elapsed_seconds": 79.0, "terminal": "TICK_PARTIAL", "b_stop_reason": "PACE_WAIT",
+                   "next_timer_recovery": "TICK_COMPLETE", "shared_day_calls": 6, "sends": 6},
+    "process_wall_seconds": {"managed": [1.438, 1.712], "unmanaged": [1.423, 1.714]},
+    "probe_script_sha256": "c83c12e10f75638ea78ec55a5c302600cd77a0ee17e8b9af44820ed8ec9976f4",
+    "reproduce": "local/i3_shared_account_budget_bridge_v1/dispatch_probe_shared.py with SHARED_BUDGET=1|0 (reads preflight inputs; outside Git)"
+  },
+  "gate_cost": {
+    "fixture": "62 members, 60 historical scopes x 30 UTC days",
+    "managed_microseconds_per_gate": 115,
+    "unmanaged_microseconds_per_gate": 7,
+    "managed_peak_python_alloc_bytes": 26330,
+    "query_plan": "member index plus accounting_counters primary key; no counter table scan, no payload/body reads",
+    "pace_seconds": 3,
+    "production_peak_rss": "UNKNOWN"
+  },
+  "immutable_pins_untouched": {
+    "A_activation": "ACT-4744D4017AC4B196",
+    "A_schedule_sha256": "4744d4017ac4b19625c5ee11ce4e20fdd4b36c6744f8c0889467052e2a6ef23c",
+    "A_authority_sha256": "c2c937b4462b28f45a423bb42d702c3052f9a996bf4d399e58168d6e378db038",
+    "A_storage_envelope_sha256": "fa6450ba0fd9da64fa3792c8b5de0c22aacf948589f7e9b1e8e78ae236b8dcad",
+    "protection_sha256": "f70a7f2d82b27bd39b1affbb72be339401bb0d223275965ce68df795112ec3ef",
+    "mechanism": "membership/policy rows are external operational control; no frozen V1 document gains a field or a recomputed SHA"
+  }
+}

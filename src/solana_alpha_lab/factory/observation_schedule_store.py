@@ -879,6 +879,9 @@ class ObservationScheduleStore:
     ) -> dict[str, Any]:
         """Resolve UNMANAGED / MANAGED / NOT_MEMBER / CORRUPT for one caller."""
 
+        if not self._account_budget_tables_present():
+            # A read-only copy of a pre-bridge schema cannot hold managed rows.
+            return {"mode": "UNMANAGED"}
         scopes = self._conn.execute(
             "SELECT account_scope_id FROM account_budget_scopes"
         ).fetchall()
@@ -914,7 +917,44 @@ class ObservationScheduleStore:
                     "account_scope_id": scope_id}
         return {"mode": "MANAGED", "account_scope_id": scope_id, "policy": policy}
 
+    def _account_budget_tables_present(self) -> bool:
+        rows = self._conn.execute(
+            "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN "
+            "('account_budget_scopes', 'account_budget_policies', 'account_budget_members')"
+        ).fetchone()
+        return int(rows[0]) == 3
+
+    def account_budget_candidate_members(self) -> list[dict[str, Any]]:
+        """Every activation plus any counter scope lacking an activation row."""
+
+        activations = {
+            (str(row["schedule_sha256"]), str(row["activation_id"])): str(row["state"])
+            for row in self._conn.execute(
+                "SELECT schedule_sha256, activation_id, state FROM schedule_activations"
+            ).fetchall()
+        }
+        counter_keys = {
+            (str(row[0]), str(row[1]))
+            for sql in (
+                "SELECT DISTINCT schedule_sha256, activation_id FROM accounting_counters",
+                "SELECT DISTINCT schedule_sha256, activation_id FROM lifetime_counters",
+            )
+            for row in self._conn.execute(sql).fetchall()
+        }
+        return [
+            {
+                "schedule_sha256": digest,
+                "activation_id": activation_id,
+                "state": activations.get(
+                    (digest, activation_id), "COUNTER_SCOPE_WITHOUT_ACTIVATION"
+                ),
+            }
+            for digest, activation_id in sorted(set(activations) | counter_keys)
+        ]
+
     def account_budget_scope(self) -> dict[str, Any] | None:
+        if not self._account_budget_tables_present():
+            return None
         row = self._conn.execute(
             "SELECT * FROM account_budget_scopes ORDER BY account_scope_id LIMIT 2"
         ).fetchall()

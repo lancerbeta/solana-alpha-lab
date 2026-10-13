@@ -1,0 +1,17 @@
+[
+  {
+    "claim_id": "I3_SHARED_BUDGET",
+    "claim": "In a commissioned ops store every provider call gate admits a request only if the shared day-call, day-credit and cumulative-call debits of all member activations stay within one owner-approved allocation, in addition to the unchanged activation-local caps.",
+    "scope": "Controlled callers of one ops store bound to one runtime credential locator. Shared totals are sums of the existing per-activation counter rows read fresh under the writer lease; no second ledger, no counter copy, no reset. External callers of the same key remain UNKNOWN."
+  },
+  {
+    "claim_id": "I3_NO_RESET_SUCCESSION",
+    "claim": "A new activation created through any native activation path inherits the managed account in the same commit, so A->B, a new UTC day or a policy revision never opens a fresh cumulative budget; a lost binding fails closed before transport.",
+    "scope": "Store-level activation inserts (upsert_activation and transition_activation). Existing reservation, recovery, midnight and PACE_WAIT semantics are unchanged; the late-successor lifecycle rules are unchanged."
+  },
+  {
+    "claim_id": "I3_AUTHORITY",
+    "claim": "Engineering evidence makes the bridge code ready for the exact merge gate while deploy, commissioning on the running A and any B activation remain separately authorized OPERATE work.",
+    "scope": "No change to ACT-4744D4017AC4B196, its grant, frozen schedule, storage envelope, protection, C1/C2, provider calls, timers or science. The bridge is default-off until commissioning."
+  }
+]

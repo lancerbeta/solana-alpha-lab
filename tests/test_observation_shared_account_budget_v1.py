@@ -362,6 +362,19 @@ class SharedAccountBudgetStoreTests(unittest.TestCase):
         self.assertEqual(_Accounting(restored, schedule(B), B[1], T0).gate(now=T0), "BLOCKED_BUDGET")
         restored.release_lease(lease)
 
+    def test_readonly_pre_bridge_schema_reads_as_unmanaged(self):
+        for table in ("account_budget_members", "account_budget_policies", "account_budget_scopes"):
+            self.fx.store._conn.execute(f"DROP TABLE {table}")
+        self.fx.store._conn.commit()
+        self.fx.store.close()
+        old = ObservationScheduleStore(self.fx.path, readonly=True, immutable=False)
+        self.addCleanup(old.close)
+        self.assertEqual(old.account_budget_binding(schedule_sha256=A[0], activation_id=A[1]), {"mode": "UNMANAGED"})
+        self.assertIsNone(old.account_budget_scope())
+        self.assertEqual(old._account_envelope(A, T0)["status"], "UNKNOWN")
+        self.fx = StoreFixture(Path(self.tmp.name))
+        self.addCleanup(self.fx.store.close)
+
     def test_shared_gate_cost_is_bounded_index_reads(self):
         self.fx.commission()
         for index in range(60):

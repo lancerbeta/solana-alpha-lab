@@ -67,32 +67,6 @@ def _identity(account_scope_id: str, credential_locator: str) -> None:
         raise AccountBudgetError("CREDENTIAL_LOCATOR_INVALID")
 
 
-def _member_scopes(store: ObservationScheduleStore) -> list[dict[str, Any]]:
-    """Every activation plus any counter scope without an activation row."""
-
-    conn = store._conn
-    activations = {
-        (str(row["schedule_sha256"]), str(row["activation_id"])): str(row["state"])
-        for row in conn.execute(
-            "SELECT schedule_sha256, activation_id, state FROM schedule_activations"
-        ).fetchall()
-    }
-    counter_keys = {
-        (str(row[0]), str(row[1]))
-        for table in ("accounting_counters", "lifetime_counters")
-        for row in conn.execute(f"SELECT DISTINCT schedule_sha256, activation_id FROM {table}")
-    }
-    keys = sorted(set(activations) | counter_keys)
-    return [
-        {
-            "schedule_sha256": digest,
-            "activation_id": activation_id,
-            "state": activations.get((digest, activation_id), "COUNTER_SCOPE_WITHOUT_ACTIVATION"),
-        }
-        for digest, activation_id in keys
-    ]
-
-
 def _member_debits(store: ObservationScheduleStore, member: Mapping[str, Any], utc_day: str) -> dict[str, int]:
     day = store.load_accounting(
         schedule_sha256=member["schedule_sha256"], activation_id=member["activation_id"], utc_day=utc_day
@@ -133,7 +107,7 @@ def prepare_account_budget(
     bounded = _limits(limits)
     utc_day = now.astimezone(UTC).strftime("%Y-%m-%d")
     existing = store.account_budget_scope()
-    members = _member_scopes(store)
+    members = store.account_budget_candidate_members()
     totals = {"day_provider_calls": 0, "day_modeled_credits": 0, "lifetime_provider_calls": 0}
     rows = []
     for member in members:
