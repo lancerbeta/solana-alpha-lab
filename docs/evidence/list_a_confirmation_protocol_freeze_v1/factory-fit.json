@@ -4,8 +4,8 @@
   "review_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1-FACTORY-FIT",
   "as_of": "2026-10-13",
   "task_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1",
-  "reviewed_bindings_sha256": "43988d64c879e5ddad12a42aa643532d55059d48daccc037b675193f00f21ecd",
-  "reviewed_inventory_sha256": "1fcbc75d3ac4b8258e830aada08119e982d5998a03fb433b8e2af1b8f21bf8ea",
+  "reviewed_bindings_sha256": "9d78702a210331c3a2acfe141e3b3231706509e9db3838fe167b8d5989491d8b",
+  "reviewed_inventory_sha256": "c6df23bbce9bd36509b54780aabd21ac52b31dae0b0ce21fd552c59fd07ec5b8",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
