@@ -6373,6 +6373,16 @@
       "target_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001"
     },
     {
+      "source_asset_id": "DOC-SMIAL-SYNTHETIC-LIFECYCLE-SMOKE-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-EXPERIMENT-EVIDENCE-DECISION-001"
+    },
+    {
+      "source_asset_id": "DOC-SMIAL-SYNTHETIC-LIFECYCLE-SMOKE-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
       "source_asset_id": "DOC-SMIAL-VISUAL-OPERATING-SYSTEM-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-SMIAL-VISUAL-OPERATING-SYSTEM-001"

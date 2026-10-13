@@ -1,0 +1,2673 @@
+{
+  "assembler_canaries": {
+    "missing_required_run": "PASS",
+    "truncated_required_suite": "PASS",
+    "two_segments_never_full": "PASS"
+  },
+  "authored_positive_controls": [
+    {
+      "actor_fidelity": "SCRIPTED",
+      "exact_request_replay_zero_write": true,
+      "family": "SIMPLE",
+      "grounding": "GROUNDED",
+      "independent_oracle": {
+        "baseline_mean": "0.0751953125",
+        "by_cohort": [
+          {
+            "cohort": 0,
+            "contrast": "0.0604375",
+            "n": 16
+          },
+          {
+            "cohort": 1,
+            "contrast": "0.060625",
+            "n": 16
+          },
+          {
+            "cohort": 2,
+            "contrast": "0.0606875",
+            "n": 16
+          },
+          {
+            "cohort": 3,
+            "contrast": "0.05953125",
+            "n": 16
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "0.0603203125",
+        "family": "SIMPLE",
+        "lab_positive": true,
+        "n": 64,
+        "partition": "DISCOVERY",
+        "population_n": 128,
+        "selected_mean": "0.135515625"
+      },
+      "matched_n": 64,
+      "origin": "AUDIT_AUTHORED_FIXTURE",
+      "population_n": 128,
+      "registered_replay": "PASS",
+      "session_id": "HFIC-SESS-A2C472E331496A73"
+    },
+    {
+      "actor_fidelity": "SCRIPTED",
+      "exact_request_replay_zero_write": true,
+      "family": "COMPOUND",
+      "grounding": "GROUNDED",
+      "independent_oracle": {
+        "baseline_mean": "0.0751953125",
+        "by_cohort": [
+          {
+            "cohort": 0,
+            "contrast": "0.120500",
+            "n": 8
+          },
+          {
+            "cohort": 1,
+            "contrast": "0.117750",
+            "n": 8
+          },
+          {
+            "cohort": 2,
+            "contrast": "0.119750",
+            "n": 8
+          },
+          {
+            "cohort": 3,
+            "contrast": "0.12071875",
+            "n": 8
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "0.1196796875",
+        "family": "COMPOUND",
+        "lab_positive": true,
+        "n": 32,
+        "partition": "DISCOVERY",
+        "population_n": 128,
+        "selected_mean": "0.194875"
+      },
+      "matched_n": 32,
+      "origin": "AUDIT_AUTHORED_FIXTURE",
+      "population_n": 128,
+      "registered_replay": "PASS",
+      "session_id": "HFIC-SESS-3C473AA4550B430D"
+    }
+  ],
+  "campaign_id": "SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1",
+  "continuity": {
+    "aggregate_verdict": "SEGMENT_ONLY_LONG_PATH_BLOCKED",
+    "bridges": [
+      {
+        "bridge_id": "BR-01",
+        "bypassed_producers": [
+          "ACCEPTED_CHRONOLOGICAL_CONFIRMATION",
+          "RAW_TO_EPISODE_SCIENTIFIC_IDENTITY_CONVERSION"
+        ],
+        "consumed_original_forge_candidate": false,
+        "cut": "FROZEN_RAW_FORGE_CANDIDATE -> SCIENTIFIC_PROTOCOL_AND_EPISODE_RUNTIME",
+        "right_segment": {
+          "bridge_id": "BR-01",
+          "fidelity": "SEGMENT_PRODUCT_PATH",
+          "raw_to_paper": false,
+          "science_evidence_origin": "EXPLICIT_EXISTING_SYNTHETIC_FIXTURE",
+          "source_to_reconciliation": true,
+          "status": "PASS",
+          "strategies": [
+            {
+              "attempts": 2,
+              "modeled_net": "7.37",
+              "native_raw_candidate_consumed": false,
+              "right_boundary": "ORDINARY_PAPER_RECONCILIATION_AND_FRESH_PROCESS_READBACK",
+              "state": "RECONCILED",
+              "strategy": 1
+            },
+            {
+              "attempts": 2,
+              "modeled_net": "7.37",
+              "native_raw_candidate_consumed": false,
+              "right_boundary": "ORDINARY_PAPER_RECONCILIATION_AND_FRESH_PROCESS_READBACK",
+              "state": "RECONCILED",
+              "strategy": 2
+            }
+          ]
+        },
+        "substitute": "EXISTING_EXPLICIT_DIRECT_SYNTHETIC_EPISODE_SCIENCE_FIXTURES"
+      }
+    ],
+    "full_forge_to_science_to_trading": "BLOCKED",
+    "last_native_prefix_boundary": "AUTHORED_INGRESS -> MAIN -> DRAFT -> FREEZE -> GENUINE_CRITIC -> FINALIZE -> OWNER_FINAL_COLD_READBACK"
+  },
+  "forge_terminal_readback": [
+    {
+      "cold_zero_write": true,
+      "family": "SIMPLE",
+      "next": "READ_SAVED_RESULT",
+      "operation_state": "COMPLETED",
+      "owner_class": "OWNER_FINAL",
+      "terminal": "KILL_UNBOUND_EVIDENCE"
+    },
+    {
+      "cold_zero_write": true,
+      "family": "COMPOUND",
+      "next": "READ_SAVED_RESULT",
+      "operation_state": "COMPLETED",
+      "owner_class": "OWNER_FINAL",
+      "terminal": "KILL_UNBOUND_EVIDENCE"
+    }
+  ],
+  "frozen_denominator_sha256": "db53d73552053f1bd5cf79a7446e4cdde06455683414ca89fa1b6ab09f60b990",
+  "genuine_trials": [
+    {
+      "reason": "NO_OS_CONFINED_FRESH_ACTOR",
+      "status": "BLOCKED_ENVIRONMENT",
+      "trial": "POS-1"
+    },
+    {
+      "reason": "NO_OS_CONFINED_FRESH_ACTOR",
+      "status": "BLOCKED_ENVIRONMENT",
+      "trial": "POS-2"
+    },
+    {
+      "reason": "NO_OS_CONFINED_FRESH_ACTOR",
+      "status": "BLOCKED_ENVIRONMENT",
+      "trial": "POS-3"
+    },
+    {
+      "reason": "NO_OS_CONFINED_FRESH_ACTOR",
+      "status": "BLOCKED_ENVIRONMENT",
+      "trial": "NULL-1"
+    }
+  ],
+  "historical_failed_test_records": [
+    {
+      "attempt": "sls-v1-recovery-a1",
+      "campaign_seq": 201,
+      "failed_subtests": [
+        {
+          "error_type": "IndexError",
+          "id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy (control='ENVELOPE')"
+        },
+        {
+          "error_type": "IndexError",
+          "id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy (control='RUNTIME_POLICY')"
+        }
+      ],
+      "kind": "TEST_TERMINAL",
+      "metrics": {
+        "controls": [
+          "ENVELOPE_REVISION_2_10_USD",
+          "RUNTIME_POLICY_ENTRIES_DISABLED"
+        ],
+        "external_effects": 0,
+        "idempotent_reconcile": true,
+        "original_attempts": 0,
+        "restored_attempts": 0
+      },
+      "seconds": 1.036765,
+      "seq": 3,
+      "snapshots": [
+        {
+          "bytes": 3332,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/catalog/schemas/execution_evidence_binding_v1.schema.json",
+          "sha256": "98ba162ba3940b816a2d652df23db24ecf8ff0046aea5a0b08a90ea93959d3f4"
+        },
+        {
+          "bytes": 1837,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/catalog/schemas/exit_decision_v1.schema.json",
+          "sha256": "03946bcf1661afb94852efe8299ee02429e69ae3bffa199bb6a743c9f2cc5366"
+        },
+        {
+          "bytes": 3228,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/catalog/schemas/experiment_spec.schema.json",
+          "sha256": "c42e374fc942b168ea30d25f901b81bde04861426003492061d37d651c60bc69"
+        },
+        {
+          "bytes": 12528,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/catalog/schemas/owner_lifecycle_projection_v1.schema.json",
+          "sha256": "d4cadc225fc20c7a0217099ffceac8d57786a94750d20acfe767ae947189532f"
+        },
+        {
+          "bytes": 2670,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/catalog/schemas/promotion_handoff_manifest_v1.schema.json",
+          "sha256": "b33b7a5c8728360d654ce41c260c3f4436a0da616aaf993d71575ee02d7407fd"
+        },
+        {
+          "bytes": 2980,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/catalog/schemas/promotion_handoff_manifest_v1_1.schema.json",
+          "sha256": "457dd7308680374a0b74319877be878f57dd0e6ecccde4413591656150ce77bd"
+        },
+        {
+          "bytes": 2094,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/catalog/schemas/signal_decision_v1.schema.json",
+          "sha256": "e03caf41d09516f299f6422b916465267a6f8a37118c3be4a3c72bb601636c21"
+        },
+        {
+          "bytes": 3764,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/catalog/schemas/strategy_version_v1_1.schema.json",
+          "sha256": "77a510286994c973b6363286f03a401183b5a5f07159861d66041a6be2845015"
+        },
+        {
+          "bytes": 1900,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/configs/owner_lifecycle_projection_v1.yaml",
+          "sha256": "52f9bb6dbbaf6c5ec8c92beea4d7a0f14df56944e42600f16cfb0135a205f58c"
+        },
+        {
+          "bytes": 99,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/local/offline-synth/offline_runtime.json",
+          "sha256": "875af34f3b6aef52b69656b2d3e36e96ddc913b323a3d5fd73a43d33a473c05e"
+        },
+        {
+          "bytes": 278528,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/local/offline-synth/source/observation_schedule_state.sqlite",
+          "sha256": "7efafe7fa89b2d8ad8fd0290341af1cfcce11802590a5f06b45c290d359bd5d8"
+        },
+        {
+          "bytes": 287,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/local/offline-synth/source/protection/assignments/SYNTH-PROTECTION-ASSIGNMENT-V1.json",
+          "sha256": "ad9ef055f9bbf304e35018dbb8be7aee6ed328e6a89c404e5e2ff91d383a1569"
+        },
+        {
+          "bytes": 951,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/local/offline-synth/source/research/manifests/partitions/partition-456753220e8562809de25eb436380f137e632df364138c5e0372c4bbf86f88ab.json",
+          "sha256": "628a5f4125a1c325687d250565dc444b053202ab3b5cd75c8cb3deff4a55d79e"
+        },
+        {
+          "bytes": 847,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/local/offline-synth/source/research/manifests/partitions/partition-c56ce4d42d604724cd77a22bc7cd72576295aa52b6064d47a4c31cf7872ad448.json",
+          "sha256": "dcf3dca63100cba0f9232ecb6448d218be04501127874f0986ce87be9bc0a95b"
+        },
+        {
+          "bytes": 847,
+          "path": "snapshots/0001-test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy/repo/local/offline-synth/source/research/manifests/partitions/partition-f6cb632fb32e70d2332593ef57a1fea3ac803e52274aa920b21400c9a0fcdeb4.json",
+          "sha256": "20d58961db7153e329f440da89fbadc1451ce189d3b9c17df2511a3961b2a6c8"
+        }
+      ],
+      "status": "ERROR",
+      "test_id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy"
+    },
+    {
+      "attempt": "sls-v1-recovery-a1",
+      "campaign_seq": 203,
+      "error_type": "IndexError",
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.175384,
+      "seq": 5,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_configuration_chain_damage_or_omission_cannot_acknowledge_restore"
+    },
+    {
+      "attempt": "sls-v1-recovery-a1",
+      "campaign_seq": 205,
+      "error_type": "IndexError",
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.520253,
+      "seq": 7,
+      "snapshots": [
+        {
+          "bytes": 3332,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/catalog/schemas/execution_evidence_binding_v1.schema.json",
+          "sha256": "98ba162ba3940b816a2d652df23db24ecf8ff0046aea5a0b08a90ea93959d3f4"
+        },
+        {
+          "bytes": 1837,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/catalog/schemas/exit_decision_v1.schema.json",
+          "sha256": "03946bcf1661afb94852efe8299ee02429e69ae3bffa199bb6a743c9f2cc5366"
+        },
+        {
+          "bytes": 3228,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/catalog/schemas/experiment_spec.schema.json",
+          "sha256": "c42e374fc942b168ea30d25f901b81bde04861426003492061d37d651c60bc69"
+        },
+        {
+          "bytes": 12528,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/catalog/schemas/owner_lifecycle_projection_v1.schema.json",
+          "sha256": "d4cadc225fc20c7a0217099ffceac8d57786a94750d20acfe767ae947189532f"
+        },
+        {
+          "bytes": 2670,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/catalog/schemas/promotion_handoff_manifest_v1.schema.json",
+          "sha256": "b33b7a5c8728360d654ce41c260c3f4436a0da616aaf993d71575ee02d7407fd"
+        },
+        {
+          "bytes": 2980,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/catalog/schemas/promotion_handoff_manifest_v1_1.schema.json",
+          "sha256": "457dd7308680374a0b74319877be878f57dd0e6ecccde4413591656150ce77bd"
+        },
+        {
+          "bytes": 2094,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/catalog/schemas/signal_decision_v1.schema.json",
+          "sha256": "e03caf41d09516f299f6422b916465267a6f8a37118c3be4a3c72bb601636c21"
+        },
+        {
+          "bytes": 3764,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/catalog/schemas/strategy_version_v1_1.schema.json",
+          "sha256": "77a510286994c973b6363286f03a401183b5a5f07159861d66041a6be2845015"
+        },
+        {
+          "bytes": 1900,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/configs/owner_lifecycle_projection_v1.yaml",
+          "sha256": "52f9bb6dbbaf6c5ec8c92beea4d7a0f14df56944e42600f16cfb0135a205f58c"
+        },
+        {
+          "bytes": 99,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/local/offline-synth/offline_runtime.json",
+          "sha256": "875af34f3b6aef52b69656b2d3e36e96ddc913b323a3d5fd73a43d33a473c05e"
+        },
+        {
+          "bytes": 278528,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/local/offline-synth/source/observation_schedule_state.sqlite",
+          "sha256": "20d93145740ad207a4ea09529edf5bab457eb9d510b0c72839400b76f1482636"
+        },
+        {
+          "bytes": 287,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/local/offline-synth/source/protection/assignments/SYNTH-PROTECTION-ASSIGNMENT-V1.json",
+          "sha256": "ad9ef055f9bbf304e35018dbb8be7aee6ed328e6a89c404e5e2ff91d383a1569"
+        },
+        {
+          "bytes": 847,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/local/offline-synth/source/research/manifests/partitions/partition-c56ce4d42d604724cd77a22bc7cd72576295aa52b6064d47a4c31cf7872ad448.json",
+          "sha256": "dcf3dca63100cba0f9232ecb6448d218be04501127874f0986ce87be9bc0a95b"
+        },
+        {
+          "bytes": 951,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/local/offline-synth/source/research/manifests/partitions/partition-d5a80c8135c037fab1719d9880982b898e351d3ff840c9cca112a2f1a3965a23.json",
+          "sha256": "0d9d3e50d137fa9e23ea55b452f43439a29c09783d241871fb52d3719441acd7"
+        },
+        {
+          "bytes": 951,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/local/offline-synth/source/research/manifests/partitions/partition-ee0b5761aede5e18e925bd914df5a21b9625ddac18a82da264fe83377b4b8f1c.json",
+          "sha256": "8e37be5394af9c99d08b7a7e9d49a41dc6064ca70c1bf435f20c33fed3e90dfa"
+        },
+        {
+          "bytes": 847,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/local/offline-synth/source/research/manifests/partitions/partition-f6cb632fb32e70d2332593ef57a1fea3ac803e52274aa920b21400c9a0fcdeb4.json",
+          "sha256": "20d58961db7153e329f440da89fbadc1451ce189d3b9c17df2511a3961b2a6c8"
+        },
+        {
+          "bytes": 951,
+          "path": "snapshots/0002-test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit/repo/local/offline-synth/source/research/manifests/partitions/partition-fb6e5daa8b5fa5f2e2d1526c7a8d76c01ef18fb63ea47e69caf7ea63f6bc55e8.json",
+          "sha256": "bdab89fb5a73c356c332afb65d6c955f7d99fada43bff1eb33f372c57f3bcdfb"
+        }
+      ],
+      "status": "ERROR",
+      "test_id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit"
+    },
+    {
+      "attempt": "sls-v1-recovery-a1",
+      "campaign_seq": 207,
+      "error_type": "IndexError",
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.491369,
+      "seq": 9,
+      "snapshots": [
+        {
+          "bytes": 3332,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/catalog/schemas/execution_evidence_binding_v1.schema.json",
+          "sha256": "98ba162ba3940b816a2d652df23db24ecf8ff0046aea5a0b08a90ea93959d3f4"
+        },
+        {
+          "bytes": 1837,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/catalog/schemas/exit_decision_v1.schema.json",
+          "sha256": "03946bcf1661afb94852efe8299ee02429e69ae3bffa199bb6a743c9f2cc5366"
+        },
+        {
+          "bytes": 3228,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/catalog/schemas/experiment_spec.schema.json",
+          "sha256": "c42e374fc942b168ea30d25f901b81bde04861426003492061d37d651c60bc69"
+        },
+        {
+          "bytes": 12528,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/catalog/schemas/owner_lifecycle_projection_v1.schema.json",
+          "sha256": "d4cadc225fc20c7a0217099ffceac8d57786a94750d20acfe767ae947189532f"
+        },
+        {
+          "bytes": 2670,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/catalog/schemas/promotion_handoff_manifest_v1.schema.json",
+          "sha256": "b33b7a5c8728360d654ce41c260c3f4436a0da616aaf993d71575ee02d7407fd"
+        },
+        {
+          "bytes": 2980,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/catalog/schemas/promotion_handoff_manifest_v1_1.schema.json",
+          "sha256": "457dd7308680374a0b74319877be878f57dd0e6ecccde4413591656150ce77bd"
+        },
+        {
+          "bytes": 2094,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/catalog/schemas/signal_decision_v1.schema.json",
+          "sha256": "e03caf41d09516f299f6422b916465267a6f8a37118c3be4a3c72bb601636c21"
+        },
+        {
+          "bytes": 3764,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/catalog/schemas/strategy_version_v1_1.schema.json",
+          "sha256": "77a510286994c973b6363286f03a401183b5a5f07159861d66041a6be2845015"
+        },
+        {
+          "bytes": 1900,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/configs/owner_lifecycle_projection_v1.yaml",
+          "sha256": "52f9bb6dbbaf6c5ec8c92beea4d7a0f14df56944e42600f16cfb0135a205f58c"
+        },
+        {
+          "bytes": 99,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/local/offline-synth/offline_runtime.json",
+          "sha256": "875af34f3b6aef52b69656b2d3e36e96ddc913b323a3d5fd73a43d33a473c05e"
+        },
+        {
+          "bytes": 278528,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/local/offline-synth/source/observation_schedule_state.sqlite",
+          "sha256": "215f82f16139de713253d871bf31b9303587ec4dc2ad8fee34efa2d803f93255"
+        },
+        {
+          "bytes": 287,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/local/offline-synth/source/protection/assignments/SYNTH-PROTECTION-ASSIGNMENT-V1.json",
+          "sha256": "ad9ef055f9bbf304e35018dbb8be7aee6ed328e6a89c404e5e2ff91d383a1569"
+        },
+        {
+          "bytes": 951,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/local/offline-synth/source/research/manifests/partitions/partition-034adc34e9bc4c9e45cfa172de3e5f3749ed37ed7f30d5691a0e672ac7262d8e.json",
+          "sha256": "3ea620e86ca9f4dc77fe1358415af24cb127bf26108c62b2ab9e09d51bba72cc"
+        },
+        {
+          "bytes": 847,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/local/offline-synth/source/research/manifests/partitions/partition-c56ce4d42d604724cd77a22bc7cd72576295aa52b6064d47a4c31cf7872ad448.json",
+          "sha256": "dcf3dca63100cba0f9232ecb6448d218be04501127874f0986ce87be9bc0a95b"
+        },
+        {
+          "bytes": 951,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/local/offline-synth/source/research/manifests/partitions/partition-d5a80c8135c037fab1719d9880982b898e351d3ff840c9cca112a2f1a3965a23.json",
+          "sha256": "0d9d3e50d137fa9e23ea55b452f43439a29c09783d241871fb52d3719441acd7"
+        },
+        {
+          "bytes": 951,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/local/offline-synth/source/research/manifests/partitions/partition-ee0b5761aede5e18e925bd914df5a21b9625ddac18a82da264fe83377b4b8f1c.json",
+          "sha256": "8e37be5394af9c99d08b7a7e9d49a41dc6064ca70c1bf435f20c33fed3e90dfa"
+        },
+        {
+          "bytes": 847,
+          "path": "snapshots/0003-test_complete_cut_retains_known_cost_floor_before_later_unknown_total/repo/local/offline-synth/source/research/manifests/partitions/partition-f6cb632fb32e70d2332593ef57a1fea3ac803e52274aa920b21400c9a0fcdeb4.json",
+          "sha256": "20d58961db7153e329f440da89fbadc1451ce189d3b9c17df2511a3961b2a6c8"
+        }
+      ],
+      "status": "ERROR",
+      "test_id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_retains_known_cost_floor_before_later_unknown_total"
+    },
+    {
+      "attempt": "sls-v1-recovery-a1",
+      "campaign_seq": 209,
+      "error_type": "IndexError",
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.175931,
+      "seq": 11,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_unknown_entry_recovery_keeps_original_pending_identity_without_quote_resend"
+    },
+    {
+      "attempt": "sls-v1-recovery-a1",
+      "campaign_seq": 211,
+      "error_type": "IndexError",
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.174972,
+      "seq": 13,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_postclaim_entry_response_failure_keeps_original_pending_and_future_old_exit_in_same_run"
+    },
+    {
+      "attempt": "sls-v1-recovery-a1",
+      "campaign_seq": 213,
+      "failed_subtests": [
+        {
+          "error_type": "IndexError",
+          "id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart (version='1.1', outcome='NO_ROUTE')"
+        },
+        {
+          "error_type": "IndexError",
+          "id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart (version='1.1', outcome='REJECTED_BEFORE_SEND')"
+        },
+        {
+          "error_type": "IndexError",
+          "id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart (version='1.1', outcome='DROPPED_OR_EXPIRED_NOT_PROCESSED')"
+        },
+        {
+          "error_type": "IndexError",
+          "id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart (version='1.1', outcome='LANDED_FAILED')"
+        },
+        {
+          "error_type": "IndexError",
+          "id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart (version='1.0', outcome='NO_ROUTE')"
+        }
+      ],
+      "kind": "TEST_TERMINAL",
+      "metrics": {
+        "cases": [],
+        "quote_effects": 0
+      },
+      "seconds": 0.958517,
+      "seq": 15,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart"
+    },
+    {
+      "attempt": "sls-v1-recovery-a1",
+      "campaign_seq": 215,
+      "error_type": "IndexError",
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.177708,
+      "seq": 17,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_malformed_new_source_json_does_not_stop_ordinary_cli_before_future_old_exit"
+    },
+    {
+      "attempt": "sls-v1-trading-a1",
+      "campaign_seq": 291,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 17.641724,
+      "seq": 51,
+      "snapshots": [],
+      "status": "FAIL",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 305,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.410029,
+      "seq": 3,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 309,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.173729,
+      "seq": 7,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_virtual_two_weeks_history_sizes_and_incident_bound"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 311,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.191979,
+      "seq": 9,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C23_actual_egress_secret_and_non_target_canaries"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 313,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.201774,
+      "seq": 11,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_common_original_switch_lineage_blocks_ingress_and_readiness_before_first_effect"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 315,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.188168,
+      "seq": 13,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_current_switch_conflict_blocks_readiness_without_unknown_original_inventory_or_exit_starvation"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 317,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.175226,
+      "seq": 15,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_managed_native_public_paper_fill_retains_original_full_exit_and_cap_release"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 319,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.176885,
+      "seq": 17,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_managed_native_public_shadow_fill_retains_original_full_exit_and_cap_release"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 321,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.178994,
+      "seq": 19,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_modeled_entry_cannot_be_reclassified_as_native_public_fill"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 323,
+      "failed_subtests": [
+        {
+          "error_type": "IndexError",
+          "id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect (mode='PAPER', native_public_entry=True)"
+        },
+        {
+          "error_type": "IndexError",
+          "id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect (mode='SHADOW', native_public_entry=True)"
+        },
+        {
+          "error_type": "IndexError",
+          "id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect (mode='PAPER', native_public_entry=False)"
+        },
+        {
+          "error_type": "IndexError",
+          "id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect (mode='SHADOW', native_public_entry=False)"
+        }
+      ],
+      "kind": "TEST_TERMINAL",
+      "metrics": {
+        "cases": [],
+        "provider_calls": 0
+      },
+      "seconds": 0.209596,
+      "seq": 21,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 325,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.180714,
+      "seq": 23,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_native_successor_initialization_checks_previous_original_chain_atomically"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 327,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.181003,
+      "seq": 25,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_native_unmodeled_legacy_projection_cannot_free_managed_cap"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 329,
+      "failed_subtests": [
+        {
+          "error_type": "IndexError",
+          "id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A1_A2_default_false_shared_admission_uses_managed_envelope (count=1, money='60')"
+        },
+        {
+          "error_type": "IndexError",
+          "id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A1_A2_default_false_shared_admission_uses_managed_envelope (count=2, money='30')"
+        }
+      ],
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.381939,
+      "seq": 27,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A1_A2_default_false_shared_admission_uses_managed_envelope"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 331,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.178391,
+      "seq": 29,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A3_native_restore_fences_new_both_sides_preserves_replay_ack_exit"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 333,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.175041,
+      "seq": 31,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_binding_profile_envelope_corruption_fails_closed_at_direct_owner"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 335,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.181737,
+      "seq": 33,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_genuine_legacy_binding_and_exact_attempt_replay_remain_compatible"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 337,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.176159,
+      "seq": 35,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_missing_corrupt_state_and_legacy_activation_cannot_downgrade"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 339,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.177886,
+      "seq": 37,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_native_switch_failure_rolls_back_all_staged_scope"
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "campaign_seq": 341,
+      "kind": "TEST_TERMINAL",
+      "metrics": {},
+      "seconds": 0.178449,
+      "seq": 39,
+      "snapshots": [],
+      "status": "ERROR",
+      "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_observed_physical_clock_guard_at_cli_and_direct_owner"
+    }
+  ],
+  "independent_numeric_observer": {
+    "canaries": {
+      "empty_denominator": "PASS",
+      "failed_attempt": "PASS",
+      "numeric_corruption": "PASS",
+      "segment_aggregation": "PASS",
+      "unvisited_boundary": "PASS"
+    },
+    "new_main_calls": 0,
+    "observer": "INDEPENDENT_DECIMAL_ARITHMETIC_NO_PRODUCT_IMPORT",
+    "results": [
+      {
+        "baseline": "0.0751953125",
+        "checks": [
+          "DENOMINATOR",
+          "POOLED_MEAN",
+          "MEDIAN",
+          "TYPE7_QUANTILES",
+          "FRACTIONAL_ES10",
+          "BASELINE",
+          "FOUR_COHORT_MEANS"
+        ],
+        "contrast": "0.0603203125",
+        "family": "SIMPLE",
+        "matched_n": 64,
+        "mean": "0.135515625",
+        "membership_limit": "Product summary exposes cohort counts; selected identities not independently emitted.",
+        "population_n": 128,
+        "selected_membership_observed_in_product": false,
+        "status": "PASS"
+      },
+      {
+        "baseline": "0.0751953125",
+        "checks": [
+          "DENOMINATOR",
+          "POOLED_MEAN",
+          "MEDIAN",
+          "TYPE7_QUANTILES",
+          "FRACTIONAL_ES10",
+          "BASELINE",
+          "FOUR_COHORT_MEANS"
+        ],
+        "contrast": "0.1196796875",
+        "family": "COMPOUND",
+        "matched_n": 32,
+        "mean": "0.194875",
+        "membership_limit": "Product summary exposes cohort counts; selected identities not independently emitted.",
+        "population_n": 128,
+        "selected_membership_observed_in_product": false,
+        "status": "PASS"
+      }
+    ],
+    "source_pins": [
+      {
+        "artifact": "SIMPLE-context.json",
+        "sha256": "3972fa2b5676fd106ff2a8550f6c761b8fcc0102ed1fffb179e466d8984005bf"
+      },
+      {
+        "artifact": "COMPOUND-context.json",
+        "sha256": "08eb0e2b2277c2db2afd1383b6e90b1142d6b6feff98728b89da9245a90629ed"
+      }
+    ],
+    "status": "PASS"
+  },
+  "lab_oracle": {
+    "factorial_cells": {
+      "00": "0.0351625",
+      "01": "0.0357625",
+      "10": "0.035375",
+      "11": "0.19545"
+    },
+    "hidden_membership_checked": true,
+    "lab_only": true,
+    "not_discovery": true,
+    "recipe": {
+      "actor_fidelity": "NONE",
+      "baseline": "SAME_DECISION_ELIGIBLE",
+      "cohorts": 10,
+      "decisions": [
+        "X300",
+        "Y900"
+      ],
+      "external_world": "SYNTHETIC",
+      "lab_floor": "0.05",
+      "lab_min_matched": 12,
+      "partition_cohorts": [
+        4,
+        3,
+        3
+      ],
+      "scientific_scope": "SYNTHETIC_LAB_ONLY",
+      "seed": 74109,
+      "target": "Y14400",
+      "tokens_per_world": 320,
+      "version": "1.0"
+    },
+    "schema": "sls.world-oracle.v1",
+    "status": "PASS",
+    "worlds": [
+      {
+        "baseline_mean": "0.0751953125",
+        "by_cohort": [
+          {
+            "cohort": 0,
+            "contrast": "0.0604375",
+            "n": 16
+          },
+          {
+            "cohort": 1,
+            "contrast": "0.060625",
+            "n": 16
+          },
+          {
+            "cohort": 2,
+            "contrast": "0.0606875",
+            "n": 16
+          },
+          {
+            "cohort": 3,
+            "contrast": "0.05953125",
+            "n": 16
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "0.0603203125",
+        "family": "SIMPLE",
+        "lab_positive": true,
+        "n": 64,
+        "partition": "DISCOVERY",
+        "population_n": 128,
+        "selected_mean": "0.135515625",
+        "world": "POS"
+      },
+      {
+        "baseline_mean": "0.0751953125",
+        "by_cohort": [
+          {
+            "cohort": 0,
+            "contrast": "0.120500",
+            "n": 8
+          },
+          {
+            "cohort": 1,
+            "contrast": "0.117750",
+            "n": 8
+          },
+          {
+            "cohort": 2,
+            "contrast": "0.119750",
+            "n": 8
+          },
+          {
+            "cohort": 3,
+            "contrast": "0.12071875",
+            "n": 8
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "0.1196796875",
+        "family": "COMPOUND",
+        "lab_positive": true,
+        "n": 32,
+        "partition": "DISCOVERY",
+        "population_n": 128,
+        "selected_mean": "0.194875",
+        "world": "POS"
+      },
+      {
+        "baseline_mean": "0.07590625",
+        "by_cohort": [
+          {
+            "cohort": 4,
+            "contrast": "0.0593750",
+            "n": 16
+          },
+          {
+            "cohort": 5,
+            "contrast": "0.0595625",
+            "n": 16
+          },
+          {
+            "cohort": 6,
+            "contrast": "0.06078125",
+            "n": 16
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "0.05990625",
+        "family": "SIMPLE",
+        "lab_positive": true,
+        "n": 48,
+        "partition": "VALIDATION",
+        "population_n": 96,
+        "selected_mean": "0.1358125",
+        "world": "POS"
+      },
+      {
+        "baseline_mean": "0.07590625",
+        "by_cohort": [
+          {
+            "cohort": 4,
+            "contrast": "0.1220625",
+            "n": 8
+          },
+          {
+            "cohort": 5,
+            "contrast": "0.1179375",
+            "n": 8
+          },
+          {
+            "cohort": 6,
+            "contrast": "0.12165625",
+            "n": 8
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "0.1205520833333333333333333333",
+        "family": "COMPOUND",
+        "lab_positive": true,
+        "n": 24,
+        "partition": "VALIDATION",
+        "population_n": 96,
+        "selected_mean": "0.1964583333333333333333333333",
+        "world": "POS"
+      },
+      {
+        "baseline_mean": "0.07529166666666666666666666667",
+        "by_cohort": [
+          {
+            "cohort": 7,
+            "contrast": "0.06015625",
+            "n": 16
+          },
+          {
+            "cohort": 8,
+            "contrast": "0.05853125",
+            "n": 16
+          },
+          {
+            "cohort": 9,
+            "contrast": "0.06150",
+            "n": 16
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "0.06006250000000000000000000003",
+        "family": "SIMPLE",
+        "lab_positive": true,
+        "n": 48,
+        "partition": "PAPER_FORWARD",
+        "population_n": 96,
+        "selected_mean": "0.1353541666666666666666666667",
+        "world": "POS"
+      },
+      {
+        "baseline_mean": "0.07529166666666666666666666667",
+        "by_cohort": [
+          {
+            "cohort": 7,
+            "contrast": "0.11890625",
+            "n": 8
+          },
+          {
+            "cohort": 8,
+            "contrast": "0.11896875",
+            "n": 8
+          },
+          {
+            "cohort": 9,
+            "contrast": "0.121875",
+            "n": 8
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "0.1199166666666666666666666666",
+        "family": "COMPOUND",
+        "lab_positive": true,
+        "n": 24,
+        "partition": "PAPER_FORWARD",
+        "population_n": 96,
+        "selected_mean": "0.1952083333333333333333333333",
+        "world": "POS"
+      },
+      {
+        "baseline_mean": "-0.0248046875",
+        "by_cohort": [
+          {
+            "cohort": 0,
+            "contrast": "0.0004375",
+            "n": 16
+          },
+          {
+            "cohort": 1,
+            "contrast": "0.000625",
+            "n": 16
+          },
+          {
+            "cohort": 2,
+            "contrast": "0.0006875",
+            "n": 16
+          },
+          {
+            "cohort": 3,
+            "contrast": "-0.00046875",
+            "n": 16
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "0.0003203125",
+        "family": "SIMPLE",
+        "lab_positive": false,
+        "n": 64,
+        "partition": "DISCOVERY",
+        "population_n": 128,
+        "selected_mean": "-0.024484375",
+        "world": "NULL"
+      },
+      {
+        "baseline_mean": "-0.0248046875",
+        "by_cohort": [
+          {
+            "cohort": 0,
+            "contrast": "0.000500",
+            "n": 8
+          },
+          {
+            "cohort": 1,
+            "contrast": "-0.002250",
+            "n": 8
+          },
+          {
+            "cohort": 2,
+            "contrast": "-0.000250",
+            "n": 8
+          },
+          {
+            "cohort": 3,
+            "contrast": "0.00071875",
+            "n": 8
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "-0.0003203125",
+        "family": "COMPOUND",
+        "lab_positive": false,
+        "n": 32,
+        "partition": "DISCOVERY",
+        "population_n": 128,
+        "selected_mean": "-0.025125",
+        "world": "NULL"
+      },
+      {
+        "baseline_mean": "-0.02409375",
+        "by_cohort": [
+          {
+            "cohort": 4,
+            "contrast": "-0.0006250",
+            "n": 16
+          },
+          {
+            "cohort": 5,
+            "contrast": "-0.0004375",
+            "n": 16
+          },
+          {
+            "cohort": 6,
+            "contrast": "0.00078125",
+            "n": 16
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "-0.00009375",
+        "family": "SIMPLE",
+        "lab_positive": false,
+        "n": 48,
+        "partition": "VALIDATION",
+        "population_n": 96,
+        "selected_mean": "-0.0241875",
+        "world": "NULL"
+      },
+      {
+        "baseline_mean": "-0.02409375",
+        "by_cohort": [
+          {
+            "cohort": 4,
+            "contrast": "0.0020625",
+            "n": 8
+          },
+          {
+            "cohort": 5,
+            "contrast": "-0.0020625",
+            "n": 8
+          },
+          {
+            "cohort": 6,
+            "contrast": "0.00165625",
+            "n": 8
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "0.00055208333333333333333333333",
+        "family": "COMPOUND",
+        "lab_positive": false,
+        "n": 24,
+        "partition": "VALIDATION",
+        "population_n": 96,
+        "selected_mean": "-0.02354166666666666666666666667",
+        "world": "NULL"
+      },
+      {
+        "baseline_mean": "-0.02470833333333333333333333333",
+        "by_cohort": [
+          {
+            "cohort": 7,
+            "contrast": "0.00015625",
+            "n": 16
+          },
+          {
+            "cohort": 8,
+            "contrast": "-0.00146875",
+            "n": 16
+          },
+          {
+            "cohort": 9,
+            "contrast": "0.00150",
+            "n": 16
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "0.00006250000000000000000000000",
+        "family": "SIMPLE",
+        "lab_positive": false,
+        "n": 48,
+        "partition": "PAPER_FORWARD",
+        "population_n": 96,
+        "selected_mean": "-0.02464583333333333333333333333",
+        "world": "NULL"
+      },
+      {
+        "baseline_mean": "-0.02470833333333333333333333333",
+        "by_cohort": [
+          {
+            "cohort": 7,
+            "contrast": "-0.00109375",
+            "n": 8
+          },
+          {
+            "cohort": 8,
+            "contrast": "-0.00103125",
+            "n": 8
+          },
+          {
+            "cohort": 9,
+            "contrast": "0.001875",
+            "n": 8
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "-0.00008333333333333333333333334",
+        "family": "COMPOUND",
+        "lab_positive": false,
+        "n": 24,
+        "partition": "PAPER_FORWARD",
+        "population_n": 96,
+        "selected_mean": "-0.02479166666666666666666666667",
+        "world": "NULL"
+      },
+      {
+        "baseline_mean": "0.0751953125",
+        "by_cohort": [
+          {
+            "cohort": 0,
+            "contrast": "0.0604375",
+            "n": 16
+          },
+          {
+            "cohort": 1,
+            "contrast": "0.060625",
+            "n": 16
+          },
+          {
+            "cohort": 2,
+            "contrast": "0.0606875",
+            "n": 16
+          },
+          {
+            "cohort": 3,
+            "contrast": "0.05953125",
+            "n": 16
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "0.0603203125",
+        "family": "SIMPLE",
+        "lab_positive": true,
+        "n": 64,
+        "partition": "DISCOVERY",
+        "population_n": 128,
+        "selected_mean": "0.135515625",
+        "world": "DECOY"
+      },
+      {
+        "baseline_mean": "0.0751953125",
+        "by_cohort": [
+          {
+            "cohort": 0,
+            "contrast": "0.120500",
+            "n": 8
+          },
+          {
+            "cohort": 1,
+            "contrast": "0.117750",
+            "n": 8
+          },
+          {
+            "cohort": 2,
+            "contrast": "0.119750",
+            "n": 8
+          },
+          {
+            "cohort": 3,
+            "contrast": "0.12071875",
+            "n": 8
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "0.1196796875",
+        "family": "COMPOUND",
+        "lab_positive": true,
+        "n": 32,
+        "partition": "DISCOVERY",
+        "population_n": 128,
+        "selected_mean": "0.194875",
+        "world": "DECOY"
+      },
+      {
+        "baseline_mean": "-0.12409375",
+        "by_cohort": [
+          {
+            "cohort": 4,
+            "contrast": "-0.0606250",
+            "n": 16
+          },
+          {
+            "cohort": 5,
+            "contrast": "-0.0604375",
+            "n": 16
+          },
+          {
+            "cohort": 6,
+            "contrast": "-0.05921875",
+            "n": 16
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "-0.06009375",
+        "family": "SIMPLE",
+        "lab_positive": false,
+        "n": 48,
+        "partition": "VALIDATION",
+        "population_n": 96,
+        "selected_mean": "-0.1841875",
+        "world": "DECOY"
+      },
+      {
+        "baseline_mean": "-0.12409375",
+        "by_cohort": [
+          {
+            "cohort": 4,
+            "contrast": "-0.1179375",
+            "n": 8
+          },
+          {
+            "cohort": 5,
+            "contrast": "-0.1220625",
+            "n": 8
+          },
+          {
+            "cohort": 6,
+            "contrast": "-0.11834375",
+            "n": 8
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "-0.1194479166666666666666666667",
+        "family": "COMPOUND",
+        "lab_positive": false,
+        "n": 24,
+        "partition": "VALIDATION",
+        "population_n": 96,
+        "selected_mean": "-0.2435416666666666666666666667",
+        "world": "DECOY"
+      },
+      {
+        "baseline_mean": "-0.1247083333333333333333333333",
+        "by_cohort": [
+          {
+            "cohort": 7,
+            "contrast": "-0.05984375",
+            "n": 16
+          },
+          {
+            "cohort": 8,
+            "contrast": "-0.06146875",
+            "n": 16
+          },
+          {
+            "cohort": 9,
+            "contrast": "-0.05850",
+            "n": 16
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "-0.0599375000000000000000000000",
+        "family": "SIMPLE",
+        "lab_positive": false,
+        "n": 48,
+        "partition": "PAPER_FORWARD",
+        "population_n": 96,
+        "selected_mean": "-0.1846458333333333333333333333",
+        "world": "DECOY"
+      },
+      {
+        "baseline_mean": "-0.1247083333333333333333333333",
+        "by_cohort": [
+          {
+            "cohort": 7,
+            "contrast": "-0.12109375",
+            "n": 8
+          },
+          {
+            "cohort": 8,
+            "contrast": "-0.12103125",
+            "n": 8
+          },
+          {
+            "cohort": 9,
+            "contrast": "-0.118125",
+            "n": 8
+          }
+        ],
+        "comparator": "SAME_DECISION_ELIGIBLE",
+        "contrast": "-0.1200833333333333333333333334",
+        "family": "COMPOUND",
+        "lab_positive": false,
+        "n": 24,
+        "partition": "PAPER_FORWARD",
+        "population_n": 96,
+        "selected_mean": "-0.2447916666666666666666666667",
+        "world": "DECOY"
+      }
+    ]
+  },
+  "ledger_suite_status_disagreements": [
+    {
+      "attempt": "sls-v1-forge-a2",
+      "ledger_status": "PASS",
+      "reason": "Old Result.current object was mutated by later setUpClass error; original terminal ledger is authoritative.",
+      "suite_status": "ERROR",
+      "test_id": "tests.test_forge_ordinary_operation_lifecycle_v1.OrdinaryOperationLifecycleTests.test_r6_predictable_preview_refusal_never_calls_the_loader"
+    }
+  ],
+  "non_claims": [
+    "NO_BLIND_DISCOVERY",
+    "NO_NATIVE_OOS_CONFIRMATION",
+    "NO_RAW_TO_PAPER_CONTINUITY",
+    "NO_REAL_MARKET_ALPHA_NETRETURN_FCF",
+    "NO_MODEL_DIVERSITY_PROVEN",
+    "NO_BROWSER_UI_PROOF",
+    "NO_AUTONOMOUS_FEEDBACK_CONTINUATION_PROOF",
+    "NO_PRODUCT_FIX_OR_PROMOTION"
+  ],
+  "product_ref": "94b391d658b52035ae88e2da05f1ea25ff17b0f8",
+  "report_scope_complete": true,
+  "resource_footprint": {
+    "cleanup": "OWNER_DECISION_PENDING_NO_DELETE",
+    "docker": {
+      "all_campaign_containers_stopped": true,
+      "container_writable_layers_bytes": 602112,
+      "containers": [
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-footprint-20261013234619",
+          "running": false,
+          "writable_layer_bytes": 12288
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-prepare-a3",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-footprint-20261013232839",
+          "running": false,
+          "writable_layer_bytes": 12288
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-footprint-20261013232712",
+          "running": false,
+          "writable_layer_bytes": 12288
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-fortnight-a1",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-handoff-a1",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-seams-a1",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-spine-a2",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-finalize-a1",
+          "running": false,
+          "writable_layer_bytes": 32768
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-spine-a1",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-forge-tail-a1",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-trading-tail-a2",
+          "running": false,
+          "writable_layer_bytes": 28672
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-recovery-a2",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-scratch-owner",
+          "running": false,
+          "writable_layer_bytes": 8192
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-recovery-a1",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-trading-tail-a1",
+          "running": false,
+          "writable_layer_bytes": 28672
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-forge-a2",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-forge-a1",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-world-a3",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-world-a2-look-inspect",
+          "running": false,
+          "writable_layer_bytes": 8192
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-world-a2-readback",
+          "running": false,
+          "writable_layer_bytes": 8192
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-world-a2",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-trading-a1",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-world-a1",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-prepare-a2",
+          "running": false,
+          "writable_layer_bytes": 24576
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-snapshot-copy",
+          "running": false,
+          "writable_layer_bytes": 12288
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-volume-owner",
+          "running": false,
+          "writable_layer_bytes": 8192
+        },
+        {
+          "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+          "log_driver": "json-file",
+          "name": "sls-v1-prepare-a1",
+          "running": false,
+          "writable_layer_bytes": 24576
+        }
+      ],
+      "deleted": false,
+      "existing_image_reported_size_bytes": 533691498,
+      "image_id": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+      "log_stat_failures": 0,
+      "logs_allocated_bytes": 184320,
+      "logs_limit": "Exact owned Docker log paths only; failed read remains UNKNOWN. The final measurement helper log and directory metadata are excluded (one small JSON line).",
+      "logs_logical_bytes": 104453,
+      "measured_at": "2026-10-13T23:53:23.6474656Z",
+      "measurement_helper": "sls-v1-footprint-20261013235322",
+      "new_image_bytes": 0,
+      "reused_image": "smial-baa-v1:local",
+      "volumes": {
+        "product": {
+          "allocated_bytes": 135839744,
+          "logical_bytes": 119598586
+        },
+        "scratch": {
+          "allocated_bytes": 4096,
+          "logical_bytes": 0
+        }
+      }
+    },
+    "host": {
+      "allocated_unique_owned_bytes": 489674520,
+      "allocation_limit": "NTFS allocation deduplicated within campaign; hardlinks to existing uv cache may overstate incremental allocation. Directory metadata and measurement receipt excluded.",
+      "deleted": false,
+      "groups": {
+        "product": {
+          "allocated_unique_owned_bytes": 130566552,
+          "files": 5583,
+          "logical_bytes": 119598586
+        },
+        "retained": {
+          "allocated_unique_owned_bytes": 54244112,
+          "files": 2279,
+          "logical_bytes": 48905613
+        },
+        "source": {
+          "allocated_unique_owned_bytes": 132242360,
+          "files": 5636,
+          "logical_bytes": 121174296
+        },
+        "source/.venv": {
+          "allocated_unique_owned_bytes": 172621496,
+          "files": 1630,
+          "logical_bytes": 169602791
+        }
+      },
+      "logical_bytes": 459281286,
+      "measurement_errors": [],
+      "scope": "EXACT_CAMPAIGN_ROOT_ONLY"
+    },
+    "known_allocated_total_bytes": 626304792,
+    "known_allocated_total_gib": 0.5833,
+    "shared_image_incremental_bytes": 0
+  },
+  "runs": [
+    {
+      "attempt": "sls-v1-finalize-a1",
+      "terminal": {
+        "attempt": "a1",
+        "container": "sls-v1-finalize-a1",
+        "exit_code": 0,
+        "oom_killed": false,
+        "phase": "finalize",
+        "resources": {
+          "active_container_seconds": 2757.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 47552396,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-forge-a1",
+      "terminal": {
+        "attempt": "a1",
+        "container": "sls-v1-forge-a1",
+        "exit_code": 1,
+        "oom_killed": false,
+        "phase": "forge",
+        "resources": {
+          "active_container_seconds": 1526.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 38620479,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-forge-a2",
+      "suite": {
+        "failed_ids": [
+          "setUpClass (tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests)"
+        ],
+        "status": "FAIL",
+        "tests_run": 28
+      },
+      "terminal": {
+        "attempt": "a2",
+        "container": "sls-v1-forge-a2",
+        "exit_code": 1,
+        "oom_killed": false,
+        "phase": "forge",
+        "resources": {
+          "active_container_seconds": 2190.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 44000586,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-forge-tail-a1",
+      "suite": {
+        "failed_ids": [],
+        "status": "PASS",
+        "tests_run": 3
+      },
+      "terminal": {
+        "attempt": "a1",
+        "container": "sls-v1-forge-tail-a1",
+        "exit_code": 0,
+        "oom_killed": false,
+        "phase": "forge-tail",
+        "resources": {
+          "active_container_seconds": 2741.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 47403056,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-fortnight-a1",
+      "suite": {
+        "failed_ids": [],
+        "status": "PASS",
+        "tests_run": 1
+      },
+      "terminal": {
+        "attempt": "a1",
+        "container": "sls-v1-fortnight-a1",
+        "exit_code": 0,
+        "oom_killed": false,
+        "phase": "fortnight",
+        "resources": {
+          "active_container_seconds": 2855.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 47743812,
+          "scratch_bytes": 0,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-handoff-a1",
+      "suite": {
+        "failed_ids": [],
+        "status": "PASS",
+        "tests_run": 30
+      },
+      "terminal": {
+        "attempt": "a1",
+        "container": "sls-v1-handoff-a1",
+        "exit_code": 0,
+        "oom_killed": false,
+        "phase": "handoff",
+        "resources": {
+          "active_container_seconds": 2797.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 47741618,
+          "scratch_bytes": 0,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-prepare-a1",
+      "terminal": {
+        "container": "sls-v1-prepare-a1",
+        "exit_code": 1,
+        "oom_killed": false,
+        "running": false
+      }
+    },
+    {
+      "attempt": "sls-v1-prepare-a2",
+      "suite": {
+        "failed_ids": [],
+        "status": "PASS",
+        "tests_run": 15
+      },
+      "terminal": {
+        "container": "sls-v1-prepare-a2",
+        "exit_code": 0,
+        "oom_killed": false,
+        "running": false
+      }
+    },
+    {
+      "attempt": "sls-v1-prepare-a3",
+      "suite": {
+        "failed_ids": [],
+        "status": "PASS",
+        "tests_run": 15
+      },
+      "terminal": {
+        "attempt": "a3",
+        "container": "sls-v1-prepare-a3",
+        "exit_code": 0,
+        "oom_killed": false,
+        "phase": "prepare",
+        "resources": {
+          "active_container_seconds": 2866.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 48905687,
+          "scratch_bytes": 0,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-recovery-a1",
+      "suite": {
+        "failed_ids": [
+          "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy (control='ENVELOPE')",
+          "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy (control='RUNTIME_POLICY')",
+          "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_configuration_chain_damage_or_omission_cannot_acknowledge_restore",
+          "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit",
+          "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_retains_known_cost_floor_before_later_unknown_total",
+          "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_unknown_entry_recovery_keeps_original_pending_identity_without_quote_resend",
+          "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_postclaim_entry_response_failure_keeps_original_pending_and_future_old_exit_in_same_run",
+          "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart (version='1.1', outcome='NO_ROUTE')",
+          "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart (version='1.1', outcome='REJECTED_BEFORE_SEND')",
+          "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart (version='1.1', outcome='DROPPED_OR_EXPIRED_NOT_PROCESSED')",
+          "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart (version='1.1', outcome='LANDED_FAILED')",
+          "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart (version='1.0', outcome='NO_ROUTE')",
+          "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_malformed_new_source_json_does_not_stop_ordinary_cli_before_future_old_exit"
+        ],
+        "status": "FAIL",
+        "tests_run": 8
+      },
+      "terminal": {
+        "attempt": "a1",
+        "container": "sls-v1-recovery-a1",
+        "exit_code": 1,
+        "oom_killed": false,
+        "phase": "recovery",
+        "resources": {
+          "active_container_seconds": 2107.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 41684837,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-recovery-a2",
+      "suite": {
+        "failed_ids": [],
+        "status": "PASS",
+        "tests_run": 8
+      },
+      "terminal": {
+        "attempt": "a2",
+        "container": "sls-v1-recovery-a2",
+        "exit_code": 0,
+        "oom_killed": false,
+        "phase": "recovery",
+        "resources": {
+          "active_container_seconds": 2215.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 45155464,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-seams-a1",
+      "terminal": {
+        "attempt": "a1",
+        "container": "sls-v1-seams-a1",
+        "exit_code": 0,
+        "oom_killed": false,
+        "phase": "seams",
+        "resources": {
+          "active_container_seconds": 2759.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 47609898,
+          "scratch_bytes": 0,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-spine-a1",
+      "campaign-error": {
+        "error_type": "AssertionError",
+        "status": "HARNESS_ERROR"
+      },
+      "terminal": {
+        "attempt": "a1",
+        "container": "sls-v1-spine-a1",
+        "exit_code": 1,
+        "oom_killed": false,
+        "phase": "spine",
+        "resources": {
+          "active_container_seconds": 2452.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 45404681,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-spine-a2",
+      "terminal": {
+        "attempt": "a2",
+        "container": "sls-v1-spine-a2",
+        "exit_code": 0,
+        "oom_killed": false,
+        "phase": "spine",
+        "resources": {
+          "active_container_seconds": 2745.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 47403498,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-trading-a1",
+      "terminal": {
+        "container": "sls-v1-trading-a1",
+        "exit_code": 143,
+        "oom_killed": false,
+        "running": false
+      }
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a1",
+      "suite": {
+        "failed_ids": [
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_virtual_two_weeks_history_sizes_and_incident_bound",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C23_actual_egress_secret_and_non_target_canaries",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_common_original_switch_lineage_blocks_ingress_and_readiness_before_first_effect",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_current_switch_conflict_blocks_readiness_without_unknown_original_inventory_or_exit_starvation",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_managed_native_public_paper_fill_retains_original_full_exit_and_cap_release",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_managed_native_public_shadow_fill_retains_original_full_exit_and_cap_release",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_modeled_entry_cannot_be_reclassified_as_native_public_fill",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect (mode='PAPER', native_public_entry=True)",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect (mode='SHADOW', native_public_entry=True)",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect (mode='PAPER', native_public_entry=False)",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect (mode='SHADOW', native_public_entry=False)",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_native_successor_initialization_checks_previous_original_chain_atomically",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_native_unmodeled_legacy_projection_cannot_free_managed_cap",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A1_A2_default_false_shared_admission_uses_managed_envelope (count=1, money='60')",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A1_A2_default_false_shared_admission_uses_managed_envelope (count=2, money='30')",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A3_native_restore_fences_new_both_sides_preserves_replay_ack_exit",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_binding_profile_envelope_corruption_fails_closed_at_direct_owner",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_genuine_legacy_binding_and_exact_attempt_replay_remain_compatible",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_missing_corrupt_state_and_legacy_activation_cannot_downgrade",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_native_switch_failure_rolls_back_all_staged_scope",
+          "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_observed_physical_clock_guard_at_cli_and_direct_owner"
+        ],
+        "status": "FAIL",
+        "tests_run": 51
+      },
+      "terminal": {
+        "attempt": "a1",
+        "container": "sls-v1-trading-tail-a1",
+        "exit_code": 1,
+        "oom_killed": false,
+        "phase": "trading-tail",
+        "resources": {
+          "active_container_seconds": 2041.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 40603428,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-trading-tail-a2",
+      "suite": {
+        "failed_ids": [],
+        "status": "PASS",
+        "tests_run": 51
+      },
+      "terminal": {
+        "attempt": "a2",
+        "container": "sls-v1-trading-tail-a2",
+        "exit_code": 0,
+        "oom_killed": false,
+        "phase": "trading-tail",
+        "resources": {
+          "active_container_seconds": 2432.0,
+          "bytes_limit": 2147483648,
+          "retained_bytes": 45403611,
+          "seconds_limit": 7200
+        },
+        "running": false,
+        "stop_reason": null
+      }
+    },
+    {
+      "attempt": "sls-v1-world-a1",
+      "terminal": {
+        "container": "sls-v1-world-a1",
+        "exit_code": 1,
+        "oom_killed": false,
+        "running": false
+      }
+    },
+    {
+      "attempt": "sls-v1-world-a2",
+      "terminal": {
+        "container": "sls-v1-world-a2",
+        "exit_code": 1,
+        "oom_killed": false,
+        "running": false
+      }
+    },
+    {
+      "attempt": "sls-v1-world-a3",
+      "terminal": {
+        "container": "sls-v1-world-a3",
+        "exit_code": 0,
+        "oom_killed": false,
+        "running": false
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "consumer_accepted": true,
+      "evidence_test_ids": [
+        "tests.test_big_agentic_audit_v1.AuditOracleControls.test_bridge_requires_execution_refusal_and_readonly_guards",
+        "tests.test_big_agentic_audit_v1.AuditOracleControls.test_committed_coverage_never_grants_unvisited_pass",
+        "tests.test_big_agentic_audit_v1.AuditOracleControls.test_empty_replay_does_not_inherit_baseline_failure_or_observations",
+        "tests.test_big_agentic_audit_v1.AuditOracleControls.test_interactions_require_completed_actual_proof_and_preserve_failure",
+        "tests.test_big_agentic_audit_v1.AuditOracleControls.test_known_failure_survives_aggregation",
+        "tests.test_big_agentic_audit_v1.AuditOracleControls.test_observer_rejects_state_readout_disagreement",
+        "tests.test_big_agentic_audit_v1.AuditOracleControls.test_replay_collector_preserves_existing_output",
+        "tests.test_big_agentic_audit_v1.AuditOracleControls.test_retained_material_failures_have_backlog_records",
+        "tests.test_big_agentic_audit_v1.AuditOracleControls.test_summary_without_complete_trace_cannot_close_unittest_coverage",
+        "tests.test_big_agentic_audit_v1.AuditOracleControls.test_truncated_and_dropped_traces_are_incomplete",
+        "tests.test_big_agentic_audit_v1.AuditOracleControls.test_unvisited_boundary_cannot_pass",
+        "tests.test_big_agentic_audit_v1.AuditOracleControls.test_valid_control",
+        "tests.test_big_agentic_audit_v1.AuditOracleControls.test_wal_requires_fresh_readers_and_unchanged_inventory"
+      ],
+      "fidelity": "CONTRACT_ONLY",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": true,
+      "reached": true,
+      "reason": "FINAL_SCOPE_SAFETY_AND_ORACLES",
+      "scenario_id": "S00",
+      "status": "PASS"
+    },
+    {
+      "consumer_accepted": false,
+      "evidence_test_ids": [],
+      "fidelity": "NONE",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": false,
+      "reached": false,
+      "reason": "NO_OS_CONFINED_BLIND_ACTOR_SIMPLE",
+      "scenario_id": "S01",
+      "status": "BLOCKED"
+    },
+    {
+      "consumer_accepted": false,
+      "evidence_test_ids": [],
+      "fidelity": "NONE",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": false,
+      "reached": false,
+      "reason": "NO_OS_CONFINED_BLIND_ACTOR_COMPOUND",
+      "scenario_id": "S02",
+      "status": "BLOCKED"
+    },
+    {
+      "consumer_accepted": false,
+      "evidence_test_ids": [],
+      "fidelity": "MODEL_ONLY",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": false,
+      "reached": false,
+      "reason": "NULL_LAB_NEGATIVE; GENUINE_NULL_AND_NULL_NATIVE_MEMORY_UNVISITED",
+      "scenario_id": "S03",
+      "status": "UNKNOWN"
+    },
+    {
+      "consumer_accepted": false,
+      "evidence_test_ids": [],
+      "fidelity": "MODEL_ONLY",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": false,
+      "reached": false,
+      "reason": "DECOY_LAB_COUNTEREXAMPLE; NATIVE_CONFIRMATION_UNBOUND",
+      "scenario_id": "S04",
+      "status": "BLOCKED"
+    },
+    {
+      "consumer_accepted": true,
+      "evidence_test_ids": [
+        "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_public_prefix_is_invariant_to_produced_future_poison_but_authorized_numeric_changes"
+      ],
+      "fidelity": "SEGMENT_PRODUCT_PATH",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": true,
+      "reached": true,
+      "reason": "FUTURE_POISON_PREFIX_AND_TYPED_MISSING_TESTED_SCOPE",
+      "scenario_id": "S05",
+      "status": "PASS"
+    },
+    {
+      "consumer_accepted": false,
+      "evidence_test_ids": [
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_b_later_evidence_does_not_rewrite_manifest"
+      ],
+      "fidelity": "CONTRACT_ONLY",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": false,
+      "reached": false,
+      "reason": "NEW_MATURITY_TO_NATIVE_CONFIRMATION_NOT_EXECUTED",
+      "scenario_id": "S06",
+      "status": "UNKNOWN"
+    },
+    {
+      "consumer_accepted": true,
+      "evidence_test_ids": [
+        "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_os_reply_loss_then_moved_root_resume_uses_original_draft_and_charge"
+      ],
+      "fidelity": "SEGMENT_PRODUCT_PATH",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": true,
+      "reached": true,
+      "reason": "NATIVE_ACK_LOSS_MOVED_ROOT_AND_WORLD_OWNER_FINAL",
+      "scenario_id": "S07",
+      "status": "PASS"
+    },
+    {
+      "consumer_accepted": true,
+      "evidence_test_ids": [
+        "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_conflict_and_holdout_empty_list_stay_distinct",
+        "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_decision_loop_stale_retry_and_writer_busy",
+        "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_degraded_source_keeps_definition_and_unknown_obligations",
+        "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_direct_vs_related_classification",
+        "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_get_experiment_detail_is_non_mutating",
+        "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_html_decision_and_promote_guard_copy",
+        "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_http_records_reject_and_surfaces_done",
+        "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_owner_language_ru_pass",
+        "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_promote_guard_and_strategy_untouched",
+        "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_real_incomplete_experiment_is_truthful",
+        "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_run_completed_does_not_satisfy_pit",
+        "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_semantic_anti_hijack"
+      ],
+      "fidelity": "CONTRACT_ONLY",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": true,
+      "reached": true,
+      "reason": "EXACT_REPLAY_AND_STALE_RELATED_IDENTITY_GUARDS_TESTED_SCOPE",
+      "scenario_id": "S08",
+      "status": "PASS"
+    },
+    {
+      "consumer_accepted": false,
+      "evidence_test_ids": [
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_check_mismatch_does_not_report_materialized",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_check_rejects_tampered_manifest",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_coerced_execution_inputs_are_gaps",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_deterministic_render_and_snapshot_meaning",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_handoff_contract_names_manifest_1_1_when_binding_is_present",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_materialized_keeps_evidence_hash_conflict",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_mismatched_decision_event_or_clock_is_invalid",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_overview_ready_is_not_available",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_a_happy_path_vertical",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_b_later_evidence_does_not_rewrite_manifest",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_c_legacy_promote_is_explicit_gap",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_d_execution_input_gap",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_e_and_f_collision_and_replay",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_g_get_is_non_mutating",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_h_no_activation",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_semantic_gold_query",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_unreadable_strategy_file_is_conflict",
+        "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_verify_rejects_lineage_or_clock_mismatch"
+      ],
+      "fidelity": "SEGMENT_PRODUCT_PATH",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": false,
+      "reached": false,
+      "reason": "ACTUAL_FORGE_CANDIDATES_HAVE_NO_ACCEPTED_SCIENCE_HANDOFF; BR01_RIGHT_SEGMENT_PASS",
+      "scenario_id": "S09",
+      "status": "BLOCKED"
+    },
+    {
+      "consumer_accepted": true,
+      "evidence_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_C02_C03_C05_C06_native_loop_full_money_oracle",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_check_rejects_missing_or_invalid_operating_limits_readonly",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_C04_deadline_and_stale_do_not_backdate",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_C17_observed_current_health_denies_virtual_clocks_readonly",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_late_input_unknown_is_not_healed_by_publication",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_list_only_same_driver",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_observed_activation_timestamp_does_not_override_freshness_clock",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C04_exact_stream_sets_equal_timestamps_pagination",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C04_late_physical_source_insert_survives_restart",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_C15_real_loss_after_admission",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_real_loss_after_capture_no_duplicate_effect",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_real_loss_after_claim_paper_reconciles",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C12_real_loss_after_quote_effect_no_resend",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C06_C19_frozen_base_episode_replay_preserves_identity_and_payload",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_C08_C09_positive_successor_and_old_exit",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C11_C12_shadow_failure_unknown_partial_remainder_drain",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C15_C16_pause_during_live_lock_survives_restart",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_cached_tick_clock_cannot_authorize_expired_entry",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C10_C14_C15_C17_frozen_controls_and_observer_without_research",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C13_captured_body_corruption_retains_unknown_no_effect",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C14_nondivisible_raw_funding_adapter_accepts_partial",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_missing_or_corrupt_envelope_never_ready",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_shadow_quote_inputs_are_current_readonly_health",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C17_current_runtime_policy_health_preserves_known_inventory_and_old_exit",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C17_readonly_current_wal_snapshot_writes_nothing",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_C19_native_restore_before_effect_independent_ledger",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_backup_before_due_exit_imports_original_exit_no_repeat",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_pre_admission_snapshot_complete_cut_no_duplicate",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_native_source_stream_over_virtual_two_weeks",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_source_capacity_guard_stops_before_nomination",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_virtual_two_weeks_history_sizes_and_incident_bound",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C23_actual_egress_secret_and_non_target_canaries",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_common_original_switch_lineage_blocks_ingress_and_readiness_before_first_effect",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_current_switch_conflict_blocks_readiness_without_unknown_original_inventory_or_exit_starvation",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_managed_native_public_paper_fill_retains_original_full_exit_and_cap_release",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_managed_native_public_shadow_fill_retains_original_full_exit_and_cap_release",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_modeled_entry_cannot_be_reclassified_as_native_public_fill",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_native_successor_initialization_checks_previous_original_chain_atomically",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_native_unmodeled_legacy_projection_cannot_free_managed_cap",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A1_A2_default_false_shared_admission_uses_managed_envelope",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A3_native_restore_fences_new_both_sides_preserves_replay_ack_exit",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_binding_profile_envelope_corruption_fails_closed_at_direct_owner",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_genuine_legacy_binding_and_exact_attempt_replay_remain_compatible",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_missing_corrupt_state_and_legacy_activation_cannot_downgrade",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_native_switch_failure_rolls_back_all_staged_scope",
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_observed_physical_clock_guard_at_cli_and_direct_owner"
+      ],
+      "fidelity": "SEGMENT_PRODUCT_PATH",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": true,
+      "reached": true,
+      "reason": "ORDINARY_PAPER_TWO_SCIENTIFIC_RECIPES_SUCCESSOR_AND_FORTNIGHT",
+      "scenario_id": "S10",
+      "status": "PASS"
+    },
+    {
+      "consumer_accepted": true,
+      "evidence_test_ids": [
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_malformed_new_source_json_does_not_stop_ordinary_cli_before_future_old_exit"
+      ],
+      "fidelity": "SEGMENT_PRODUCT_PATH",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": true,
+      "reached": true,
+      "reason": "ENTRY_BLOCKER_OLD_EXIT_LEGACY_GUARD_TESTED_SCOPE",
+      "scenario_id": "S11",
+      "status": "PASS"
+    },
+    {
+      "consumer_accepted": true,
+      "evidence_test_ids": [
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_coherent_remainder_reduction_requires_original_inventory_before_headroom",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_concurrent_admission_and_entry_claim_both_deny_coherent_inventory_corruption",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_configuration_required_and_legacy_unchanged",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_corrupt_remainder_or_final_never_frees_capacity",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_claim_rechecks_coherent_predecessor_corruption_atomically",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_fee_allocation_and_leg_pnl_conserve_on_three_exits",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_price_quantity_notional_conflict_rejected_atomically",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_genuine_v1_0_entry_then_v1_1_partial_and_full_preserves_original_payload",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_quantity_overfill_units_and_crash_are_atomic",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_money_preserves_identity_bound_unknown_economics_readback",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_quantity_preserves_identity_bound_unknown_economics_readback",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_literal_partial_accounting_oracle_replay_and_cold_readback",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_modern_entry_witness_cannot_be_hidden_by_nulling_quantity_projection_flags",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_modes_independent_and_concurrent_reservations_serialized",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_terminal_release_requires_intact_final_result_chain",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_unattempted_cancel_releases_only_with_original_pre_attempt_witness",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_nonfill_frees_capacity_but_unknown_cost_stays_economic",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_partial_entry_raw_rounddown_retains_exact_paid_notional_without_fee_double_count",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_partial_unknown_retains_realized_leg_and_residual_upper_bound",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_quantity_result_acceptance_rejects_corrupt_original_or_cumulative_projection",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_readback_cost_is_bounded_by_outstanding_scope_not_historical_journal",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_repeat_envelope_cas_corruption_and_attempt_recheck",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_shared_predecessor_reservation_and_no_auto_shrink",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_unknown_exit_retains_inventory_and_blocks_overlapping_attempt",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_0_native_complete_result_chain_still_releases_capacity",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_0_result_event_payload_and_replay_remain_exact",
+        "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_1_entry_preserves_raw_quote_quantity_and_included_fee"
+      ],
+      "fidelity": "SEGMENT_PRODUCT_PATH",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": true,
+      "reached": true,
+      "reason": "PARTIAL_UNKNOWN_NO_RESEND_KNOWN_COST_FLOOR",
+      "scenario_id": "S12",
+      "status": "PASS"
+    },
+    {
+      "consumer_accepted": true,
+      "evidence_test_ids": [
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_retains_known_cost_floor_before_later_unknown_total",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_configuration_chain_damage_or_omission_cannot_acknowledge_restore",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_malformed_new_source_json_does_not_stop_ordinary_cli_before_future_old_exit",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_postclaim_entry_response_failure_keeps_original_pending_and_future_old_exit_in_same_run",
+        "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_unknown_entry_recovery_keeps_original_pending_identity_without_quote_resend"
+      ],
+      "fidelity": "SEGMENT_PRODUCT_PATH",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": true,
+      "reached": true,
+      "reason": "COMPLETE_CUT_ORIGINAL_SWITCH_TIGHTENED_CONTROL_RESTORE",
+      "scenario_id": "S13",
+      "status": "PASS"
+    },
+    {
+      "consumer_accepted": false,
+      "evidence_test_ids": [
+        "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit"
+      ],
+      "fidelity": "SEGMENT_PRODUCT_PATH",
+      "native_full_original_forge_to_trading": false,
+      "oracle_exercised": false,
+      "reached": false,
+      "reason": "FRESH_WAL_AWARE_READBACK_AND_HUMAN_CLI_PASS; FEEDBACK_CONTINUATION_UNKNOWN",
+      "scenario_id": "S14",
+      "status": "UNKNOWN",
+      "sub_obligations": [
+        {
+          "boundary": "FRESH_WAL_AND_HUMAN_CLI",
+          "consumer_accepted": true,
+          "oracle_exercised": true,
+          "reached": true,
+          "status": "PASS"
+        },
+        {
+          "boundary": "TRADING_FEEDBACK_TO_FRESH_FORGE_MISSION",
+          "consumer_accepted": false,
+          "oracle_exercised": false,
+          "reached": false,
+          "status": "UNKNOWN"
+        },
+        {
+          "boundary": "BROWSER_UI_OPTIONAL",
+          "consumer_accepted": false,
+          "oracle_exercised": false,
+          "reached": false,
+          "status": "UNKNOWN"
+        }
+      ]
+    }
+  ],
+  "schema_version": "1.0",
+  "status": "PARTIAL_ENVIRONMENT_OR_AUTHORITY",
+  "unique_passed_test_count": 164,
+  "unique_passed_test_ids": [
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_C02_C03_C05_C06_native_loop_full_money_oracle",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C01_check_rejects_missing_or_invalid_operating_limits_readonly",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_C04_deadline_and_stale_do_not_backdate",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_C17_observed_current_health_denies_virtual_clocks_readonly",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_late_input_unknown_is_not_healed_by_publication",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_list_only_same_driver",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C03_observed_activation_timestamp_does_not_override_freshness_clock",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C04_exact_stream_sets_equal_timestamps_pagination",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C04_late_physical_source_insert_survives_restart",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_C15_real_loss_after_admission",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_real_loss_after_capture_no_duplicate_effect",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C06_real_loss_after_claim_paper_reconciles",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C05_C12_real_loss_after_quote_effect_no_resend",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C06_C19_frozen_base_episode_replay_preserves_identity_and_payload",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_C08_C09_positive_successor_and_old_exit",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C07_invalid_and_concurrent_successor_preserve_atomic_pointer",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C11_C12_shadow_failure_unknown_partial_remainder_drain",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_C15_C16_pause_during_live_lock_survives_restart",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C09_cached_tick_clock_cannot_authorize_expired_entry",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C10_C14_C15_C17_frozen_controls_and_observer_without_research",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C13_captured_body_corruption_retains_unknown_no_effect",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C14_nondivisible_raw_funding_adapter_accepts_partial",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_missing_or_corrupt_envelope_never_ready",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_shadow_quote_inputs_are_current_readonly_health",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C17_current_runtime_policy_health_preserves_known_inventory_and_old_exit",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C17_readonly_current_wal_snapshot_writes_nothing",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_C19_native_restore_before_effect_independent_ledger",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_backup_before_due_exit_imports_original_exit_no_repeat",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C18_pre_admission_snapshot_complete_cut_no_duplicate",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_native_source_stream_over_virtual_two_weeks",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_source_capacity_guard_stops_before_nomination",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_virtual_two_weeks_history_sizes_and_incident_bound",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C23_actual_egress_secret_and_non_target_canaries",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_common_original_switch_lineage_blocks_ingress_and_readiness_before_first_effect",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_current_switch_conflict_blocks_readiness_without_unknown_original_inventory_or_exit_starvation",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_managed_native_public_paper_fill_retains_original_full_exit_and_cap_release",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_managed_native_public_shadow_fill_retains_original_full_exit_and_cap_release",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_modeled_entry_cannot_be_reclassified_as_native_public_fill",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_native_successor_initialization_checks_previous_original_chain_atomically",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_native_unmodeled_legacy_projection_cannot_free_managed_cap",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A1_A2_default_false_shared_admission_uses_managed_envelope",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A3_native_restore_fences_new_both_sides_preserves_replay_ack_exit",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_binding_profile_envelope_corruption_fails_closed_at_direct_owner",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_genuine_legacy_binding_and_exact_attempt_replay_remain_compatible",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_missing_corrupt_state_and_legacy_activation_cannot_downgrade",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_native_switch_failure_rolls_back_all_staged_scope",
+    "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_observed_physical_clock_guard_at_cli_and_direct_owner",
+    "test_trading_operational_adapters_v1.AdapterTests.test_C03_C14_input_clock_and_denominator_guards",
+    "test_trading_operational_adapters_v1.AdapterTests.test_C04_C14_fee_in_quote_raw_units_literal_oracle",
+    "test_trading_operational_adapters_v1.AdapterTests.test_C12_timeout_unknown_rejection_definitive_not_flat",
+    "test_trading_operational_adapters_v1.AdapterTests.test_C14_C23_negative_wire_shapes_before_persistence",
+    "test_trading_operational_adapters_v1.AdapterTests.test_route_and_fee_json_shapes_are_existing_typed_refusals",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_coherent_remainder_reduction_requires_original_inventory_before_headroom",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_concurrent_admission_and_entry_claim_both_deny_coherent_inventory_corruption",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_configuration_required_and_legacy_unchanged",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_corrupt_remainder_or_final_never_frees_capacity",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_claim_rechecks_coherent_predecessor_corruption_atomically",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_fee_allocation_and_leg_pnl_conserve_on_three_exits",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_entry_price_quantity_notional_conflict_rejected_atomically",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_genuine_v1_0_entry_then_v1_1_partial_and_full_preserves_original_payload",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_quantity_overfill_units_and_crash_are_atomic",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_money_preserves_identity_bound_unknown_economics_readback",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_invalid_residual_quantity_preserves_identity_bound_unknown_economics_readback",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_literal_partial_accounting_oracle_replay_and_cold_readback",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_modern_entry_witness_cannot_be_hidden_by_nulling_quantity_projection_flags",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_modes_independent_and_concurrent_reservations_serialized",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_terminal_release_requires_intact_final_result_chain",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_unattempted_cancel_releases_only_with_original_pre_attempt_witness",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_nonfill_frees_capacity_but_unknown_cost_stays_economic",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_partial_entry_raw_rounddown_retains_exact_paid_notional_without_fee_double_count",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_partial_unknown_retains_realized_leg_and_residual_upper_bound",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_quantity_result_acceptance_rejects_corrupt_original_or_cumulative_projection",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_readback_cost_is_bounded_by_outstanding_scope_not_historical_journal",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_repeat_envelope_cas_corruption_and_attempt_recheck",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_shared_predecessor_reservation_and_no_auto_shrink",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_unknown_exit_retains_inventory_and_blocks_overlapping_attempt",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_0_native_complete_result_chain_still_releases_capacity",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_0_result_event_payload_and_replay_remain_exact",
+    "test_trading_operational_obligations_v1.OperatingObligationsTests.test_v1_1_entry_preserves_raw_quote_quantity_and_included_fee",
+    "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_restores_tighter_envelope_and_disabled_runtime_policy",
+    "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_complete_cut_retains_known_cost_floor_before_later_unknown_total",
+    "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_configuration_chain_damage_or_omission_cannot_acknowledge_restore",
+    "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_cross_snapshot_original_switch_cut_ack_resume_admits_successor_and_services_old_exit",
+    "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_malformed_new_source_json_does_not_stop_ordinary_cli_before_future_old_exit",
+    "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart",
+    "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_postclaim_entry_response_failure_keeps_original_pending_and_future_old_exit_in_same_run",
+    "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_unknown_entry_recovery_keeps_original_pending_identity_without_quote_resend",
+    "tests.test_big_agentic_audit_v1.AuditOracleControls.test_bridge_requires_execution_refusal_and_readonly_guards",
+    "tests.test_big_agentic_audit_v1.AuditOracleControls.test_committed_coverage_never_grants_unvisited_pass",
+    "tests.test_big_agentic_audit_v1.AuditOracleControls.test_empty_replay_does_not_inherit_baseline_failure_or_observations",
+    "tests.test_big_agentic_audit_v1.AuditOracleControls.test_interactions_require_completed_actual_proof_and_preserve_failure",
+    "tests.test_big_agentic_audit_v1.AuditOracleControls.test_known_failure_survives_aggregation",
+    "tests.test_big_agentic_audit_v1.AuditOracleControls.test_observer_rejects_state_readout_disagreement",
+    "tests.test_big_agentic_audit_v1.AuditOracleControls.test_replay_collector_preserves_existing_output",
+    "tests.test_big_agentic_audit_v1.AuditOracleControls.test_retained_material_failures_have_backlog_records",
+    "tests.test_big_agentic_audit_v1.AuditOracleControls.test_summary_without_complete_trace_cannot_close_unittest_coverage",
+    "tests.test_big_agentic_audit_v1.AuditOracleControls.test_truncated_and_dropped_traces_are_incomplete",
+    "tests.test_big_agentic_audit_v1.AuditOracleControls.test_unvisited_boundary_cannot_pass",
+    "tests.test_big_agentic_audit_v1.AuditOracleControls.test_valid_control",
+    "tests.test_big_agentic_audit_v1.AuditOracleControls.test_wal_requires_fresh_readers_and_unchanged_inventory",
+    "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_conflict_and_holdout_empty_list_stay_distinct",
+    "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_decision_loop_stale_retry_and_writer_busy",
+    "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_degraded_source_keeps_definition_and_unknown_obligations",
+    "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_direct_vs_related_classification",
+    "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_get_experiment_detail_is_non_mutating",
+    "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_html_decision_and_promote_guard_copy",
+    "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_http_records_reject_and_surfaces_done",
+    "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_owner_language_ru_pass",
+    "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_promote_guard_and_strategy_untouched",
+    "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_real_incomplete_experiment_is_truthful",
+    "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_run_completed_does_not_satisfy_pit",
+    "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_semantic_anti_hijack",
+    "tests.test_forge_composite_feature_recipes_v1.AdmissionTests.test_guard_table_does_not_rewrite_identity",
+    "tests.test_forge_composite_feature_recipes_v1.AdmissionTests.test_public_bound_window_refusal_precedes_reservation_and_loader",
+    "tests.test_forge_composite_feature_recipes_v1.AdmissionTests.test_public_refusal_precedes_values_and_reservations",
+    "tests.test_forge_composite_feature_recipes_v1.EntryWitness.test_accepted_legacy_membership_depends_on_future_target",
+    "tests.test_forge_composite_feature_recipes_v1.EntryWitness.test_capability_only_grounding_is_accepted_without_authority",
+    "tests.test_forge_composite_feature_recipes_v1.EntryWitness.test_holder_raw_recipe_is_supported",
+    "tests.test_forge_composite_feature_recipes_v1.EntryWitness.test_non_holder_dynamic_feature_preview_keeps_legacy_refusal",
+    "tests.test_forge_composite_feature_recipes_v1.PublicSupportTests.test_identical_support_retains_each_operation_binding",
+    "tests.test_forge_composite_feature_recipes_v1.PublicSupportTests.test_legacy_saved_preview_has_explicit_missing_detail",
+    "tests.test_forge_composite_feature_recipes_v1.PublicSupportTests.test_public_legacy_mixed_preview_projects_only_point_features",
+    "tests.test_forge_composite_feature_recipes_v1.PublicSupportTests.test_public_support_and_loader_free_cold_preview",
+    "tests.test_forge_composite_feature_recipes_v1.RawArithmeticTests.test_closed_new_parameters_and_bound_schedule",
+    "tests.test_forge_composite_feature_recipes_v1.RawArithmeticTests.test_equal_relative_targets_do_not_hide_source_copy_conflict",
+    "tests.test_forge_composite_feature_recipes_v1.RawArithmeticTests.test_legacy_preview_exact_base_output",
+    "tests.test_forge_composite_feature_recipes_v1.RawArithmeticTests.test_oracles_and_typed_unavailable",
+    "tests.test_forge_composite_feature_recipes_v1.RawArithmeticTests.test_preview_includes_empty_admitted_cohort",
+    "tests.test_forge_composite_feature_recipes_v1.RawArithmeticTests.test_raw_mixed_clock_conflict_preserves_seat_and_is_order_invariant",
+    "tests.test_forge_composite_feature_recipes_v1.RawArithmeticTests.test_raw_overlap_prefix_and_unavailable_suffix_are_order_invariant",
+    "tests.test_forge_composite_feature_recipes_v1.RawArithmeticTests.test_same_value_target_clock_conflict_is_order_invariant",
+    "tests.test_forge_composite_feature_recipes_v1.ScientificPathTests.test_public_raw_recovery_and_owner_final",
+    "tests.test_forge_composite_feature_recipes_v1.ScientificPathTests.test_serialized_scientific_identity_preserves_path_rejection",
+    "tests.test_forge_ordinary_operation_lifecycle_v1.OperationCompletionBindingTests.test_bound_owner_final_completes_and_each_binding_is_required",
+    "tests.test_forge_ordinary_operation_lifecycle_v1.OperationCompletionBindingTests.test_completion_is_monotone",
+    "tests.test_forge_ordinary_operation_lifecycle_v1.OperationCompletionBindingTests.test_non_scientific_stop_completes_without_a_scientific_claim",
+    "tests.test_forge_ordinary_operation_lifecycle_v1.OrdinaryOperationLifecycleTests.test_r1_r3_two_full_cycles_release_the_profile_without_repair",
+    "tests.test_forge_ordinary_operation_lifecycle_v1.OrdinaryOperationLifecycleTests.test_r2_r4_r5_owner_stop_without_profile_keeps_history_and_quota",
+    "tests.test_forge_ordinary_operation_lifecycle_v1.OrdinaryOperationLifecycleTests.test_r4_open_run_blocks_apply_and_limited_result_pauses",
+    "tests.test_forge_ordinary_operation_lifecycle_v1.OrdinaryOperationLifecycleTests.test_r6_predictable_preview_refusal_never_calls_the_loader",
+    "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_os_reply_loss_then_moved_root_resume_uses_original_draft_and_charge",
+    "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_public_prefix_is_invariant_to_produced_future_poison_but_authorized_numeric_changes",
+    "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_scripted_positive_boundary_runs_real_classify_final_runner_replay",
+    "tests.test_research_store.ResearchStoreTests.test_payload_hash_mismatch_is_rejected",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_check_mismatch_does_not_report_materialized",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_check_rejects_tampered_manifest",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_coerced_execution_inputs_are_gaps",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_deterministic_render_and_snapshot_meaning",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_handoff_contract_names_manifest_1_1_when_binding_is_present",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_materialized_keeps_evidence_hash_conflict",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_mismatched_decision_event_or_clock_is_invalid",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_overview_ready_is_not_available",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_a_happy_path_vertical",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_b_later_evidence_does_not_rewrite_manifest",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_c_legacy_promote_is_explicit_gap",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_d_execution_input_gap",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_e_and_f_collision_and_replay",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_g_get_is_non_mutating",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_h_no_activation",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_semantic_gold_query",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_unreadable_strategy_file_is_conflict",
+    "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_verify_rejects_lineage_or_clock_mismatch"
+  ],
+  "world_recipe": {
+    "actor_fidelity": "NONE",
+    "baseline": "SAME_DECISION_ELIGIBLE",
+    "cohorts": 10,
+    "decisions": [
+      "X300",
+      "Y900"
+    ],
+    "external_world": "SYNTHETIC",
+    "lab_floor": "0.05",
+    "lab_min_matched": 12,
+    "partition_cohorts": [
+      4,
+      3,
+      3
+    ],
+    "scientific_scope": "SYNTHETIC_LAB_ONLY",
+    "seed": 74109,
+    "target": "Y14400",
+    "tokens_per_world": 320,
+    "version": "1.0"
+  },
+  "world_recipe_sha256": "2de3e52ea19f66f19a699165e4471efbc9e45ae9e74d0a3b92303a71808ec9f9"
+}

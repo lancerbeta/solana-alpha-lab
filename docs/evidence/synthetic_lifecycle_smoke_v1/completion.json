@@ -1,0 +1,68 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1-AUDIT-CANDIDATE",
+  "as_of": "2026-10-14",
+  "task_id": "SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1",
+  "state_change": "Completed available synthetic audit scope, frozen S00-S14 coverage with honest actor/science/consumer blockers, native authored Forge technical terminal, explicit BR-01 PAPER and recovery segments, replayable compact receipts and measured retained environment. No product fix or readiness/science/market acceptance.",
+  "implementation_bindings": {},
+  "base_main": "94b391d658b52035ae88e2da05f1ea25ff17b0f8",
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/synthetic_lifecycle_smoke_v1/factory-fit.json",
+    "sha256": "",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_AUDIT_READOUT_CONTROLS_AND_CANONICAL_TESTED_SCOPE_WITH_EXPLICIT_RESIDUAL_BLOCKERS",
+    "independent_review": {
+      "path": "docs/evidence/synthetic_lifecycle_smoke_v1/independent-review.json",
+      "sha256": "",
+      "verdict": "NOT_READY"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FINAL_SAFETY_CANARIES",
+      "PASS_INDEPENDENT_NUMERIC_AND_FIDELITY_ORACLES",
+      "PASS_NATIVE_AUTHORed_FORGE_TERMINAL_AND_COLD_READBACK",
+      "PASS_BR01_PAPER_SEGMENTS_AND_RECOVERY",
+      "PASS_ALL_S00_S14_ACCOUNTED",
+      "PASS_RETAINED_BYTES_NO_CLEANUP"
+    ]
+  },
+  "non_claims": [
+    "NO_BLIND_DISCOVERY",
+    "NO_NATIVE_OOS",
+    "NO_RAW_TO_PAPER_CONTINUITY",
+    "NO_MARKET_ALPHA_NETRETURN_FCF",
+    "NO_BROWSER_OR_FEEDBACK_CONTINUATION_PROOF",
+    "NO_MODEL_DIVERSITY_PROVEN",
+    "NO_CANONICAL_DONE_OR_MERGE_AUTHORITY"
+  ],
+  "side_effects": {
+    "provider_calls": 0,
+    "production_data_writes": 0,
+    "cash_spend": 0,
+    "deployment": 0,
+    "signing_or_transactions": 0,
+    "new_image_builds": 0,
+    "synthetic_fixture_writes": "OWNED_NATIVE_AUDIT_ONLY_RETAINED",
+    "locked_runtime_bootstrap": "ONE_DUPLICATE_HOST_VENV_DISCLOSED_AND_MEASURED_NO_NEW_DEPENDENCY_CHOICE"
+  },
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Audit kit/report only; optional cloud export not an execution gate."
+  },
+  "capability_radar_now": "NONE"
+}

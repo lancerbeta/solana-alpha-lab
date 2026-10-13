@@ -2,6 +2,22 @@ schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-CORE-001
 as_of: '2026-08-10'
 records:
+- asset_id: DOC-SMIAL-SYNTHETIC-LIFECYCLE-SMOKE-V1-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian partial synthetic lifecycle audit, exact native and BR-01 segment boundaries, replayable S00-S14 coverage and measured retained environment; no discovery/science/trading acceptance.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/synthetic_lifecycle_smoke_v1/OWNER_REPORT.md', repository_path: docs/reports/synthetic_lifecycle_smoke_v1/OWNER_REPORT.md}
+  integrity: {kind: sha256, sha256: 40daf05f749c9a4a5923fa8df28a3e5e9064e2eaad20b5a5770191897165df39}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: DOC-EXPERIMENT-EVIDENCE-DECISION-001}, {relation_type: depends_on, target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001}]
+  consumers: [SMIAL-SYNTHETIC-LIFECYCLE-SMOKE-V1, FACTORY-001, NEXT-REPAIR-EXECUTOR]
+  evidence: []
+  search_terms: [SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1, synthetic lifecycle smoke, BR-01, raw episode boundary, recovery, retained environment, SLS-F-002]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: DOC-BIG-AGENTIC-AUDIT-V1-001
   record_version: '1.0'
   asset_type: control_document
