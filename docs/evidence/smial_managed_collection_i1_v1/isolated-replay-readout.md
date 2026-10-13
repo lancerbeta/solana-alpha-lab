@@ -77,9 +77,9 @@ run then exposed a new test's incorrect assumption that its small synthetic
 fixture contained a day-open `member_unit`; it actually publishes plain member
 files. The corrected vertical test passed on a clean commit in 242.40 seconds;
 after the first metadata verifier correction it passed again on a clean commit
-in 243.61 seconds. The added historical metadata check still requires a
-clean-candidate vertical rerun. Focused owner-path/harness tests passed nine
-cases after that correction. A sampled C2 worker process showed
+in 243.61 seconds. With the historical metadata check, the final clean-commit
+vertical run passed in 238.04 seconds. Focused owner-path/harness tests passed
+nine cases after that correction. A sampled C2 worker process showed
 at least 174,604,288 bytes PeakWorkingSet64; this is a lower-bound snapshot,
 not a measured end-to-end peak RSS. End-to-end peak RSS remains `UNKNOWN`.
 
