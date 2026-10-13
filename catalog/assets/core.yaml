@@ -40281,7 +40281,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_opportunity_episodes_vertical_v1.py', repository_path: tests/test_opportunity_episodes_vertical_v1.py}
-  integrity: {kind: sha256, sha256: e9a4b5858fd2384fb501bd2c88265fd358c17cc1305bdfffc8ffc6d59538b4d2}
+  integrity: {kind: sha256, sha256: 6ef304e3f369df415da4354b62155fb9309dcc88453b6fab14eca627de540947}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}

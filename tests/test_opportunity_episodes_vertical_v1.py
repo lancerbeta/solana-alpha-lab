@@ -546,23 +546,31 @@ def phase_p2(work: Path) -> dict[str, Any]:
     report["legacy_import"] = _import_legacy(plane, p2)
     packets = p1["packets"]
     first_packet = json.loads(Path(packets[0]).read_bytes())
-    frozen_unit = next(item for item in first_packet["transfer_manifest"]["entries"] if item["source_class"] == "member_unit")
     assert first_packet["transfer_manifest"]["schema_version"] == "2"
-    frozen_path = source / frozen_unit["transfer_path"]
-    original_unit_path = source / frozen_unit["path"]
-    original_unit = original_unit_path.read_bytes()
-    assert hashlib.sha256(frozen_path.read_bytes()).hexdigest() == frozen_unit["sha256"]
-    try:
-        original_unit_path.write_bytes(b"later open-day index append cannot change the captured version")
+    units = [item for item in first_packet["transfer_manifest"]["entries"] if item["source_class"] == "member_unit"]
+    if units:
+        frozen_unit = units[0]
+        frozen_path = source / frozen_unit["transfer_path"]
+        original_unit_path = source / frozen_unit["path"]
+        original_unit = original_unit_path.read_bytes()
+        assert hashlib.sha256(frozen_path.read_bytes()).hexdigest() == frozen_unit["sha256"]
+        try:
+            original_unit_path.write_bytes(b"later open-day index append cannot change the captured version")
+            first = _consume(packets[:1], source=source, mirror=mirror, plane=plane)
+        finally:
+            original_unit_path.write_bytes(original_unit)
+        report["producer_snapshot_race"] = {
+            "status": "EXERCISED",
+            "frozen_sha256": frozen_unit["sha256"],
+            "frozen_bytes_unchanged": hashlib.sha256(frozen_path.read_bytes()).hexdigest() == frozen_unit["sha256"],
+        }
+    else:
+        # This small vertical fixture publishes plain member files, not a
+        # day-open unit. The dedicated owner-path test exercises unit growth.
         first = _consume(packets[:1], source=source, mirror=mirror, plane=plane)
-    finally:
-        original_unit_path.write_bytes(original_unit)
-    report["producer_snapshot_race"] = {
-        "manifest_version": first_packet["transfer_manifest"]["schema_version"],
-        "frozen_sha256": frozen_unit["sha256"],
-        "frozen_bytes_unchanged": hashlib.sha256(frozen_path.read_bytes()).hexdigest() == frozen_unit["sha256"],
-        "first_import_status": first.get("result", {}).get("cohorts", [{}])[0].get("import_status"),
-    }
+        report["producer_snapshot_race"] = {"status": "NOT_APPLICABLE_PLAIN_MEMBER_LOCATION"}
+    report["producer_snapshot_race"]["manifest_version"] = first_packet["transfer_manifest"]["schema_version"]
+    report["producer_snapshot_race"]["first_import_status"] = first.get("result", {}).get("cohorts", [{}])[0].get("import_status")
     report["consume_first"] = first
     replay_import = _consume(packets[:1], source=source, mirror=mirror, plane=plane)
     report["consume_repeat"] = replay_import
@@ -911,7 +919,9 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertEqual(p2["consume_first"]["result"]["terminal"], "EPISODE_BATCH_COMPLETE", p2["consume_first"])
         self.assertEqual(p2["consume_first"]["result"]["cohorts"][0]["import_status"], "IMPORTED")
         self.assertEqual(p2["producer_snapshot_race"]["manifest_version"], "2")
-        self.assertTrue(p2["producer_snapshot_race"]["frozen_bytes_unchanged"])
+        self.assertIn(p2["producer_snapshot_race"]["status"], {"EXERCISED", "NOT_APPLICABLE_PLAIN_MEMBER_LOCATION"})
+        if p2["producer_snapshot_race"]["status"] == "EXERCISED":
+            self.assertTrue(p2["producer_snapshot_race"]["frozen_bytes_unchanged"])
         self.assertEqual(p2["producer_snapshot_race"]["first_import_status"], "IMPORTED")
         self.assertEqual(p2["consume_repeat"]["result"]["cohorts"][0]["import_status"], "PASS_ALREADY_PRESENT_EXACT")
         self.assertEqual(p2["consume_repeat"]["result"]["cohorts"][0]["transferred_files"], 0)
