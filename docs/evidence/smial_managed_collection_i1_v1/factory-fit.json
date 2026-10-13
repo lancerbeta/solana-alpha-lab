@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "SMIAL_MANAGED_COLLECTION_I1_V1-FIT",
+  "as_of": "2026-10-13",
+  "task_id": "SMIAL_MANAGED_COLLECTION_I1_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "One existing owner command can use exact C2 source while preserving C1 capture identity; the production consume remains behind its separate OPERATE gate.",
+    "flexibility_and_history": "Version-1 transfer packets and already imported releases stay readable; version-2 freezes mutable metadata once on the existing exporter. C1 source/release are never overwritten to make C2 pass.",
+    "context_efficiency": "One exact task and checkout, five Catalog source hashes, focused owner/contract tests and one C1/C2 disposable replay. No pre-PR full local gate; exact-head CI is mandatory. Material interrupted and dirty-tree checks are retained as failures, not promoted.",
+    "research_truth": "Closed closure, episode membership, point membership, field states, missingness and admission-time protection remain hash-bound. Transport identity changes do not broaden the scientific denominator, PIT clock or estimand.",
+    "owner_operability": "Ordinary unpack command returns explicit exact repeat, typed missing version and conflict; release-only historical replay names absent source and requires restoration before retention. One exact C2 OPERATE packet contains target, source, numerical oracle and stop conditions.",
+    "execution_to_cashflow": "This is evidence transport for exploratory research. It makes no trading, alpha, revenue, wallet or cashflow claim and authorizes no provider call.",
+    "monitoring_and_recovery": "Verified partial transfer fragments remain for same-packet retry; an imported historical release can answer only after full release, installed-byte and current metadata checks. Production recovery coverage must be independently read back under OPERATE.",
+    "build_vs_buy": "ADOPT existing capture/export, mirror, seal/import, Catalog and locked Python. WRAP mutable member-unit in capture-scoped views and an exporter-frozen snapshot. No new package, service, connector, provider or backup plane.",
+    "security": "Manifest self-hash, closure binding, safe relative paths, symlink refusal, bounded streaming size/hash checks and exclusive publication protect the transport seam. No credentials, external writes or live collector mutation.",
+    "red_team": "C1(8) to C2(24) is the original falsifier; changed immutable payload, wrong source bytes, missing historical source, altered installed release and missing current metadata must refuse or return explicitly limited verified fallback. Exact-head CI must validate the committed vertical route."
+  },
+  "capability_radar": {
+    "now": "I1 exact software merge gate and separately authorized C2 consume. Value: delivery continuity; evidence: isolated exact C1/C2 replay. Owner activates only at exact merge phrase then distinct OPERATE gate; no new tool.",
+    "watch": "Continuity checkpoint 2026-10-14 03:00 Moscow before 17 October intake stop. Re-read live grant/intake/storage state and choose an exact I3 continuation atom only if that trigger becomes due; no I2-I5 work is authorized here."
+  },
+  "recovery": "Before production C2 write, code can revert. After a new import, preserve C1 and every committed cohort; retry same packet or forward-repair import intent. Never delete lineage, overwrite shared unit metadata or restore a pre-C2 corpus snapshot over newer data.",
+  "limits": [
+    "NO_PRODUCTION_C2_IMPORT_DEPLOY_OR_DRIVE_BACKUP",
+    "NO_COLLECTOR_GRANT_FROZEN_SCHEDULE_OR_PROVIDER_CHANGE",
+    "NO_NEW_SCIENCE_ALPHA_PROFITABILITY_OR_CANONICAL_DONE",
+    "NO_PEAK_RSS_OR_UNBOUNDED_CAPACITY_CLAIM",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_LOCAL_EVIDENCE"
+  ]
+}

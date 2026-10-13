@@ -1,0 +1,17 @@
+[
+  {
+    "claim_id": "I1_CAPTURE",
+    "claim": "A closed Opportunity Episodes capture retains its exact scientific closure while each mutable member-unit metadata version gets a distinct transport identity and immutable producer snapshot.",
+    "scope": "Version-2 producer transport manifest and capture-scoped workstation source view only. A new transport identity grants no new admission, denominator, field, PIT, source, science or collector authority. Version-1 packets remain historical bytes."
+  },
+  {
+    "claim_id": "I1_CONSUME",
+    "claim": "The existing owner unpack command can consume exact C2 over a C1 mirror without overwriting C1, repeat C2 without a corpus epoch bump, and replay C1 after C2.",
+    "scope": "Verified source fragments, sealed releases and append-only corpus on a disposable isolated copy. Conflicting immutable paths or wrong bytes refuse. A missing old source may answer only from a fully verified already imported release and every installed canonical dependency."
+  },
+  {
+    "claim_id": "I1_AUTHORITY",
+    "claim": "Engineering evidence can make the I1 code ready for the exact merge gate while real C2 import, producer deploy and recovery coverage remain separate owner-authorized OPERATE work.",
+    "scope": "No change to ACT-4744D4017AC4B196, its grant, frozen schedule, provider calls, Drive, scientific validity or production corpus. Isolated corpus currentness labels may mark C1 non-current after C2 while canonical C1 bytes remain unchanged."
+  }
+]

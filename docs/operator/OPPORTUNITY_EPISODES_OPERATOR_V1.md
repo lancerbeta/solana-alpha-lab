@@ -121,6 +121,22 @@ files, local seal (release 1.2) → verify → import into
 add `--capture-packet <packet.json> --source-rdp <rdp> --mirror-rdp <mirror>`.
 A repeated import of identical bytes returns `PASS_ALREADY_PRESENT_EXACT`. The
 command never starts Forge; it prints the generated population card.
+Each packet has its own verified source view under the mirror's `captures/`
+directory. The release remains under the usual `sealed_releases/` directory.
+Keep the exact packet, its source view and the verified source/export package
+until a separate retention decision; the next capture may grow the day's
+`unit.json`. Historical version `1` packets are accepted with their original
+bytes. A new version `2` packet uses exporter-frozen `capture_metadata` inside
+the cohort export and therefore requires an independently authorized producer
+deploy. Reuse the same packet for recovery; do not request another provider
+call or replace the shared mirror's `unit.json`.
+If an old packet's source version is missing after its release was already
+imported, the top-level result is `EPISODE_BATCH_REPLAY_SOURCE_MISSING`, with
+`source_unverified_n > 0` and cohort `source_resolution=VERIFIED_IMPORTED_RELEASE`.
+It verifies the sealed release, current corpus metadata and every canonical
+installed dependency before reporting an exact import repeat. It does not
+claim that the missing source was transferred; restore that exact source/view
+before any retention decision. `newly_imported_n` remains zero on this path.
 
 ## Ordinary Forge
 
@@ -150,6 +166,11 @@ values; registered replay recomputes from the frozen recipe and release files.
 | `EPISODE_BATCH_NOTHING_MATURE` (PASS) | no mature unimported cohort yet | wait for the next UTC day |
 | `ROUND_STARTED_UNRESOLVED`, `ROUND_PARTIAL_ADMISSION`, `ROUND_RECOVERY_REFUSED`, `ROUND_FRAME_CORRUPT`, `ROUND_ROW_MISSING` in the blocking reasons of `EPISODE_BATCH_NOTHING_MATURE` | a nomination round crashed: still unreconciled, partially admitted, or its durable evidence is invalid, unreadable or missing | while the activation is active an ordinary tick reconciles an unresolved round (a paused/aborted/completed activation does not); a partial, refused, corrupt or missing round stays blocked: do not capture, report the `reason_code` from `episode_rounds` |
 | `MIRROR_INCOMPLETE` | transfer interrupted | rerun the same command |
+| `CAPTURE_SOURCE_VERSION_MISSING` | an exact old metadata version is absent and no fully verified imported release can answer the replay | restore the saved source package/view by its hash; do not synthesize it from the current index |
+| `EPISODE_BATCH_REPLAY_SOURCE_MISSING` (PASS for imported corpus only) | historical release and installed corpus verify, but capture source is still absent | inspect cohort `source_resolution` and `unverified_source_paths`; restore the exact source before retention or another unimported consume |
+| `EPISODE_BATCH_PLAN_READY` (`--plan-only`) | read-only capture-view accounting; no transfer, seal or import | inspect `mirror.reused_files`, `missing_files`, `missing_bytes` and `conflicts`; await the exact OPERATE gate before running without `--plan-only` |
+| `CANONICAL_METADATA_CONFLICT` | current published corpus labels, manifest, partitions or publication marker fail repeat verification | stop; restore exact metadata through the owned recovery path before Forge |
+| `TRANSFER_MANIFEST_INVALID`, `TRANSFER_ARCHIVE_INVALID`, `TRANSFER_SHA_MISMATCH` | packet binding, archive member or bytes failed verification | stop; compare the original packet and verified source package, then retry the same packet only after repairing the missing exact bytes |
 | `MARKET_EVIDENCE_BASIS_INCOMPLETE` at preflight | an import was interrupted after labels, before lineage | rerun the same unpack command (not preflight); it reuses the recorded import instant |
 | `RELEASE_HASH_MISMATCH`, `MIRROR_CONFLICT`, `CLOSURE_COHORT_MISMATCH` | bytes differ from the sealed or captured identity | stop; do not import |
 | `COLLECTION_PACKET_MISMATCH` | packet from another collection | use an OPPORTUNITY_EPISODES capture packet |

@@ -1,0 +1,18 @@
+[
+  {
+    "logical_ref": "docs/evidence/smial_managed_collection_i1_v1/source-contract.md",
+    "sha256_or_fingerprint": "6f3cce30bbea09eeffe286ccb6f9bc3a53dddf46b213dae038be0dc4ab4880e3"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_managed_collection_i1_v1/isolated-proof.json",
+    "sha256_or_fingerprint": "494b6f58a5a46c0aa023fd53d28268539216098bdb901d0c55540b15097808fd"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_managed_collection_i1_v1/isolated-replay-readout.md",
+    "sha256_or_fingerprint": "8f734b61c4bdda88ab1f858216360634248df023f4d931cd676d23aee8ef3b2c"
+  },
+  {
+    "logical_ref": "docs/evidence/smial_managed_collection_i1_v1/C2_OPERATE_PACKET.md",
+    "sha256_or_fingerprint": "a5204d5f37cb1c3ee956fa60572a0a891c6267d1509b4845677bf4dd2dd27bd9"
+  }
+]

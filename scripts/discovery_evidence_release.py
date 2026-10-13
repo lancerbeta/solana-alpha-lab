@@ -246,11 +246,59 @@ json.dump(packet, sys.stdout, default=str)
     mirror = repo_root / "local/factory_mirror/observation_rdp"
     mirror.mkdir(parents=True, exist_ok=True)
 
-    def _transfer(manifest: dict, missing: list[str]) -> None:
-        del manifest
+    def _transfer(manifest: dict, missing: list[str], *, destination_root: Path | None = None) -> None:
         if not missing:
             return
-        listing = "\n".join(missing) + "\n"
+        entries = {entry["path"]: entry for entry in manifest["entries"]}
+        listing = "\n".join(str(entries[path].get("transfer_path") or path) for path in missing) + "\n"
+        if destination_root is not None:
+            import tarfile
+            import threading
+            from solana_alpha_lab.factory.live_cohort_vanilla_path import install_transfer_stream
+            from solana_alpha_lab.factory.opportunity_episode_release import _contained
+            expected = {str(entries[path].get("transfer_path") or path): entries[path] for path in missing}
+            with subprocess.Popen(ssh + ["sudo -n tar -C " + deploy + "/local/factory_v1/observation_rdp -cf - -T -"],
+                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) as child:
+                assert child.stdin is not None and child.stdout is not None
+                writer_errors: list[OSError] = []
+
+                def feed_listing() -> None:
+                    try:
+                        child.stdin.write(listing.encode("utf-8"))
+                    except OSError as exc:
+                        writer_errors.append(exc)
+                    finally:
+                        child.stdin.close()
+
+                writer = threading.Thread(target=feed_listing, daemon=True)
+                writer.start()
+                received: set[str] = set()
+                try:
+                    with tarfile.open(fileobj=child.stdout, mode="r|") as archive:
+                        for member in archive:
+                            entry = expected.get(member.name)
+                            if entry is None or member.name in received or not member.isfile() or member.size != entry["bytes"]:
+                                raise LiveCohortReleaseError("TRANSFER_ARCHIVE_INVALID")
+                            stream = archive.extractfile(member)
+                            if stream is None:
+                                raise LiveCohortReleaseError("TRANSFER_ARCHIVE_INVALID")
+                            with stream:
+                                install_transfer_stream(stream, _contained(destination_root, entry["path"]), entry, root=destination_root)
+                            received.add(member.name)
+                    writer.join(timeout=600)
+                    if writer.is_alive() or writer_errors or child.wait(timeout=600) != 0 or received != set(expected):
+                        raise LiveCohortReleaseError("CAPTURE_SOURCE_VERSION_MISSING")
+                except (tarfile.TarError, subprocess.TimeoutExpired) as exc:
+                    child.kill()
+                    child.wait()
+                    writer.join(timeout=5)
+                    raise LiveCohortReleaseError("TRANSFER_ARCHIVE_INVALID") from exc
+                except BaseException:
+                    child.kill()
+                    child.wait()
+                    writer.join(timeout=5)
+                    raise
+            return
         remote_tar = subprocess.run(
             ssh
             + [
@@ -273,7 +321,13 @@ json.dump(packet, sys.stdout, default=str)
             raise LiveCohortReleaseError("CAPTURE_EXPORT_FAILED")
 
     if plan_only:
-        classified = classify_mirror(packet["transfer_manifest"], mirror)
+        if collection == EPISODE_COLLECTION:
+            from solana_alpha_lab.factory.live_cohort_vanilla_path import classify_episode_capture_plan, validate_episode_transfer_manifest
+            validate_episode_transfer_manifest(packet["transfer_manifest"], packet["closure_receipt"])
+            classified = classify_episode_capture_plan(packet["transfer_manifest"], mirror)
+        else:
+            classified = classify_mirror(packet["transfer_manifest"], mirror)
+        classified.pop("missing_paths", None)
         return {
             "terminal": "PLAN_READY",
             "mirror": classified,
@@ -299,6 +353,11 @@ EPISODE_FAIL_NEXT = {
     "COLLECTION_PACKET_MISMATCH": "STOP_USE_OPPORTUNITY_EPISODES_CAPTURE_PACKET",
     "CAPTURE_PACKET_REQUIRES_SOURCE_AND_MIRROR_RDP": "RERUN_WITH_SOURCE_RDP_AND_MIRROR_RDP",
     "MIRROR_INCOMPLETE": "RERUN_UNPACK_SAME_COMMAND",
+    "CAPTURE_SOURCE_VERSION_MISSING": "STOP_RESTORE_EXACT_CAPTURE_SOURCE_VERSION",
+    "TRANSFER_MANIFEST_INVALID": "STOP_INSPECT_CAPTURE_PACKET_BINDING",
+    "TRANSFER_ARCHIVE_INVALID": "STOP_INSPECT_CAPTURE_ARCHIVE",
+    "TRANSFER_SHA_MISMATCH": "STOP_RESTORE_EXACT_CAPTURE_SOURCE_VERSION",
+    "CANONICAL_METADATA_CONFLICT": "STOP_RESTORE_CANONICAL_CORPUS_METADATA",
     "MIRROR_CONFLICT": "STOP_DO_NOT_IMPORT",
     "CLOSURE_COHORT_MISMATCH": "STOP_DO_NOT_IMPORT",
     "RELEASE_HASH_MISMATCH": "STOP_DO_NOT_IMPORT",
@@ -331,15 +390,11 @@ def _episode_next(code: str) -> str:
 def _filesystem_transfer(source_root: Path, mirror_root: Path):
     """Native transport boundary on one filesystem: copy only missing paths."""
 
-    import shutil
+    from solana_alpha_lab.factory.live_cohort_vanilla_path import place_missing
 
-    def _transfer(manifest: dict, missing: list[str]) -> None:
-        del manifest
-        for relative in missing:
-            src = source_root / relative
-            dest = mirror_root / relative
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(src, dest)
+    def _transfer(manifest: dict, missing: list[str], *, destination_root: Path | None = None) -> None:
+        place_missing(manifest=manifest, source_root=source_root, mirror_root=destination_root or mirror_root,
+                      classification={"conflicts": 0, "missing_paths": missing})
 
     return _transfer
 
@@ -359,11 +414,21 @@ def _unpack_episode_cohorts(args: argparse.Namespace, *, data_root: Path, repo_r
             raise LiveCohortReleaseError("CAPTURE_PACKET_REQUIRES_SOURCE_AND_MIRROR_RDP")
         source_root = _path(args.source_rdp)
         mirror_root = _path(args.mirror_rdp)
-        mirror_root.mkdir(parents=True, exist_ok=True)
+        if not args.plan_only:
+            mirror_root.mkdir(parents=True, exist_ok=True)
         for packet_path in packets[:max_cohorts]:
             packet = json.loads(_path(packet_path).read_text(encoding="utf-8"))
             if packet.get("collection") != EPISODE_COLLECTION:
                 raise LiveCohortReleaseError("COLLECTION_PACKET_MISMATCH")
+            if args.plan_only:
+                from solana_alpha_lab.factory.live_cohort_vanilla_path import classify_episode_capture_plan, validate_episode_transfer_manifest
+                validate_episode_transfer_manifest(packet["transfer_manifest"], packet["closure_receipt"])
+                plan = classify_episode_capture_plan(packet["transfer_manifest"], mirror_root)
+                plan.pop("missing_paths", None)
+                results.append({"cohort_id": packet["cohort_id"], "terminal": "PLAN_READY",
+                                "mirror": plan,
+                                "transfer_manifest_sha256": packet["transfer_manifest"]["manifest_sha256"]})
+                continue
             try:
                 result = run_owner_live_cohort(
                     capture=lambda packet=packet: packet,
@@ -402,11 +467,16 @@ def _unpack_episode_cohorts(args: argparse.Namespace, *, data_root: Path, repo_r
             if args.plan_only:
                 break
     imported = [item for item in results if item.get("import_status") in {"IMPORTED", "PASS_ALREADY_PRESENT_EXACT"}]
+    source_unverified = [item for item in results if item.get("source_resolution") == "VERIFIED_IMPORTED_RELEASE"]
     failed = [item for item in results if item.get("terminal") == "FAIL"]
     if failed:
         terminal, next_action = "EPISODE_BATCH_PARTIAL", str(failed[-1].get("next") or "STOP_INSPECT_FAIL_CODE")
     elif not results:
         terminal, next_action = "EPISODE_BATCH_NOTHING_MATURE", "WAIT_UNTIL_COHORT_MATURE"
+    elif args.plan_only:
+        terminal, next_action = "EPISODE_BATCH_PLAN_READY", "AWAIT_EXACT_OPERATE_GATE"
+    elif source_unverified:
+        terminal, next_action = "EPISODE_BATCH_REPLAY_SOURCE_MISSING", "RESTORE_EXACT_CAPTURE_SOURCE_VERSION_BEFORE_RETENTION"
     else:
         terminal, next_action = "EPISODE_BATCH_COMPLETE", "ORDINARY_FORGE_PREFLIGHT_COLLECTION_OPPORTUNITY_EPISODES"
     return {
@@ -414,6 +484,8 @@ def _unpack_episode_cohorts(args: argparse.Namespace, *, data_root: Path, repo_r
         "terminal": terminal,
         "cohorts": results,
         "imported_n": len(imported),
+        "newly_imported_n": sum(item.get("import_status") == "IMPORTED" for item in results),
+        "source_unverified_n": len(source_unverified),
         "next": next_action,
         "forge_run_started": False,
     }
@@ -727,7 +799,7 @@ def main(argv: list[str] | None = None) -> int:
                 repo_root=ROOT if args.repo_root is None else _path(args.repo_root),
                 as_of=_parse_utc(args.as_of) or datetime.now().astimezone(),
             )
-            ok = result["terminal"] in {"EPISODE_BATCH_COMPLETE", "EPISODE_BATCH_NOTHING_MATURE"}
+            ok = result["terminal"] in {"EPISODE_BATCH_COMPLETE", "EPISODE_BATCH_NOTHING_MATURE", "EPISODE_BATCH_REPLAY_SOURCE_MISSING", "EPISODE_BATCH_PLAN_READY"}
             print(json.dumps({"status": "PASS" if ok else "FAIL", "result": result}, sort_keys=True, default=str))
             return 0 if ok else 2
         elif args.command == "unpack-next-live-cohort":

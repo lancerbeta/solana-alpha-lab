@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "SMIAL_MANAGED_COLLECTION_I1_V1-SOFTWARE-CANDIDATE",
+  "as_of": "2026-10-13",
+  "task_id": "SMIAL_MANAGED_COLLECTION_I1_V1",
+  "state_change": "The existing Opportunity Episodes owner path preserves capture-specific mutable metadata, consumes C2 over C1 without shared overwrite, verifies historical replay and prepares an exact separately gated C2 operation.",
+  "base_main": "339c50dabe128a4c672028141f93d214152b6252",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Git is the working context and evidence owner; no cloud export requested."
+  },
+  "capability_radar_now": "NONE: existing Git/gh, locked Python, native capture/export/consume and Catalog suffice; no new package, connector, service or automation.",
+  "implementation_bindings": {
+    "docs/tasks/SMIAL_MANAGED_COLLECTION_I1_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/smial_managed_collection_i1_v1/factory-fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FOCUSED_OWNER_CONTRACT_TESTS_AND_ISOLATED_C1_C2_REPLAY",
+    "independent_review": {
+      "path": "docs/evidence/smial_managed_collection_i1_v1/independent-review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_CONTEXT",
+      "PASS_CATALOG_PROPAGATION",
+      "PASS_EXACT_C2_SOURCE_VIEW_AND_HISTORICAL_REPLAY",
+      "PASS_NO_RUNTIME_COLLECTOR_MUTATION"
+    ]
+  },
+  "non_claims": [
+    "NO_PRODUCTION_C2_IMPORT_OR_RECOVERY_COPY",
+    "NO_COLLECTOR_GRANT_FROZEN_SCHEDULE_OR_PROVIDER_CHANGE",
+    "NO_NEW_SCIENTIFIC_ESTIMAND_ALPHA_OR_CASHFLOW",
+    "NO_CANONICAL_DONE_OR_OWNER_SEMANTIC_ACCEPTANCE",
+    "NO_V2_PRODUCER_DEPLOY_FROM_MERGE",
+    "NO_PEAK_RSS_OR_UNBOUNDED_CAPACITY_CLAIM"
+  ],
+  "side_effects": {
+    "repository": "bounded I1 branch files and Catalog hashes",
+    "local": "disposable C1/C2 proof roots under local/ only",
+    "external": "read-only GitHub and collector health; no production import, provider, deploy or Drive write"
+  }
+}

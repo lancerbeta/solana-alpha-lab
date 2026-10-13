@@ -8,7 +8,11 @@ import primitives. It does not materialize on a capture host and does not run
 from __future__ import annotations
 
 import hashlib
+import io
 import json
+import os
+import re
+import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping
@@ -253,6 +257,139 @@ def write_transfer_manifest(path: Path, manifest: Mapping[str, Any]) -> None:
     )
 
 
+def episode_capture_source_root(manifest: Mapping[str, Any], mirror_root: Path) -> Path:
+    """A transport identity owns its source bytes; sealed releases keep their old root."""
+    digest = str(manifest.get("manifest_sha256") or "")
+    if not re.fullmatch(r"[0-9a-f]{64}", digest):
+        raise LiveCohortReleaseError("TRANSFER_MANIFEST_INVALID")
+    from solana_alpha_lab.factory.opportunity_episode_release import _contained
+    return _contained(Path(mirror_root), f"captures/{digest}/source")
+
+
+def validate_episode_transfer_manifest(manifest: Mapping[str, Any], receipt: Mapping[str, Any]) -> None:
+    from solana_alpha_lab.factory.opportunity_episode_release import (
+        TRANSFER_KIND, _safe_rel, assert_episode_closure_ready, export_dir_rel,
+    )
+    assert_episode_closure_ready(receipt)
+    body = dict(manifest)
+    digest = body.pop("manifest_sha256", None)
+    if (digest != canonical_sha256(body) or body.get("kind") != TRANSFER_KIND
+            or body.get("schema_version") not in {"1", "2"}
+            or body.get("collection") != "OPPORTUNITY_EPISODES"
+            or any(body.get(key) != receipt.get(key) for key in (
+                "cohort_id", "schedule_sha256", "activation_id", "closure_receipt_sha256"))):
+        raise LiveCohortReleaseError("TRANSFER_MANIFEST_INVALID")
+    entries = body.get("entries")
+    if not isinstance(entries, list) or not entries:
+        raise LiveCohortReleaseError("TRANSFER_MANIFEST_INVALID")
+    seen: set[str] = set()
+    for entry in entries:
+        if not isinstance(entry, Mapping):
+            raise LiveCohortReleaseError("TRANSFER_MANIFEST_INVALID")
+        rel = str(entry.get("path") or "")
+        if (_safe_rel(rel) != rel or ":" in rel or "\\" in rel or "\n" in rel or "\r" in rel
+                or "\x00" in rel or rel in seen or rel in {".", "/"}
+                or any(part in {"", "."} for part in rel.split("/"))
+                or not re.fullmatch(r"[0-9a-f]{64}", str(entry.get("sha256") or ""))
+                or type(entry.get("bytes")) is not int or entry["bytes"] < 0):
+            raise LiveCohortReleaseError("TRANSFER_MANIFEST_INVALID")
+        seen.add(rel)
+        if "transfer_path" in entry:
+            expected = f"{export_dir_rel(receipt)}/capture_metadata/{entry['sha256']}/unit.json"
+            if (body["schema_version"] != "2" or entry.get("source_class") != "member_unit"
+                    or entry["transfer_path"] != expected):
+                raise LiveCohortReleaseError("TRANSFER_MANIFEST_INVALID")
+        elif body["schema_version"] == "2" and entry.get("source_class") == "member_unit":
+            raise LiveCohortReleaseError("TRANSFER_MANIFEST_INVALID")
+
+
+def install_transfer_stream(stream, dest: Path, entry: Mapping[str, Any], *, root: Path) -> None:
+    """Hash bounded chunks, then publish exclusively; a failed fragment is never visible."""
+    from solana_alpha_lab.factory.opportunity_episode_release import _contained
+    dest = _contained(Path(root), dest.relative_to(root).as_posix())
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix=".capture-transfer-", dir=dest.parent)
+    tmp = Path(temporary)
+    try:
+        digest, size = hashlib.sha256(), 0
+        with os.fdopen(fd, "wb") as output:
+            while chunk := stream.read(1024 * 1024):
+                size += len(chunk)
+                if size > int(entry["bytes"]):
+                    raise LiveCohortReleaseError("TRANSFER_SHA_MISMATCH")
+                digest.update(chunk)
+                output.write(chunk)
+            output.flush()
+            os.fsync(output.fileno())
+        if size != entry["bytes"] or digest.hexdigest() != entry["sha256"]:
+            raise LiveCohortReleaseError("TRANSFER_SHA_MISMATCH")
+        _contained(Path(root), dest.relative_to(root).as_posix())
+        try:
+            # Exclusive publication of the verified temporary inode, never a link to source.
+            os.link(tmp, dest)
+        except FileExistsError:
+            if (dest.is_symlink() or not dest.is_file() or dest.stat().st_size != size
+                    or sha256_file_streaming(dest) != digest.hexdigest()):
+                raise LiveCohortReleaseError("MIRROR_CONFLICT")
+    finally:
+        tmp.unlink(missing_ok=True)
+
+
+def prepare_episode_capture_view(manifest: Mapping[str, Any], mirror_root: Path) -> Path:
+    from solana_alpha_lab.factory.opportunity_episode_release import _contained
+    view = episode_capture_source_root(manifest, mirror_root)
+    view.mkdir(parents=True, exist_ok=True)
+    marker = view.parent / "transfer_manifest.json"
+    raw = json.dumps(dict(manifest), sort_keys=True, separators=(",", ":")).encode("utf-8")
+    with io.BytesIO(raw) as stream:
+        install_transfer_stream(stream, marker, {"bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}, root=Path(mirror_root))
+    for entry in manifest["entries"]:
+        dest = _contained(view, str(entry["path"]))
+        shared = _contained(Path(mirror_root), str(entry["path"]))
+        if not shared.is_file():
+            continue
+        matches = shared.stat().st_size == entry["bytes"] and sha256_file_streaming(shared) == entry["sha256"]
+        if not matches:
+            if entry.get("source_class") != "member_unit":
+                raise LiveCohortReleaseError("MIRROR_CONFLICT")
+            continue
+        if not dest.exists():
+            with shared.open("rb") as stream:
+                install_transfer_stream(stream, dest, entry, root=view)
+    return view
+
+
+def classify_episode_capture_plan(manifest: Mapping[str, Any], mirror_root: Path) -> dict[str, Any]:
+    """Read-only transfer plan using the same capture-view identity as consume."""
+
+    from solana_alpha_lab.factory.opportunity_episode_release import _contained
+
+    view = episode_capture_source_root(manifest, mirror_root)
+    reused = missing = conflicts = missing_bytes = 0
+    missing_paths: list[str] = []
+    for entry in manifest["entries"]:
+        relative = str(entry["path"])
+        scoped = _contained(view, relative)
+        shared = _contained(Path(mirror_root), relative)
+        candidate = scoped if scoped.is_file() else shared
+        if candidate.is_file() and candidate.stat().st_size == entry["bytes"] and sha256_file_streaming(candidate) == entry["sha256"]:
+            reused += 1
+        elif scoped.exists() or (shared.exists() and entry.get("source_class") != "member_unit"):
+            conflicts += 1
+        else:
+            missing += 1
+            missing_bytes += entry["bytes"]
+            missing_paths.append(relative)
+    return {
+        "conflicts": conflicts, "missing_bytes": missing_bytes,
+        "missing_files": missing, "missing_paths": missing_paths,
+        "reused_files": reused, "unique_paths_total": reused + missing + conflicts,
+        "verified_paths_total": reused,
+        "status": "CONFLICT" if conflicts else "READY",
+        "source_resolution": "CAPTURE_VIEW_READ_ONLY_PLAN",
+    }
+
+
 def classify_mirror(
     manifest: Mapping[str, Any],
     mirror_root: Path,
@@ -306,17 +443,19 @@ def place_missing(
     moved = 0
     for relative in classification.get("missing_paths") or []:
         entry = by_path[str(relative)]
-        src = Path(source_root) / str(relative)
-        digest = sha256_file_streaming(src)
-        if digest != entry.get("sha256"):
-            raise LiveCohortReleaseError(f"TRANSFER_SHA_MISMATCH:{relative}")
-        dest = Path(mirror_root) / str(relative)
-        if dest.exists():
-            raise LiveCohortReleaseError(f"MIRROR_CONFLICT:{relative}")
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_bytes(src.read_bytes())
-        if hashlib.sha256(dest.read_bytes()).hexdigest() != digest:
-            raise LiveCohortReleaseError(f"TRANSFER_SHA_MISMATCH:{relative}")
+        from solana_alpha_lab.factory.opportunity_episode_release import _contained
+        src = _contained(Path(source_root), str(entry.get("transfer_path") or relative))
+        dest = _contained(Path(mirror_root), str(relative))
+        if not src.is_file():
+            code = "CAPTURE_SOURCE_VERSION_MISSING" if entry.get("source_class") == "member_unit" else "DEPENDENCY_MISSING"
+            raise LiveCohortReleaseError(code)
+        with src.open("rb") as stream:
+            try:
+                install_transfer_stream(stream, dest, entry, root=Path(mirror_root))
+            except LiveCohortReleaseError as exc:
+                if str(exc) == "TRANSFER_SHA_MISMATCH" and entry.get("source_class") == "member_unit" and manifest.get("schema_version") == "1":
+                    raise LiveCohortReleaseError("CAPTURE_SOURCE_VERSION_MISSING") from exc
+                raise
         moved += 1
     return moved
 
@@ -406,7 +545,12 @@ def run_owner_live_cohort(
 
     packet = capture()
     manifest = packet["transfer_manifest"]
-    before = classify_mirror(manifest, mirror_root)
+    shared_mirror = Path(mirror_root)
+    episode = packet.get("collection") == "OPPORTUNITY_EPISODES"
+    if episode:
+        validate_episode_transfer_manifest(manifest, packet["closure_receipt"])
+        mirror_root = prepare_episode_capture_view(manifest, shared_mirror)
+    before = classify_mirror(manifest, Path(mirror_root))
     accounted = (
         int(before["reused_files"]) + int(before["missing_files"]) + int(before["conflicts"])
     )
@@ -415,7 +559,28 @@ def run_owner_live_cohort(
     if before["conflicts"]:
         raise LiveCohortReleaseError("MIRROR_CONFLICT")
     if before["missing_files"]:
-        transfer(manifest, list(before["missing_paths"]))
+        if episode:
+            try:
+                transfer(manifest, list(before["missing_paths"]), destination_root=Path(mirror_root))
+            except LiveCohortReleaseError as exc:
+                if manifest.get("schema_version") != "1" or str(exc) not in {
+                    "CAPTURE_SOURCE_VERSION_MISSING", "DEPENDENCY_MISSING"
+                }:
+                    raise
+                from solana_alpha_lab.factory.opportunity_episode_release import replay_imported_episode_release
+                replay = replay_imported_episode_release(
+                    release_base_root=shared_mirror, data_root=Path(data_root),
+                    receipt=packet["closure_receipt"], manifest=manifest, as_of=as_of,
+                )
+                partial = classify_mirror(manifest, Path(mirror_root))
+                replay.update(unique_paths_total=before["unique_paths_total"],
+                              verified_paths_total=partial["reused_files"],
+                              transferred_files=partial["reused_files"] - before["reused_files"],
+                              reused_files=before["reused_files"],
+                              unverified_source_paths=partial["missing_files"])
+                return replay
+        else:
+            transfer(manifest, list(before["missing_paths"]))
     after = classify_mirror(manifest, mirror_root)
     if (
         after["missing_files"]
@@ -436,6 +601,7 @@ def run_owner_live_cohort(
             manifest=manifest,
             as_of=as_of,
             release_builder_git_sha=release_builder_git_sha,
+            release_base_root=shared_mirror,
         )
         result["unique_paths_total"] = before["unique_paths_total"]
         result["verified_paths_total"] = after["verified_paths_total"]
