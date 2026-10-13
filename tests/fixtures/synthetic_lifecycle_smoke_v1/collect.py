@@ -139,7 +139,9 @@ def main():
         'ledger_suite_status_disagreements':disagreements,
         'assembler_canaries':{'missing_required_run':'PASS','truncated_required_suite':'PASS','two_segments_never_full':'PASS'},
         'resource_footprint':{'host':host,'docker':docker,'known_allocated_total_bytes':allocated,'known_allocated_total_gib':round(allocated/1024**3,4),
-            'shared_image_incremental_bytes':0,'cleanup':'OWNER_DECISION_PENDING_NO_DELETE'},
+            'shared_image_incremental_bytes':0,'shared_uv_cache_incremental_bytes':None,
+            'shared_uv_cache_limit':'No pre-campaign cache allocation baseline; incremental shared bytes remain UNKNOWN.',
+            'cleanup':'OWNER_DECISION_PENDING_NO_DELETE'},
         'non_claims':['NO_BLIND_DISCOVERY','NO_NATIVE_OOS_CONFIRMATION','NO_RAW_TO_PAPER_CONTINUITY','NO_REAL_MARKET_ALPHA_NETRETURN_FCF',
             'NO_MODEL_DIVERSITY_PROVEN','NO_BROWSER_UI_PROOF','NO_AUTONOMOUS_FEEDBACK_CONTINUATION_PROOF','NO_PRODUCT_FIX_OR_PROMOTION']}
     dump(out/'campaign.json',campaign);dump(out/'coverage.json',{'derived_from':'campaign.json + attempts.jsonl','scenarios':coverage})

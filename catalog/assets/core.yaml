@@ -11,7 +11,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/synthetic_lifecycle_smoke_v1/OWNER_REPORT.md', repository_path: docs/reports/synthetic_lifecycle_smoke_v1/OWNER_REPORT.md}
-  integrity: {kind: sha256, sha256: 40daf05f749c9a4a5923fa8df28a3e5e9064e2eaad20b5a5770191897165df39}
+  integrity: {kind: sha256, sha256: f125cfedd8c40b1fbd449dfc098d6f57d11e81946a89a02472f4a5b44896f365}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: DOC-EXPERIMENT-EVIDENCE-DECISION-001}, {relation_type: depends_on, target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001}]
   consumers: [SMIAL-SYNTHETIC-LIFECYCLE-SMOKE-V1, FACTORY-001, NEXT-REPAIR-EXECUTOR]

@@ -1738,7 +1738,9 @@
     },
     "known_allocated_total_bytes": 626304792,
     "known_allocated_total_gib": 0.5833,
-    "shared_image_incremental_bytes": 0
+    "shared_image_incremental_bytes": 0,
+    "shared_uv_cache_incremental_bytes": null,
+    "shared_uv_cache_limit": "No pre-campaign cache allocation baseline; incremental shared bytes remain UNKNOWN."
   },
   "runs": [
     {

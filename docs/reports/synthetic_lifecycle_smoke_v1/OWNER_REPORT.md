@@ -13,14 +13,15 @@
 | Scientific boundary | Accepted независимое подтверждение этих двух raw recipes не установлено. Технический STOP не является отрицательным научным результатом. NULL/DECOY validation — только независимый lab oracle. |
 | Safety | Изолированные product containers: сеть отключена, source readonly, UID 1000, 2 CPU/2 GiB/128 PIDs. Production data, providers, signer, деньги и deployment не использованы. Все созданные контейнеры остановлены. |
 
-**Созданная среда занимает примерно 0,58 GiB выделенного места.** В этот объём входят
+**Для созданной среды учтено примерно 0,58 GiB выделенного места.** В этот объём входят
 две отдельные копии репозитория, retained evidence, Docker product volume, небольшие
 writable layers/logs и дополнительная `.venv` около 0,16 GiB. Existing runtime image
 переиспользован; новых images — 0. Scratch volume после штатного test teardown пуст.
 Среда и evidence оставлены; решение об удалении за владельцем. Точные bytes и пределы
 учёта — в [campaign.json](../../evidence/synthetic_lifecycle_smoke_v1/campaign.json).
 Shared uv cache, уже существующий image и общий Docker VHDX не прибавлены к новым
-данным кампании; hardlinks могут завышать оценку её дополнительной физической аллокации.
+данным кампании; прирост общего uv cache отдельно не восстановлен (`UNKNOWN`).
+Hardlinks могут завышать оценку дополнительной физической аллокации кампании.
 
 **Один NOW:** связать accepted independent confirmation contract для сохранённых raw
 recipes: точные dataset/availability/required-outcome bindings, независимое chronological
