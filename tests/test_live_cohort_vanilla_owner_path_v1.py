@@ -131,6 +131,7 @@ class VanillaOwnerPathTests(unittest.TestCase):
                           classification=classify_mirror(next_manifest, next_view))
             self.assertEqual((next_view / relative).read_bytes(), thirty)
             (mirror / immutable).write_bytes(b"tampered publication")
+            self.assertEqual(classify_episode_capture_plan(next_manifest, mirror)["status"], "CONFLICT")
             with self.assertRaisesRegex(LiveCohortReleaseError, "MIRROR_CONFLICT"):
                 prepare_episode_capture_view(next_manifest, mirror)
 

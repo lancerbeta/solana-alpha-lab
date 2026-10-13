@@ -281,6 +281,8 @@ def main() -> int:
         finally:
             installed_manifest.write_bytes(exact)
     metadata_conflict = "NOT_EXERCISED"
+    semantic_labels_conflict = "NOT_EXERCISED"
+    partition_lineage_conflict = "NOT_EXERCISED"
     if args.exercise_metadata_conflict:
         if not args.verify_existing:
             raise RuntimeError("METADATA_CONFLICT_REQUIRES_VERIFIED_DISPOSABLE_STATE")
@@ -301,6 +303,87 @@ def main() -> int:
                 raise RuntimeError("MISSING_METADATA_ACCEPTED")
         finally:
             os.replace(backup, labels)
+        exact_labels = labels.read_bytes()
+        try:
+            altered = json.loads(exact_labels)
+            altered["yield_missing"] = 1
+            labels.write_bytes(json.dumps(altered, sort_keys=True, separators=(",", ":")).encode("utf-8"))
+            try:
+                import_episode_release(release_root=c2_root, data_root=plane, import_time=proof_time)
+            except EpisodeReleaseError as exc:
+                if str(exc) != "CANONICAL_METADATA_CONFLICT":
+                    raise
+                semantic_labels_conflict = str(exc)
+            else:
+                raise RuntimeError("ALTERED_SEMANTIC_LABEL_ACCEPTED")
+        finally:
+            labels.write_bytes(exact_labels)
+        from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManifest
+        from solana_alpha_lab.storage.manifests import (
+            build_dataset_manifest, build_partition_manifest, verify_dataset_manifest,
+        )
+        manifest_dir = plane / "datasets/manifests"
+        stem = lineage["current_dataset_manifest_id"]
+        dataset_path = manifest_dir / f"{stem}.json"
+        validation_path = manifest_dir / f"{stem}.validation.json"
+        published_path = manifest_dir / f"{stem}.published"
+        originals = {p: p.read_bytes() for p in (dataset_path, validation_path, published_path)}
+        dataset = DatasetManifest.model_validate_json(originals[dataset_path])
+        validation = json.loads(originals[validation_path])
+        parts = [PartitionManifest.model_validate_json(
+            (manifest_dir / "partitions" / f"{part_id}.json").read_bytes())
+            for part_id in validation["partition_manifest_ids"]]
+        old_partition = next(part for part in parts if part.logical_location == lineage["cohorts"][1]["census_rel"])
+        earlier = lineage["cohorts"][0]
+        alternate_payload = plane / "datasets/opportunity_episodes_corpus/alternate-c1-census.parquet"
+        if alternate_payload.exists():
+            raise RuntimeError("ALTERNATE_PAYLOAD_ALREADY_PRESENT")
+        shutil.copyfile(plane / earlier["census_rel"], alternate_payload)
+        substitute = build_partition_manifest(
+            dataset_id=dataset.dataset_id, dataset_version=dataset.dataset_version,
+            partition_id=old_partition.partition_id, logical_location=alternate_payload.relative_to(plane).as_posix(),
+            file_sha256=earlier["census_sha256"], content_sha256=earlier["census_sha256"],
+            row_count=int(earlier["admissions_n"]),
+            first_reliable_available_at=old_partition.first_reliable_available_at,
+            created_at=old_partition.created_at,
+        )
+        altered_parts = [substitute if part == old_partition else part for part in parts]
+        validation["partition_manifest_ids"] = sorted(part.partition_manifest_id for part in altered_parts)
+        altered_validation = json.dumps(validation, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        altered_dataset = build_dataset_manifest(
+            dataset_id=dataset.dataset_id, dataset_version=dataset.dataset_version,
+            schema_id=dataset.schema_id, schema_sha256=dataset.schema_sha256,
+            generation_task_id=dataset.generation_task_id,
+            generation_run_id=dataset.generation_run_id,
+            validation_receipt_sha256=hashlib.sha256(altered_validation).hexdigest(),
+            first_reliable_available_at=dataset.first_reliable_available_at,
+            created_at=dataset.created_at, partitions=altered_parts,
+        )
+        verify_dataset_manifest(altered_dataset, partitions=altered_parts)
+        altered_published = json.loads(originals[published_path])
+        altered_published["dataset_fingerprint"] = altered_dataset.dataset_fingerprint
+        new_part_path = manifest_dir / "partitions" / f"{substitute.partition_manifest_id}.json"
+        if new_part_path.exists():
+            raise RuntimeError("ALTERED_PARTITION_ALREADY_PRESENT")
+        try:
+            new_part_path.write_bytes(substitute.model_dump_json().encode("utf-8"))
+            validation_path.write_bytes(altered_validation)
+            dataset_path.write_bytes(altered_dataset.model_dump_json().encode("utf-8"))
+            published_path.write_bytes(json.dumps(altered_published, sort_keys=True,
+                                                  separators=(",", ":")).encode("utf-8"))
+            try:
+                import_episode_release(release_root=c2_root, data_root=plane, import_time=proof_time)
+            except EpisodeReleaseError as exc:
+                if str(exc) != "CANONICAL_METADATA_CONFLICT":
+                    raise
+                partition_lineage_conflict = str(exc)
+            else:
+                raise RuntimeError("ALTERED_PARTITION_LINEAGE_ACCEPTED")
+        finally:
+            for path, raw in originals.items():
+                path.write_bytes(raw)
+            new_part_path.unlink(missing_ok=True)
+            alternate_payload.unlink(missing_ok=True)
     pairs = []
     for item in lineage["cohorts"]:
         path = plane / item["obs_rel"]
@@ -368,6 +451,8 @@ def main() -> int:
               "historical_grown_source_fallback": grown_fallback,
               "tampered_installed_release_refusal": imported_conflict,
               "missing_current_labels_refusal": metadata_conflict,
+              "semantic_labels_refusal": semantic_labels_conflict,
+              "self_consistent_partition_lineage_refusal": partition_lineage_conflict,
               "wall_seconds": round(time.monotonic() - start, 2), "canonical_writes": 0}
     (work / "proof.json").write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(output, sort_keys=True))

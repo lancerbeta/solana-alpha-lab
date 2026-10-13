@@ -50,9 +50,13 @@ a later grown version present, the public path returned
 `EPISODE_BATCH_REPLAY_SOURCE_MISSING` plus a fully verified imported-release
 replay; neither case claimed new transfer or import. A temporarily altered
 installed C2 release manifest refused with `CANONICAL_TARGET_CONFLICT`;
-missing current labels refused with `CANONICAL_METADATA_CONFLICT`. Disposable
-bytes were restored after each negative probe. The cold independent run took
-43.90 seconds; it is verification time, not first-transfer wall time.
+missing current labels and altered `yield_missing` both refused with
+`CANONICAL_METADATA_CONFLICT`. A partition manifest redirected to a different
+valid copied Parquet payload, with internally valid partition/dataset hashes,
+validation and published fingerprint, also refused with
+`CANONICAL_METADATA_CONFLICT` because it disagreed with lineage. Disposable
+bytes were restored after each negative probe. The latest cold independent run
+took 44.75 seconds; it is verification time, not first-transfer wall time.
 
 The earlier run_01 first C2 invocation exceeded a 300-second caller wait after
 committing release/corpus but before a terminal receipt. Its resumed public
@@ -60,11 +64,14 @@ command succeeded, yet that interrupted invocation is not called an
 uninterrupted PASS. The first proof script then failed on a wrong oracle that
 counted field rows instead of unique pairs. A subsequent run_02 proof script
 failed before C2 on a mistaken expectation about C1 currentness; the corrected
-fresh run_03 and cold replay above passed. A full vertical test reached the
-ordinary Forge draft step after P1 capture and P2 consume, then refused
-`PREFLIGHT_GIT_COMPOSITE_MISMATCH` against the dirty working tree; it must be
-checked on a committed candidate. Focused owner-path/contract/harness tests
-passed 44 cases with one pre-existing skip. A sampled C2 worker process showed
+fresh run_03 and cold replay above passed. A full vertical test first reached
+the ordinary Forge draft step after P1 capture and P2 consume, then refused
+`PREFLIGHT_GIT_COMPOSITE_MISMATCH` against the dirty working tree. A committed
+run then exposed a new test's incorrect assumption that its small synthetic
+fixture contained a day-open `member_unit`; it actually publishes plain member
+files. The corrected vertical test passed on a clean commit in 242.40 seconds;
+the final verifier change requires one more clean-candidate run. Focused
+owner-path/harness tests passed nine cases after the verifier correction. A sampled C2 worker process showed
 at least 174,604,288 bytes PeakWorkingSet64; this is a lower-bound snapshot,
 not a measured end-to-end peak RSS. End-to-end peak RSS remains `UNKNOWN`.
 

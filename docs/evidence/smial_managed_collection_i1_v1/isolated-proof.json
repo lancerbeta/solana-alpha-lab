@@ -58,18 +58,18 @@
       "epoch_bump": false
     },
     "c1-missing-source": {
-      "sha256": "b21877745e24dd6fdb983695f0db19c003827bf584eaf148829b218711523cf8",
+      "sha256": "1636186bd4a1191e6b5956825798e63d16e6911e88145bc52d7ddfe2a542c29d",
       "exit_code": 0,
-      "wall_seconds": 15.15,
+      "wall_seconds": 14.58,
       "batch_terminal": "EPISODE_BATCH_REPLAY_SOURCE_MISSING",
       "import_status": "PASS_ALREADY_PRESENT_EXACT",
       "transferred_files": 0,
       "epoch_bump": false
     },
     "c1-grown-source": {
-      "sha256": "0c6798cb065b271349138378a3946d9f99fe10f0fe65768f06bd7aa46aedebd3",
+      "sha256": "6cdeed32822a084c103b03ddc68e69b52b394bf0f4e9dac0b70a0c4aa403c4a8",
       "exit_code": 0,
-      "wall_seconds": 15.13,
+      "wall_seconds": 14.75,
       "batch_terminal": "EPISODE_BATCH_REPLAY_SOURCE_MISSING",
       "import_status": "PASS_ALREADY_PRESENT_EXACT",
       "transferred_files": 0,
@@ -81,6 +81,8 @@
   "historical_grown_source_fallback": "VERIFIED_IMPORTED_RELEASE",
   "tampered_installed_release_refusal": "CANONICAL_TARGET_CONFLICT",
   "missing_current_labels_refusal": "CANONICAL_METADATA_CONFLICT",
-  "wall_seconds": 43.9,
+  "semantic_labels_refusal": "CANONICAL_METADATA_CONFLICT",
+  "self_consistent_partition_lineage_refusal": "CANONICAL_METADATA_CONFLICT",
+  "wall_seconds": 44.75,
   "canonical_writes": 0
 }

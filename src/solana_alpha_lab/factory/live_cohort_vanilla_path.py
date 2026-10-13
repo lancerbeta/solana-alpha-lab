@@ -371,6 +371,11 @@ def classify_episode_capture_plan(manifest: Mapping[str, Any], mirror_root: Path
         relative = str(entry["path"])
         scoped = _contained(view, relative)
         shared = _contained(Path(mirror_root), relative)
+        if (entry.get("source_class") != "member_unit" and shared.exists()
+                and (not shared.is_file() or shared.stat().st_size != entry["bytes"]
+                     or sha256_file_streaming(shared) != entry["sha256"])):
+            conflicts += 1
+            continue
         candidate = scoped if scoped.is_file() else shared
         if candidate.is_file() and candidate.stat().st_size == entry["bytes"] and sha256_file_streaming(candidate) == entry["sha256"]:
             reused += 1
