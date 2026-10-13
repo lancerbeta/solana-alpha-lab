@@ -280,6 +280,12 @@ class _Accounting:
         self.budgets = schedule["budgets"]
         self.pace = int(self.budgets["min_provider_pace_seconds"])
         self.credit_costs = dict(credit_costs or {})
+        self.last_denial: dict[str, Any] | None = None
+        # Shared managed-account binding is store runtime state, not a flag:
+        # once commissioned, no caller can fall back to activation-only caps.
+        self.account = store.account_budget_binding(
+            schedule_sha256=self.digest, activation_id=activation_id
+        )
         if self.day.get("last_provider_call_at") is None:
             self.day["last_provider_call_at"] = store.latest_provider_call_at(
                 schedule_sha256=self.digest,
@@ -313,30 +319,31 @@ class _Accounting:
         reference_now = (now or self.now).astimezone(UTC)
         self._refresh_day(reference_now)
         self.now = reference_now
+        self.last_denial = None
         if str(self.budgets.get("cash_usd_max")) != "0":
             return "CHANGE_LANE_SAFETY_CONTRACT_GAP"
         if self.budgets.get("retry") is not False or self.budgets.get("fallback") is not False:
             return "CHANGE_LANE_SAFETY_CONTRACT_GAP"
-        if self.tick_calls + extra_calls > int(self.budgets["provider_calls_per_tick_max"]):
-            return "BLOCKED_BUDGET"
-        if int(self.day["provider_calls"]) + extra_calls > int(
-            self.budgets["provider_calls_per_utc_day_max"]
-        ):
-            return "BLOCKED_BUDGET"
-        if int(self.life["provider_calls"]) + extra_calls > int(
-            self.budgets["provider_calls_lifetime_max"]
-        ):
-            return "BLOCKED_BUDGET"
-        if int(self.day["modeled_credits"]) + extra_credits > int(
-            self.budgets["modeled_provider_credits_per_utc_day_max"]
-        ):
-            return "BLOCKED_BUDGET"
-        if int(self.day["raw_bytes"]) + extra_raw > int(self.budgets["raw_bytes_per_utc_day_max"]):
-            return "BLOCKED_BUDGET"
-        if int(self.life["canonical_bytes"]) + extra_raw > int(
-            self.budgets["canonical_bytes_lifetime_max"]
-        ):
-            return "BLOCKED_BUDGET"
+        local = (
+            ("TICK_PROVIDER_CALLS", self.tick_calls, extra_calls,
+             self.budgets["provider_calls_per_tick_max"]),
+            ("DAY_PROVIDER_CALLS", self.day["provider_calls"], extra_calls,
+             self.budgets["provider_calls_per_utc_day_max"]),
+            ("LIFETIME_PROVIDER_CALLS", self.life["provider_calls"], extra_calls,
+             self.budgets["provider_calls_lifetime_max"]),
+            ("DAY_MODELED_CREDITS", self.day["modeled_credits"], extra_credits,
+             self.budgets["modeled_provider_credits_per_utc_day_max"]),
+            ("DAY_RAW_BYTES", self.day["raw_bytes"], extra_raw,
+             self.budgets["raw_bytes_per_utc_day_max"]),
+            ("LIFETIME_CANONICAL_BYTES", self.life["canonical_bytes"], extra_raw,
+             self.budgets["canonical_bytes_lifetime_max"]),
+        )
+        for dimension, used, debit, limit in local:
+            if int(used) + int(debit) > int(limit):
+                return self._deny("ACTIVATION", dimension, used, debit, limit)
+        shared = self._shared_gate(extra_calls=extra_calls, extra_credits=extra_credits)
+        if shared:
+            return shared
         last = self.day.get("last_provider_call_at")
         if last:
             try:
@@ -347,6 +354,70 @@ class _Accounting:
                 elapsed = self.pace
             if elapsed < self.pace:
                 return "PACE_WAIT"
+        return None
+
+    def _deny(
+        self,
+        scope: str,
+        dimension: str,
+        used: Any,
+        debit: Any,
+        limit: Any,
+        *,
+        revision: int | None = None,
+        reason: str | None = None,
+    ) -> str:
+        if dimension == "ACCOUNT_BINDING":
+            next_action = "RECONCILE_ACCOUNT_BUDGET_BINDING"
+        elif "LIFETIME" in dimension:
+            next_action = "OWNER_DECISION_REQUIRED"
+        elif dimension.startswith("TICK"):
+            next_action = "WAIT_NEXT_TICK"
+        else:
+            next_action = "WAIT_NEXT_UTC_DAY"
+        self.last_denial = {
+            "terminal": "BLOCKED_BUDGET",
+            "budget_scope": scope,
+            "budget_dimension": dimension,
+            "used": None if used is None else int(used),
+            "requested_debit": None if debit is None else int(debit),
+            "limit": None if limit is None else int(limit),
+            "account_scope_id": self.account.get("account_scope_id"),
+            "policy_revision": revision,
+            "reason": reason,
+            "utc_day": self.utc_day,
+            "next_action": next_action,
+        }
+        return "BLOCKED_BUDGET"
+
+    def _shared_gate(self, *, extra_calls: int, extra_credits: int) -> str | None:
+        """Fresh shared-account read under the writer fence; never a cached snapshot."""
+
+        if self.account.get("mode") == "UNMANAGED":
+            return None
+        # Re-resolve so a revision/membership change during this process applies.
+        self.account = self.store.account_budget_binding(
+            schedule_sha256=self.digest, activation_id=self.activation_id
+        )
+        if self.account.get("mode") != "MANAGED":
+            return self._deny("SHARED_ACCOUNT", "ACCOUNT_BINDING", None, extra_calls, None,
+                              reason=str(self.account.get("reason") or "ACCOUNT_BUDGET_CORRUPT"))
+        policy = self.account["policy"]
+        usage = self.store.account_budget_usage(
+            account_scope_id=str(self.account["account_scope_id"]), utc_day=self.utc_day
+        )
+        checks = (
+            ("SHARED_DAY_PROVIDER_CALLS", usage["day_provider_calls"], extra_calls,
+             policy["provider_calls_per_utc_day_max"]),
+            ("SHARED_DAY_MODELED_CREDITS", usage["day_modeled_credits"], extra_credits,
+             policy["modeled_credits_per_utc_day_max"]),
+            ("SHARED_LIFETIME_PROVIDER_CALLS", usage["lifetime_provider_calls"], extra_calls,
+             policy["provider_calls_lifetime_max"]),
+        )
+        for dimension, used, debit, limit in checks:
+            if int(used) + int(debit) > int(limit):
+                return self._deny("SHARED_ACCOUNT", dimension, used, debit, limit,
+                                  revision=int(policy["revision"]))
         return None
 
     def reserve_call(self, *, credits: int, now: datetime) -> str | None:
@@ -378,18 +449,13 @@ class _Accounting:
         if consume_call:
             self.life["provider_calls"] = int(self.life["provider_calls"]) + 1
         self.life["canonical_bytes"] = int(self.life["canonical_bytes"]) + raw_bytes
-        self.store.save_accounting(
+        self.store.save_call_debit(
             schedule_sha256=self.digest,
             activation_id=self.activation_id,
             utc_day=self.utc_day,
             values=self.day,
-            clock=completed,
-        )
-        self.store.save_lifetime(
-            schedule_sha256=self.digest,
-            activation_id=self.activation_id,
-            provider_calls=int(self.life["provider_calls"]),
-            canonical_bytes=int(self.life["canonical_bytes"]),
+            lifetime_provider_calls=int(self.life["provider_calls"]),
+            lifetime_canonical_bytes=int(self.life["canonical_bytes"]),
             clock=completed,
         )
 

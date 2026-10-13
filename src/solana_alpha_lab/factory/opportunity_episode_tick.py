@@ -519,6 +519,12 @@ class _EpisodeTick:
             if callable(sleeper):
                 sleeper((target - current).total_seconds())
 
+    def _note_budget_denial(self, terminal: str) -> None:
+        """Expose which budget refused: activation cap vs shared managed account."""
+
+        if terminal == "BLOCKED_BUDGET" and self.accounts.last_denial is not None:
+            self.report["budget_denial"] = dict(self.accounts.last_denial)
+
     def _credential(self) -> None:
         if self.holder is None and self.credential_loader is not None:
             self.holder = self.credential_loader()
@@ -555,6 +561,7 @@ class _EpisodeTick:
             extra_credits=max(1, int(self.accounts.credit_costs.get(primitive_id, 1))),
         )
         if blocked:
+            self._note_budget_denial(blocked)
             return blocked, None
         if dispatch_deadline is not None and (
             self.provider_ctx.now() < not_before or self.provider_ctx.now() >= dispatch_deadline
@@ -567,6 +574,7 @@ class _EpisodeTick:
             credits=max(1, int(self.accounts.credit_costs.get(primitive_id, 1))),
             now=self.provider_ctx.now())
         if blocked:
+            self._note_budget_denial(blocked)
             return blocked, None
         attempt_id = f"ATT-{uuid4().hex[:12].upper()}"
         started = self.store.start_call(

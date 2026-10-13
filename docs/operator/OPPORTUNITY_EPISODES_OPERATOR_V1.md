@@ -182,6 +182,41 @@ values; registered replay recomputes from the frozen recipe and release files.
 | `STOP_INTAKE_CLOCK_BEFORE_LAST_ADMISSION` / `STOP_INTAKE_ROLLOVER_PENDING` | the clock is earlier than an existing admission, or a rollover cutover is pending | fix the clock / wait for the cutover, then repeat |
 | `FOCUS_POPULATION_MISMATCH` | question population differs from the focus collection | use `population=OPPORTUNITY_EPISODES` with an episode focus |
 
+## Shared account budget — OPERATE gate only
+
+One Jupiter account behind the producer store has one shared call/credit/
+cumulative budget for every activation (A tail, B intake, later ones). It is
+off until commissioned; merge or deploy never enables it. Each command prints
+one JSON line and reads the credential slot name from runtime config, never
+its value.
+
+```text
+observation_schedule.py account-budget-status
+observation_schedule.py account-budget-prepare --account-scope-id <ID> \
+  --provider-calls-per-utc-day-max N --modeled-credits-per-utc-day-max N \
+  --provider-calls-lifetime-max N
+observation_schedule.py account-budget-apply  <same args> --expected-plan-sha256 <plan_sha256>
+observation_schedule.py account-budget-revise --expected-revision R --reason <CODE> <limit args>
+```
+
+`prepare` is read-only: it lists every member (all activations and counter
+scopes of the store), today's and cumulative debits, remaining allocation and
+`plan_sha256`. `apply` binds once under the writer lease; repeating it returns
+`ACCOUNT_BUDGET_ALREADY_APPLIED`. Spend after prepare is counted, never
+reset. A tick refusal carries `budget_denial.budget_scope`:
+`ACTIVATION` = this grant's cap, `SHARED_ACCOUNT` = the account is spent.
+
+| Code | Meaning | Next |
+| --- | --- | --- |
+| `ACCOUNT_BUDGET_PLAN_STALE` | membership/limits changed since prepare | run prepare again |
+| `ACCOUNT_BUDGET_ALREADY_COMMISSIONED` | another scope already binds this store | stop; a scope is never replaced |
+| `ACCOUNT_BUDGET_REVISION_STALE` | another revision landed first | read status, retry with its revision |
+| `WRITER_BUSY` | a tick holds the lease | retry after the tick |
+| `RESTORE_MARKER_UNRESOLVED` | restore not reconciled | reconcile restore first |
+| `budget_dimension=SHARED_DAY_*` | shared day allocation spent | next UTC day; or an approved revision |
+| `budget_dimension=SHARED_LIFETIME_PROVIDER_CALLS` | cumulative allocation spent | owner decision; waiting does not help |
+| `budget_dimension=ACCOUNT_BINDING` / status `CORRUPT` | membership/scope/policy missing after commissioning | stop B; never edit counters by SQL; reconcile binding |
+
 ## Not here
 
 No provider smoke, deploy, live activation, real science, retention/eviction or
