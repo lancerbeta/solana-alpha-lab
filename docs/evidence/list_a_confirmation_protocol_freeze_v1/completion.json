@@ -2,7 +2,7 @@
   "schema": "smial.delivery-completion-evidence",
   "schema_version": "1.0",
   "acceptance_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1-LIMITED-DESIGN",
-  "as_of": "2026-10-12",
+  "as_of": "2026-10-13",
   "task_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1",
   "state_change": "Materialized accepted protocol/config and safe real metadata evidence; DESIGN_VALIDATED with BOUND_CONTRACT_NOT_READY; no scientific semantic DONE",
   "base_main": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
@@ -58,10 +58,11 @@
       "PASS_HARNESS_STRUCTURE",
       "PASS_51_FOCUSED_CONTRACT_CASES",
       "PASS_COLD_ARTIFACT_CONSUMER_5_REFUSALS",
-      "PASS_CATALOG_1969_ASSETS_SCHEMA_RELATIONS_INTEGRITY",
+      "PASS_CATALOG_1978_ASSETS_SCHEMA_RELATIONS_INTEGRITY",
       "PASS_INCREMENTAL_GENERATED_CLOSURE_NOOP",
       "PASS_ZERO_PRODUCTION_PATH_DIFF",
-      "PASS_ISOLATED_CODE_GOAL_ARCHITECTURE_EXACT_INVENTORY_P2_REMEDIATED"
+      "PASS_ISOLATED_CODE_GOAL_ARCHITECTURE_EXACT_INVENTORY_P2_REMEDIATED",
+      "PASS_CURRENT_MAIN_INTEGRATION_WITH_UNCHANGED_SCIENTIFIC_IDENTITIES"
     ]
   },
   "non_claims": [
@@ -81,7 +82,8 @@
     "activation": 0,
     "spend": 0,
     "owned_review_scratch_removed": true,
-    "owned_review_scratch_removed_bytes": 482275.0
+    "owned_review_scratch_removed_bytes": 482275.0,
+    "owned_refresh_review_scratch_removed": false
   },
   "capability_radar_now": "NONE"
 }

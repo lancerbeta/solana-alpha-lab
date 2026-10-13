@@ -1,0 +1,149 @@
+{
+  "schema": "smial.list-a-delivery-main-refresh",
+  "schema_version": "1.0",
+  "as_of": "2026-10-13",
+  "task_id": "LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1",
+  "prior_delivery_head": "a70c49ec3da7b65fd1bc6508b2757f88fd56d3f1",
+  "original_design_base": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+  "delivery_base": "ad8c9315db8ffa0d22281615571565c41bc1a15b",
+  "upstream_merge_pr": 398,
+  "history_mode": "ORDINARY_MERGE_NO_REWRITE",
+  "owner_authorization": "Refresh current main, renew exact evidence and CI; apply new machine owner_phrase after readiness and guarded merge autonomously",
+  "source_metadata_snapshot": "2026-10-12_PRESERVED_NO_NEW_SOURCE_READ",
+  "native_owner_checks": [
+    {
+      "path": "src/solana_alpha_lab/factory/hfic_research_scope.py",
+      "source_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+      "delivery_base_commit": "ad8c9315db8ffa0d22281615571565c41bc1a15b",
+      "sha256": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+      "status": "MATCH_UNCHANGED"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
+      "source_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+      "delivery_base_commit": "ad8c9315db8ffa0d22281615571565c41bc1a15b",
+      "sha256": "af898471e64d5beecdb4e6f56caeca7d7cde0ec14fd5e7559634c7b241f0c383",
+      "status": "MATCH_UNCHANGED"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/opportunity_episodes.py",
+      "source_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+      "delivery_base_commit": "ad8c9315db8ffa0d22281615571565c41bc1a15b",
+      "sha256": "3565d1dff50b3b4be630ec1ee737c81e4259b247dde702c2327f976cfae837cc",
+      "status": "MATCH_UNCHANGED"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/observation_schedule.py",
+      "source_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+      "delivery_base_commit": "ad8c9315db8ffa0d22281615571565c41bc1a15b",
+      "sha256": "dff14477838de0d06b5c145650e203d988edd63f84c983d898d2e03be344c6a2",
+      "status": "MATCH_UNCHANGED"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/live_cohort_schedule_artifact.py",
+      "source_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+      "delivery_base_commit": "ad8c9315db8ffa0d22281615571565c41bc1a15b",
+      "sha256": "b6bd6099d0a12c61fa04960868b888d096038c3db70eabe38585b905d6434dde",
+      "status": "MATCH_UNCHANGED"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/data_root.py",
+      "source_commit": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+      "delivery_base_commit": "ad8c9315db8ffa0d22281615571565c41bc1a15b",
+      "sha256": "594c98c33acbc9b43ad3a45c29b58063f94946a73113d81fdc6967382c13e2b6",
+      "status": "MATCH_UNCHANGED"
+    }
+  ],
+  "immutable_artifacts": [
+    {
+      "path": "configs/list_a_chronological_confirmation_v1.yaml",
+      "sha256": "4bfd2c80526d617f664e047ffa38f802722c5ca96211aed06992506bbc29be12",
+      "status": "UNCHANGED_FROM_PRE_REFRESH_HEAD"
+    },
+    {
+      "path": "docs/contracts/list_a_chronological_confirmation_v1.md",
+      "sha256": "4be4f46884ed742adbabaf5bb14f7ee37fa84e3a57263adf8162c609c5c94d6c",
+      "status": "UNCHANGED_FROM_PRE_REFRESH_HEAD"
+    },
+    {
+      "path": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-contract.md",
+      "sha256": "4931c4c569fb2630e9b403b33185bd86b9ffe9ff0df06dd9bb0bec41f5040510",
+      "status": "UNCHANGED_FROM_PRE_REFRESH_HEAD"
+    },
+    {
+      "path": "docs/evidence/list_a_confirmation_protocol_freeze_v1/metadata-bindings.json",
+      "sha256": "c01d47e84443335101e686494321dccf071d3298cddc05ed36cee64a687c889f",
+      "status": "UNCHANGED_FROM_PRE_REFRESH_HEAD"
+    },
+    {
+      "path": "docs/evidence/list_a_confirmation_protocol_freeze_v1/validation.json",
+      "sha256": "1fb0582af78a86a7c5f24c28e8f82f4367636b157fb01c1e1015f7871041bc82",
+      "status": "UNCHANGED_FROM_PRE_REFRESH_HEAD"
+    },
+    {
+      "path": "docs/evidence/list_a_confirmation_protocol_freeze_v1/source-inventory.json",
+      "sha256": "4c9f84c7c9334a0005a60dddd77b9b6f3feb06f1ab38400d3175051c2be811b6",
+      "status": "UNCHANGED_FROM_PRE_REFRESH_HEAD"
+    },
+    {
+      "path": "docs/evidence/list_a_confirmation_protocol_freeze_v1/probe_metadata.py",
+      "sha256": "4751b985567797adb208f5f038bb0e52dd27dc293dc70e310490699ed847f47a",
+      "status": "UNCHANGED_FROM_PRE_REFRESH_HEAD"
+    },
+    {
+      "path": "docs/evidence/list_a_confirmation_protocol_freeze_v1/verify_contract.py",
+      "sha256": "caa30e1c29f61b73422b4be3e699c7c0f9b76ae238b3642377befe5d3723b469",
+      "status": "UNCHANGED_FROM_PRE_REFRESH_HEAD"
+    }
+  ],
+  "frozen_identities": {
+    "protocol_core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+    "sample_binding_sha256": "9ce82941a13f4fc415f57d5a79a33ea34ce5b21600a0beff9c57afaee791baf1"
+  },
+  "derived_seeds": {
+    "86400": 2055296707731192101,
+    "172800": 3449030900544075880
+  },
+  "control_runtime_and_authority_delta": "NONE",
+  "catalog_resolution": "All upstream records preserved plus exact four List A records; generated owners propagated with native harness_sync",
+  "executed_checks": {
+    "contract_model_native_seams": {
+      "status": "PASS",
+      "cases": 51
+    },
+    "cold_artifact_consumer": {
+      "status": "PASS",
+      "result": "BOUND_CONTRACT_NOT_READY"
+    },
+    "adversarial_refusal_canaries": {
+      "status": "PASS",
+      "cases": 5,
+      "own_temp_removed": true
+    },
+    "catalog": {
+      "status": "PASS",
+      "assets": 1978
+    },
+    "incremental_generated_idempotency": "PASS_IMPACTED_CLOSURE_NOOP",
+    "harness_check": "PASS",
+    "local_full_gate": "NOT_EXECUTED_GUARDED_MERGE_OWNS_GATE"
+  },
+  "scientific_result": "BOUND_CONTRACT_NOT_READY",
+  "non_claims": [
+    "NO_NEW_METADATA_OR_EXPOSURE_READ",
+    "NO_SCIENTIFIC_LOOK",
+    "NO_NEW_MARKET_VALUES",
+    "NO_TRADING_CLOSURE_IMPLEMENTATION_IN_LIST_A_DIFF",
+    "NO_FULL_CONFIRMING_ROUTE_OR_ALPHA"
+  ],
+  "side_effects": {
+    "new_metadata_payloads_read": 0,
+    "market_values_read": 0,
+    "scientific_looks": 0,
+    "runtime_writes": 0,
+    "ledger_or_protection_writes": 0,
+    "provider_calls": 0,
+    "spend": 0
+  },
+  "review_scratch_lifecycle_owner": "completion.json#side_effects; remove after independent verdicts before readiness"
+}

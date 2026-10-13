@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -26,6 +26,8 @@ ACCEPTED_RECONCILED_CLASSES = frozenset(
 ACCEPTED_MARK_CLASSES = frozenset(
     {"PAPER_MARK_TO_MODEL", "SHADOW_EXECUTABLE_QUOTE_MARK"}
 )
+RESIDUAL_COMPONENT_GAPS = frozenset({"REMAINING_QUANTITY_INVALID",
+    "REMAINING_COST_BASIS_INVALID", "REMAINING_ENTRY_FEE_INVALID"})
 NOT_DEFINED_POLICIES = (
     "daily_loss_limit",
     "drawdown_limit",
@@ -59,6 +61,67 @@ def _dec(value: Any) -> Decimal | None:
     if value is None or value == "":
         return None
     return Decimal(str(value))
+
+
+def _residual_component(
+    position: Mapping[str, Any], column: str, legacy_column: str | None, gap: str,
+) -> tuple[Decimal | None, str | None]:
+    """Validate an explicit residual before arithmetic; absent means legacy basis."""
+    raw = position.get(column)
+    if raw is None:
+        return _dec(position.get(legacy_column)) if legacy_column else None, None
+    try:
+        amount = _dec(raw)
+    except (InvalidOperation, TypeError, ValueError):
+        amount = None
+    if amount is None or not amount.is_finite() or amount < 0:
+        return None, gap
+    return amount, None
+
+
+def _remaining_quantity(position: Mapping[str, Any]) -> tuple[Decimal | None, str | None]:
+    return _residual_component(position, "remaining_qty_dec", "qty_dec", "REMAINING_QUANTITY_INVALID")
+
+
+def _remaining_money(position: Mapping[str, Any]) -> tuple[Decimal | None, Decimal | None, str | None]:
+    cost, cost_gap = _residual_component(position, "remaining_cost_basis_usd_dec",
+        "entered_notional_usd_dec", "REMAINING_COST_BASIS_INVALID")
+    fee, fee_gap = _residual_component(position, "remaining_entry_fee_usd_dec",
+        "entry_fee_usd_dec", "REMAINING_ENTRY_FEE_INVALID")
+    return cost, fee, cost_gap or fee_gap
+
+
+def _partial_realized_row(
+    position: Mapping[str, Any], bot: Mapping[str, Any] | None,
+) -> dict[str, Any] | None:
+    if position.get("remaining_qty_dec") is None or position.get("realized_net_pnl_usd_dec") is None:
+        return None
+    quantity, gap = _remaining_quantity(position)
+    if gap is None and (quantity is None or quantity <= 0):
+        return None
+    cost, fee, money_gap = _remaining_money(position)
+    gap = gap or money_gap
+    return {
+        "position_id": position.get("position_id"),
+        "strategy_id": position.get("strategy_id") or (bot.get("strategy_id") if bot else None),
+        "strategy_version": position.get("strategy_version_label") or (
+            strategy_version_label_from_bot(bot) if bot else None
+        ),
+        "mode": bot.get("mode") if bot else None,
+        "activation_epoch_id": position.get("activation_epoch_id") or (
+            bot.get("activation_epoch_id") if bot else None
+        ),
+        "bot_instance_id": position.get("bot_instance_id"),
+        "remaining_quantity": _money(quantity),
+        "remaining_cost_basis_usd": _money(cost),
+        "remaining_entry_fee_usd": _money(fee),
+        "realized_gross_pnl_usd": position.get("realized_gross_pnl_usd_dec"),
+        "realized_trade_net_after_allocated_fees_usd": position.get("realized_net_pnl_usd_dec"),
+        "status": "UNKNOWN" if gap else "KNOWN",
+        "gap": gap,
+        "settlement": "UNKNOWN_INVENTORY" if gap else "PARTIAL_INVENTORY_REMAINS",
+        "netreturn_status": "NOT_ESTABLISHED",
+    }
 
 
 def _money(value: Decimal | None) -> str | None:
@@ -132,6 +195,10 @@ def _load_git_strategies(root: Path) -> list[dict[str, Any]]:
 def _accounting_invariant(position: Mapping[str, Any]) -> str | None:
     gross = _dec(position.get("realized_gross_pnl_usd_dec"))
     entry_fee = _dec(position.get("entry_fee_usd_dec"))
+    remaining_fee, _ = _residual_component(position, "remaining_entry_fee_usd_dec", None,
+        "REMAINING_ENTRY_FEE_INVALID")
+    if entry_fee is not None and remaining_fee is not None:
+        entry_fee -= remaining_fee
     exit_fee = _dec(position.get("exit_fee_usd_dec"))
     stored_net = _dec(position.get("realized_net_pnl_usd_dec"))
     if None in {gross, entry_fee, exit_fee, stored_net}:
@@ -146,9 +213,14 @@ def _accounting_invariant(position: Mapping[str, Any]) -> str | None:
 
 def _reconciled_row(position: Mapping[str, Any], bot: Mapping[str, Any] | None) -> dict[str, Any]:
     evidence = str(position.get("pnl_evidence_class") or "")
-    conflict = _accounting_invariant(position)
+    _, _, money_gap = _remaining_money(position)
+    conflict = _accounting_invariant(position) if money_gap is None else None
     net = _dec(position.get("realized_net_pnl_usd_dec"))
-    if not evidence or evidence not in ACCEPTED_RECONCILED_CLASSES:
+    if money_gap:
+        status = "UNKNOWN"
+        trust = False
+        gap = money_gap
+    elif not evidence or evidence not in ACCEPTED_RECONCILED_CLASSES:
         status = "UNKNOWN"
         trust = False
         gap = "EVIDENCE_CLASS_UNKNOWN"
@@ -205,9 +277,8 @@ def _open_mark_row(
     mode = str(bot.get("mode") or "") if bot else ""
     mark_as_of = position.get("mark_as_of")
     mark_price = _dec(position.get("mark_price_dec"))
-    qty = _dec(position.get("qty_dec"))
-    entered = _dec(position.get("entered_notional_usd_dec"))
-    entry_fee = _dec(position.get("entry_fee_usd_dec"))
+    qty, quantity_gap = _remaining_quantity(position)
+    entered, entry_fee, money_gap = _remaining_money(position)
     fee_bps = position.get("fee_bps")
     gap = None
     derived_from_legacy = False
@@ -216,7 +287,9 @@ def _open_mark_row(
     modeled_exit = None
     mark_age = None
     status = "UNKNOWN"
-    if evidence not in ACCEPTED_MARK_CLASSES:
+    if quantity_gap or money_gap:
+        gap = quantity_gap or money_gap
+    elif evidence not in ACCEPTED_MARK_CLASSES:
         gap = "EVIDENCE_CLASS_UNKNOWN"
     elif mark_as_of in {None, ""}:
         gap = "MARK_TIME_UNKNOWN"
@@ -250,6 +323,9 @@ def _open_mark_row(
         or (bot.get("activation_epoch_id") if bot else None),
         "bot_instance_id": position.get("bot_instance_id"),
         "state": position.get("state"),
+        "remaining_quantity": _money(qty),
+        "remaining_cost_basis_usd": _money(entered),
+        "remaining_entry_fee_usd": _money(entry_fee),
         "mark_price": _money(mark_price),
         "mark_as_of": mark_as_of,
         "mark_age_seconds": mark_age,
@@ -533,7 +609,7 @@ def _next_action(
         return "WAIT_FOR_RECONCILED_EVIDENCE"
     if evidence_state == "ACCOUNTING_CONFLICT":
         return "INSPECT_ACCOUNTING_EVIDENCE"
-    if any(row.get("gap") == "OPEN_MARK_COST_COMPONENT_GAP" for row in mark_rows):
+    if any(row.get("gap") in RESIDUAL_COMPONENT_GAPS | {"OPEN_MARK_COST_COMPONENT_GAP"} for row in mark_rows):
         return "INSPECT_POSITION_EVIDENCE"
     if any(scope.get("entry_admission_status") == "DECLARED_ENTRY_LIMIT_BREACH" for scope in risk_scopes):
         return "INSPECT_OPERATIONS"
@@ -579,6 +655,7 @@ def compose_risk_economics(
         },
         "reconciled_scopes": [],
         "open_mark_scopes": [],
+        "partial_realized_rows": [],
         "declared_risk_scopes": [],
         "exposure_scopes": [],
         "gaps": [
@@ -633,6 +710,11 @@ def compose_risk_economics(
         and str(position.get("state"))
         in {"OPEN", "PARTIAL", "UNKNOWN", "EXIT_REQUIRED", "EXITING", "UNRESOLVED"}
     ]
+    partial_realized_rows = []
+    for position in positions:
+        row = _partial_realized_row(position, bots.get(str(position.get("bot_instance_id"))))
+        if row is not None:
+            partial_realized_rows.append(row)
 
     reconciled_groups: dict[tuple[str, str, str, str], list[dict[str, Any]]] = {}
     for row in reconciled_rows:
@@ -761,7 +843,7 @@ def compose_risk_economics(
     if mixed:
         gaps.append({"code": "MIXED_EVIDENCE_NOT_AGGREGATED"})
     for row in reconciled_rows:
-        if row.get("gap"):
+        if row.get("gap") and row["gap"] not in RESIDUAL_COMPONENT_GAPS:
             gaps.append(
                 {
                     "code": row["gap"],
@@ -769,8 +851,16 @@ def compose_risk_economics(
                 }
             )
     for row in mark_rows:
-        if row.get("gap"):
+        if row.get("gap") and row["gap"] not in RESIDUAL_COMPONENT_GAPS:
             gaps.append({"code": row["gap"], "position_id": row.get("position_id")})
+    residual_gap_positions = set()
+    for row in reconciled_rows + mark_rows + partial_realized_rows:
+        if row.get("gap") in RESIDUAL_COMPONENT_GAPS and row.get("position_id") not in residual_gap_positions:
+            gaps.append({"code": row["gap"], "status": "UNKNOWN", **{
+                key: row.get(key) for key in ("position_id", "bot_instance_id", "strategy_id",
+                    "strategy_version", "activation_epoch_id", "mode")
+            }})
+            residual_gap_positions.add(row.get("position_id"))
     for scope in risk_scopes:
         if scope.get("gap"):
             gaps.append(
@@ -788,6 +878,8 @@ def compose_risk_economics(
     )
     if any(scope.get("entry_admission_status") == "DECLARED_ENTRY_LIMIT_BREACH" for scope in risk_scopes):
         next_action = "INSPECT_OPERATIONS"
+    if residual_gap_positions:
+        next_action = "INSPECT_POSITION_EVIDENCE"
     coverage = {
         "reconciled_count_total": len(reconciled_rows),
         "reconciled_count_known": sum(1 for row in reconciled_rows if row.get("trusted")),
@@ -835,6 +927,7 @@ def compose_risk_economics(
         "coverage": coverage,
         "reconciled_scopes": reconciled_scopes,
         "open_mark_scopes": open_mark_scopes,
+        "partial_realized_rows": partial_realized_rows,
         "declared_risk_scopes": risk_scopes,
         "exposure_scopes": exposure,
         "gaps": gaps,

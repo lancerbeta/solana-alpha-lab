@@ -2,6 +2,14 @@
 
 **Result: BOUND_CONTRACT_NOT_READY. Design: DESIGN_VALIDATED.**
 
+Delivery refresh 2026-10-13: PR #397 includes main
+`ad8c9315db8ffa0d22281615571565c41bc1a15b` through ordinary merge.
+The six pinned scientific/metadata owner blobs match the original design base.
+Method core, sample identity, seeds and accepted specification are unchanged.
+The source evidence below remains the 2026-10-12 snapshot; no new metadata,
+market values or exposure/protection payloads were read. main-refresh.json
+records revalidation and Catalog conflict resolution against the new main.
+
 Готовы authoritative scientific contract/config: List A на T0,
 E1800→E14400 conditional episode-weighted mean contrast, first-test, delta0,
 24/48h crossed bootstrap,4096 replicates, exact support/coverage/sensitivity,
@@ -42,8 +50,10 @@ exposure provenance и frozen/current protection, potential support≥baseline.
 новый source/access/meaning будет отдельной authority boundary при resume.
 
 Merge данного design не закрывает real data gap и не разрешает look/activation.
-Delivery завершится только через exact-head CI→machine readiness→отдельную
-owner phrase→guarded merge→post-merge readback. Cleanup — cleanup.json.
+Delivery завершится только через exact-head CI→machine readiness→точную
+owner phrase→guarded merge→post-merge readback. Owner 2026-10-13 разрешил
+агенту самостоятельно применить новую машинную фразу после готовности gate.
+Это разрешение не меняет scientific grants. Cleanup — cleanup.json.
 
 FACTORY_FIT_REVIEW=FULL_REVIEW. Product Horizon NOW=этот contract binding;
 WATCH=native confirmer software лишь после bound protocol или отдельно принятого

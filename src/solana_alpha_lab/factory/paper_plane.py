@@ -132,12 +132,575 @@ CANCEL_REASONS = frozenset(
         "BOT_DRAINING",
         "BOT_STOPPED",
         "SIGNAL_EXPIRED",
+        "OPERATING_SAFETY_VETO",
     }
 ) | DEFINITIVE_NON_FILL_REASONS
 FORBIDDEN_SIGNAL_KINDS = frozenset({"REAL_FILL"})
 OPEN_RISK_STATES = frozenset(
     {"WATCHED", "SIGNALLED", "INTENT_CREATED", "ATTEMPTING", "OPEN", "PARTIAL", "UNKNOWN"}
 )
+# A query/index prefilter only. The policy owner still validates each candidate.
+# Exact zero strings are intentionally conservative; unusual representations
+# remain candidates rather than acquiring a guessed release proof.
+_KNOWN_FLAT_SQL = """state='RECONCILED' AND exit_notional_usd_dec IS NOT NULL
+    AND pnl_evidence_class IS NOT NULL
+    AND pnl_evidence_class IN ('PAPER_RECONCILED_MODEL','SHADOW_RECONCILED_QUOTE_MODEL')
+    AND qty_dec IS NOT NULL AND json_valid(qty_dec) AND CAST(qty_dec AS REAL)>0
+    AND (remaining_qty_dec IS NULL OR (
+        remaining_qty_dec IN ('0','0.0','0.00','0.00000000')
+        AND remaining_cost_basis_usd_dec IS NOT NULL AND remaining_cost_basis_usd_dec IN ('0','0.0','0.00','0.00000000')
+        AND remaining_entry_fee_usd_dec IS NOT NULL AND remaining_entry_fee_usd_dec IN ('0','0.0','0.00','0.00000000')))"""
+_KNOWN_RELEASED_SQL = f"""({_KNOWN_FLAT_SQL}) OR (state='CANCELLED'
+    AND qty_dec IS NULL AND entry_price_dec IS NULL AND remaining_qty_dec IS NOT NULL AND remaining_qty_dec IN ('0','0.0','0.00')
+    AND remaining_cost_basis_usd_dec IS NOT NULL AND remaining_cost_basis_usd_dec IN ('0','0.0','0.00')
+    AND remaining_entry_fee_usd_dec IS NOT NULL AND remaining_entry_fee_usd_dec IN ('0','0.0','0.00'))"""
+_OBLIGATION_CANDIDATE_SQL = f"NOT ({_KNOWN_RELEASED_SQL})"
+
+
+def modeled_final_witness_valid(attempt: Mapping[str, Any], final: Mapping[str, Any] | None,
+                                accepted: Mapping[str, Any], *, mode: str,
+                                legacy_original_quantity: Any = None,
+                                original_position: Mapping[str, Any] | None = None) -> bool:
+    """Validate original provenance; a missing final validates an observation only."""
+    try:
+        body, terminal, payload = attempt["payload"], final["payload"] if final is not None else {}, accepted["payload"]
+        if not all(isinstance(value, Mapping) for value in (body, terminal, payload)):
+            return False
+        result = payload.get("result")
+        if not isinstance(result, Mapping):
+            return False
+        allowed = {"attempt_id", "result_id", "outcome", "observed_at", "unit_price_usd", "filled_notional_usd", "chargeable_cost_usd"}
+        if result.get("schema_version") == "1.1":
+            allowed |= {"schema_version", "quantity_filled", "quantity_sold", "quantity_unit", "remaining_quantity", "fee_semantics"}
+        if set(result) - allowed or set(payload) != {"result", "evidence_class", "chargeable_cost_status"}:
+            return False
+        identity = {key: body[key] for key in ("position_id", "side", "mode", "attempt_key")}
+        aid = "ATTEMPT-" + canonical_spec_sha256(identity).upper()
+        rid = "RESULT-" + canonical_spec_sha256({"result_id": result["result_id"]}).upper()
+        outcome = result["outcome"]
+        if (mode not in {"PAPER", "SHADOW"} or body["mode"] != mode or body["side"] not in {"ENTRY", "EXIT"}
+            or attempt["event_type"] != "MODELED_ATTEMPT_STARTED" or attempt["event_id"] != aid or body["attempt_id"] != aid
+            or accepted["event_type"] != "MODELED_RESULT_ACCEPTED" or accepted["event_id"] != rid
+            or result["attempt_id"] != aid
+            or outcome not in {"NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED", "LANDED_SUCCESS", "PARTIAL", "UNKNOWN_REQUIRES_RECONCILIATION"}
+            or any(event["position_id"] != body["position_id"] or event["bot_instance_id"] != attempt["bot_instance_id"]
+                for event in ((final, accepted) if final is not None else (accepted,)))
+            or attempt["position_id"] != body["position_id"]
+            or payload.get("evidence_class") != body["evidence_class"]
+            or body["evidence_class"] != ("PAPER_MODEL" if mode == "PAPER" else "SHADOW_QUOTE_MODEL")
+            or not isinstance(result["result_id"], str) or not 0 < len(result["result_id"]) <= 120
+            or attempt["created_at"] != body["as_of"] or accepted["created_at"] != result["observed_at"]
+            or _parse_utc(result["observed_at"]) < _parse_utc(body["as_of"])):
+            return False
+        version = result.get("schema_version", "1.0")
+        if version not in {"1.0", "1.1"}:
+            return False
+        if final is not None and (outcome == "UNKNOWN_REQUIRES_RECONCILIATION"
+                or final["event_type"] != "MODELED_ATTEMPT_FINAL" or final["event_id"] != "FINAL-" + aid
+                or final["created_at"] != result["observed_at"]
+                or terminal != {"outcome": outcome, "result_event_id": rid,
+                    **({"schema_version": "1.1"} if version == "1.1" else {})}):
+            return False
+        cost = result.get("chargeable_cost_usd")
+        if payload.get("chargeable_cost_status") != ("KNOWN" if cost is not None else "UNKNOWN"):
+            return False
+        if cost is not None:
+            _positive_model_decimal(cost, "MODELED_RESULT_COST_INVALID", allow_zero=True)
+        positive = outcome in {"LANDED_SUCCESS", "PARTIAL"}
+        if not positive:
+            return all(result.get(key) is None for key in ("unit_price_usd", "filled_notional_usd", "quantity_filled", "quantity_sold", "remaining_quantity"))
+        price = _positive_model_decimal(result.get("unit_price_usd"), "MODELED_FILL_DETAILS_INVALID")
+        if body["side"] == "ENTRY":
+            notional = _positive_model_decimal(result.get("filled_notional_usd"), "MODELED_FILL_DETAILS_INVALID")
+            if original_position is not None:
+                original_qty = _positive_model_decimal(original_position.get("qty_dec"), "MODELED_QUANTITY_INVALID")
+                admitted = _positive_model_decimal(original_position.get("admitted_entry_notional_usd_dec"), "MODELED_FILL_DETAILS_INVALID")
+                if (price != _positive_model_decimal(original_position.get("entry_price_dec"), "MODELED_FILL_DETAILS_INVALID")
+                    or notional != _positive_model_decimal(original_position.get("entered_notional_usd_dec"), "MODELED_FILL_DETAILS_INVALID")
+                    or notional > admitted or (outcome == "PARTIAL") != (notional < admitted)):
+                    return False
+                quantity = (_positive_model_decimal(result.get("quantity_filled"), "MODELED_QUANTITY_INVALID") if version == "1.1"
+                    else (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP))
+                if quantity != original_qty or version == "1.1" and result.get("fee_semantics") != original_position.get("entry_fee_semantics"):
+                    return False
+            if version == "1.0" and legacy_original_quantity is not None:
+                original = _positive_model_decimal(legacy_original_quantity, "MODELED_QUANTITY_INVALID")
+                if (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP) != original:
+                    return False
+        if version == "1.1":
+            if result.get("quantity_unit") != "TOKEN_UNITS" or result.get("fee_semantics") not in {"SEPARATE_MODELED_FEE", "INCLUDED_IN_UNIT_PRICE"}:
+                return False
+            quantity = _positive_model_decimal(result.get("quantity_filled" if body["side"] == "ENTRY" else "quantity_sold"), "MODELED_QUANTITY_INVALID")
+            if body["side"] == "ENTRY":
+                if "quantity_sold" in result or "remaining_quantity" in result:
+                    return False
+                if (price * quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP) != notional.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP):
+                    return False
+            if body["side"] == "EXIT":
+                if "quantity_filled" in result or "filled_notional_usd" in result:
+                    return False
+                remainder = _positive_model_decimal(result.get("remaining_quantity"), "MODELED_QUANTITY_INVALID", allow_zero=True)
+                if body.get("remaining_quantity") is None:
+                    # v1.0 entry has no quantity reservation in its first EXIT
+                    # attempt; its retained immutable entry quantity is the bound.
+                    if "quantity_unit" in body:
+                        return False
+                    original = _positive_model_decimal(legacy_original_quantity, "MODELED_QUANTITY_INVALID")
+                else:
+                    if body.get("quantity_unit") != "TOKEN_UNITS":
+                        return False
+                    original = _positive_model_decimal(body["remaining_quantity"], "MODELED_QUANTITY_INVALID")
+                if quantity + remainder != original or (outcome == "PARTIAL") != (remainder > 0):
+                    return False
+        elif body["side"] == "EXIT" and (outcome != "LANDED_SUCCESS" or result.get("filled_notional_usd") is not None):
+            return False
+        return True
+    except (KeyError, TypeError, ValueError, ArithmeticError, PaperPlaneError):
+        return False
+
+
+def _native_legacy_entry_witness_valid(position: Mapping[str, Any], events: list[dict[str, Any]], *, mode: str) -> bool:
+    """A native public fill has its own original intent, never a missing modeled ENTRY."""
+    try:
+        if mode not in {"PAPER", "SHADOW"} or position.get("entry_fee_semantics") is not None:
+            return False
+        entries = [event for event in events if event["event_type"] in {
+            "PAPER_SIMULATION_OBSERVED", "SHADOW_EXECUTABLE_OBSERVED"}]
+        intents = [event for event in events if event["event_type"] == "EXECUTION_INTENT_CREATED"]
+        if len(entries) != 1 or len(intents) != 1 or any(
+                event["event_type"] == "MODELED_ATTEMPT_STARTED" and event["payload"].get("side") == "ENTRY"
+                for event in events):
+            return False
+        entry, intent = entries[0], intents[0]
+        source, body = entry["payload"], intent["payload"]
+        if (entry["event_type"] != ("PAPER_SIMULATION_OBSERVED" if mode == "PAPER" else "SHADOW_EXECUTABLE_OBSERVED")
+            or source["side"] != "ENTRY" or source["mode"] != mode or body["mode"] != mode
+            or body["signal_kind"] != ("SIMULATED_FILL" if mode == "PAPER" else "SHADOW_EXECUTABLE")
+            or any(event["position_id"] != position["position_id"] or event["bot_instance_id"] != position["bot_instance_id"]
+                   for event in (entry, intent))
+            or _identity_fields(source) != _identity_fields(position)
+            or body.get("action") != "ENTER"
+            or any(body.get(key) != value for key, value in _identity_fields(position).items())):
+            return False
+        return all(_positive_model_decimal(position[field], "EXIT_INVENTORY_WITNESS_CONFLICT", allow_zero=field == "entry_fee_usd_dec")
+            == _positive_model_decimal(source[original], "EXIT_INVENTORY_WITNESS_CONFLICT", allow_zero=field == "entry_fee_usd_dec")
+            for field, original in (("qty_dec", "qty_dec"), ("entry_price_dec", "entry_price_dec"),
+                ("entered_notional_usd_dec", "entry_gross_notional_usd_dec"), ("entry_fee_usd_dec", "entry_fee_usd_dec")))
+    except (KeyError, TypeError, ValueError, ArithmeticError, AttributeError, PaperPlaneError):
+        return False
+
+
+def _native_legacy_inventory_witness_valid(position: Mapping[str, Any], events: list[dict[str, Any]], *, mode: str) -> bool:
+    """Released native full inventory/release, from its original observations."""
+    try:
+        if not _native_legacy_entry_witness_valid(position, events, mode=mode):
+            return False
+        pid, bot = position["position_id"], position["bot_instance_id"]
+        entries = [event for event in events if event["event_type"] in {
+            "PAPER_SIMULATION_OBSERVED", "SHADOW_EXECUTABLE_OBSERVED"}]
+        exits = [event for event in events if event["event_type"] in {
+            "PAPER_EXIT_OBSERVED", "SHADOW_EXIT_EXECUTABLE_OBSERVED"}]
+        if len(entries) != 1 or len(exits) > 1 or any(position.get(key) is not None for key in (
+                "remaining_qty_dec", "remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec")):
+            return False
+        entry, source = entries[0], entries[0]["payload"]
+        if (entry["event_type"] != ("PAPER_SIMULATION_OBSERVED" if mode == "PAPER" else "SHADOW_EXECUTABLE_OBSERVED")
+            or entry["position_id"] != pid or entry["bot_instance_id"] != bot
+            or source["side"] != "ENTRY" or source["mode"] != mode
+            or _identity_fields(source) != _identity_fields(position)):
+            return False
+        values = {}
+        for field, original_field in (("qty_dec", "qty_dec"), ("entry_price_dec", "entry_price_dec"),
+                ("entered_notional_usd_dec", "entry_gross_notional_usd_dec"), ("entry_fee_usd_dec", "entry_fee_usd_dec")):
+            original = _positive_model_decimal(source[original_field], "EXIT_INVENTORY_WITNESS_CONFLICT",
+                allow_zero=field == "entry_fee_usd_dec")
+            if _positive_model_decimal(position[field], "EXIT_INVENTORY_WITNESS_CONFLICT",
+                    allow_zero=field == "entry_fee_usd_dec") != original:
+                return False
+            values[field] = original
+        exit_fields = ("exit_price_dec", "exit_fee_usd_dec", "exit_notional_usd_dec",
+            "realized_gross_pnl_usd_dec", "realized_net_pnl_usd_dec", "pnl_evidence_class")
+        if not exits:
+            return position["state"] != "RECONCILED" and all(position.get(field) is None for field in exit_fields)
+        event, payload = exits[0], exits[0]["payload"]
+        if (event["event_type"] != ("PAPER_EXIT_OBSERVED" if mode == "PAPER" else "SHADOW_EXIT_EXECUTABLE_OBSERVED")
+            or event["position_id"] != pid or event["bot_instance_id"] != bot
+            or payload["side"] != "EXIT" or payload["mode"] != mode
+            or _identity_fields(payload) != _identity_fields(position)
+            or _parse_utc(event["created_at"]) < _parse_utc(entry["created_at"])
+            or position["state"] != "RECONCILED"
+            or position["pnl_evidence_class"] != ("PAPER_RECONCILED_MODEL" if mode == "PAPER" else "SHADOW_RECONCILED_QUOTE_MODEL")):
+            return False
+        price = _positive_model_decimal(payload["exit_price_dec"], "EXIT_INVENTORY_WITNESS_CONFLICT")
+        proceeds = (price * values["qty_dec"]).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        fee_bps = _bound_entry_fee_bps(position, int(position["fee_bps"]))
+        fee = (proceeds * Decimal(fee_bps) / Decimal("10000")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        gross = (proceeds - values["entered_notional_usd_dec"]).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        net = (gross - values["entry_fee_usd_dec"] - fee).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        if Decimal(payload["exit_fee_usd_dec"]) != fee or Decimal(payload["realized_net_pnl_usd_dec"]) != net:
+            return False
+        return all(Decimal(position[field]) == expected for field, expected in (
+            ("exit_price_dec", price), ("exit_fee_usd_dec", fee), ("exit_notional_usd_dec", proceeds),
+            ("realized_gross_pnl_usd_dec", gross), ("realized_net_pnl_usd_dec", net)))
+    except (KeyError, TypeError, ValueError, ArithmeticError, AttributeError, PaperPlaneError):
+        return False
+
+
+def _sql_native_legacy_inventory_witness(position_raw: Any, events_raw: Any, mode: Any, *, entry_only: bool = False) -> int:
+    try:
+        events = json.loads(events_raw)
+        for event in events:
+            event["payload"] = json.loads(event.pop("payload_json"))
+        position = json.loads(position_raw)
+        if not _native_legacy_entry_witness_valid(position, events, mode=mode):
+            return 0
+        if not entry_only:
+            _assert_quantity_inventory_witness(position, events, mode=mode)
+        return 1
+    except (TypeError, ValueError, KeyError, PaperPlaneError):
+        return 0
+
+
+def _sql_native_legacy_entry_witness(position_raw: Any, events_raw: Any, mode: Any) -> int:
+    return _sql_native_legacy_inventory_witness(position_raw, events_raw, mode, entry_only=True)
+
+
+def assert_quantity_inventory_witness(store: PaperPlaneStore, position: Mapping[str, Any], *,
+                                      pending_attempt_id: str | None = None,
+                                      allow_pending: bool = False, force_quantity: bool = False) -> None:
+    events = store.filtered_execution_events(position_ids=[position["position_id"]])
+    bot = store.get_bot(position["bot_instance_id"])
+    if bot is None:
+        raise PaperPlaneError("EXIT_INVENTORY_WITNESS_CONFLICT")
+    _assert_quantity_inventory_witness(position, events, mode=bot["mode"],
+        pending_attempt_id=pending_attempt_id, allow_pending=allow_pending, force_quantity=force_quantity)
+
+
+def _assert_quantity_inventory_witness(position: Mapping[str, Any], events: list[dict[str, Any]], *, mode: str,
+                                      pending_attempt_id: str | None = None,
+                                      allow_pending: bool = False, force_quantity: bool = False) -> None:
+    """A mutable remainder is never authority for the next quantity EXIT.
+
+    Fold only this position's existing original final/results and quantity legs.
+    Legacy execution without quantity accounting keeps its released payloads.
+    The caller supplies its read snapshot or immediate claim/result transaction.
+    """
+    quantitative = force_quantity or position.get("entry_fee_semantics") is not None or (
+        position.get("qty_dec") is None and position.get("state") == "CANCELLED") or (
+        position.get("qty_dec") is not None and any(
+            event["event_type"] == "MODELED_ATTEMPT_STARTED" for event in events)) or any(
+        event["event_type"] == "MODELED_EXIT_QUANTITY_LEG"
+        or event["event_type"] == "MODELED_ATTEMPT_FINAL" and isinstance(event["payload"], Mapping)
+           and event["payload"].get("schema_version") == "1.1"
+        or event["event_type"] == "MODELED_RESULT_ACCEPTED" and isinstance(event["payload"], Mapping)
+           and isinstance(event["payload"].get("result"), Mapping)
+           and event["payload"]["result"].get("schema_version") == "1.1" for event in events)
+    # Missing mutable quantity does not erase an original positive ENTRY or
+    # its economic projection. Only a genuine legacy row with no inventory
+    # evidence can use the no-quantity compatibility path.
+    inventory_evidence = any(position.get(key) is not None for key in (
+        "entry_price_dec", "entered_notional_usd_dec", "entry_fee_usd_dec",
+        "remaining_qty_dec", "remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec",
+    )) or any(event["event_type"] in {
+        "PAPER_SIMULATION_OBSERVED", "SHADOW_EXECUTABLE_OBSERVED",
+        "PAPER_EXIT_OBSERVED", "SHADOW_EXIT_EXECUTABLE_OBSERVED",
+    } for event in events)
+    if not quantitative and position.get("qty_dec") is None and not inventory_evidence:
+        return
+    try:
+        pid, bot = position["position_id"], position["bot_instance_id"]
+        if not quantitative:
+            if not _native_legacy_inventory_witness_valid(position, events, mode=mode):
+                raise ValueError()
+            return
+        starts = [event for event in events if event["event_type"] == "MODELED_ATTEMPT_STARTED"]
+        attempts = {event["event_id"]: event for event in starts}
+        finals = {event["event_id"]: event for event in events if event["event_type"] == "MODELED_ATTEMPT_FINAL"}
+        observations = {event["event_id"]: event for event in events if event["event_type"] == "MODELED_RESULT_ACCEPTED"}
+        if position["qty_dec"] is None:
+            # A definitive original ENTRY nonfill proves no inventory. It has
+            # no positive entry from which a quantity EXIT can be derived.
+            if (position["state"] != "CANCELLED" or len(finals) != len(starts)
+                or any(event["payload"]["side"] != "ENTRY" for event in starts)
+                or any(event["event_type"] in {"PAPER_SIMULATION_OBSERVED", "SHADOW_EXECUTABLE_OBSERVED", "MODELED_EXIT_QUANTITY_LEG"}
+                       for event in events)):
+                raise ValueError()
+            if any(position.get(key) is not None for key in ("entry_price_dec", "entered_notional_usd_dec",
+                    "entry_gross_notional_usd_dec", "entry_fee_usd_dec", "entry_fee_semantics", "exit_notional_usd_dec",
+                    "exit_fee_usd_dec", "realized_gross_pnl_usd_dec", "realized_net_pnl_usd_dec")):
+                raise ValueError()
+            for key in ("remaining_qty_dec", "remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec"):
+                if _positive_model_decimal(position[key], "EXIT_INVENTORY_WITNESS_CONFLICT", allow_zero=True) != 0:
+                    raise ValueError()
+            if not starts:
+                if observations or not any(event["event_type"] == "ENTRY_INTENT_CANCELLED"
+                        and unattempted_cancel_witness_valid(position, event) for event in events):
+                    raise ValueError()
+                return
+            for event in observations.values():
+                attempt = attempts.get(event["payload"]["result"]["attempt_id"])
+                if attempt is None or not modeled_final_witness_valid(attempt, None, event, mode=mode,
+                        original_position=position):
+                    raise ValueError()
+            for attempt in starts:
+                final = finals["FINAL-" + attempt["event_id"]]
+                accepted = observations[final["payload"]["result_event_id"]]
+                if (not modeled_final_witness_valid(attempt, final, accepted, mode=mode, original_position=position)
+                    or accepted["payload"]["result"]["outcome"] not in {
+                        "NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED"}):
+                    raise ValueError()
+            return
+        original = _positive_model_decimal(position["qty_dec"], "EXIT_INVENTORY_WITNESS_CONFLICT")
+        legacy = original if position.get("entry_fee_semantics") is None else None
+        for event in observations.values():
+            attempt = attempts.get(event["payload"]["result"]["attempt_id"])
+            if attempt is None or not modeled_final_witness_valid(attempt, None, event, mode=mode,
+                    legacy_original_quantity=legacy, original_position=position):
+                raise ValueError()
+        if any(event["event_id"].removeprefix("FINAL-") not in attempts for event in finals.values()):
+            raise ValueError()
+        entry = [event for event in starts if event["payload"]["side"] == "ENTRY"]
+        native_entry_basis = not entry
+        if native_entry_basis:
+            if not _native_legacy_entry_witness_valid(position, events, mode=mode):
+                raise ValueError()
+            filled = {"filled_notional_usd": position["entered_notional_usd_dec"],
+                      "unit_price_usd": position["entry_price_dec"]}
+        elif len(entry) != 1:
+            raise ValueError()
+        else:
+            terminal = finals["FINAL-" + entry[0]["event_id"]]
+            accepted = observations[terminal["payload"]["result_event_id"]]
+            if not modeled_final_witness_valid(entry[0], terminal, accepted, mode=mode,
+                    legacy_original_quantity=legacy, original_position=position):
+                raise ValueError()
+            filled = accepted["payload"]["result"]
+            if filled["outcome"] not in {"LANDED_SUCCESS", "PARTIAL"}:
+                raise ValueError()
+        notional = _positive_model_decimal(filled["filled_notional_usd"], "EXIT_INVENTORY_WITNESS_CONFLICT")
+        if (Decimal(position["entered_notional_usd_dec"]) != notional
+            or Decimal(position["entry_price_dec"]) != Decimal(filled["unit_price_usd"])):
+            raise ValueError()
+        fee_bps = _bound_entry_fee_bps(position, int(position["fee_bps"]))
+        entry_fee = (Decimal("0") if filled.get("fee_semantics") == "INCLUDED_IN_UNIT_PRICE" else
+                     (notional * Decimal(fee_bps) / Decimal("10000")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+        native_entry = [event for event in events if event["event_type"] in {"PAPER_SIMULATION_OBSERVED", "SHADOW_EXECUTABLE_OBSERVED"}
+                        and event["payload"].get("side") == "ENTRY"]
+        if len(native_entry) != 1 or native_entry[0]["bot_instance_id"] != bot or native_entry[0]["position_id"] != pid:
+            raise ValueError()
+        source_entry = native_entry[0]["payload"]
+        for key, value in (("qty_dec", original), ("entry_price_dec", Decimal(filled["unit_price_usd"])),
+                           ("entry_gross_notional_usd_dec", notional), ("entry_fee_usd_dec", entry_fee)):
+            if Decimal(source_entry[key]) != value:
+                raise ValueError()
+        if Decimal(position["entry_fee_usd_dec"]) != entry_fee or source_entry["mode"] != mode:
+            raise ValueError()
+        remainder, proceeds, exit_fees, allocated_fee = original, Decimal("0"), Decimal("0"), Decimal("0")
+        gross, net = Decimal("0"), Decimal("0")
+        legs = {event["event_id"]: event for event in events if event["event_type"] == "MODELED_EXIT_QUANTITY_LEG"}
+        native_exits = [event for event in events if event["event_type"] in {"PAPER_EXIT_OBSERVED", "SHADOW_EXIT_EXECUTABLE_OBSERVED"}]
+        consumed = set()
+        consumed_native = set()
+        for attempt in starts:
+            body = attempt["payload"]
+            if body["side"] != "EXIT":
+                continue
+            if body.get("remaining_quantity") is not None:
+                if Decimal(body["remaining_quantity"]) != remainder or body.get("quantity_unit") != "TOKEN_UNITS":
+                    raise ValueError()
+            elif legacy is None or remainder != original:
+                raise ValueError()
+            final = finals.get("FINAL-" + attempt["event_id"])
+            if final is None:
+                if not (allow_pending or pending_attempt_id == attempt["event_id"]):
+                    raise ValueError()
+                if any(event["payload"]["result"]["outcome"] != "UNKNOWN_REQUIRES_RECONCILIATION"
+                       for event in observations.values() if event["payload"]["result"]["attempt_id"] == attempt["event_id"]):
+                    raise ValueError()
+                continue
+            accepted = observations[final["payload"]["result_event_id"]]
+            if not modeled_final_witness_valid(attempt, final, accepted, mode=mode,
+                    legacy_original_quantity=legacy, original_position=position):
+                raise ValueError()
+            result = accepted["payload"]["result"]
+            if result["outcome"] not in {"LANDED_SUCCESS", "PARTIAL"}:
+                continue
+            modern = result.get("schema_version") == "1.1"
+            sold = Decimal(result["quantity_sold"]) if modern else remainder
+            remaining = Decimal(result["remaining_quantity"]) if modern else Decimal("0")
+            if sold + remaining != remainder or native_entry_basis and remaining != 0:
+                raise ValueError()
+            semantics = result.get("fee_semantics", "SEPARATE_MODELED_FEE")
+            price = Decimal(result["unit_price_usd"])
+            leg_proceeds = (price * sold).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            leg_fee = (Decimal("0") if semantics == "INCLUDED_IN_UNIT_PRICE" else
+                       (leg_proceeds * Decimal(fee_bps) / Decimal("10000")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+            proceeds += leg_proceeds
+            exit_fees += leg_fee
+            cost = notional * remaining / original
+            next_fee = (entry_fee * (original - remaining) / original).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            next_gross = (proceeds - (notional - cost)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            next_net = (next_gross - next_fee - exit_fees).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            if modern:
+                leg = legs.get("LEG-" + accepted["event_id"])
+            else:
+                matches = [event for event in legs.values() if event["event_id"] not in consumed
+                    and event["payload"]["request"]["quantity_sold"] == format(sold, "f")
+                    and event["payload"]["request"]["remaining_quantity"] == format(remaining, "f")]
+                leg = matches[0] if len(matches) == 1 else None
+            if leg is None and not modern and legacy is not None:
+                # Genuine v1.0 full EXIT has its original native observation,
+                # without a quantity leg or invented v1.1 accounting marker.
+                if len(native_exits) != 1 or consumed_native:
+                    raise ValueError()
+                native = native_exits[0]
+                payload = native["payload"]
+                if (native["position_id"] != pid or native["bot_instance_id"] != bot
+                    or payload["side"] != "EXIT" or payload["mode"] != mode
+                    or Decimal(payload["exit_price_dec"]) != price
+                    or Decimal(payload["exit_fee_usd_dec"]) != leg_fee
+                    or Decimal(payload["realized_net_pnl_usd_dec"]) != next_net):
+                    raise ValueError()
+                consumed_native.add(native["event_id"])
+                remainder, allocated_fee, gross, net = remaining, next_fee, next_gross, next_net
+                continue
+            if leg is None or leg["position_id"] != pid or leg["bot_instance_id"] != bot:
+                raise ValueError()
+            clock = result["observed_at"] if modern else leg["created_at"]
+            expected = {"schema_version": "1.1", "request": {"quantity_sold": format(sold, "f"),
+                "remaining_quantity": format(remaining, "f"), "unit_price_usd": format(price, "f"),
+                "fee_semantics": semantics, "observed_at": clock, "mode": mode}, "quantity_unit": "TOKEN_UNITS",
+                "proceeds_usd": format(leg_proceeds, "f"), "exit_fee_usd": format(leg_fee, "f"),
+                "allocated_entry_fee_total_usd": format(next_fee, "f"), "allocated_entry_fee_usd": format(next_fee - allocated_fee, "f"),
+                "realized_gross_pnl_usd": format(next_gross - gross, "f"), "realized_trade_net_usd": format(next_net - net, "f"),
+                "remaining_cost_basis_usd": format(cost, "f"), "realized_trade_net_total_usd": format(next_net, "f"), "evidence_class": mode + "_MODEL"}
+            if leg["created_at"] != clock or leg["payload"] != expected:
+                raise ValueError()
+            consumed.add(leg["event_id"])
+            remainder, allocated_fee, gross, net = remaining, next_fee, next_gross, next_net
+        if consumed != set(legs) or consumed_native != {event["event_id"] for event in native_exits}:
+            raise ValueError()
+        if position.get("remaining_qty_dec") is not None:
+            for key, value in (("remaining_qty_dec", remainder), ("remaining_cost_basis_usd_dec", notional * remainder / original),
+                               ("remaining_entry_fee_usd_dec", entry_fee - allocated_fee)):
+                if Decimal(position[key]) != value:
+                    raise ValueError()
+        elif (position.get("entry_fee_semantics") is not None or consumed
+            or position.get("remaining_cost_basis_usd_dec") is not None
+            or position.get("remaining_entry_fee_usd_dec") is not None):
+            raise ValueError()
+        for key, value in (("exit_notional_usd_dec", proceeds), ("exit_fee_usd_dec", exit_fees),
+                           ("realized_gross_pnl_usd_dec", gross), ("realized_net_pnl_usd_dec", net)):
+            if (position.get(key) is None and consumed) or position.get(key) is not None and Decimal(position[key]) != value:
+                raise ValueError()
+    except (KeyError, TypeError, ValueError, ArithmeticError, AttributeError, PaperPlaneError):
+        raise PaperPlaneError("EXIT_INVENTORY_WITNESS_CONFLICT") from None
+
+
+def _sql_modeled_final_witness(*values: Any) -> int:
+    try:
+        keys = ("event_type", "event_id", "bot_instance_id", "position_id", "created_at", "payload")
+        events = [dict(zip(keys, values[offset:offset + 6])) for offset in (0, 6, 12)]
+        for offset, event in enumerate(events):
+            if offset == 1 and event["event_id"] is None:
+                events[offset] = None
+            else:
+                event["payload"] = json.loads(event["payload"])
+        return int(modeled_final_witness_valid(*events, mode=values[18], legacy_original_quantity=values[19],
+            original_position=json.loads(values[20])))
+    except (TypeError, ValueError):
+        return 0
+
+
+def unattempted_cancel_witness_valid(position: Mapping[str, Any], event: Mapping[str, Any]) -> bool:
+    """Only an original cancellation from a pre-attempt state proves no send."""
+    try:
+        payload = event["payload"]
+        return (isinstance(payload, Mapping) and event["event_type"] == "ENTRY_INTENT_CANCELLED"
+            and event["position_id"] == position["position_id"] and event["bot_instance_id"] == position["bot_instance_id"]
+            and isinstance(payload.get("from_state"), str) and payload["from_state"] in PRE_ATTEMPT_STATES
+            and isinstance(payload.get("cancel_reason_code"), str) and payload["cancel_reason_code"] in CANCEL_REASONS
+            and payload["cancel_reason_code"] == position.get("cancel_reason_code"))
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def _sql_unattempted_cancel_witness(pid: Any, bot: Any, reason: Any, event_type: Any,
+                                  event_bot: Any, event_pid: Any, raw: Any) -> int:
+    try:
+        return int(unattempted_cancel_witness_valid(
+            {"position_id": pid, "bot_instance_id": bot, "cancel_reason_code": reason},
+            {"event_type": event_type, "bot_instance_id": event_bot, "position_id": event_pid, "payload": json.loads(raw)}))
+    except (TypeError, ValueError):
+        return 0
+
+
+_NATIVE_LEGACY_POSITION_SQL = "json_object(" + ",".join("'" + field + "',positions." + field for field in (
+    "position_id", "bot_instance_id", "signal_decision_id", "strategy_id", "strategy_version_label", "reason_code", "activation_epoch_id", "mint", "state",
+    "qty_dec", "entry_price_dec", "entered_notional_usd_dec", "entry_fee_usd_dec", "entry_fee_semantics", "fee_bps", "admitted_fee_bps",
+    "admitted_entry_notional_usd_dec", "remaining_qty_dec", "remaining_cost_basis_usd_dec", "remaining_entry_fee_usd_dec", "exit_price_dec", "exit_fee_usd_dec",
+    "exit_notional_usd_dec", "realized_gross_pnl_usd_dec", "realized_net_pnl_usd_dec", "pnl_evidence_class")) + ")"
+_NATIVE_LEGACY_EVENTS_SQL = """(SELECT json_group_array(json_object('event_type',ne.event_type,'event_id',ne.event_id,
+    'position_id',ne.position_id,'bot_instance_id',ne.bot_instance_id,'created_at',ne.created_at,'payload_json',ne.payload_json))
+    FROM execution_events ne WHERE ne.position_id=positions.position_id)"""
+_NATIVE_LEGACY_ENTRY_SQL = f"native_legacy_entry_witness_v1({_NATIVE_LEGACY_POSITION_SQL},{_NATIVE_LEGACY_EVENTS_SQL},bot_instances.mode)=1"
+_NATIVE_LEGACY_RELEASE_SQL = f"native_legacy_inventory_witness_v1({_NATIVE_LEGACY_POSITION_SQL},{_NATIVE_LEGACY_EVENTS_SQL},bot_instances.mode)=1"
+_LEGACY_QUANTITY_SQL = """CASE WHEN positions.entry_fee_semantics IS NULL AND EXISTS(
+    SELECT 1 FROM execution_events la JOIN execution_events lr ON la.event_id=
+        json_extract(CASE WHEN json_valid(lr.payload_json) THEN lr.payload_json ELSE '{}' END,'$.result.attempt_id')
+    WHERE la.position_id=positions.position_id AND la.event_type='MODELED_ATTEMPT_STARTED'
+    AND json_extract(CASE WHEN json_valid(la.payload_json) THEN la.payload_json ELSE '{}' END,'$.side')='ENTRY'
+    AND lr.position_id=positions.position_id AND lr.event_type='MODELED_RESULT_ACCEPTED'
+    AND json_extract(CASE WHEN json_valid(lr.payload_json) THEN lr.payload_json ELSE '{}' END,'$.result.schema_version') IS NULL
+    AND json_extract(CASE WHEN json_valid(lr.payload_json) THEN lr.payload_json ELSE '{}' END,'$.result.outcome') IN ('LANDED_SUCCESS','PARTIAL'))
+    THEN positions.qty_dec WHEN """ + _NATIVE_LEGACY_ENTRY_SQL + " THEN positions.qty_dec ELSE NULL END"
+_ORIGINAL_ENTRY_SQL = """json_object('qty_dec',positions.qty_dec,'entry_price_dec',positions.entry_price_dec,
+    'entered_notional_usd_dec',positions.entered_notional_usd_dec,'entry_fee_semantics',positions.entry_fee_semantics,
+    'admitted_entry_notional_usd_dec',positions.admitted_entry_notional_usd_dec)"""
+_FINAL_WITNESS_JOIN_SQL = f"""execution_events f JOIN execution_events r ON r.event_id=
+    json_extract(CASE WHEN json_valid(f.payload_json) THEN f.payload_json ELSE '{{}}' END,'$.result_event_id')
+    WHERE f.event_id='FINAL-'||a.event_id AND a.bot_instance_id=positions.bot_instance_id
+    AND modeled_final_witness_v1(a.event_type,a.event_id,a.bot_instance_id,a.position_id,a.created_at,a.payload_json,
+        f.event_type,f.event_id,f.bot_instance_id,f.position_id,f.created_at,f.payload_json,
+        r.event_type,r.event_id,r.bot_instance_id,r.position_id,r.created_at,r.payload_json,bot_instances.mode,
+        {_LEGACY_QUANTITY_SQL},{_ORIGINAL_ENTRY_SQL})=1"""
+_ALL_ATTEMPTS_FINAL_SQL = f"""NOT EXISTS(SELECT 1 FROM execution_events a
+    WHERE a.position_id=positions.position_id AND a.event_type='MODELED_ATTEMPT_STARTED'
+    AND NOT EXISTS(SELECT 1 FROM {_FINAL_WITNESS_JOIN_SQL}))"""
+_NO_MODELED_EVENTS_SQL = """NOT EXISTS(SELECT 1 FROM execution_events e WHERE e.position_id=positions.position_id
+    AND e.event_type IN ('MODELED_ATTEMPT_STARTED','MODELED_ATTEMPT_FINAL','MODELED_RESULT_ACCEPTED'))"""
+_UNATTEMPTED_CANCEL_PROOF_SQL = f"""({_NO_MODELED_EVENTS_SQL}) AND EXISTS(SELECT 1 FROM execution_events c
+    WHERE c.position_id=positions.position_id AND c.event_type='ENTRY_INTENT_CANCELLED'
+    AND unattempted_cancel_witness_v1(positions.position_id,positions.bot_instance_id,positions.cancel_reason_code,
+        c.event_type,c.bot_instance_id,c.position_id,c.payload_json)=1)"""
+_NO_ORPHAN_MODELED_EVENTS_SQL = f"""NOT EXISTS(SELECT 1 FROM execution_events e
+    WHERE e.position_id=positions.position_id AND (
+        (e.event_type='MODELED_ATTEMPT_FINAL' AND NOT EXISTS(SELECT 1 FROM execution_events a
+            WHERE a.position_id=positions.position_id AND e.event_id='FINAL-'||a.event_id
+            AND a.event_type='MODELED_ATTEMPT_STARTED' AND EXISTS(SELECT 1 FROM {_FINAL_WITNESS_JOIN_SQL})))
+        OR (e.event_type='MODELED_RESULT_ACCEPTED' AND NOT EXISTS(SELECT 1 FROM execution_events a
+            WHERE a.event_id=json_extract(CASE WHEN json_valid(e.payload_json) THEN e.payload_json ELSE '{{}}' END,'$.result.attempt_id')
+            AND a.position_id=positions.position_id AND a.bot_instance_id=positions.bot_instance_id
+            AND modeled_final_witness_v1(a.event_type,a.event_id,a.bot_instance_id,a.position_id,a.created_at,a.payload_json,
+                NULL,NULL,NULL,NULL,NULL,NULL,e.event_type,e.event_id,e.bot_instance_id,e.position_id,e.created_at,e.payload_json,bot_instances.mode,
+                {_LEGACY_QUANTITY_SQL},{_ORIGINAL_ENTRY_SQL})=1))))"""
+_PROVED_RELEASE_SQL = f"""({_ALL_ATTEMPTS_FINAL_SQL}) AND ({_NO_ORPHAN_MODELED_EVENTS_SQL}) AND (
+    (state='CANCELLED' AND (EXISTS(SELECT 1 FROM execution_events a
+        WHERE a.position_id=positions.position_id AND a.event_type='MODELED_ATTEMPT_STARTED'
+        AND json_extract(CASE WHEN json_valid(a.payload_json) THEN a.payload_json ELSE '{{}}' END,'$.side')='ENTRY'
+        AND EXISTS(SELECT 1 FROM {_FINAL_WITNESS_JOIN_SQL}
+            AND json_extract(CASE WHEN json_valid(f.payload_json) THEN f.payload_json ELSE '{{}}' END,'$.outcome') IN ('NO_ROUTE','REJECTED_BEFORE_SEND','DROPPED_OR_EXPIRED_NOT_PROCESSED','LANDED_FAILED')))
+        OR ({_UNATTEMPTED_CANCEL_PROOF_SQL})))
+    OR (state='RECONCILED' AND (EXISTS(SELECT 1 FROM execution_events a
+        WHERE a.position_id=positions.position_id AND a.event_type='MODELED_ATTEMPT_STARTED'
+        AND json_extract(CASE WHEN json_valid(a.payload_json) THEN a.payload_json ELSE '{{}}' END,'$.side')='EXIT'
+        AND EXISTS(SELECT 1 FROM {_FINAL_WITNESS_JOIN_SQL} AND json_extract(CASE WHEN json_valid(f.payload_json) THEN f.payload_json ELSE '{{}}' END,'$.outcome')='LANDED_SUCCESS')
+        AND (COALESCE(ordinary_operating,0)=0 OR EXISTS(SELECT 1 FROM execution_events a
+            WHERE a.position_id=positions.position_id AND a.event_type='MODELED_ATTEMPT_STARTED'
+            AND json_extract(CASE WHEN json_valid(a.payload_json) THEN a.payload_json ELSE '{{}}' END,'$.side')='ENTRY'
+            AND EXISTS(SELECT 1 FROM {_FINAL_WITNESS_JOIN_SQL}
+                AND json_extract(CASE WHEN json_valid(f.payload_json) THEN f.payload_json ELSE '{{}}' END,'$.outcome') IN ('LANDED_SUCCESS','PARTIAL')))))
+        OR ({_NATIVE_LEGACY_RELEASE_SQL}))))"""
 
 
 def _now() -> str:
@@ -146,6 +709,16 @@ def _now() -> str:
 
 def _parse_utc(value: str) -> datetime:
     return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+
+
+def _positive_model_decimal(value: Any, code: str, *, allow_zero: bool = False) -> Decimal:
+    try:
+        amount = Decimal(str(value))
+        if not amount.is_finite() or amount < 0 or not allow_zero and amount == 0:
+            raise ValueError()
+    except (ValueError, ArithmeticError):
+        raise PaperPlaneError(code) from None
+    return amount
 
 
 def modeled_unrealized_mark(
@@ -231,6 +804,10 @@ def _connect_sqlite(path: Path, *, readonly: bool) -> sqlite3.Connection:
         conn.isolation_level = None
         conn.execute("PRAGMA busy_timeout=5000")
     conn.row_factory = sqlite3.Row
+    conn.create_function("modeled_final_witness_v1", 21, _sql_modeled_final_witness, deterministic=True)
+    conn.create_function("unattempted_cancel_witness_v1", 7, _sql_unattempted_cancel_witness, deterministic=True)
+    conn.create_function("native_legacy_inventory_witness_v1", 3, _sql_native_legacy_inventory_witness, deterministic=True)
+    conn.create_function("native_legacy_entry_witness_v1", 3, _sql_native_legacy_entry_witness, deterministic=True)
     if readonly:
         try:
             # Validate actual source access now, so discovery can report an
@@ -289,6 +866,7 @@ class PaperPlaneStore:
         self._migrate_trading_runtime_policy_v1()
         self._migrate_entry_intent_integrity_v1()
         self._migrate_decision_identity_v1()
+        self._migrate_operational_accounting_v1()
         self._commit()
 
     @contextmanager
@@ -436,6 +1014,21 @@ class PaperPlaneStore:
         _ensure_column(self._conn, "positions", "exit_reason_code", "TEXT")
         _ensure_column(self._conn, "bot_instances", "strategy_spec_sha256", "TEXT")
 
+    def _migrate_operational_accounting_v1(self) -> None:
+        """Additive remaining inventory; legacy fill/event bytes are untouched."""
+        for column, kind in (
+            ("ordinary_operating", "INTEGER"),
+            ("ordinary_envelope_sha256", "TEXT"),
+            ("entry_fee_semantics", "TEXT"),
+            ("remaining_qty_dec", "TEXT"),
+            ("remaining_cost_basis_usd_dec", "TEXT"),
+            ("remaining_entry_fee_usd_dec", "TEXT"),
+        ):
+            _ensure_column(self._conn, "positions", column, kind)
+        self._conn.execute("CREATE INDEX IF NOT EXISTS idx_execution_events_type ON execution_events(event_type)")
+        self._conn.execute("CREATE INDEX IF NOT EXISTS idx_execution_events_position_type ON execution_events(position_id,event_type)")
+        self._conn.execute(f"CREATE INDEX IF NOT EXISTS idx_positions_outstanding_candidates_v1 ON positions(bot_instance_id) WHERE {_OBLIGATION_CANDIDATE_SQL}")
+
     def _commit(self) -> None:
         # Writable connections use isolation_level=None. Statements persist
         # immediately unless immediate_write() opened BEGIN IMMEDIATE.
@@ -473,6 +1066,10 @@ class PaperPlaneStore:
         mode: str = "PAPER",
         activation_epoch_id: str | None = None,
     ) -> dict[str, Any]:
+        with self.immediate_write():
+            return self._start_bot(strategy, mode=mode, activation_epoch_id=activation_epoch_id)
+
+    def _start_bot(self, strategy, *, mode, activation_epoch_id):
         if mode not in {"PAPER", "SHADOW"}:
             raise PaperPlaneError("BOT_MODE_INVALID")
         schema_version = str(strategy.get("schema_version", "1.0"))
@@ -514,6 +1111,22 @@ class PaperPlaneStore:
             if status in {"DRAINING", "STOPPED"}:
                 # Never resurrect control-plane status via start_bot side effect.
                 return existing
+        scope = _effective_operating_scope(self, mode)
+        recovering = False
+        if scope["managed"]:
+            retained = self.get_execution_event(str(activation_epoch_id))
+            recovering = (scope["reason_code"] == "RESTORE_NEW_EFFECTS_FORBIDDEN" and retained is not None
+                and retained["event_type"] == "OFFLINE_ACTIVATION_CREATED" and retained["bot_instance_id"] == bot_instance_id
+                and _operating_binding_block(self, mode=mode, epoch_id=activation_epoch_id, strategy_sha256=spec) is None
+                and retained["payload"] == self.get_execution_event("OPERATING-" + activation_epoch_id)["payload"]["activation"])
+            block = None if recovering else _operating_entry_block(self, scope, epoch_id=activation_epoch_id,
+                strategy_sha256=spec, initializing=True)
+            if block:
+                raise PaperPlaneError(block)
+            # Only the native switch transaction can stage a new current epoch.
+            # Re-reading a retained bot above is not a new activation.
+            if retained is not None and not recovering:
+                raise PaperPlaneError("OPERATING_ACTIVATION_BINDING_INCOMPLETE")
         record = {
             "bot_instance_id": bot_instance_id,
             "strategy_id": str(strategy["strategy_id"]),
@@ -560,6 +1173,8 @@ class PaperPlaneStore:
                 spec,
             ),
         )
+        if recovering:
+            self._conn.execute("UPDATE bot_instances SET entries_paused=1 WHERE bot_instance_id=?", (bot_instance_id,))
         self._commit()
         refreshed = self.get_bot(bot_instance_id)
         assert refreshed is not None
@@ -674,6 +1289,15 @@ class PaperPlaneStore:
         rows = self._conn.execute("SELECT * FROM positions ORDER BY opened_at").fetchall()
         return [dict(row) for row in rows]
 
+    def obligation_positions(self, mode: str) -> list[dict[str, Any]]:
+        """Terminal rows require live indexed witnesses, never a cached release."""
+        predicate = (f"({_OBLIGATION_CANDIDATE_SQL}) OR NOT ({_PROVED_RELEASE_SQL})" if "remaining_qty_dec" in _table_columns(self._conn, "positions")
+                     else "1=1")  # Pre-migration readonly legacy compatibility.
+        rows = self._conn.execute(f"""SELECT positions.*, bot_instances.mode AS obligation_mode
+            FROM positions LEFT JOIN bot_instances USING(bot_instance_id)
+            WHERE ({predicate}) AND (bot_instances.mode=? OR bot_instances.mode IS NULL)""", (mode,)).fetchall()
+        return [dict(row) for row in rows]
+
     def open_risk_count(self, bot_instance_id: str) -> int:
         rows = self._conn.execute(
             "SELECT state FROM positions WHERE bot_instance_id = ?",
@@ -758,12 +1382,30 @@ class PaperPlaneStore:
         return eid
 
     def execution_events(self) -> list[dict[str, Any]]:
-        rows = self._conn.execute(
-            "SELECT * FROM execution_events ORDER BY rowid"
-        ).fetchall()
+        return self.filtered_execution_events()
+
+    def filtered_execution_events(self, *, event_type: str | None = None,
+                                  position_ids: list[str] | None = None) -> list[dict[str, Any]]:
+        if position_ids == []:
+            return []
+        groups = [None] if position_ids is None else [position_ids[i:i + 500] for i in range(0, len(position_ids), 500)]
+        rows = []
+        for group in groups:
+            conditions = []
+            parameters: list[Any] = []
+            if event_type is not None:
+                conditions.append("event_type=?")
+                parameters.append(event_type)
+            if group is not None:
+                conditions.append("position_id IN (" + ",".join("?" for _ in group) + ")")
+                parameters.extend(group)
+            where = " WHERE " + " AND ".join(conditions) if conditions else ""
+            rows.extend(self._conn.execute("SELECT rowid AS event_sequence,* FROM execution_events" + where + " ORDER BY rowid", parameters).fetchall())
+        rows.sort(key=lambda row: row["event_sequence"])
         out: list[dict[str, Any]] = []
         for row in rows:
             item = dict(row)
+            item.pop("event_sequence")
             raw = item.pop("payload_json")
             try:
                 item["payload"] = json.loads(raw)
@@ -903,7 +1545,7 @@ class PaperPlaneStore:
                 raise PaperPlaneError("CANCEL_AFTER_FILL_FORBIDDEN")
             self.transition(position_id, "CANCELLED")
             self._conn.execute(
-                "UPDATE positions SET cancel_reason_code = ? WHERE position_id = ?",
+                "UPDATE positions SET cancel_reason_code = ?, remaining_qty_dec='0', remaining_cost_basis_usd_dec='0', remaining_entry_fee_usd_dec='0' WHERE position_id = ?",
                 (reason_code, position_id),
             )
             self.append_execution_event(
@@ -1089,10 +1731,10 @@ class PaperPlaneStore:
                 and position.get("qty_dec")
                 and position.get("entered_notional_usd_dec") is not None
             ):
-                qty = Decimal(str(position["qty_dec"]))
+                qty = Decimal(str(position.get("remaining_qty_dec") if position.get("remaining_qty_dec") is not None else position["qty_dec"]))
                 mark = Decimal(str(mark_price_dec))
-                entry_notional = Decimal(str(position["entered_notional_usd_dec"]))
-                entry_fee_raw = position.get("entry_fee_usd_dec")
+                entry_notional = Decimal(str(position.get("remaining_cost_basis_usd_dec") if position.get("remaining_cost_basis_usd_dec") is not None else position["entered_notional_usd_dec"]))
+                entry_fee_raw = position.get("remaining_entry_fee_usd_dec") if position.get("remaining_entry_fee_usd_dec") is not None else position.get("entry_fee_usd_dec")
                 fee_bps_raw = position.get("fee_bps")
                 if entry_fee_raw not in {None, ""} and fee_bps_raw is not None:
                     derived = modeled_unrealized_mark(
@@ -1144,6 +1786,8 @@ class PaperPlaneStore:
         fee_bps: int | None = None,
         mode: str,
         reconcile_pending_close: bool = False,
+        entry_quantity_units: str | None = None,
+        fee_semantics: str | None = None,
     ) -> dict[str, Any]:
         if mode not in {"PAPER", "SHADOW"}:
             raise PaperPlaneError("BOT_MODE_INVALID")
@@ -1164,6 +1808,15 @@ class PaperPlaneStore:
             if not price.is_finite() or not notional.is_finite() or price <= 0 or notional <= 0:
                 raise PaperPlaneError("ENTRY_FILL_INVALID")
             fee_bps = _bound_entry_fee_bps(position, fee_bps)
+            if fee_semantics not in {None, "SEPARATE_MODELED_FEE", "INCLUDED_IN_UNIT_PRICE"}:
+                raise PaperPlaneError("MODELED_FEE_SEMANTICS_UNSUPPORTED")
+            quantity = (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP)
+            if entry_quantity_units is not None:
+                quantity = _positive_model_decimal(entry_quantity_units, "MODELED_QUANTITY_INVALID")
+                if (price * quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP) != notional.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP):
+                    raise PaperPlaneError("MODELED_ENTRY_QUANTITY_PRICE_CONFLICT")
+            entry_fee = (Decimal("0") if fee_semantics == "INCLUDED_IN_UNIT_PRICE" else
+                         (notional * Decimal(fee_bps) / Decimal(10000)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
             bot = self.get_bot(str(position["bot_instance_id"]))
             if bot is None or str(bot.get("mode")) != mode:
                 raise PaperPlaneError("ENTRY_FILL_MODE_MISMATCH")
@@ -1174,8 +1827,8 @@ class PaperPlaneStore:
                     or int(position["fee_bps"]) != fee_bps
                 ):
                     raise PaperPlaneError("ENTRY_FILL_CONTENT_CONFLICT")
-                quantity = (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP)
-                entry_fee = (notional * Decimal(fee_bps) / Decimal(10000)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+                if position.get("entry_fee_semantics") != fee_semantics:
+                    raise PaperPlaneError("ENTRY_FILL_CONTENT_CONFLICT")
                 for field, expected in (("qty_dec", quantity), ("entry_fee_usd_dec", entry_fee)):
                     if position.get(field) not in {None, ""} and Decimal(str(position[field])) != expected:
                         raise PaperPlaneError("ENTRY_ACCOUNTING_CONTENT_CONFLICT")
@@ -1195,10 +1848,6 @@ class PaperPlaneStore:
                 self.transition(position_id, "PARTIAL" if admitted not in {None, ""} and notional < Decimal(str(admitted)) else "OPEN")
                 position = self.get_position(position_id)
                 assert position is not None
-            quantity = (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP)
-            entry_fee = (notional * Decimal(fee_bps) / Decimal(10000)).quantize(
-                Decimal("0.01"), rounding=ROUND_HALF_UP
-            )
             evidence = (
                 "PAPER_RECONCILED_MODEL" if mode == "PAPER" else "SHADOW_RECONCILED_QUOTE_MODEL"
             )
@@ -1227,6 +1876,9 @@ class PaperPlaneStore:
                     position_id,
                 ),
             )
+            if fee_semantics is not None:
+                self._conn.execute("UPDATE positions SET entry_fee_semantics=?, remaining_qty_dec=?, remaining_cost_basis_usd_dec=?, remaining_entry_fee_usd_dec=? WHERE position_id=?",
+                    (fee_semantics, format(quantity, "f"), format(notional, "f"), format(entry_fee, "f"), position_id))
             event_type = (
                 "PAPER_SIMULATION_OBSERVED" if mode == "PAPER" else "SHADOW_EXECUTABLE_OBSERVED"
             )
@@ -1263,6 +1915,11 @@ class PaperPlaneStore:
             position = self.get_position(position_id)
             if position is None:
                 raise PaperPlaneError("POSITION_NOT_FOUND")
+            if not unresolved and exit_unit_price_usd is not None and position.get("remaining_qty_dec") is not None:
+                return self.apply_quantity_exit_fill(position_id=position_id, mode=mode,
+                    quantity_sold=str(position["remaining_qty_dec"]), remaining_quantity="0",
+                    exit_unit_price_usd=exit_unit_price_usd, fee_semantics="SEPARATE_MODELED_FEE",
+                    observed_at=_now(), leg_id="LEG-" + uuid4().hex.upper())
             state0 = str(position["state"])
             if state0 == "RECONCILED":
                 raise PaperPlaneError(f"EXIT_FILL_STATE_INVALID:{state0}")
@@ -1295,8 +1952,8 @@ class PaperPlaneStore:
                     """
                     UPDATE positions
                     SET pnl_evidence_class = NULL,
-                        realized_gross_pnl_usd_dec = NULL,
-                        realized_net_pnl_usd_dec = NULL
+                        realized_gross_pnl_usd_dec = CASE WHEN remaining_qty_dec IS NULL THEN NULL ELSE realized_gross_pnl_usd_dec END,
+                        realized_net_pnl_usd_dec = CASE WHEN remaining_qty_dec IS NULL THEN NULL ELSE realized_net_pnl_usd_dec END
                     WHERE position_id = ?
                     """,
                     (position_id,),
@@ -1403,6 +2060,82 @@ class PaperPlaneStore:
                     "mode": mode,
                 },
             )
+            updated = self.get_position(position_id)
+            assert updated is not None
+            return updated
+
+    def apply_quantity_exit_fill(self, *, position_id: str, mode: str,
+                                 quantity_sold: str, remaining_quantity: str,
+                                 exit_unit_price_usd: str, fee_semantics: str,
+                                 observed_at: str, leg_id: str) -> dict[str, Any]:
+        """A definitive v1.1 leg finalizes one attempt, conserving its remainder."""
+        sold = _positive_model_decimal(quantity_sold, "MODELED_QUANTITY_INVALID")
+        remaining = _positive_model_decimal(remaining_quantity, "MODELED_QUANTITY_INVALID", allow_zero=True)
+        price = _positive_model_decimal(exit_unit_price_usd, "MODELED_FILL_DETAILS_INVALID")
+        if fee_semantics not in {"SEPARATE_MODELED_FEE", "INCLUDED_IN_UNIT_PRICE"}:
+            raise PaperPlaneError("MODELED_FEE_SEMANTICS_UNSUPPORTED")
+        with self.immediate_write():
+            position = self.get_position(position_id)
+            if position is None:
+                raise PaperPlaneError("POSITION_NOT_FOUND")
+            bot = self.get_bot(str(position["bot_instance_id"]))
+            if bot is None or bot["mode"] != mode:
+                raise PaperPlaneError("EXIT_FILL_MODE_MISMATCH")
+            request = {"quantity_sold": format(sold, "f"), "remaining_quantity": format(remaining, "f"),
+                       "unit_price_usd": format(price, "f"), "fee_semantics": fee_semantics,
+                       "observed_at": observed_at, "mode": mode}
+            previous = self.get_execution_event(leg_id)
+            if previous is not None:
+                if previous["position_id"] != position_id or previous["payload"].get("request") != request:
+                    raise PaperPlaneError("EXIT_LEG_CONTENT_CONFLICT")
+                return position
+            if position["state"] not in {"OPEN", "PARTIAL", "EXIT_REQUIRED", "EXITING", "UNRESOLVED"}:
+                raise PaperPlaneError("EXIT_QUANTITY_STATE_INVALID")
+            original = _positive_model_decimal(position.get("qty_dec"), "EXIT_FILL_REQUIRES_ENTRY")
+            prior_remaining = original if position.get("remaining_qty_dec") is None else _positive_model_decimal(
+                position["remaining_qty_dec"], "MODELED_QUANTITY_INVALID")
+            if sold > prior_remaining or sold + remaining != prior_remaining:
+                raise PaperPlaneError("MODELED_EXIT_QUANTITY_CONFLICT")
+            entry_notional = _positive_model_decimal(position.get("entered_notional_usd_dec"), "EXIT_FILL_REQUIRES_ENTRY_NOTIONAL")
+            entry_fee = _positive_model_decimal(position.get("entry_fee_usd_dec"), "EXIT_FILL_REQUIRES_ENTRY_FEE", allow_zero=True)
+            previous_exit = Decimal(str(position.get("exit_notional_usd_dec") or "0"))
+            previous_fee = Decimal(str(position.get("exit_fee_usd_dec") or "0"))
+            proceeds = (price * sold).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            leg_fee = (Decimal("0") if fee_semantics == "INCLUDED_IN_UNIT_PRICE" else
+                       (proceeds * Decimal(int(position["fee_bps"])) / Decimal("10000")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+            remaining_cost = entry_notional * remaining / original
+            allocated_cost = entry_notional - remaining_cost
+            allocated_fee = (entry_fee * (original - remaining) / original).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            remaining_fee = entry_fee - allocated_fee
+            prior_allocated_fee = entry_fee - Decimal(str(position.get("remaining_entry_fee_usd_dec")
+                if position.get("remaining_entry_fee_usd_dec") is not None else entry_fee))
+            exit_total = previous_exit + proceeds
+            exit_fee = previous_fee + leg_fee
+            gross = (exit_total - allocated_cost).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            net = (gross - allocated_fee - exit_fee).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            evidence = None if remaining else ("PAPER_RECONCILED_MODEL" if mode == "PAPER" else "SHADOW_RECONCILED_QUOTE_MODEL")
+            # A completed partial leg returns to the same originating exit;
+            # ordinary successor/control state cannot replace this obligation.
+            self._conn.execute("""UPDATE positions SET state=?, remaining_qty_dec=?, remaining_cost_basis_usd_dec=?,
+                remaining_entry_fee_usd_dec=?, exit_price_dec=?, exit_notional_usd=?, exit_notional_usd_dec=?,
+                exit_fee_usd_dec=?, realized_gross_pnl_usd_dec=?, realized_net_pnl_usd_dec=?, pnl_evidence_class=?,
+                closed_at=CASE WHEN ?=1 THEN COALESCE(closed_at,?) ELSE closed_at END,
+                mark_price_dec=NULL, mark_as_of=NULL, unrealized_gross_pnl_usd_dec=NULL,
+                unrealized_net_pnl_usd_dec=NULL, unrealized_evidence_class=NULL WHERE position_id=?""",
+                ("EXIT_REQUIRED" if remaining else "RECONCILED", format(remaining, "f"), format(remaining_cost, "f"),
+                 format(remaining_fee, "f"), format(exit_total / (original - remaining), "f"), float(exit_total),
+                 format(exit_total, "f"), format(exit_fee, "f"), format(gross, "f"), format(net, "f"), evidence,
+                 int(remaining == 0), observed_at, position_id))
+            self.append_execution_event(event_type="MODELED_EXIT_QUANTITY_LEG", event_id=leg_id,
+                bot_instance_id=bot["bot_instance_id"], position_id=position_id, created_at=observed_at,
+                payload={"schema_version": "1.1", "request": request, "quantity_unit": "TOKEN_UNITS",
+                         "proceeds_usd": format(proceeds, "f"), "exit_fee_usd": format(leg_fee, "f"),
+                         "allocated_entry_fee_total_usd": format(allocated_fee, "f"),
+                         "allocated_entry_fee_usd": format(allocated_fee - prior_allocated_fee, "f"),
+                         "realized_gross_pnl_usd": format(gross - Decimal(str(position.get("realized_gross_pnl_usd_dec") or "0")), "f"),
+                         "realized_trade_net_usd": format(net - Decimal(str(position.get("realized_net_pnl_usd_dec") or "0")), "f"),
+                         "remaining_cost_basis_usd": format(remaining_cost, "f"),
+                         "realized_trade_net_total_usd": format(net, "f"), "evidence_class": bot["mode"] + "_MODEL"})
             updated = self.get_position(position_id)
             assert updated is not None
             return updated
@@ -1633,6 +2366,190 @@ def _resume_block(
     return None, None
 
 
+def _effective_operating_scope(store, mode):
+    """Read the existing lifecycle owner in the caller's SQLite transaction.
+
+    Frozen bindings also exist in legacy databases. A state row or native
+    profile/switch history establishes managed scope; a lost part cannot make
+    that scope legacy again. Envelope-only opt-in remains legacy compatible.
+    """
+    table = store._conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='ordinary_state'").fetchone()
+    row = None if table is None else store._conn.execute("SELECT * FROM ordinary_state WHERE mode=?", (mode,)).fetchone()
+    managed = row is not None
+    for event_type in ("OPERATING_PROFILE_COMMITTED", "OPERATING_SWITCH_COMMITTED"):
+        for raw in store._conn.execute("SELECT payload_json FROM execution_events WHERE event_type=?", (event_type,)):
+            try:
+                payload = json.loads(raw[0])
+                event_mode = payload["profile"]["mode"] if event_type == "OPERATING_PROFILE_COMMITTED" else payload["mode"]
+            except (ValueError, KeyError, TypeError):
+                # An unreadable native lifecycle marker has no safe legacy scope.
+                managed = True
+                continue
+            managed = managed or event_mode == mode
+    if not managed:
+        return {"managed": False, "mode": mode, "state": None, "reason_code": None}
+    if row is None:
+        return {"managed": True, "mode": mode, "state": None, "reason_code": "OPERATING_STATE_REQUIRED"}
+    state = dict(row)
+    if (not isinstance(state.get("epoch_id"), str) or not state["epoch_id"]
+        or type(state.get("generation")) is not int or state["generation"] < 1
+        or type(state.get("restore_guard")) is not int or state["restore_guard"] not in (0, 1)):
+        reason = "OPERATING_STATE_INVALID"
+    else:
+        reason = "RESTORE_NEW_EFFECTS_FORBIDDEN" if state["restore_guard"] else None
+    return {"managed": True, "mode": mode, "state": state, "reason_code": reason}
+
+
+def _operating_binding_block(store, *, mode, epoch_id, strategy_sha256=None, as_of=None):
+    return _operating_binding_records_block(store.get_execution_event("OPERATING-" + epoch_id),
+        store.get_execution_event(epoch_id), mode=mode, epoch_id=epoch_id,
+        strategy_sha256=strategy_sha256, as_of=as_of)
+
+
+def _operating_binding_records_block(event, original, *, mode, epoch_id, strategy_sha256=None, as_of=None):
+    from solana_alpha_lab.factory.hfic_research_scope import sha256_of
+    try:
+        if event is None:
+            return "OPERATING_BINDING_MISSING"
+        body = event["payload"]
+        activation = body["activation"]
+        strategy = body["strategy"]
+        if original is None:
+            return "OPERATING_ACTIVATION_BINDING_INCOMPLETE"
+        expected_bot = f"BOT-{strategy['strategy_id']}-{strategy['strategy_version']}-{mode}-{epoch_id}"
+        if (event["event_type"] != "OPERATING_BINDING_COMMITTED"
+            or event["event_id"] != "OPERATING-" + epoch_id or original["event_id"] != epoch_id
+            or sha256_of({key: value for key, value in body.items() if key != "binding_sha256"}) != body["binding_sha256"]
+            or activation["epoch_id"] != epoch_id or activation["mode"] != mode
+            or activation["evidence_class"] not in {"OBSERVED", "SYNTHETIC_OFFLINE"}
+            or activation["strategy_sha256"] != strategy["spec_sha256"]
+            or activation["strategy_id"] != strategy["strategy_id"] or activation["strategy_version"] != strategy["strategy_version"]
+            or event["bot_instance_id"] != expected_bot or event["position_id"] is not None
+            or event["created_at"] != activation["at"]
+            or original["event_type"] != "OFFLINE_ACTIVATION_CREATED" or original["payload"] != activation
+            or original["bot_instance_id"] != expected_bot or original["position_id"] is not None
+            or original["created_at"] != activation["at"]
+            or strategy_sha256 is not None and activation["strategy_sha256"] != strategy_sha256):
+            return "OPERATING_BINDING_INTEGRITY_CONFLICT"
+        if as_of is not None and _parse_utc(as_of) < _parse_utc(activation["at"]):
+            return "DECISION_BEFORE_ACTIVATION"
+        if as_of is not None and activation["evidence_class"] == "OBSERVED":
+            if abs((datetime.now(UTC) - _parse_utc(as_of)).total_seconds()) > SIGNAL_MAX_CLOCK_SKEW_SECONDS:
+                return "OBSERVED_RUNTIME_REQUIRES_PHYSICAL_CLOCK"
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return "OPERATING_BINDING_INTEGRITY_CONFLICT"
+    return None
+
+
+def _operating_switch_lineage_block(*, mode, current, switches, bindings,
+                                    strategy_sha256=None, as_of=None, initializing=False):
+    """One original CAS/identity verifier for managed ingress and recovery cuts."""
+    from solana_alpha_lab.factory.hfic_research_scope import sha256_of
+    conflict = "OPERATING_SWITCH_STATE_CONFLICT"
+    try:
+        if (not isinstance(switches, list) or not switches or type(current["generation"]) is not int
+            or len(switches) != current["generation"] or len({event["event_id"] for event in switches}) != len(switches)
+            or switches[-1]["payload"]["epoch_id"] != current["epoch_id"]):
+            return conflict
+        previous = None
+        for event in switches:
+            body = event["payload"]
+            epoch = body["epoch_id"]
+            bundle = bindings[epoch]
+            activation, binding, profile_event = bundle["activation"], bundle["binding"], bundle["profile"]
+            if (set(event) != {"event_id", "event_type", "bot_instance_id", "position_id", "created_at", "payload"}
+                or event["event_type"] != "OPERATING_SWITCH_COMMITTED" or event["bot_instance_id"] is not None
+                or event["position_id"] is not None or not isinstance(event["event_id"], str)
+                or not event["event_id"].startswith("SWITCH-") or len(event["event_id"]) != 71
+                or any(char not in "0123456789abcdef" for char in event["event_id"][7:])
+                or set(body) != {"epoch_id", "at", "mode", "profile", "strategy_sha256", "expected_current_epoch"}
+                or body["mode"] != mode or body["expected_current_epoch"] != previous
+                or event["created_at"] != body["at"]):
+                return conflict
+            if profile_event is None:
+                return "OPERATING_PROFILE_REQUIRED"
+            profile = profile_event["payload"]
+            if (profile_event["event_type"] != "OPERATING_PROFILE_COMMITTED" or profile_event["event_id"] != "PROFILE-" + epoch
+                or profile_event["bot_instance_id"] is not None or profile_event["position_id"] is not None
+                or set(profile) != {"profile", "profile_sha256"} or not isinstance(profile["profile"], dict)
+                or profile["profile_sha256"] != sha256_of(profile["profile"]) or profile["profile"].get("mode") != mode):
+                return "OPERATING_PROFILE_INTEGRITY_CONFLICT"
+            if body["profile"] != profile["profile"] or profile_event["created_at"] != body["at"]:
+                return conflict
+            # The existing native initialization transaction stages current
+            # profile/switch before start_bot writes activation and binding.
+            if initializing and epoch == current["epoch_id"] and activation is None and binding is None:
+                if strategy_sha256 is None or body["strategy_sha256"] != strategy_sha256:
+                    return conflict
+            else:
+                block = _operating_binding_records_block(binding, activation, mode=mode, epoch_id=epoch)
+                if block:
+                    return block
+                if (activation["payload"]["at"] != body["at"]
+                    or body["strategy_sha256"] != binding["payload"]["strategy"]["spec_sha256"]):
+                    return conflict
+                if epoch == current["epoch_id"] and strategy_sha256 is not None:
+                    block = _operating_binding_records_block(binding, activation, mode=mode,
+                        epoch_id=epoch, strategy_sha256=strategy_sha256)
+                    if block:
+                        return block
+            if as_of is not None and _parse_utc(body["at"]) > _parse_utc(as_of):
+                return "DECISION_BEFORE_ACTIVATION"
+            previous = epoch
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return conflict
+    return None
+
+
+def _operating_entry_block(store, scope, *, epoch_id, strategy_sha256=None, as_of=None, initializing=False):
+    from solana_alpha_lab.factory.hfic_research_scope import sha256_of
+    if not scope["managed"]:
+        return None
+    if scope["reason_code"]:
+        return scope["reason_code"]
+    if scope["state"]["epoch_id"] != epoch_id:
+        return "OPERATING_ENTRY_SCOPE_NOT_CURRENT"
+    try:
+        profile_event = store.get_execution_event("PROFILE-" + epoch_id)
+        if profile_event is None:
+            return "OPERATING_PROFILE_REQUIRED"
+        body = profile_event["payload"]
+        profile = body["profile"]
+        if (profile_event["event_type"] != "OPERATING_PROFILE_COMMITTED"
+            or set(body) != {"profile", "profile_sha256"} or not isinstance(profile, dict)
+            or body["profile_sha256"] != sha256_of(profile) or profile.get("mode") != scope["mode"]):
+            return "OPERATING_PROFILE_INTEGRITY_CONFLICT"
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return "OPERATING_PROFILE_INTEGRITY_CONFLICT"
+    try:
+        switches = [event for event in store.filtered_execution_events(event_type="OPERATING_SWITCH_COMMITTED")
+            if event["payload"].get("mode") == scope["mode"]]
+        bindings = {event["payload"]["epoch_id"]: {
+            "activation": store.get_execution_event(event["payload"]["epoch_id"]),
+            "binding": store.get_execution_event("OPERATING-" + event["payload"]["epoch_id"]),
+            "profile": store.get_execution_event("PROFILE-" + event["payload"]["epoch_id"])} for event in switches}
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return "OPERATING_SWITCH_STATE_CONFLICT"
+    block = _operating_switch_lineage_block(mode=scope["mode"], current=scope["state"], switches=switches,
+        bindings=bindings, strategy_sha256=strategy_sha256, as_of=as_of, initializing=initializing)
+    if block:
+        return block
+    return None if initializing else _operating_binding_block(store, mode=scope["mode"], epoch_id=epoch_id,
+        strategy_sha256=strategy_sha256, as_of=as_of)
+
+
+def _operating_attempt_block(store, scope, *, epoch_id, side, as_of):
+    if not scope["managed"]:
+        return None
+    if scope["reason_code"]:
+        return scope["reason_code"]
+    if side == "ENTRY":
+        return _operating_entry_block(store, scope, epoch_id=epoch_id, as_of=as_of)
+    # Old exits use their originating binding and remain independent of a
+    # poisoned successor profile. The restore fence still covers both sides.
+    return _operating_binding_block(store, mode=scope["mode"], epoch_id=epoch_id, as_of=as_of)
+
+
 def _append_exact_admission_event(store, *, event_type, bot_instance_id, position_id, payload, as_of):
     event_id = "ADMISSION-" + canonical_spec_sha256({"event_type": event_type, "payload": payload})
     previous = store.get_execution_event(event_id)
@@ -1671,11 +2588,12 @@ def accept_signal_decision(
     signal_decision: Mapping[str, Any],
     known_activation_epochs: Mapping[str, Any] | set[str] | frozenset[str],
     mode: str = "PAPER", as_of: str | None = None, skip_fill: bool = False,
+    ordinary_operating: bool = False,
 ) -> dict[str, Any]:
     """Legacy exception API; orchestration transactions use the outcome API."""
     outcome = accept_signal_decision_outcome(root, store, strategy=strategy,
         signal_decision=signal_decision, known_activation_epochs=known_activation_epochs,
-        mode=mode, as_of=as_of, skip_fill=skip_fill)
+        mode=mode, as_of=as_of, skip_fill=skip_fill, ordinary_operating=ordinary_operating)
     if outcome.get("outcome") == "DENIED":
         raise PaperPlaneError(outcome["reason_code"])
     return outcome
@@ -1691,6 +2609,7 @@ def accept_signal_decision_outcome(
     mode: str = "PAPER",
     as_of: str | None = None,
     skip_fill: bool = False,
+    ordinary_operating: bool = False,
 ) -> dict[str, Any]:
     """Return a normal refusal without aborting the caller's atomic transaction.
 
@@ -1698,6 +2617,8 @@ def accept_signal_decision_outcome(
     propagate. No exception catch or transaction behavior is changed here.
     """
 
+    if not isinstance(strategy, Mapping) or not isinstance(signal_decision, Mapping):
+        raise PaperPlaneError("INPUT_SHAPE_INVALID")
     if mode not in {"PAPER", "SHADOW"}:
         raise PaperPlaneError("BOT_MODE_INVALID")
     if not as_of:
@@ -1847,6 +2768,20 @@ def accept_signal_decision_outcome(
                     }:
                         raise PaperPlaneError("ADMISSION_BINDING_MISSING")
                 resume_only = True
+        scope = _effective_operating_scope(store, mode)
+        effective_operating = ordinary_operating or scope["managed"]
+        block_code = _operating_entry_block(store, scope,
+            epoch_id=str(decision["activation_epoch_id"]), strategy_sha256=str(strategy.get("spec_sha256") or ""), as_of=as_of)
+        if block_code:
+            return _signal_refusal(store, decision=decision, lineage=lineage, bot=bot,
+                mode=mode, as_of=as_of, reason_code=block_code)
+        if resume_only and effective_operating:
+            from solana_alpha_lab.factory.trading_runtime_policy import enforce_operating_envelope
+            operating_risk = enforce_operating_envelope(store, mode=mode,
+                admitted_notional_usd=admitted_notional, exclude_position_id=position_id)
+            if operating_risk["decision"] != "ALLOW":
+                return _signal_refusal(store, decision=decision, lineage=lineage, bot=bot,
+                    mode=mode, as_of=as_of, reason_code=operating_risk["reason_code"])
         if not resume_only:
             if str(bot.get("status")) in {"DRAINING", "STOPPED"}:
                 return _signal_refusal(store, decision=decision, lineage=lineage, bot=bot,
@@ -1875,6 +2810,14 @@ def accept_signal_decision_outcome(
                 policy=current_policy.get("policy"),
                 inventory=inventory,
             )
+            if effective_operating and risk["decision"] == "ALLOW":
+                from solana_alpha_lab.factory.trading_runtime_policy import enforce_operating_envelope
+                operating_risk = enforce_operating_envelope(store, mode=mode,
+                    admitted_notional_usd=risk["effective_entry_notional_usd_dec"])
+                risk["ordinary_operating_envelope"] = operating_risk
+                if operating_risk["decision"] != "ALLOW":
+                    risk["decision"] = operating_risk["reason_code"]
+                    risk["reason_codes"] = [operating_risk["reason_code"]]
             risk["signal_decision_id"] = decision["signal_decision_id"]
             risk_event_id, _ = _append_exact_admission_event(store,
                 event_type="PRE_TRADE_RISK_SNAPSHOT",
@@ -1922,6 +2865,9 @@ def accept_signal_decision_outcome(
                         else current_policy["policy"].get("policy_sha256")
                     ),
                 )
+                if effective_operating:
+                    store._conn.execute("UPDATE positions SET ordinary_operating=1, ordinary_envelope_sha256=? WHERE position_id=?",
+                        (operating_risk["envelope"]["envelope_sha256"], position_id))
                 store.append_execution_event(
                     event_type="SIGNAL_DECISION_ACCEPTED",
                     bot_instance_id=bot["bot_instance_id"],
@@ -1963,6 +2909,19 @@ def accept_signal_decision_outcome(
         if before is not None and str(before["state"]) in PRE_ATTEMPT_STATES:
             current_bot = store.get_bot(bot_instance_id)
             assert current_bot is not None
+            scope = _effective_operating_scope(store, mode)
+            operating_block = _operating_entry_block(store, scope, epoch_id=before.get("activation_epoch_id"),
+                strategy_sha256=before.get("strategy_spec_sha256"), as_of=as_of)
+            if operating_block:
+                return _signal_refusal(store, decision=decision, lineage=lineage, bot=current_bot,
+                    mode=mode, as_of=as_of, reason_code=operating_block, position=before)
+            if ordinary_operating or scope["managed"] or before.get("ordinary_operating") == 1:
+                from solana_alpha_lab.factory.trading_runtime_policy import enforce_operating_envelope
+                operating_risk = enforce_operating_envelope(store, mode=mode,
+                    admitted_notional_usd=admitted_notional, exclude_position_id=position_id)
+                if operating_risk["decision"] != "ALLOW":
+                    return _signal_refusal(store, decision=decision, lineage=lineage, bot=current_bot,
+                        mode=mode, as_of=as_of, reason_code=operating_risk["reason_code"], position=before)
             final_block, cancel_reason = _resume_block(store, current_bot, mode, stale=stale)
             if final_block is not None:
                 cancelled = store.cancel_entry_intent(position_id, reason_code=str(cancel_reason))
@@ -2064,7 +3023,8 @@ def accept_exit_decision(
 
 def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str,
                          mode: str, attempt_key: str, decision_at: str,
-                         max_age_seconds: int, as_of: str) -> dict[str, Any]:
+                         max_age_seconds: int, as_of: str,
+                         ordinary_operating: bool = False) -> dict[str, Any]:
     """Persist before the external boundary. Replays never authorize another send."""
     if side not in {"ENTRY", "EXIT"} or mode not in {"PAPER", "SHADOW"}:
         raise PaperPlaneError("MODELED_ATTEMPT_SCOPE_INVALID")
@@ -2082,14 +3042,23 @@ def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str
         bot = store.get_bot(str(position["bot_instance_id"]))
         if bot is None or bot["mode"] != mode:
             raise PaperPlaneError("MODELED_ATTEMPT_MODE_MISMATCH")
-        prior = [event for event in store.execution_events()
+        scope = _effective_operating_scope(store, mode)
+        block = _operating_attempt_block(store, scope, epoch_id=position.get("activation_epoch_id"),
+            side=side, as_of=as_of)
+        if block:
+            return {"send_permitted": False, "action": "BLOCKED", "reason_code": block,
+                    "position_id": position_id, "state": position["state"], "idempotent": False}
+        prior = [event for event in store.filtered_execution_events(event_type="MODELED_ATTEMPT_STARTED",position_ids=[position_id])
                  if event["event_type"] == "MODELED_ATTEMPT_STARTED" and event["position_id"] == position_id
                  and event["payload"].get("side") == side]
         if prior:
             if side == "ENTRY":
                 raise PaperPlaneError("ENTRY_ATTEMPT_ALREADY_EXISTS")
             last = store.get_execution_event("FINAL-" + prior[-1]["event_id"])
-            if last is None or last["payload"]["outcome"] not in {"NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED"}:
+            permitted = last is not None and last["payload"]["outcome"] in {"NO_ROUTE", "REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED", "LANDED_FAILED"}
+            if last is not None and last["payload"]["outcome"] == "PARTIAL" and last["payload"].get("schema_version") == "1.1":
+                permitted = position.get("remaining_qty_dec") is not None and Decimal(str(position["remaining_qty_dec"])) > 0
+            if not permitted:
                 raise PaperPlaneError("ATTEMPT_RECONCILIATION_REQUIRED")
         state = str(position["state"])
         if side == "ENTRY":
@@ -2103,6 +3072,15 @@ def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str
                 store.cancel_entry_intent(position_id, reason_code=str(cancel))
                 return {"send_permitted": False, "action": "BLOCKED", "reason_code": block,
                         "position_id": position_id, "state": "CANCELLED"}
+            if ordinary_operating or scope["managed"] or position.get("ordinary_operating") == 1:
+                from solana_alpha_lab.factory.trading_runtime_policy import enforce_operating_envelope
+                safety = enforce_operating_envelope(store, mode=mode,
+                    admitted_notional_usd=position.get("admitted_entry_notional_usd_dec"),
+                    exclude_position_id=position_id)
+                if safety["decision"] != "ALLOW":
+                    store.cancel_entry_intent(position_id, reason_code="OPERATING_SAFETY_VETO")
+                    return {"send_permitted": False, "action": "BLOCKED", "reason_code": safety["reason_code"],
+                            "position_id": position_id, "state": "CANCELLED", "ordinary_operating_envelope": safety}
             if state == "WATCHED":
                 store.transition(position_id, "SIGNALLED")
             if state in {"WATCHED", "SIGNALLED"}:
@@ -2111,10 +3089,11 @@ def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str
         elif state not in {"EXIT_REQUIRED", "EXITING", "UNRESOLVED"}:
             raise PaperPlaneError("EXIT_ATTEMPT_REQUIRES_ORIGINATING_EXIT")
         if side == "EXIT":
+            assert_quantity_inventory_witness(store, position)
             if position.get("entry_price_dec") is None:
                 raise PaperPlaneError("EXIT_ATTEMPT_REQUIRES_ENTRY_RECONCILIATION")
             clocks = [decision_at]
-            for event in store.execution_events():
+            for event in store.filtered_execution_events(event_type="MODELED_RESULT_ACCEPTED",position_ids=[position_id]):
                 if event["position_id"] == position_id and event["event_type"] == "MODELED_RESULT_ACCEPTED":
                     clocks.append(event["payload"]["result"]["observed_at"])
             if _parse_utc(as_of) < max(_parse_utc(clock) for clock in clocks):
@@ -2123,6 +3102,8 @@ def begin_modeled_attempt(store: PaperPlaneStore, *, position_id: str, side: str
             store.transition(position_id, "EXITING")
         payload = {**identity, "attempt_id": attempt_id, "as_of": as_of,
                    "evidence_class": "PAPER_MODEL" if mode == "PAPER" else "SHADOW_QUOTE_MODEL"}
+        if side == "EXIT" and position.get("remaining_qty_dec") is not None:
+            payload.update(remaining_quantity=position["remaining_qty_dec"], quantity_unit="TOKEN_UNITS")
         store.append_execution_event(event_type="MODELED_ATTEMPT_STARTED", event_id=attempt_id,
                                      bot_instance_id=bot["bot_instance_id"], position_id=position_id,
                                      payload=payload, created_at=as_of)
@@ -2136,7 +3117,12 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
     immutable. Chargeable failure costs are retained separately from trade PnL.
     This boundary cannot claim an on-chain fill or accept signing material.
     """
+    version = result.get("schema_version", "1.0")
+    if version not in {"1.0", "1.1"}:
+        raise PaperPlaneError("MODELED_RESULT_VERSION_UNSUPPORTED")
     allowed = {"attempt_id", "result_id", "outcome", "observed_at", "unit_price_usd", "filled_notional_usd", "chargeable_cost_usd"}
+    if version == "1.1":
+        allowed |= {"schema_version", "quantity_sold", "quantity_filled", "quantity_unit", "remaining_quantity", "fee_semantics"}
     if set(result) - allowed or not {"attempt_id", "result_id", "outcome", "observed_at"} <= set(result):
         raise PaperPlaneError("MODELED_RESULT_INVALID")
     outcome = result["outcome"]
@@ -2145,6 +3131,13 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
     if not isinstance(result["result_id"], str) or not result["result_id"] or len(result["result_id"]) > 120:
         raise PaperPlaneError("MODELED_RESULT_ID_INVALID")
     positive = outcome in {"LANDED_SUCCESS", "PARTIAL"}
+    if version == "1.1" and positive:
+        if result.get("quantity_unit") != "TOKEN_UNITS":
+            raise PaperPlaneError("MODELED_QUANTITY_UNIT_UNSUPPORTED")
+        if result.get("fee_semantics") not in {"SEPARATE_MODELED_FEE", "INCLUDED_IN_UNIT_PRICE"}:
+            raise PaperPlaneError("MODELED_FEE_SEMANTICS_UNSUPPORTED")
+    if not positive and any(result.get(field) is not None for field in ("quantity_sold", "quantity_filled", "remaining_quantity")):
+        raise PaperPlaneError("NON_FILL_RESULT_HAS_FILL")
     if positive:
         for field in ("unit_price_usd", "filled_notional_usd"):
             if result.get(field) is not None:
@@ -2169,6 +3162,12 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
         if attempt is None or attempt["event_type"] != "MODELED_ATTEMPT_STARTED":
             raise PaperPlaneError("MODELED_ATTEMPT_UNRESOLVED")
         bound = attempt["payload"]
+        position = store.get_position(bound["position_id"])
+        if position is None:
+            raise PaperPlaneError("POSITION_NOT_FOUND")
+        if bound["side"] == "EXIT":
+            assert_quantity_inventory_witness(store, position, pending_attempt_id=attempt["event_id"],
+                force_quantity=version == "1.1" and positive)
         if _parse_utc(str(result["observed_at"])) < _parse_utc(bound["as_of"]):
             raise PaperPlaneError("MODELED_RESULT_CLOCK_INVALID")
         rid = "RESULT-" + canonical_spec_sha256({"result_id": result["result_id"]}).upper()
@@ -2184,7 +3183,7 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
         # Observations describe a cumulative cost, never a replaceable estimate.
         # A later unknown total may retain uncertainty, but cannot erase known costs.
         prior_known_cost = Decimal("0")
-        for event in store.execution_events():
+        for event in store.filtered_execution_events(event_type="MODELED_RESULT_ACCEPTED",position_ids=[bound["position_id"]]):
             if event["event_type"] != "MODELED_RESULT_ACCEPTED":
                 continue
             prior = event["payload"].get("result") or {}
@@ -2213,21 +3212,42 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
                 admitted = Decimal(str(position["admitted_entry_notional_usd_dec"]))
                 if (outcome == "PARTIAL") != (Decimal(str(filled)) < admitted):
                     raise PaperPlaneError("MODELED_FILL_AMOUNT_CLASS_CONFLICT")
+                if version == "1.1":
+                    if "quantity_sold" in result or "remaining_quantity" in result:
+                        raise PaperPlaneError("MODELED_ENTRY_QUANTITY_FIELDS_INVALID")
+                    _positive_model_decimal(result.get("quantity_filled"), "MODELED_QUANTITY_INVALID")
                 store.apply_paper_entry_fill(position_id=bound["position_id"],
                     entry_unit_price_usd=str(result["unit_price_usd"]), entry_gross_notional_usd=str(filled),
-                    fee_bps=int(position["admitted_fee_bps"]), mode=bound["mode"], reconcile_pending_close=True)
+                    fee_bps=int(position["admitted_fee_bps"]), mode=bound["mode"], reconcile_pending_close=True,
+                    entry_quantity_units=str(result["quantity_filled"]) if version == "1.1" else None,
+                    fee_semantics=str(result["fee_semantics"]) if version == "1.1" else None)
             elif outcome == "UNKNOWN_REQUIRES_RECONCILIATION":
                 if position["state"] == "ATTEMPTING":
                     store.transition(bound["position_id"], "UNKNOWN")
             else:
                 store.transition(bound["position_id"], "CANCELLED")
+                store._conn.execute("UPDATE positions SET remaining_qty_dec='0', remaining_cost_basis_usd_dec='0', remaining_entry_fee_usd_dec='0' WHERE position_id=?", (bound["position_id"],))
         elif positive:
-            if outcome == "PARTIAL" or result.get("filled_notional_usd") is not None:
-                raise PaperPlaneError("PARTIAL_EXIT_MODEL_UNSUPPORTED")
-            if result.get("unit_price_usd") is None:
-                raise PaperPlaneError("MODELED_FILL_DETAILS_REQUIRED")
-            store.apply_paper_exit_fill(position_id=bound["position_id"],
-                exit_unit_price_usd=str(result["unit_price_usd"]), mode=bound["mode"])
+            if version == "1.0":
+                if outcome == "PARTIAL" or result.get("filled_notional_usd") is not None:
+                    raise PaperPlaneError("PARTIAL_EXIT_MODEL_UNSUPPORTED")
+                if result.get("unit_price_usd") is None:
+                    raise PaperPlaneError("MODELED_FILL_DETAILS_REQUIRED")
+                store.apply_paper_exit_fill(position_id=bound["position_id"],
+                    exit_unit_price_usd=str(result["unit_price_usd"]), mode=bound["mode"])
+            else:
+                if "filled_notional_usd" in result or "quantity_filled" in result:
+                    raise PaperPlaneError("MODELED_EXIT_QUANTITY_FIELDS_INVALID")
+                remaining = _positive_model_decimal(result.get("remaining_quantity"), "MODELED_QUANTITY_INVALID", allow_zero=True)
+                if (outcome == "PARTIAL") != (remaining > 0):
+                    raise PaperPlaneError("MODELED_EXIT_AMOUNT_CLASS_CONFLICT")
+                if remaining and _native_legacy_entry_witness_valid(position,
+                        store.filtered_execution_events(position_ids=[bound["position_id"]]), mode=bound["mode"]):
+                    raise PaperPlaneError("PARTIAL_EXIT_MODEL_UNSUPPORTED")
+                store.apply_quantity_exit_fill(position_id=bound["position_id"], mode=bound["mode"],
+                    quantity_sold=str(result.get("quantity_sold")), remaining_quantity=str(remaining),
+                    exit_unit_price_usd=str(result.get("unit_price_usd")), fee_semantics=str(result["fee_semantics"]),
+                    observed_at=str(result["observed_at"]), leg_id="LEG-" + rid)
         else:
             store.apply_paper_exit_fill(position_id=bound["position_id"], exit_unit_price_usd=None,
                                        mode=bound["mode"], unresolved=True)
@@ -2239,7 +3259,8 @@ def accept_modeled_result(store: PaperPlaneStore, *, result: Mapping[str, Any]) 
         if outcome != "UNKNOWN_REQUIRES_RECONCILIATION":
             store.append_execution_event(event_type="MODELED_ATTEMPT_FINAL", event_id=final_id,
                 bot_instance_id=attempt["bot_instance_id"], position_id=bound["position_id"],
-                payload={"outcome": outcome, "result_event_id": rid}, created_at=str(result["observed_at"]))
+                payload={"outcome": outcome, "result_event_id": rid,
+                         **({"schema_version": "1.1"} if version == "1.1" else {})}, created_at=str(result["observed_at"]))
         return {"idempotent": False, "attempt_id": result["attempt_id"],
                 "position": store.get_position(bound["position_id"])}
 

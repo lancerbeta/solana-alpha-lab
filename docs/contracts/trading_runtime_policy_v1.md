@@ -12,7 +12,8 @@ The ordinary offline runner uses the same policy/admission owner and frozen
 revision/notional/fee bindings: `docs/contracts/episode_decision_continuity_v1.md`.
 Entry-admission count, possible inventory, operator-settled and drain-clear
 remain distinct. Correcting a consumer count does not add EXIT_*/UNRESOLVED to
-entry veto. A pending entry is rechecked for pause/stop/stale/invalid policy
+the historical entry-risk basis. The ordinary operating profile additionally
+checks the versioned outstanding-obligation basis below. A pending entry is rechecked for pause/stop/stale/invalid policy
 before a modeled attempt. Exit reconciliation remains available during drain.
 
 ```text
@@ -135,6 +136,67 @@ minimum as canonical capacity.
 Relevant OPEN_RISK unknown required notional → `RUNTIME_EXPOSURE_UNKNOWN`
 → BLOCK. Historical CLOSED/RECONCILED missing notional does not block.
 
+## 6.1 Ordinary operating envelope: outstanding obligations V1
+
+The optional ordinary profile stores an append-only, hash-linked
+`smial.ordinary-operating-envelope` v1.0 event in the same PaperPlane database.
+It requires two explicit positive bounds: `max_outstanding_positions` and
+`max_outstanding_cost_basis_usd`. Missing configuration is
+`CONFIGURATION_REQUIRED` for an ordinary caller. Genuine legacy scope retains
+StrategyVersion/runtime-policy entry-risk semantics and original hashes.
+Public legacy APIs used on a managed mode inherit its durable operating rules;
+omitting or setting the caller flag to False cannot disable those rules.
+These bounds are operating cost basis, never wallet cash, equity, VaR or a
+scientific risk estimate. Configuration takes authority from its enclosing
+explicit operator/profile command; the storage helper grants none.
+
+`OUTSTANDING_OBLIGATIONS_V1` counts all identities and activation epochs in
+one mode: unattempted reservations, possible entries, known inventory,
+partial remainder, `EXIT_REQUIRED`, `EXITING`, and unreconciled inventory.
+PAPER and SHADOW stay independent. Unattempted cancellation, definitive entry
+non-fill, or a proved complete exit releases the physical obligation.
+`CLOSED` alone does not. Missing identity/exposure or an unresolved attempt
+is `OUTSTANDING_OBLIGATIONS_UNKNOWN` and vetoes new entries. A possible entry
+retains at least its admitted cost basis; an uncertain exit retains the last
+proved remaining inventory. Unknown fees/costs are shown separately and do
+not invent inventory after a proved complete exit.
+
+The admission check and frozen reservation share `BEGIN IMMEDIATE` with the
+existing risk owner. It may only deny, never enlarge or auto-shrink the
+accepted amount. A predecessor using the full mode bound still consumes it
+after switching the entry-active identity. A confirmed partial exit reduces
+capacity by its proved residual cost basis; a new request above headroom is
+denied unchanged. Before ENTRY attempt the same check excludes that attempt's
+existing reservation, includes every other obligation, and rechecks current
+envelope/control. Exit/reconciliation remains available during safety veto.
+
+Existing owner API: `normalize_operating_envelope`,
+`configure_operating_envelope` (compare-and-swap plus command idempotency),
+`read_operating_envelope`, `obligation_summary`, `enforce_operating_envelope`.
+The shared admission and attempt owners derive effective managed scope from
+the existing ordinary state and native profile/switch history in the same
+transaction. A frozen OPERATING binding alone does not establish managed
+scope: compatible legacy activations also retain one. Missing or corrupt
+managed state fails closed, without silently falling back to legacy.
+`accept_signal_decision_outcome` enforces the current entry epoch and shared
+envelope on every managed ingress. An explicit `ordinary_operating=True`
+can tighten genuine legacy calls; False cannot downgrade managed state.
+`begin_modeled_attempt` repeats current entry/control/envelope checks before
+new ENTRY effects and applies the restore fence to new ENTRY and EXIT claims.
+Exact retained attempt replay returns its original identity with send denied;
+original result reconciliation and snapshot-bound cut/ACK remain available.
+Managed OBSERVED new-effect claims require physical current time, including
+manual stages; original result/activation/recovery clocks are preserved.
+New managed activation must follow the same atomic current-epoch/CAS owner;
+retrieving a retained bot is not a new activation. No competing inventory
+table or risk engine is introduced.
+Indexed event-type/position queries read the envelope revision chain and the
+original witnesses of current and terminal position candidates. Terminal
+release requires verified attempt/FINAL/result, so SQL work grows linearly
+with terminal positions; O(outstanding) is not claimed. Unrelated journal
+growth does not require a full journal scan. Legacy readonly stores without
+the additive columns retain their compatible read fallback.
+
 ## 7. Operator path
 
 Agent uses SHOW → CHECK → DIFF → exact owner authorization → APPLY →
@@ -174,4 +236,22 @@ mutable backup source list. Ordinary Workbench/service restart and
 exact-SHA deploy do not reset current policy. Rollback appends; it
 never deletes history.
 
+Cold recovery must retain the current original operating-envelope events and
+runtime-policy revisions, including changes after backup. A complete cut
+binds their full chains and committed heads. Reconciliation preserves exact
+original identities, clocks and lineage; it never re-authorizes an old policy
+through a new configure command. Missing, damaged, foreign or conflicting
+authority retains the restore fence. A valid later local extension is not
+replaced by an older cut. Inventory ACK and RESUME cannot substitute current
+configuration reconciliation or restore a less restrictive backup limit.
+
 LIVE cannot resolve TradingRuntimePolicyV1 as authority.
+
+Current ordinary readonly status resolves this same policy owner in its coherent
+snapshot. VALID or intentional NOT_CONFIGURED_STRATEGY_ONLY are acceptable;
+RUNTIME_POLICY_INVALID prevents READY and projects exact policy status/revision/SHA.
+Invalid current policy does not fabricate UNKNOWN for independently verified old
+positions or prevent their originating EXIT. OBSERVED current health uses physical
+clock; synthetic virtual time and original activation/recovery timestamps remain
+separate. Current status/check cannot use --as-of/clock-file to assert historical
+input freshness as present readiness.

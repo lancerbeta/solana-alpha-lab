@@ -7,7 +7,9 @@
     "src/solana_alpha_lab/factory/lifecycle_projection.py",
     "src/solana_alpha_lab/factory/episode_decision.py",
     "src/solana_alpha_lab/factory/trading_runner.py",
-    "scripts/trading_continuity.py"
+    "scripts/trading_continuity.py",
+    "src/solana_alpha_lab/factory/trading_coordinator.py",
+    "src/solana_alpha_lab/factory/trading_adapters.py"
   ],
   "contract_paths": [
     "catalog/schemas/strategy_version_v1_1.schema.json",
@@ -32,7 +34,11 @@
     "tests/test_execution_domain_modularity_and_fast_ci_v1.py",
     "tests/test_risk_and_economics_v1.py",
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py",
-    "tests/test_trading_continuity_v1.py"
+    "tests/test_trading_continuity_v1.py",
+    "tests/test_trading_core_operational_closure_v1.py",
+    "tests/test_trading_operational_adapters_v1.py",
+    "tests/test_trading_operational_obligations_v1.py",
+    "tests/test_trading_operational_recovery_v1.py"
   ],
   "runtime_mode_scope": [
     "PAPER",
@@ -47,7 +53,8 @@
     {
       "allowed_factory_imports": [
         "solana_alpha_lab.factory.strategy_runtime",
-        "solana_alpha_lab.factory.trading_runtime_policy"
+        "solana_alpha_lab.factory.trading_runtime_policy",
+        "solana_alpha_lab.factory.hfic_research_scope"
       ],
       "path": "src/solana_alpha_lab/factory/paper_plane.py"
     },
@@ -63,6 +70,47 @@
         "solana_alpha_lab.factory.paper_shadow_operations"
       ],
       "path": "src/solana_alpha_lab/factory/paper_shadow_commands.py"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/trading_runner.py",
+      "allowed_factory_imports": [
+        "solana_alpha_lab.factory.episode_decision",
+        "solana_alpha_lab.factory.experiment_spec",
+        "solana_alpha_lab.factory.hfic_research_scope",
+        "solana_alpha_lab.factory.observation_schedule",
+        "solana_alpha_lab.factory.paper_plane",
+        "solana_alpha_lab.factory.paper_shadow_commands",
+        "solana_alpha_lab.factory.paper_shadow_operations",
+        "solana_alpha_lab.factory.promotion_handoff",
+        "solana_alpha_lab.factory.research_store",
+        "solana_alpha_lab.factory.strategy_runtime"
+      ]
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/trading_coordinator.py",
+      "allowed_factory_imports": [
+        "solana_alpha_lab.factory.episode_decision",
+        "solana_alpha_lab.factory.hfic_research_scope",
+        "solana_alpha_lab.factory.hfic_temporal_discovery",
+        "solana_alpha_lab.factory.observation_schedule",
+        "solana_alpha_lab.factory.observation_schedule_store",
+        "solana_alpha_lab.factory.opportunity_episodes",
+        "solana_alpha_lab.factory.paper_plane",
+        "solana_alpha_lab.factory.paper_shadow_commands",
+        "solana_alpha_lab.factory.paper_shadow_operations",
+        "solana_alpha_lab.factory.strategy_runtime",
+        "solana_alpha_lab.factory.trading_adapters",
+        "solana_alpha_lab.factory.trading_runner",
+        "solana_alpha_lab.factory.trading_runtime_policy"
+      ]
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/trading_adapters.py",
+      "allowed_factory_imports": [
+        "solana_alpha_lab.factory.hfic_research_scope",
+        "solana_alpha_lab.factory.observation_schedule",
+        "solana_alpha_lab.factory.strategy_runtime"
+      ]
     }
   ],
   "test_inventory_policy": "EXACTLY_ONCE_ACROSS_EXECUTION_AND_GENERAL_SHARDS"

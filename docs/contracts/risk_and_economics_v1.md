@@ -183,6 +183,71 @@ NetReturn or FCF. Exact semantics: `docs/contracts/episode_decision_continuity_v
 `ENTERED_NOTIONAL_EXPOSURE_USD` scoped by strategy_version and mode. Not
 CAPITAL_AT_RISK. UNKNOWN inventory is not zero.
 
+## 9.1 Quantity-based modeled results V1.1
+
+`accept_modeled_result` remains byte-compatible for stored v1.0 results and
+their exact replays. Its additive v1.1 contract uses explicit quantity in
+`TOKEN_UNITS`; entry `filled_notional_usd` is not an exit proceeds field.
+Positive ENTRY requires `quantity_filled`, `filled_notional_usd`, and
+`unit_price_usd`. Positive EXIT requires `quantity_sold`,
+`remaining_quantity`, and `unit_price_usd`. A partial EXIT has strictly
+positive remaining quantity; a full EXIT has zero. Sold plus remaining must
+equal the last proved inventory, without overfill, negative/NaN values or
+unsupported units. A definitive partial completes one attempt and returns
+the position to its originating `EXIT_REQUIRED`; the next attempt targets
+only the remainder. UNKNOWN cannot authorize an overlapping attempt.
+ENTRY quantity times its effective paid-notional unit price must agree with
+the filled notional at the model's cent precision. A quote's market midpoint
+cannot substitute for that effective net quote price.
+
+V1.1 positive results require `fee_semantics`:
+`SEPARATE_MODELED_FEE` uses the frozen fee basis points per price leg;
+`INCLUDED_IN_UNIT_PRICE` declares fees already net in quote price/quantity and
+adds no modeled fee again. Raw quote quantity is preserved exactly. The
+separate `chargeable_cost_usd` remains cumulative additional cost excluding
+both such leg fees. Missing costs preserve economic UNKNOWN even after a
+quantity-proved physical drain.
+Cold recovery retains every original accepted result observation after the
+backup, including its result ID, physical clock and known cumulative cost.
+Replay passes through the same accounting owner before the latest receipt;
+a later UNKNOWN total cannot erase the earlier known cost floor.
+
+The original `qty_dec`, entry cost and total entry fee stay immutable.
+`remaining_qty_dec`, `remaining_cost_basis_usd_dec` and
+`remaining_entry_fee_usd_dec` express the proved remainder. Append-only
+`MODELED_EXIT_QUANTITY_LEG` records realized proceeds and fee allocation.
+Entry fee allocation uses the cumulative sold fraction rounded to cents;
+the final leg consumes the exact residual fee, so total allocation equals
+the original entry fee. Partial realized rows and residual open marks are
+separate, without a settled/full-return headline or mixed-mode aggregation.
+
+Before another quantity EXIT, the existing PaperPlane owner verifies
+the current remainder and accumulated cost/fee/proceeds/net against indexed
+original accepted entry and ordered EXIT witnesses. Readback and dispatch
+share this proof. The same check runs inside attempt creation and EXIT result
+acceptance transactions. A corrupt partial projection cannot become new
+inventory authority through another attempt: retain typed UNKNOWN, the
+original quantities and any pending result, without another quote effect.
+Healthy neighboring originating obligations continue independently. No
+new truth table, cache or schema is introduced. An exact restored original
+witness/projection may resume through the same validated ordinary path.
+
+Definitive ENTRY nonfill is a released reservation, not positive inventory.
+Recovery proves the original attempt/FINAL/accepted result, including identity,
+side, outcome, clocks and provenance, and the natural zero-residual position
+before closing its incident. A schema1.1 nonfill must not require positive
+quantity. Merely changing state to CANCELLED is insufficient: corrupt original
+witnesses, possible inventory, positive execution legs and UNKNOWN remain fenced.
+An EXIT nonfill preserves its originating inventory and quantity checks.
+
+Literal synthetic oracle: 10M units at `$0.000003` enter for `$30` plus
+`$0.06` fee. Exit 4M at `$0.0000033` gives `$13.20` proceeds and `$0.03`
+fee, retaining 6M units and `$18` cost basis. Exit the final 6M at
+`$0.000003` gives `$18` proceeds and `$0.04` fee. Aggregate gross is
+`$1.20`, trade net `$1.07`; additional `$0.01` gives model net `$1.06`.
+Exact result replay creates no second accounting effect. These are offline
+engineering quantities, with no alpha, live cash, NetReturn or FCF claim.
+
 ## 10. GET purity
 
 GET `/economics` creates no SQLite, migration, PaperPlane write, mark,

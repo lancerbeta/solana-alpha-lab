@@ -207,3 +207,15 @@ provider, wallet, signer, or spend from this capability.
 This contract does not own ExperimentSpec meaning, science obligation
 definitions, StrategyVersion v1.1 schema, or
 `FACTORY_STRATEGY_EXECUTION_BOUNDARY_V1` runtime execution.
+
+## Operational closure consumer
+
+SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1 consumes this exact handoff; it does
+not loosen PROMOTE, recipe, regime, producer Git or V1 guards. D1 successor uses
+different A@V1/B@V1 scientific identities. Same-ID V2 is still DENY; historical
+S08/S13 remain blocked under their original premise. Activation references exact
+PROMOTE records and their direct dependencies, not a latest/global history scan.
+It materializes a verified immutable operating closure (including original spec
+bytes) so research retention cannot strand already admitted originating risk.
+Missing legacy provenance stays UNKNOWN. A frozen recipe also needs an explicit
+runtime_execution exit rule before ordinary activation; target alone is not one.

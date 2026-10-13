@@ -30,7 +30,7 @@
         "scripts/harness_sync.py",
         "--apply",
         "--base-ref",
-        "ba87f8e339d5cc3aa55322801ae56e3f92369446"
+        "ad8c9315db8ffa0d22281615571565c41bc1a15b"
       ],
       "status": "PASS_INCREMENTAL_IMPACTED_CLOSURE_NOOP",
       "navigation": "UNCHANGED_ON_REPLAY"
@@ -42,7 +42,7 @@
         "scripts/validate_catalog.py"
       ],
       "status": "PASS",
-      "assets": 1969
+      "assets": 1978
     },
     {
       "argv": [
@@ -97,5 +97,6 @@
     "positive_baseline": "PASS",
     "foreign_core_actual": "RECEIPT_CORE_BINDING_MISMATCH",
     "foreign_sample_actual": "RECEIPT_SAMPLE_BINDING_MISMATCH"
-  }
+  },
+  "delivery_refresh_ref": "docs/evidence/list_a_confirmation_protocol_freeze_v1/main-refresh.json"
 }

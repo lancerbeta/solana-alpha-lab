@@ -2,15 +2,15 @@
 task_id: LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1
 task_version: '1.0'
 status: IN_PROGRESS
-as_of: '2026-10-12'
+as_of: '2026-10-13'
 owner: GOAL_OWNER
 allowed_routes: [DIRECT_CODEX_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: ba87f8e339d5cc3aa55322801ae56e3f92369446
+  expected_base: ad8c9315db8ffa0d22281615571565c41bc1a15b
   expected_upstream: origin/main
-  expected_upstream_oid: ba87f8e339d5cc3aa55322801ae56e3f92369446
+  expected_upstream_oid: ad8c9315db8ffa0d22281615571565c41bc1a15b
   expected_branch: codex/list-a-confirmation-protocol-freeze-v1
   dirty_mode: ALLOW_REPORTED
 objective: Materialize and independently validate one accepted List A scientific protocol and configuration with available exact local metadata/exposure bindings, returning a fully bound freeze or precise BOUND_CONTRACT_NOT_READY while preserving completed design and zero new market values or scientific looks.
@@ -62,6 +62,14 @@ Authority: owner EXECUTE of the supplied PRD+SSD, acceptance D01-D08 and section
 the exact source bytes are retained once in source-contract.md, SHA256
 4931c4c569fb2630e9b403b33185bd86b9ffe9ff0df06dd9bb0bec41f5040510.
 The attachment supplies specification, not additional scientific/access grants.
+
+Delivery refresh authorized by the owner on 2026-10-13: merge current main
+without rewriting history, renew exact evidence/reviews and green CI, then
+apply the machine-rendered phrase and guarded merge autonomously after fresh
+merge-readiness. This authorization grants no scientific look or wider scope.
+The original 2026-10-12 metadata and scientific-owner pins remain historical
+immutable inputs at ba87f8e339d5cc3aa55322801ae56e3f92369446; the delivery
+base is ad8c9315db8ffa0d22281615571565c41bc1a15b. See main-refresh.json.
 
 ENTRY_DECISION: START_AS_WRITTEN. SPEC_ROUTE: BOTH (supplied PRD+SSD).
 Route/actor: DIRECT_CODEX_DELIVERY/CODEX.

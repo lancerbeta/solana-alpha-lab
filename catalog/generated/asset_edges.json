@@ -14083,6 +14083,11 @@
       "target_asset_id": "CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001"
     },
     {
+      "source_asset_id": "MODULE-TRADING-ADAPTERS-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001"
+    },
+    {
       "source_asset_id": "MODULE-TRADING-CONTINUITY-RUNNER-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
@@ -14091,6 +14096,11 @@
       "source_asset_id": "MODULE-TRADING-CONTINUITY-RUNNER-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "MODULE-TRADING-COORDINATOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001"
     },
     {
       "source_asset_id": "MODULE-TRADING-OPERATIONS-001",
@@ -14866,6 +14876,11 @@
       "source_asset_id": "REPORT-RC002-H11-PARK-FROM-PRIORITY-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-RC002-H11-PARK-FROM-PRIORITY-001"
+    },
+    {
+      "source_asset_id": "REPORT-SMIAL-TRADING-CORE-OPERATIONAL-CLOSURE-V1",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001"
     },
     {
       "source_asset_id": "REPORT-T23-COHORT-DIAGNOSTICS-001",
@@ -16368,6 +16383,11 @@
       "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
     },
     {
+      "source_asset_id": "SCRIPT-PROVE-TRADING-CORE-OPERATIONAL-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001"
+    },
+    {
       "source_asset_id": "SCRIPT-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
@@ -17111,6 +17131,11 @@
       "source_asset_id": "TASK-SMIAL-TRADING-CONTINUITY-AUDIT-REPAIR-V1",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "TASK-SMIAL-TRADING-CORE-OPERATIONAL-CLOSURE-V1",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001"
     },
     {
       "source_asset_id": "TASK-T30-A14P-R1-AUTH-RECOVERY-001",
@@ -20686,6 +20711,26 @@
       "source_asset_id": "TEST-TRADING-CONTINUITY-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "TEST-TRADING-CORE-OPERATIONAL-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001"
+    },
+    {
+      "source_asset_id": "TEST-TRADING-OPERATIONAL-ADAPTERS-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001"
+    },
+    {
+      "source_asset_id": "TEST-TRADING-OPERATIONAL-OBLIGATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001"
+    },
+    {
+      "source_asset_id": "TEST-TRADING-OPERATIONAL-RECOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-TRADING-CONTINUITY-OFFLINE-001"
     },
     {
       "source_asset_id": "TEST-TRADING-OPERATIONS-WORKBENCH-001",

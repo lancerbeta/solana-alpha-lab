@@ -36,7 +36,7 @@ from solana_alpha_lab.factory.research_workbench import LifecycleEntityLocatorV1
 from solana_alpha_lab.factory.trading_runner import TradingContinuityRunner, OFFLINE_MARKER
 from solana_alpha_lab.factory.paper_plane import PaperPlaneStore
 from solana_alpha_lab.factory.trading_runtime_policy import apply_policy, show_policy
-from solana_alpha_lab.factory.opportunity_episodes import admission_content_sha256
+from solana_alpha_lab.factory.opportunity_episodes import admission_content_sha256, schedule_binding, resolve_point
 from tests.test_opportunity_episodes_harness_v1 import EpisodeScenario, nominate, token_object, synth_mint
 from tests.test_opportunity_episodes_contract_v1 import episode_spec, HOLD
 from tests.test_science_to_strategy_handoff_v1 import _schema_root, _event, _scientific_payload
@@ -139,20 +139,33 @@ class OrdinarySourceTests(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def prepare(self, *, list_only=False, defer_publication=False):
+    def prepare(self, *, list_only=False, defer_publication=False, operating=False, suffix="", negative=False, exit_point=None):
         obj = token_object(self.mint, price=0.000003, liquidity=10000, holders=60)
         mapping = {"toptraded": [obj], "toptrending": [obj] if self.membership == "TRUE" else []}
         nominate(self.source.market, self.start, mapping)
         self.source.market.series[self.mint] = lambda now: token_object(self.mint,
             price=self.future_price if now.hour >= 16 else self.decision_price, liquidity=10000,
-            holders=self.holders_end if now >= datetime(2026, 10, 5, 12, 35, tzinfo=UTC) else self.holders_start)
+            holders=self.holders_end if now >= self.start + timedelta(minutes=30) else self.holders_start)
+        if getattr(self, "stream_cases", None):
+            objects = [obj]
+            listed = [obj] if self.membership == "TRUE" else []
+            for mint, case in self.stream_cases.items():
+                row = token_object(mint, price=.000003, liquidity=10000, holders=case["start"])
+                objects.append(row)
+                if case.get("listed", True):
+                    listed.append(row)
+                self.source.market.series[mint] = lambda now, mint=mint, case=case: token_object(mint,
+                    price=.000003, liquidity=10000, holders=case["end"] if now >= self.start + timedelta(minutes=30) else case["start"])
+            nominate(self.source.market, self.start, {"toptraded": objects, "toptrending": listed})
         if self.late:
             self.source.market.latency = lambda kind, now: 301 if kind == "search" and now.hour == 12 and now.minute == 35 else 1
         self.source.tick(self.start)
         self.admission = self.source.admissions()[0]
         fault = "EPISODE_BEFORE_PUBLISH" if defer_publication else None
-        self.source.tick(datetime(2026, 10, 5, 12, 10, tzinfo=UTC), fault=fault)
-        self.source.tick(datetime(2026, 10, 5, 12, 35, tzinfo=UTC), fault=fault)
+        binding = schedule_binding(self.source.schedule)
+        t0 = datetime.fromisoformat(self.admission["t0"].replace("Z", "+00:00"))
+        self.source.tick(resolve_point(binding, t0, "E300").request_not_before, fault=fault)
+        self.source.tick(resolve_point(binding, t0, "E1800").request_not_before, fault=fault)
         evidence = scope.MembershipEvidence()
         for definition in scope.jupiter_definitions(self.source.schedule).values():
             evidence.add_definition(definition)
@@ -177,14 +190,20 @@ class OrdinarySourceTests(unittest.TestCase):
             features=[] if list_only else [{"name": "d_holders", "op": "delta", "field_id": HOLD, "start": "E300", "end": "E1800"}],
             all=[] if list_only else [{"feature": "d_holders", "op": "gt", "value": 0}])
         query = scope.canonicalize_query_scope(query, evidence)
+        if negative and query.get("all"):
+            query["all"][0]["op"] = "lt"
+        if exit_point:
+            query["target"]["exit_point"] = exit_point
         spec = yaml.safe_load((ROOT / "configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml").read_text(encoding="utf-8"))
-        self.experiment_id = "EXP-CONTINUITY-SYNTH-001"
-        self.hypothesis = "HYP-CONTINUITY-SYNTH-V1"
+        self.experiment_id = "EXP-CONTINUITY-SYNTH-001" + suffix
+        self.hypothesis = "HYP-CONTINUITY-SYNTH-V1" + suffix
         spec.update(experiment_id=self.experiment_id, hypothesis_version=self.hypothesis, population="OPPORTUNITY_EPISODES",
                     question="Engineering continuity of a synthetic episode, without alpha claims",
                     estimand="Synthetic offline decision and execution continuity only",
                     parameters={"episode_query": query, "membership_snapshot_shas": snapshot_shas})
-        self.spec_rel = "configs/experiment_specs/continuity_synth.yaml"
+        if operating:
+            spec["parameters"]["runtime_execution"] = {"kind": "FROZEN_TIME_EXIT", "exit_point": query["target"]["exit_point"]}
+        self.spec_rel = "configs/experiment_specs/continuity_synth" + suffix + ".yaml"
         spec_path = self.root / self.spec_rel
         spec_path.parent.mkdir(parents=True, exist_ok=True)
         spec_path.write_text(yaml.safe_dump(spec, allow_unicode=True, sort_keys=False), encoding="utf-8")
@@ -198,7 +217,7 @@ class OrdinarySourceTests(unittest.TestCase):
                         "-c", "user.email=offline-fixture@invalid.example", "-c", "commit.gpgSign=false",
                         "commit", "--quiet", "-m", "Freeze synthetic experiment spec"],
                        cwd=self.root, check=True, capture_output=True)
-        run = _event(record_id="RUN-CONTINUITY-SYNTH-001", record_kind="RUN_COMPLETED", entity_id="RUN-CONTINUITY-SYNTH-001",
+        run = _event(record_id="RUN-CONTINUITY-SYNTH-001" + suffix, record_kind="RUN_COMPLETED", entity_id="RUN-CONTINUITY-SYNTH-001" + suffix,
             run_id="RUN-CONTINUITY-SYNTH-001", hypothesis_version_id=self.hypothesis, transaction_id="RESEARCH-TXN-CONTINUITY-SYNTH-001",
             payload={"experiment_id": self.experiment_id, "run_id": "RUN-CONTINUITY-SYNTH-001", "availability_cutoff": "2026-09-01T00:00:00Z",
                      "first_reliable_available_at": "2026-09-01T00:00:00Z", "observed_n": 24, "robustness": "HOLD_SPLIT", "outcome": "INCONCLUSIVE"})
@@ -209,12 +228,28 @@ class OrdinarySourceTests(unittest.TestCase):
                          "two_way_n": 18, "entry_only_n": 4, "no_entry_n": 1, "unknown_n": 1,
                          "strategy_fee_bps_assumption": 20, "cost_evidence_refs": [ref]}], "direct_evidence_refs": [ref]}
         binding = {**unsigned, "binding_sha256": scope.sha256_of(unsigned)}
-        evidence_event = _event(record_id="EVIDENCE-CONTINUITY-SYNTH-001", record_kind="EVIDENCE_BINDING",
+        evidence_event = _event(record_id="EVIDENCE-CONTINUITY-SYNTH-001" + suffix, record_kind="EVIDENCE_BINDING",
             entity_id="EVIDENCE-CONTINUITY-SYNTH-001", hypothesis_version_id=self.hypothesis,
             transaction_id="RESEARCH-TXN-CONTINUITY-SYNTH-001", payload=_scientific_payload(
                 experiment_id=self.experiment_id, execution_evidence_binding=binding))
         research = ResearchStore(self.data / "research-data")
-        research.append([run, evidence_event], transaction_id="RESEARCH-TXN-CONTINUITY-SYNTH-001")
+        if not suffix:
+            research.append([run, evidence_event], transaction_id="RESEARCH-TXN-CONTINUITY-SYNTH-001")
+        else:
+            run = _event(record_id=run.record_id, record_kind=run.record_kind, entity_id=run.entity_id,
+                run_id="RUN-CONTINUITY-SYNTH-001" + suffix, hypothesis_version_id=self.hypothesis,
+                transaction_id="RESEARCH-TXN-CONTINUITY-SYNTH-001" + suffix,
+                payload={**json.loads(run.payload_json), "run_id": "RUN-CONTINUITY-SYNTH-001" + suffix})
+            # Refresh reference bytes after changing the independent science ID.
+            ref = {"record_id": run.record_id, "payload_sha256": run.payload_sha256}
+            unsigned["direct_evidence_refs"] = [ref]
+            unsigned["regimes"][0]["cost_evidence_refs"] = [ref]
+            binding = {**unsigned, "binding_sha256": scope.sha256_of(unsigned)}
+            evidence_event = _event(record_id=evidence_event.record_id, record_kind="EVIDENCE_BINDING",
+                entity_id=evidence_event.record_id, hypothesis_version_id=self.hypothesis,
+                transaction_id="RESEARCH-TXN-CONTINUITY-SYNTH-001" + suffix,
+                payload=_scientific_payload(experiment_id=self.experiment_id, execution_evidence_binding=binding))
+            research.append([run, evidence_event], transaction_id="RESEARCH-TXN-CONTINUITY-SYNTH-001" + suffix)
         app = FactoryApplication(root=self.root, spec_relative=self.spec_rel, research_data_root=self.data / "research-data")
         locator = LifecycleEntityLocatorV1(self.experiment_id, "GIT", "EXPERIMENT_SPEC")
         detail = app.research_detail(locator)
@@ -237,13 +272,15 @@ class OrdinarySourceTests(unittest.TestCase):
             execution_inputs=inputs, execution_evidence_binding=self.binding)
         self.assertEqual(materialized["disposition"], "RENDERED")
         self.assertFalse(materialized["activation_created"])
-        self.strategy_rel = "configs/strategies/continuity_synth.yaml"
+        self.strategy_rel = "configs/strategies/continuity_synth" + suffix + ".yaml"
         (self.root / self.strategy_rel).write_text(yaml.safe_dump(materialized["candidate"], sort_keys=False), encoding="utf-8")
         self.runner = TradingContinuityRunner(self.root, data_root=self.data, strategy_relative=self.strategy_rel)
-        self.assertFalse(self.runner.store_path.exists(), "Definition load is not activation")
-        self.epoch = "ACTIVATION-EPOCH-CONTINUITY-PAPER-001"
+        if not suffix:
+            self.assertFalse(self.runner.store_path.exists(), "Definition load is not activation")
+        self.epoch = "ACTIVATION-EPOCH-CONTINUITY-PAPER-001" + suffix
         # Only the physical owner clock is synthetic; the PROMOTE guard runs unchanged.
-        self.runner.activate(epoch_id=self.epoch, mode="PAPER", at=self.manifest["decision_effective_at"])
+        if not suffix:
+            self.runner.activate(epoch_id=self.epoch, mode="PAPER", at=self.manifest["decision_effective_at"])
 
     def decision(self):
         return self.runner.episode(source_relative="source/observation_schedule_state.sqlite", episode_id=self.admission["episode_id"],
@@ -946,8 +983,10 @@ class OrdinarySourceTests(unittest.TestCase):
         research.rename(backup)
         completed = subprocess.run([sys.executable, "-B", str(ROOT / "scripts/trading_continuity.py"), "load",
             "--repository-root", str(self.root), "--data-root", str(self.data), "--strategy", self.strategy_rel], cwd=ROOT, capture_output=True, timeout=30)
-        self.assertEqual(completed.returncode, 2)
-        self.assertEqual(json.loads(completed.stdout)["status"], "BLOCKED")
+        # OPERATIONAL_CLOSURE D3: exact activated context survives research
+        # retention. Origin corruption above still refuses before any attempt.
+        self.assertEqual(completed.returncode, 0)
+        self.assertEqual(json.loads(completed.stdout)["status"], "LOADED_VERIFIED")
         self.assertFalse(research.exists())
 
     def test_mixed_stream_pause_resume_policy_revision_route_loss_restart_conservation(self):

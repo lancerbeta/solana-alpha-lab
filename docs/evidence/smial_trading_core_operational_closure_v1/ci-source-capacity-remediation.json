@@ -1,0 +1,66 @@
+{
+  "before_archives": {
+    "interim-before-ci-fixture-repair.json": "32b8c26508cd4d83118f1c3fa6855230a1e50f31bea45d46d6aa7296c01d866d",
+    "review-1a617c5f.json": "f15ef4ef929173e3273cb2e0135df2ca911a9c88de8289538fcb29e63db4107e"
+  },
+  "ci_failure": {
+    "boundary": "FIRST_SOURCE_ADMISSION_EMPTY",
+    "error_type": "IndexError",
+    "errors": 1,
+    "failures": 0,
+    "runner_free_bytes": "UNKNOWN_NOT_CAPTURED",
+    "skipped": 2,
+    "test_id": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_native_source_stream_over_virtual_two_weeks",
+    "tests_run": 341
+  },
+  "ci_log_sha256": "08df0b2023d5f61db23a6c086f3de311b4bd00e206e5e12de4f5735f1f51acd1",
+  "ci_run_id": 38233152025,
+  "credential_reads": false,
+  "deploy": false,
+  "failed_job": "validate-execution",
+  "failed_job_id": 114757772098,
+  "inference": "CI symptom matches native insufficient-capacity reproduction; actual CI free space was not logged.",
+  "live_authority": false,
+  "native_before_reproduction": {
+    "admissions": 0,
+    "future_nomination_reserve_bytes": 135392133120,
+    "headroom_status": "STOP_NEW_INTAKE",
+    "physical_free_bytes": 34359738368,
+    "provider_calls": 0,
+    "required_free_bytes": 142188216320,
+    "source_terminal": "TICK_PARTIAL",
+    "startup_error_type": "IndexError",
+    "stop_reason": "DRAIN_RESERVE_PRESSURE"
+  },
+  "observed_ci_head": "d8ee540f1f89626629912ec2e6769265a3228057",
+  "positive_capacity_fixture_free_bytes": 1099511627776,
+  "provider_calls": false,
+  "repair_scope": "TEST_PHYSICAL_CAPACITY_ONLY_PRODUCTION_SOURCE_AND_GUARD_UNCHANGED",
+  "schema": "smial.ci-source-capacity-remediation.v1",
+  "source_pins": {
+    "tests/test_trading_core_operational_closure_v1.py": "2c9f40b73bc065338f6e9b089d8c26d58f42670fe5994b1f028eedfff69fa4fa"
+  },
+  "targeted_after": {
+    "capacity_guard_nomination_calls": 0,
+    "elapsed_seconds": 90.835,
+    "fourteen_day_positions": 14,
+    "reconciled_positions": 14,
+    "status": "PASS",
+    "test_ids": [
+      "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_source_capacity_guard_stops_before_nomination",
+      "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_native_source_stream_over_virtual_two_weeks"
+    ],
+    "tests_run": 2,
+    "unique_modeled_attempts": 28
+  },
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "whole_after": {
+    "owned_roots_absent": true,
+    "receipt": "executed-tests.json",
+    "receipt_sha256": "8467b8f8cd7b1b4cfc510b0e0486fa60fc7142493b87a0b63fe7f241f9b13a3c",
+    "source_unchanged": true,
+    "status": "PASS",
+    "tests_run": 155
+  },
+  "working_settings_changed": false
+}

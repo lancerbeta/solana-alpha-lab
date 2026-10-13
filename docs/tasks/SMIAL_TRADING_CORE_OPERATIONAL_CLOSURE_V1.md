@@ -1,0 +1,377 @@
+---
+task_id: SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1
+task_version: '1.0'
+status: IMPLEMENTED_UNVERIFIED
+as_of: '2026-10-11'
+owner: GOAL_OWNER
+allowed_routes: [DIRECT_CODEX_DELIVERY]
+required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
+expected_repository: lancerbeta/solana-alpha-lab
+git_binding:
+  expected_base: ba87f8e339d5cc3aa55322801ae56e3f92369446
+  expected_upstream: origin/main
+  expected_upstream_oid: ba87f8e339d5cc3aa55322801ae56e3f92369446
+  expected_branch: codex/smial-trading-core-operational-closure-v1
+  dirty_mode: ALLOW_REPORTED
+objective: Complete the ordinary source-driven PAPER/SHADOW software operating path, including durable activation, automatic adapters, successor continuity, shared outstanding-obligation envelope, originating exits, partial accounting, cold recovery, truthful readback and ownership cleanup, without operational or financial authority.
+managed_write_set:
+- .github/workflows/ci.yml
+- .github/workflows/factory-operability-resource-proof.yml
+- scripts/validate_ci.py
+- scripts/render_ci_workflow.py
+- tests/test_ci.py
+- docs/tasks/SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1.md
+- docs/evidence/smial_trading_core_operational_closure_v1/**
+- docs/reports/smial_trading_core_operational_closure_v1/**
+- docs/operator/TRADING_CONTINUITY_OFFLINE_V1.md
+- docs/contracts/science_to_strategy_handoff_v1.md
+- docs/contracts/trading_runtime_policy_v1.md
+- docs/contracts/risk_and_economics_v1.md
+- docs/contracts/episode_decision_continuity_v1.md
+- docs/contracts/owner_lifecycle_projection_spine_v1.md
+- src/solana_alpha_lab/factory/trading_runner.py
+- src/solana_alpha_lab/factory/trading_coordinator.py
+- src/solana_alpha_lab/factory/trading_adapters.py
+- src/solana_alpha_lab/factory/episode_decision.py
+- src/solana_alpha_lab/factory/strategy_runtime.py
+- src/solana_alpha_lab/factory/promotion_handoff.py
+- src/solana_alpha_lab/factory/hfic_research_scope.py
+- src/solana_alpha_lab/factory/observation_schedule_store.py
+- src/solana_alpha_lab/factory/paper_plane.py
+- src/solana_alpha_lab/factory/paper_shadow_operations.py
+- src/solana_alpha_lab/factory/paper_shadow_commands.py
+- src/solana_alpha_lab/factory/trading_operations.py
+- src/solana_alpha_lab/factory/trading_runtime_policy.py
+- src/solana_alpha_lab/factory/risk_economics.py
+- scripts/trading_continuity.py
+- scripts/prove_trading_core_operational_closure.py
+- configs/execution_domain_v1.json
+- configs/factory_semantic_operability_v1.yaml
+- delivery-harness/policies/solana-alpha-lab.md
+- tests/test_trading_core_operational_closure_v1.py
+- tests/test_trading_operational_adapters_v1.py
+- tests/test_trading_operational_obligations_v1.py
+- tests/test_trading_operational_recovery_v1.py
+- tests/test_trading_continuity_v1.py
+- tests/fixtures/trading_core_operational_closure_v1/**
+- catalog/assets/**
+- catalog/catalog_manifest.yaml
+- catalog/generated/**
+- docs/generated/**
+- docs/PROJECT_MAP.md
+- docs/FACTORY_SEMANTIC_MAP.md
+external_caps:
+  network: false
+  credentials: false
+  external_system: false
+  signing_or_financial_action: false
+  cash_spend: false
+  deployment: false
+stop_conditions:
+- STOP_EXACT_HEAD_CI_AND_MACHINE_READINESS_THEN_EXACT_OWNER_MERGE_PHRASE
+- STOP_MATERIAL_CONFLICT_OUTSIDE_OWNER_ACCEPTED_D1_D4
+- STOP_WORKING_RUNTIME_PROVIDER_CREDENTIALS_DEPLOY_SIGNER_TRANSACTIONS_OR_MONEY
+- STOP_NEW_DEPENDENCY_UNOWNED_CLEANUP_SETTINGS_OR_HISTORY_REWRITE
+- REPLAN_IMPOSSIBLE_FALSIFIER_REPEATED_SEAM_FAILURE_OR_RESOURCE_UNSAFETY
+context_requirements:
+  catalog_asset_ids: []
+  l2_roles: [ARCHITECTURE_DECISIONS, EXTERNAL_ROUTE_KNOWLEDGE, DELIVERY_EVIDENCE]
+  l3_roles: []
+  roadmap_path: null
+  exact_role_asset_ids:
+    LIFECYCLE: []
+    EXTERNAL_ROUTE_KNOWLEDGE: [CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011]
+    ARCHITECTURE_DECISIONS: []
+    DELIVERY_EVIDENCE: []
+    HISTORICAL_CONTEXT: []
+  exact_role_paths:
+    LIFECYCLE: []
+    EXTERNAL_ROUTE_KNOWLEDGE: []
+    ARCHITECTURE_DECISIONS:
+    - docs/contracts/science_to_strategy_handoff_v1.md
+    - docs/contracts/trading_runtime_policy_v1.md
+    - docs/contracts/risk_and_economics_v1.md
+    - docs/evidence/smial_trading_core_operational_closure_v1/source-contract.md
+    DELIVERY_EVIDENCE:
+    - docs/evidence/smial_trading_core_operational_closure_v1/completion.json
+    - docs/evidence/smial_trading_core_operational_closure_v1/independent-review.json
+    - docs/evidence/smial_trading_core_operational_closure_v1/factory-fit.json
+    HISTORICAL_CONTEXT: []
+---
+
+# SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1
+
+Source PRD/SSD is the exact attached MD, preserved byte-for-byte at
+`docs/evidence/smial_trading_core_operational_closure_v1/source-contract.md`,
+SHA256 `addc05071197efb3462771b52f5699170d54061656efeda0b7f48e52bdb0f0b7`.
+The owner's explicit EXECUTE accepts D1-D4; document proposals alone grant no
+authority. This binding does not create a second PRD. C01-C24 are mandatory.
+
+ENTRY_DECISION: START_WITH_PATCH. SPEC_ROUTE: BOTH (attached PRD/SSD).
+Route/actor: DIRECT_CODEX_DELIVERY/CODEX. MODEL_EFFORT_RECOMMENDATION: SOL_XHIGH.
+DECISION_DELTA: software commissioning readiness for ordinary PAPER/SHADOW.
+UNCERTAINTY_REMOVED: automatic callers, durable state and independent recovery.
+CAPABILITY_OR_EVIDENCE: source-driven process, A@V1 to B@V1 with A inventory,
+shared mode obligations, frozen old exits, partial conservation, cold restore.
+Named consumer: future authorized commissioning operator and eligible strategy.
+Cheapest falsifier: cold ordinary process autonomously consumes an eligible
+source episode and persists its linked attempt/result without manual stitching.
+STOP: exact machine-ready owner merge phrase, or a material new authority fork.
+NEXT: complete all safe dependent slices, whole-outcome proof, cleanup, reviews,
+bindings, preflight, task push/PR and exact-head CI/readiness.
+REPLAN_TRIGGER: repeated seam failure, impossible oracle or resource unsafety.
+Evidence budget: compact synthetic fixtures, real disposable SQLite and bounded
+subprocesses, virtual time, no real data or full local gate before PR.
+
+D1: distinct accepted scientific identities A@V1/B@V1; same-ID V2 still denied.
+D2: one entry-enabled bot per mode, shared versioned outstanding envelope;
+absence of explicit limits is CONFIGURATION_REQUIRED, UNKNOWN frees nothing.
+D3: pause/stop/switch close new entries; originating exits/results continue.
+D4: ordinary driver plus real PAPER/quote-only SHADOW adapters are software
+scope, external activation and all financial execution are excluded.
+Historical S08/S13 and previous PARTIAL outcomes are preserved; replacement
+positive successor evidence references this explicit accepted decision.
+
+Tool Entry: existing delivery-harness, Git/gh, locked toolchain, native SQLite.
+New plugin/connector/MCP/automation/package/service: NONE. Factory Fit FULL_REVIEW.
+NOW: this exact operating closure. WATCH: separately authorized commissioning.
+Readback proved predecessor #396/main CI success. Clean base, one checkout;
+prior task branch retained. All active time gates are resolved/superseded.
+Current canonical provider binding resolves to registry-011 and is pinned
+explicitly by this task context. Preserve the historical domain-policy bytes
+and TASK30 receipt; policy-wide prose normalization is outside this atom.
+Immutable predecessors and provider grants stay intact.
+
+Implementation replan inside this same authorized atom: frozen 0df9aa7e
+architecture review reproduced a partial EXIT using a corrupted remainder
+despite UNKNOWN readback. Reuse the existing PaperPlane original witnesses
+to verify cumulative quantity/cost/fee projection before EXIT inputs, inside
+attempt creation and at result acceptance. Quarantine the affected obligation
+while healthy originating exits continue. No new state owner, schema/cache,
+dependency, product decision or operational authority; no internal seam is
+deferred to commissioning. Preserve actual role verdicts and native before,
+then require fresh whole-outcome evidence and all four exact-inventory roles.
+
+The subsequent frozen 4a327869 review found two required internal seams:
+valid schema1.1 definitive ENTRY nonfill must finish recovery without being
+mistaken for positive inventory; ordinary SHADOW must select separately
+authorized existing grants by originating epoch/strategy before attempt/quota
+claim, so A-oldEXIT and B-newENTRY coexist in one caller. Reuse native original
+attempt/FINAL/result release proofs and existing scoped adapter/grant owners.
+No grant issuance, operational configuration, new registry or external action.
+Preserve actual CODE/ARCH NOT_READY and GOAL PASS for that frozen head; require
+native before/after and fresh exact-inventory review after both repairs.
+
+Frozen 1cdf0003 CODE/GOAL/ARCH reviews returned actual NOT_READY: native backup
+could overwrite an existing hardlinked manifest/SQLite auxiliary artifact;
+malformed original JSON could crash tick/status and starve healthy old EXIT.
+Bound the same backup owner to all five final artifacts before any write,
+exclusive reservations and private native SQLite staging with standalone copy.
+Validate original JSON shapes in existing origin/capture/attempt owners;
+quarantine the exact affected obligation without resend or fabricated closure.
+No new schema, state owner, dependency, product decision or external authority.
+Preserve native before/after and actual role verdicts; require fresh whole
+outcome, cold operator and all four isolated exact-inventory reviews.
+
+Frozen 08c5ae1e CODE review reproduced a P1 restore destination collision:
+preexisting regular -journal/-wal/-shm were deleted by native SQLite while
+restore returned success. Actual GOAL and ARCH PASS remain scoped historical
+verdicts; OWNER review was not performed on the blocked inventory. Reuse the
+native restore owner with complete fresh destination-family guards, exclusive
+publication and private preparation of the original fence/pause/snapshot event.
+Preserve native before/after and rerun whole outcome plus four frozen roles.
+Further critic output is restricted to P0/P1 by the owner's explicit steering;
+the required role set, exact-head gate and separate merge phrase stay binding.
+The bounded native repair falsifier also proved an unhashed WAL overlay could
+change the restored envelope $30 to $90 while the sealed main DB hash matched,
+for both historical WAL-format and fresh DELETE-format carriers. Preserve this
+actual P1 before evidence; require a standalone source and hash-verified private
+input copy before native restore, without deleting source artifacts or using
+immutable readers for current runtime truth.
+An interim repair native two-cycle backup/restore/reconcile/ACK falsifier then
+hit the fixed RESTORE-SNAPSHOT event ID; its actual interim source pins are
+preserved separately rather than attributed to frozen 08c5ae1e. Append a new
+snapshot-bound event through the same owner, retain every original event/body/
+clock, and bind cut/reconcile/ACK to the current restore. Prove the second ACK
+and originating due EXIT before fresh whole-outcome evidence.
+
+Exact-head CI for d8ee540f failed the fourteen-day C21 source startup with
+an empty first admission. A native 32 GiB capacity reproduction confirmed
+the existing producer guard stops before nomination: its conservative
+fourteen-day fixture reserve is 142188216320 bytes. Actual CI free space
+was not logged and stays UNKNOWN. Keep production storage/admission unchanged;
+explicitly model physical capacity in the positive synthetic scenario and
+prove the low-capacity native stop with zero calls. Preserve that actual CI
+failure and the scoped four-role PASS on 1a617c5f as history. Refresh whole
+native outcome, consumer/clock/operator receipts, four isolated P0/P1 reviews
+and exact-head CI in this same PR; no operational configuration or new grant.
+The same CI's shard4 also proved the semantic overview was 16404 bytes against
+the existing 16384-byte limit. Compress only SEM-OWNER-LIFECYCLE purpose text;
+retain route/question/owner/operator bindings and authority/size boundaries.
+The direct semantic consumer module proves 16349 bytes and 15 PASS tests.
+
+Frozen 9ee9fb57 CODE/GOAL/ARCH P0/P1 reviews returned actual NOT_READY:
+coherent mutable quantity/cost could undercount the shared mode envelope;
+malformed new source JSON and retained SHADOW request shapes could terminate
+the process before healthy originating exits. OWNER review was not performed
+on that blocked inventory. Preserve the actual verdicts and byte-exact proof
+archives. Reuse original cumulative inventory witnesses before capacity
+release/admission and existing per-source/per-position error boundaries;
+healthy independent exits continue, damaged obligations remain unresolved.
+
+The owner subsequently authorized bounded PATCH #398 using
+SMIAL_PR398_OPERATING_BOUNDARY_PATCH_V1, preserved byte-for-byte at
+docs/evidence/smial_trading_core_operational_closure_v1/operating-boundary-patch-review.md,
+SHA256 3defd490906ef153417a0b44203adb1b50544c4ed6342f52aecc701bdae1a7f4.
+That document is source-control-flow review, not executed native evidence.
+Its reviewed remote head is d8ee540f; actual entry readback still finds OPEN
+PR398 at that head, base ba87f8e3 and failed CI. Local repair head 9ee9fb57 is
+not pushed. First reproduce F-A admission/attempt bypass and native restore
+fence bypass, and F-B scoped new-entry grant refusal on unchanged relevant
+native owners. Record actual source fingerprints rather than relabeling
+changed bytes as the review head.
+Repair only these existing boundaries: effective managed operating scope
+comes from durable state under the existing transaction, caller flags cannot
+downgrade envelope/current-entry/restore/clock rules, and scoped entry failures
+preserve same-process originating EXIT service. Preserve genuine legacy
+compatibility, original reconciliation, no-resend, normal-denial atomicity,
+pause/controls, request/attempt/quota identities and fatal shared-store failure.
+No new product functionality, scientific semantics, grants, dependency or
+external authority. C01-C24 remain mandatory. Refresh affected native outcome,
+consumer/clock/operator proof, all four isolated P0/P1 roles, bindings and
+exact-head CI/readiness in the same PR. This PATCH grants no merge; stop only
+after readiness PASS for the separate exact machine-rendered owner phrase.
+
+Native patch BEFORE confirmed F-A at the unchanged admission/attempt owners
+shared by reviewed d8ee and local9ee, and F-B at the unchanged grant checker
+and loop boundary. Source-scoped before identities are explicit; no whole-head
+execution identity is inferred from a subset of pins. The intermediate managed
+guard still admitted a fresh direct attempt after the original activation event
+was removed. Replan keeps one retained activation/binding invariant in the
+existing PaperPlane owner, reused by runner; exact original replay and recovery
+remain available. Its native intermediate BEFORE/AFTER is separate from9ee.
+The interrupted intermediate whole run has no completed execution receipt and
+is not PASS. Native C23 then reproduced the obsolete exit2 oracle after expected
+entry failures became retained blockers; only that outcome assertion changes,
+with egress, secret, non-target, noattempt/noquota and LIVE refusal kept strict.
+Final source/test freeze precedes whole proof, direct consumers, independent
+clock/cold operator, exact four-role review and unchanged delivery gates.
+
+Frozen7b56 CODE and GOAL returned actual P1 NOT_READY: a successor asset JSON
+array escaped the existing input boundary and stopped native run before old
+EXIT; a valid disabled-entry runtime policy still projected READY/entries
+enabled while native admission correctly refused. Native before facts and
+historical successful proofs retain exact recorded pins. Replan only validates
+the existing local asset input and aligns tick/status with the existing policy
+owner, preserving old exits, refusal/no-resend, legacy and fatal store behavior.
+ARCH review was interrupted before verdict; OWNER was not performed on this
+blocked inventory. All four final roles must run freshly after this repair.
+
+Frozen970e1176 four-role review returned actual CODE/GOAL/ARCH P1 NOT_READY
+and OWNER_UX PASS. Native code witnesses show valid funding raw-unit zero
+stopping run before old EXIT, and malformed vendor router array stopping the
+same run after original pending attempt/request/quota. Native GOAL proves
+corrupt current SWITCH can falsely project READY despite common ingress DENY.
+Independent packet-only ARCH proves backup-before-successor/cut-after-successor
+loses original switch lineage: ACK/RESUME points to B but shared ingress denies
+its eligible ENTER; unrestored B positive control opens. Preserve exact before
+and five successful historical proof carriers at their recorded pins.
+One bounded replan closes these existing software boundaries with finite typed
+input/response refusals, common managed lineage readback, and exact original
+switch/CAS events through existing complete-cut recovery. Do not synthesize
+switch authority from current pointer, weaken guards, erase original pending,
+fabricate UNKNOWN for verified old inventory, or widen science/external scope.
+Valid restore fences, ACK pause, legacy carriers and atomic refusals remain.
+After source freeze rerun current outcome/consumer/clock/cold operator proofs
+and all four isolated P0/P1 roles; no historical PASS is promoted to readiness.
+
+Bounded repair completed its 14 scoped native checks in 55.836607s on frozen
+source pins. Preserve the actual initial after fixture failure and corrected
+native producer in review-970-native-boundary-recovery-remediation.json.
+The original switch chain, not a reconstructed current pointer, now supports
+cross-snapshot ACK/pause/explicit RESUME and eligible successor entry.
+Full affected outcome/consumers/clock/cold proof and four fresh isolated roles
+remain required for this candidate; the owner PATCH grants no merge authority.
+
+Frozen27a9d076 all four actual isolated P0/P1 roles returned NOT_READY.
+Native CODE changes only initial SWITCH.expected_current_epoch and still gets
+one OPEN entry; GOAL/OWNER change only original SWITCH.strategy_sha256 and get
+fresh ENTER DENIED but false READY/entries_enabled/integrity_verified. Native
+packet-only ARCH uses genuine ordinary PAPER v1.0: original entry30/no EXIT,
+mutable remaining1M/cost3/fee0.01, unchanged journal, shared cap40. New30 moves
+from DENIED to ALLOW and status remains READY. No additional effect was sent.
+Retain actual before facts, measurement gaps and five byte-exact27a9 proof
+archives. One bounded repair shares complete original SWITCH/CAS/count/
+generation/activation/binding/profile validation between common PaperPlane
+ingress, health and existing recovery, and extends original inventory-witness
+validation to native v1.0 residual projections. No new store/schema/adapter
+version/policy authority. Genuine legacy, original reconciliation/no-resend,
+restore fence/ACK pause, old EXIT independence and atomic refusals remain.
+After final source freeze rerun affected native outcome,99 consumers,2 clocks,
+24 cold CLI stages plus2 final semantic navigation calls, and all four fresh
+P0/P1-only roles. Exact-head CI/readiness and separate owner phrase remain;
+this pending replan grants no merge or external authority.
+
+Final common-owner source freeze:21/21 selected native checks PASS in56.597423s,
+16 source pins stable before/after; four new exact regression IDs and two
+actual oracle FAIL corrections retained in review-27a9-common-lineage-remediation.json.
+Native initializing predecessor/CAS refusal stays atomic; real PAPER v1.0
+tuple/cost-only/quantity-only/fee-only damage cannot create new headroom or
+EXIT effect. Damaged origin may retain its legitimate EXIT_REQUIRED decision,
+healthy old neighbor completes. Genuine legacy original packets/replay/full
+v1.0 terminal and current partial-v1.1 remain compatible. Fresh full affected
+proofs, final navigation, four roles and exact-head gates remain mandatory.
+
+Supplemental native boundary check on frozen uncommitted source16 (not a new
+reviewed Git head) reproduced the same remaining-projection authority gap on
+genuine legacy public owners. Default skip_fill=False accepted SignalDecision,
+native apply_paper_entry_fill created original OPEN30/10M/fee0.06 without
+MODELED events; native STOP_BOT APPLIED and managed B activation succeeded.
+Only remaining_*=(1M,3,0.006) changed: original journal unchanged, KNOWN30/
+new30 DENIED became KNOWN3/new30 ALLOW, then actual B reservation30 and shared
+attempt send_permitted=true (attempt1/results0). Tick/status were not run and
+remain UNKNOWN. Before and actual fixture bootstrap failure are retained
+byte-for-byte, together with185/99/2/cold24 historical proof carriers.
+Close unsupported positive legacy remaining projections in the existing
+witness owner using its existing typed conflict, while genuine absent/all-NULL
+legacy/full EXIT/replay stay compatible. Do not introduce a new legacy partial
+feature or force genuine no-MODELED history into the modeled fold. Re-run
+current proof/final navigation/four reviews/exact-head gates after finalfreeze.
+
+Native legacy remediation completed22/22 scoped checks PASS in60.2148304s,
+with16 source pins stable. One pure PaperPlane verifier proves the original
+native ENTRY/full EXIT and is reused by cumulative admission and SQL release
+via a deterministic UDF. Unsupported base/remainder or forged terminal
+projections retain typed UNKNOWN and the original exposure floor. Missing
+original ENTRY/EXIT stays UNKNOWN; genuine all-NULL replay and full EXIT
+remain valid. Exact executed cases, actual before and fixture corrections,
+source pins and owned cleanup are retained in the new remediation receipt.
+
+First186 affected run completed185 PASS/1 FAIL in672.642169s. Native refusal
+readbacks straddled adjacent wall-clock seconds at the equality oracle; the
+complete historical diff was truncated and remains UNKNOWN. Exact FAIL receipt
+is archived before any oracle change. The existing test now compares at one
+projection time and retains complete native journal/state rollback assertions:
+targeted1 PASS in3.793863s, production source unchanged. Final affected proof,
+99 consumers/2 clocks/cold24/four roles must use the final test pin.
+
+Owner subsequently authorized one-off CI budget60 minutes for this exact atom
+at PR and merge. Scope is PR398 on the exact task branch and its ordinary
+two-parent guarded merge push to main; all unrelated PR/main events retain
+default job caps. The local tracked-only merge fallback gets3600 seconds only
+on this exact branch with the matching Git task contract. Existing checks,
+deny semantics, exact-head gates, owner phrase and merge prohibition remain.
+Because trusted CI/workflow paths change, preserve native validation eligibility
+and trusted-path checks. The existing gate selects exact-head CI or a trusted
+project-bound fallback; do not change that selection or run a full local gate
+before PR. The3600-second fallback cap applies only if that native path executes.
+Generated ci.yml is rendered from its existing owner. The50 affected CI tests
+PASS, including wrong PR/main scope and malformed/missing/wrong task binding
+refusal; initial unquoted YAML expression probe and corrected renderer PASS
+are retained in ci-atom-hour-budget.json. No settings/credentials mutation.
+
+Frozen cd663642 independent P0/P1 review replan within the same atom: supported public managed native fill must derive inventory and original full EXIT proof from its accepted native observation, including mixed modeled EXIT; operating permission remains durable-state derived. Pending originating identity must be typed before epoch binding so one damaged obligation is quarantined while healthy original EXIT continues. Preserve actual CODE/GOAL NOT_READY, OWNER PASS, absent ARCH verdict and exact historical186/99+2/cold24 proofs. No schema/history synthesis, no legacy partial feature, no external action; genuine reconciliation/no-resend/cap safety/shared-store fatal semantics and all existing gates remain mandatory.
+
+Owner evidence compaction directive: preserve full C01–C24/DoD/original oracle/recovery/CI/safety gates; current Git carries compact verdicts, native reproducer/test IDs, exact hashes and material negative facts. Superseded proof/review names in historical narrative resolve through history.json to frozen Git blobs; their working copies are intentionally removed. No history rewrite. One final exact-candidate independent four-role P0/P1 review set only; a proven new P0/P1 requires common-seam replan rather than a broad new campaign. Merge remains separately authorized by exact owner phrase after live CI/readiness.
+
+Final a2cc four-role set replan: actual ARCH P1 NOT_READY retained with native reproducer; CODE/GOAL/OWNER PASS remain historical exact-a2cc verdicts. Common quantity witness must distinguish genuine no-inventory legacy/nonfill from absent mutable qty with retained positive ENTRY/economic evidence. Reject the latter before new EXIT attempt/request/quote; preserve original source EXIT decision, scoped quarantine, healthy neighbor EXIT, original reconciliation/no-resend and all existing gates. Completion of the same mandatory review set is limited to this known seam/delta and exact binding verification, with no new broad critic campaign.

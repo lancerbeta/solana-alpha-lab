@@ -1,0 +1,18 @@
+{
+  "after_fix_result": "PASS",
+  "after_receipt_sha256": "90f8bcbe1d84e2a6dc960449dc275a6eaa0cb0237ee0445c2fb8df27a1fcd7cb",
+  "after_source_identities": 14,
+  "after_stable_attempts": 28,
+  "after_test_duration_seconds": 96.407883,
+  "causality_status": "NATIVE_BEFORE_FAIL_AND_CURRENT_AFTER_PASS",
+  "elapsed_seconds": 97.791,
+  "evidence_class": "SYNTHETIC_OFFLINE",
+  "exit_code": 1,
+  "expected_position_mints_n": 14,
+  "implementation": "single discovery cursor reset to zero on every exhausted append page",
+  "missing_position_mints_n": 8,
+  "observed_position_mints_n": 6,
+  "provider_calls": false,
+  "status": "REPRODUCED_DURING_IMPLEMENTATION",
+  "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C21_native_source_stream_over_virtual_two_weeks"
+}

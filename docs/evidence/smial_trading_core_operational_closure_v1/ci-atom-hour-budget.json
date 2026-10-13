@@ -1,0 +1,55 @@
+{
+  "branch": "codex/smial-trading-core-operational-closure-v1",
+  "clock_scope": "PER_JOB_BUDGET_NOT_TOTAL_WORKFLOW_DAG_WALL_TIME",
+  "credentials_changed": false,
+  "elapsed_seconds": 0.481706,
+  "exit_code": 0,
+  "job_timeout_minutes": 60,
+  "merge_and_post_merge_ci": "NOT_EXECUTED_OWNER_PHRASE_REQUIRED",
+  "native_selection": "UNCHANGED_TRUSTED_PATH_AND_EXACT_HEAD_CI_GATES",
+  "official_context_reference": "https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability",
+  "pr_number": 398,
+  "provider_calls": 0,
+  "receipt_sha256": "378cad1f0189d2269b3ed40500c4a92c4c8245f718f4d3b8ca99c7e2a9e95e92",
+  "renderer_initial_probe": {
+    "cause": "Unquoted YAML scalar truncated at space-hash in literal merge message",
+    "followup_renderer_status": "PASS",
+    "reason": "workflow_exact_contract_mismatch",
+    "repair": "Quote expression scalars then rerender and validate native exact workflow",
+    "status": "FAIL"
+  },
+  "repository_settings_changed": false,
+  "schema": "smial.single-atom-ci-budget-proof.v1",
+  "source_pins_after": {
+    ".github/workflows/ci.yml": "e12e5960c08620f01e53e8fa3a41d9dc182cbf2b896b49dad526efcd14e4f8d2",
+    ".github/workflows/factory-operability-resource-proof.yml": "4b081142f00c635b7b3c97bc390ade97c18e6be910cc76fc94c2addfedf6efbd",
+    "scripts/render_ci_workflow.py": "8e47e226280564594ac90142b6e37a9117497c04cfa946877123517c5a0e36bc",
+    "scripts/validate_ci.py": "0cce5cb425ea60f2f810f520428bff0baf57a4357daf7761e914835539a95dfd",
+    "tests/test_ci.py": "499d4cb04b02b0ddfe4741a28226f602a0715a80deb0d7b9d4a5476fd801b794"
+  },
+  "source_pins_before": {
+    ".github/workflows/ci.yml": "e12e5960c08620f01e53e8fa3a41d9dc182cbf2b896b49dad526efcd14e4f8d2",
+    ".github/workflows/factory-operability-resource-proof.yml": "4b081142f00c635b7b3c97bc390ade97c18e6be910cc76fc94c2addfedf6efbd",
+    "scripts/render_ci_workflow.py": "8e47e226280564594ac90142b6e37a9117497c04cfa946877123517c5a0e36bc",
+    "scripts/validate_ci.py": "0cce5cb425ea60f2f810f520428bff0baf57a4357daf7761e914835539a95dfd",
+    "tests/test_ci.py": "499d4cb04b02b0ddfe4741a28226f602a0715a80deb0d7b9d4a5476fd801b794"
+  },
+  "status": "PASS",
+  "stderr_bytes": 154,
+  "stderr_sha256": "d1a5da16534168235468d0204e9ca98e6fd3374e0424a243f8b24153a8de4ad8",
+  "stdout_bytes": 17,
+  "stdout_sha256": "4b330ecfdd8f6e3b280a75912a5762f185a592e45dc62ddd7e51c8e9fd857c25",
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "tests_run": 50,
+  "tracked_only_full_gate": "NOT_EXECUTED_PRE_PR_NATIVE_GUARD_OWNS_FUTURE_SELECTION",
+  "tracked_only_timeout_seconds_if_selected": 3600,
+  "unrelated_defaults_minutes": {
+    "aggregator": 5,
+    "core": 25,
+    "execution": 25,
+    "resources": 20,
+    "shards": 60
+  },
+  "unrelated_tracked_only_timeout_seconds": 1500,
+  "workflow_scope": "github.repository == 'lancerbeta/solana-alpha-lab' && ((github.event_name == 'pull_request' && github.event.pull_request.number == 398 && github.event.pull_request.head.ref == 'codex/smial-trading-core-operational-closure-v1') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'Merge pull request #398 from lancerbeta/codex/smial-trading-core-operational-closure-v1')))"
+}
