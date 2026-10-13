@@ -1,0 +1,55 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "I3_EPISODE_SHARED_ACCOUNT_BUDGET_BRIDGE_V1-FINAL",
+  "as_of": "2026-10-13",
+  "task_id": "I3_EPISODE_SHARED_ACCOUNT_BUDGET_BRIDGE_V1",
+  "reviewed_bindings_sha256": "PENDING_BIND",
+  "reviewed_inventory_sha256": "PENDING_BIND",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only review of 2685adbb then delta re-review on 5c422d7b5a3c1f008054d3412d76469bdd6104b7: no P0/P1. Every spend path (reserve_call, legacy scheduler, pacing, pathrisk) passes _Accounting.gate and the shared gate; save_call_debit commits day and lifetime together; no BEGIN inside an open transaction; both activation insert sites auto-bind; 19/19 suite and 117 adjacent tests pass. Residual P2: gate pace stays per activation (stated non-claim); policy-revision accessor returns raw rows."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Outcome delivered on 5c422d7b5a3c1f008054d3412d76469bdd6104b7: shared day/credit/cumulative gate over existing rows, default-off commissioning without reset, native auto-binding, separate exhaustion proofs, independent oracle, mutation (shared gate off: 10/16 fail at first review; cached-UNMANAGED shortcut restored: new control fails), identical preflight dispatch timing, self-contained OPERATE packet and section-10 readout. Earlier P2s (wall-clock caveat, tail recovery, crash before STARTED, long-lived process) closed. Residual P2: tail recovery proven via revision, day rollover covered elsewhere."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SEMANTIC_PREMISE=PASS; packet_fingerprint_sha256=3788430d55d8d601228edee8e8bfbf33a9a8c29fbf115d7ac4f7720399b223ac. Recomputed fingerprint, diff and evidence hashes match. PACKET_INFORMATION_PATH only; launch isolation remains PROCESS_OBLIGATION and model diversity UNPROVEN.",
+        "Tests could pass while shared exhaustion produces time-of-day-dependent right-censored SLOT_NOT_EXECUTED:BLOCKED_BUDGET gaps, B intake couples to A tail load, or the conservative cumulative over-count is misread as provider usage; these are now named residuals in OWNER_READOUT and change no estimand. Downgrade protection is procedural (packet stop). Residual P2: prepare on a readonly partial schema can show PLAN_READY; apply then fails closed without writes."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CLI flow UNMANAGED -> PLAN_READY -> APPLIED -> MANAGED runs from the packet alone on a disposable root; refusals exit 2; replay with different arguments now REPLAY_MISMATCH; runbook lists every code and states raises need an exact owner OPERATE decision; readout labels the falsifier synthetic and keeps residuals visible; packet step 2 compares limits with frozen A budgets. Re-reviewed on 5c422d7b5a3c1f008054d3412d76469bdd6104b7; residual P2 as architecture (partial schema prepare)."
+      ]
+    }
+  ],
+  "remediation_history": [],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_REVIEW_MODEL_DIVERSITY_PROOF",
+    "NO_PRODUCTION_DEPLOY_OR_COMMISSIONING",
+    "NO_NEW_PIT_SCIENTIFIC_ALPHA_OR_CASHFLOW_VERDICT",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_REVIEW"
+  ]
+}

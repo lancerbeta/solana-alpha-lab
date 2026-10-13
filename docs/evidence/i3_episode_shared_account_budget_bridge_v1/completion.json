@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "I3_EPISODE_SHARED_ACCOUNT_BUDGET_BRIDGE_V1-SOFTWARE-CANDIDATE",
+  "as_of": "2026-10-13",
+  "task_id": "I3_EPISODE_SHARED_ACCOUNT_BUDGET_BRIDGE_V1",
+  "state_change": "A commissioned ops store gates every provider call by one shared day-call, day-credit and cumulative-call allocation summed fresh over existing per-activation debits, so a new activation cannot reset the managed Jupiter account; commissioning is default-off and prepared as a separate OPERATE packet.",
+  "base_main": "f8edf94f874484e4cecec61fa53cfca1dc77cbd4",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Git is the working context and evidence owner; no cloud export requested."
+  },
+  "capability_radar_now": "NONE: existing store, writer lease, _Accounting, CLI, release path and locked Python suffice; no new package, connector, service or automation.",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/i3_episode_shared_account_budget_bridge_v1/factory-fit.json",
+    "sha256": "PENDING_BIND",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_19_SHARED_BUDGET_TESTS_25_MODULE_424_TEST_DIRECT_CONSUMER_REGRESSION_AND_PREFLIGHT_GEOMETRY_REPLAY",
+    "independent_review": {
+      "path": "docs/evidence/i3_episode_shared_account_budget_bridge_v1/independent-review.json",
+      "sha256": "PENDING_BIND",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_CONTEXT",
+      "PASS_CATALOG_PROPAGATION",
+      "PASS_ORIGINAL_FALSIFIER_AND_TARGETED_MUTATION",
+      "PASS_NO_RUNTIME_COLLECTOR_MUTATION"
+    ]
+  },
+  "non_claims": [
+    "NO_PRODUCTION_DEPLOY_COMMISSIONING_OR_B_ACTIVATION",
+    "NO_GLOBAL_ACCOUNT_OR_TARIFF_CLAIM",
+    "NO_COLLECTOR_GRANT_FROZEN_SCHEDULE_OR_PROVIDER_CHANGE",
+    "NO_NEW_SCIENTIFIC_ESTIMAND_ALPHA_OR_CASHFLOW",
+    "NO_CANONICAL_DONE_OR_OWNER_SEMANTIC_ACCEPTANCE",
+    "NO_PRODUCTION_PEAK_RSS_OR_FULL_72H_LOAD_CLAIM"
+  ],
+  "side_effects": {
+    "repository": "bounded I3 bridge branch files and Catalog hashes",
+    "local": "disposable SQLite/probe roots under local/ only",
+    "external": "read-only GitHub; no production read or write, provider call, deploy or Drive write"
+  }
+}
