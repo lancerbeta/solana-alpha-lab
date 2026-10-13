@@ -58,18 +58,18 @@
       "epoch_bump": false
     },
     "c1-missing-source": {
-      "sha256": "1636186bd4a1191e6b5956825798e63d16e6911e88145bc52d7ddfe2a542c29d",
+      "sha256": "39e40d7d8716fb26bf9c7fa138f93cc67be614490c70c0216be73912b61a0b37",
       "exit_code": 0,
-      "wall_seconds": 14.58,
+      "wall_seconds": 15.11,
       "batch_terminal": "EPISODE_BATCH_REPLAY_SOURCE_MISSING",
       "import_status": "PASS_ALREADY_PRESENT_EXACT",
       "transferred_files": 0,
       "epoch_bump": false
     },
     "c1-grown-source": {
-      "sha256": "6cdeed32822a084c103b03ddc68e69b52b394bf0f4e9dac0b70a0c4aa403c4a8",
+      "sha256": "9978aa101d4b9dbfac78e9ef0ea24094bd8a7f2d67ee517da2e8e461e94c0049",
       "exit_code": 0,
-      "wall_seconds": 14.75,
+      "wall_seconds": 14.9,
       "batch_terminal": "EPISODE_BATCH_REPLAY_SOURCE_MISSING",
       "import_status": "PASS_ALREADY_PRESENT_EXACT",
       "transferred_files": 0,
@@ -83,6 +83,11 @@
   "missing_current_labels_refusal": "CANONICAL_METADATA_CONFLICT",
   "semantic_labels_refusal": "CANONICAL_METADATA_CONFLICT",
   "self_consistent_partition_lineage_refusal": "CANONICAL_METADATA_CONFLICT",
-  "wall_seconds": 44.75,
+  "historical_metadata_refusals": {
+    "json": "CANONICAL_METADATA_CONFLICT",
+    "labels.json": "CANONICAL_METADATA_CONFLICT",
+    "published": "CANONICAL_METADATA_CONFLICT"
+  },
+  "wall_seconds": 48.31,
   "canonical_writes": 0
 }

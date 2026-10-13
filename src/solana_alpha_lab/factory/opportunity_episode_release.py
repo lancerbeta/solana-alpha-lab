@@ -1205,8 +1205,10 @@ def _install_verified(src: Path, dest: Path, expected_sha: str) -> None:
     tmp.replace(dest)
 
 
-def verify_current_episode_import_metadata(data_root: Path, lineage: Mapping[str, Any]) -> None:
-    """An exact replay also requires the current published corpus binding."""
+def _verify_episode_dataset_metadata(
+    data_root: Path, cohort_rows: list[Mapping[str, Any]], manifest_id: str, *, is_current: bool,
+) -> None:
+    """Verify one published corpus version against its exact lineage prefix."""
 
     from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManifest
     from solana_alpha_lab.storage.manifests import (
@@ -1215,7 +1217,6 @@ def verify_current_episode_import_metadata(data_root: Path, lineage: Mapping[str
     )
 
     root = Path(data_root)
-    manifest_id = str(lineage.get("current_dataset_manifest_id") or "")
     _require(re.fullmatch(r"dataset-[0-9a-f]{64}", manifest_id) is not None, "CANONICAL_METADATA_CONFLICT")
     directory = root / "datasets" / "manifests"
     paths = {suffix: directory / f"{manifest_id}.{suffix}" for suffix in (
@@ -1228,14 +1229,11 @@ def verify_current_episode_import_metadata(data_root: Path, lineage: Mapping[str
         validation_bytes = paths["validation.json"].read_bytes()
         validation = json.loads(validation_bytes)
         published = json.loads(paths["published"].read_bytes())
-        cohort_rows = lineage.get("cohorts") or []
-        _require(isinstance(cohort_rows, list) and cohort_rows, "CANONICAL_METADATA_CONFLICT")
         version_n = len(cohort_rows)
         current = cohort_rows[-1]
         imported_at = parse_utc(str(current["imported_at"]))
         dataset_version = f"opportunity-episodes-v{version_n}-{current['cohort_id']}"
-        _require(lineage.get("current_corpus_version") == version_n
-                 and manifest_id == compute_dataset_manifest_id(LOGICAL_DATASET_ID, dataset_version)
+        _require(manifest_id == compute_dataset_manifest_id(LOGICAL_DATASET_ID, dataset_version)
                  and dataset.dataset_version == dataset_version, "CANONICAL_METADATA_CONFLICT")
         _require(dataset.dataset_manifest_id == manifest_id and dataset.dataset_id == LOGICAL_DATASET_ID
                  and dataset.schema_id == CORPUS_SCHEMA_ID
@@ -1252,7 +1250,7 @@ def verify_current_episode_import_metadata(data_root: Path, lineage: Mapping[str
             "feature_families": sorted({fam for item in cohort_rows for fam in item["feature_families"]},
                                        key=FEATURE_FAMILY_ORDER.index),
             "imported_at": render_utc(imported_at),
-            "is_current_corpus_version": True,
+            "is_current_corpus_version": is_current,
             "projection_id": PROJECTION_ID,
             "projection_version": PROJECTION_VERSION,
             "provider_calls_for_bind": 0,
@@ -1331,6 +1329,31 @@ def verify_current_episode_import_metadata(data_root: Path, lineage: Mapping[str
             "published_at": render_utc(imported_at),
             "metadata_clock_at": render_utc(imported_at),
         }, "CANONICAL_METADATA_CONFLICT")
+    except EpisodeReleaseError:
+        raise
+    except Exception as exc:
+        raise EpisodeReleaseError("CANONICAL_METADATA_CONFLICT") from exc
+
+
+def verify_current_episode_import_metadata(data_root: Path, lineage: Mapping[str, Any]) -> None:
+    """Exact replay verifies every published corpus version, including C1 after C2."""
+
+    from solana_alpha_lab.storage.manifests import compute_dataset_manifest_id
+
+    try:
+        cohorts = lineage.get("cohorts")
+        _require(isinstance(cohorts, list) and cohorts, "CANONICAL_METADATA_CONFLICT")
+        _require(lineage.get("current_corpus_version") == len(cohorts), "CANONICAL_METADATA_CONFLICT")
+        for version_n in range(1, len(cohorts) + 1):
+            prefix = cohorts[:version_n]
+            last = prefix[-1]
+            dataset_version = f"opportunity-episodes-v{version_n}-{last['cohort_id']}"
+            manifest_id = compute_dataset_manifest_id(LOGICAL_DATASET_ID, dataset_version)
+            is_current = version_n == len(cohorts)
+            if is_current:
+                _require(lineage.get("current_dataset_manifest_id") == manifest_id,
+                         "CANONICAL_METADATA_CONFLICT")
+            _verify_episode_dataset_metadata(data_root, prefix, manifest_id, is_current=is_current)
     except EpisodeReleaseError:
         raise
     except Exception as exc:

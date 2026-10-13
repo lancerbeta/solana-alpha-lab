@@ -58,8 +58,11 @@ missing current labels and altered `yield_missing` both refused with
 valid copied Parquet payload, with internally valid partition/dataset hashes,
 validation and published fingerprint, also refused with
 `CANONICAL_METADATA_CONFLICT` because it disagreed with lineage. Disposable
-bytes were restored after each negative probe. The latest cold independent run
-took 44.75 seconds; it is verification time, not first-transfer wall time.
+historical C1 dataset manifest, labels and published marker were each altered
+after C2 while C2 metadata and C1 release stayed intact; old C1 replay refused
+each with `CANONICAL_METADATA_CONFLICT`. Disposable bytes were restored after
+each negative probe. The latest cold independent run took 48.31 seconds; it is
+verification time, not first-transfer wall time.
 
 The earlier run_01 first C2 invocation exceeded a 300-second caller wait after
 committing release/corpus but before a terminal receipt. Its resumed public
@@ -73,9 +76,10 @@ the ordinary Forge draft step after P1 capture and P2 consume, then refused
 run then exposed a new test's incorrect assumption that its small synthetic
 fixture contained a day-open `member_unit`; it actually publishes plain member
 files. The corrected vertical test passed on a clean commit in 242.40 seconds;
-after the metadata verifier correction it passed again on a clean commit in
-243.61 seconds. Focused owner-path/harness tests passed nine cases after that
-correction. A sampled C2 worker process showed
+after the first metadata verifier correction it passed again on a clean commit
+in 243.61 seconds. The added historical metadata check still requires a
+clean-candidate vertical rerun. Focused owner-path/harness tests passed nine
+cases after that correction. A sampled C2 worker process showed
 at least 174,604,288 bytes PeakWorkingSet64; this is a lower-bound snapshot,
 not a measured end-to-end peak RSS. End-to-end peak RSS remains `UNKNOWN`.
 

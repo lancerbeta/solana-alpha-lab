@@ -283,6 +283,7 @@ def main() -> int:
     metadata_conflict = "NOT_EXERCISED"
     semantic_labels_conflict = "NOT_EXERCISED"
     partition_lineage_conflict = "NOT_EXERCISED"
+    historical_metadata_refusals: dict[str, str] = {}
     if args.exercise_metadata_conflict:
         if not args.verify_existing:
             raise RuntimeError("METADATA_CONFLICT_REQUIRES_VERIFIED_DISPOSABLE_STATE")
@@ -318,6 +319,30 @@ def main() -> int:
                 raise RuntimeError("ALTERED_SEMANTIC_LABEL_ACCEPTED")
         finally:
             labels.write_bytes(exact_labels)
+        from solana_alpha_lab.storage.manifests import compute_dataset_manifest_id
+        historical_version = f"opportunity-episodes-v1-{lineage['cohorts'][0]['cohort_id']}"
+        historical_id = compute_dataset_manifest_id(lineage["corpus_dataset_id"], historical_version)
+        for suffix, key, replacement in (
+            ("json", "schema_sha256", "0" * 64),
+            ("labels.json", "yield_missing", 1),
+            ("published", "dataset_fingerprint", "0" * 64),
+        ):
+            path = plane / "datasets/manifests" / f"{historical_id}.{suffix}"
+            exact = path.read_bytes()
+            try:
+                changed = json.loads(exact)
+                changed[key] = replacement
+                path.write_bytes(json.dumps(changed, sort_keys=True, separators=(",", ":")).encode("utf-8"))
+                try:
+                    import_episode_release(release_root=local_release, data_root=plane, import_time=proof_time)
+                except EpisodeReleaseError as exc:
+                    if str(exc) != "CANONICAL_METADATA_CONFLICT":
+                        raise
+                    historical_metadata_refusals[suffix] = str(exc)
+                else:
+                    raise RuntimeError(f"HISTORICAL_METADATA_ACCEPTED:{suffix}")
+            finally:
+                path.write_bytes(exact)
         from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManifest
         from solana_alpha_lab.storage.manifests import (
             build_dataset_manifest, build_partition_manifest, verify_dataset_manifest,
@@ -453,6 +478,7 @@ def main() -> int:
               "missing_current_labels_refusal": metadata_conflict,
               "semantic_labels_refusal": semantic_labels_conflict,
               "self_consistent_partition_lineage_refusal": partition_lineage_conflict,
+              "historical_metadata_refusals": historical_metadata_refusals,
               "wall_seconds": round(time.monotonic() - start, 2), "canonical_writes": 0}
     (work / "proof.json").write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(output, sort_keys=True))

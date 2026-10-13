@@ -5,11 +5,11 @@
   },
   {
     "logical_ref": "docs/evidence/smial_managed_collection_i1_v1/isolated-proof.json",
-    "sha256_or_fingerprint": "be57a668d12e8844ec373b3cb45d7d8b2318067503371c71c8a260c7482e1eac"
+    "sha256_or_fingerprint": "f76f4b0c7eaedcb49e2566bc4f496e6d9894990f099600cdbb11aabc9efed438"
   },
   {
     "logical_ref": "docs/evidence/smial_managed_collection_i1_v1/isolated-replay-readout.md",
-    "sha256_or_fingerprint": "f9d57945dd51a92a2d2f92b99580ac6714044a8ce3241fde6370c0e6939cc1b3"
+    "sha256_or_fingerprint": "48bf7251bc6add204c3e9b3e858a649afff9107c66264f4ebe699d6aa11d6e59"
   },
   {
     "logical_ref": "docs/evidence/smial_managed_collection_i1_v1/C2_OPERATE_PACKET.md",
