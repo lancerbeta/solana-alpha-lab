@@ -166,10 +166,17 @@ def apply_account_budget(
 
     existing = store.account_budget_scope()
     if existing is not None:
-        if existing["commission_sha256"] == expected_plan_sha256:
-            return {**account_budget_status(store, now=now), "terminal": "ACCOUNT_BUDGET_ALREADY_APPLIED",
-                    "replayed": True}
-        raise AccountBudgetError("ACCOUNT_BUDGET_ALREADY_COMMISSIONED")
+        if existing["commission_sha256"] != expected_plan_sha256:
+            raise AccountBudgetError("ACCOUNT_BUDGET_ALREADY_COMMISSIONED")
+        first = store.account_budget_policy_revision(str(existing["account_scope_id"]), 1)
+        if (existing["account_scope_id"] != account_scope_id
+                or existing["credential_locator"] != credential_locator
+                or first is None
+                or any(int(first[key]) != _limits(limits)[key] for key in LIMIT_KEYS)):
+            # A mistyped scope or limit is never reported as "already applied".
+            raise AccountBudgetError("ACCOUNT_BUDGET_REPLAY_MISMATCH")
+        return {**account_budget_status(store, now=now), "terminal": "ACCOUNT_BUDGET_ALREADY_APPLIED",
+                "replayed": True}
     lease = store.acquire_lease("ACCOUNT-BUDGET-COMMISSION", clock=now)
     if not lease:
         raise AccountBudgetError("WRITER_BUSY")

@@ -227,6 +227,12 @@ class SharedAccountBudgetStoreTests(unittest.TestCase):
         with self.assertRaisesRegex(AccountBudgetError, "ACCOUNT_BUDGET_ALREADY_COMMISSIONED"):
             apply_account_budget(self.fx.store, account_scope_id="JUPITER-FRESH-ACCOUNT", limits=LIMITS,
                                  credential_locator="JUPITER_FREE_API_KEY", expected_plan_sha256="0" * 64, now=T0)
+        for scope_id, limits in (("JUPITER-TYPO-ACCOUNT", LIMITS),
+                                 (SCOPE, {**LIMITS, "provider_calls_per_utc_day_max": 1300})):
+            with self.assertRaisesRegex(AccountBudgetError, "ACCOUNT_BUDGET_REPLAY_MISMATCH"):
+                apply_account_budget(self.fx.store, account_scope_id=scope_id, limits=limits,
+                                     credential_locator="JUPITER_FREE_API_KEY",
+                                     expected_plan_sha256=plan["plan_sha256"], now=T0)
         with self.assertRaisesRegex(AccountBudgetError, "ACCOUNT_SCOPE_ID_INVALID"):
             prepare_account_budget(self.fx.store, account_scope_id=A[1], credential_locator="JUPITER_FREE_API_KEY",
                                    limits=LIMITS, now=T0)
@@ -361,6 +367,25 @@ class SharedAccountBudgetStoreTests(unittest.TestCase):
         lease = restored.acquire_lease("restored", clock=T0)
         self.assertEqual(_Accounting(restored, schedule(B), B[1], T0).gate(now=T0), "BLOCKED_BUDGET")
         restored.release_lease(lease)
+
+    def test_accounting_built_before_commissioning_obeys_shared_gate(self):
+        self.fx.debit(A, calls=DAY_CAP)
+        lease = self.fx.store.acquire_lease("long-lived", clock=T0)
+        early_b = self.fx.accounting(B)
+        self.assertIsNone(early_b.gate(now=T0))
+        self.fx.store.release_lease(lease)
+        self.fx.commission()
+        lease = self.fx.store.acquire_lease("long-lived", clock=T0)
+        self.assertEqual(early_b.reserve_call(credits=1, now=T0), "BLOCKED_BUDGET")
+        self.assertEqual(early_b.last_denial["budget_scope"], "SHARED_ACCOUNT")
+        self.fx.store.release_lease(lease)
+
+    def test_partial_account_schema_fails_closed(self):
+        self.fx.store._conn.execute("DROP TABLE account_budget_policies")
+        self.fx.store._conn.commit()
+        self.assertEqual(self.fx.store.account_budget_binding(schedule_sha256=A[0], activation_id=A[1])["reason"],
+                         "ACCOUNT_BUDGET_SCHEMA_PARTIAL")
+        self.assertEqual(self.fx.gate(A)[1]["budget_dimension"], "ACCOUNT_BINDING")
 
     def test_readonly_pre_bridge_schema_reads_as_unmanaged(self):
         for table in ("account_budget_members", "account_budget_policies", "account_budget_scopes"):
@@ -501,6 +526,32 @@ class SharedAccountBudgetEpisodeTests(unittest.TestCase):
             self.assertIsNone(store.call_state("OCC-B"))
         self.assertEqual(opener.calls, [])
 
+    def test_crash_after_reserve_before_started_keeps_debit_without_send(self):
+        from solana_alpha_lab.factory.observation_primitives import search_url
+        from solana_alpha_lab.factory.observation_provider_pacing import AdvancingClock
+        from solana_alpha_lab.factory.opportunity_episode_tick import SEARCH_PRIMITIVE
+        start = datetime(2026, 10, 12, 1, 0, tzinfo=UTC)
+        sc = EpisodeScenario(Path(self.tmp.name) / "rdp", start=start, stops=start + timedelta(hours=2))
+        at = start + timedelta(minutes=5)
+        clock = AdvancingClock(at)
+        opener = SyntheticJupiter(sc.market, clock)
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            plan = prepare_account_budget(store, account_scope_id=SCOPE, credential_locator="JUPITER_FREE_API_KEY",
+                                          limits=LIMITS, now=at)
+            apply_account_budget(store, account_scope_id=SCOPE, credential_locator="JUPITER_FREE_API_KEY",
+                                 limits=LIMITS, expected_plan_sha256=plan["plan_sha256"], now=at)
+            lease = store.acquire_lease("crash-before-started", clock=at)
+            tick = self._tick(store, sc, sc.schedule, sc.activation_id, at, clock, opener)
+            with patch.object(store, "start_call", side_effect=RuntimeError("process died")):
+                with self.assertRaises(RuntimeError):
+                    tick._call(primitive_id=SEARCH_PRIMITIVE, url=search_url([synth_mint("Crash")]),
+                               occurrence="OCC-CRASH", expected_entities=None, claim_identity=[])
+            store.release_lease(lease)
+            self.assertIsNone(store.call_state("OCC-CRASH"))
+        self.assertEqual(opener.calls, [])
+        # The committed reservation survives the crash; nothing is refunded.
+        self.assertEqual(raw_shared(sc.ops_path, "2026-10-12"), (1, 1, 1))
+
     def test_native_late_successor_on_public_tick_shares_one_account(self):
         start = datetime(2026, 10, 16, 23, 0, tzinfo=UTC)
         cut = start + timedelta(hours=1)
@@ -565,6 +616,29 @@ class SharedAccountBudgetEpisodeTests(unittest.TestCase):
         status = cli_command(sc.data_root, due + timedelta(minutes=1), "account-budget-status")
         self.assertEqual((status["mode"], status["remaining"]["day_provider_calls"], status["policy_revision"]),
                          ("MANAGED", 0, 2))
+        # Exhausted: the next due A batch gets the typed no-request gap, yet the
+        # later tail stays PENDING and is observed once allocation returns.
+        later = sc.query("SELECT DISTINCT due_at FROM due_observations WHERE activation_id=? AND state='PENDING' "
+                         "ORDER BY due_at LIMIT 2", (sc.activation_id,))
+        blocked_at, resumed_at = (datetime.fromisoformat(row[0].replace("Z", "+00:00")) for row in later)
+        self.assertEqual(blocked_at.date(), due.date())
+        blocked = wall_tick(sc, blocked_at + timedelta(seconds=5))
+        self.assertEqual([call for call in blocked["_calls"] if call["kind"] == "search"], [])
+        reasons = {row[0] for row in sc.query(
+            "SELECT json_extract(payload_json,'$.missing_reason') FROM due_observations WHERE activation_id=? "
+            "AND due_at=?", (sc.activation_id, later[0][0]))}
+        self.assertEqual(reasons, {"SLOT_NOT_EXECUTED:BLOCKED_BUDGET"})
+        pending_after_block = sc.query("SELECT COUNT(*) FROM due_observations WHERE activation_id=? AND "
+                                       "state='PENDING'", (sc.activation_id,))[0][0]
+        self.assertGreater(pending_after_block, 0)
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            revise_account_budget_policy(store, expected_revision=2, now=resumed_at, reason="RESTORE_TEST_LIMITS",
+                                         limits=dict(LIMITS))
+        resumed = wall_tick(sc, resumed_at + timedelta(seconds=5))
+        self.assertTrue(any(call["kind"] == "search" for call in resumed["_calls"]), resumed)
+        observed = sc.query("SELECT state FROM due_observations WHERE activation_id=? AND due_at=?",
+                            (sc.activation_id, later[1][0]))
+        self.assertEqual({row[0] for row in observed}, {"OBSERVED"})
 
 
 if __name__ == "__main__":

@@ -209,13 +209,22 @@ reset. A tick refusal carries `budget_denial.budget_scope`:
 | Code | Meaning | Next |
 | --- | --- | --- |
 | `ACCOUNT_BUDGET_PLAN_STALE` | membership/limits changed since prepare | run prepare again |
+| `ACCOUNT_BUDGET_ALREADY_APPLIED` (prepare exit 2, apply exit 0) | this scope is already commissioned | read status; nothing to do |
+| `ACCOUNT_BUDGET_REPLAY_MISMATCH` | apply repeated with a different scope id, locator or limits than were applied | stop; compare with status, never "re-apply" new numbers (use revise under OPERATE) |
 | `ACCOUNT_BUDGET_ALREADY_COMMISSIONED` | another scope already binds this store | stop; a scope is never replaced |
+| `ACCOUNT_SCOPE_ID_INVALID` / `ACCOUNT_BUDGET_LIMIT_INVALID` / `CREDENTIAL_LOCATOR_INVALID` | bad id (uppercase `A-Z0-9_.-`, not an ACT-/OBS- identity), non-positive limit, or runtime `credential_env` missing | fix the argument or runtime config |
+| `ACCOUNT_BUDGET_NOT_COMMISSIONED` / `ACCOUNT_BUDGET_REVISION_REASON_INVALID` | revise before apply, or reason not an uppercase code | apply first / pass e.g. `--reason OWNER_APPROVED_RAISE` |
 | `ACCOUNT_BUDGET_REVISION_STALE` | another revision landed first | read status, retry with its revision |
 | `WRITER_BUSY` | a tick holds the lease | retry after the tick |
 | `RESTORE_MARKER_UNRESOLVED` | restore not reconciled | reconcile restore first |
 | `budget_dimension=SHARED_DAY_*` | shared day allocation spent | next UTC day; or an approved revision |
 | `budget_dimension=SHARED_LIFETIME_PROVIDER_CALLS` | cumulative allocation spent | owner decision; waiting does not help |
-| `budget_dimension=ACCOUNT_BINDING` / status `CORRUPT` | membership/scope/policy missing after commissioning | stop B; never edit counters by SQL; reconcile binding |
+| `budget_dimension=ACCOUNT_BINDING` / status `CORRUPT` (`reason`: `ACCOUNT_BUDGET_SCOPE_MISSING`, `_SCOPE_AMBIGUOUS`, `_POLICY_MISSING`, `_MEMBERSHIP_REQUIRED`, `_SCHEMA_PARTIAL`, or `unbound_live_activations` not empty) | membership/scope/policy/schema damaged after commissioning | stop B; never edit counters by SQL; reconcile binding under OPERATE |
+
+CLI refusals all print `next_action=INSPECT_ACCOUNT_BUDGET_STATUS`; the row
+above is the specific step. `account-budget-revise` has no built-in ceiling:
+any new number, raise or lower, needs an exact owner OPERATE decision for those
+numbers, and a raise never grants a provider entitlement or widens a grant.
 
 ## Not here
 

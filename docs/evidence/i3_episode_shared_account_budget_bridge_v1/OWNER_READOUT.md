@@ -10,7 +10,8 @@ ROUTE:   DIRECT_CLAUDE_CODE_DELIVERY
 
 ## Что было и что стало
 
-**Было.** Исходный falsifier preflight (receipt self SHA `4f25a205…`): A
+**Было.** Исходный falsifier preflight (receipt self SHA `4f25a205…`). В
+изолированном синтетическом тесте (это не реальный расход на VPS) A
 израсходовала 1200 calls за день и 2000000 lifetime, а B с новой identity видела
 только свои 4 вызова и разрешала следующий. Причина: `_Accounting` читал
 counters только по паре `(schedule, activation)`. Pace уже был общим на store,
@@ -60,15 +61,19 @@ commit. Индивидуальные caps (grant, per-tick, bytes, pace, окн�
 
 ## Доказательства
 
-- 16 адресных тестов (`tests/test_observation_shared_account_budget_v1.py`):
+- 19 адресных тестов (`tests/test_observation_shared_account_budget_v1.py`):
   отдельно daily, credits, lifetime, midnight, crash/atomic commit, конкурентный
   последний вызов со stale snapshot, replay против нового occurrence, commissioning
   fresh/stale/restore, backup-копия, старая readonly-схема, native late A→B на
-  публичном tick. Oracle — заранее заданный trace и raw SQL, а не production
+  публичном tick. Кроме того: crash между reserve и STARTED (debit сохраняется,
+  отправки нет), `_Accounting`, созданный до commissioning, частичная схема →
+  CORRUPT, replay apply с другими аргументами → `REPLAY_MISMATCH`, и due-хвост
+  после shared-блока остаётся PENDING и наблюдается, когда бюджет вернётся.
+  Oracle — заранее заданный trace и raw SQL, а не production
   helper.
 - Targeted mutation: если отключить shared gate, падают 5/5 контрольных тестов;
   если вернуть порядок по hash, падает native-тест.
-- Регрессия прямых потребителей: 23 модуля, 374 теста, PASS.
+- Регрессия прямых потребителей: 25 модулей, 424 теста, PASS.
 - Native late-successor: A естественно уходит в DRAINING, затем B через обычный
   lifecycle (`NATIVE_ACTIVATION`). Mixed default tick обслуживает A-хвост первым.
   Когда в shared остаётся 1 вызов, его получает due SEARCH A; nomination B
@@ -77,12 +82,32 @@ commit. Индивидуальные caps (grant, per-tick, bytes, pace, окн�
   совпадают байт в байт (16/20/24/28s и 16/27/38/49s), `PACE_WAIT` и
   восстановление на следующем tick сохранились. Shared day = числу отправок
   (7 и 6). Накладной расход managed-режима ≈0.015s на tick, ≈115µs на gate.
+  Wall-clock сравнивался только managed и unmanaged на новом коде. «До»
+  (installed 4378c5b8) доказано на логических часах (те же времена отправки),
+  его wall-clock не измерялся.
 - Pins A (schedule `4744d401…`, grant `c2c937b4…`, storage `fa6450ba…`,
   protection `f70a7f2d…`) и C1/C2 не тронуты. Shared control — внешний
   операционный слой, frozen V1 не меняется.
 - Peak RSS в production: `UNKNOWN`. Измерения синтетические.
 
 ## Остаточные риски и честные ограничения
+
+Риски для смысла сбора (не меняют estimand в этом PR, но важны до B и C3+):
+- **Информативное цензурирование.** При исчерпании shared gaps
+  `SLOT_NOT_EXECUTED:BLOCKED_BUDGET` скапливаются к концу UTC-суток и на
+  поздних горизонтах. Это неизвестность, зависящая от времени суток. Это не
+  «нет возможности» и не случайный пропуск; анализ должен так их и трактовать.
+- **Связь B с нагрузкой A.** Хвост A обслуживается первым, поэтому intake B
+  получает остаток бюджета. Состав и время admissions B зависят от A. При
+  shared 1200 (не повышается для B) возможен голод B. Это нужно учесть при
+  выборе окна после I2.
+- **Lifetime завышен намеренно.** Это консервативный debit: reservations без
+  HTTP тоже считаются. Его нельзя читать как фактическое использование
+  провайдера.
+- **Pace остаётся per activation.** В начале episode tick есть store-wide
+  priming; отдельного shared-измерения pace нет.
+- **Другие provider lanes того же store** при commissioning тоже попадают
+  в scope (консервативно). Владелец подтверждает список members на gate.
 
 - Per-tick cap остаётся индивидуальным, как его задаёт существующий envelope;
   общего per-tick ceiling в нём нет. Aggregate видно в multi-activation отчёте.

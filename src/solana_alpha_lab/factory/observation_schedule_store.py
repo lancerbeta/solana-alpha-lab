@@ -879,9 +879,12 @@ class ObservationScheduleStore:
     ) -> dict[str, Any]:
         """Resolve UNMANAGED / MANAGED / NOT_MEMBER / CORRUPT for one caller."""
 
-        if not self._account_budget_tables_present():
+        tables = self._account_budget_table_count()
+        if tables == 0:
             # A read-only copy of a pre-bridge schema cannot hold managed rows.
             return {"mode": "UNMANAGED"}
+        if tables != 3:
+            return {"mode": "CORRUPT", "reason": "ACCOUNT_BUDGET_SCHEMA_PARTIAL"}
         scopes = self._conn.execute(
             "SELECT account_scope_id FROM account_budget_scopes"
         ).fetchall()
@@ -917,12 +920,12 @@ class ObservationScheduleStore:
                     "account_scope_id": scope_id}
         return {"mode": "MANAGED", "account_scope_id": scope_id, "policy": policy}
 
-    def _account_budget_tables_present(self) -> bool:
+    def _account_budget_table_count(self) -> int:
         rows = self._conn.execute(
             "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN "
             "('account_budget_scopes', 'account_budget_policies', 'account_budget_members')"
         ).fetchone()
-        return int(rows[0]) == 3
+        return int(rows[0])
 
     def account_budget_candidate_members(self) -> list[dict[str, Any]]:
         """Every activation plus any counter scope lacking an activation row."""
@@ -953,7 +956,7 @@ class ObservationScheduleStore:
         ]
 
     def account_budget_scope(self) -> dict[str, Any] | None:
-        if not self._account_budget_tables_present():
+        if self._account_budget_table_count() != 3:
             return None
         row = self._conn.execute(
             "SELECT * FROM account_budget_scopes ORDER BY account_scope_id LIMIT 2"
@@ -978,6 +981,15 @@ class ObservationScheduleStore:
         payload = dict(row)
         payload["payload"] = json.loads(payload.pop("payload_json"))
         return payload
+
+    def account_budget_policy_revision(
+        self, account_scope_id: str, revision: int
+    ) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            "SELECT * FROM account_budget_policies WHERE account_scope_id = ? AND revision = ?",
+            (account_scope_id, int(revision)),
+        ).fetchone()
+        return dict(row) if row is not None else None
 
     def account_budget_policy_by_command(self, command_sha256: str) -> dict[str, Any] | None:
         row = self._conn.execute(

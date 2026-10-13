@@ -393,12 +393,13 @@ class _Accounting:
     def _shared_gate(self, *, extra_calls: int, extra_credits: int) -> str | None:
         """Fresh shared-account read under the writer fence; never a cached snapshot."""
 
-        if self.account.get("mode") == "UNMANAGED":
-            return None
-        # Re-resolve so a revision/membership change during this process applies.
+        # Re-resolve every time: commissioning, a revision or a membership loss
+        # during this process must apply, never a binding cached at construction.
         self.account = self.store.account_budget_binding(
             schedule_sha256=self.digest, activation_id=self.activation_id
         )
+        if self.account.get("mode") == "UNMANAGED":
+            return None
         if self.account.get("mode") != "MANAGED":
             return self._deny("SHARED_ACCOUNT", "ACCOUNT_BINDING", None, extra_calls, None,
                               reason=str(self.account.get("reason") or "ACCOUNT_BUDGET_CORRUPT"))

@@ -294,7 +294,10 @@ callers stay `UNKNOWN`, never `GLOBAL_ACCOUNT_PROVEN`. The default tick serves
 DRAINING tails before ACTIVE intake; near exhaustion it does not exceed the cap
 to save a tail (typed `SLOT_NOT_EXECUTED:BLOCKED_BUDGET` gaps). Merge/deploy
 never commissions. After managed debits, a binary or SQLite older than this
-bridge is a forbidden downgrade; policy rollback is a new revision.
+bridge is a forbidden downgrade; policy rollback is a new revision. The binding
+is re-resolved at every gate; a partial account schema is `CORRUPT`. Pace is
+not a new shared dimension: the episode tick primes store-wide pace at entry,
+while the gate's pace check stays per activation.
 
 Before activation, the operator supplies `EPISODE_PRODUCER_STORAGE_COMMISSIONING_V1`
 via `activate --episode-storage-commissioning <json>`. It binds the exact root

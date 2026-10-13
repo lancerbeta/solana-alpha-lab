@@ -66,6 +66,10 @@ account id and these numbers in the OPERATE gate. Raising them is a later
 `account-budget-revise`, never part of this packet.
 
 Inspect:
+- the three limits equal the frozen A schedule budgets read from the registered
+  A document (`provider_calls_per_utc_day_max`,
+  `modeled_provider_credits_per_utc_day_max`, `provider_calls_lifetime_max`);
+  any difference stops the packet;
 - `terminal=ACCOUNT_BUDGET_PLAN_READY`,
   `credential_locator=JUPITER_FREE_API_KEY`;
 - `member_debits`: every activation of the store (A plus historical canary or
@@ -84,7 +88,8 @@ observation_schedule.py account-budget-apply <same args> --expected-plan-sha256 
 
 Run between ticks. `WRITER_BUSY` means retry after the tick.
 `ACCOUNT_BUDGET_PLAN_STALE` means prepare again (membership changed). A repeat
-returns `ACCOUNT_BUDGET_ALREADY_APPLIED`.
+with identical arguments returns `ACCOUNT_BUDGET_ALREADY_APPLIED`; different
+arguments return `ACCOUNT_BUDGET_REPLAY_MISMATCH`.
 
 Acceptance:
 - `terminal=ACCOUNT_BUDGET_APPLIED`, `mode=MANAGED`, `policy_revision=1`;

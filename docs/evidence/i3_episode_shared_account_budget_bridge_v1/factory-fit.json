@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "I3_EPISODE_SHARED_ACCOUNT_BUDGET_BRIDGE_V1-FIT",
+  "as_of": "2026-10-13",
+  "task_id": "I3_EPISODE_SHARED_ACCOUNT_BUDGET_BRIDGE_V1",
+  "reviewed_bindings_sha256": "PENDING_BIND",
+  "reviewed_inventory_sha256": "PENDING_BIND",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "A tail and B intake of one managed Jupiter account share one durable day/credit/cumulative allocation; a new activation cannot reset it. Live enablement stays behind a separate OPERATE gate.",
+    "flexibility_and_history": "Existing per-activation counters stay the only debit history; membership and append-only policy revisions are external runtime rows, so frozen schedules, grants and envelopes keep their hashes. Pre-bridge stores read as UNMANAGED; the bridge is default-off.",
+    "context_efficiency": "One task, one checkout, one new small module plus seams in the existing owners; 19 focused tests, 25-module/424-test direct-consumer regression and one reused preflight geometry probe. No pre-PR full gate; exact-head CI is mandatory.",
+    "research_truth": "No estimand, denominator, PIT or field semantics change. Under shared exhaustion slots get the existing typed SLOT_NOT_EXECUTED:BLOCKED_BUDGET gap (unknown, never negative evidence); DRAINING tails are served before ACTIVE intake.",
+    "owner_operability": "Four CLI subcommands with typed terminals and next_action, runbook table, BLOCKED_BUDGET keeps its enum while budget_denial names ACTIVATION vs SHARED_ACCOUNT, one OPERATE packet with acceptance numbers and stop conditions, Russian owner readout.",
+    "execution_to_cashflow": "Collection operability only; no trading, alpha, revenue, wallet or cashflow claim; no provider call or tariff claim.",
+    "monitoring_and_recovery": "account-budget-status and operability account_envelope expose usage/remaining/membership; the same SQLite carries bindings through the existing mutable backup; restore marker blocks commissioning; downgrade after managed debits is named forbidden.",
+    "build_vs_buy": "ADOPT existing store, writer lease, _Accounting, CLI and release path. WRAP them with membership aggregation. No package, service, queue, distributed limiter or second ledger.",
+    "security": "Only the credential slot name is bound; the key value is never read or hashed. No secrets, no external writes, no production mutation in this atom.",
+    "red_team": "Activation-only lookup and hash-ordered tick are mutation-killed by the controls; stale snapshot, concurrent last call, crash between day/lifetime writes, membership loss and scope replacement fail closed."
+  },
+  "capability_radar": {
+    "now": "Exact merge gate, then one OPERATE: deploy merge artifact, live UNMANAGED readback, prepare/apply JUPITER-MANAGED-ACCOUNT-1 without reset, ordinary-tick readback. No new tool.",
+    "watch": "I2 footprint/compression; a sustainable successor window (half-day B is SHORT_BRIDGE_ONLY); producer V2 hashes before the first fresh C3+ capture; A intake stop 2026-10-17T00:00Z."
+  },
+  "recovery": "Before commissioning, ordinary code rollback to 4378c5b8. After managed debits, forward fix only; policy rollback is a new revision; never restore an older SQLite or edit counters.",
+  "limits": [
+    "NO_PRODUCTION_DEPLOY_COMMISSIONING_OR_B_ACTIVATION",
+    "NO_GLOBAL_ACCOUNT_OR_TARIFF_CLAIM",
+    "NO_COLLECTOR_GRANT_FROZEN_SCHEDULE_OR_PROVIDER_CHANGE",
+    "NO_PRODUCTION_PEAK_RSS_OR_FULL_72H_LOAD_CLAIM",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_LOCAL_EVIDENCE"
+  ]
+}

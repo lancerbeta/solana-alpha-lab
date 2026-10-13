@@ -9,18 +9,32 @@
     "receipt": "local/i3_episode_continuity_preflight_v1/continuity-preflight-receipt.json",
     "receipt_self_sha256": "4f25a20520716dcc2e6121a8ea92d3992c7bc4dd6a2cd9d57791da0aa55744fa",
     "named_blocker": "SHARED_PROVIDER_BUDGET_RESETS_ON_ACTIVATION",
-    "before": {"predecessor_gate": "BLOCKED_BUDGET", "successor_gate": null,
-               "predecessor_day_calls": 1200, "successor_day_calls": 4,
-               "predecessor_lifetime_calls": 2000000, "successor_lifetime_calls": 4},
-    "after_unmanaged_store": {"successor_gate": null, "meaning": "default-off: unchanged until commissioning"},
-    "after_commissioned_store": {"successor_gate": "BLOCKED_BUDGET", "budget_scope": "SHARED_ACCOUNT",
-                                 "budget_dimension": "SHARED_DAY_PROVIDER_CALLS", "used": 1204,
-                                 "requested_debit": 1, "limit": 1200, "policy_revision": 1}
+    "before": {
+      "predecessor_gate": "BLOCKED_BUDGET",
+      "successor_gate": null,
+      "predecessor_day_calls": 1200,
+      "successor_day_calls": 4,
+      "predecessor_lifetime_calls": 2000000,
+      "successor_lifetime_calls": 4
+    },
+    "after_unmanaged_store": {
+      "successor_gate": null,
+      "meaning": "default-off: unchanged until commissioning"
+    },
+    "after_commissioned_store": {
+      "successor_gate": "BLOCKED_BUDGET",
+      "budget_scope": "SHARED_ACCOUNT",
+      "budget_dimension": "SHARED_DAY_PROVIDER_CALLS",
+      "used": 1204,
+      "requested_debit": 1,
+      "limit": 1200,
+      "policy_revision": 1
+    }
   },
   "root_cause": "_Accounting loaded day/lifetime counters by (schedule_sha256, activation_id) only; a new activation identity saw empty counters while the account pace was already store-wide.",
   "risk_matrix": {
     "suite": "tests/test_observation_shared_account_budget_v1.py",
-    "tests": 16,
+    "tests": 19,
     "result": "PASS",
     "cases": {
       "original_falsifier": "test_original_falsifier_unmanaged_reset_then_managed_refusal",
@@ -38,37 +52,90 @@
       "bounded_gate_cost": "test_shared_gate_cost_is_bounded_index_reads",
       "replay_new_occurrence_midnight": "test_replay_and_new_occurrence_and_midnight_across_two_activations",
       "successor_blocked_before_transport_and_start": "test_shared_exhaustion_blocks_successor_before_transport_and_start",
-      "native_late_successor_public_tick": "test_native_late_successor_on_public_tick_shares_one_account"
+      "native_late_successor_public_tick": "test_native_late_successor_on_public_tick_shares_one_account",
+      "accounting_built_before_commissioning": "test_accounting_built_before_commissioning_obeys_shared_gate",
+      "partial_account_schema": "test_partial_account_schema_fails_closed",
+      "crash_after_reserve_before_started": "test_crash_after_reserve_before_started_keeps_debit_without_send"
     },
-    "oracle": "authored event trace and raw SQL over member rows; transport spy counts sends; production aggregation helper is never the oracle"
+    "oracle": "authored event trace and raw SQL over member rows; transport spy counts sends; production aggregation helper is never the oracle",
+    "replay_mismatch": "covered in test_second_account_store_is_independent_and_scope_cannot_be_replaced",
+    "tail_recoverable_after_shared_block": "covered in test_native_late_successor_on_public_tick_shares_one_account"
   },
   "targeted_mutation": {
-    "shared_gate_disabled": {"controls": 5, "failed_or_errored": 5},
-    "default_tick_order_by_hash_only": {"controls": 1, "failed": 1},
+    "shared_gate_disabled": {
+      "controls": 5,
+      "failed_or_errored": 5
+    },
+    "default_tick_order_by_hash_only": {
+      "controls": 1,
+      "failed": 1
+    },
     "reproduce": "monkeypatch _Accounting._shared_gate -> None, or scripts.observation_schedule._tick_candidates_as_of -> sorted by digest; run the named controls"
   },
   "regression": {
-    "modules": 23,
-    "tests": 374,
+    "modules": 25,
+    "tests": 424,
     "result": "PASS",
-    "scope": "every test module referencing _Accounting, counters, tick_once, the default tick CLI or account_envelope"
+    "scope": "every test module referencing _Accounting, counters, tick_once, the default tick CLI or account_envelope, plus store and round-recovery suites"
   },
   "dispatch_geometry_before_after": {
     "fixture": "preflight joint bucket: 259 A + 40 B due claims, 4 SEARCH, default CLI tick, latency 1s and 8s",
-    "baseline": {"source": "local/i3_episode_continuity_preflight_v1/dispatch-probes.json",
-                 "sha256": "87b289cd3afa5bec6e70f6ef4815bc72faafe8061650c9ecf08045803f3766d4",
-                 "code": "installed 4378c5b82f2dc309ccd629b267affd5d19b34995"},
-    "candidate_managed": {"sha256": "5a40c8dc5f88fba011e1d3a3458d95f925ed0daee39f2be52b73113f8b86ff62",
-                          "members": {"ACT-4744D4017AC4B196": "COMMISSIONING", "ACT-9D3327EB9C791265": "NATIVE_ACTIVATION"}},
-    "candidate_unmanaged": {"sha256": "7e36f5c00d5be8a4ce802ab0bcf857d11edd7ae8052d12ae558720d795ca25e5"},
-    "latency_1s": {"search_request_times_identical": true, "seconds_after_assigned": [16, 20, 24, 28],
-                   "clock_elapsed_seconds": 41.0, "terminal": "TICK_COMPLETE", "shared_day_calls": 7, "sends": 7},
-    "latency_8s": {"search_request_times_identical": true, "seconds_after_assigned": [16, 27, 38, 49],
-                   "clock_elapsed_seconds": 79.0, "terminal": "TICK_PARTIAL", "b_stop_reason": "PACE_WAIT",
-                   "next_timer_recovery": "TICK_COMPLETE", "shared_day_calls": 6, "sends": 6},
-    "process_wall_seconds": {"managed": [1.438, 1.712], "unmanaged": [1.423, 1.714]},
+    "baseline": {
+      "source": "local/i3_episode_continuity_preflight_v1/dispatch-probes.json",
+      "sha256": "87b289cd3afa5bec6e70f6ef4815bc72faafe8061650c9ecf08045803f3766d4",
+      "code": "installed 4378c5b82f2dc309ccd629b267affd5d19b34995"
+    },
+    "candidate_managed": {
+      "sha256": "5a40c8dc5f88fba011e1d3a3458d95f925ed0daee39f2be52b73113f8b86ff62",
+      "members": {
+        "ACT-4744D4017AC4B196": "COMMISSIONING",
+        "ACT-9D3327EB9C791265": "NATIVE_ACTIVATION"
+      }
+    },
+    "candidate_unmanaged": {
+      "sha256": "7e36f5c00d5be8a4ce802ab0bcf857d11edd7ae8052d12ae558720d795ca25e5"
+    },
+    "latency_1s": {
+      "search_request_times_identical": true,
+      "seconds_after_assigned": [
+        16,
+        20,
+        24,
+        28
+      ],
+      "clock_elapsed_seconds": 41.0,
+      "terminal": "TICK_COMPLETE",
+      "shared_day_calls": 7,
+      "sends": 7
+    },
+    "latency_8s": {
+      "search_request_times_identical": true,
+      "seconds_after_assigned": [
+        16,
+        27,
+        38,
+        49
+      ],
+      "clock_elapsed_seconds": 79.0,
+      "terminal": "TICK_PARTIAL",
+      "b_stop_reason": "PACE_WAIT",
+      "next_timer_recovery": "TICK_COMPLETE",
+      "shared_day_calls": 6,
+      "sends": 6
+    },
+    "process_wall_seconds": {
+      "managed": [
+        1.438,
+        1.712
+      ],
+      "unmanaged": [
+        1.423,
+        1.714
+      ]
+    },
     "probe_script_sha256": "c83c12e10f75638ea78ec55a5c302600cd77a0ee17e8b9af44820ed8ec9976f4",
-    "reproduce": "local/i3_shared_account_budget_bridge_v1/dispatch_probe_shared.py with SHARED_BUDGET=1|0 (reads preflight inputs; outside Git)"
+    "reproduce": "local/i3_shared_account_budget_bridge_v1/dispatch_probe_shared.py with SHARED_BUDGET=1|0 (reads preflight inputs; outside Git)",
+    "wall_clock_note": "wall seconds compare managed vs unmanaged on candidate code only; the installed baseline is matched on the logical clock (identical send times), its wall time was not recorded"
   },
   "gate_cost": {
     "fixture": "62 members, 60 historical scopes x 30 UTC days",
