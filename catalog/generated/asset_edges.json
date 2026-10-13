@@ -12318,6 +12318,16 @@
       "target_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-001"
     },
     {
+      "source_asset_id": "MODULE-OBSERVATION-ACCOUNT-BUDGET-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OBSERVATION-SCHEDULER-001"
+    },
+    {
+      "source_asset_id": "MODULE-OBSERVATION-ACCOUNT-BUDGET-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
       "source_asset_id": "MODULE-OBSERVATION-PRIMITIVES-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"

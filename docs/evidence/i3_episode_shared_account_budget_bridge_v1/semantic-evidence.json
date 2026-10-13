@@ -1,0 +1,18 @@
+[
+  {
+    "logical_ref": "docs/evidence/i3_episode_shared_account_budget_bridge_v1/proof.json",
+    "sha256_or_fingerprint": "38a22590e232417d94f68964d0d364721ad59e77f905e51905c2a8df3664b868"
+  },
+  {
+    "logical_ref": "docs/evidence/i3_episode_shared_account_budget_bridge_v1/OPERATE_PACKET.md",
+    "sha256_or_fingerprint": "4c415ebf766411368048db62bb59a8a4ae94947517e4f0f65fcaef723d8a2990"
+  },
+  {
+    "logical_ref": "docs/evidence/i3_episode_shared_account_budget_bridge_v1/OWNER_READOUT.md",
+    "sha256_or_fingerprint": "e7d77e98f3aea4126c92cfe4bba484da669e721c0e43f51f8e256118cd5e3969"
+  },
+  {
+    "logical_ref": "local/i3_episode_continuity_preflight_v1/continuity-preflight-receipt.json#receipt_sha256",
+    "sha256_or_fingerprint": "4f25a20520716dcc2e6121a8ea92d3992c7bc4dd6a2cd9d57791da0aa55744fa"
+  }
+]

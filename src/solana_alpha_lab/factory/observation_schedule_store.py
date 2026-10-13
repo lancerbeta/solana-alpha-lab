@@ -412,6 +412,38 @@ class ObservationScheduleStore:
             );
             CREATE INDEX IF NOT EXISTS idx_episode_publication_cohorts
                 ON episode_publication_cohorts(schedule_sha256, activation_id, cohort_id);
+            -- Shared managed-account budget (default-off runtime state). The
+            -- per-activation counters stay the primary debit history; these
+            -- rows only name the account, its policy revisions and membership.
+            CREATE TABLE IF NOT EXISTS account_budget_scopes (
+                account_scope_id TEXT PRIMARY KEY,
+                provider_lane TEXT NOT NULL,
+                credential_locator TEXT NOT NULL,
+                commission_sha256 TEXT NOT NULL,
+                commissioned_at TEXT NOT NULL,
+                payload_json TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS account_budget_policies (
+                account_scope_id TEXT NOT NULL,
+                revision INTEGER NOT NULL CHECK (revision >= 1),
+                provider_calls_per_utc_day_max INTEGER NOT NULL,
+                modeled_credits_per_utc_day_max INTEGER NOT NULL,
+                provider_calls_lifetime_max INTEGER NOT NULL,
+                command_sha256 TEXT NOT NULL UNIQUE,
+                created_at TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                PRIMARY KEY (account_scope_id, revision)
+            );
+            CREATE TABLE IF NOT EXISTS account_budget_members (
+                schedule_sha256 TEXT NOT NULL,
+                activation_id TEXT NOT NULL,
+                account_scope_id TEXT NOT NULL,
+                binding_source TEXT NOT NULL,
+                bound_at TEXT NOT NULL,
+                PRIMARY KEY (schedule_sha256, activation_id)
+            );
+            CREATE INDEX IF NOT EXISTS idx_account_budget_members_scope
+                ON account_budget_members(account_scope_id);
             """
         )
         self._ensure_column(
@@ -812,7 +844,312 @@ class ObservationScheduleStore:
                 last_transition_event_id,
             ),
         )
+        if existing is None:
+            # A new activation in a commissioned store inherits the one managed
+            # account in the same commit; no per-successor accounting ceremony.
+            self._bind_new_activation_to_account(
+                str(row["schedule_sha256"]), str(row["activation_id"]), now
+            )
         self._conn.commit()
+
+    def _bind_new_activation_to_account(
+        self, schedule_sha256: str, activation_id: str, now: str
+    ) -> None:
+        scopes = self._conn.execute(
+            "SELECT account_scope_id FROM account_budget_scopes"
+        ).fetchall()
+        if not scopes:
+            return
+        if len(scopes) != 1:
+            self._conn.rollback()
+            raise ObservationScheduleStoreError("ACCOUNT_BUDGET_SCOPE_AMBIGUOUS")
+        self._conn.execute(
+            """
+            INSERT OR IGNORE INTO account_budget_members(
+                schedule_sha256, activation_id, account_scope_id, binding_source, bound_at
+            ) VALUES (?, ?, ?, 'NATIVE_ACTIVATION', ?)
+            """,
+            (schedule_sha256, activation_id, str(scopes[0]["account_scope_id"]), now),
+        )
+
+    # ------------------------------------------------------------------
+    # Shared managed-account budget
+    def account_budget_binding(
+        self, *, schedule_sha256: str, activation_id: str
+    ) -> dict[str, Any]:
+        """Resolve UNMANAGED / MANAGED / NOT_MEMBER / CORRUPT for one caller."""
+
+        tables = self._account_budget_table_count()
+        if tables == 0:
+            # A read-only copy of a pre-bridge schema cannot hold managed rows.
+            return {"mode": "UNMANAGED"}
+        if tables != 3:
+            return {"mode": "CORRUPT", "reason": "ACCOUNT_BUDGET_SCHEMA_PARTIAL"}
+        scopes = self._conn.execute(
+            "SELECT account_scope_id FROM account_budget_scopes"
+        ).fetchall()
+        member_count = int(
+            self._conn.execute("SELECT COUNT(*) FROM account_budget_members").fetchone()[0]
+        )
+        policy_count = int(
+            self._conn.execute("SELECT COUNT(*) FROM account_budget_policies").fetchone()[0]
+        )
+        if not scopes:
+            if member_count or policy_count:
+                return {"mode": "CORRUPT", "reason": "ACCOUNT_BUDGET_SCOPE_MISSING"}
+            return {"mode": "UNMANAGED"}
+        if len(scopes) != 1:
+            return {"mode": "CORRUPT", "reason": "ACCOUNT_BUDGET_SCOPE_AMBIGUOUS"}
+        scope_id = str(scopes[0]["account_scope_id"])
+        policy = self.account_budget_policy(scope_id)
+        if policy is None:
+            return {"mode": "CORRUPT", "reason": "ACCOUNT_BUDGET_POLICY_MISSING",
+                    "account_scope_id": scope_id}
+        member = self._conn.execute(
+            """
+            SELECT account_scope_id FROM account_budget_members
+            WHERE schedule_sha256 = ? AND activation_id = ?
+            """,
+            (schedule_sha256, activation_id),
+        ).fetchone()
+        if member is None:
+            return {"mode": "NOT_MEMBER", "reason": "ACCOUNT_BUDGET_MEMBERSHIP_REQUIRED",
+                    "account_scope_id": scope_id, "policy": policy}
+        if str(member["account_scope_id"]) != scope_id:
+            return {"mode": "CORRUPT", "reason": "ACCOUNT_BUDGET_MEMBER_SCOPE_MISMATCH",
+                    "account_scope_id": scope_id}
+        return {"mode": "MANAGED", "account_scope_id": scope_id, "policy": policy}
+
+    def _account_budget_table_count(self) -> int:
+        rows = self._conn.execute(
+            "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN "
+            "('account_budget_scopes', 'account_budget_policies', 'account_budget_members')"
+        ).fetchone()
+        return int(rows[0])
+
+    def account_budget_candidate_members(self) -> list[dict[str, Any]]:
+        """Every activation plus any counter scope lacking an activation row."""
+
+        activations = {
+            (str(row["schedule_sha256"]), str(row["activation_id"])): str(row["state"])
+            for row in self._conn.execute(
+                "SELECT schedule_sha256, activation_id, state FROM schedule_activations"
+            ).fetchall()
+        }
+        counter_keys = {
+            (str(row[0]), str(row[1]))
+            for sql in (
+                "SELECT DISTINCT schedule_sha256, activation_id FROM accounting_counters",
+                "SELECT DISTINCT schedule_sha256, activation_id FROM lifetime_counters",
+            )
+            for row in self._conn.execute(sql).fetchall()
+        }
+        return [
+            {
+                "schedule_sha256": digest,
+                "activation_id": activation_id,
+                "state": activations.get(
+                    (digest, activation_id), "COUNTER_SCOPE_WITHOUT_ACTIVATION"
+                ),
+            }
+            for digest, activation_id in sorted(set(activations) | counter_keys)
+        ]
+
+    def account_budget_scope(self) -> dict[str, Any] | None:
+        if self._account_budget_table_count() != 3:
+            return None
+        row = self._conn.execute(
+            "SELECT * FROM account_budget_scopes ORDER BY account_scope_id LIMIT 2"
+        ).fetchall()
+        if not row:
+            return None
+        payload = dict(row[0])
+        payload["payload"] = json.loads(payload.pop("payload_json"))
+        payload["scope_count"] = len(row)
+        return payload
+
+    def account_budget_policy(self, account_scope_id: str) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            """
+            SELECT * FROM account_budget_policies
+            WHERE account_scope_id = ? ORDER BY revision DESC LIMIT 1
+            """,
+            (account_scope_id,),
+        ).fetchone()
+        if row is None:
+            return None
+        payload = dict(row)
+        payload["payload"] = json.loads(payload.pop("payload_json"))
+        return payload
+
+    def account_budget_policy_revision(
+        self, account_scope_id: str, revision: int
+    ) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            "SELECT * FROM account_budget_policies WHERE account_scope_id = ? AND revision = ?",
+            (account_scope_id, int(revision)),
+        ).fetchone()
+        return dict(row) if row is not None else None
+
+    def account_budget_policy_by_command(self, command_sha256: str) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            "SELECT * FROM account_budget_policies WHERE command_sha256 = ?",
+            (command_sha256,),
+        ).fetchone()
+        if row is None:
+            return None
+        payload = dict(row)
+        payload["payload"] = json.loads(payload.pop("payload_json"))
+        return payload
+
+    def account_budget_members(self, account_scope_id: str) -> list[dict[str, Any]]:
+        return [
+            dict(row)
+            for row in self._conn.execute(
+                """
+                SELECT schedule_sha256, activation_id, binding_source, bound_at
+                FROM account_budget_members WHERE account_scope_id = ?
+                ORDER BY schedule_sha256, activation_id
+                """,
+                (account_scope_id,),
+            ).fetchall()
+        ]
+
+    def account_budget_usage(self, *, account_scope_id: str, utc_day: str) -> dict[str, int]:
+        """Authoritative shared debit: member counters only, no payload/body reads."""
+
+        _STORE_READ_STATS["account_budget_usage_calls"] = (
+            _STORE_READ_STATS.get("account_budget_usage_calls", 0) + 1
+        )
+        day = self._conn.execute(
+            """
+            SELECT COALESCE(SUM(c.provider_calls), 0), COALESCE(SUM(c.modeled_credits), 0)
+            FROM account_budget_members AS m
+            JOIN accounting_counters AS c
+              ON c.schedule_sha256 = m.schedule_sha256
+             AND c.activation_id = m.activation_id
+             AND c.utc_day = ?
+            WHERE m.account_scope_id = ?
+            """,
+            (utc_day, account_scope_id),
+        ).fetchone()
+        life = self._conn.execute(
+            """
+            SELECT COALESCE(SUM(l.provider_calls), 0)
+            FROM account_budget_members AS m
+            JOIN lifetime_counters AS l
+              ON l.schedule_sha256 = m.schedule_sha256
+             AND l.activation_id = m.activation_id
+            WHERE m.account_scope_id = ?
+            """,
+            (account_scope_id,),
+        ).fetchone()
+        return {
+            "day_provider_calls": int(day[0]),
+            "day_modeled_credits": int(day[1]),
+            "lifetime_provider_calls": int(life[0]),
+        }
+
+    def commission_account_budget(
+        self,
+        *,
+        account_scope_id: str,
+        provider_lane: str,
+        credential_locator: str,
+        commission_sha256: str,
+        policy: Mapping[str, Any],
+        members: Sequence[tuple[str, str]],
+        payload: Mapping[str, Any],
+        clock: datetime | None = None,
+    ) -> None:
+        """One transaction: scope, policy revision 1 and every named member."""
+
+        self._require_write_lease(clock)
+        now = _now(clock)
+        try:
+            self._conn.execute("BEGIN IMMEDIATE")
+            self._require_write_lease(clock, within_transaction=True)
+            if self._conn.execute("SELECT 1 FROM account_budget_scopes").fetchone() is not None:
+                raise ObservationScheduleStoreError("ACCOUNT_BUDGET_ALREADY_COMMISSIONED")
+            if self._conn.execute("SELECT 1 FROM account_budget_members").fetchone() is not None:
+                raise ObservationScheduleStoreError("ACCOUNT_BUDGET_SCOPE_MISSING")
+            self._conn.execute(
+                """
+                INSERT INTO account_budget_scopes(
+                    account_scope_id, provider_lane, credential_locator,
+                    commission_sha256, commissioned_at, payload_json
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (account_scope_id, provider_lane, credential_locator, commission_sha256,
+                 now, json.dumps(dict(payload), sort_keys=True)),
+            )
+            self._insert_account_policy(account_scope_id, 1, policy, now)
+            for schedule_sha256, activation_id in members:
+                self._conn.execute(
+                    """
+                    INSERT INTO account_budget_members(
+                        schedule_sha256, activation_id, account_scope_id,
+                        binding_source, bound_at
+                    ) VALUES (?, ?, ?, 'COMMISSIONING', ?)
+                    """,
+                    (schedule_sha256, activation_id, account_scope_id, now),
+                )
+            self._conn.commit()
+        except Exception:
+            self._conn.rollback()
+            raise
+
+    def revise_account_budget_policy(
+        self,
+        *,
+        account_scope_id: str,
+        expected_revision: int,
+        policy: Mapping[str, Any],
+        clock: datetime | None = None,
+    ) -> int:
+        self._require_write_lease(clock)
+        now = _now(clock)
+        try:
+            self._conn.execute("BEGIN IMMEDIATE")
+            self._require_write_lease(clock, within_transaction=True)
+            current = self._conn.execute(
+                "SELECT MAX(revision) FROM account_budget_policies WHERE account_scope_id = ?",
+                (account_scope_id,),
+            ).fetchone()[0]
+            if current is None:
+                raise ObservationScheduleStoreError("ACCOUNT_BUDGET_POLICY_MISSING")
+            if int(current) != int(expected_revision):
+                raise ObservationScheduleStoreError("ACCOUNT_BUDGET_REVISION_STALE")
+            revision = int(current) + 1
+            self._insert_account_policy(account_scope_id, revision, policy, now)
+            self._conn.commit()
+            return revision
+        except Exception:
+            self._conn.rollback()
+            raise
+
+    def _insert_account_policy(
+        self, account_scope_id: str, revision: int, policy: Mapping[str, Any], now: str
+    ) -> None:
+        self._conn.execute(
+            """
+            INSERT INTO account_budget_policies(
+                account_scope_id, revision, provider_calls_per_utc_day_max,
+                modeled_credits_per_utc_day_max, provider_calls_lifetime_max,
+                command_sha256, created_at, payload_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                account_scope_id,
+                revision,
+                int(policy["provider_calls_per_utc_day_max"]),
+                int(policy["modeled_credits_per_utc_day_max"]),
+                int(policy["provider_calls_lifetime_max"]),
+                str(policy["command_sha256"]),
+                now,
+                json.dumps(dict(policy.get("payload") or {}), sort_keys=True),
+            ),
+        )
 
     def transition_activation(
         self,
@@ -939,6 +1276,7 @@ class ObservationScheduleStore:
                         event_id,
                     ),
                 )
+                self._bind_new_activation_to_account(schedule_sha256, activation_id, now)
             else:
                 self._conn.execute(
                     """
@@ -2795,7 +3133,41 @@ class ObservationScheduleStore:
         clock: datetime | None = None,
     ) -> None:
         self._require_write_lease(clock)
+        self._write_accounting(schedule_sha256, activation_id, utc_day, values, _now(clock))
+        self._conn.commit()
+
+    def save_call_debit(
+        self,
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        utc_day: str,
+        values: Mapping[str, Any],
+        lifetime_provider_calls: int,
+        lifetime_canonical_bytes: int,
+        clock: datetime | None = None,
+    ) -> None:
+        """Day and lifetime debit in one commit: a crash cannot keep only one."""
+
+        self._require_write_lease(clock)
         now = _now(clock)
+        try:
+            self._write_accounting(schedule_sha256, activation_id, utc_day, values, now)
+            self._write_lifetime(schedule_sha256, activation_id, lifetime_provider_calls,
+                                 lifetime_canonical_bytes, now)
+            self._conn.commit()
+        except Exception:
+            self._conn.rollback()
+            raise
+
+    def _write_accounting(
+        self,
+        schedule_sha256: str,
+        activation_id: str,
+        utc_day: str,
+        values: Mapping[str, Any],
+        now: str,
+    ) -> None:
         self._conn.execute(
             """
             INSERT INTO accounting_counters(
@@ -2829,7 +3201,6 @@ class ObservationScheduleStore:
                 now,
             ),
         )
-        self._conn.commit()
 
     def latest_provider_call_at(
         self,
@@ -2879,7 +3250,18 @@ class ObservationScheduleStore:
         clock: datetime | None = None,
     ) -> None:
         self._require_write_lease(clock)
-        now = _now(clock)
+        self._write_lifetime(schedule_sha256, activation_id, provider_calls, canonical_bytes,
+                             _now(clock))
+        self._conn.commit()
+
+    def _write_lifetime(
+        self,
+        schedule_sha256: str,
+        activation_id: str,
+        provider_calls: int,
+        canonical_bytes: int,
+        now: str,
+    ) -> None:
         self._conn.execute(
             """
             INSERT INTO lifetime_counters(
@@ -2892,7 +3274,6 @@ class ObservationScheduleStore:
             """,
             (schedule_sha256, activation_id, provider_calls, canonical_bytes, now),
         )
-        self._conn.commit()
 
     def load_poll_slot(self, poll_slot_id: str) -> dict[str, Any] | None:
         row = self._conn.execute(
@@ -3656,7 +4037,23 @@ class ObservationScheduleStore:
                 "last_successful_publication_at": publication,
                 "next_cohort_maturity": dict(maturity) if maturity else None,
                 "drain_headroom": {"status": "UNKNOWN", "reason": "FRESH_LOCAL_FREE_SPACE_AND_BOUND_ENVELOPE_REQUIRED"},
-                "account_envelope": {"status": "UNKNOWN", "reason": "APPROVED_SHARED_ACCOUNT_BINDING_REQUIRED"}}
+                "account_envelope": self._account_envelope(scope, now)}
+
+    def _account_envelope(self, scope: tuple[str, str], now: datetime) -> dict[str, Any]:
+        binding = self.account_budget_binding(schedule_sha256=scope[0], activation_id=scope[1])
+        if binding["mode"] == "UNMANAGED":
+            return {"status": "UNKNOWN", "reason": "APPROVED_SHARED_ACCOUNT_BINDING_REQUIRED"}
+        if binding["mode"] != "MANAGED":
+            return {"status": binding["mode"], "reason": binding.get("reason")}
+        policy = binding["policy"]
+        usage = self.account_budget_usage(account_scope_id=binding["account_scope_id"],
+                                          utc_day=now.astimezone(UTC).strftime("%Y-%m-%d"))
+        return {"status": "MANAGED", "account_scope_id": binding["account_scope_id"],
+                "policy_revision": int(policy["revision"]), "usage": usage,
+                "limits": {key: int(policy[key]) for key in (
+                    "provider_calls_per_utc_day_max", "modeled_credits_per_utc_day_max",
+                    "provider_calls_lifetime_max")},
+                "external_callers": "UNKNOWN"}
 
     def episode_slot_state_counts(
         self,

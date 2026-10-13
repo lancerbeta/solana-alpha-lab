@@ -23,6 +23,13 @@ from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
     load_observation_schedule,
     parse_utc,
 )
+from solana_alpha_lab.factory.observation_account_budget import (  # noqa: E402
+    AccountBudgetError,
+    account_budget_status,
+    apply_account_budget,
+    prepare_account_budget,
+    revise_account_budget_policy,
+)
 from solana_alpha_lab.factory.observation_schedule_compiler import (  # noqa: E402
     compile_schedule_document,
 )
@@ -111,11 +118,14 @@ def _tick_candidates_as_of(
     candidates = []
     for row in rows:
         projected = project_activation_as_of(row, now)
-        if str(projected.get("state") or "") in {"ACTIVE", "DRAINING"}:
+        state = str(projected.get("state") or "")
+        if state in {"ACTIVE", "DRAINING"}:
             candidates.append(
-                (str(row["schedule_sha256"]), str(row["activation_id"]))
+                (state != "DRAINING", str(row["schedule_sha256"]), str(row["activation_id"]))
             )
-    return sorted(candidates)
+    # Committed tails (DRAINING) are served before any ACTIVE intake so a new
+    # activation cannot spend the shared account quota a due tail needs now.
+    return [(digest, activation_id) for _, digest, activation_id in sorted(candidates)]
 
 
 # A tick before ``starts_at`` makes no provider call and is an honest idle, not a failure.
@@ -139,6 +149,44 @@ def _bind_runtime(
         ops = resolve_data_root(ROOT, str(config["ops_store_relative"]))
     store = ObservationScheduleStore(ops)
     return config, resolved, store
+
+
+def _account_budget_command(args: argparse.Namespace, *, config: dict, store, now: datetime) -> int:
+    """Shared managed-account budget OPERATE surface; never reads a credential value."""
+
+    limits = {
+        key: getattr(args, key, None)
+        for key in (
+            "provider_calls_per_utc_day_max",
+            "modeled_credits_per_utc_day_max",
+            "provider_calls_lifetime_max",
+        )
+    }
+    # The logical credential slot name binds the account; its value is never read.
+    locator = str(config.get("credential_env") or "")
+    try:
+        if args.command == "account-budget-status":
+            result = account_budget_status(store, now=now)
+            return _emit(result, 0 if result["mode"] != "CORRUPT" else 2)
+        if args.command == "account-budget-prepare":
+            result = prepare_account_budget(
+                store, account_scope_id=args.account_scope_id, credential_locator=locator,
+                limits=limits, now=now,
+            )
+            return _emit(result, 0 if result["terminal"] == "ACCOUNT_BUDGET_PLAN_READY" else 2)
+        if args.command == "account-budget-apply":
+            result = apply_account_budget(
+                store, account_scope_id=args.account_scope_id, credential_locator=locator,
+                limits=limits, expected_plan_sha256=args.expected_plan_sha256, now=now,
+            )
+            return _emit(result, 0)
+        result = revise_account_budget_policy(
+            store, expected_revision=args.expected_revision, limits=limits,
+            reason=args.reason, now=now,
+        )
+        return _emit(result, 0)
+    except AccountBudgetError as exc:
+        return _emit({"terminal": str(exc), "next_action": "INSPECT_ACCOUNT_BUDGET_STATUS"}, 2)
 
 
 def main(
@@ -187,6 +235,22 @@ def main(
             cmd.add_argument("--schedule-sha256")
         if name == "status":
             cmd.add_argument("--activation-id")
+    for name in ("account-budget-prepare", "account-budget-apply", "account-budget-revise",
+                 "account-budget-status"):
+        cmd = sub.add_parser(name)
+        cmd.add_argument("--runtime-config", default=DEFAULT_RUNTIME_RELATIVE)
+        cmd.add_argument("--data-root")
+        if name in {"account-budget-prepare", "account-budget-apply"}:
+            cmd.add_argument("--account-scope-id", required=True)
+        if name != "account-budget-status":
+            cmd.add_argument("--provider-calls-per-utc-day-max", type=int, required=True)
+            cmd.add_argument("--modeled-credits-per-utc-day-max", type=int, required=True)
+            cmd.add_argument("--provider-calls-lifetime-max", type=int, required=True)
+        if name == "account-budget-apply":
+            cmd.add_argument("--expected-plan-sha256", required=True)
+        if name == "account-budget-revise":
+            cmd.add_argument("--expected-revision", type=int, required=True)
+            cmd.add_argument("--reason", required=True)
     tick = sub.add_parser("tick")
     tick.add_argument("--once", action="store_true", required=True)
     tick.add_argument("--runtime-config", default=DEFAULT_RUNTIME_RELATIVE)
@@ -221,6 +285,8 @@ def main(
             now = resolve_clock(runtime_config)
         config, data_root, store = _bind_runtime(args, config=runtime_config)
         producer = git_sha(ROOT, config.get("producer_git_sha"))
+        if args.command.startswith("account-budget-"):
+            return _account_budget_command(args, config=config, store=store, now=now)
         if args.command == "register":
             if not args.schedule:
                 return _emit({"terminal": "SCHEDULE_PATH_REQUIRED"}, 2)

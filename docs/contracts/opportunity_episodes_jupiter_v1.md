@@ -258,6 +258,47 @@ Completion adds bytes/pacing without a second ordinary debit. This affects
 episode accounting only; legacy calls keep the previous completion policy.
 Counter debits are conservative reservations, not evidence of HTTP attempts.
 
+Shared managed-account budget (I3 bridge). One ops store binds one runtime
+credential locator (`credential_env`, the slot name, never its value), so it
+holds at most one managed account scope. The owner-assigned logical
+`account_scope_id` is stable across A->B, restart, Git SHA and key rotation; a
+schedule, activation, date or key hash is not an account identity. The existing
+per-activation `accounting_counters`/`lifetime_counters` rows stay the only debit
+history. `account_budget_members` names which of them belong to the scope;
+`account_budget_policies` holds append-only owner-approved shared caps
+(calls/UTC day, modeled credits/UTC day, cumulative calls). Shared caps are one
+allocation, never the sum of grants; each grant's narrower caps, per-tick cap,
+raw/canonical bytes, pace and dispatch window still apply. "Lifetime" means the
+cumulative debit of this named scope, not a provider-wide lifetime limit.
+
+Admission is: individual authority AND activation-local caps AND
+`shared_used + debit <= shared_limit` for each shared dimension, read fresh
+from member rows under the writer lease at every gate (no cached snapshot).
+Day and lifetime debits of one reservation commit together. A refusal stays
+`BLOCKED_BUDGET`; the tick report adds `budget_denial` with `budget_scope`
+(`ACTIVATION|SHARED_ACCOUNT`), `budget_dimension`, `used`, `requested_debit`,
+`limit`, `policy_revision`, `next_action`. A new UTC day opens only the day
+bucket; activation change, revision or date never resets cumulative debt.
+
+The mode is store state, not a flag: no scope = `UNMANAGED` (activation-local
+caps only, the pre-bridge behavior); once commissioned, every caller resolves
+`MANAGED`, and a missing membership/scope/policy fails closed as
+`ACCOUNT_BINDING` before transport. Any new activation row in a commissioned
+store is bound in the same commit (`NATIVE_ACTIVATION`). Commissioning
+(`account-budget-prepare/apply`) includes every activation and counter scope in
+the store (conservative period boundary), seeds/copies nothing and counts debits
+made after prepare. `account-budget-revise` appends a revision with
+expected-revision/idempotent command identity; lowering below use keeps the debt
+and refuses new spend. Coverage is controlled callers of this store; external
+callers stay `UNKNOWN`, never `GLOBAL_ACCOUNT_PROVEN`. The default tick serves
+DRAINING tails before ACTIVE intake; near exhaustion it does not exceed the cap
+to save a tail (typed `SLOT_NOT_EXECUTED:BLOCKED_BUDGET` gaps). Merge/deploy
+never commissions. After managed debits, a binary or SQLite older than this
+bridge is a forbidden downgrade; policy rollback is a new revision. The binding
+is re-resolved at every gate; a partial account schema is `CORRUPT`. Pace is
+not a new shared dimension: the episode tick primes store-wide pace at entry,
+while the gate's pace check stays per activation.
+
 Before activation, the operator supplies `EPISODE_PRODUCER_STORAGE_COMMISSIONING_V1`
 via `activate --episode-storage-commissioning <json>`. It binds the exact root
 device/inode, schedule SHA and activation ID, separate OPERATE reference, verified
