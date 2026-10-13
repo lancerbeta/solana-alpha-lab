@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import inspect
+import hashlib
+import io
 import json
 import sys
 import tempfile
@@ -34,8 +36,11 @@ from solana_alpha_lab.factory.hfic_evidence_identity import (  # noqa: E402
 from solana_alpha_lab.factory.live_cohort_vanilla_path import (  # noqa: E402
     capture_freeze_export,
     classify_mirror,
+    classify_episode_capture_plan,
     collect_bounded_transfer_manifest,
     place_missing,
+    prepare_episode_capture_view,
+    install_transfer_stream,
     select_next_mature_unimported_cohort,
     unpack_next_live_cohort,
 )
@@ -56,6 +61,80 @@ CORPUS_ID = "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001"
 
 
 class VanillaOwnerPathTests(unittest.TestCase):
+    def test_episode_capture_versions_keep_old_index_and_refuse_wrong_bytes(self) -> None:
+        from solana_alpha_lab.factory.observation_schedule import canonical_sha256
+
+        relative = "datasets/members_snapshot_plus_delta/20261011/unit.json"
+        immutable = "datasets/members_snapshot_plus_delta/20261011/members.parquet"
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source, mirror = root / "source", root / "mirror"
+            (mirror / relative).parent.mkdir(parents=True)
+            (source / relative).parent.mkdir(parents=True)
+            eight, twenty_four, thirty = (b"8 publications", b"24 publications", b"30 publications")
+            (mirror / relative).write_bytes(eight)
+            (source / relative).write_bytes(twenty_four)
+            (mirror / immutable).write_bytes(b"frozen publication")
+            (source / immutable).write_bytes(b"frozen publication")
+
+            def manifest(unit: bytes, *, version: str) -> dict:
+                entry = {"path": relative, "bytes": len(unit), "sha256": hashlib.sha256(unit).hexdigest(),
+                         "source_class": "member_unit"}
+                if version == "2":
+                    entry["transfer_path"] = "exports/opportunity_episodes/act/c2/capture_metadata/" + entry["sha256"] + "/unit.json"
+                body = {"kind": "OPPORTUNITY_EPISODES_BOUNDED_TRANSFER_MANIFEST", "schema_version": version,
+                        "collection": "OPPORTUNITY_EPISODES", "entries": [entry,
+                            {"path": immutable, "bytes": 18,
+                             "sha256": hashlib.sha256(b"frozen publication").hexdigest(),
+                             "source_class": "member_prefix"}]}
+                body["manifest_sha256"] = canonical_sha256(body)
+                return body
+
+            old, current = manifest(eight, version="1"), manifest(twenty_four, version="1")
+            planned = classify_episode_capture_plan(current, mirror)
+            self.assertEqual((planned["conflicts"], planned["missing_files"]), (0, 1))
+            empty_old = root / "empty-old-view"
+            with self.assertRaisesRegex(LiveCohortReleaseError, "CAPTURE_SOURCE_VERSION_MISSING"):
+                place_missing(manifest=old, source_root=source, mirror_root=empty_old,
+                              classification=classify_mirror(old, empty_old))
+            old_view = prepare_episode_capture_view(old, mirror)
+            new_view = prepare_episode_capture_view(current, mirror)
+            missing = classify_mirror(current, new_view)
+            self.assertEqual((missing["conflicts"], missing["missing_files"]), (0, 1))
+            place_missing(manifest=current, source_root=source, mirror_root=new_view, classification=missing)
+            self.assertEqual((old_view / relative).read_bytes(), eight)
+            self.assertEqual((new_view / relative).read_bytes(), twenty_four)
+            self.assertEqual((mirror / relative).read_bytes(), eight)
+
+            next_manifest = manifest(thirty, version="2")
+            next_entry = next_manifest["entries"][0]
+            frozen = source / next_entry["transfer_path"]
+            frozen.parent.mkdir(parents=True)
+            frozen.write_bytes(thirty)
+            (source / relative).write_bytes(b"31 publications")
+            next_view = prepare_episode_capture_view(next_manifest, mirror)
+            place_missing(manifest=next_manifest, source_root=source, mirror_root=next_view,
+                          classification=classify_mirror(next_manifest, next_view))
+            self.assertEqual((next_view / relative).read_bytes(), thirty)
+            self.assertEqual((old_view / relative).read_bytes(), eight)
+            self.assertEqual((new_view / relative).read_bytes(), twenty_four)
+            with self.assertRaisesRegex(LiveCohortReleaseError, "TRANSFER_SHA_MISMATCH"):
+                install_transfer_stream(io.BytesIO(b"tampered"), next_view / "bad.bin",
+                                        next_entry, root=next_view)
+            self.assertFalse((next_view / "bad.bin").exists())
+            (next_view / relative).unlink()
+            with self.assertRaisesRegex(LiveCohortReleaseError, "TRANSFER_SHA_MISMATCH"):
+                install_transfer_stream(io.BytesIO(b"31 publications"), next_view / relative,
+                                        next_entry, root=next_view)
+            self.assertFalse((next_view / relative).exists())
+            place_missing(manifest=next_manifest, source_root=source, mirror_root=next_view,
+                          classification=classify_mirror(next_manifest, next_view))
+            self.assertEqual((next_view / relative).read_bytes(), thirty)
+            (mirror / immutable).write_bytes(b"tampered publication")
+            self.assertEqual(classify_episode_capture_plan(next_manifest, mirror)["status"], "CONFLICT")
+            with self.assertRaisesRegex(LiveCohortReleaseError, "MIRROR_CONFLICT"):
+                prepare_episode_capture_view(next_manifest, mirror)
+
     def test_rollover_does_not_invent_predecessor_successor_window(self) -> None:
         cutover = datetime(2026, 9, 14, 17, 35, 10, 845525, tzinfo=UTC)
         predecessor = {

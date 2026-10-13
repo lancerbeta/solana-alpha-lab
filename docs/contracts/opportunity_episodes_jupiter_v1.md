@@ -219,6 +219,38 @@ content is refused. Multiple activation/profile fragments of one UTC-day cohort
 are explicitly `EPISODE_COHORT_FRAGMENTED_UNSUPPORTED` before partial export;
 the canary uses one profile with no intraday switch.
 
+### Capture source identity and ordinary replay
+
+The episode transfer manifest has two compatible forms. Historical version `1`
+names the exact source path and SHA256 of each file. Version `2` retains the
+same scientific `path` and frozen closure identity, and for each mutable
+`member_unit` adds `transfer_path` under that cohort's existing export directory,
+`capture_metadata/<sha256>/unit.json`. The exporter writes and verifies that
+immutable copy before returning the manifest. The full manifest self-hash is
+the capture transport identity. A later index append may create a new transport
+identity; it cannot change the closure or old packet's bytes. A changed old
+publication, admission, protection or anchor remains an integrity conflict.
+
+The workstation verifies manifest shape, self-hash, closure binding, byte size
+and SHA256. It places each capture under
+`<mirror>/captures/<manifest_sha256>/source/<original relative path>` and seals
+the release in the established shared `sealed_releases` namespace. Shared
+immutable files are reused only after exact verification; the shared mutable
+`unit.json` is never replaced. Files cross the destination filesystem via
+bounded copy, SHA256 and exclusive atomic publication. Interrupted transfer
+retains verified fragments for a same-packet retry. Version `1` packets remain
+readable when their exact source bytes or an already saved view survive. If an
+old source version is absent, an already imported release can answer the replay
+only after full release and canonical installed-byte verification. Otherwise
+the result is `CAPTURE_SOURCE_VERSION_MISSING`; metadata is never reconstructed
+from the latest index. A sealed release or lineage name alone is not a
+successful historical transfer replay. The source view and manifest marker remain durable
+until an owned, separately authorized retention decision proves independence.
+
+The installed producer must support version `2` before any new live capture
+claims this race guarantee. A software merge does not deploy it or authorize
+capture/import against the working collector.
+
 Episode calls reserve budget before durable STARTED/send; ambiguous outcomes
 keep that debit. A UTC rollover during STARTED persistence conservatively
 charges the request_started_at day too, with no refund of the earlier debit.

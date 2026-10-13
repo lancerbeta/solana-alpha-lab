@@ -1,0 +1,93 @@
+{
+  "status": "PASS",
+  "c1_lineage_before_sha256": "e6b4ad6d731d249e4ada852670b0a166943240ab3e1d3fc317af166a0b509ce8",
+  "c1_release_manifest_sha256": "c989607915434db5785ad3255de49a6ff747f57755ab14da90a075bf29fad97b",
+  "canonical_c1_pins_verified": 8,
+  "copied_c1_pins_verified": 6,
+  "c1_currentness_updates": 1,
+  "c2_packet_sha256": "5422507511381f587dd4d970088530b963d5ef98349b20e2148186181408d6ef",
+  "c2_source_inventory_sha256": "568af0a61919f68efc513c80ce91abc808b54c8080475fca7cfb4cff5c18db79",
+  "c2_source_files": 3082,
+  "c2_source_payload_bytes": 33819016,
+  "c2_transfer_manifest_sha256": "5b06e711b46e65740889446fc3e138358c552727e15e264c85eb9171a3fb7009",
+  "c2_release_id": "5532f3b0f69c5a22d2dd3e4111162a90e19b92aab3de40d1a95e4a9e147df51d",
+  "first_import": "IMPORTED",
+  "repeat_import": "PASS_ALREADY_PRESENT_EXACT",
+  "repeat_epoch_bump": false,
+  "old_c1_replay": "PASS_ALREADY_PRESENT_EXACT",
+  "episodes": 47,
+  "episode_point_pairs": 6533,
+  "c1_oracle": {
+    "episodes": 24,
+    "pairs": 3336,
+    "field_rows": 53376,
+    "membership_state_sha256": "566394db5cb788dacf1e223cd5fe9aaa6188389afe5c7e9ba3cf7cb1581ae565"
+  },
+  "c2_oracle": {
+    "episodes": 23,
+    "pairs": 3197,
+    "field_rows": 51152,
+    "membership_state_sha256": "470ae82d8c168bfda8c86bebdba9f546518235665cc3d19995ba26425e9dd36f"
+  },
+  "public_receipts": {
+    "c2-first": {
+      "sha256": "e52b3ec285a8bae2691c06dfd838e65e4cdccb152dc83daaa2c41c31c8448a37",
+      "exit_code": 0,
+      "wall_seconds": 299.52,
+      "batch_terminal": "EPISODE_BATCH_COMPLETE",
+      "import_status": "IMPORTED",
+      "transferred_files": 1082,
+      "epoch_bump": true
+    },
+    "c2-repeat": {
+      "sha256": "7f6f38836b7f8ebbbbdf031bc3ea207d8ef0a9c856f3be36375877e42d4d68ad",
+      "exit_code": 0,
+      "wall_seconds": 271.36,
+      "batch_terminal": "EPISODE_BATCH_COMPLETE",
+      "import_status": "PASS_ALREADY_PRESENT_EXACT",
+      "transferred_files": 0,
+      "epoch_bump": false
+    },
+    "c1-old-replay": {
+      "sha256": "3e711abbeb5f9d2d4ca720101883ddc4fd0597a871400da2445320d1f040146f",
+      "exit_code": 0,
+      "wall_seconds": 301.48,
+      "batch_terminal": "EPISODE_BATCH_COMPLETE",
+      "import_status": "PASS_ALREADY_PRESENT_EXACT",
+      "transferred_files": 0,
+      "epoch_bump": false
+    },
+    "c1-missing-source": {
+      "sha256": "39e40d7d8716fb26bf9c7fa138f93cc67be614490c70c0216be73912b61a0b37",
+      "exit_code": 0,
+      "wall_seconds": 15.11,
+      "batch_terminal": "EPISODE_BATCH_REPLAY_SOURCE_MISSING",
+      "import_status": "PASS_ALREADY_PRESENT_EXACT",
+      "transferred_files": 0,
+      "epoch_bump": false
+    },
+    "c1-grown-source": {
+      "sha256": "9978aa101d4b9dbfac78e9ef0ea24094bd8a7f2d67ee517da2e8e461e94c0049",
+      "exit_code": 0,
+      "wall_seconds": 14.9,
+      "batch_terminal": "EPISODE_BATCH_REPLAY_SOURCE_MISSING",
+      "import_status": "PASS_ALREADY_PRESENT_EXACT",
+      "transferred_files": 0,
+      "epoch_bump": false
+    }
+  },
+  "proof_mode": "COLD_PUBLIC_PATH_REPLAY",
+  "historical_missing_source_fallback": "VERIFIED_IMPORTED_RELEASE",
+  "historical_grown_source_fallback": "VERIFIED_IMPORTED_RELEASE",
+  "tampered_installed_release_refusal": "CANONICAL_TARGET_CONFLICT",
+  "missing_current_labels_refusal": "CANONICAL_METADATA_CONFLICT",
+  "semantic_labels_refusal": "CANONICAL_METADATA_CONFLICT",
+  "self_consistent_partition_lineage_refusal": "CANONICAL_METADATA_CONFLICT",
+  "historical_metadata_refusals": {
+    "json": "CANONICAL_METADATA_CONFLICT",
+    "labels.json": "CANONICAL_METADATA_CONFLICT",
+    "published": "CANONICAL_METADATA_CONFLICT"
+  },
+  "wall_seconds": 48.31,
+  "canonical_writes": 0
+}

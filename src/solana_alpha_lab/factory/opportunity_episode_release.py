@@ -10,7 +10,9 @@ is their collection-specific strategy, not a second importer or service.
 
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 import shutil
 from collections.abc import Iterator, Mapping, Sequence
 from datetime import UTC, datetime
@@ -678,7 +680,8 @@ def collect_episode_transfer_manifest(*, observation_rdp: Path, receipt: Mapping
     _require(export_root.is_dir(), "EXPORT_BUNDLE_MISSING")
     for path in sorted(export_root.rglob("*")):
         if path.is_file() and not path.is_symlink():
-            _add_file(entries, root, path.relative_to(root).as_posix(), "episode_export")
+            if "capture_metadata" not in path.relative_to(export_root).parts:
+                _add_file(entries, root, path.relative_to(root).as_posix(), "episode_export")
     cohort_id = str(receipt["cohort_id"])
     raw_rels: set[str] = set()
     for publication in receipt.get("publications") or []:
@@ -695,10 +698,20 @@ def collect_episode_transfer_manifest(*, observation_rdp: Path, receipt: Mapping
                 raw_rels.add(rel)
     for rel in sorted(raw_rels):
         _add_file(entries, root, _safe_rel(rel), "raw_body")
+    # Capture the exact indexed bytes once. Later day-open appends cannot alter
+    # a transport packet already returned to a workstation.
+    from solana_alpha_lab.factory.live_cohort_vanilla_path import install_transfer_stream
+    for entry in entries.values():
+        if entry["source_class"] != "member_unit":
+            continue
+        transfer_rel = f"{export_rel}/capture_metadata/{entry['sha256']}/unit.json"
+        with _contained(root, entry["path"]).open("rb") as stream:
+            install_transfer_stream(stream, _contained(root, transfer_rel), entry, root=root)
+        entry["transfer_path"] = transfer_rel
     ordered = [entries[key] for key in sorted(entries)]
     body = {
         "kind": TRANSFER_KIND,
-        "schema_version": "1",
+        "schema_version": "2",
         "collection": COLLECTION,
         "activation_id": receipt["activation_id"],
         "cohort_id": cohort_id,
@@ -1192,6 +1205,161 @@ def _install_verified(src: Path, dest: Path, expected_sha: str) -> None:
     tmp.replace(dest)
 
 
+def _verify_episode_dataset_metadata(
+    data_root: Path, cohort_rows: list[Mapping[str, Any]], manifest_id: str, *, is_current: bool,
+) -> None:
+    """Verify one published corpus version against its exact lineage prefix."""
+
+    from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManifest
+    from solana_alpha_lab.storage.manifests import (
+        build_dataset_manifest, build_partition_manifest, compute_dataset_manifest_id,
+        verify_dataset_manifest, verify_partition_manifest,
+    )
+
+    root = Path(data_root)
+    _require(re.fullmatch(r"dataset-[0-9a-f]{64}", manifest_id) is not None, "CANONICAL_METADATA_CONFLICT")
+    directory = root / "datasets" / "manifests"
+    paths = {suffix: directory / f"{manifest_id}.{suffix}" for suffix in (
+        "json", "labels.json", "validation.json", "published"
+    )}
+    _require(all(path.is_file() and not path.is_symlink() for path in paths.values()), "CANONICAL_METADATA_CONFLICT")
+    try:
+        dataset = DatasetManifest.model_validate_json(paths["json"].read_bytes())
+        labels = json.loads(paths["labels.json"].read_bytes())
+        validation_bytes = paths["validation.json"].read_bytes()
+        validation = json.loads(validation_bytes)
+        published = json.loads(paths["published"].read_bytes())
+        version_n = len(cohort_rows)
+        current = cohort_rows[-1]
+        imported_at = parse_utc(str(current["imported_at"]))
+        dataset_version = f"opportunity-episodes-v{version_n}-{current['cohort_id']}"
+        _require(manifest_id == compute_dataset_manifest_id(LOGICAL_DATASET_ID, dataset_version)
+                 and dataset.dataset_version == dataset_version, "CANONICAL_METADATA_CONFLICT")
+        _require(dataset.dataset_manifest_id == manifest_id and dataset.dataset_id == LOGICAL_DATASET_ID
+                 and dataset.schema_id == CORPUS_SCHEMA_ID
+                 and dataset.schema_sha256 == episode_corpus_schema_sha256()
+                 and hashlib.sha256(validation_bytes).hexdigest() == dataset.validation_receipt_sha256,
+                 "CANONICAL_METADATA_CONFLICT")
+        admissions_n = sum(int(item["admissions_n"]) for item in cohort_rows)
+        expected_labels = {
+            **REQUIRED_EPISODE_LABELS,
+            "dataset_version": dataset_version,
+            "corpus_version": version_n,
+            "cohort_lineage": [str(item["cohort_id"]) for item in cohort_rows],
+            "admissions_n_cumulative": admissions_n,
+            "feature_families": sorted({fam for item in cohort_rows for fam in item["feature_families"]},
+                                       key=FEATURE_FAMILY_ORDER.index),
+            "imported_at": render_utc(imported_at),
+            "is_current_corpus_version": is_current,
+            "projection_id": PROJECTION_ID,
+            "projection_version": PROJECTION_VERSION,
+            "provider_calls_for_bind": 0,
+            "yield_eligible": admissions_n,
+            "yield_missing": 0,
+            "dataset_terminal": "IMPORTED_VALID",
+            "yield_semantics": "ADMISSIONS_DENOMINATOR_NOT_OBSERVED_YIELD",
+        }
+        _require(labels == expected_labels, "CANONICAL_METADATA_CONFLICT")
+        _require(isinstance(validation, dict) and validation.get("dataset_id") == LOGICAL_DATASET_ID
+                 and validation.get("dataset_version") == dataset.dataset_version
+                 and validation.get("corpus_composition") == [
+                     {"cohort_id": item["cohort_id"], "release_id": item["release_id"],
+                      "content_sha256": item["source_sha256"]} for item in cohort_rows
+                 ], "CANONICAL_METADATA_CONFLICT")
+        _require(isinstance(published, dict) and published.get("dataset_manifest_id") == manifest_id
+                 and published.get("dataset_fingerprint") == dataset.dataset_fingerprint,
+                 "CANONICAL_METADATA_CONFLICT")
+        partition_ids = validation.get("partition_manifest_ids")
+        _require(isinstance(partition_ids, list) and len(partition_ids) == len(cohort_rows) * 2
+                 and len(set(partition_ids)) == len(partition_ids), "CANONICAL_METADATA_CONFLICT")
+        expected_parts = {}
+        for item in cohort_rows:
+            for kind, rel_key, sha_key in (("CENSUS", "census_rel", "census_sha256"),
+                                           ("OBS", "obs_rel", "observations_sha256")):
+                part = build_partition_manifest(
+                    dataset_id=LOGICAL_DATASET_ID, dataset_version=dataset_version,
+                    partition_id=f"PARTITION-OPPORTUNITY-EPISODES-{item['cohort_id']}-{kind}",
+                    logical_location=str(item[rel_key]), file_sha256=str(item[sha_key]),
+                    content_sha256=str(item[sha_key]),
+                    row_count=int(item["admissions_n"]) if kind == "CENSUS" else
+                    sum(int(v) for v in item["observation_field_state_counts"].values()),
+                    first_reliable_available_at=imported_at, created_at=imported_at,
+                )
+                expected_parts[part.partition_manifest_id] = part
+        _require(sorted(partition_ids) == sorted(expected_parts), "CANONICAL_METADATA_CONFLICT")
+        expected_validation = {
+            "schema": "smial.opportunity-episodes-dataset-validation-receipt",
+            "schema_version": "1.0",
+            "dataset_id": LOGICAL_DATASET_ID,
+            "dataset_version": dataset_version,
+            "partition_manifest_ids": sorted(expected_parts),
+            "corpus_composition": [
+                {"cohort_id": item["cohort_id"], "release_id": item["release_id"],
+                 "content_sha256": item["source_sha256"]} for item in cohort_rows
+            ],
+        }
+        _require(validation == expected_validation, "CANONICAL_METADATA_CONFLICT")
+        partitions = []
+        for part_id in partition_ids:
+            _require(isinstance(part_id, str) and re.fullmatch(r"partition-[0-9a-f]{64}", part_id) is not None,
+                     "CANONICAL_METADATA_CONFLICT")
+            path = directory / "partitions" / f"{part_id}.json"
+            _require(path.is_file() and not path.is_symlink(), "CANONICAL_METADATA_CONFLICT")
+            part = PartitionManifest.model_validate_json(path.read_bytes())
+            verify_partition_manifest(part)
+            _require(part.partition_manifest_id == part_id and part == expected_parts[part_id],
+                     "CANONICAL_METADATA_CONFLICT")
+            payload = _contained(root, part.logical_location)
+            _require(payload.is_file() and not payload.is_symlink()
+                     and sha256_file_streaming(payload) == part.file_sha256, "CANONICAL_METADATA_CONFLICT")
+            partitions.append(part)
+        verify_dataset_manifest(dataset, partitions=partitions)
+        expected_dataset = build_dataset_manifest(
+            dataset_id=LOGICAL_DATASET_ID, dataset_version=dataset_version,
+            schema_id=CORPUS_SCHEMA_ID, schema_sha256=episode_corpus_schema_sha256(),
+            generation_task_id=IMPORT_GENERATION_TASK,
+            generation_run_id=f"import-{str(current['release_id'])[:16]}",
+            validation_receipt_sha256=hashlib.sha256(validation_bytes).hexdigest(),
+            first_reliable_available_at=imported_at, created_at=imported_at,
+            partitions=list(expected_parts.values()),
+        )
+        _require(dataset == expected_dataset and published == {
+            "dataset_manifest_id": manifest_id,
+            "dataset_fingerprint": expected_dataset.dataset_fingerprint,
+            "published_at": render_utc(imported_at),
+            "metadata_clock_at": render_utc(imported_at),
+        }, "CANONICAL_METADATA_CONFLICT")
+    except EpisodeReleaseError:
+        raise
+    except Exception as exc:
+        raise EpisodeReleaseError("CANONICAL_METADATA_CONFLICT") from exc
+
+
+def verify_current_episode_import_metadata(data_root: Path, lineage: Mapping[str, Any]) -> None:
+    """Exact replay verifies every published corpus version, including C1 after C2."""
+
+    from solana_alpha_lab.storage.manifests import compute_dataset_manifest_id
+
+    try:
+        cohorts = lineage.get("cohorts")
+        _require(isinstance(cohorts, list) and cohorts, "CANONICAL_METADATA_CONFLICT")
+        _require(lineage.get("current_corpus_version") == len(cohorts), "CANONICAL_METADATA_CONFLICT")
+        for version_n in range(1, len(cohorts) + 1):
+            prefix = cohorts[:version_n]
+            last = prefix[-1]
+            dataset_version = f"opportunity-episodes-v{version_n}-{last['cohort_id']}"
+            manifest_id = compute_dataset_manifest_id(LOGICAL_DATASET_ID, dataset_version)
+            is_current = version_n == len(cohorts)
+            if is_current:
+                _require(lineage.get("current_dataset_manifest_id") == manifest_id,
+                         "CANONICAL_METADATA_CONFLICT")
+            _verify_episode_dataset_metadata(data_root, prefix, manifest_id, is_current=is_current)
+    except EpisodeReleaseError:
+        raise
+    except Exception as exc:
+        raise EpisodeReleaseError("CANONICAL_METADATA_CONFLICT") from exc
+
+
 def import_episode_release(
     *,
     release_root: Path,
@@ -1218,6 +1386,16 @@ def import_episode_release(
                 and prior.get("observations_sha256") == manifest["observations_sha256"],
                 "CANONICAL_TARGET_CONFLICT",
             )
+            base = _contained(Path(data_root), str(prior.get("release_dir_rel") or ""))
+            for item in episode_release_files(manifest) + [
+                {"path": RELEASE_MANIFEST_NAME, "sha256": sha256_file_streaming(Path(release_root) / RELEASE_MANIFEST_NAME)}
+            ]:
+                dest = _contained(base, item["path"])
+                _require(
+                    dest.is_file() and not dest.is_symlink() and sha256_file_streaming(dest) == item["sha256"],
+                    "CANONICAL_TARGET_CONFLICT",
+                )
+            verify_current_episode_import_metadata(data_root, lineage)
             return {
                 "status": PASS_ALREADY_PRESENT_EXACT,
                 "collection": COLLECTION,
@@ -1425,6 +1603,40 @@ def default_episode_release_root(mirror_root: Path, receipt: Mapping[str, Any]) 
     )
 
 
+def replay_imported_episode_release(
+    *, release_base_root: Path, data_root: Path, receipt: Mapping[str, Any],
+    manifest: Mapping[str, Any], as_of: datetime,
+) -> dict[str, Any]:
+    """A version-1 packet may use an already imported, fully verified release."""
+
+    release_root = default_episode_release_root(release_base_root, receipt)
+    if not (release_root / RELEASE_MANIFEST_NAME).is_file():
+        raise EpisodeReleaseError("CAPTURE_SOURCE_VERSION_MISSING")
+    verified = verify_episode_release(release_root)
+    _require(
+        all(verified.get(key) == receipt.get(key) for key in (
+            "cohort_id", "activation_id", "schedule_sha256", "closure_receipt_sha256"
+        )), "RELEASE_PACKET_MISMATCH",
+    )
+    if not any(item.get("release_id") == verified["release_id"] for item in load_episode_lineage(data_root).get("cohorts") or []):
+        raise EpisodeReleaseError("CAPTURE_SOURCE_VERSION_MISSING")
+    imported = import_episode_release(release_root=release_root, data_root=data_root, import_time=as_of)
+    _require(imported["status"] == PASS_ALREADY_PRESENT_EXACT, "CANONICAL_TARGET_CONFLICT")
+    return {
+        "terminal": PASS_ALREADY_PRESENT_EXACT,
+        "collection": COLLECTION,
+        "next": "ORDINARY_FORGE_PREFLIGHT_COLLECTION_OPPORTUNITY_EPISODES",
+        "cohort_id": receipt["cohort_id"],
+        "release_id": verified["release_id"],
+        "sealed_at": verified["sealed_at"],
+        "import_status": PASS_ALREADY_PRESENT_EXACT,
+        "epoch_bump": False,
+        "population_card": build_population_card(data_root),
+        "transfer_manifest_sha256": manifest.get("manifest_sha256"),
+        "source_resolution": "VERIFIED_IMPORTED_RELEASE",
+    }
+
+
 def unpack_next_episode_cohort(
     *,
     mirror_root: Path,
@@ -1434,17 +1646,19 @@ def unpack_next_episode_cohort(
     manifest: Mapping[str, Any],
     as_of: datetime,
     release_builder_git_sha: str | None = None,
+    release_base_root: Path | None = None,
 ) -> dict[str, Any]:
     """Workstation half: verified mirror → seal (reused) → verify → import → card."""
 
-    from solana_alpha_lab.factory.live_cohort_vanilla_path import classify_mirror
+    from solana_alpha_lab.factory.live_cohort_vanilla_path import classify_mirror, validate_episode_transfer_manifest
 
     assert_episode_closure_ready(closure_receipt)
+    validate_episode_transfer_manifest(manifest, closure_receipt)
     _require(manifest.get("closure_receipt_sha256") == closure_receipt.get("closure_receipt_sha256"), "CLOSURE_COHORT_MISMATCH")
     classification = classify_mirror(manifest, Path(mirror_root))
     _require(classification["status"] != "CONFLICT", "MIRROR_CONFLICT")
     _require(not classification["missing_files"], "MIRROR_INCOMPLETE")
-    release_root = default_episode_release_root(Path(mirror_root), closure_receipt)
+    release_root = default_episode_release_root(Path(release_base_root or mirror_root), closure_receipt)
     sealed = seal_episode_cohort(
         mirror_root=Path(mirror_root),
         receipt=closure_receipt,
@@ -1463,6 +1677,7 @@ def unpack_next_episode_cohort(
         "release_id": verified["release_id"],
         "sealed_at": sealed["sealed_at"],
         "import_status": imported["status"],
+        "epoch_bump": imported.get("epoch_bump", imported["status"] == "IMPORTED"),
         "population_card": card,
         "transfer_manifest_sha256": manifest.get("manifest_sha256"),
     }
