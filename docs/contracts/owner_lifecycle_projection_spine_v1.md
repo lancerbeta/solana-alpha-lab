@@ -201,3 +201,12 @@ Do not auto-start Move 1 from this atom.
 New source: prove named consumer → narrow adapter → keep V1 entity envelope
 → bump compatibly → no new truth store. If a relation is missing, emit GAP
 first. Repair only when a named owner workflow needs it.
+
+Ordinary PAPER/SHADOW operation resolves SEM-OWNER-LIFECYCLE's operator asset
+DOC-TRADING-CONTINUITY-OFFLINE-001. Its CLI status reads the one PaperPlane
+store plus current readonly source availability, with explicit process/input/
+progress/integrity/exit-health signals. It is an operating view, not a second
+lifecycle truth store. Frozen originating lineage survives current research
+retention. Readback exposes partial/UNKNOWN outstanding obligations and scoped
+model economics; it grants no scientific acceptance, NetReturn, owner FCF or
+financial authority. See the operator runbook for the cold path and recovery.

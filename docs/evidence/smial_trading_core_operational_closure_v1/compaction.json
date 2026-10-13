@@ -1,0 +1,99 @@
+{
+  "after_current_content_snapshot": {
+    "added": 19142,
+    "base": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+    "categories": {
+      "contracts_control_generated": {
+        "added": 1378,
+        "deleted": 145,
+        "files": 16
+      },
+      "evidence_review": {
+        "added": 8000,
+        "deleted": 0,
+        "files": 31
+      },
+      "product_code": {
+        "added": 4088,
+        "deleted": 103,
+        "files": 13
+      },
+      "tests": {
+        "added": 5676,
+        "deleted": 20,
+        "files": 6
+      }
+    },
+    "deleted": 268,
+    "files": 66,
+    "head": "cd6636427e50ea3c04e9b3d2140f571a9429022e",
+    "staged_files": 0,
+    "unstaged_files": 120,
+    "untracked_files": 7
+  },
+  "after_snapshot": "CONTENT_BEFORE_THREE_EXCLUDED_FINAL_GATE_ARTIFACTS; final PR-head totals are measured read-only after evidence binding.",
+  "before": {
+    "added": 95397,
+    "base": "ba87f8e339d5cc3aa55322801ae56e3f92369446",
+    "categories": {
+      "contracts_control_generated": {
+        "added": 1376,
+        "deleted": 145,
+        "files": 16
+      },
+      "evidence_review": {
+        "added": 84257,
+        "deleted": 0,
+        "files": 137
+      },
+      "product_code": {
+        "added": 4088,
+        "deleted": 103,
+        "files": 13
+      },
+      "tests": {
+        "added": 5676,
+        "deleted": 20,
+        "files": 6
+      }
+    },
+    "deleted": 268,
+    "files": 172,
+    "head": "cd6636427e50ea3c04e9b3d2140f571a9429022e",
+    "staged_files": 0,
+    "unstaged_files": 7,
+    "untracked_files": 10
+  },
+  "history_rewritten": false,
+  "mandatory_consumers": {
+    "gates": [
+      "completion.json",
+      "independent-review.json",
+      "factory-fit.json"
+    ],
+    "reproduction": [
+      "source-contract.md",
+      "coverage.json",
+      "executed-tests.json",
+      "direct-consumer-proof.json",
+      "clock-proof.json",
+      "operator-proof.json",
+      "history.json",
+      "review-operating-boundary-remediation.json",
+      "review-cd663642.json",
+      "review-managed-native-recovery-remediation.json",
+      "operator-reproducer.py"
+    ],
+    "semantic_contract": [
+      "semantic-claims.json",
+      "semantic-non-claims.json",
+      "semantic-evidence.json"
+    ]
+  },
+  "product_oracle_recovery_ci_safety_relaxed": false,
+  "removed_working_bytes": 3835933,
+  "removed_working_lines": 74622,
+  "schema": "smial.evidence-compaction",
+  "schema_version": "1.0",
+  "superseded_artifacts_removed": 111
+}

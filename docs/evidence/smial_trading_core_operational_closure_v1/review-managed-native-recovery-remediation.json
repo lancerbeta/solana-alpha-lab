@@ -1,0 +1,474 @@
+{
+  "before_carriers": [
+    "review-cd663642.json",
+    "review-a2cc-quantity-guard.json"
+  ],
+  "code_unchanged_during_execution": true,
+  "credential_reads": 0,
+  "elapsed_seconds": 70.347384,
+  "failed_test_ids": [],
+  "full_local_gate": "NOT_EXECUTED",
+  "live_authority": false,
+  "native_test_output_bytes": 3740,
+  "native_test_output_sha256": "58816cec371fa6886edca3364875100c694093201fc4b8a5ce14851bc1a02d08",
+  "provider_calls": 0,
+  "receipt_sha256": "b1e7579c701e360be4648843d636e8bb2b8e7f65c62070d9573f047a20f46be8",
+  "schema": "smial.managed-native-recovery-remediation",
+  "schema_version": "1.0",
+  "source_pins_after": {
+    "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+    "scripts/trading_continuity.py": "ba9615ae37886197b52a394415989427b182a33976d03b1985868d2f36f597dd",
+    "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+    "src/solana_alpha_lab/factory/paper_plane.py": "b832b090453ef475b06268aa1ecf0308879339c61b1423efa894256fa8b14c02",
+    "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+    "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+    "src/solana_alpha_lab/factory/trading_adapters.py": "cf6fa566e491d68aeee5c059228fc2385b2884c23c297aa6905f00f3606c8e05",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "78dc900e17849aab9b55753b9148370914363d3362c7d6aecfca880eb5e25748",
+    "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
+    "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+    "tests/test_trading_core_operational_closure_v1.py": "aa224814b1d3774174c330c5356816d167a7e5eea76d1e6d7c485ef8dc055e25",
+    "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
+    "tests/test_trading_operational_obligations_v1.py": "5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880",
+    "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
+  },
+  "source_pins_before": {
+    "scripts/prove_trading_core_operational_closure.py": "b866c77fa22ae8728f2a0aaa4153493410c17eb6c86935ec4f18caa018f1c27e",
+    "scripts/trading_continuity.py": "ba9615ae37886197b52a394415989427b182a33976d03b1985868d2f36f597dd",
+    "src/solana_alpha_lab/factory/episode_decision.py": "107b767a90d65e42fe93ab2dba8e25f96447eb31ac8eba629ee51ced271f722c",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "6ca50df308cc07945aefac9eb28c81f6dd8701fb90bc40baede26d812f7a6006",
+    "src/solana_alpha_lab/factory/paper_plane.py": "b832b090453ef475b06268aa1ecf0308879339c61b1423efa894256fa8b14c02",
+    "src/solana_alpha_lab/factory/paper_shadow_commands.py": "cdb2b2c5969b44d83f24436e3913d772d9f79b6c5ac56e20292995b409fed219",
+    "src/solana_alpha_lab/factory/risk_economics.py": "733a81e99d5043793a2931c4c6ca690bef8e7a380695aa63e99a9591f7a59191",
+    "src/solana_alpha_lab/factory/trading_adapters.py": "cf6fa566e491d68aeee5c059228fc2385b2884c23c297aa6905f00f3606c8e05",
+    "src/solana_alpha_lab/factory/trading_coordinator.py": "78dc900e17849aab9b55753b9148370914363d3362c7d6aecfca880eb5e25748",
+    "src/solana_alpha_lab/factory/trading_runner.py": "a6136a63c8609e4f0f5ffc761309d4cbac91591618868522518db8e02d1f45a3",
+    "src/solana_alpha_lab/factory/trading_runtime_policy.py": "bec746f1c02d59ce4440e259b537b15a47c8e5e61f52277e3eecd87c02dbcda6",
+    "tests/test_trading_continuity_v1.py": "d691f158a02e5fd1fdc3495132bebd2cad844ae2d85e516fbadfc8a2a40aa76f",
+    "tests/test_trading_core_operational_closure_v1.py": "aa224814b1d3774174c330c5356816d167a7e5eea76d1e6d7c485ef8dc055e25",
+    "tests/test_trading_operational_adapters_v1.py": "3ba76442cdd633ca38c928ec523c24878f1d30d88fb59b3ab71660ab67cd9dd9",
+    "tests/test_trading_operational_obligations_v1.py": "5cc13a4c6796a6924cb50a5189a8ae62d6da431e77603ce43264471b7143a880",
+    "tests/test_trading_operational_recovery_v1.py": "60c14e2c7a8a0b2c51f174fbc6adbf5a9fbd3d82260cc443ed8777d0ca9b2cef"
+  },
+  "status": "PASS",
+  "tests": [
+    {
+      "elapsed_seconds": 3.573908,
+      "metrics": {
+        "attempts_unchanged_after_repeat": true,
+        "inventory_status": "KNOWN",
+        "mode": "PAPER",
+        "modeled_entry": 0,
+        "modeled_exit": 1,
+        "original_native_entry": 1,
+        "released_cost_basis_usd": "30",
+        "state": "RECONCILED",
+        "synthetic_quote_calls": 0
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_managed_native_public_paper_fill_retains_original_full_exit_and_cap_release"
+    },
+    {
+      "elapsed_seconds": 2.977112,
+      "metrics": {
+        "attempts_unchanged_after_repeat": true,
+        "inventory_status": "KNOWN",
+        "mode": "SHADOW",
+        "modeled_entry": 0,
+        "modeled_exit": 1,
+        "original_native_entry": 1,
+        "released_cost_basis_usd": "30",
+        "state": "RECONCILED",
+        "synthetic_quote_calls": 1
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_managed_native_public_shadow_fill_retains_original_full_exit_and_cap_release"
+    },
+    {
+      "elapsed_seconds": 2.112169,
+      "metrics": {
+        "damaged_modeled_entry": "UNKNOWN",
+        "known_cost_basis_floor_usd": "30",
+        "native_intent_absent": true,
+        "new_entry_permission": "DENIED"
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_modeled_entry_cannot_be_reclassified_as_native_public_fill"
+    },
+    {
+      "elapsed_seconds": 3.899745,
+      "metrics": {
+        "cases": [
+          {
+            "inventory": "UNKNOWN",
+            "known_original_floor_usd": "30.0",
+            "native_new_admission": "DENIED",
+            "new_attempt_request_result": 0,
+            "projection": "remaining-tuple",
+            "reason": "OUTSTANDING_OBLIGATIONS_UNKNOWN"
+          },
+          {
+            "inventory": "UNKNOWN",
+            "known_original_floor_usd": "30.0",
+            "native_new_admission": "DENIED",
+            "new_attempt_request_result": 0,
+            "projection": "remaining-cost-only",
+            "reason": "OUTSTANDING_OBLIGATIONS_UNKNOWN"
+          },
+          {
+            "inventory": "UNKNOWN",
+            "known_original_floor_usd": "30",
+            "native_new_admission": "DENIED",
+            "new_attempt_request_result": 0,
+            "projection": "remaining-qty-only",
+            "reason": "OUTSTANDING_OBLIGATIONS_UNKNOWN"
+          },
+          {
+            "inventory": "UNKNOWN",
+            "known_original_floor_usd": "30",
+            "native_new_admission": "DENIED",
+            "new_attempt_request_result": 0,
+            "projection": "remaining-fee-only",
+            "reason": "OUTSTANDING_OBLIGATIONS_UNKNOWN"
+          },
+          {
+            "inventory": "UNKNOWN",
+            "known_original_floor_usd": "30.0",
+            "native_new_admission": "DENIED",
+            "new_attempt_request_result": 0,
+            "projection": "base-cost-only",
+            "reason": "OUTSTANDING_OBLIGATIONS_UNKNOWN"
+          },
+          {
+            "inventory": "UNKNOWN",
+            "known_original_floor_usd": "30",
+            "native_new_admission": "DENIED",
+            "new_attempt_request_result": 0,
+            "projection": "base-qty-only",
+            "reason": "OUTSTANDING_OBLIGATIONS_UNKNOWN"
+          },
+          {
+            "inventory": "UNKNOWN",
+            "known_original_floor_usd": "30.0",
+            "native_new_admission": "DENIED",
+            "new_attempt_request_result": 0,
+            "projection": "coherent-base-tuple",
+            "reason": "OUTSTANDING_OBLIGATIONS_UNKNOWN"
+          },
+          {
+            "inventory": "UNKNOWN",
+            "known_original_floor_usd": "30",
+            "native_new_admission": "DENIED",
+            "new_attempt_request_result": 0,
+            "projection": "base-fee-only",
+            "reason": "OUTSTANDING_OBLIGATIONS_UNKNOWN"
+          },
+          {
+            "inventory": "UNKNOWN",
+            "known_original_floor_usd": "30",
+            "native_new_admission": "DENIED",
+            "new_attempt_request_result": 0,
+            "projection": "base-price-only",
+            "reason": "OUTSTANDING_OBLIGATIONS_UNKNOWN"
+          },
+          {
+            "inventory": "UNKNOWN",
+            "known_original_floor_usd": "30",
+            "native_new_admission": "DENIED",
+            "new_attempt_request_result": 0,
+            "projection": "forged-terminal-no-original-exit",
+            "reason": "OUTSTANDING_OBLIGATIONS_UNKNOWN"
+          }
+        ],
+        "legacy_full_exit": "RECONCILED_RELEASED_EXCLUDED",
+        "managed_activation": "SUCCEEDED",
+        "managed_cap_usd": "40",
+        "missing_original_entry": "UNKNOWN_NO_HEADROOM",
+        "missing_original_exit": "UNKNOWN_RETAINED_30",
+        "modeled_attempts_results": 0,
+        "native_legacy": "DEFAULT_PUBLIC_FILL_AND_NATIVE_ACCOUNTING",
+        "native_stop": "DRAINING",
+        "null_legacy_replay": "EXACT_NO_EVENT_DRIFT",
+        "original_cost_usd": "30",
+        "original_entry_observation_sha256": "d0bd5bc7503c690e2b36db02643c1459c909c90b5d5c55e3a391ae995a6372b6",
+        "original_journal_sha256": "1565b185be33ebcc0c3320bbdf39d7e65a6127411e43b88fafbe9a6156af29c9",
+        "original_native_exit_sha256": "e9d05bebd52a3c3cf3c36aeab73e32aaa150c1d3582df8a6f739df001b476978",
+        "original_quantity": "10000000.00000000",
+        "restored_all_null_inventory": "KNOWN_30"
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_native_unmodeled_legacy_projection_cannot_free_managed_cap"
+    },
+    {
+      "elapsed_seconds": 2.1025,
+      "metrics": {},
+      "owned_root_absent": true,
+      "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_patch_A4_genuine_legacy_binding_and_exact_attempt_replay_remain_compatible"
+    },
+    {
+      "elapsed_seconds": 3.441467,
+      "metrics": {
+        "damaged_origin": "QUARANTINED",
+        "exact_identity_restore": "RECONCILED",
+        "healthy_neighbor": "RECONCILED",
+        "original_attempt_unchanged": true,
+        "resends": 0,
+        "run_ticks": 2
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_missing_pending_origin_identity_isolated_without_stopping_healthy_exit_or_resend"
+    },
+    {
+      "elapsed_seconds": 3.564411,
+      "metrics": {
+        "adapter": "NATIVE_PAPER_MODEL_V1_0",
+        "damaged_origin": "EXIT_REQUIRED_NO_EXIT_EFFECT",
+        "healthy_neighbor": "RECONCILED",
+        "inventory": "UNKNOWN",
+        "native_ticks": 2,
+        "new_origin_exit_attempt_request_result": 0,
+        "retained_original_events_unchanged": true,
+        "total_attempts": 3,
+        "typed_reason": "EXIT_INVENTORY_WITNESS_CONFLICT"
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_native_paper_v1_0_damaged_origin_exit_isolated_from_healthy_neighbor"
+    },
+    {
+      "elapsed_seconds": 2.285509,
+      "metrics": {
+        "new_attempts": 0,
+        "new_effects": 0,
+        "readback_unchanged": true,
+        "shared_discovery_write": "FATAL",
+        "shared_store": "FATAL"
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_shared_store_failure_remains_fatal_and_atomic_in_ordinary_run"
+    },
+    {
+      "elapsed_seconds": 2.897193,
+      "metrics": {},
+      "owned_root_absent": true,
+      "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_terminal_release_requires_intact_final_result_chain"
+    },
+    {
+      "elapsed_seconds": 0.063108,
+      "metrics": {
+        "legacy_original_payload_unchanged": true,
+        "partial_quantity": "6000000",
+        "terminal_net_usd": "1.07"
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_genuine_v1_0_entry_then_v1_1_partial_and_full_preserves_original_payload"
+    },
+    {
+      "elapsed_seconds": 14.275581,
+      "metrics": {
+        "cases": [
+          {
+            "blocked_fresh_attempts_requests_captures": true,
+            "blocked_quote_calls": 0,
+            "damage_variants": 3,
+            "mode": "PAPER",
+            "native_public_entry": true,
+            "no_resend": true,
+            "original_journal_unchanged": true,
+            "restored_original_exit": "RECONCILED"
+          },
+          {
+            "blocked_fresh_attempts_requests_captures": true,
+            "blocked_quote_calls": 0,
+            "damage_variants": 3,
+            "mode": "SHADOW",
+            "native_public_entry": true,
+            "no_resend": true,
+            "original_journal_unchanged": true,
+            "restored_original_exit": "RECONCILED"
+          },
+          {
+            "blocked_fresh_attempts_requests_captures": true,
+            "blocked_quote_calls": 0,
+            "damage_variants": 3,
+            "mode": "PAPER",
+            "native_public_entry": false,
+            "no_resend": true,
+            "original_journal_unchanged": true,
+            "restored_original_exit": "RECONCILED"
+          },
+          {
+            "blocked_fresh_attempts_requests_captures": true,
+            "blocked_quote_calls": 0,
+            "damage_variants": 3,
+            "mode": "SHADOW",
+            "native_public_entry": false,
+            "no_resend": true,
+            "original_journal_unchanged": true,
+            "restored_original_exit": "RECONCILED"
+          }
+        ],
+        "provider_calls": 0
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_missing_original_quantity_never_authorizes_fresh_exit_effect"
+    },
+    {
+      "elapsed_seconds": 12.77721,
+      "metrics": {
+        "cases": [
+          {
+            "attempts": 1,
+            "outcome": "NO_ROUTE",
+            "pending": 0,
+            "status": "READY",
+            "version": "1.1"
+          },
+          {
+            "attempts": 1,
+            "outcome": "REJECTED_BEFORE_SEND",
+            "pending": 0,
+            "status": "READY",
+            "version": "1.1"
+          },
+          {
+            "attempts": 1,
+            "outcome": "DROPPED_OR_EXPIRED_NOT_PROCESSED",
+            "pending": 0,
+            "status": "READY",
+            "version": "1.1"
+          },
+          {
+            "attempts": 1,
+            "outcome": "LANDED_FAILED",
+            "pending": 0,
+            "status": "READY",
+            "version": "1.1"
+          },
+          {
+            "attempts": 1,
+            "outcome": "NO_ROUTE",
+            "pending": 0,
+            "status": "READY",
+            "version": "1.0"
+          }
+        ],
+        "quote_effects": 0
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_operational_recovery_v1.OperationalRecoveryTests.test_original_entry_nonfill_recovery_clears_only_proved_incident_after_cold_restart"
+    },
+    {
+      "elapsed_seconds": 0.263672,
+      "metrics": {},
+      "owned_root_absent": true,
+      "test": "test_trading_operational_obligations_v1.OperatingObligationsTests.test_natural_unattempted_cancel_releases_only_with_original_pre_attempt_witness"
+    },
+    {
+      "elapsed_seconds": 4.843987,
+      "metrics": {
+        "db_wal_shm_bytes_unchanged_by_native_json_human_readback": true,
+        "disabled_new_attempts": 0,
+        "disabled_status": {
+          "entries_enabled": false,
+          "integrity_verified": true,
+          "next_safe_action": "VERIFY_RUNTIME_POLICY",
+          "next_safe_command": "readback --mode PAPER",
+          "runtime_policy_revision": 3,
+          "runtime_policy_sha256": "8ab8c19a4aac662510c74630f4973f72befa7b05d0b7eb1e55a200eaf2f679ce",
+          "runtime_policy_status": "VALID",
+          "runtime_policy_verified": true,
+          "status": "ACTION_REQUIRED"
+        },
+        "disabled_tick": {
+          "as_of": "2026-10-05T12:40:00Z",
+          "attempts": 0,
+          "decisions": 1,
+          "discovered": 1,
+          "entries_enabled": false,
+          "epoch_id": "ACTIVATION-EPOCH-CONTINUITY-PAPER-001",
+          "exits": 0,
+          "mode": "PAPER",
+          "reconciliation_healthy": true,
+          "source_status": "AVAILABLE",
+          "status": "TICK_COMPLETE"
+        },
+        "explicit_enabled_tick_entries_enabled": true,
+        "native_exit_run_ticks": 2,
+        "old_exit_under_disabled_policy": "RECONCILED",
+        "old_position_identity_retained": true,
+        "policy_remains_owner_disabled": true,
+        "refusal_reason": "BLOCK_NEW_ENTRIES_DISABLED"
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_C16_valid_disabled_runtime_policy_projects_permission_and_preserves_old_exit"
+    },
+    {
+      "elapsed_seconds": 6.150418,
+      "metrics": {
+        "cases": [
+          {
+            "alteration": "INITIAL_CAS",
+            "attempts": 0,
+            "native_and_cold_status": "ACTION_REQUIRED",
+            "positions": 0,
+            "readonly_db_wal_shm_unchanged": true,
+            "reason": "OPERATING_SWITCH_STATE_CONFLICT",
+            "results": 0,
+            "tick_entries_enabled": false
+          },
+          {
+            "alteration": "STRATEGY",
+            "attempts": 0,
+            "native_and_cold_status": "ACTION_REQUIRED",
+            "positions": 0,
+            "readonly_db_wal_shm_unchanged": true,
+            "reason": "OPERATING_SWITCH_STATE_CONFLICT",
+            "results": 0,
+            "tick_entries_enabled": false
+          },
+          {
+            "alteration": "GENERATION",
+            "attempts": 0,
+            "native_and_cold_status": "ACTION_REQUIRED",
+            "positions": 0,
+            "readonly_db_wal_shm_unchanged": true,
+            "reason": "OPERATING_SWITCH_STATE_CONFLICT",
+            "results": 0,
+            "tick_entries_enabled": false
+          },
+          {
+            "alteration": "CHAIN_COUNT",
+            "attempts": 0,
+            "native_and_cold_status": "ACTION_REQUIRED",
+            "positions": 0,
+            "readonly_db_wal_shm_unchanged": true,
+            "reason": "OPERATING_SWITCH_STATE_CONFLICT",
+            "results": 0,
+            "tick_entries_enabled": false
+          }
+        ],
+        "honest_before_activation_clock": "DECISION_BEFORE_ACTIVATION",
+        "positive_original": "OPEN",
+        "positive_original_attempts": 1
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_common_original_switch_lineage_blocks_ingress_and_readiness_before_first_effect"
+    },
+    {
+      "elapsed_seconds": 4.152492,
+      "metrics": {
+        "db_wal_shm_unchanged_by_readback": true,
+        "inventory_status": "KNOWN",
+        "original_exit": "RECONCILED",
+        "original_position_id": "POS-SIG-SIGDEC-5814C1436EE45B9F00A727125A894487ED2F50C5191B6148A3B1BC372A3F66E8",
+        "status": "ACTION_REQUIRED",
+        "tick_entries_enabled": false,
+        "typed_reason": "OPERATING_SWITCH_STATE_CONFLICT"
+      },
+      "owned_root_absent": true,
+      "test": "test_trading_core_operational_closure_v1.OperatingDriverTests.test_current_switch_conflict_blocks_readiness_without_unknown_original_inventory_or_exit_starvation"
+    }
+  ],
+  "tests_run": 16
+}

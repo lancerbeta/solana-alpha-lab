@@ -1,0 +1,33 @@
+{
+  "after": {
+    "elapsed_seconds": 10.127086,
+    "failed_test_ids": [],
+    "limit_bytes": 16384,
+    "output_sha256": "acc19b85c610e53ab499caa7a9a6099ea643c208ec64d2da88fcbfa206863e7a",
+    "overview_bytes": 16349,
+    "tests_run": 15
+  },
+  "before": {
+    "failed_size_tests": 2,
+    "failures": 2,
+    "limit_bytes": 16384,
+    "overview_bytes": 16404,
+    "skipped": 20,
+    "tests_run_in_shard": 1151
+  },
+  "ci_log_sha256": "a341715f8c63ed7fc2a30a7b25cf8dd8d7d53d26629f98af171f5c348b3dfee9",
+  "ci_run_id": 38233152025,
+  "credential_reads": false,
+  "failed_job_id": 114757261927,
+  "live_authority": false,
+  "observed_ci_head": "d8ee540f1f89626629912ec2e6769265a3228057",
+  "provider_calls": false,
+  "repair": "COMPRESS_LIFECYCLE_PURPOSE_ONLY_ROUTE_LINKS_LIMITS_AND_AUTHORITY_UNCHANGED",
+  "schema": "smial.semantic-overview-capacity-remediation.v1",
+  "source_pins": {
+    "configs/factory_semantic_operability_v1.yaml": "fad949f339a8623c6d0e2cdab4e515faed86a597039ea687700d5e21ac0ec6ba"
+  },
+  "status": "PASS",
+  "task_id": "SMIAL_TRADING_CORE_OPERATIONAL_CLOSURE_V1",
+  "working_settings_changed": false
+}

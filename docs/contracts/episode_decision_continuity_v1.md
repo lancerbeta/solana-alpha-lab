@@ -146,3 +146,29 @@ before reading source admission fields. EXIT requires the recomputed hash to
 equal the stored source hash and the originating entry hash. A changed record
 with an unchanged hash column is EXIT_ORIGIN_SOURCE_CONFLICT before any source
 exit/admission binding effects; the hash column is never proof of body integrity.
+
+## Ordinary operating closure (owner-accepted D1–D4)
+
+The legacy manual route above remains compatible. `TradingCoordinator.run`
+owns ordinary source paging, due queue, same production decision owner, adapter
+request/attempt claim, result acceptance and originating exits. The queue shares
+PaperPlane's SQLite transaction boundary; its cursor cannot grant effects.
+Append discovery and cyclic retention recheck use distinct rowid watermarks.
+Decision cutoff/TTL is frozen at admission: late physical arrival can be
+discovered, but stale work cannot enter retrospectively. UNKNOWN never heals
+from later publication. Control is rechecked atomically before a new attempt.
+
+Explicit activation freezes verified strategy/manifest/binding, original spec
+bytes, recipe and operating profile. FROZEN_TIME_EXIT must be an explicit
+runtime_execution rule, not inferred from a scientific target. Retained admission
+body/schedule and packet fingerprint authorize old due exits without current
+research/source membership. Current execution observations remain separately
+required; missing price makes an uncertain result, never a fabricated fill.
+Pause/drain/switch stop entries while old originating exits/reconciliation run.
+Source failures veto new entries without removing old obligations.
+
+The ordinary envelope counts outstanding obligations mode-wide, including
+EXIT_* and UNKNOWN. This is the separately accepted D2 policy, not an implicit
+change to the legacy OPEN_RISK_STATES table. v1.1 explicit partial result
+semantics conserve quantity/cost basis/fees. Actual financial execution remains
+forbidden. Software proof is not scientific validity or operational activation.

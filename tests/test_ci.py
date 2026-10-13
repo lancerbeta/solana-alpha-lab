@@ -109,7 +109,7 @@ class CiWorkflowTests(unittest.TestCase):
         final = document["jobs"]["validate"]
         self.assertEqual(
             core["timeout-minutes"],
-            str(ci.GITHUB_VALIDATE_TIMEOUT_MINUTES),
+            ci.github_job_timeout(ci.GITHUB_VALIDATE_TIMEOUT_MINUTES),
         )
         self.assertEqual(
             tests["timeout-minutes"],
@@ -117,7 +117,7 @@ class CiWorkflowTests(unittest.TestCase):
         )
         self.assertEqual(
             final["timeout-minutes"],
-            str(ci.GITHUB_AGGREGATOR_TIMEOUT_MINUTES),
+            ci.github_job_timeout(ci.GITHUB_AGGREGATOR_TIMEOUT_MINUTES),
         )
         self.assertEqual(
             ci.DELIVERY_PREFLIGHT_TIMEOUT_SECONDS,
@@ -205,7 +205,7 @@ class CiWorkflowTests(unittest.TestCase):
                 1,
             ),
             self.text.replace(
-                f"timeout-minutes: {ci.GITHUB_VALIDATE_TIMEOUT_MINUTES}\n",
+                f'timeout-minutes: "{ci.github_job_timeout(ci.GITHUB_VALIDATE_TIMEOUT_MINUTES)}"\n',
                 "timeout-minutes: 99\n",
                 1,
             ),
@@ -268,6 +268,58 @@ class CleanCloneDocumentationTests(unittest.TestCase):
             text,
         )
         self.assertIn("Keep `main` attached to `origin/main`", text)
+
+
+class TradingClosureCiBudgetTests(unittest.TestCase):
+    def test_workflow_rejects_budget_scope_drift(self) -> None:
+        text = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+        for old, new in (
+            ("pull_request.number == 398", "pull_request.number == 399"),
+            ("github.ref == 'refs/heads/main'", "github.ref != 'refs/heads/main'"),
+            ("Merge pull request #398 from lancerbeta/", "Merge pull request #399 from lancerbeta/"),
+            ("&& 60 || 25", "&& 60 || 60"),
+        ):
+            with self.subTest(replacement=new):
+                self.assertIn(old, text)
+                with self.assertRaises(ci.CiValidationError):
+                    ci.validate_workflow_text(text.replace(old, new))
+
+    def test_resource_job_has_same_single_atom_scope(self) -> None:
+        text = (ROOT / ci.RESOURCE_PROOF_WORKFLOW.removeprefix("./")).read_text(encoding="utf-8")
+        job = yaml.load(text, Loader=yaml.BaseLoader)["jobs"]["watch-and-pulse"]
+        self.assertEqual(job["timeout-minutes"], ci.github_job_timeout(20))
+        self.assertEqual(ci.github_job_timeout(60), "60")
+
+    def test_local_hour_requires_exact_branch_and_complete_task_binding(self) -> None:
+        contract = {
+            "task_id": ci.TRADING_CLOSURE_CI_TASK_ID,
+            "expected_repository": "lancerbeta/solana-alpha-lab",
+            "git_binding": {"expected_branch": ci.TRADING_CLOSURE_CI_BRANCH},
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            original = ci.ROOT
+            ci.ROOT = Path(tmp)
+            try:
+                task = ci.ROOT / "docs/tasks" / (ci.TRADING_CLOSURE_CI_TASK_ID + ".md")
+                task.parent.mkdir(parents=True)
+                self.assertEqual(ci.delivery_preflight_timeout_seconds(ci.TRADING_CLOSURE_CI_BRANCH), 1500)
+                good = "---\n" + yaml.safe_dump(contract) + "---\nBounded atom.\n"
+                task.write_text(good, encoding="utf-8")
+                self.assertEqual(ci.delivery_preflight_timeout_seconds(ci.TRADING_CLOSURE_CI_BRANCH), 3600)
+                for branch in ("main", "codex/other-atom", ci.TRADING_CLOSURE_CI_BRANCH + "-next"):
+                    with self.subTest(branch=branch):
+                        self.assertEqual(ci.delivery_preflight_timeout_seconds(branch), 1500)
+                invalid = ["", "---\n[\n---\n", good.rsplit("---\n", 1)[0], "---\nnull\n---\n"]
+                for key, value in (("task_id", "OTHER"), ("expected_repository", "other/repo"),
+                                   ("git_binding", {"expected_branch": "codex/other-atom"})):
+                    changed = {**contract, key: value}
+                    invalid.append("---\n" + yaml.safe_dump(changed) + "---\n")
+                for text in invalid:
+                    with self.subTest(contract=text):
+                        task.write_text(text, encoding="utf-8")
+                        self.assertEqual(ci.delivery_preflight_timeout_seconds(ci.TRADING_CLOSURE_CI_BRANCH), 1500)
+            finally:
+                ci.ROOT = original
 
 
 class TrackedOnlyDeliveryPreflightTests(unittest.TestCase):

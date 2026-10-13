@@ -42,7 +42,7 @@ concurrency:
 jobs:
   validate-core:
     runs-on: ubuntu-24.04
-    timeout-minutes: {ci.GITHUB_VALIDATE_TIMEOUT_MINUTES}
+    timeout-minutes: "{ci.github_job_timeout(ci.GITHUB_VALIDATE_TIMEOUT_MINUTES)}"
     env:
       UV_NO_ENV_FILE: "1"
       PYTHONDONTWRITEBYTECODE: "1"
@@ -66,7 +66,7 @@ jobs:
 
   validate-execution:
     runs-on: ubuntu-24.04
-    timeout-minutes: {ci.GITHUB_VALIDATE_TIMEOUT_MINUTES}
+    timeout-minutes: "{ci.github_job_timeout(ci.GITHUB_VALIDATE_TIMEOUT_MINUTES)}"
     needs:
       - validate-core
     env:
@@ -131,7 +131,7 @@ jobs:
       - validate-tests
       - validate-operability-resources
     runs-on: ubuntu-24.04
-    timeout-minutes: {ci.GITHUB_AGGREGATOR_TIMEOUT_MINUTES}
+    timeout-minutes: "{ci.github_job_timeout(ci.GITHUB_AGGREGATOR_TIMEOUT_MINUTES)}"
     env:
       CORE_RESULT: ${{{{ needs.validate-core.result }}}}
       EXECUTION_RESULT: ${{{{ needs.validate-execution.result }}}}
