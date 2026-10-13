@@ -4,8 +4,8 @@
   "review_id": "SMIAL_MANAGED_COLLECTION_I1_V1-FIT",
   "as_of": "2026-10-13",
   "task_id": "SMIAL_MANAGED_COLLECTION_I1_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "e98e9444e0332981e4cb98c3789c39b4a62052d3cf4b0d37f5fabc660a76164e",
+  "reviewed_inventory_sha256": "1c1e2841ff4933eece1ec8321c8daa030d48fc477d6f1441b87e91174bcd0dde",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

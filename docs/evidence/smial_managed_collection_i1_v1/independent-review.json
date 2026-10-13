@@ -1,1 +1,73 @@
-{"status":"NOT_READY","task_id":"SMIAL_MANAGED_COLLECTION_I1_V1"}
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "SMIAL_MANAGED_COLLECTION_I1_V1-FINAL",
+  "as_of": "2026-10-13",
+  "task_id": "SMIAL_MANAGED_COLLECTION_I1_V1",
+  "reviewed_bindings_sha256": "e98e9444e0332981e4cb98c3789c39b4a62052d3cf4b0d37f5fabc660a76164e",
+  "reviewed_inventory_sha256": "1c1e2841ff4933eece1ec8321c8daa030d48fc477d6f1441b87e91174bcd0dde",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Read-only code review on clean product head 98ad190f966df24c6bfc5bea7985010d9a67030e found no P0/P1. Exact replay reconstructs metadata for each lineage prefix, requires historical currentness=false and current=true, and matches the importer writer and negative C1 manifest/labels/published probes. Product code did not change after this review; the later commit updates only readout evidence."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Public disposable C2 import/repeat and old C1 replay, exact source-versus-corpus membership/state/missingness oracle, historical absent/grown-source fallback, integrity refusals and final clean-commit vertical PASS at 238.04 seconds satisfy the bounded I1 DoD. C1 historical metadata tamper after C2 refuses. Production C2 and recovery copy remain separately gated; no merge or science claim follows."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SEMANTIC_PREMISE=PASS; packet_fingerprint_sha256=5a009e066a263095924325b442b4bbcc77d230c883accaa46a7780d2cf9c9509. Frozen diff, contract and four evidence hashes match. PACKET_INFORMATION_PATH only; launch isolation remains PROCESS_OBLIGATION and model diversity UNPROVEN.",
+        "Tests could pass while a grown historical index replaces frozen source, a missing source is misread as a negative observation, or field values and availability times change without a new scientific check. Capture views, exact byte publication and typed missing-source terminal preserve the I1 transport/recovery boundary; the independent oracle does not compare values or availability timestamps and grants no PIT/science/production/merge authority.",
+        "Nonblocking P2: collection-specific private _contained is imported by transport/CLI, and SSH --plan-only may create an empty mirror directory. The C2 packet plan route was read-only in the observed rehearsal. A narrow public path guard and truthful SSH plan semantics are future bounded cleanup, not an I1 C2 or science claim."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "No P0/P1 operator gap on clean head 1fcf7cd898cbd3c6f521ab16cea5045dc67afff1. The runbook gives explicit CANONICAL_METADATA_CONFLICT recovery, the readout reports historical C1 refusals and numerical replay, and C2_OPERATE_PACKET stays PREPARED_NOT_EXECUTED with a separate production gate."
+      ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Replay checked selected current labels and internally consistent partitions without exact lineage binding.",
+      "observed_head": "af490274e25b8b315369abcb719c6eb67a9835c9",
+      "resolved_by_head": "41810163abf2b83842c6cd7b1b1f344ddf49c1d3"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Old C1 replay could ignore historical C1 dataset metadata after C2 despite claiming every installed dependency verified.",
+      "observed_head": "daf05307afa21053bdd1abc2734a010a08c186af",
+      "resolved_by_head": "98ad190f966df24c6bfc5bea7985010d9a67030e"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_REVIEW_MODEL_DIVERSITY_PROOF",
+    "NO_PRODUCTION_C2_IMPORT_OR_RECOVERY_COPY",
+    "NO_NEW_PIT_SCIENTIFIC_ALPHA_OR_CASHFLOW_VERDICT",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_REVIEW"
+  ]
+}
