@@ -1,0 +1,92 @@
+{
+  "schema": "smial.i3-managed-continuity-proof",
+  "schema_version": "1.0",
+  "task_id": "I3_MANAGED_COLLECTION_CONTINUITY_V1",
+  "evidence_class": "DISPOSABLE_SQLITE_AND_SYNTHETIC_TRANSPORT_NOT_PRODUCTION",
+  "production_provider_calls": 0,
+  "production_writes": 0,
+  "input_falsifier": {
+    "before": "an unmanaged store at the next UTC boundary answers TICK_REFUSED_NO_LIVE_DEFAULT with next_action REGISTER_AUTHORIZE_ACTIVATE: one manual register/authorize/activate per window",
+    "after": "managed store: three consecutive UTC boundaries each return RECONCILE_CHILD_ACTIVATED from the ordinary tick; 1 owner phrase (collection-apply), 3 derived receipts, 0 manual steps"
+  },
+  "risk_matrix": {
+    "suite": "tests/test_managed_collection_continuity_v1.py",
+    "tests": 25,
+    "result": "PASS",
+    "oracles": "authored UTC timeline and raw SQL; managed helpers are never the oracle for day ownership, receipts, admissions or counters",
+    "cases": {
+      "three_boundaries_one_phrase": "test_three_utc_days_one_owner_phrase_no_manual_child",
+      "dedup_lineage": "test_weekly_mint_dedup_and_lineage_continue_across_children_and_the_bridge",
+      "missed_days_forward": "test_missed_days_resume_forward_without_fictional_children_or_old_calls",
+      "steady_no_writes": "test_reconcile_is_idempotent_across_process_restarts_and_writes_nothing_when_steady",
+      "plan_guards": "test_plan_guards_handover_account_and_exact_phrase",
+      "bridge_template": "test_unactivated_registered_bridge_is_the_template_and_sets_the_handover",
+      "ceiling_geometry": "test_rate_above_v1_ceiling_is_refused_with_numeric_axes_not_clipped",
+      "readonly": "test_status_and_plan_never_create_or_change_state",
+      "crash_event": "test_crash_after_activation_commit_before_event_is_repaired_without_second_owner",
+      "crash_authorize": "test_crash_between_register_and_authorize_resumes_same_intent",
+      "competing_reconciler": "test_competing_reconciler_defers_and_creates_no_second_owner",
+      "child_within_grant_and_tamper": "test_child_must_fit_inside_the_grant_and_tampering_blocks_new_intake",
+      "tamper_tick_time": "test_tampered_grant_fails_closed_for_the_issued_child_at_tick_time_too",
+      "stop_intake_resume": "test_stop_intake_blocks_new_children_but_issued_tail_authority_stays_live",
+      "day_owner_closed": "test_day_owner_closed_mid_day_raises_one_incident_and_next_boundary_recovers",
+      "finite_validity": "test_finite_validity_stops_new_intake_but_keeps_the_tail",
+      "rollback": "test_rollback_to_restrictive_approved_revision_needs_no_phrase_and_keeps_history",
+      "resource_matrix": "test_decision_matrix_never_forges_pass_and_keeps_independent_checks",
+      "blocked_recovers": "test_blocked_intake_opens_one_incident_keeps_tails_and_recovers_when_resource_returns",
+      "budget_tail": "test_new_intake_waits_when_committed_tail_would_not_be_covered",
+      "hold_vs_drain": "test_pressure_holds_a_managed_child_but_still_drains_an_unmanaged_one",
+      "restore_marker": "test_unresolved_restore_marker_blocks_the_controller_and_the_tick",
+      "alerts": "ManagedAlertTests"
+    }
+  },
+  "targeted_mutation": {
+    "M1_child_may_exceed_grant": "killed",
+    "M2_window_backdated_to_midnight": "killed",
+    "M3_storage_never_blocks": "killed",
+    "M4_no_event_repair": "killed",
+    "M5_hold_disabled_sticky_drain": "killed",
+    "baseline": "25 pass"
+  },
+  "regression_direct_consumers": {
+    "modules": 47,
+    "tests": 735,
+    "environment_failures_identical_on_origin_main": 5,
+    "note": "five Windows/cgroup resource-gate tests error identically on a clean origin/main worktree; vertical suite green on a clean tree"
+  },
+  "capacity_lower_bounds": {
+    "100": [
+      300,
+      13800,
+      426
+    ],
+    "200": [
+      600,
+      27600,
+      564
+    ],
+    "500": [
+      1500,
+      69000,
+      978
+    ],
+    "1000": [
+      3000,
+      138000,
+      1668
+    ],
+    "2000": [
+      6000,
+      276000,
+      3048
+    ]
+  },
+  "owner_burden": {
+    "approvals_first_profile": 1,
+    "approvals_per_child": 0,
+    "remaining_manual": [
+      "record backup receipt after a verified checkpoint (until wired into the backup unit)"
+    ]
+  },
+  "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_managed_collection_continuity_v1"
+}

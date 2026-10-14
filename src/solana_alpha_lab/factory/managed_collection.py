@@ -396,6 +396,10 @@ def require_child_within_standing_grant(
     stops = parse_utc(str(document["activation"]["stops_admitting_at"]))
     if body["validity"]["mode"] == "UNTIL_DATE" and stops > parse_utc(str(body["validity"]["intake_until"])):
         raise ManagedCollectionError("MANAGED_CHILD_EXCEEDS_GRANT")
+    # Everything the owner approved is the frozen template: protection, exclusions, grid,
+    # filters, outputs and authority profile may not differ in a derived child.
+    if {key: value for key, value in document.items() if key not in {"activation", "schedule_sha256"}} != body["template"]:
+        raise ManagedCollectionError("MANAGED_CHILD_SEMANTICS_MISMATCH")
     if issuing_at is None:
         return
     control = store.managed_control(lineage)
@@ -626,6 +630,17 @@ def managed_storage_decision(
             health = "DEGRADED_TARGET"
         else:
             reasons.append("TARGET_EXCEEDED_UNACCEPTED")
+    # Optional intake must never spend the budget that committed tails still need.
+    account = account_budget_status(store, now=now)
+    budget_state = "UNMANAGED"
+    if account.get("mode") == "MANAGED":
+        pending = _pending_obligations(store, batch)["remaining_call_groups"]
+        needed = pending + capacity_geometry(template, body["limits"])["provider_calls_per_day_lower_bound"]
+        remaining = account["remaining"]
+        budget_state = "TAIL_COVERED"
+        if remaining["lifetime_provider_calls"] < needed or remaining["day_provider_calls"] <= 0:
+            reasons.append("BUDGET_TAIL_RISK")
+            budget_state = "TAIL_AT_RISK"
     allowed = not reasons
     grant_sha = canonical_sha256(body)
     runway = _runway(policy, factory_bytes, int(body["validity"]["planning_horizon_days"]))
@@ -643,6 +658,7 @@ def managed_storage_decision(
         "target_bytes": target,
         "hard_bytes": hard,
         "backup": backup,
+        "budget_tail": budget_state,
         "runway": runway,
         "decided_at": render_utc(now),
     }

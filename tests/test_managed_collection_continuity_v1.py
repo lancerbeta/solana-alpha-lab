@@ -487,6 +487,28 @@ class ManagedAuthorityTests(ManagedBase):
         finally:
             store.close()
         self.assertEqual(sc.derived_receipts(), [])
+        # Same limits but a weaker approved semantic (no asset exclusion): not the frozen template.
+        import copy
+
+        from solana_alpha_lab.factory.observation_schedule import validate_observation_schedule
+
+        weaker = copy.deepcopy(build_schedule(starts_at=D1, stops_at=D2, assignment=sc.assignment, daily_ceiling=96))
+        weaker.pop("schedule_sha256")
+        weaker["asset_exclusion"]["excluded_tags"] = []
+        weaker = validate_observation_schedule(weaker, root=ROOT)
+        store = ObservationScheduleStore(sc.ops_path)
+        try:
+            register_schedule(root=ROOT, data_root=sc.data_root, store=store, document=weaker,
+                              now=D1, producer_git_sha=PRODUCER)
+            with self.assertRaises(ObservationLifecycleError) as caught:
+                authorize_schedule_from_standing_grant(
+                    root=ROOT, data_root=sc.data_root, store=store, schedule_sha256=weaker["schedule_sha256"],
+                    standing_grant_sha256=sc.proposal["proposal_sha256"], standing_grant_revision=1,
+                    now=D1, producer_git_sha=PRODUCER)
+            self.assertEqual(str(caught.exception), "MANAGED_CHILD_SEMANTICS_MISMATCH")
+        finally:
+            store.close()
+        self.assertEqual(sc.derived_receipts(), [])
         # Tamper with the stored grant: derivation and ticks fail closed, tails of earlier children stay.
         with closing(sqlite3.connect(sc.ops_path)) as conn:
             conn.execute("UPDATE managed_profiles SET payload_json = replace(payload_json, '\"UNTIL_REVOKED\"', '\"UNTIL_DATE\"')")
@@ -690,6 +712,28 @@ class ManagedResourceTests(ManagedBase):
         self.assertEqual(sql(sc.ops_path, "SELECT state FROM managed_incidents"), [("RECOVERED",)])
         window = sql(sc.ops_path, "SELECT starts_at FROM schedule_activations WHERE activation_id=?", (sc.children()[0][2],))
         self.assertEqual(window, [("2026-10-18T00:21:00Z",)])
+
+
+class ManagedBudgetTailTests(ManagedBase):
+    def test_new_intake_waits_when_committed_tail_would_not_be_covered(self) -> None:
+        sc = self.sc
+        self.commission_profile()
+        sc.backup(D1 - timedelta(hours=1))
+        used = sql(sc.ops_path, "SELECT COALESCE(SUM(provider_calls),0) FROM lifetime_counters")[0][0]
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            from solana_alpha_lab.factory.observation_account_budget import revise_account_budget_policy
+
+            revise_account_budget_policy(
+                store, expected_revision=1, reason="TAIL_RISK_TEST", now=D0 + timedelta(hours=2),
+                limits={"provider_calls_per_utc_day_max": 1200, "modeled_credits_per_utc_day_max": 1200,
+                        "provider_calls_lifetime_max": int(used) + 100})
+        sc.nominate_round(D1, "Tail")
+        blocked = sc.tick(D1 + timedelta(seconds=5))
+        self.assertEqual(blocked["managed"]["terminal"], "RECONCILE_BLOCKED_NEW_INTAKE", blocked)
+        self.assertEqual(blocked["managed"]["lineages"][0]["reasons"], ["BUDGET_TAIL_RISK"])
+        self.assertEqual(sc.children(), [])
+        # The committed tail of the bridge is still served in the same invocation.
+        self.assertEqual(blocked["activations"][0]["activation_id"], sc.activation_id)
 
 
 class ManagedHoldTests(ManagedBase):

@@ -33673,7 +33673,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/managed_collection.py', repository_path: src/solana_alpha_lab/factory/managed_collection.py}
-  integrity: {kind: sha256, sha256: 39afee0a729d18e258d0d3e7c3133217d04ff40488ae3d4dadafb3989f016987}
+  integrity: {kind: sha256, sha256: 2299648ad143f52290460cac706c6df939ba8656de7ae3fb554877018db2bd29}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
