@@ -421,9 +421,21 @@ approves one exact profile revision and OPERATE applies it.
   sticky early drain used for unmanaged activations. Owner stop, revocation and abort
   still drain.
 - **Resource decision.** `EPISODE_PRODUCER_STORAGE_COMMISSIONING_V2_MANAGED` carries a
-  `storage_decision` and never `factory_storage_gate=PASS`. `ALLOW` needs HARD margin,
-  physical tail reserve and a fresh compact backup receipt; `DEGRADED_TARGET` needs an
-  exact scoped acceptance below HARD. A block stops new intake only.
+  `storage_decision` and never `factory_storage_gate=PASS`. Three independent checks: the
+  physical free-space reserve; the projected whole-factory peak (OPS SQLite+WAL, resident RDP
+  without open publication jobs, the existing backup sink, transient staging, measured growth
+  and the prospective write peak, each byte counted once) against HARD and TARGET; and backup
+  freshness read from the existing backup owners (`OFFHOST_VERIFIED` state CURRENT or the
+  newest published `BACKUP_<sha>.zip` bundle), never from a typed hash. An unreadable part is
+  `FOOTPRINT_UNKNOWN` and blocks. `DEGRADED_TARGET` needs an exact scoped acceptance below
+  HARD. A block stops new intake only.
+- **Authority truth planes.** A child receipt (SQL) and its `OBSERVATION_SCHEDULE_AUTHORITY`
+  ResearchEvent are two planes: a kill between them is repaired by rebuilding the same
+  immutable event from the stored receipt, never by issuing a new receipt.
+- **Stop is sticky.** A rollback never changes `desired_state` or the revocation instant; only
+  an approved `collection-apply` re-enables intake. A rollback needs no phrase only when the
+  restored profile is no wider in limits, end date, routes, resource policy, template
+  (protection, exclusions, grid, filters, outputs) and handover timing.
 - **Shared account.** Unchanged: per-activation counters stay the only debit history
   summed by the shared-account owner; new children bind natively.
 - **Tick order.** committed tails (draining first) -> one bounded reconcile (no

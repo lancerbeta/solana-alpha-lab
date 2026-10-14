@@ -14,9 +14,10 @@ changes provider entitlement, raises a cap or touches A, the armed B timer, C1/C
    from runtime; the prefix `78acdcb7…` alone is not enough) and the
    `factory-i3-b-activate.timer` armed state; shared account `JUPITER-MANAGED-ACCOUNT-1`
    `MANAGED` with 1200/1200/2,000,000; restore marker resolved; due backlog 0.
-3. A compact backup health receipt source exists: the latest verified remote checkpoint
-   timestamp, artifact SHA256 and coverage label from the existing backup owner. If there
-   is none, STOP: new intake would be blocked `BACKUP_MISSING` by design.
+3. The existing backup owners report a verified checkpoint: `offhost_health_snapshot`
+   state CURRENT (default `--backup-source OFFHOST_VERIFIED`) or a published `BACKUP_<sha>.zip`
+   in the independent sink (`LOCAL_BUNDLE`). `collection-status` shows `backup.state=FRESH`
+   without any manual step. If not, STOP: new intake would be blocked by design.
 4. `account-budget-status` `unbound_live_activations` is empty.
 
 ## 1. Deploy `M` (authority: exact producer deploy)
@@ -78,15 +79,12 @@ action).
 ```text
 observation_schedule.py collection-apply <same args> \
   --expected-proposal-sha256 <proposal_sha256> --phrase "<exact_owner_phrase>"
-observation_schedule.py collection-record-backup --checkpoint-at <UTC> \
-  --artifact-sha256 <hex> --coverage <label>
 ```
 
 This is the single owner approval for every technical step inside the profile: derived
 child register, authorize, activate, recovery and tails. There is no further approval per
-child. Re-record the backup receipt after every verified remote checkpoint (daily). A step
-that wires this record call into the existing backup unit is a unit change and needs its
-own OPERATE decision; until then the OPERATE agent runs it.
+child. Nothing is recorded by hand afterwards: the next ordinary tick reads the existing
+verified backup/footprint owners, so there is no daily owner or agent step.
 
 Acceptance: `MANAGED_APPLIED revision=1`; `collection-status` shows `grant.state=VALID`,
 `current_intake=null`, no open incident, `RECONCILE_WAIT_BOOTSTRAP_NOT_BEFORE` on the next
@@ -135,14 +133,13 @@ observation_schedule.py collection-plan/apply ...                       # resume
 `--expected-revision` is mandatory (read `collection-status`). A rollback needs no phrase only
 when nothing it restores is wider than the current revision (limits, end date, routes, hard/
 target bytes, backup age, acceptance); otherwise the exact phrase of the new revision.
-`collection-record-backup` makes the OPERATE agent the attester: read the checkpoint time, hash
-and coverage from the existing backup owner's verified output; any 64-hex value would be
-accepted by the code.
+A rollback never resumes intake after a stop; resuming is a fresh plan and apply with the exact
+phrase. There is no manual backup command.
 
 ## Stop conditions
 
-Any of: a refused plan axis, an unresolved restore marker, a backup receipt that cannot be
-produced, B not started when expected (the controller reports it; it never claims it
+Any of: a refused plan axis, an unresolved restore marker, a backup owner that does not report a
+verified checkpoint, B not started when expected (the controller reports it; it never claims it
 started), a same-family window the controller did not create overlapping a managed day,
 `RECONCILE_BLOCKED_MANAGED_GRANT_*`, or any request to raise limits, lift the 100/day
 ceiling, change provider entitlement or delete data. Each needs a new exact owner decision.

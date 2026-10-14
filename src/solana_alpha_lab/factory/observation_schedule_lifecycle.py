@@ -886,6 +886,40 @@ def _commit_authority_receipt(
     }
 
 
+def ensure_authority_event(
+    *,
+    data_root: Path,
+    store: ObservationScheduleStore,
+    receipt_sha256: str,
+    now: datetime,
+    producer_git_sha: str,
+) -> bool:
+    """Append the immutable authority ResearchEvent of an already persisted receipt if absent.
+
+    Repairs a kill between ``persist_authority`` (SQL) and the event append. The event is the one
+    ``_commit_authority_receipt`` would have written (same id, same payload); it never creates or
+    changes a receipt. Returns True when an event was appended.
+    """
+
+    receipt = store.get_authority(receipt_sha256)
+    if receipt is None:
+        raise ObservationLifecycleError("AUTHORITY_MISSING")
+    event = _research_event(
+        record_id=f"OBS-AUTHZ-{receipt['receipt_sha256'][:16].upper()}",
+        record_kind=RecordKind.OBSERVATION_SCHEDULE_AUTHORITY,
+        entity_id=str(receipt["schedule_sha256"]),
+        payload=receipt,
+        now=now,
+        producer_git_sha=producer_git_sha,
+        run_id=None,
+        transaction_id=f"RESEARCH-TXN-OBS-AUTHZ-{receipt['receipt_sha256'][:12].upper()}",
+    )
+    if ResearchStore(data_root).find_record(event.record_id) is not None:
+        return False
+    _append_or_replay(data_root, event)
+    return True
+
+
 def authorize_schedule_from_standing_grant(
     *,
     root: Path,

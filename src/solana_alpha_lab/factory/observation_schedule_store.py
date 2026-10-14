@@ -1249,9 +1249,14 @@ class ObservationScheduleStore:
         command_sha256: str,
         payload: Mapping[str, Any],
         desired_state: str = "RUN",
+        resume: bool = True,
         clock: datetime | None = None,
     ) -> str:
-        """Insert one immutable revision and move the control pointer by CAS."""
+        """Insert one immutable revision and move the control pointer by CAS.
+
+        ``resume=False`` (rollback) keeps the existing desired state and revocation instant: only
+        an explicit approved apply may re-enable intake after a stop.
+        """
 
         self._require_write_lease(clock)
         now = _now(clock)
@@ -1277,12 +1282,17 @@ class ObservationScheduleStore:
                 "previous_revision, command_sha256, created_at, payload_json) VALUES (?, ?, ?, ?, ?, ?, ?)",
                 (lineage, int(revision), profile_sha256, current or None, command_sha256, now,
                  json.dumps(dict(payload), sort_keys=True, ensure_ascii=False)))
-            self._conn.execute(
-                "INSERT INTO managed_control(collection_lineage_id, current_revision, desired_state, "
-                "intake_revoked_at, updated_at) VALUES (?, ?, ?, NULL, ?) "
-                "ON CONFLICT(collection_lineage_id) DO UPDATE SET current_revision = excluded.current_revision, "
-                "desired_state = excluded.desired_state, intake_revoked_at = NULL, updated_at = excluded.updated_at",
-                (lineage, int(revision), desired_state, now))
+            if resume or control is None:
+                self._conn.execute(
+                    "INSERT INTO managed_control(collection_lineage_id, current_revision, desired_state, "
+                    "intake_revoked_at, updated_at) VALUES (?, ?, ?, NULL, ?) "
+                    "ON CONFLICT(collection_lineage_id) DO UPDATE SET current_revision = excluded.current_revision, "
+                    "desired_state = excluded.desired_state, intake_revoked_at = NULL, updated_at = excluded.updated_at",
+                    (lineage, int(revision), desired_state, now))
+            else:
+                self._conn.execute(
+                    "UPDATE managed_control SET current_revision = ?, updated_at = ? WHERE collection_lineage_id = ?",
+                    (int(revision), now, lineage))
             self._conn.commit()
             return "COMMITTED"
         except Exception:

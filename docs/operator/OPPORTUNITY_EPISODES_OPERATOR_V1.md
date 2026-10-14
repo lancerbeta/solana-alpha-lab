@@ -240,7 +240,6 @@ observation_schedule.py collection-plan   --template-schedule-sha256 <running sc
   [--validity UNTIL_REVOKED|UNTIL_DATE --intake-until <UTC>] [--bootstrap-not-before <UTC>] \
   [--protected-bridge-activation-id <B>] [--admissions-per-utc-day N ...]   # read-only
 observation_schedule.py collection-apply  <same args> --expected-proposal-sha256 <hash> --phrase "<exact phrase>"
-observation_schedule.py collection-record-backup --checkpoint-at <UTC> --artifact-sha256 <hex> --coverage <label>
 observation_schedule.py collection-reconcile --once
 observation_schedule.py collection-stop-intake --expected-revision R
 observation_schedule.py collection-rollback --to-revision N --expected-revision R [--phrase "..."]
@@ -260,7 +259,7 @@ same-family window (armed B): the controller never competes with a bridge and
 | `MANAGED_REVISION_CONFLICT` | another revision landed | read status |
 | `RECONCILE_WAIT_BOOTSTRAP_NOT_BEFORE` / `RECONCILE_WAIT_PEER_ACTIVE` / `RECONCILE_WAIT_PEER_CLOSURE[_PROOF]` | the bridge or the previous day is still closing | none; the next tick continues |
 | `RECONCILE_CHILD_ACTIVATED` / `RECONCILE_INTAKE_OK` | the day owner is active | none |
-| `RECONCILE_BLOCKED_NEW_INTAKE` (`reasons`: `HARD_BYTES`, `PHYSICAL_TAIL_RESERVE`, `BACKUP_MISSING`, `BACKUP_STALE`, `BACKUP_INVALID`, `TARGET_EXCEEDED_UNACCEPTED`) | new intake stopped, tails continue | restore the resource or record a fresh backup receipt; recovers by itself |
+| `RECONCILE_BLOCKED_NEW_INTAKE` (`reasons`: `HARD_BYTES`, `PHYSICAL_TAIL_RESERVE`, `FOOTPRINT_UNKNOWN`, `BACKUP_MISSING`, `BACKUP_STALE`, `BACKUP_OWNER_*`, `BACKUP_UNCONFIGURED`, `BACKUP_INVALID`, `BUDGET_TAIL_RISK`, `TARGET_EXCEEDED_UNACCEPTED`) | new intake stopped, tails continue | restore the resource or record a fresh backup receipt; recovers by itself |
 | `RECONCILE_DAY_OWNER_CLOSED` | the day owner closed before its window end (stop, abort, pause) | none; a new child starts at the next UTC boundary |
 | `RECONCILE_INTAKE_STOPPED` | intake was stopped by the owner | `collection-plan`/`apply` again to resume at the next lawful boundary |
 | `RECONCILE_VALIDITY_ENDED` | `UNTIL_DATE` reached; tails continue | owner decision for a new profile |
@@ -271,9 +270,11 @@ same-family window (armed B): the controller never competes with a bridge and
 one and needs no phrase only when no limit is higher and validity is not extended;
 otherwise the exact phrase of that new revision is required. Existing children, debt
 and admitted episodes are untouched; the new numbers apply to the next child.
-`collection-record-backup` records what the backup owner verified; it does not
-authenticate remote content. Rolling a binary back below this build after managed
-debits exist is forbidden; use a forward fix.
+A rollback never re-enables intake after `collection-stop-intake`: only a fresh `collection-plan`
+and `collection-apply` with the exact phrase does. Backup freshness is read from the existing
+backup owners (`--backup-source OFFHOST_VERIFIED`, default, or `LOCAL_BUNDLE`); there is no
+manual receipt command. Rolling a binary back below this build after managed debits exist is
+forbidden; use a forward fix.
 
 ## Not here
 

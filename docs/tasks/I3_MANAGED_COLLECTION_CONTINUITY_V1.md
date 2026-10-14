@@ -87,7 +87,8 @@ resume, the managed storage decision (no forged PASS), HOLD-versus-DRAIN and ale
 dedup compose on the existing owners over several UTC boundaries.
 CAPABILITY_OR_EVIDENCE: `managed_collection.py` plus seams in lifecycle, store, tick,
 storage owner, CLI and watch; `collection-status|plan|apply|reconcile|stop-intake|
-rollback|record-backup`; vertical test across three UTC days with one phrase.
+rollback`; vertical test across three UTC days with one phrase plus a release seam proof (four
+managed days across a weekly boundary through the existing verify/import/preflight).
 Named consumer: the default `observation_schedule.py tick --once` and the OPERATE agent.
 Cheapest falsifier: real CLI flow on a disposable store — approved profile, native
 child, actual admissions, natural close, next generated child, mixed tails, no owner
@@ -123,8 +124,8 @@ Honest scope limits carried into the PR (not silently dropped):
 - The deadman for a lost VPS is not provided here (`HOST_LOSS_ALERT_UNPROVEN`).
 - Not proven here, named instead of implied: five or more UTC boundaries and a weekly
   boundary (three child days are proven); 180-day/100-week time-advanced rollover and
-  bounded-metadata/RSS at scale; seal/import/metadata-preflight of managed children (only
-  the release cohort selector is exercised); a test that an older binary rejects derived
+  bounded-metadata/RSS at scale; (seal/import/preflight of managed children is now exercised by
+  tests/test_managed_collection_release_seam_v1.py on an isolated corpus); a test that an older binary rejects derived
   authority (stated as a rule: no binary rollback after the first managed child); Telegram
   outage retry and delivery health; conservative debit of an uncertain HTTP send inside
   managed scope (covered by the shared-account suite).
@@ -137,8 +138,10 @@ Honest scope limits carried into the PR (not silently dropped):
   window, not on the UTC date alone.
 - The controller runs inside the tick: if the tick timer itself is dead, only the existing
   generic stale-collector and required-timer alerts fire, not a managed-owner incident.
-- The compact backup receipt is attested by the OPERATE agent from the backup owner; its
-  content is not authenticated.
+- Backup freshness is what the existing backup owners report; archive content is not
+  re-verified here. Whole-factory footprint reuses the collector packet's measurements; a
+  volume not visible to them (unrelated residents) stays outside TARGET/HARD and is covered by
+  the separate physical free-space reserve only.
 
 DoD before merge: derived child authority limited by the approved grant and tick-time
 immutable fit; one owner per UTC day (no fragmented day); crash resume from the saved

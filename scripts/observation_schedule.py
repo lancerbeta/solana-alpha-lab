@@ -39,7 +39,6 @@ from solana_alpha_lab.factory.managed_collection import (  # noqa: E402
     collection_status,
     plan_profile,
     reconcile_once,
-    record_backup_health,
     rollback_profile,
     stop_intake,
     update_hold_incident,
@@ -571,7 +570,7 @@ def _collection_params(args: argparse.Namespace) -> dict:
         "bootstrap_not_before": args.bootstrap_not_before,
         "protected_bridge_activation_id": args.protected_bridge_activation_id,
         "planning_horizon_days": args.planning_horizon_days,
-        "backup_receipt_relative": args.backup_receipt_relative,
+        "backup_source": args.backup_source,
         "backup_max_age_seconds": args.backup_max_age_seconds,
         "measured_growth_bytes_per_day": args.measured_growth_bytes_per_day,
         "target_acceptance": acceptance,
@@ -605,7 +604,7 @@ def _collection_command(
         if args.command == "collection-status":
             return _emit(
                 collection_status(
-                    store=store, data_root=data_root, now=now, measure_storage=args.measure_storage
+                    store=store, data_root=data_root, root=ROOT, now=now, measure_storage=args.measure_storage
                 ),
                 0,
             )
@@ -659,27 +658,6 @@ def _collection_command(
                     now=now,
                     phrase=args.phrase,
                 ),
-                0,
-            )
-        if args.command == "collection-record-backup":
-            lineage = _sole_lineage(store, args.lineage)
-            revision = int(store.managed_control(lineage)["current_revision"])
-            relative = store.managed_profile(lineage, revision)["payload"]["profile"]["resource_policy"][
-                "backup_receipt_relative"
-            ]
-            return _emit(
-                {
-                    "terminal": "MANAGED_BACKUP_RECEIPT_RECORDED",
-                    "receipt": record_backup_health(
-                        data_root=data_root,
-                        relative=relative,
-                        checkpoint_at=parse_utc(args.checkpoint_at),
-                        artifact_sha256=args.artifact_sha256,
-                        coverage=args.coverage,
-                        now=now,
-                    ),
-                    "authenticates_remote_content": False,
-                },
                 0,
             )
     except ManagedCollectionError as exc:
@@ -787,7 +765,6 @@ def main(
         "collection-reconcile",
         "collection-stop-intake",
         "collection-rollback",
-        "collection-record-backup",
     ):
         cmd = sub.add_parser(name)
         cmd.add_argument("--runtime-config", default=DEFAULT_RUNTIME_RELATIVE)
@@ -810,7 +787,7 @@ def main(
             cmd.add_argument("--bootstrap-not-before")
             cmd.add_argument("--protected-bridge-activation-id")
             cmd.add_argument("--planning-horizon-days", type=int, default=180)
-            cmd.add_argument("--backup-receipt-relative")
+            cmd.add_argument("--backup-source", choices=("OFFHOST_VERIFIED", "LOCAL_BUNDLE"))
             cmd.add_argument("--backup-max-age-seconds", type=int)
             cmd.add_argument("--measured-growth-bytes-per-day", type=int)
             cmd.add_argument("--target-acceptance-sha256")
@@ -820,17 +797,13 @@ def main(
             cmd.add_argument("--phrase", required=True)
         if name == "collection-reconcile":
             cmd.add_argument("--once", action="store_true", required=True)
-        if name in {"collection-stop-intake", "collection-rollback", "collection-record-backup"}:
+        if name in {"collection-stop-intake", "collection-rollback"}:
             cmd.add_argument("--lineage")
         if name in {"collection-stop-intake", "collection-rollback"}:
             cmd.add_argument("--expected-revision", type=int, required=True)
         if name == "collection-rollback":
             cmd.add_argument("--to-revision", type=int, required=True)
             cmd.add_argument("--phrase")
-        if name == "collection-record-backup":
-            cmd.add_argument("--checkpoint-at", required=True)
-            cmd.add_argument("--artifact-sha256", required=True)
-            cmd.add_argument("--coverage", required=True)
     tick = sub.add_parser("tick")
     tick.add_argument("--once", action="store_true", required=True)
     tick.add_argument("--runtime-config", default=DEFAULT_RUNTIME_RELATIVE)

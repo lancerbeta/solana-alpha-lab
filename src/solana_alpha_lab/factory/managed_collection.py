@@ -31,6 +31,7 @@ from solana_alpha_lab.factory.collector_read_model import project_activation_as_
 from solana_alpha_lab.factory.hot90_storage_admission import (
     EPISODE_STORAGE_KIND_V2_MANAGED,
     HARD_BYTES,
+    HORIZON_DAYS,
     TARGET_BYTES,
     episode_drain_reserve,
     producer_root_identity,
@@ -51,6 +52,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (
     activate_schedule,
     activation_transition_research_event_proven,
     authorize_schedule_from_standing_grant,
+    ensure_authority_event,
     register_schedule,
     stop_episode_intake,
 )
@@ -72,9 +74,8 @@ PROFILE_VERSION = "1.0"
 ADAPTER = "MANAGED_EPISODE_ADAPTER_V1"
 V1_ADMISSION_CEILING = 100  # the frozen V1 episode validator ceiling, not a managed policy
 VALIDITY_MODES = ("UNTIL_REVOKED", "UNTIL_DATE")
-DEFAULT_BACKUP_RECEIPT = "managed/backup_health_receipt_v1.json"
+DEFAULT_BACKUP_SOURCE = "OFFHOST_VERIFIED"
 DEFAULT_BACKUP_MAX_AGE_SECONDS = 30 * 3600
-BACKUP_RECEIPT_KIND = "MANAGED_BACKUP_HEALTH_RECEIPT_V1"
 # Re-evaluating a blocked resource decision walks the data root; do it at most this often.
 BLOCKED_RECHECK_SECONDS = 300
 INTAKE_MISSING_GRACE_SECONDS = 600
@@ -170,7 +171,7 @@ def build_profile(
     bootstrap_not_before: str | None = None,
     protected_bridge: Mapping[str, Any] | None = None,
     storage_basis: Mapping[str, Any],
-    backup_receipt_relative: str = DEFAULT_BACKUP_RECEIPT,
+    backup_source: str = DEFAULT_BACKUP_SOURCE,
     backup_max_age_seconds: int = DEFAULT_BACKUP_MAX_AGE_SECONDS,
     target_bytes: int = TARGET_BYTES,
     hard_bytes: int = HARD_BYTES,
@@ -218,7 +219,7 @@ def build_profile(
         "resource_policy": {
             "target_bytes": int(target_bytes),
             "hard_bytes": int(hard_bytes),
-            "backup_receipt_relative": backup_receipt_relative,
+            "backup_source": backup_source,
             "backup_max_age_seconds": int(backup_max_age_seconds),
             "storage_basis": dict(storage_basis),
             "target_acceptance": dict(target_acceptance) if target_acceptance else None,
@@ -290,7 +291,7 @@ def validate_profile(body: Mapping[str, Any]) -> None:
         if not _hex64(body["resource_policy"]["storage_basis"][key]):
             raise ManagedCollectionError("MANAGED_STORAGE_BASIS_INVALID")
     policy = body["resource_policy"]
-    if not 0 < policy["target_bytes"] <= policy["hard_bytes"]:
+    if not 0 < policy["target_bytes"] <= policy["hard_bytes"] or policy.get("backup_source") not in _BACKUP_SOURCES:
         raise ManagedCollectionError("MANAGED_RESOURCE_POLICY_INVALID")
     if body["continuation"].get("bootstrap_not_before") is not None:
         parse_utc(str(body["continuation"]["bootstrap_not_before"]))
@@ -344,7 +345,29 @@ def _not_wider(new: Mapping[str, Any], old: Mapping[str, Any]) -> bool:
     oa, na = op_.get("target_acceptance"), np_.get("target_acceptance")
     if na and (not oa or int(na.get("max_projected_bytes", 0)) > int(oa.get("max_projected_bytes", 0))):
         return False
-    return new["semantics"]["cohort_family_key"] == old["semantics"]["cohort_family_key"]
+    if new["semantics"] != old["semantics"] or new["recovery"] != old["recovery"] or new["notifications"] != old["notifications"]:
+        return False
+    # Protection, exclusions, grid, filters, outputs and authority profile may not change; only the
+    # numeric limits already compared above may differ inside the frozen template.
+    if _template_core(new["template"]) != _template_core(old["template"]):
+        return False
+    nc, oc = new["continuation"], old["continuation"]
+    if nc.get("protected_bridge") != oc.get("protected_bridge") or nc.get("automatic") != oc.get("automatic"):
+        return False
+    new_start, old_start = nc.get("bootstrap_not_before"), oc.get("bootstrap_not_before")
+    if old_start is not None and (new_start is None or parse_utc(str(new_start)) < parse_utc(str(old_start))):
+        return False  # an earlier handover could compete with a bridge the owner protected
+    return True
+
+
+def _template_core(template: Mapping[str, Any]) -> dict[str, Any]:
+    core = copy.deepcopy(dict(template))
+    for key in ("daily_normal_ceiling", "rolling_24h_max", "active_episode_cap"):
+        core["sampling"].pop(key, None)
+    for key in ("provider_calls_per_utc_day_max", "modeled_provider_credits_per_utc_day_max",
+                "provider_calls_lifetime_max"):
+        core["budgets"].pop(key, None)
+    return core
 
 
 def _restrictive(new: Mapping[str, Any], old: Mapping[str, Any]) -> bool:
@@ -507,72 +530,109 @@ def capacity_geometry(template: Mapping[str, Any], limits: Mapping[str, Any]) ->
 # Resource decision (storage / backup / physical tail), no PASS forgery
 
 
-def measure_factory_bytes(data_root: Path) -> int:
-    total = 0
-    for current, _dirs, files in os.walk(data_root):
-        for name in files:
-            try:
-                total += os.lstat(os.path.join(current, name)).st_size
-            except OSError:
-                continue
-    return total
+_UNKNOWN = "UNKNOWN"
+_BACKUP_SOURCES = ("OFFHOST_VERIFIED", "LOCAL_BUNDLE")
 
 
-def _backup_receipt_path(data_root: Path, relative: str) -> Path:
-    path = Path(relative)
-    if path.is_absolute() or ".." in path.parts:
-        raise ManagedCollectionError("MANAGED_BACKUP_RECEIPT_PATH_UNSAFE")
-    return Path(data_root) / path
-
-
-def record_backup_health(
-    *, data_root: Path, relative: str, checkpoint_at: datetime, artifact_sha256: str,
-    coverage: str, now: datetime,
-) -> dict[str, Any]:
-    """Write the compact receipt the hot path reads. It records what the backup owner
-    verified; it does not authenticate remote content itself."""
-
-    if not _hex64(artifact_sha256) or checkpoint_at > now or not coverage:
-        raise ManagedCollectionError("MANAGED_BACKUP_RECEIPT_INVALID")
-    body = {
-        "kind": BACKUP_RECEIPT_KIND,
-        "checkpoint_at": render_utc(checkpoint_at),
-        "artifact_sha256": artifact_sha256,
-        "coverage": coverage,
-        "recorded_at": render_utc(now),
-    }
-    receipt = {**body, "self_sha256": canonical_sha256(body)}
-    path = _backup_receipt_path(data_root, relative)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temp = path.with_suffix(path.suffix + ".tmp")
-    temp.write_text(json.dumps(receipt, sort_keys=True), encoding="utf-8")
-    os.replace(temp, path)
-    return receipt
-
-
-def read_backup_health(
-    *, data_root: Path, relative: str, max_age_seconds: int, now: datetime
-) -> dict[str, Any]:
-    path = _backup_receipt_path(data_root, relative)
+def _file_bytes(path: Path) -> int:
     try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
-        body = {key: value for key, value in raw.items() if key != "self_sha256"}
-        if raw.get("kind") != BACKUP_RECEIPT_KIND or canonical_sha256(body) != raw.get("self_sha256"):
-            return {"state": "INVALID"}
-        age = (now - parse_utc(str(raw["checkpoint_at"]))).total_seconds()
-        if not _hex64(raw.get("artifact_sha256")):
-            return {"state": "INVALID"}
-    except FileNotFoundError:
-        return {"state": "MISSING"}
-    except (OSError, ValueError, TypeError, KeyError, AttributeError):
-        return {"state": "INVALID"}
+        return int(path.stat().st_size)
+    except OSError:
+        return 0
+
+
+def measure_whole_factory(
+    *, store: ObservationScheduleStore, data_root: Path, root: Path, environ: Mapping[str, str] | None = None
+) -> dict[str, Any]:
+    """Non-overlapping resident and transient bytes of the whole same-volume factory.
+
+    Reuses the collector packet's own measurements (RDP inventory with open publication
+    jobs as transient staging, OPS SQLite plus WAL, the existing backup sink). An OPS store
+    nested inside the RDP is counted once. Any unreadable part is UNKNOWN and fails closed.
+    """
+
+    from solana_alpha_lab.factory.collector_operational_packet import (
+        _rdp_inventory_bytes,
+        _tree_bytes,
+        resident_rdp_bytes,
+    )
+    from solana_alpha_lab.factory.remote_ops import load_config, resolve_backup_sink
+
+    sqlite_path = Path(store.path)
+    sqlite_bytes = _file_bytes(sqlite_path) + _file_bytes(Path(str(sqlite_path) + "-wal"))
+    total, _open_count, open_bytes, _science = _rdp_inventory_bytes(Path(data_root))
+    resident = resident_rdp_bytes(total, open_bytes)
+    nested = False
+    try:
+        nested = Path(data_root).resolve() in sqlite_path.resolve().parents
+    except OSError:
+        nested = False
+    if isinstance(resident, int) and nested:
+        resident = max(0, resident - sqlite_bytes)
+    sink_bytes: Any = _UNKNOWN
+    try:
+        sink = resolve_backup_sink(Path(root), load_config(Path(root)), environ if environ is not None else os.environ)
+        measured = _tree_bytes(sink)
+        sink_bytes = 0 if measured is None else int(measured)
+    except Exception:  # noqa: BLE001 - an unresolvable sink is UNKNOWN, never zero
+        sink_bytes = _UNKNOWN
     return {
-        "state": "FRESH" if 0 <= age <= max_age_seconds else "STALE",
-        "age_seconds": int(age),
-        "max_age_seconds": int(max_age_seconds),
-        "artifact_sha256": raw["artifact_sha256"],
-        "checkpoint_at": raw["checkpoint_at"],
-        "coverage": raw["coverage"],
+        "sqlite_bytes": sqlite_bytes,
+        "resident_rdp_bytes": resident if isinstance(resident, int) else _UNKNOWN,
+        "backup_sink_bytes": sink_bytes,
+        "staging_bytes": int(open_bytes) if isinstance(open_bytes, int) else _UNKNOWN,
+        "ops_nested_in_rdp": nested,
+    }
+
+
+def read_verified_backup(
+    *, root: Path, policy: Mapping[str, Any], now: datetime, environ: Mapping[str, str] | None = None
+) -> dict[str, Any]:
+    """Backup health from the existing backup owners only; nothing here is attested by hand.
+
+    ``OFFHOST_VERIFIED``: the off-host receipt owner reports state CURRENT with a verified
+    checkpoint. ``LOCAL_BUNDLE``: the newest published BACKUP bundle of the independent sink.
+    """
+
+    from solana_alpha_lab.factory.offhost_backup import offhost_health_snapshot
+    from solana_alpha_lab.factory.remote_ops import _backup_newest, load_config, resolve_backup_sink
+
+    source = str(policy.get("backup_source") or "")
+    max_age = int(policy["backup_max_age_seconds"])
+    if source not in _BACKUP_SOURCES:
+        return {"state": "INVALID", "source": source}
+    try:
+        if source == "OFFHOST_VERIFIED":
+            snapshot = offhost_health_snapshot(Path(root), now=now)
+            if not snapshot.get("configured"):
+                return {"state": "UNCONFIGURED", "source": source}
+            checkpoint = snapshot.get("offhost_last_verified_at")
+            artifact = snapshot.get("offhost_last_sha256")
+            owner_state = str(snapshot.get("offhost_backup_state") or "")
+            coverage = "OFFHOST_VERIFIED_CHECKPOINT"
+        else:
+            sink = resolve_backup_sink(Path(root), load_config(Path(root)), environ if environ is not None else os.environ)
+            newest = _backup_newest(sink)
+            if newest is None:
+                return {"state": "MISSING", "source": source}
+            checkpoint = newest.get("mtime")
+            artifact = newest.get("sha256")
+            owner_state = "CURRENT"
+            coverage = "LOCAL_PUBLISHED_BUNDLE"
+        if not checkpoint:
+            return {"state": "MISSING", "source": source}
+        age = (now - parse_utc(str(checkpoint))).total_seconds()
+    except Exception:  # noqa: BLE001 - unreadable owner output never counts as fresh
+        return {"state": "INVALID", "source": source}
+    if not _hex64(artifact):
+        return {"state": "INVALID", "source": source}
+    if owner_state != "CURRENT":
+        state = "OWNER_" + (owner_state or "UNKNOWN")
+    else:
+        state = "FRESH" if 0 <= age <= max_age else "STALE"
+    return {
+        "state": state, "source": source, "age_seconds": int(age), "max_age_seconds": max_age,
+        "artifact_sha256": artifact, "checkpoint_at": render_utc(parse_utc(str(checkpoint))), "coverage": coverage,
     }
 
 
@@ -596,14 +656,19 @@ def managed_storage_decision(
     store: ObservationScheduleStore,
     body: Mapping[str, Any],
     data_root: Path,
+    root: Path,
     now: datetime,
     free_bytes: Any = _MEASURE,
-    factory_bytes: Any = _MEASURE,
+    footprint: Mapping[str, Any] | None = None,
+    environ: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     """Physical + owner-policy decision for starting a new intake child.
 
-    Semantics/authority are not decided here and are never overridden. A blocked
-    decision stops new intake only; committed tails keep running.
+    Three independent checks, never merged: (1) physical free-space reserve for the committed
+    tail and next round, (2) projected whole-factory peak against HARD and TARGET (resident
+    OPS/RDP/backup plus transient staging plus the prospective write peak), (3) verified
+    backup freshness. Semantics/authority are never decided here. A block stops new intake
+    only; committed tails keep running.
     """
 
     policy = body["resource_policy"]
@@ -615,8 +680,8 @@ def managed_storage_decision(
             free_bytes = shutil.disk_usage(data_root).free
         except OSError:
             free_bytes = None
-    if factory_bytes is _MEASURE:
-        factory_bytes = measure_factory_bytes(data_root)
+    measured = dict(footprint) if footprint is not None else measure_whole_factory(
+        store=store, data_root=data_root, root=root, environ=environ)
     admissions = int(body["limits"]["admissions_per_utc_day"])
     # Same unit as the tick's own gate: one round's quota, re-evaluated every round.
     prospective = max(round_quota(admissions, index) for index in range(ROUNDS_PER_DAY)) * (
@@ -631,14 +696,24 @@ def managed_storage_decision(
         **_pending_obligations(store, batch), prospective_slots=prospective,
         prospective_call_groups=prospective, remaining_nomination_calls=nomination_calls,
         local_envelope=local, free_bytes=free_bytes)
-    backup = read_backup_health(
-        data_root=data_root, relative=policy["backup_receipt_relative"],
-        max_age_seconds=int(policy["backup_max_age_seconds"]), now=now)
+    backup = read_verified_backup(root=root, policy=policy, now=now, environ=environ)
     reasons: list[str] = []
     hard = int(policy["hard_bytes"])
     target = int(policy["target_bytes"])
     required = int(reserve["required_free_bytes"])
-    if factory_bytes + required >= hard:
+    parts = [measured.get(key) for key in ("sqlite_bytes", "resident_rdp_bytes", "backup_sink_bytes", "staging_bytes")]
+    known = all(isinstance(item, int) for item in parts)
+    growth = policy.get("measured_growth_bytes_per_day")
+    horizon_bytes = int(growth) * HORIZON_DAYS if growth else 0
+    prospective_peak = (
+        int(reserve["committed_drain_reserve_bytes"]) + int(reserve["prospective_reserve_bytes"])
+        + int(reserve["future_nomination_reserve_bytes"])
+    )
+    resident_total = sum(parts) - (parts[3] if known else 0) if known else None
+    projected = (sum(parts) + horizon_bytes + prospective_peak) if known else None
+    if not known:
+        reasons.append("FOOTPRINT_UNKNOWN")
+    elif projected >= hard:
         reasons.append("HARD_BYTES")
     if reserve["status"] != "LOCAL_HEADROOM":
         reasons.append("PHYSICAL_TAIL_RESERVE")
@@ -646,11 +721,11 @@ def managed_storage_decision(
         reasons.append("BACKUP_" + backup["state"])
     acceptance = policy.get("target_acceptance")
     health = "OK"
-    if factory_bytes >= target:
+    if known and projected >= target:
         accepted = (
             isinstance(acceptance, Mapping)
             and _hex64(acceptance.get("acceptance_sha256"))
-            and factory_bytes + required <= min(int(acceptance.get("max_projected_bytes", 0)), hard - 1)
+            and projected <= min(int(acceptance.get("max_projected_bytes", 0)), hard - 1)
         )
         if accepted:
             health = "DEGRADED_TARGET"
@@ -669,16 +744,19 @@ def managed_storage_decision(
             budget_state = "TAIL_AT_RISK"
     allowed = not reasons
     grant_sha = canonical_sha256(body)
-    runway = _runway(policy, factory_bytes, int(body["validity"]["planning_horizon_days"]))
+    runway = _runway(policy, resident_total, int(body["validity"]["planning_horizon_days"]))
     return {
         "decision": ("ALLOW" if health == "OK" else "ALLOW_WITH_ACCEPTED_TARGET_RISK") if allowed else "BLOCK",
         "storage_health": health if allowed else "BLOCKED",
-        "hard_constraints": "FAIL" if "HARD_BYTES" in reasons else "PASS",
+        "hard_constraints": "FAIL" if ("HARD_BYTES" in reasons or "FOOTPRINT_UNKNOWN" in reasons) else "PASS",
         "physical_tail_reserve": "FAIL" if "PHYSICAL_TAIL_RESERVE" in reasons else "PASS",
         "target_acceptance": dict(acceptance) if allowed and health == "DEGRADED_TARGET" else None,
         "grant_sha256": grant_sha,
         "reasons": reasons,
-        "factory_bytes": factory_bytes,
+        "footprint": {**measured, "resident_total_bytes": resident_total, "incremental_horizon_bytes": horizon_bytes,
+                      "prospective_peak_bytes": prospective_peak, "projected_peak_bytes": projected},
+        "factory_bytes": resident_total,
+        "projected_peak_bytes": projected,
         "free_bytes": free_bytes,
         "required_free_bytes": required,
         "target_bytes": target,
@@ -690,23 +768,23 @@ def managed_storage_decision(
     }
 
 
-def _runway(policy: Mapping[str, Any], factory_bytes: int, horizon_days: int) -> dict[str, Any]:
+def _runway(policy: Mapping[str, Any], resident_bytes: int | None, horizon_days: int) -> dict[str, Any]:
     growth = policy.get("measured_growth_bytes_per_day")
     hard = int(policy["hard_bytes"])
     out: dict[str, Any] = {
         "planning_horizon_days": horizon_days,
-        "resident_hot_bytes": factory_bytes,
+        "resident_hot_bytes": resident_bytes,
         "new_useful_bytes_per_day": growth,
         "upload_bytes_per_day": None,
         "remote_retained_bytes": None,
         "peak_transient_bytes": None,
         "expected_i2_savings_applied_bytes": 0,
     }
-    if not growth:
+    if not growth or resident_bytes is None:
         out.update({"days_to_hard": None, "status": "UNKNOWN_GROWTH_NOT_MEASURED",
                     "i2_action": "MEASURE_NEW_BYTES_PER_DAY_AND_APPLY_I2_PACKAGING"})
         return out
-    days = max(0, (hard - factory_bytes)) // int(growth)
+    days = max(0, (hard - resident_bytes)) // int(growth)
     out.update({"days_to_hard": days, "status": "COVERS_HORIZON" if days >= horizon_days else "SHORT_OF_HORIZON",
                 "i2_action": None if days >= horizon_days else "APPLY_I2_PACKAGING_OR_RETENTION_BEFORE_HORIZON"})
     return out
@@ -805,7 +883,7 @@ def plan_profile(
         planning_horizon_days=int(params.get("planning_horizon_days") or 180),
         bootstrap_not_before=params.get("bootstrap_not_before"), protected_bridge=bridge,
         storage_basis=basis,
-        backup_receipt_relative=str(params.get("backup_receipt_relative") or DEFAULT_BACKUP_RECEIPT),
+        backup_source=str(params.get("backup_source") or DEFAULT_BACKUP_SOURCE),
         backup_max_age_seconds=int(params.get("backup_max_age_seconds") or DEFAULT_BACKUP_MAX_AGE_SECONDS),
         target_acceptance=params.get("target_acceptance"),
         measured_growth_bytes_per_day=params.get("measured_growth_bytes_per_day"),
@@ -936,12 +1014,14 @@ def rollback_profile(
         outcome = store.managed_commit_profile(
             lineage=lineage, revision=new_body["revision"], expected_revision=int(expected_revision),
             profile_sha256=canonical_sha256(new_body), command_sha256=command,
-            payload={"profile": new_body, "approval": approval}, clock=now)
+            payload={"profile": new_body, "approval": approval}, resume=False, clock=now)
     except ObservationScheduleStoreError as exc:
         raise ManagedCollectionError(str(exc)) from exc
     return {"terminal": "MANAGED_ROLLED_BACK" if outcome == "COMMITTED" else "MANAGED_ROLLBACK_REPLAY",
             "revision": new_body["revision"], "restored_from_revision": int(to_revision),
             "effective": "NEXT_CHILD_AT_UTC_BOUNDARY", "existing_children_unchanged": True,
+            "desired_state": store.managed_control(lineage)["desired_state"],
+            "resume_requires": "collection-plan and collection-apply with the exact owner phrase",
             "debt_and_admitted_episodes_preserved": True}
 
 
@@ -1052,7 +1132,7 @@ def _plan_child(
     document = validate_observation_schedule(document, root=root)
     schedule_sha = str(document["schedule_sha256"])
     activation_id = "ACT-" + schedule_sha[:16].upper()
-    decision = managed_storage_decision(store=store, body=body, data_root=data_root, now=now)
+    decision = managed_storage_decision(store=store, body=body, data_root=data_root, root=root, now=now)
     if decision["decision"] == "BLOCK":
         return {"blocked": True, "decision": decision}
     envelope = build_child_storage_commissioning(
@@ -1100,8 +1180,13 @@ def _drive_child(
         advance("REGISTERED")
     if state == "REGISTERED":
         existing = store.latest_authority_for_schedule(sha)
-        if not (existing and existing.get("authority_basis") == "STANDING_GRANT"
-                and existing.get("standing_grant_sha256") == payload["grant_sha256"]):
+        if existing and existing.get("authority_basis") == "STANDING_GRANT" and existing.get(
+                "standing_grant_sha256") == payload["grant_sha256"]:
+            # A kill between the SQL commit and the ResearchEvent append leaves a receipt
+            # without its immutable event: rebuild the very same event, never a new receipt.
+            ensure_authority_event(data_root=data_root, store=store, receipt_sha256=str(existing["receipt_sha256"]),
+                                   now=now, producer_git_sha=producer)
+        else:
             authorize_schedule_from_standing_grant(
                 root=root, data_root=data_root, store=store, schedule_sha256=sha,
                 standing_grant_sha256=payload["grant_sha256"],
@@ -1310,6 +1395,7 @@ def _finish_blocked(store, lineage, report, decision: Mapping[str, Any], now: da
     key = "STORAGE_BLOCKED:" + lineage
     payload = {"reasons": decision["reasons"], "scope": "NEW_INTAKE_ONLY", "committed_tails": "CONTINUE",
                "factory_bytes": decision["factory_bytes"], "free_bytes": decision["free_bytes"],
+               "projected_peak_bytes": decision["projected_peak_bytes"], "footprint": decision["footprint"],
                "required_free_bytes": decision["required_free_bytes"], "backup": decision["backup"],
                "runway": decision["runway"]}
     store.managed_incident_open(key, payload, clock=now)
@@ -1321,7 +1407,7 @@ def _finish_blocked(store, lineage, report, decision: Mapping[str, Any], now: da
 
 
 def collection_status(
-    *, store: ObservationScheduleStore, data_root: Path, now: datetime, measure_storage: bool = False,
+    *, store: ObservationScheduleStore, data_root: Path, root: Path, now: datetime, measure_storage: bool = False,
 ) -> dict[str, Any]:
     lineages = store.managed_lineages()
     if not lineages:
@@ -1368,13 +1454,16 @@ def collection_status(
             "bootstrap_not_before": body["continuation"].get("bootstrap_not_before"),
             "open_incidents": [{"incident_key": i["incident_key"], **i["payload"]} for i in incidents],
             "capacity": capacity_geometry(body["template"], body["limits"]),
-            "backup": read_backup_health(
-                data_root=data_root, relative=body["resource_policy"]["backup_receipt_relative"],
-                max_age_seconds=int(body["resource_policy"]["backup_max_age_seconds"]), now=now),
+            "backup": read_verified_backup(root=root, policy=body["resource_policy"], now=now),
         }
         if measure_storage:
-            item["runway"] = _runway(body["resource_policy"], measure_factory_bytes(data_root),
-                                     int(body["validity"]["planning_horizon_days"]))
+            footprint = measure_whole_factory(store=store, data_root=data_root, root=root)
+            known = all(isinstance(footprint[key], int) for key in ("sqlite_bytes", "resident_rdp_bytes", "backup_sink_bytes"))
+            item["footprint"] = footprint
+            item["runway"] = _runway(
+                body["resource_policy"],
+                footprint["sqlite_bytes"] + footprint["resident_rdp_bytes"] + footprint["backup_sink_bytes"] if known else None,
+                int(body["validity"]["planning_horizon_days"]))
         out.append(item)
     account = account_budget_status(store, now=now)
     return {

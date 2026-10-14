@@ -43,13 +43,13 @@ JSON на каждое окно. Это код, проверенный на од
 
 ## EVIDENCE
 
-- 28 целевых тестов: 3 UTC-границы с одной фразой и 3 производными receipts, raw-SQL
+- 34 целевых теста + seam-тест релиза: 3 UTC-границы с одной фразой и 3 производными receipts, raw-SQL
   oracle владельца дня; handover/plan-отказы; crash после activation до event и после
   register до authorize; конкурирующий reconciler; tamper grant (derive и tick); stop/
   re-apply/rollback; finite validity; матрица storage/backup/TARGET/HARD; weekly dedup и
   lineage через child; пропущенные дни; reconcile без записей в steady state; HOLD против
   sticky drain; alerts через существующий watch; release-селектор принимает daily scopes.
-- Targeted mutation: 5/5 контролей убивают тесты (воспроизведение: см. proof.json) (child вне grant, backdated окно,
+- Targeted mutation: 7/7 контролей убивают тесты (воспроизведение: см. proof.json) (child вне grant, backdated окно,
   storage не блокирует, нет repair события, нет HOLD).
 - Регрессия прямых потребителей: 47 модулей, 735 тестов; единственные красные — 5 Windows/cgroup ошибок, идентичных на чистом origin/main (не связаны с изменением); vertical-сьют зелёный на чистом дереве.
 
@@ -83,8 +83,8 @@ JSON на каждое окно. Это код, проверенный на од
 ## BURDEN
 
 - Утверждений на первый профиль: 1. На каждый следующий child: 0. Остаточные ручные
-  действия: записать backup-receipt после проверенного checkpoint (пока не встроено в
-  unit — это отдельное OPERATE-решение); ничего ежедневного для owner.
+  действий нет: свежесть backup читается из существующих backup-владельцев, footprint
+  меряется самим tick; ничего ежедневного ни для owner, ни для агента.
 
 ## NEXT / RESUME
 
@@ -107,7 +107,8 @@ JSON на каждое окно. Это код, проверенный на од
   seal/import/preflight managed child, тест отказа старого бинарника (правило: после первого
   managed child бинарник не откатывать), Telegram retry/health.
 - Если сам tick-timer мёртв, срабатывают только общие stale/timer алерты.
-- Backup-receipt аттестует агент OPERATE; содержимое не аутентифицируется.
+- Свежесть backup — это то, что сообщают существующие владельцы (off-host CURRENT или
+  опубликованный bundle); содержимое архива код не проверяет.
 
 ## Что код не утверждает
 

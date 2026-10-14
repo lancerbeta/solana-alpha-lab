@@ -12,6 +12,6 @@
   {
     "claim_id": "I3_NO_FORGED_STORAGE_PASS",
     "claim": "The managed storage decision records HARD, physical tail reserve, backup freshness, accepted TARGET risk and budget tail coverage independently and never emits factory_storage_gate=PASS.",
-    "scope": "Compact receipt reader; remote content is not authenticated."
+    "scope": "Backup freshness is read from the existing backup owners; the footprint reuses the collector packet measurements; archive content and unrelated residents are not authenticated."
   }
 ]

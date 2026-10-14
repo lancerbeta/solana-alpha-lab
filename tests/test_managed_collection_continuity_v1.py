@@ -42,6 +42,7 @@ D1 = D0 + timedelta(days=1)
 D2 = D0 + timedelta(days=2)
 D3 = D0 + timedelta(days=3)
 ARTIFACT = "a1" * 32
+ROOT_DIR = Path(__file__).resolve().parents[1]
 LIMIT_ARGS = ["--provider-calls-per-utc-day-max", "1200", "--modeled-credits-per-utc-day-max", "1200",
               "--provider-calls-lifetime-max", "2000000"]
 Usage = namedtuple("Usage", "total used free")
@@ -55,8 +56,8 @@ def sql(path: Path, query: str, params: tuple = ()) -> list[tuple]:
 class ManagedScenario(EpisodeScenario):
     """Seed activation X (the protected bridge) plus the managed profile on top of it."""
 
-    def __init__(self, root: Path, **kwargs) -> None:
-        super().__init__(root, start=D0, stops=D1, **kwargs)
+    def __init__(self, root: Path, *, start: datetime = D0, stops: datetime = D1, **kwargs) -> None:
+        super().__init__(root, start=start, stops=stops, **kwargs)
         self.proposal: dict | None = None
 
     def cmd(self, at: datetime, *argv: str) -> dict:
@@ -81,7 +82,7 @@ class ManagedScenario(EpisodeScenario):
             raise AssertionError(detail)
 
     def profile_args(self, *extra: str, not_before: datetime | None = D1) -> list[str]:
-        args = ["--template-schedule-sha256", self.schedule["schedule_sha256"],
+        args = ["--backup-source", "LOCAL_BUNDLE", "--template-schedule-sha256", self.schedule["schedule_sha256"],
                 "--account-scope-id", SCOPE, "--storage-basis-activation-id", self.activation_id,
                 "--protected-bridge-activation-id", self.activation_id]
         if not_before is not None:
@@ -98,9 +99,21 @@ class ManagedScenario(EpisodeScenario):
         return self.cmd(at, "collection-apply", *self.profile_args(*extra, **kwargs),
                         "--expected-proposal-sha256", plan["proposal_sha256"], "--phrase", plan["exact_owner_phrase"])
 
-    def backup(self, at: datetime) -> dict:
-        return self.cmd(at, "collection-record-backup", "--checkpoint-at", mc.render_utc(at - timedelta(minutes=5)),
-                        "--artifact-sha256", ARTIFACT, "--coverage", "FULL_OPS_STORE")
+    @property
+    def sink(self) -> Path:
+        return self.data_root.parent / "backup_sink"
+
+    def backup(self, at: datetime) -> Path:
+        """What the existing backup owner leaves behind: a published BACKUP bundle in the sink."""
+
+        import os
+
+        self.sink.mkdir(parents=True, exist_ok=True)
+        bundle = self.sink / f"BACKUP_{ARTIFACT}.zip"
+        bundle.write_bytes(b"PK-synthetic-bundle")
+        stamp = (at - timedelta(minutes=5)).timestamp()
+        os.utime(bundle, (stamp, stamp))
+        return bundle
 
     def status(self, at: datetime) -> dict:
         return self.cmd(at, "collection-status")
@@ -133,11 +146,16 @@ class ManagedBase(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.sc = ManagedScenario(Path(self.tmp.name) / "rdp")
         self.sc.commission_account()
+        from solana_alpha_lab.factory.remote_ops import BACKUP_SINK_ENV
+
+        patcher = patch.dict("os.environ", {BACKUP_SINK_ENV: str(self.sc.sink)})
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def commission_profile(self, *extra: str, at: datetime = D0 + timedelta(hours=1), **kwargs) -> dict:
         applied = self.sc.apply(at, *extra, **kwargs)
         self.assertEqual(applied["terminal"], "MANAGED_APPLIED", applied)
-        self.assertEqual(self.sc.backup(at)["terminal"], "MANAGED_BACKUP_RECEIPT_RECORDED")
+        self.sc.backup(at)
         return applied
 
 
@@ -682,8 +700,9 @@ class ManagedResourceTests(ManagedBase):
         return store.managed_profile(next(iter(store.managed_lineages())), 1)["payload"]["profile"], store
 
     def decide(self, body, store, *, free, factory, at=D1):
-        return mc.managed_storage_decision(store=store, body=body, data_root=self.sc.data_root, now=at,
-                                           free_bytes=free, factory_bytes=factory)
+        footprint = {"sqlite_bytes": 0, "resident_rdp_bytes": factory, "backup_sink_bytes": 0, "staging_bytes": 0}
+        return mc.managed_storage_decision(store=store, body=body, data_root=self.sc.data_root, root=ROOT_DIR, now=at,
+                                           free_bytes=free, footprint=footprint)
 
     def test_decision_matrix_never_forges_pass_and_keeps_independent_checks(self) -> None:
         body, store = self.body_and_store()
@@ -693,15 +712,15 @@ class ManagedResourceTests(ManagedBase):
         # approved local byte bounds make the fixture's physical tail reserve about 15.3 GiB.
         body = json.loads(json.dumps(body))
         body["resource_policy"]["target_bytes"] = 20 * gib
-        ok = self.decide(body, store, free=100 * gib, factory=10 * gib)
+        ok = self.decide(body, store, free=100 * gib, factory=2 * gib)
         self.assertEqual((ok["decision"], ok["storage_health"], ok["reasons"]), ("ALLOW", "OK", []))
-        self.assertEqual(self.decide(body, store, free=100 * gib, factory=36 * gib)["reasons"],
+        self.assertEqual(self.decide(body, store, free=100 * gib, factory=38 * gib)["reasons"],
                          ["HARD_BYTES", "TARGET_EXCEEDED_UNACCEPTED"])
-        self.assertEqual(self.decide(body, store, free=1 * gib, factory=10 * gib)["reasons"], ["PHYSICAL_TAIL_RESERVE"])
-        self.assertEqual(self.decide(body, store, free=None, factory=10 * gib)["reasons"], ["PHYSICAL_TAIL_RESERVE"])
+        self.assertEqual(self.decide(body, store, free=1 * gib, factory=2 * gib)["reasons"], ["PHYSICAL_TAIL_RESERVE"])
+        self.assertEqual(self.decide(body, store, free=None, factory=2 * gib)["reasons"], ["PHYSICAL_TAIL_RESERVE"])
         target_only = self.decide(body, store, free=100 * gib, factory=25 * gib)
         self.assertEqual((target_only["decision"], target_only["reasons"]), ("BLOCK", ["TARGET_EXCEEDED_UNACCEPTED"]))
-        stale = self.decide(body, store, free=100 * gib, factory=10 * gib, at=D1 + timedelta(days=3))
+        stale = self.decide(body, store, free=100 * gib, factory=2 * gib, at=D1 + timedelta(days=3))
         self.assertEqual(stale["reasons"], ["BACKUP_STALE"])
         # A forged, too-small or hard-exceeding acceptance never converts a block into an allow.
         for acceptance in ({"acceptance_sha256": "nothex", "max_projected_bytes": 45 * gib},
@@ -709,7 +728,7 @@ class ManagedResourceTests(ManagedBase):
                            {"acceptance_sha256": "b" * 64, "max_projected_bytes": 60 * gib}):
             tuned = json.loads(json.dumps(body))
             tuned["resource_policy"]["target_acceptance"] = acceptance
-            factory = 36 * gib if acceptance["max_projected_bytes"] == 60 * gib else 25 * gib
+            factory = 38 * gib if acceptance["max_projected_bytes"] == 60 * gib else 25 * gib
             self.assertEqual(self.decide(tuned, store, free=100 * gib, factory=factory)["decision"], "BLOCK", acceptance)
         accepted = json.loads(json.dumps(body))
         accepted["resource_policy"]["target_acceptance"] = {"acceptance_sha256": "b" * 64, "max_projected_bytes": 45 * gib}
@@ -753,6 +772,248 @@ class ManagedResourceTests(ManagedBase):
         self.assertEqual(sql(sc.ops_path, "SELECT state FROM managed_incidents"), [("RECOVERED",)])
         window = sql(sc.ops_path, "SELECT starts_at FROM schedule_activations WHERE activation_id=?", (sc.children()[0][2],))
         self.assertEqual(window, [("2026-10-18T00:21:00Z",)])
+
+
+class ManagedFootprintTests(ManagedBase):
+    """P0-A: TARGET/HARD see the whole same-volume factory, not only the observation RDP."""
+
+    def sibling_topology(self):
+        """OPS store outside the RDP (as in production) plus a backup sink and open staging."""
+
+        import os
+
+        base = Path(self.tmp.name)
+        ops_dir = base / "ops_sibling"
+        ops_dir.mkdir()
+        store = ObservationScheduleStore(ops_dir / "observation_schedule_state.sqlite")
+        self.addCleanup(store.close)
+        from solana_alpha_lab.factory.observation_publication_jobs import open_dir
+
+        staging = open_dir(self.sc.data_root)
+        staging.mkdir(parents=True, exist_ok=True)
+        return store, ops_dir, staging, os
+
+    @staticmethod
+    def tree(path: Path, *, skip: Path | None = None) -> int:
+        import os
+
+        total = 0
+        for current, _dirs, files in os.walk(path):
+            for name in files:
+                full = Path(current) / name
+                if skip is not None and skip in full.parents:
+                    continue
+                total += full.stat().st_size
+        return total
+
+    def decide(self, body, store, footprint=None, free=100 * 1024 ** 3):
+        from solana_alpha_lab.factory.remote_ops import BACKUP_SINK_ENV
+
+        return mc.managed_storage_decision(
+            store=store, body=body, data_root=self.sc.data_root, root=ROOT_DIR, now=D1, free_bytes=free,
+            footprint=footprint, environ={BACKUP_SINK_ENV: str(self.sc.sink)})
+
+    def test_sibling_ops_wal_backup_and_staging_move_target_and_hard_not_physical_reserve(self) -> None:
+        sc = self.sc
+        self.commission_profile()
+        sc.backup(D1 - timedelta(hours=1))
+        store, ops_dir, staging, _os = self.sibling_topology()
+        body = json.loads(json.dumps(store_profile(sc)))
+        zero = {"sqlite_bytes": 0, "resident_rdp_bytes": 0, "backup_sink_bytes": 0, "staging_bytes": 0}
+        peak = self.decide(body, store, zero)["footprint"]["prospective_peak_bytes"]
+        mib = 1024 ** 2
+        # TARGET sits 24 MiB above the prospective peak, HARD 60 MiB above: only real growth of the
+        # sibling stores can cross them, and the old RDP-only measure would never see that growth.
+        body["resource_policy"]["target_bytes"] = peak + 24 * mib
+        body["resource_policy"]["hard_bytes"] = peak + 60 * mib
+        base = self.decide(body, store)
+        self.assertEqual(base["reasons"], [], base)
+        measured = base["footprint"]
+        self.assertEqual(measured["resident_rdp_bytes"] + (measured["sqlite_bytes"] if measured["ops_nested_in_rdp"] else 0),
+                         self.tree(sc.data_root, skip=staging))
+        # (1) sibling OPS WAL grows 30 MiB (outside the RDP): TARGET only, hard margin kept.
+        (ops_dir / "observation_schedule_state.sqlite-wal").write_bytes(b"w" * (30 * mib))
+        grown = self.decide(body, store)
+        ops_bytes = sum((ops_dir / name).stat().st_size for name in (
+            "observation_schedule_state.sqlite", "observation_schedule_state.sqlite-wal"))  # the packet's own definition
+        independent = (ops_bytes + self.tree(sc.data_root, skip=staging) + self.tree(sc.sink)
+                       + self.tree(staging) + peak)
+        self.assertEqual(grown["footprint"]["projected_peak_bytes"], independent)
+        self.assertEqual(grown["reasons"], ["TARGET_EXCEEDED_UNACCEPTED"])
+        self.assertEqual(grown["physical_tail_reserve"], "PASS")
+        # (2) the backup sink and open publication staging push the projection over HARD.
+        (sc.sink / "BACKUP_extra.tmp").write_bytes(b"b" * (20 * mib))
+        (staging / "job.json.tmp").write_bytes(b"s" * (20 * mib))
+        hard = self.decide(body, store)
+        self.assertEqual(hard["footprint"]["staging_bytes"], self.tree(staging))
+        self.assertEqual(hard["reasons"], ["HARD_BYTES", "TARGET_EXCEEDED_UNACCEPTED"])
+        self.assertEqual(hard["hard_constraints"], "FAIL")
+        # (3) an exact scoped acceptance below HARD changes TARGET only; physical reserve is separate.
+        body["resource_policy"]["target_acceptance"] = {"acceptance_sha256": "c" * 64,
+                                                       "max_projected_bytes": hard["projected_peak_bytes"] + 1}
+        body["resource_policy"]["hard_bytes"] = hard["projected_peak_bytes"] + 2
+        accepted = self.decide(body, store)
+        self.assertEqual((accepted["decision"], accepted["storage_health"]), ("ALLOW_WITH_ACCEPTED_TARGET_RISK", "DEGRADED_TARGET"))
+        starved = self.decide(body, store, free=1024 ** 3)
+        self.assertEqual(starved["reasons"], ["PHYSICAL_TAIL_RESERVE"])
+        # (4) an unreadable measurement is UNKNOWN and blocks; it is never zero.
+        unknown = self.decide(body, store, {**zero, "backup_sink_bytes": "UNKNOWN"})
+        self.assertIn("FOOTPRINT_UNKNOWN", unknown["reasons"])
+
+
+def store_profile(sc) -> dict:
+    with closing(ObservationScheduleStore(sc.ops_path)) as store:
+        lineage = store.managed_lineages()[0]
+        return store.managed_profile(lineage, 1)["payload"]["profile"]
+
+
+class ManagedVerifiedBackupTests(ManagedBase):
+    """P0-B: backup freshness comes from the existing backup owners, never from a typed hash."""
+
+    def test_no_manual_receipt_command_and_stale_then_recovery_follow_the_backup_owner(self) -> None:
+        sc = self.sc
+        self.commission_profile("--backup-max-age-seconds", "7200")
+        with self.assertRaises(SystemExit):
+            sc.cmd(D1, "collection-record-backup", "--checkpoint-at", "x", "--artifact-sha256", "a" * 64, "--coverage", "x")
+        # A file named like a receipt, or a bundle that is not a published BACKUP_<sha>.zip, proves nothing.
+        sc.sink.mkdir(parents=True, exist_ok=True)
+        (sc.sink / "BACKUP_not-a-hash.zip").write_bytes(b"x")
+        (sc.data_root / "managed").mkdir(exist_ok=True)
+        (sc.data_root / "managed" / "backup_health_receipt_v1.json").write_text("{}", encoding="utf-8")
+        (sc.sink / f"BACKUP_{ARTIFACT}.zip").unlink(missing_ok=True)
+        blocked = sc.tick(D1 + timedelta(seconds=5))
+        self.assertEqual(blocked["managed"]["lineages"][0]["reasons"], ["BACKUP_MISSING"], blocked)
+        # A failed backup run leaves an old bundle: STALE. A later successful run recovers by itself.
+        sc.backup(D1 - timedelta(hours=5))
+        stale = sc.tick(D1 + timedelta(minutes=10))
+        self.assertEqual(stale["managed"]["lineages"][0]["reasons"], ["BACKUP_STALE"], stale)
+        sc.backup(D1 + timedelta(minutes=20))
+        fresh = sc.tick(D1 + timedelta(minutes=21))
+        self.assertEqual(fresh["managed"]["terminal"], "RECONCILE_CHILD_ACTIVATED", fresh)
+        envelope = sql(sc.ops_path, "SELECT json_extract(payload_json,'$.storage_commissioning.verified_backup_sha256') "
+                                    "FROM schedule_activations WHERE activation_id=?", (sc.children()[0][2],))
+        self.assertEqual(envelope, [(ARTIFACT,)])
+
+    def test_offhost_source_requires_the_owner_state_current(self) -> None:
+        sc = self.sc
+        self.commission_profile()
+        policy = {"backup_source": "OFFHOST_VERIFIED", "backup_max_age_seconds": 3600}
+
+        def snapshot(state, verified, sha=ARTIFACT, configured=True):
+            return {"configured": configured, "offhost_backup_state": state,
+                    "offhost_last_verified_at": verified, "offhost_last_sha256": sha}
+
+        with patch("solana_alpha_lab.factory.offhost_backup.offhost_health_snapshot") as owner:
+            owner.return_value = snapshot("CURRENT", mc.render_utc(D1 - timedelta(minutes=10)))
+            self.assertEqual(mc.read_verified_backup(root=ROOT_DIR, policy=policy, now=D1)["state"], "FRESH")
+            owner.return_value = snapshot("CURRENT", mc.render_utc(D1 - timedelta(hours=3)))
+            self.assertEqual(mc.read_verified_backup(root=ROOT_DIR, policy=policy, now=D1)["state"], "STALE")
+            owner.return_value = snapshot("DEGRADED", mc.render_utc(D1 - timedelta(minutes=10)))
+            self.assertEqual(mc.read_verified_backup(root=ROOT_DIR, policy=policy, now=D1)["state"], "OWNER_DEGRADED")
+            owner.return_value = snapshot("CURRENT", mc.render_utc(D1 - timedelta(minutes=10)), sha="not-hex")
+            self.assertEqual(mc.read_verified_backup(root=ROOT_DIR, policy=policy, now=D1)["state"], "INVALID")
+            owner.return_value = snapshot("UNCONFIGURED", None, configured=False)
+            self.assertEqual(mc.read_verified_backup(root=ROOT_DIR, policy=policy, now=D1)["state"], "UNCONFIGURED")
+
+
+class ManagedAuthorityEventCrashTests(ManagedBase):
+    """P0-C: kill between the authority SQL commit and its ResearchEvent."""
+
+    def test_authority_event_is_rebuilt_not_reissued(self) -> None:
+        import hashlib
+
+        from solana_alpha_lab.factory import observation_schedule_lifecycle as lifecycle
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        sc = self.sc
+        self.commission_profile()
+        sc.backup(D1 - timedelta(hours=1))
+        original = lifecycle._append_or_replay
+        crashed = {"n": 0}
+
+        def crash_authority_event(data_root, event):
+            if str(event.record_kind) == str(RecordKind.OBSERVATION_SCHEDULE_AUTHORITY) and not crashed["n"]:
+                crashed["n"] += 1
+                raise RuntimeError("SIMULATED_PROCESS_KILL")
+            return original(data_root, event)
+
+        with patch.object(lifecycle, "_append_or_replay", side_effect=crash_authority_event):
+            first = sc.tick(D1 + timedelta(seconds=5))
+        self.assertEqual(crashed["n"], 1)
+        self.assertEqual(first["managed"]["terminal"], "RECONCILE_UNEXPECTED_ERROR", first)
+        # SQL plane has the receipt; the event plane does not.
+        receipts = sql(sc.ops_path, "SELECT receipt_sha256, payload_json FROM authority_receipts "
+                                    "WHERE json_extract(payload_json,'$.authority_basis')='STANDING_GRANT'")
+        self.assertEqual(len(receipts), 1)
+        receipt_sha, payload_json = receipts[0]
+        record_id = "OBS-AUTHZ-" + receipt_sha[:16].upper()
+        self.assertIsNone(ResearchStore(sc.data_root).find_record(record_id))
+        counters_before = sql(sc.ops_path, "SELECT COALESCE(SUM(provider_calls),0) FROM lifetime_counters")[0][0]
+        admissions_before = sql(sc.ops_path, "SELECT COUNT(*) FROM episode_admissions")[0][0]
+        repaired = sc.cmd(D1 + timedelta(seconds=20), "collection-reconcile", "--once")
+        self.assertEqual(repaired["terminal"], "RECONCILE_CHILD_ACTIVATED", repaired)
+        # Independent readback of both truth planes.
+        after = sql(sc.ops_path, "SELECT receipt_sha256, payload_json FROM authority_receipts "
+                                 "WHERE json_extract(payload_json,'$.authority_basis')='STANDING_GRANT'")
+        self.assertEqual(after, receipts)
+        record = ResearchStore(sc.data_root).find_record(record_id)
+        self.assertIsNotNone(record)
+        expected = json.dumps(json.loads(payload_json), ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        self.assertEqual(record.payload_sha256, hashlib.sha256(expected.encode("utf-8")).hexdigest())
+        self.assertEqual(sql(sc.ops_path, "SELECT COALESCE(SUM(provider_calls),0) FROM lifetime_counters")[0][0], counters_before)
+        self.assertEqual(sql(sc.ops_path, "SELECT COUNT(*) FROM episode_admissions")[0][0], admissions_before)
+        self.assertEqual(sql(sc.ops_path, "SELECT COUNT(*) FROM schedule_activations WHERE activation_id=?",
+                             (sc.children()[0][2],))[0][0], 1)
+        self.assertEqual(sql(sc.ops_path, "SELECT COUNT(*) FROM authority_receipts")[0][0], len(sql(
+            sc.ops_path, "SELECT 1 FROM authority_receipts")))
+
+
+class ManagedRevocationRollbackTests(ManagedBase):
+    """P0-D: a rollback never re-enables intake the owner stopped, and compares the whole grant scope."""
+
+    def test_rollback_after_stop_keeps_intake_stopped_until_a_fresh_apply(self) -> None:
+        sc = self.sc
+        self.commission_profile("--admissions-per-utc-day", "50")
+        sc.apply(D0 + timedelta(hours=2), "--admissions-per-utc-day", "96")
+        stopped = sc.cmd(D0 + timedelta(hours=3), "collection-stop-intake", "--expected-revision", "2")
+        self.assertEqual(stopped["terminal"], "MANAGED_INTAKE_STOPPED")
+        control_before = sql(sc.ops_path, "SELECT desired_state, intake_revoked_at FROM managed_control")
+        rolled = sc.cmd(D0 + timedelta(hours=4), "collection-rollback", "--expected-revision", "2", "--to-revision", "1")
+        self.assertEqual(rolled["terminal"], "MANAGED_ROLLED_BACK", rolled)
+        self.assertEqual(rolled["desired_state"], "STOP_INTAKE")
+        self.assertEqual(sql(sc.ops_path, "SELECT desired_state, intake_revoked_at FROM managed_control"), control_before)
+        self.assertEqual(sql(sc.ops_path, "SELECT current_revision FROM managed_control"), [(3,)])
+        sc.backup(D1 - timedelta(hours=1))
+        self.assertEqual(sc.tick(D1 + timedelta(seconds=5))["managed"]["terminal"], "RECONCILE_INTAKE_STOPPED")
+        self.assertEqual(sc.children(), [])
+        # Even a rollback that carries its own phrase does not resume: only apply does.
+        resumed = sc.apply(D1 + timedelta(hours=1), "--admissions-per-utc-day", "50")
+        self.assertEqual(resumed["terminal"], "MANAGED_APPLIED", resumed)
+        self.assertEqual(sql(sc.ops_path, "SELECT desired_state, intake_revoked_at FROM managed_control"), [("RUN", None)])
+
+    def test_earlier_handover_or_changed_template_counts_as_wider(self) -> None:
+        import copy
+
+        sc = self.sc
+        self.commission_profile()
+        later = sc.apply(D0 + timedelta(hours=2), not_before=D2)
+        self.assertEqual(later["revision"], 2, later)
+        denied = sc.cmd(D0 + timedelta(hours=3), "collection-rollback", "--expected-revision", "2", "--to-revision", "1")
+        self.assertEqual(denied["terminal"], "ROLLBACK_NOT_RESTRICTIVE_PHRASE_REQUIRED", denied)
+        body = store_profile(sc)
+        same = copy.deepcopy(body)
+        self.assertTrue(mc._not_wider(same, body))
+        for mutate in (
+            lambda b: b["template"]["asset_exclusion"].__setitem__("excluded_tags", []),
+            lambda b: b["template"]["protection"]["assignment_sources"].clear(),
+            lambda b: b["template"]["observation_schedule"].__setitem__("max_batch_size", 50),
+            lambda b: b["continuation"].__setitem__("bootstrap_not_before", mc.render_utc(D0)),
+            lambda b: b["continuation"].__setitem__("protected_bridge", None),
+            lambda b: b["resource_policy"].__setitem__("hard_bytes", b["resource_policy"]["hard_bytes"] + 1),
+        ):
+            wider = copy.deepcopy(body)
+            mutate(wider)
+            self.assertFalse(mc._not_wider(wider, body))
 
 
 class ManagedBudgetTailTests(ManagedBase):
