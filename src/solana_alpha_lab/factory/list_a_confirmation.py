@@ -27,10 +27,10 @@ from solana_alpha_lab.factory.list_a_confirmation_method import (
     CORE_SHA, PARTITIONS, block_for, calculate_list_a, digest, finite_bytes,
 )
 from solana_alpha_lab.factory.hfic_temporal_discovery import (
-    confirmation_price_cell, confirmation_price_relative,
+    GroundedDiscoveryError, confirmation_price_cell, confirmation_price_relative,
 )
 from solana_alpha_lab.factory.opportunity_episodes import resolve_point
-from solana_alpha_lab.factory.research_store import RecordKind, ResearchStore
+from solana_alpha_lab.factory.research_store import RecordKind, ResearchStore, ResearchStoreError
 from solana_alpha_lab.factory.run_passport import compute_run_key_sha256, validate_run_passport
 
 VALUE_COLUMNS = ["episode_id", "cohort_id", "release_id", "mint", "point_id", "field_id", "state", "typed_value",
@@ -71,6 +71,31 @@ def committed(store, record_id: str) -> dict | None:
     matches = [r for r in records(store) if r["record_id"] == record_id]
     require(len(matches) <= 1, "COMMITTED_IDENTITY_CONFLICT")
     return matches[0] if matches else None
+
+
+def confirmation_checkpoint(store, binding_id: str) -> dict:
+    """Committed charge/identity only; independent of current execution authority.
+
+    This never decodes observations or result values. A read/identity failure
+    raises: callers must project UNKNOWN, never infer an unspent allowance.
+    """
+    require(bool(re.fullmatch(r"[0-9a-f]{64}", binding_id)), "EXECUTION_BINDING_UNBOUND")
+    matches = [r for r in records(store) if r["kind"] == "RESEARCH_ARTIFACT" and
+               r["payload"].get("type") == "CONFIRMATION_RESERVATION" and
+               r["payload"].get("execution_binding_sha256") == binding_id]
+    require(len(matches) <= 1, "COMMITTED_RESERVATION_CONFLICT")
+    if not matches:
+        return {"execution_binding_sha256": binding_id, "scientific_charge": 0,
+                "trial_id": None, "run_id": None, "run_key_sha256": None, "domain": None}
+    record, payload = matches[0], matches[0]["payload"]
+    trial_id = "LA-TRIAL-" + digest({"binding": binding_id, "grant": payload["grant_id"], "protocol": CORE_SHA}).upper()
+    require(record["producer"] == CAPABILITY and record["record_id"] == "LA-RESERVATION-" + trial_id[9:] and
+            payload["trial_id"] == trial_id and payload["scientific_charge"] == 1 and
+            payload["protocol_core_sha256"] == CORE_SHA and
+            compute_run_key_sha256(payload["run_key_inputs"]) == payload["run_key_sha256"] and
+            payload["run_id"] == "RUN-" + payload["run_key_sha256"][:24].upper(), "COMMITTED_RESERVATION_INVALID")
+    return {key: payload[key] for key in
+            ("execution_binding_sha256", "scientific_charge", "trial_id", "run_id", "run_key_sha256", "domain")}
 
 
 def current_context(spec: dict, binding_id: str, *, root: Path, store: ResearchStore, now: datetime) -> dict:
@@ -177,7 +202,12 @@ def evaluate_native(context: dict, *, store, phase=None) -> tuple[dict, dict]:
         if not population[-1]["decision_eligible"]:
             continue
         if cells["E14400"]["status"] == "OBSERVED":
-            value = confirmation_price_relative(cells["E14400"]["value"], cells["E1800"]["value"])
+            try:
+                value = confirmation_price_relative(cells["E14400"]["value"], cells["E1800"]["value"])
+            except GroundedDiscoveryError as exc:
+                # Native owner's deterministic numeric refusal is terminal for
+                # this immutable input, not a retryable infrastructure crash.
+                raise ConfirmationError(str(exc)) from exc
             observed.append({**{k: population[-1][k] for k in ("episode_id", "mint", "group", "blocks")}, "r": value})
         else:
             missing[group + ":" + (source_rows[0]["state"] if source_rows else "ABSENT")] += 1
@@ -267,6 +297,7 @@ def compose_confirmation_dossier(*, spec: dict, locator, root: Path, store,
     """Typed ordinary consumer. Presence is linked availability, not promotion."""
     from solana_alpha_lab.factory.run_passport import experiment_spec_sha256
     spec_sha = experiment_spec_sha256(spec)
+    store_records = store_records or []
     direct, decisions, trials, conflicts = [], [], [], []
     for record in store_records:
         payload = json.loads(record.payload_json)
@@ -286,8 +317,19 @@ def compose_confirmation_dossier(*, spec: dict, locator, root: Path, store,
                     if readback.get("result"):
                         require(readback["result"]["identity"]["experiment_spec_sha256"] == spec_sha, "RESULT_DEFINITION_CONFLICT")
                     trials.append(readback)
-                except (ConfirmationError, ValueError, OSError, KeyError) as exc:
-                    conflicts.append(getattr(exc, "code", "TYPED_RESULT_UNVERIFIABLE"))
+                except (ConfirmationError, ResearchStoreError, ValueError, OSError, KeyError) as exc:
+                    reason = getattr(exc, "code", "TYPED_RESULT_UNVERIFIABLE")
+                    conflicts.append(reason)
+                    # A failed artifact verification cannot erase a committed
+                    # potentially exposed reservation from the owner readout.
+                    try:
+                        checkpoint = confirmation_checkpoint(store, payload["execution_binding_sha256"])
+                        require(checkpoint["scientific_charge"] == 1 and checkpoint["trial_id"] == payload["trial_id"],
+                                "COMMITTED_RESERVATION_INVALID")
+                        trials.append({**checkpoint, "status": "UNVERIFIABLE", "protocol_terminal": None,
+                            "reason_codes": [reason], "next_action": "VERIFY_SAVED_ARTIFACT_KEEP_CONSUMED_ALLOWANCE"})
+                    except (ConfirmationError, ResearchStoreError, ValueError, OSError, KeyError, AttributeError):
+                        conflicts.append("COMMITTED_RESERVATION_UNVERIFIABLE")
     decisions.sort(key=lambda d: (d["effective_at"], d["record_id"]))
     known_trials = {t["trial_id"] for t in trials}
     for card in direct:
@@ -303,9 +345,9 @@ def compose_confirmation_dossier(*, spec: dict, locator, root: Path, store,
         "next_action": t["next_action"], **({"population": {k: v for k, v in t["result"]["population"].items() if k != "membership"},
             "method": t["result"]["method"], "interval": [t["result"]["binding"]["interval_start"],
             t["result"]["binding"]["interval_end_exclusive"]]} if t.get("result") else {})} for t in trials]
-    from solana_alpha_lab.factory.experiment_evidence import _build_obligations, science_guard
+    from solana_alpha_lab.factory.experiment_evidence import build_science_obligations, science_guard
     ordinary_spec = {**spec, "falsifier": "BOTH_UPPER_BOUNDS_AND_ALL_LEAVE_ONE_NONPOSITIVE"}
-    obligations = _build_obligations(ordinary_spec, entity={"entity_id": locator.entity_id}, direct=direct,
+    obligations = build_science_obligations(ordinary_spec, entity={"entity_id": locator.entity_id}, direct=direct,
         records=store_records, records_status=records_status, root=root)
     obligations = [o for o in obligations if o["code"] != "RESULT"] + [{"code": "RESULT", "status": status, "values": {"trials": result_view},
                     "reason_codes": sorted(set(conflicts)), "next_safe_action": "VERIFY_TYPED_RESULT_LINEAGE"},
@@ -329,8 +371,10 @@ def compose_confirmation_dossier(*, spec: dict, locator, root: Path, store,
         "typed_status": status, "conflicts": sorted(set(conflicts))})
     return {"schema": "smial.experiment-evidence-dossier", "schema_version": "1.0", "authority_granted": False,
         "locator": {"entity_id": locator.entity_id, "truth_plane": locator.truth_plane, "native_kind": locator.native_kind},
-        "planes": {"execution": "COMPLETE" if complete else "INTERRUPTED" if trials else "NO_RUN",
-                   "evidence": status, "decision": decisions[-1].get("decision_kind") if decisions else "NO_DECISION"},
+        "planes": {"execution": "UNKNOWN" if records_status != "AVAILABLE" or conflicts else
+                   "COMPLETE" if complete and len(complete) == len(trials) else "INTERRUPTED" if trials else "NO_RUN",
+                   "evidence": status, "decision": "UNKNOWN" if records_status != "AVAILABLE" else
+                   decisions[-1].get("decision_kind") if decisions else "NO_DECISION"},
         "tested": {"question": spec["question"], "estimand": spec["estimand"], "population": spec["population"],
                    "hypothesis_version_id": spec["hypothesis_version"], "holdout_policy": "ALLOW_EXACT_CONFIRMATION",
                    "method": "CROSSED_CLUSTER_PERCENTILE_BOOTSTRAP", "falsifier": "BOTH_UPPER_BOUNDS_AND_ALL_LEAVE_ONE_NONPOSITIVE"},

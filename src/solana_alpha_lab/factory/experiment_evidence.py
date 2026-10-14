@@ -708,6 +708,15 @@ def _build_obligations(
     return matrix
 
 
+def build_science_obligations(
+    spec: Mapping[str, Any], *, entity: Mapping[str, Any], direct: Sequence[Mapping[str, Any]],
+    records: Sequence[Any] | None, records_status: str, root: Path | None = None,
+) -> list[dict[str, Any]]:
+    """Public facade for version-specific consumers of ordinary science guards."""
+    return _build_obligations(spec, entity=entity, direct=direct, records=records,
+                              records_status=records_status, root=root)
+
+
 def science_guard(obligations: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     blocked = [
         item["code"]

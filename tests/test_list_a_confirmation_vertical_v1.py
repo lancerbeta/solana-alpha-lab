@@ -14,7 +14,7 @@ from solana_alpha_lab.factory.application import FactoryApplication, Application
 from solana_alpha_lab.factory.capabilities import execute_capability
 from solana_alpha_lab.factory.document_runner import DocumentRunner, RunContext
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
-from solana_alpha_lab.factory.list_a_confirmation import read_confirmation
+from solana_alpha_lab.factory.list_a_confirmation import compose_confirmation_dossier, read_confirmation
 from solana_alpha_lab.factory.list_a_confirmation_inputs import (
     DEFINITION, authorize_confirmation, prepare_confirmation, validate_confirmation_result, ConfirmationError, event,
 )
@@ -131,6 +131,25 @@ class VerticalTests(unittest.TestCase):
                 read_confirmation(store,trial_id=response["trial_id"],root=ROOT)
             conflict = app.research_detail(locator)["dossier"]
             self.assertEqual(next(o for o in conflict["obligations"] if o["code"]=="RESULT")["status"],"CONFLICT")
+            self.assertEqual(conflict["planes"]["execution"], "UNKNOWN")
+            self.assertEqual(len(conflict["result"]["trials"]), 1)
+            checkpoint = conflict["result"]["trials"][0]
+            self.assertEqual((checkpoint["trial_id"], checkpoint["scientific_charge"], checkpoint["status"]),
+                             (response["trial_id"], 1, "UNVERIFIABLE"))
+
+    def test_unavailable_history_preserves_unknown_execution_and_decision(self):
+        spec = load_experiment_spec(ROOT, DEFINITION)
+        locator = parse_locator(spec["experiment_id"], "GIT", "EXPERIMENT_SPEC")
+        with patch.object(pq, "read_table", side_effect=AssertionError("NO_DECODER")), patch.object(
+                ResearchStore, "append", side_effect=AssertionError("NO_WRITE")):
+            unknown = compose_confirmation_dossier(spec=spec, locator=locator, root=ROOT, store=None,
+                store_records=None, records_status="UNAVAILABLE")
+            self.assertEqual(unknown["planes"], {"execution": "UNKNOWN", "evidence": "UNKNOWN", "decision": "UNKNOWN"})
+            self.assertFalse(unknown["science_guard"]["allowed"])
+            empty = compose_confirmation_dossier(spec=spec, locator=locator, root=ROOT, store=None,
+                store_records=[], records_status="AVAILABLE")
+            self.assertEqual(empty["planes"]["execution"], "NO_RUN")
+            self.assertEqual(empty["planes"]["decision"], "NO_DECISION")
 
     def test_null_and_insufficient_native_path(self):
         fixed_mask = None

@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import copy
+import contextlib
+import io
 import json
 import tempfile
 import unittest
@@ -20,6 +22,7 @@ from solana_alpha_lab.factory.list_a_confirmation_method import finite_bytes, di
 from solana_alpha_lab.factory.research_store import ResearchStore, RecordKind
 from tests.test_list_a_confirmation_vertical_v1 import ROOT, bound, ValueReader
 from tests.fixtures.list_a_confirmation_v1.native import NOW
+from scripts import list_a_confirmation as cli
 
 
 class AdmissionTests(unittest.TestCase):
@@ -228,3 +231,67 @@ class AdmissionTests(unittest.TestCase):
         self.assertEqual(saved["scientific_charge"], 1)
         self.assertFalse(any(r["kind"] == "RUN_COMPLETED" for r in records(self.store)))
         self.assertEqual(sum(r["kind"] == "RUN_STARTED" for r in records(self.store)), 1)
+
+    def assert_cli_checkpoint(self, binding_id, charge, terminal, trial_id=None):
+        reader = ValueReader(self.store)
+        before = self.store.diagnostics().committed_inventory_sha256
+        with patch.object(pq, "read_table", reader.read), patch(
+                "solana_alpha_lab.factory.list_a_confirmation.calculate_list_a", side_effect=AssertionError("NO_EVALUATOR")), patch.object(
+                ResearchStore, "append", side_effect=AssertionError("NO_WRITES")):
+            for command in ("classify", "submit"):
+                output = io.StringIO()
+                with contextlib.redirect_stdout(output):
+                    code = cli.main([command, "--data-root", str(self.store.root), "--binding-id", binding_id,
+                                     "--as-of", "2027-01-04T00:00:00Z"])
+                self.assertEqual(code, 0)
+                response = json.loads(output.getvalue())
+                checkpoint = response["confirmation_checkpoint"] if command == "classify" else response
+                self.assertEqual(checkpoint["scientific_charge"], charge)
+                self.assertEqual(checkpoint.get("trial_id"), trial_id)
+                self.assertEqual(response["terminal" if command == "classify" else "status"], terminal)
+        self.assertEqual(reader.reads, [])
+        self.assertEqual(before, self.store.diagnostics().committed_inventory_sha256)
+
+    def test_cli_revoke_retains_reserved_identity_charge_and_no_new_look(self):
+        def fail(phase):
+            if phase == "AFTER_RESERVATION":
+                raise RuntimeError("CONTROLLED_PRE_VALUE_CRASH")
+        with self.assertRaises(RuntimeError):
+            self.execute(fail)
+        reservation = next(r["payload"] for r in records(self.store) if r["kind"] == "RUN_STARTED")
+        grant = next(r for r in records(self.store) if r["payload"].get("type") == "CONFIRMATION_GRANT")
+        txn = "RESEARCH-TXN-LA-CLI-REVOKE"
+        self.store.append([event(ROOT, record_id="LA-CLI-REVOKE", kind=RecordKind.RESEARCH_ARTIFACT,
+            transaction_id=txn, payload={"type": "GRANT_REVOKED", "grant_id": grant["record_id"]})], transaction_id=txn)
+        self.assert_cli_checkpoint(self.p["binding_id"], 1, "BLOCKED_AFTER_RESERVE", reservation["trial_id"])
+        self.assert_cli_checkpoint("0" * 64, 0, "BLOCKED_BEFORE_RESERVE")
+        with patch.object(ResearchStore, "iter_committed_records", side_effect=RuntimeError("UNAVAILABLE")):
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                self.assertEqual(cli.main(["submit", "--data-root", str(self.store.root), "--binding-id", self.p["binding_id"]]), 2)
+            self.assertIsNone(json.loads(output.getvalue())["scientific_charge"])
+
+    def test_native_numeric_refusals_are_terminal_with_consumed_charge(self):
+        from tests.fixtures.list_a_confirmation_v1 import native
+        original = native.write_native_confirmation_sample
+        for reason, decision, target in (("TEMPORAL_TARGET_NONFINITE", "1e-308", "1e308"),
+                ("TEMPORAL_TARGET_UNREPRESENTABLE", "1", "1." + "0" * 399 + "1")):
+            with self.subTest(reason=reason):
+                def ingress(**kwargs):
+                    rows = copy.deepcopy(kwargs["observations"])
+                    for row in rows:
+                        row["typed_value"] = decision if row["point_id"] == "E1800" else target
+                    return original(**{**kwargs, "observations": rows})
+                with patch.object(native, "write_native_confirmation_sample", ingress):
+                    spec, prepared, _ = bound(self.store, source_id="SYNTH-" + reason.replace("_", "-"))
+                with patch("solana_alpha_lab.factory.list_a_confirmation.calculate_list_a", side_effect=AssertionError("NO_BOOTSTRAP")), self.assertRaisesRegex(
+                        ConfirmationError, reason):
+                    execute_capability(spec, root=ROOT, capture_hooks={"execution_context": {
+                        "binding_id": prepared["binding_id"], "data_root": self.store.root, "now": NOW}})
+                reservation = next(r["payload"] for r in records(self.store) if r["kind"] == "RUN_STARTED" and
+                    r["payload"].get("execution_binding_sha256") == prepared["binding_id"])
+                saved = read_confirmation(self.store, trial_id=reservation["trial_id"], root=ROOT)
+                self.assertEqual((saved["status"], saved["scientific_charge"], saved["reason_codes"]),
+                                 ("INVALID_AFTER_RESERVE", 1, [reason]))
+                self.assert_cli_checkpoint(prepared["binding_id"], 1, "BLOCKED_AFTER_RESERVE", reservation["trial_id"])
+                self.assertFalse(any(r["kind"] == "RUN_COMPLETED" for r in records(self.store)))

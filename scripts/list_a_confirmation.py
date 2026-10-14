@@ -16,7 +16,7 @@ from solana_alpha_lab.factory.list_a_confirmation_inputs import (
     DEFINITION, ConfirmationError, authorize_confirmation, load_json,
     prepare_confirmation, utc, write_native_confirmation_sample, register_source_authority,
 )
-from solana_alpha_lab.factory.list_a_confirmation import read_confirmation, resume_confirmation
+from solana_alpha_lab.factory.list_a_confirmation import confirmation_checkpoint, read_confirmation, resume_confirmation
 from solana_alpha_lab.factory.lane_classifier import classify_lane
 from solana_alpha_lab.factory.document_runner import DocumentRunner, RunContext
 from solana_alpha_lab.factory.research_store import ResearchStore
@@ -74,7 +74,8 @@ def main(argv=None) -> int:
                 result = asdict(lane)
             else:
                 if lane.terminal not in {"FAST_LANE_READY", "REPLAY_AVAILABLE", "RESUME_REQUIRED"}:
-                    result = {"status": lane.terminal, "reason_codes": list(lane.reason_codes), "scientific_charge": 0,
+                    result = {**(getattr(lane, "confirmation_checkpoint", None) or {"scientific_charge": None}),
+                              "status": lane.terminal, "reason_codes": list(lane.reason_codes),
                               "next_action": lane.next_action}
                 else:
                     result = DocumentRunner(root=ROOT, store=None).start_document(spec,
@@ -83,7 +84,13 @@ def main(argv=None) -> int:
         print(json.dumps(public_response(result), ensure_ascii=False, sort_keys=True, allow_nan=False))
         return 0
     except (ValueError, OSError, KeyError, TypeError, RuntimeError) as exc:
-        print(json.dumps({"status": "REFUSED", "reason_codes": [getattr(exc, "code", "CONFIRMATION_INPUT_OR_RUNTIME_INVALID")],
+        checkpoint = {"scientific_charge": None}
+        if args.command in {"submit", "resume", "classify"} and args.binding_id:
+            try:
+                checkpoint = confirmation_checkpoint(ResearchStore(args.data_root, create_if_missing=False), args.binding_id)
+            except (ValueError, OSError, KeyError, TypeError, RuntimeError):
+                pass  # Unavailable committed metadata stays UNKNOWN/null.
+        print(json.dumps({**checkpoint, "status": "REFUSED", "reason_codes": [getattr(exc, "code", "CONFIRMATION_INPUT_OR_RUNTIME_INVALID")],
                           "next_action": "VERIFY_EXACT_INPUT_AND_SAVED_CHECKPOINT"}))
         return 2
 
