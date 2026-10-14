@@ -4,8 +4,8 @@
   "review_id": "I3_MANAGED_COLLECTION_CONTINUITY_V1-FIT",
   "as_of": "2026-10-14",
   "task_id": "I3_MANAGED_COLLECTION_CONTINUITY_V1",
-  "reviewed_bindings_sha256": "db23bd3e7662928d373734d9bcf2c3a1827c8c29280f4ba22dd411521f0c2eea",
-  "reviewed_inventory_sha256": "d6999db43da643e6c281eba0fecb699a9829950cc2f480dc25e2178a8037e2d1",
+  "reviewed_bindings_sha256": "492d0e3cca7c9a7c648f563a19771d15398e2d1066282424286e514456b03a72",
+  "reviewed_inventory_sha256": "c2c070a0c094805a62ea05b702e6e6a97c6032b3b61df5756df1383b356f9c09",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
