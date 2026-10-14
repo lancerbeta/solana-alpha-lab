@@ -11,14 +11,14 @@
   "dimensions": {
     "mission": "Collection continues from one approved profile: children, authority, activation, tails, alerts and operational plan/apply/rollback without per-window manual steps; live enablement stays a separate OPERATE gate.",
     "flexibility_and_history": "Profile revisions are immutable rows; children are normal frozen V1 episode schedules equal to the approved template; V1 grants, A, armed B, C1/C2 and all identities are untouched; the schema change is optional keys only.",
-    "context_efficiency": "One task, one new module plus seams in existing owners; 28 focused tests, 47-module/735-test direct-consumer regression, five mutation controls; no pre-PR full gate; exact-head CI is mandatory.",
+    "context_efficiency": "One task, one new module plus seams in existing owners; 35 focused tests plus one release seam test, 48-module/744-test direct-consumer regression, seven mutation controls; no pre-PR full gate; exact-head CI is mandatory.",
     "research_truth": "No estimand, filter, seed, grid or T0 change; one owner per UTC day keeps cohort scopes releasable; HOLD and mid-day windows leave nomination gaps that are UNKNOWN, not negative evidence, and are named for downstream consumers.",
     "owner_operability": "One phrase per profile, zero per child; plan shows numbers and refusing axes; typed terminals with next_action; runbook table; OPERATE packet with stop/rollback and acceptance; Russian readout with residuals.",
     "execution_to_cashflow": "Collection operability only; no trading, alpha, revenue or cashflow claim; no provider call.",
     "monitoring_and_recovery": "Durable incidents deduplicated through the existing watch; crash resume from the saved intent; restore marker blocks controller and tick; binary rollback after the first managed child is forbidden (forward fix); policy rollback is a new revision.",
     "build_vs_buy": "ADOPT existing lifecycle, store, tick, watch, account budget; WRAP with a small controller. No service, queue, cron generator or second collector.",
     "security": "No credential read, no secret, no external write; derived authority is bounded by the approved template; approval is integrity not provenance (named).",
-    "red_team": "Five mutations (child beyond grant, backdated window, storage never blocks, no event repair, no HOLD) are killed; tamper at derive and tick time, competing reconciler, clock backwards and rollback widening fail closed."
+    "red_team": "Seven mutations (child beyond grant, backdated window, storage never blocks, no activation-event repair, no authority-event repair, rollback always not-wider, no HOLD) are killed; tamper at derive and tick time, competing reconciler, clock backwards, rollback widening and sticky stop fail closed."
   },
   "capability_radar": {
     "now": "Exact merge gate, then one OPERATE: deploy, plan, one profile apply, B handover on 18.10, TEST alert readback. No new tool.",

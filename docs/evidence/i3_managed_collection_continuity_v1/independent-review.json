@@ -17,28 +17,28 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only review of da297ff4, delta re-review on a3f7da9c321828e5f015ef594994fa3846d829f7: first review found one P1 (rollback widened validity/resources/routes without a phrase) and P2s (unmanaged multi-candidate semantics, controller failure invisible in exit code, hold incident first lineage only, masked successor gap, lease on storage walk). P1 and exit-code/hold/isolation fixed and re-verified (28 tests pass); no new defect. Residual P2 declared: unmanaged multi-candidate refusals are collected instead of returned first; lease is not renewed during the data-root size walk (surfaces as RECONCILE_FAILED, exit 2); one managed lineage per store."
+        "Isolated read-only review chain da297ff4 -> a3f7da9c -> 8e69811a -> 11d9779254bb83f5ce9cd7e408bec80ad5489e3d (final PASS, 35 managed tests green). Findings closed in order: rollback widened authority (P1); controller failure invisible in exit code; hold incident first lineage only; owner follow-up seams (whole-factory footprint, owner-sourced backup, authority event repair, sticky stop) reviewed with no defect except an unreadable backup sink counted as 0 (P1, now UNKNOWN fail-closed) and backup_source missing from rollback wideness (P2, fixed). Declared residuals: unmanaged multi-candidate refusals are collected; lease is not renewed during the size walk (surfaces as RECONCILE_FAILED, exit 2); one managed lineage per store."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "First review NOT_READY (narrow): PRD 12.2 rows not proven nor declared. Closed on a3f7da9c321828e5f015ef594994fa3846d829f7 by tests (clock backwards, rollback authority, exit code) and by naming the unproven items in the task contract (5+ UTC and weekly boundary, 180d/100w scale, seal/import/preflight, old-binary rejection, Telegram outage). Outcome stays CODE_READY_RUNTIME_PENDING; no overclaim found."
+        "PASS on 11d9779254bb83f5ce9cd7e408bec80ad5489e3d after earlier NOT_READY (PRD 12.2 rows). Each owner P0 (whole-factory TARGET/HARD, owner-sourced backup, authority event repair, sticky revocation-safe rollback) has a before/after in proof.json, a named test and a mutation kill; the release seam test (four managed days across a weekly boundary, one failing child, production verify/import and Forge preflight) is substantive. Outcome stays CODE_READY_RUNTIME_PENDING; unproven items are declared in the task contract."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "SEMANTIC_PREMISE=PASS; packet_fingerprint_sha256=bd9037e8530dd90a2503d01a00ffdf34a075403b6775b2ac749bcefb7efa389a (delta re-review on a3f7da9c; first packet d3d4cfe655de32e09d4ddcc0a610044f51495db8c520650ab05f15bbd359076b). PACKET_INFORMATION_PATH only; launch isolation is PROCESS_OBLIGATION; fingerprint was read from the packet (the reviewer environment lacked jsonschema) and recomputed by the coordinator with validate-launch. Named residuals: approval is integrity not provenance; HOLD round and mid-day window leave no per-round event so nomination gaps are UNKNOWN and statistics must key on the child window; controller-dead masking relies on generic alerts; backup receipt unauthenticated."
+        "SEMANTIC_PREMISE=PASS; packet_fingerprint_sha256=2870c3922107c3a8dab15a7beb626e4ff78d85cc1b1546c17816dd8984775765 (delta re-review on 11d9779254bb83f5ce9cd7e408bec80ad5489e3d; earlier packets d3d4cfe6..., bd9037e8..., b8654d75...). PACKET_INFORMATION_PATH only; launch isolation is PROCESS_OBLIGATION; the reviewer environment lacked jsonschema so the fingerprint was read from the packet and recomputed by the coordinator with validate-launch. Named residuals: approval is integrity not provenance; HOLD rounds and mid-day windows leave no per-round event so nomination gaps are UNKNOWN and statistics must key on the child window; repaired authority event carries repair time; LOCAL_BUNDLE is not an off-host guarantee; controller-dead masking relies on generic alerts."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "First review NOT_READY (two P1 documentation items): packet did not show values bound only by the profile hash nor the stop/rollback commands. Fixed and re-reviewed on a3f7da9c321828e5f015ef594994fa3846d829f7 with per-code incident next steps, CLI refusal reason/next_action and backup attestation warning. Residual P2: managed incident codes do not page as owner-attention."
+        "PASS on 11d9779254bb83f5ce9cd7e408bec80ad5489e3d after NOT_READY twice (packet hid bound values and lacked stop/rollback commands; then stale references to the removed backup-receipt step). No daily owner or agent step remains; refusal and incident text per reason; readout states residuals. Residual P2: managed incident codes do not page as owner-attention."
       ]
     }
   ],
@@ -66,6 +66,22 @@
       "finding": "P1: OPERATE packet hid values bound only by the profile hash and lacked stop/rollback commands; closed in the packet with per-code incident next steps and refusal hints.",
       "observed_head": "da297ff496fd3729f6110e23c2252a544dffa5a5",
       "resolved_by_head": "a3f7da9c321828e5f015ef594994fa3846d829f7"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1: an existing but unreadable backup sink was counted as 0 bytes (under-counted whole-factory footprint); closed by _walk_bytes returning UNKNOWN and blocking with FOOTPRINT_UNKNOWN, with a test.",
+      "observed_head": "8e69811a7d8bd85cedb2d4dc54d640544693dfc7",
+      "resolved_by_head": "11d9779254bb83f5ce9cd7e408bec80ad5489e3d"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1: stale references to the removed backup-receipt step in the runbook row, the STORAGE_BLOCKED incident text and proof.json; closed with actionable backup-owner/footprint wording.",
+      "observed_head": "8e69811a7d8bd85cedb2d4dc54d640544693dfc7",
+      "resolved_by_head": "11d9779254bb83f5ce9cd7e408bec80ad5489e3d"
     }
   ],
   "verdict": "PASS",
