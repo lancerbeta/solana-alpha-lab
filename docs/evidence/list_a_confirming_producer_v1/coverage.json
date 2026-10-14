@@ -61,7 +61,7 @@
       "status": "PASS_WITH_EXPLICIT_SKIPS"
     },
     {
-      "evidence": "Measured allocation under target/cap; named failed P0/OS attempts retained, no image/.venv/new dependencies",
+      "evidence": "Measured allocation under target/cap; named P0/OS attempts retained; no new images/dependencies. One accidental empty review environment created, reversibly archived with no installs/product/science use, accounted in footprint-review-final; active .venv absent",
       "requirement": "resources/history",
       "status": "PASS"
     },
