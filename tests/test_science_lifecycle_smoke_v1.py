@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 KIT=ROOT/'tests/fixtures/science_lifecycle_smoke_v1'
 sys.path.insert(0,str(KIT))
-from verify_saved import verify,verify_run,verify_failure_receipts
+from verify_saved import verify,verify_run,verify_failure_receipts,verify_sc06
 
 EVIDENCE=ROOT/'docs/evidence/science_lifecycle_smoke_v1'
 
@@ -16,9 +16,31 @@ class ScienceLifecycleSavedTests(unittest.TestCase):
     def setUp(self):
         self.numeric=json.loads((EVIDENCE/'numerical.json').read_text(encoding='utf-8'))
 
-    def test_actual_saved_witnesses_and_partial_coverage(self):
+    def test_actual_saved_witnesses_and_final_bounded_coverage(self):
         result=verify(EVIDENCE)
-        self.assertEqual(result['charges'],{'main':4,'evaluator':8,'confirmation':0})
+        self.assertEqual(result['charges'],{'main':6,'evaluator':10,'confirmation':0})
+
+    def test_sc06_cannot_hide_changed_prefix_or_membership(self):
+        changed=json.loads((EVIDENCE/'sc06.json').read_text(encoding='utf-8'))
+        corrupt=copy.deepcopy(changed)
+        corrupt['prefix_oracle']['changed']['prefix_sha256']='0'*64
+        with self.assertRaisesRegex(AssertionError,'SC06_DECISION_PREFIX_CHANGED'):
+            verify_sc06(self.numeric,corrupt)
+        corrupt=copy.deepcopy(changed)
+        corrupt['oracle_rows'][0]['decision_eligible']=not corrupt['oracle_rows'][0]['decision_eligible']
+        with self.assertRaisesRegex(AssertionError,'SC06_ORACLE_MEMBERSHIP_CHANGED'):
+            verify_sc06(self.numeric,corrupt)
+
+    def test_sc06_unchanged_future_or_denominator_is_rejected(self):
+        changed=json.loads((EVIDENCE/'sc06.json').read_text(encoding='utf-8'))
+        corrupt=copy.deepcopy(changed)
+        corrupt['oracle_rows']=copy.deepcopy(self.numeric['oracle_rows'])
+        with self.assertRaisesRegex(AssertionError,'SC06_FUTURE_ORACLE_NOT_REGISTERED_DELTA'):
+            verify_sc06(self.numeric,corrupt)
+        corrupt=copy.deepcopy(changed)
+        corrupt['runs']['LIST_CONTRAST']['classifier']['episode_outcome_binding']['decision_n']=19
+        with self.assertRaises(AssertionError):
+            verify_sc06(self.numeric,corrupt)
 
     def test_forged_complete_without_native_commit_is_rejected(self):
         run=copy.deepcopy(self.numeric['runs']['LIST_CONTRAST']);run['records']=[]

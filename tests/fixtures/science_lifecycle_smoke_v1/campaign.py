@@ -28,11 +28,11 @@ def main():
         from probe import confirmation
         dump(OUT/'confirmation-reachability.json',confirmation())
         dump(OUT/'classified.json',classify_world('base-v2'))
-    elif phase in ('numeric','replay','numeric-v3','replay-v3'):
+    elif phase in ('numeric','replay','numeric-v3','replay-v3','replay-changed'):
         from execution import run
         from oracle import check_summary
         for kind in ('LIST_CONTRAST','MIXED_LIST_NUMERIC'):
-            world='base-v3' if phase.endswith('-v3') else 'base-v2'
+            world='changed' if phase=='replay-changed' else ('base-v3' if phase.endswith('-v3') else 'base-v2')
             receipt=run(world=world,kind=kind)
             response=receipt['response']
             assert response['status']=='COMPLETE' and response['scientific_terminal']=='INCONCLUSIVE',response
@@ -59,6 +59,9 @@ def main():
     elif phase in ('export-saved','export-saved-v3'):
         from export_saved import export
         dump(OUT/(phase+'.json'),export('base-v3' if phase.endswith('-v3') else 'base-v2'))
+    elif phase=='export-sc06':
+        from export_saved import export_sc06
+        dump(OUT/'export-sc06.json',export_sc06())
     elif phase=='negatives':
         from negatives import check as negative_check
         dump(OUT/'negative-check.json',negative_check())
@@ -82,8 +85,10 @@ def main():
         from execution import classify_world,run
         from oracle import check_summary
         from common import load
-        dump(OUT/'changed-classified.json',classify_world('changed'))
-        original=load(OUT/'base-v2'/'membership-numeric-oracle.json')
+        dump(OUT/'changed-classified.json',classify_world('changed',retain_pre_run=False))
+        from sc06_oracle import build
+        dump(OUT/'sc06-prefix-oracle.json',build())
+        original=load(OUT/'base-v3'/'membership-numeric-oracle.json')
         changed=load(OUT/'changed'/'membership-numeric-oracle.json')
         role_keys=('episode_id','decision_eligible','matched','comparator')
         assert [{k:r[k] for k in role_keys} for r in original]==[{k:r[k] for k in role_keys} for r in changed]
@@ -91,7 +96,7 @@ def main():
             receipt=run(world='changed',kind=kind)
             assert receipt['response']['status']=='COMPLETE' and receipt['reads']['evaluator_invocations']==1
             expected=check_summary(receipt['response']['capability_result']['summary'],changed,kind)
-            old=load(OUT/'base-v2'/(kind+'-run.json'))['response']['capability_result']
+            old=load(OUT/'base-v3'/(kind+'-run.json'))['response']['capability_result']
             assert old['result_sha256']!=receipt['response']['capability_result']['result_sha256']
             dump(OUT/'changed'/kind/'numeric-oracle-check.json',expected)
     elif phase.startswith('fault-'):

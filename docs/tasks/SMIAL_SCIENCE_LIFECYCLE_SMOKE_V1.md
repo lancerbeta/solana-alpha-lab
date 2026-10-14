@@ -1,6 +1,6 @@
 ---
 task_id: SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1
-task_version: '1.0'
+task_version: '1.1'
 status: READY
 as_of: '2026-10-14'
 owner: GOAL_OWNER
@@ -26,6 +26,7 @@ managed_write_set:
 - catalog/generated/**
 - docs/generated/**
 - docs/PROJECT_MAP.md
+- docs/OPERATOR_NAVIGATION.md
 - docs/FACTORY_SEMANTIC_MAP.md
 external_caps:
   network: false
@@ -56,12 +57,9 @@ context_requirements:
     - docs/contracts/episode_native_required_outcomes_v1.md
     - docs/contracts/list_a_chronological_confirmation_v1.md
     DELIVERY_EVIDENCE:
-    - docs/evidence/science_lifecycle_smoke_v1/summary.json
-    - docs/evidence/science_lifecycle_smoke_v1/numerical.json
-    - docs/evidence/science_lifecycle_smoke_v1/readback.json
-    - docs/evidence/science_lifecycle_smoke_v1/chronology.json
-    - docs/evidence/science_lifecycle_smoke_v1/chronology-geometry.json
-    - docs/evidence/science_lifecycle_smoke_v1/footprint.json
+    - docs/evidence/science_lifecycle_smoke_v1/completion.json
+    - docs/evidence/science_lifecycle_smoke_v1/independent-review.json
+    - docs/evidence/science_lifecycle_smoke_v1/factory-fit.json
 ---
 
 Owner EXECUTE: "возьми в работу", with the exact attached named PRD+SSD.
@@ -134,5 +132,20 @@ is about 509.3/512 MiB including checkout and owned writable layers; Docker VHD
 growth remains UNKNOWN. No post-hoc budget increase.
 Current deliverable is a reviewable local checkpoint. Full DoD, final delivery
 binding, PR/CI/readiness/merge remain pending; no prior merge phrase applies.
-Next exact owner decision: optional replan allocation cap from 512 to 640 MiB
-for only outstanding SC06, keeping trial caps and all scientific history.
+Historical checkpoint above is preserved, not a current cap or verdict.
+
+OWNER BOUNDED CONTINUATION 2026-10-14: execute SC06 and finalize this audit,
+without product repair or a new research cycle. Forward-only known owned
+allocation cap is 640 MiB (671088640 bytes). Original 512 MiB cap and its
+post-hook breach remain historical: 706668368 known bytes, breach 169797456.
+Only the local hook-created .venv (172621496 allocated bytes) may be deleted,
+after proving it is not shared or used. All scientific stores, receipts,
+trial history, caches and other data stay retained. New trial caps remain
+6 MAIN / 12 evaluators / 3 conditional B. No scientific cap is reset.
+SC06 must change future outcomes on the real numeric path while preserving
+decision-time membership and denominators under an independent oracle.
+Stop at 640 MiB with exact checkpoint if insufficient. Mandatory Git hooks
+remain enabled; an unexpectedly recreated local .venv counts toward the cap.
+Deliver final coverage/findings/evidence/owner report/REPRODUCE, one proposed
+NOW repair and explicit UNKNOWN; stop at exact-head merge readiness for a
+new owner phrase. This continuation does not authorize repair or merge.

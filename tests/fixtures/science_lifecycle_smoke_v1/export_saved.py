@@ -42,13 +42,8 @@ def compact_run(receipt):
         'after':compact_state(receipt['after']), 'spec_sha256':receipt['spec_sha256']}
 
 
-def export(world='base-v2'):
+def numerical_runs(world, all_records, pins):
     plane=OUT/world/'plane'
-    before=state(plane)
-    all_records=records(plane)
-    prefix='' if world=='base-v2' else world+'-'
-    definition_file='definition-ingress'+('' if world=='base-v2' else '-'+world)+'.json'
-    pins=load(OUT/definition_file)['pins']
     runs={}
     for kind in ('LIST_CONTRAST','MIXED_LIST_NUMERIC'):
         original=load(OUT/world/(kind+'-run.json'))
@@ -67,6 +62,17 @@ def export(world='base-v2'):
                 'after':compact_state(repeat['after'])},
             'classifier':frozen['classifier_receipt'],
             'lineage':passport['source_lineage']}
+    return runs
+
+
+def export(world='base-v2'):
+    plane=OUT/world/'plane'
+    before=state(plane)
+    all_records=records(plane)
+    prefix='' if world=='base-v2' else world+'-'
+    definition_file='definition-ingress'+('' if world=='base-v2' else '-'+world)+'.json'
+    pins=load(OUT/definition_file)['pins']
+    runs=numerical_runs(world,all_records,pins)
     ledger=[json.loads(line) for line in (OUT/'attempts.jsonl').read_text().splitlines()]
     charges={k:sum(r['kind']==k for r in ledger) for k in ('main','evaluator','confirmation')}
     baseline_ids=set(load(OUT/world/'LIST_CONTRAST-run.json')['before']['completion_ids'])
@@ -131,3 +137,17 @@ def export(world='base-v2'):
     (destination/'attempts.jsonl').write_text(''.join(json.dumps({'ledger_kind':'native_charge','event':r},sort_keys=True)+'\n' for r in ledger))
     assert state(plane)==before,'SAVED_EXPORT_CHANGED_SCIENCE'
     return {'status':'SAVED_EXPORT_CREATED','files':len(list(destination.iterdir())),'charges':charges}
+
+
+def export_sc06():
+    world='changed'
+    plane=OUT/world/'plane';before=state(plane)
+    pins=load(OUT/'definition-ingress-changed.json')['pins']
+    witness={'tested_git_sha':BASE,'world':world,
+        'registered_input':load(OUT/world/'registered-input.json'),
+        'oracle_rows':load(OUT/world/'membership-numeric-oracle.json'),
+        'prefix_oracle':load(OUT/'sc06-prefix-oracle.json'),
+        'runs':numerical_runs(world,records(plane),pins)}
+    dump(OUT/'portable-sc06/sc06.json',witness)
+    assert state(plane)==before,'SC06_EXPORT_CHANGED_SCIENCE'
+    return {'status':'SAVED_SC06_EXPORT_CREATED'}

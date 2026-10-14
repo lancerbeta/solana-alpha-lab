@@ -1,88 +1,95 @@
-# SMIAL Science lifecycle smoke: частичный checkpoint
+# Окончательный bounded audit: COMPLETE_WITH_FINDINGS
 
-На продукте `fbac5449f6dd22a7bc066114109be8bbed830447`, включающем #403,
-доказан настоящий численный путь Spec 1.4 до сохранённого результата, passport
-и атомарных ResearchStore records. Эти records потребляет обычный dossier;
-он сохраняет PAUSE и отказывает в PROMOTE. В проверенном accepted List A маршруте
-нет confirming producer с pre-values reservation. **Полный DoD кампании не закрыт:
-SC06 не выполнен из-за замороженного бюджета хранения.** Это
-`PARTIAL_ENVIRONMENT`, без научного PASS.
+На продукте `fbac5449f6dd22a7bc066114109be8bbed830447` подтверждены настоящий
+численный путь Spec 1.4, сохранение результата/passport/атомарных records,
+холодный повтор, guards/recovery и потребление обычным dossier. SC06 завершён.
+Сквозное научное подтверждение упирается в доказанный product/contract gap:
+**у принятого List A протокола нет accepted confirming producer с reservation
+до чтения значений и substantive scientific evidence.** Аудит завершён;
+научного PASS, готовой стратегии или полного lifecycle нет. Git delivery
+и merge проходят отдельные machine gates.
 
-| Ветка | Результат и граница | Основное evidence |
+| Ветка | Подтверждённый результат | Evidence |
 |---|---|---|
-| A — числа, повтор, восстановление | PASS engineering. LIST: M=10/C=10, mean M=0.10, contrast=0.11. MIXED: M=10/C=D=20, contrast=0.055. Обе дают COMPLETE / INCONCLUSIVE | [numerical.json](../../evidence/science_lifecycle_smoke_v1/numerical.json), actual artifacts/passports/records; independent Fraction oracle |
-| B — подтверждение | BLOCKED_PRODUCT_CONTRACT. Есть принятый List A метод; нет accepted confirming producer с reservation до значений и substantive evidence | [chronology.json](../../evidence/science_lifecycle_smoke_v1/chronology.json): registry, actual dispatch, contract, consumer и source hashes |
-| C — ordinary consumer | PASS engineering. Actual A completion DIRECT; planes COMPLETED / BLOCKED / PAUSE. Cold PAUSE — REPLAY_IDENTICAL, без новых business records | [readback.json](../../evidence/science_lifecycle_smoke_v1/readback.json): реальный dossier и native decision guards |
+| A, SC00–SC06 | Native COMPLETE / INCONCLUSIVE; независимая арифметика, actual artifact/passport/records, cold replay, guards, оба crash boundaries | [numerical.json](../../evidence/science_lifecycle_smoke_v1/numerical.json), [sc06.json](../../evidence/science_lifecycle_smoke_v1/sc06.json), [readback.json](../../evidence/science_lifecycle_smoke_v1/readback.json) |
+| B, SC09–SC12 | SC09 reachability PASS; SC10–12 BLOCKED_PRODUCT_CONTRACT. Confirming trials не запускались | [chronology.json](../../evidence/science_lifecycle_smoke_v1/chronology.json) |
+| C, SC07–SC08 | Actual A completion DIRECT; dossier COMPLETED / BLOCKED / PAUSE; cold REPLAY_IDENTICAL. STALE_EVIDENCE_SNAPSHOT и PROMOTE_BLOCKED | [readback.json](../../evidence/science_lifecycle_smoke_v1/readback.json) |
 
-`FULL_PRODUCT_PATH` относится только к явно названным переходам
-«Spec1.4 → committed numerical artifact» и «actual RUN → dossier → PAUSE».
-Upstream Actor/Critic scripted; регистрация definition slot — явный fixture
-(`SEGMENT_PRODUCT_PATH`). Эти части не складываются в Forge→OOS→Strategy.
-StrategyVersion, activation и PAPER не запускались.
+SC06 меняет matched future returns на −0.20, оставляя comparator неизменным:
 
-Числа проверены отдельно от продуктовой реализации: exact episode IDs и D/M/C,
-средние/медианы, contrast, downside/type-7 quantiles/ES10, полное покрытие
-cohorts/calendar и missing-stress MODEL. [Chronology geometry](../../evidence/science_lifecycle_smoke_v1/chronology-geometry.json)
-отдельно пересчитывает расписание и фактическую доступность для 10 matched episodes
-и 20 E1800/E14400 ячеек из сохранённых metadata, без чтения `typed_value`.
-Корректный comparator важен: MIXED сравнивает M со всем D,
-включая M, поэтому contrast вдвое меньше LIST. Costs не измерены, NetReturn false.
-Повтор обоих corrected Specs в новом контейнере не вызвал evaluator, не
-декодировал future values и не изменил committed inventory.
+| Метрика | base-v3 | changed |
+|---|---:|---:|
+| mean M, M=10 | 0.10 | −0.10 |
+| LIST contrast, C=10 | 0.11 | −0.09 |
+| MIXED contrast, C=D=20 | 0.055 | −0.045 |
 
-Guard/fault specimens сохранили expected отказы при missing/stale source,
-чужом definition и отзыве текущей protection после READY. Historical completion
-сохранилась. В первом process fault записан настоящий result-file до commit;
-orphan не признан завершением, recovery пересчитал и сохранил один completion.
-Во втором fault commit уже завершился до потери ответа; cold replay вернул его
-без evaluator и дубля. Эти проверки — segments на base-v2 с тем же frozen recipe,
-sources и masks, что у исправленного primary base-v3.
+Fraction oracle проверил результаты обеих веток. Native membership совпала
+во всех полях, кроме content-addressed `release_id`: он обязан меняться при
+изменении source bytes. Exact episode IDs, роли и D/M/C остались прежними.
+Отдельно прочитаны только native Parquet prefix rows E0..E1800: canonical
+row digest совпал между мирами; будущие typed_value эта проверка не читала.
+Source hashes связаны с actual classifier и passports. Оба changed result
+повторены в новом контейнере: evaluator=0, target decode=0, unchanged state.
 
-Во время аудита исправлены ошибки **audit kit**, без product repair: Windows
-bind capture превысил 600s; Linux owned volume стал рабочим штатным storage path;
-неверное имя response field; неподготовленная mutable store copy; ошибочное
-ожидание foreign RUN в RELATED. Последний contract исключает conflicting RUN,
-а same-hypothesis PAUSE оставляет RELATED. Затем выявлен унаследованный quote
-question/estimand и лишний Catalog binding в base-v2 Spec. Они давали неверный
-текст вопроса и PIT CONFLICT в dossier. Новая base-v3 зарегистрирована **до**
-classification/run с корректной episode семантикой и corpus binding; старые
-Spec, численные результаты и failures сохранены. Никаких refunds.
+Арифметика включает median/downside/type-7 quantiles/ES10, cohort/calendar
+coverage и missing-stress MODEL. [Clock geometry](../../evidence/science_lifecycle_smoke_v1/chronology-geometry.json)
+проверяет 20 E1800/E14400 metadata cells для 10 matched episodes. MIXED
+сравнивает M со всем D, поэтому его contrast вдвое меньше LIST.
 
-В corrected dossier PIT/population/HOLDOUT остаются UNKNOWN, квалифицирующие
-result/uncertainty/robustness/cost/execution obligations — MISSING. Это ожидаемый
-science refusal: технический RUN не становится квалифицированным подтверждением.
-Валидные команды достигли `STALE_EVIDENCE_SNAPSHOT` и `PROMOTE_BLOCKED`; ноль
-strategy/activation/PAPER writes. Для B проверены короткие альтернативы: frozen
-replay, schedule compile, diagnostics и quote capture не выполняют тот же accepted
-confirmation estimand. Не построены собственный confirmer, reservation ledger
-или scientific carriers.
+Проблемы разделены в [findings.json](../../evidence/science_lifecycle_smoke_v1/findings.json):
 
-Учет: **4 MAIN, 8 evaluator invocations, 0 B attempts, 0 LLM science trials**;
-старые 22 MAIN из #403 — отдельно. Восемь включают прерванные и failed recovery
-вызовы. Unified [ledger](../../evidence/science_lifecycle_smoke_v1/attempts.jsonl)
-сохраняет original native sequence и отдельно clocked container attempts;
-environment misses до контейнера имеют timestamp UNKNOWN. Его порядок не
-выдаётся за восстановленную точную causal chronology.
+- Product gap: accepted chronological producer → pre-values reservation →
+  substantive evidence. Frozen replay, schedule compile, diagnostics и quote
+  capture не выполняют тот же estimand; эквивалентный путь не найден.
+- Ошибки audit kit: Windows bind timeout, response field, mutable clone lookup,
+  foreign RUN attribution, унаследованные quote question/estimand и лишний
+  Catalog binding. Corrected base-v3 зарегистрирована до classification/run;
+  старые specs/results/failures сохранены без refunds. Base-v2 guard/recovery
+  specimens — segments с теми же recipe/sources/masks.
+- Ожидаемые отказы: COMPLETE остаётся INCONCLUSIVE; PIT/population/HOLDOUT
+  UNKNOWN, qualifying obligations MISSING, evidence BLOCKED и PROMOTE_BLOCKED.
+  Технический RUN не заменяет научное подтверждение.
+- Ограничения исходного аудита: SC06 storage stop закрыт owner continuation;
+  ordinary definition registration и blind Actor по-прежнему не доказаны.
 
-Footprint на checkpoint: см. [footprint.json](../../evidence/science_lifecycle_smoke_v1/footprint.json).
-Это измеренные allocated file blocks host + два owned volumes + container RW,
-включая elected checkout: известная сумма **около 509.3 MiB из 512 MiB**,
-остаток **около 2.7 MiB** на checkpoint-замере. Собственно сохранённая test environment
-без elected checkout — **440.62 MiB**. Только стандартный fresh world до
-classification требует около **43 MiB**. Это оценка по выделенным file blocks,
-не рост Docker VHD. Shared существующий image 533,691,498 bytes (508.97 MiB)
-переиспользован, новых image/dependencies
-нет. Docker VHD growth, directory metadata и физическая allocation Docker logs —
-UNKNOWN без baseline/доступного readback. Все owned процессы остановлены;
-автоматического удаления не было. Retained targets: runtime sibling directory,
-volumes `science-lifecycle-v1-product` / `science-lifecycle-v1-output` и только
-контейнеры с campaign label. Чужие ресурсы и старый #403 мир не изменены.
+FULL_PRODUCT_PATH относится только к «Spec1.4 → committed numeric artifact»
+и «actual RUN → ordinary dossier → PAUSE». Scripted Actor/Critic и definition
+fixture остаются SEGMENT_PRODUCT_PATH. StrategyVersion, activation и PAPER
+не запускались; guards/thresholds/Spec semantics не ремонтировались.
 
-**Следующий шаг — закончить SC06 после отдельного budget replan до 640 MiB.**
-Не менять MAIN/evaluator caps (6/12), не очищать историю: новая negative market
-версия должна дать −0.09 / −0.045 при тех же prefix roles. Это пока предложение,
-не authority. По проверенным A/B/C пока выявлен один product seam —
-[List A confirming producer atom](REPAIR_PRD_SSD.md), с отдельными
-sample/authority gates. SC06 ещё может изменить карту findings.
-Guard/threshold/Spec semantics repair по имеющимся данным не нужен. Git
-delivery/merge-readiness не объявляются завершёнными на частичном DoD.
+Учет: **6 MAIN / 10 evaluator invocations / 0 B / 0 LLM science trials**.
+MAIN cap исчерпан. Все interrupted/failed invocations включены; прежние 22 MAIN
+из #403 — отдельно. [Ledger](../../evidence/science_lifecycle_smoke_v1/attempts.jsonl)
+сохраняет native sequence и отдельно clocked operational attempts; для host
+attempts без достоверного времени сохранён timestamp UNKNOWN.
+
+[Footprint](../../evidence/science_lifecycle_smoke_v1/footprint.json) измеряет owned
+file allocation host + два volumes + container RW. На замере после SC06 известно
+**555.53 MiB из forward cap 640 MiB**, test environment без checkout —
+**486.67 MiB**; финальный live readback после Git content сохраняется отдельно.
+Shared preexisting image — ещё 508.97 MiB, новых images нет. Это не физический
+рост Docker VHD. VHD growth, allocation logs и directory metadata UNKNOWN.
+
+Исходный cap 512 MiB действительно был превышен: Git hook создал локальную
+.venv, known total достиг **673.93 MiB**, превышение **161.93 MiB**. Факт
+сохранён в [budget-continuation.json](../../evidence/science_lifecycle_smoke_v1/budget-continuation.json).
+После проверки процессов и отсутствия shared/reparse links удалена только
+разрешённая .venv — **164.62 MiB**. Научные stores, trials, receipts и caches
+сохранены. Mandatory Git hooks используют existing locked shared runtime.
+640 MiB действует только вперёд; прежняя история не пересчитана.
+
+Воспроизводимость: offline verifier требует locked dependencies; native cold
+replay требует retained volumes и локального exact image ID. Fresh capture
+не разрешён exhausted MAIN cap. Первичная ручная подготовка Docker volumes
+не является clean-host one-command bootstrap; см. [REPRODUCE](REPRODUCE.md).
+Девять offline falsifier tests PASS.
+
+**Один NOW repair:** [List A confirming producer/reservation/consumer](REPAIR_PRD_SSD.md),
+PROPOSED_ONLY. Сначала отдельный exact task и sample/data authority; method,
+floors, estimand и scientific guards сохраняются. Новый сервис не требуется.
+WATCH: после его cold substantive evidence повторно оценить science decision.
+Текущий audit не даёт repair, sample activation, provider или merge authority.
+
+Честные UNKNOWN: AGENT_BEHAVIOR_UNVERIFIED; ordinary definition registration;
+PIT/population/HOLDOUT в dossier; costs ABSENT и NetReturn false; opaque hash-byte
+reads не инструментированы; physical Docker storage рост не установлен.

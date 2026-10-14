@@ -110,6 +110,42 @@ def verify_failure_receipts(consumer):
             assert len(recovery['after']['completion_ids'])==len(fault['interruption']['state']['completion_ids'])+1
 
 
+def verify_sc06(base, changed):
+    assert changed['world']=='changed' and changed['tested_git_sha']==base['tested_git_sha']
+    assert changed['registered_input']['negative_world'] is True
+    roles=('episode_id','cohort_id','t0','decision_eligible','matched','comparator')
+    assert [{k:r[k] for k in roles} for r in base['oracle_rows']]==[{k:r[k] for k in roles} for r in changed['oracle_rows']], 'SC06_ORACLE_MEMBERSHIP_CHANGED'
+    from fractions import Fraction
+    for old,new in zip(base['oracle_rows'],changed['oracle_rows']):
+        if old['decision_eligible']:
+            assert Fraction(new['return'])==Fraction(old['return'])-(Fraction(1,5) if old['matched'] else 0), 'SC06_FUTURE_ORACLE_NOT_REGISTERED_DELTA'
+    prefix=changed['prefix_oracle']
+    assert prefix['status']=='PASS_CAPTURED_PREFIX_INVARIANCE'
+    assert prefix['base']['prefix_sha256']==prefix['changed']['prefix_sha256'], 'SC06_DECISION_PREFIX_CHANGED'
+    assert prefix['base']['prefix_rows']==prefix['changed']['prefix_rows']>0
+    for item in ('base','changed'):
+        assert prefix[item]['prefix_episode_count']==24
+        assert prefix[item]['target_value_cells_read']==prefix[item]['evaluator_invocations']==0
+    assert set(changed['runs'])==set(base['runs'])
+    contrasts={}
+    for kind,run in changed['runs'].items():
+        old=base['runs'][kind]
+        result=verify_run(run,changed['oracle_rows'],kind)
+        contrasts[kind]=str(result['contrast'])
+        before=old['classifier']['episode_outcome_binding'];after=run['classifier']['episode_outcome_binding']
+        # Content-addressed release identity must change with future source bytes.
+        # Every other native membership field, including role and episode ID, stays exact.
+        stable=lambda rows:[{k:v for k,v in r.items() if k!='release_id'} for r in rows]
+        assert stable(before['membership'])==stable(after['membership']), 'SC06_NATIVE_MEMBERSHIP_CHANGED'
+        assert any(x['release_id']!=y['release_id'] for x,y in zip(before['membership'],after['membership'])), 'SC06_RELEASE_IDENTITY_UNCHANGED'
+        assert all(before[k]==after[k] for k in ('admissions_n','decision_n','matched_n','comparator_n')), 'SC06_DENOMINATOR_CHANGED'
+        assert old['response']['capability_result']['summary']!=run['response']['capability_result']['summary'], 'SC06_NUMERIC_RESULT_UNCHANGED'
+        assert old['response']['passport']['result_digest_sha256']!=run['response']['passport']['result_digest_sha256']
+        assert prefix['changed']['source_pins']==after['sources'], 'SC06_PREFIX_SOURCE_BINDING_MISMATCH'
+    assert prefix['base']['source_pins']==base['runs']['LIST_CONTRAST']['classifier']['episode_outcome_binding']['sources']
+    return contrasts
+
+
 def verify(directory):
     directory = Path(directory)
     numeric = json.loads((directory/'numerical.json').read_text(encoding='utf-8'))
@@ -138,11 +174,19 @@ def verify(directory):
     assert hashlib.sha256(native_bytes).hexdigest()==binding['native_ledger_sha256'], 'NATIVE_LEDGER_HASH_MISMATCH'
     assert hashlib.sha256((directory/'chronology-geometry.json').read_bytes()).hexdigest()==binding['chronology_geometry_sha256'], 'CHRONOLOGY_RECEIPT_HASH_MISMATCH'
     counts = {kind: sum(r['event']['kind'] == kind for r in native) for kind in ('main', 'evaluator', 'confirmation')}
-    assert counts == numeric['charges'], 'LEDGER_CHARGE_MISMATCH'
+    assert numeric['charges']=={'main':4,'evaluator':8,'confirmation':0}, 'PRIMARY_SNAPSHOT_CHARGE_MISMATCH'
     assert counts['main'] <= 6 and counts['evaluator'] <= 12 and counts['confirmation'] == 0
     summary = json.loads((directory/'summary.json').read_text(encoding='utf-8'))
-    assert summary['campaign_status'] == 'PARTIAL_ENVIRONMENT'
-    assert summary['coverage']['SC06']['status'] == 'BLOCKED_BUDGET'
+    assert summary['campaign_status'] == 'COMPLETE_WITH_FINDINGS'
+    assert summary['coverage']['SC06']['status'] == 'PASS_ENGINEERING'
+    assert counts==summary['charges']=={'main':6,'evaluator':10,'confirmation':0}, 'LEDGER_CHARGE_MISMATCH'
+    sc06=verify_sc06(numeric,json.loads((directory/'sc06.json').read_text(encoding='utf-8')))
+    budget=json.loads((directory/'budget-continuation.json').read_text(encoding='utf-8'))
+    assert budget['original_cap_bytes']==536870912 and budget['original_breach_bytes']==169797456
+    assert budget['original_post_hook_known_allocation_bytes']==706668368 and budget['history_recomputed'] is False
+    assert budget['forward_only_cap_bytes']==671088640 and budget['cleanup_performed'] is True
+    footprint=json.loads((directory/'footprint.json').read_text(encoding='utf-8'))
+    assert footprint['frozen_cap_bytes']==671088640 and footprint['known_file_remaining_bytes']>=0, 'FORWARD_STORAGE_CAP_EXCEEDED'
     assert all(summary['coverage'][s]['status'] == 'BLOCKED_PRODUCT_CONTRACT' for s in ('SC10','SC11','SC12'))
     assert all(value is False for value in summary['science'].values())
     chronology = json.loads((directory/'chronology.json').read_text(encoding='utf-8'))
@@ -163,8 +207,8 @@ def verify(directory):
     direct = {r['record_id'] for r in consumer['cold_dossier']['direct_evidence']}
     list_completion = next(r['id'] for r in numeric['runs']['LIST_CONTRAST']['records'] if r['kind']=='RUN_COMPLETED')
     assert list_completion in direct, 'ACTUAL_A_COMPLETION_NOT_DIRECT'
-    return {'status':'PASS_SAVED_A_C_WITH_EXPLICIT_PARTIAL_COVERAGE', 'charges':counts,
-        'numeric_checks':{k:str(v['contrast']) for k,v in outcomes.items()}}
+    return {'status':'PASS_SAVED_A_C_SC06_WITH_PROVED_B_BOUNDARY', 'charges':counts,
+        'numeric_checks':{k:str(v['contrast']) for k,v in outcomes.items()},'sc06_numeric_checks':sc06}
 
 
 if __name__ == '__main__':

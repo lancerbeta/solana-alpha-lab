@@ -1,48 +1,51 @@
 {
   "allocation_scope": "File blocks, identity-deduplicated; directory metadata and Docker log allocation UNKNOWN; not physical VHD growth",
-  "frozen_cap_bytes": 536870912,
+  "cap_semantics": "OWNER_FORWARD_ONLY; ORIGINAL_512_MIB_BREACH_PRESERVED",
+  "explicit_authorized_cleanup": "elected_checkout/.venv ONLY; budget-continuation.json",
+  "frozen_cap_bytes": 671088640,
   "host": {
-    "allocated_unique_bytes": 194156696,
+    "allocated_unique_bytes": 195120656,
     "cleanup_performed": false,
     "common_git_objects_runtime_cache_existing_worlds": "EXCLUDED_SHARED_OR_PREEXISTING",
     "directory_metadata_and_output_receipt": "EXCLUDED",
     "groups": {
       "elected_checkout": {
-        "allocated_unique_bytes": 72014040,
-        "files": 4298,
-        "logical_bytes": 63387561
+        "allocated_unique_bytes": 72198360,
+        "files": 4303,
+        "logical_bytes": 63558992
       },
       "runtime_snapshot_and_retained_host_output": {
-        "allocated_unique_bytes": 122142656,
-        "files": 8212,
-        "logical_bytes": 104613327
+        "allocated_unique_bytes": 122922296,
+        "files": 8327,
+        "logical_bytes": 105185077
       }
     },
-    "logical_bytes": 168000888,
+    "logical_bytes": 168744069,
     "measurement_errors": []
   },
-  "known_file_remaining_bytes": 2836328,
-  "known_owned_file_allocation_bytes": 534034584,
-  "known_test_environment_excluding_checkout_bytes": 462020544,
+  "known_file_remaining_bytes": 88576496,
+  "known_owned_file_allocation_bytes": 582512144,
+  "known_test_environment_excluding_checkout_bytes": 510313784,
+  "measurement_stage": "FINAL_AUDIT_CONTENT_BEFORE_DELIVERY_METADATA; final live receipt follows separately",
   "new_image_build_or_pull_bytes": 0,
   "no_automatic_cleanup": true,
   "owned_container_metadata": {
     "cleanup_performed": false,
     "container_metadata_directory_allocation": "UNKNOWN_NOT_EXPOSED_BY_DOCKER_INSPECT",
-    "container_rw_known_bytes": 954368,
+    "container_rw_known_bytes": 1093632,
     "docker_log_stream_bytes": 502974,
     "running_owned_processes": 0,
     "shared_docker_vhd_growth": "UNKNOWN_NO_BEFORE_BASELINE"
   },
   "owned_volumes": {
-    "allocated_unique_bytes": 338923520,
+    "allocated_unique_bytes": 386297856,
     "cleanup_performed": false,
     "directory_metadata": "EXCLUDED",
     "groups": {
       "/audit": {
-        "allocated_unique_bytes": 248320000,
-        "files": 15988,
-        "logical_bytes": 204903883
+        "allocated_unique_bytes": 295694336,
+        "files": 20433,
+        "logical_bytes": 239265061
       },
       "/repo": {
         "allocated_unique_bytes": 90603520,
@@ -50,7 +53,7 @@
         "logical_bytes": 81512144
       }
     },
-    "logical_bytes": 286416027,
+    "logical_bytes": 320777205,
     "shared_image_runtime_cache": "EXCLUDED_EXISTING"
   },
   "shared_preexisting_image_bytes": 533691498

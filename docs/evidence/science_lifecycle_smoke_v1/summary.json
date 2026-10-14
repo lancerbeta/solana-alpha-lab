@@ -1,11 +1,55 @@
 {
-  "audit_delivery": "REVIEWABLE_PARTIAL_CHECKPOINT; FULL_CAMPAIGN_DOD_NOT_CLOSED",
+  "audit_delivery": "BOUNDED_AUDIT_OUTCOME_COMPLETE; FULL_SCIENCE_PRODUCT_PATH_BLOCKED; GIT_GATES_SEPARATE",
+  "budget_history": {
+    "authorized_cleanup_scope": "elected_checkout/.venv",
+    "cleanup_performed": true,
+    "cleanup_readback": "EXACT_LOCAL_VENV_ABSENT",
+    "forward_only_cap_bytes": 671088640,
+    "history_recomputed": false,
+    "original_breach_bytes": 169797456,
+    "original_cap_bytes": 536870912,
+    "original_post_hook_known_allocation_bytes": 706668368,
+    "owner_authorization": "BOUNDED_CONTINUATION_SC06_AND_AUDIT_HANDOFF",
+    "process_check": {
+      "method": "Win32_Process executable and command-line path match, excluding checker PID",
+      "prior_attempts": [
+        "SANDBOX_CIM_ACCESS_FAILED_NOT_NEGATIVE_RESULT",
+        "SELF_COMMANDLINE_MATCH_DENIED_NO_DELETE"
+      ],
+      "references": 0,
+      "status": "SUCCESS"
+    },
+    "schema_version": "1.0",
+    "scientific_stores_receipts_trials_caches": "PRESERVED",
+    "sharing_check": {
+      "cfg_sha256": "981d7567d42ebb8219e69d7618d8c3b9017d2f959959c0793fa59311b9c4f9e0",
+      "child_reparse_count": 0,
+      "include_system_site_packages": false,
+      "root_reparse": false,
+      "shared_runtime_is_different": true
+    },
+    "venv_before": {
+      "allocated_unique_bytes": 172621496,
+      "cleanup_performed": false,
+      "common_git_objects_runtime_cache_existing_worlds": "EXCLUDED_SHARED_OR_PREEXISTING",
+      "directory_metadata_and_output_receipt": "EXCLUDED",
+      "groups": {
+        "authorized_venv": {
+          "allocated_unique_bytes": 172621496,
+          "files": 1630,
+          "logical_bytes": 169602701
+        }
+      },
+      "logical_bytes": 169602701,
+      "measurement_errors": []
+    }
+  },
   "campaign": "SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1",
-  "campaign_status": "PARTIAL_ENVIRONMENT",
+  "campaign_status": "COMPLETE_WITH_FINDINGS",
   "charges": {
     "confirmation": 0,
-    "evaluator": 8,
-    "main": 4
+    "evaluator": 10,
+    "main": 6
   },
   "chronology_geometry": "PASS_METADATA_ONLY; 10 matched episodes, 20 E1800/E14400 cells, zero target-value reads",
   "coverage": {
@@ -38,8 +82,9 @@
       "status": "PASS_ENGINEERING"
     },
     "SC06": {
-      "scope": "No changed-world capture/MAIN/numeric attempt; standard fresh world ~43 MiB before classification; insufficient frozen allocation",
-      "status": "BLOCKED_BUDGET"
+      "history": "Originally BLOCKED_BUDGET; owner forward-only continuation, no trial refund",
+      "scope": "Native changed-world LIST -0.09/MIXED -0.045; independent captured prefix hash, exact D/M/C invariant; committed result/passports and cold zero-evaluator replay",
+      "status": "PASS_ENGINEERING"
     },
     "SC07": {
       "scope": "Actual corrected A RUN_COMPLETED DIRECT -> ordinary dossier COMPLETED/BLOCKED/PAUSE; cold identical decision zero writes",
@@ -99,6 +144,14 @@
     "strategy_ready": false,
     "synthetic_protocol_executed": false
   },
-  "stop_reason": "FROZEN_OWNED_STORAGE_ENVELOPE; SC06_NOT_EXECUTED",
-  "tested_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447"
+  "stop_reason": "PROVED_ACCEPTED_CHRONOLOGICAL_PRODUCER_BOUNDARY; NO_REPAIR_AUTHORITY",
+  "tested_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+  "unknowns": [
+    "AGENT_BEHAVIOR_UNVERIFIED",
+    "ORDINARY_DEFINITION_REGISTRATION_UNVERIFIED",
+    "PIT_POPULATION_HOLDOUT_UNKNOWN_IN_DOSSIER",
+    "COST_ABSENT_NET_RETURN_FALSE",
+    "OPAQUE_HASH_BYTES_NOT_INSTRUMENTED",
+    "DOCKER_VHD_GROWTH_LOG_DIRECTORY_ALLOCATION_UNKNOWN"
+  ]
 }

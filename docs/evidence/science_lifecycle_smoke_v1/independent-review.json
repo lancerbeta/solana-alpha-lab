@@ -1,0 +1,22 @@
+{
+  "as_of": "2026-10-14",
+  "non_claims": [
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SCIENTIFIC_ACCEPTANCE"
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "review_id": "SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1-INDEPENDENT",
+  "reviewed_bindings_sha256": "PENDING",
+  "reviewed_inventory_sha256": "PENDING",
+  "reviews": [],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1",
+  "verdict": "NOT_READY"
+}

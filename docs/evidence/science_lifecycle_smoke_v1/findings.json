@@ -31,13 +31,13 @@
       "severity": "EXPECTED"
     },
     {
-      "actual": "Frozen storage cap leaves insufficient allocation after retained attempts; changed world not executed",
+      "actual": "Original SC06 storage stop retained; explicit owner forward-only 640 MiB continuation closes SC06 with actual native numeric and unchanged captured prefix",
       "boundary": "SC06 fresh market variation -> registered native capture",
-      "class": "COVERAGE_GAP_UNKNOWN",
+      "class": "RESOLVED_ORIGINAL_AUDIT_LIMITATION",
       "confidence": "HIGH",
       "id": "F04",
-      "next_gate": "Owner budget replan required; all existing counters/history retained; no automatic cleanup",
-      "severity": "MATERIAL"
+      "proof": "sc06.json and budget-continuation.json; all counters/history retained",
+      "severity": "HISTORICAL"
     },
     {
       "actual": "Spec definition slot registered via explicit fixture; no ordinary authoring/registration edge proved",
@@ -46,6 +46,15 @@
       "id": "F05",
       "repair": "No product seam fabricated; SEGMENT_PRODUCT_PATH on registration",
       "severity": "LIMITATION"
+    },
+    {
+      "actual": "Mandatory Git hook created local .venv: known allocation 706668368 > original cap 536870912; breach 169797456, never recomputed",
+      "class": "HISTORICAL_ENGINEERING_ENVELOPE_BREACH",
+      "confidence": "HIGH",
+      "id": "F06",
+      "proof": "budget-continuation.json; scientific stores/trials/caches preserved",
+      "resolution": "Only owner-authorized unused local .venv deleted; shared runtime reused by mandatory hooks; forward-only cap 671088640",
+      "severity": "MATERIAL"
     }
   ]
 }

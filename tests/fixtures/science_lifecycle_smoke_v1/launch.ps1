@@ -9,6 +9,9 @@ $root=(Resolve-Path -LiteralPath $RuntimeRoot).Path
 if ((Get-Content -LiteralPath (Join-Path $root '.science-owner') -Raw) -ne 'SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1') {throw 'UNOWNED_RUNTIME'}
 $product=Join-Path $root 'product'
 $out=Join-Path $root 'output'
+$manifest=Get-Content -LiteralPath (Join-Path $PSScriptRoot 'manifest.json') -Raw | ConvertFrom-Json
+$allocationCap=[long]$manifest.budget.owned_retained_allocation_bytes
+if($allocationCap -ne 671088640 -or $manifest.budget_replan.forward_only -ne $true){throw 'UNAUTHORIZED_ALLOCATION_CAP'}
 $checkout=Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent
 $kit=Join-Path $root ('kit-'+$Attempt)
 if (Test-Path -LiteralPath $kit) {throw 'IMMUTABLE_ATTEMPT_ALREADY_PRESENT'}
@@ -78,7 +81,13 @@ do {
   }
   $upper += $measured
  }
- if([DateTime]::UtcNow -gt $deadline -or $upper -gt 536870912){
+ $ownedContainers=@(docker ps -aq --filter 'label=science.campaign=SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1')
+ foreach($ownedContainer in $ownedContainers){
+  $rwBytes=docker inspect --size --format '{{.SizeRw}}' $ownedContainer
+  if($LASTEXITCODE -ne 0){throw 'OWNED_CONTAINER_ALLOCATION_UNKNOWN'}
+  $upper += [long]$rwBytes
+ }
+ if([DateTime]::UtcNow -gt $deadline -or $upper -gt $allocationCap){
    docker stop --time 2 $name | Out-Null
    docker logs $name 2>&1 | Out-File -LiteralPath (Join-Path $out ($Attempt+'-log.txt')) -Encoding utf8
    $state=docker inspect --format '{{json .State}}' $name | ConvertFrom-Json

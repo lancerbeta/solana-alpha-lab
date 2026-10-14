@@ -1,0 +1,3183 @@
+{
+  "oracle_rows": [
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "comparator": false,
+      "decision_eligible": true,
+      "episode_id": "EP-013dd4cfaa8aeb09f61870a767d8e5fe",
+      "input_label": "B02",
+      "matched": true,
+      "return": "-13/100",
+      "t0": "2026-10-05T00:15:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "comparator": true,
+      "decision_eligible": true,
+      "episode_id": "EP-0611bac616834f2c78f7b6a3ac116aec",
+      "input_label": "A01",
+      "matched": false,
+      "return": "-1/25",
+      "t0": "2026-10-01T00:15:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "comparator": true,
+      "decision_eligible": true,
+      "episode_id": "EP-08ddaf01ab9d04cb7a7bc9aa6fd06f92",
+      "input_label": "A09",
+      "matched": false,
+      "return": "0",
+      "t0": "2026-10-01T02:15:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "comparator": true,
+      "decision_eligible": true,
+      "episode_id": "EP-1888ac631a560676249b9ec3673a7325",
+      "input_label": "A05",
+      "matched": false,
+      "return": "-1/50",
+      "t0": "2026-10-01T01:15:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "comparator": false,
+      "decision_eligible": false,
+      "episode_id": "EP-2eba7c8572988b55db03dd004be5bbf6",
+      "input_label": "A10",
+      "matched": false,
+      "return": null,
+      "t0": "2026-10-01T02:30:18Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "comparator": true,
+      "decision_eligible": true,
+      "episode_id": "EP-3382902b72258d74b4da38fb87e2a6db",
+      "input_label": "B03",
+      "matched": false,
+      "return": "-1/100",
+      "t0": "2026-10-05T00:30:18Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "comparator": false,
+      "decision_eligible": true,
+      "episode_id": "EP-3e02274345df4c5cc7d918f587a5e278",
+      "input_label": "B04",
+      "matched": true,
+      "return": "-3/25",
+      "t0": "2026-10-05T00:45:18Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "comparator": true,
+      "decision_eligible": true,
+      "episode_id": "EP-42e14d2ad14738c3d84a67bd76d65d67",
+      "input_label": "B07",
+      "matched": false,
+      "return": "1/100",
+      "t0": "2026-10-05T01:30:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "comparator": false,
+      "decision_eligible": true,
+      "episode_id": "EP-546926d5fa141db52d4d5041ab3f5eda",
+      "input_label": "A08",
+      "matched": true,
+      "return": "-3/50",
+      "t0": "2026-10-01T02:00:18Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "comparator": false,
+      "decision_eligible": false,
+      "episode_id": "EP-5531d331aee58de7e41d088c5920db02",
+      "input_label": "B11",
+      "matched": false,
+      "return": null,
+      "t0": "2026-10-05T02:30:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "comparator": true,
+      "decision_eligible": true,
+      "episode_id": "EP-5b7758429af08ffe6edd30e95264c529",
+      "input_label": "A07",
+      "matched": false,
+      "return": "-1/100",
+      "t0": "2026-10-01T01:45:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "comparator": false,
+      "decision_eligible": true,
+      "episode_id": "EP-67725c4a4072933dca6a8c6e5fa65fd1",
+      "input_label": "A00",
+      "matched": true,
+      "return": "-1/10",
+      "t0": "2026-10-01T00:00:14Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "comparator": true,
+      "decision_eligible": true,
+      "episode_id": "EP-7ce8b2ae9f5a403059df4df14a4cda26",
+      "input_label": "B01",
+      "matched": false,
+      "return": "-1/50",
+      "t0": "2026-10-05T00:00:14Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "comparator": true,
+      "decision_eligible": true,
+      "episode_id": "EP-7d66a3a5defcae0609780443eb794594",
+      "input_label": "B05",
+      "matched": false,
+      "return": "0",
+      "t0": "2026-10-05T01:00:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "comparator": false,
+      "decision_eligible": true,
+      "episode_id": "EP-8a629ced120b4ee48b53e7ce5a7344dd",
+      "input_label": "A06",
+      "matched": true,
+      "return": "-7/100",
+      "t0": "2026-10-01T01:30:18Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "comparator": false,
+      "decision_eligible": true,
+      "episode_id": "EP-8ab26e7faa48387e7cdef43a12a5a422",
+      "input_label": "B00",
+      "matched": true,
+      "return": "-7/50",
+      "t0": "2026-10-05T02:45:18Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "comparator": false,
+      "decision_eligible": true,
+      "episode_id": "EP-a61423ea563194ecc0ccf78c70468cf4",
+      "input_label": "B08",
+      "matched": true,
+      "return": "-1/10",
+      "t0": "2026-10-05T01:45:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "comparator": false,
+      "decision_eligible": false,
+      "episode_id": "EP-a66e7f1a673d88552a2261c191027330",
+      "input_label": "A11",
+      "matched": false,
+      "return": null,
+      "t0": "2026-10-01T02:45:18Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "comparator": false,
+      "decision_eligible": false,
+      "episode_id": "EP-a807d9a06e3febc7b5c9421b5011da5d",
+      "input_label": "B10",
+      "matched": false,
+      "return": null,
+      "t0": "2026-10-05T02:15:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "comparator": false,
+      "decision_eligible": true,
+      "episode_id": "EP-af1087bbc9a2f1e4d305707647486710",
+      "input_label": "A04",
+      "matched": true,
+      "return": "-2/25",
+      "t0": "2026-10-01T01:00:18Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "comparator": true,
+      "decision_eligible": true,
+      "episode_id": "EP-bb276d007a9dae3456b6c512a460daa8",
+      "input_label": "B09",
+      "matched": false,
+      "return": "1/50",
+      "t0": "2026-10-05T02:00:18Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "comparator": false,
+      "decision_eligible": true,
+      "episode_id": "EP-d41409d987eb1e69d865a3b5aea0d9b7",
+      "input_label": "B06",
+      "matched": true,
+      "return": "-11/100",
+      "t0": "2026-10-05T01:15:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "comparator": true,
+      "decision_eligible": true,
+      "episode_id": "EP-d6cd78255f5c5627a1a0c2f409ef0ef6",
+      "input_label": "A03",
+      "matched": false,
+      "return": "-3/100",
+      "t0": "2026-10-01T00:45:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "comparator": false,
+      "decision_eligible": true,
+      "episode_id": "EP-f6218a9dc1caf4cd5ed0026b6b63aa67",
+      "input_label": "A02",
+      "matched": true,
+      "return": "-9/100",
+      "t0": "2026-10-01T00:30:18Z"
+    }
+  ],
+  "prefix_oracle": {
+    "base": {
+      "evaluator_invocations": 0,
+      "prefix_episode_count": 24,
+      "prefix_rows": 2688,
+      "prefix_sha256": "ff737d58fe819822c29f6d763ca4f21f6ee43c9a03e3845c4ba2baa73981bade",
+      "source_pins": [
+        {
+          "census_sha256": "5e72a1701d9a146e0c855011cf62bfc5b69967c9117957dff510a38b27e8d139",
+          "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+          "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+          "observations_sha256": "4fde6f0bae6b1ed4144bb5f5365618dfe2f08009163ed0f905c59cff75187505",
+          "release_id": "6efb454b7acf19f6dd4db235e8d07ada26faf94d53f7a425074e56fbb3be0541",
+          "schedule_binding": {
+            "availability_grace_seconds": 300,
+            "dense_step_seconds": 300,
+            "dense_until_seconds": 21600,
+            "dispatch_window_seconds": 60,
+            "horizon_seconds": 259200,
+            "hourly_step_seconds": 3600,
+            "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+            "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+            "witness_max_age_seconds": 120
+          },
+          "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+        },
+        {
+          "census_sha256": "d895badc51cf31d0d298a389c09255213387e9c7e71046179eb4ef02e68119ae",
+          "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+          "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+          "observations_sha256": "55fb8e96e6915ccbc396e613d69b8183456618e707caacc94701211b40436d29",
+          "release_id": "7d01a7cf3c35781535dabffaca72c6398f931c8ea77ce4e3eb1bfcbb228397ee",
+          "schedule_binding": {
+            "availability_grace_seconds": 300,
+            "dense_step_seconds": 300,
+            "dense_until_seconds": 21600,
+            "dispatch_window_seconds": 60,
+            "horizon_seconds": 259200,
+            "hourly_step_seconds": 3600,
+            "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+            "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+            "witness_max_age_seconds": 120
+          },
+          "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+        }
+      ],
+      "target_value_cells_read": 0
+    },
+    "changed": {
+      "evaluator_invocations": 0,
+      "prefix_episode_count": 24,
+      "prefix_rows": 2688,
+      "prefix_sha256": "ff737d58fe819822c29f6d763ca4f21f6ee43c9a03e3845c4ba2baa73981bade",
+      "source_pins": [
+        {
+          "census_sha256": "aa7049dc03b5aab16763d47660b635c38d67eed9e1f16e77ed214c51dbeb3799",
+          "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+          "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+          "observations_sha256": "c3c1dab3824737e25f449d8de771f27b0cc59328766a0d1d9384a651626d4aa2",
+          "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+          "schedule_binding": {
+            "availability_grace_seconds": 300,
+            "dense_step_seconds": 300,
+            "dense_until_seconds": 21600,
+            "dispatch_window_seconds": 60,
+            "horizon_seconds": 259200,
+            "hourly_step_seconds": 3600,
+            "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+            "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+            "witness_max_age_seconds": 120
+          },
+          "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+        },
+        {
+          "census_sha256": "00031b6fb7b266fb637cf6f89c4ee31aa0cbeee5bb0eb0bafa27fee94470c624",
+          "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+          "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+          "observations_sha256": "aee6efbb100c767813390a13a83185cc17243d826080475993eb447fb0f15c20",
+          "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+          "schedule_binding": {
+            "availability_grace_seconds": 300,
+            "dense_step_seconds": 300,
+            "dense_until_seconds": 21600,
+            "dispatch_window_seconds": 60,
+            "horizon_seconds": 259200,
+            "hourly_step_seconds": 3600,
+            "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+            "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+            "witness_max_age_seconds": 120
+          },
+          "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+        }
+      ],
+      "target_value_cells_read": 0
+    },
+    "method": "Filtered native Parquet rows E0..E1800; independent canonical row digest; no future typed_value decode",
+    "status": "PASS_CAPTURED_PREFIX_INVARIANCE"
+  },
+  "registered_input": {
+    "admissions_n": 24,
+    "benchmark": "SCIENCE-LIFECYCLE-changed",
+    "clock_mode": "NATIVE_ASOF_AND_CLOCK_PARAMETERS; NO_SYSTEM_CLOCK_CHANGE",
+    "decision_n": 20,
+    "list_comparator_n": 10,
+    "matched_n": 10,
+    "mixed_comparator_n": 20,
+    "negative_world": true,
+    "new_fixture_main_cap": 2,
+    "scientific_acceptance": false,
+    "source_asof": "2026-10-08 06:00:00+00:00",
+    "table": {
+      "A": {
+        "scienceA00": [
+          "A",
+          true,
+          -0.1
+        ],
+        "scienceA01": [
+          "B",
+          false,
+          -0.04
+        ],
+        "scienceA02": [
+          "A",
+          true,
+          -0.09
+        ],
+        "scienceA03": [
+          "B",
+          false,
+          -0.03
+        ],
+        "scienceA04": [
+          "A",
+          true,
+          -0.08
+        ],
+        "scienceA05": [
+          "B",
+          false,
+          -0.02
+        ],
+        "scienceA06": [
+          "A",
+          true,
+          -0.07
+        ],
+        "scienceA07": [
+          "B",
+          false,
+          -0.01
+        ],
+        "scienceA08": [
+          "A",
+          true,
+          -0.06
+        ],
+        "scienceA09": [
+          "B",
+          false,
+          0.0
+        ],
+        "scienceA10": [
+          "A",
+          true,
+          0.03
+        ],
+        "scienceA11": [
+          "B",
+          false,
+          0.03
+        ]
+      },
+      "B": {
+        "scienceA00": [
+          "A",
+          true,
+          -0.14
+        ],
+        "scienceB01": [
+          "B",
+          false,
+          -0.02
+        ],
+        "scienceB02": [
+          "A",
+          true,
+          -0.13
+        ],
+        "scienceB03": [
+          "B",
+          false,
+          -0.01
+        ],
+        "scienceB04": [
+          "A",
+          true,
+          -0.12
+        ],
+        "scienceB05": [
+          "B",
+          false,
+          0.0
+        ],
+        "scienceB06": [
+          "A",
+          true,
+          -0.11
+        ],
+        "scienceB07": [
+          "B",
+          false,
+          0.01
+        ],
+        "scienceB08": [
+          "A",
+          true,
+          -0.1
+        ],
+        "scienceB09": [
+          "B",
+          false,
+          0.02
+        ],
+        "scienceB10": [
+          "A",
+          true,
+          0.03
+        ],
+        "scienceB11": [
+          "B",
+          false,
+          0.03
+        ]
+      }
+    }
+  },
+  "runs": {
+    "LIST_CONTRAST": {
+      "after": {
+        "completion_ids": [
+          "RUN-COMPLETED-C7147634BBBE4407",
+          "RUN-COMPLETED-E51CABC8B8F04243"
+        ],
+        "logical_sha256": "2bcdea4d5d22620a7656be697d72044ae8b7a2bf98022eba94444ced3752fdd0",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 3,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 40,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 2,
+          "RUN_STARTED": 2
+        }
+      },
+      "artifact": {
+        "artifact_kind": "CAPABILITY_RESULT",
+        "capability_result_sha256": "a86782b351a74135ea0d5fbfd573cdb63f2d103ca2265bcada576fc1f592a6e2",
+        "first_reliable_available_at": "2026-10-14T15:33:59.395621Z",
+        "logical_uri": "smial-data://research/artifacts/results/RESULT-ARTIFACT-61FA52B644C91D3601EA65ED.json",
+        "research_artifact_id": "RESULT-ARTIFACT-61FA52B644C91D3601EA65ED"
+      },
+      "artifact_file_sha256": "9a338c1fc1aeb54002cff75b050c08d21697c01a90563662f35ba903fac14251",
+      "before": {
+        "completion_ids": [
+          "RUN-COMPLETED-E51CABC8B8F04243"
+        ],
+        "logical_sha256": "b392cb2523ea5b552a059384691342b4a33cc2a8528ddc4898843bd58288bece",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 2,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 39,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 1,
+          "RUN_STARTED": 1
+        }
+      },
+      "classifier": {
+        "episode_outcome_binding": {
+          "admissions_n": 24,
+          "anchor_kind": "NOMINATION_T0",
+          "binding_sha256": "224be4938b78ca875a7a5f0ea251347b207f7b04c71ed09d70732a574c43006b",
+          "comparator_n": 10,
+          "contract": "EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1",
+          "current_protection_sha256": "dab071270b999ce9e011a434fd84eaa77773fb0d58aa7d5df5716cb5f4af9bc5",
+          "decision_n": 20,
+          "definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+          "experiment_spec_sha256": "a7a7ed48972351514342a9b8b39ee687f2bef9934b57804b50a5317e319b8f83",
+          "matched_n": 10,
+          "membership": [
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": false,
+              "decision_eligible": true,
+              "episode_id": "EP-013dd4cfaa8aeb09f61870a767d8e5fe",
+              "matched": true,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-0611bac616834f2c78f7b6a3ac116aec",
+              "matched": false,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-08ddaf01ab9d04cb7a7bc9aa6fd06f92",
+              "matched": false,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-1888ac631a560676249b9ec3673a7325",
+              "matched": false,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": false,
+              "decision_eligible": false,
+              "episode_id": "EP-2eba7c8572988b55db03dd004be5bbf6",
+              "matched": false,
+              "reason": "UNIVERSE_FAIL",
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "FAIL"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-3382902b72258d74b4da38fb87e2a6db",
+              "matched": false,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": false,
+              "decision_eligible": true,
+              "episode_id": "EP-3e02274345df4c5cc7d918f587a5e278",
+              "matched": true,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-42e14d2ad14738c3d84a67bd76d65d67",
+              "matched": false,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": false,
+              "decision_eligible": true,
+              "episode_id": "EP-546926d5fa141db52d4d5041ab3f5eda",
+              "matched": true,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": false,
+              "decision_eligible": false,
+              "episode_id": "EP-5531d331aee58de7e41d088c5920db02",
+              "matched": false,
+              "reason": "ABSENT",
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-5b7758429af08ffe6edd30e95264c529",
+              "matched": false,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": false,
+              "decision_eligible": true,
+              "episode_id": "EP-67725c4a4072933dca6a8c6e5fa65fd1",
+              "matched": true,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-7ce8b2ae9f5a403059df4df14a4cda26",
+              "matched": false,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-7d66a3a5defcae0609780443eb794594",
+              "matched": false,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": false,
+              "decision_eligible": true,
+              "episode_id": "EP-8a629ced120b4ee48b53e7ce5a7344dd",
+              "matched": true,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": false,
+              "decision_eligible": true,
+              "episode_id": "EP-8ab26e7faa48387e7cdef43a12a5a422",
+              "matched": true,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": false,
+              "decision_eligible": true,
+              "episode_id": "EP-a61423ea563194ecc0ccf78c70468cf4",
+              "matched": true,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": false,
+              "decision_eligible": false,
+              "episode_id": "EP-a66e7f1a673d88552a2261c191027330",
+              "matched": false,
+              "reason": "ABSENT",
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": false,
+              "decision_eligible": false,
+              "episode_id": "EP-a807d9a06e3febc7b5c9421b5011da5d",
+              "matched": false,
+              "reason": "UNIVERSE_FAIL",
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "FAIL"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": false,
+              "decision_eligible": true,
+              "episode_id": "EP-af1087bbc9a2f1e4d305707647486710",
+              "matched": true,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-bb276d007a9dae3456b6c512a460daa8",
+              "matched": false,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": false,
+              "decision_eligible": true,
+              "episode_id": "EP-d41409d987eb1e69d865a3b5aea0d9b7",
+              "matched": true,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-d6cd78255f5c5627a1a0c2f409ef0ef6",
+              "matched": false,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": false,
+              "decision_eligible": true,
+              "episode_id": "EP-f6218a9dc1caf4cd5ed0026b6b63aa67",
+              "matched": true,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            }
+          ],
+          "membership_sha256": "b907f37ca3ba8c52c1c74edcb1e32d35f335555fe90a1ed4ca05931ca541cf54",
+          "non_claims": [
+            "NO_SCIENTIFIC_ACCEPTANCE",
+            "NO_CHRONOLOGICAL_CONFIRMATION",
+            "NO_PROMOTION_AUTHORITY"
+          ],
+          "readiness": "COMPLETE",
+          "reads": {
+            "new_scientific_looks": 0,
+            "outcome_evaluations": 0,
+            "prefix_value_cells_read": 70,
+            "target_value_cells_materialized": 0
+          },
+          "recipe_scientific_identity": "c34ecb1f6d432d320d589427cb7054fe2cc5370c6c0d4c6860ba3e569d683d8e",
+          "required_coverage": [
+            {
+              "counts": {
+                "ABSENT": 0,
+                "CENSORED": 0,
+                "INVALID": 0,
+                "LATE": 0,
+                "MISSING_TYPED": 0,
+                "OBSERVED": 20
+              },
+              "denominator_n": 20,
+              "field_id": "FIELD-USD-PRICE-001",
+              "point_id": "E14400",
+              "role": "PRIMARY"
+            }
+          ],
+          "schema": "smial.episode-required-outcome-binding",
+          "schema_version": "1.0",
+          "scope_applied_sha256": "eb67fc2f3bbbbb9bf0f7da31e9c3b3e5801dc83447cd41439d350728189b5d6b",
+          "scope_rule_sha256": "f4691c8a3f72dde5d96c18a33db845ea2d68dbb1c940d1bd02392d5e53740257",
+          "sources": [
+            {
+              "census_sha256": "aa7049dc03b5aab16763d47660b635c38d67eed9e1f16e77ed214c51dbeb3799",
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+              "observations_sha256": "c3c1dab3824737e25f449d8de771f27b0cc59328766a0d1d9384a651626d4aa2",
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "schedule_binding": {
+                "availability_grace_seconds": 300,
+                "dense_step_seconds": 300,
+                "dense_until_seconds": 21600,
+                "dispatch_window_seconds": 60,
+                "horizon_seconds": 259200,
+                "hourly_step_seconds": 3600,
+                "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+                "witness_max_age_seconds": 120
+              },
+              "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+            },
+            {
+              "census_sha256": "00031b6fb7b266fb637cf6f89c4ee31aa0cbeee5bb0eb0bafa27fee94470c624",
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+              "observations_sha256": "aee6efbb100c767813390a13a83185cc17243d826080475993eb447fb0f15c20",
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "schedule_binding": {
+                "availability_grace_seconds": 300,
+                "dense_step_seconds": 300,
+                "dense_until_seconds": 21600,
+                "dispatch_window_seconds": 60,
+                "horizon_seconds": 259200,
+                "hourly_step_seconds": 3600,
+                "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+                "witness_max_age_seconds": 120
+              },
+              "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+            }
+          ],
+          "time_contract": {
+            "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+            "time_feature_clock": "FIRST_RELIABLE_AVAILABLE_AT"
+          },
+          "universe_policy": {
+            "holder_field_id": "FIELD-HOLDER-COUNT-001",
+            "liquidity_field_id": "FIELD-LIQUIDITY-USD-001",
+            "min_holders": "50",
+            "min_liquidity_usd": "5000",
+            "rule": "ALL_OF_AT_DECISION_TIME",
+            "semantic_sha256": "63b33150869273e8f5a0d5d214c8c679e24b5468125164ddcf95326bac4d533a"
+          },
+          "unresolved_n": 0
+        },
+        "experiment_spec_sha256": "a7a7ed48972351514342a9b8b39ee687f2bef9934b57804b50a5317e319b8f83",
+        "hypothesis_version": "HYP-HFIC-CAND-E8B09968FD73",
+        "lane": "FAST_LANE",
+        "lane_classifier_terminal": "FAST_LANE_READY",
+        "network_free": true,
+        "next_action": "EXECUTE_ACCEPTED_CAPABILITY",
+        "provider_calls_actual": 0,
+        "reason_codes": [],
+        "schema": "smial.hfic-classifier-receipt",
+        "schema_version": "1.0",
+        "selected_candidate_id": "HFIC-CAND-E8B09968FD73",
+        "selected_definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+        "session_id": "HFIC-SESS-5B8B6A825BF334C8"
+      },
+      "experiment_id": "EXP-SCIENCE-CHANGED-LIST-CONTRAST",
+      "lineage": {
+        "candidate_id": "HFIC-CAND-E8B09968FD73",
+        "critic_input_packet_sha256": "aa20a0769bed6c93668c1908e5fadf07c0472ac46de5d305d9909ca84fb8bea3",
+        "critic_result_sha256": "a2593b5b0a6f4dc2093519040bb5c64510ef7528a4ee6a100c99e3a350e1dc17",
+        "definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+        "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+        "existing_look_ref": "HFIC-ART-DISCOVERY-2343F3CD4420326E30DC817817ABBC4F2419E048",
+        "grounded_result_sha256": "17a72ac0a292b4d2cbe17811c12d525739dafcd0d823f49ee0398eec4856d25c",
+        "market_evidence_epoch_sha256": "159d07d03a4e82789bb52ab0525df41d8920e5deeffac026fbf8a62700f1a933",
+        "new_scientific_look": false,
+        "scientific_terminal": "PASS_FAST_LANE_READY",
+        "session_id": "HFIC-SESS-5B8B6A825BF334C8"
+      },
+      "reads": {
+        "decoded_target_value_rows": 50688,
+        "evaluator_invocations": 1,
+        "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+        "full_trace_retained": true,
+        "full_trace_sha256": "907ec5ca2d56fddd5e15a3c89a8fcdfc51fd9550ef064a5f3666291d63974364",
+        "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+        "parquet_read_calls": 200,
+        "phase": "NUMERIC",
+        "target_projection_calls": 22
+      },
+      "records": [
+        {
+          "id": "EVIDENCE-BINDING-001-BBBE4407",
+          "kind": "EVIDENCE_BINDING",
+          "payload": {
+            "binding_id": "BINDING-TEMPORAL-CORPUS-001",
+            "content_sha256": null,
+            "dataset_fingerprint": "4511a1fe3d1e5394368f206e7edaa767304134584d0ddeefb0b83a6ad0347b4c",
+            "evidence_binding_id": "EVIDENCE-BINDING-001-BBBE4407",
+            "first_reliable_available_at": "2026-10-08T06:00:00.000000Z",
+            "logical_uri": "smial-data://datasets/manifests/dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb.json",
+            "source_kind": "DATASET_MANIFEST",
+            "stable_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb"
+          },
+          "payload_sha256": "22cbab497fe547a3cd77af50d2473ee83a7c244ccfb7b531f1cffb5041c27fea",
+          "producer_capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+          "producer_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+          "run_id": "RUN-61FA52B644C91D3601EA65ED",
+          "transaction_id": "RESEARCH-TXN-C7147634BBBE4407"
+        },
+        {
+          "compact_payload": "RECONSTRUCT_ORIGINAL_WITH_RESPONSE_CAPABILITY_RESULT; ORIGINAL_NATIVE_HASH_RETAINED",
+          "id": "RESULT-ARTIFACT-61FA52B644C91D3601EA65ED",
+          "kind": "RESEARCH_ARTIFACT",
+          "payload": {
+            "artifact_kind": "CAPABILITY_RESULT",
+            "capability_result_sha256": "a86782b351a74135ea0d5fbfd573cdb63f2d103ca2265bcada576fc1f592a6e2",
+            "content_sha256": "a86782b351a74135ea0d5fbfd573cdb63f2d103ca2265bcada576fc1f592a6e2",
+            "logical_uri": "smial-data://research/artifacts/results/RESULT-ARTIFACT-61FA52B644C91D3601EA65ED.json",
+            "research_artifact_id": "RESULT-ARTIFACT-61FA52B644C91D3601EA65ED",
+            "result_digest_sha256": "a86782b351a74135ea0d5fbfd573cdb63f2d103ca2265bcada576fc1f592a6e2"
+          },
+          "payload_sha256": "0cef693a229b3d28b99795df06cb17a736ace18747fc162a61aef560e9eaedac",
+          "producer_capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+          "producer_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+          "run_id": "RUN-61FA52B644C91D3601EA65ED",
+          "transaction_id": "RESEARCH-TXN-C7147634BBBE4407"
+        },
+        {
+          "id": "RUN-COMPLETED-C7147634BBBE4407",
+          "kind": "RUN_COMPLETED",
+          "payload": {
+            "artifact_manifest_sha256": "a86782b351a74135ea0d5fbfd573cdb63f2d103ca2265bcada576fc1f592a6e2",
+            "as_of": "2026-10-14T15:33:59.395621Z",
+            "availability_cutoff": "2026-10-14T15:33:59.395621Z",
+            "capability_closure_sha256": "4cd69465927553f3c3531c272ec4e747f0e1cacc40f3cb84bb79a4a43e35aca9",
+            "cash_spend_usd_cents": 0,
+            "completed_at": "2026-10-14T15:33:59.395621Z",
+            "config_sha256": "f578d886bd5029234f741feb4592c9b80bfc0acfce7224a75274076320c5873d",
+            "dataset_fingerprints": [
+              "4511a1fe3d1e5394368f206e7edaa767304134584d0ddeefb0b83a6ad0347b4c"
+            ],
+            "dataset_manifest_ids": [
+              "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb"
+            ],
+            "execution_status": "COMPLETE",
+            "experiment_id": "EXP-SCIENCE-CHANGED-LIST-CONTRAST",
+            "experiment_spec_sha256": "a7a7ed48972351514342a9b8b39ee687f2bef9934b57804b50a5317e319b8f83",
+            "first_reliable_available_at": "2026-10-14T15:33:59.395621Z",
+            "git_mutation_count": 0,
+            "holdout_consumption_ids": [],
+            "hypothesis_definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+            "hypothesis_version_id": "HYP-HFIC-CAND-E8B09968FD73",
+            "limitations": [],
+            "non_claims": [
+              "NO_ALPHA",
+              "NO_NETRETURN",
+              "NO_NEW_SCIENTIFIC_LOOK"
+            ],
+            "observation_panel_snapshot_sha256": null,
+            "observation_schedule_authority_sha256": null,
+            "observation_schedule_sha256": null,
+            "provider_calls_actual": 0,
+            "provider_calls_planned": 0,
+            "query_recipe_binding": {
+              "reason": "CAPABILITY_DESCRIPTOR_QUERY_RECIPE_NOT_REQUIRED",
+              "status": "NOT_APPLICABLE"
+            },
+            "query_recipe_ids": [],
+            "query_recipe_sha256s": [],
+            "random_seed_or_null": null,
+            "result_artifact_id": "RESULT-ARTIFACT-61FA52B644C91D3601EA65ED",
+            "result_artifact_logical_uri": "smial-data://research/artifacts/results/RESULT-ARTIFACT-61FA52B644C91D3601EA65ED.json",
+            "result_digest_sha256": "a86782b351a74135ea0d5fbfd573cdb63f2d103ca2265bcada576fc1f592a6e2",
+            "run_id": "RUN-61FA52B644C91D3601EA65ED",
+            "run_key_sha256": "61fa52b644c91d3601ea65ed03a3f33afeac126b2440d6313be352bed1ecbbde",
+            "runner_capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+            "runner_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+            "scientific_terminal": "INCONCLUSIVE",
+            "source_lineage": {
+              "candidate_id": "HFIC-CAND-E8B09968FD73",
+              "critic_input_packet_sha256": "aa20a0769bed6c93668c1908e5fadf07c0472ac46de5d305d9909ca84fb8bea3",
+              "critic_result_sha256": "a2593b5b0a6f4dc2093519040bb5c64510ef7528a4ee6a100c99e3a350e1dc17",
+              "definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+              "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+              "existing_look_ref": "HFIC-ART-DISCOVERY-2343F3CD4420326E30DC817817ABBC4F2419E048",
+              "grounded_result_sha256": "17a72ac0a292b4d2cbe17811c12d525739dafcd0d823f49ee0398eec4856d25c",
+              "market_evidence_epoch_sha256": "159d07d03a4e82789bb52ab0525df41d8920e5deeffac026fbf8a62700f1a933",
+              "new_scientific_look": false,
+              "scientific_terminal": "PASS_FAST_LANE_READY",
+              "session_id": "HFIC-SESS-5B8B6A825BF334C8"
+            },
+            "started_at": "2026-10-14T15:33:59.395621Z",
+            "trial_id": "HFIC-ART-DISCOVERY-2343F3CD4420326E30DC817817ABBC4F2419E048",
+            "trial_outcome": "INCONCLUSIVE",
+            "uv_lock_sha256": "3b75cc1c5a2c0c83560beaf1a57c4543b885e0909c75db6d1939e90d09eefedb"
+          },
+          "payload_sha256": "d74e14394c5f095335985c7ad1a10ac720e20216f1586ddc8a710ff0db728cdd",
+          "producer_capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+          "producer_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+          "run_id": "RUN-61FA52B644C91D3601EA65ED",
+          "transaction_id": "RESEARCH-TXN-C7147634BBBE4407"
+        },
+        {
+          "id": "RUN-STARTED-C7147634BBBE4407",
+          "kind": "RUN_STARTED",
+          "payload": {
+            "experiment_id": "EXP-SCIENCE-CHANGED-LIST-CONTRAST",
+            "experiment_spec_sha256": "a7a7ed48972351514342a9b8b39ee687f2bef9934b57804b50a5317e319b8f83",
+            "run_id": "RUN-61FA52B644C91D3601EA65ED",
+            "run_key_sha256": "61fa52b644c91d3601ea65ed03a3f33afeac126b2440d6313be352bed1ecbbde"
+          },
+          "payload_sha256": "239f4a6ae8daa10fffaecd07c6cd9b84abb00448cd48684a7d92aa5c8014ea83",
+          "producer_capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+          "producer_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+          "run_id": "RUN-61FA52B644C91D3601EA65ED",
+          "transaction_id": "RESEARCH-TXN-C7147634BBBE4407"
+        }
+      ],
+      "replay": {
+        "after": {
+          "completion_ids": [
+            "RUN-COMPLETED-8A460511B31D41D3",
+            "RUN-COMPLETED-C7147634BBBE4407",
+            "RUN-COMPLETED-E51CABC8B8F04243"
+          ],
+          "logical_sha256": "29c7d515e09ba31317244d7cc748b868d67abd51e9a2cfd620a8b888143b042f",
+          "record_counts": {
+            "DECISION_EVENT": 2,
+            "EVIDENCE_BINDING": 4,
+            "EXPERIMENT_METRIC": 1,
+            "HYPOTHESIS_VERSION": 3,
+            "RESEARCH_ARTIFACT": 41,
+            "RESEARCH_CYCLE": 6,
+            "RUN_COMPLETED": 3,
+            "RUN_STARTED": 3
+          }
+        },
+        "before": {
+          "completion_ids": [
+            "RUN-COMPLETED-8A460511B31D41D3",
+            "RUN-COMPLETED-C7147634BBBE4407",
+            "RUN-COMPLETED-E51CABC8B8F04243"
+          ],
+          "logical_sha256": "29c7d515e09ba31317244d7cc748b868d67abd51e9a2cfd620a8b888143b042f",
+          "record_counts": {
+            "DECISION_EVENT": 2,
+            "EVIDENCE_BINDING": 4,
+            "EXPERIMENT_METRIC": 1,
+            "HYPOTHESIS_VERSION": 3,
+            "RESEARCH_ARTIFACT": 41,
+            "RESEARCH_CYCLE": 6,
+            "RUN_COMPLETED": 3,
+            "RUN_STARTED": 3
+          }
+        },
+        "entry_lane": "REPLAY_AVAILABLE",
+        "reads": {
+          "decoded_target_value_rows": 0,
+          "evaluator_invocations": 0,
+          "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+          "full_trace_retained": true,
+          "full_trace_sha256": "f41688613ed76bf3d85412d47a654688811324e01b9e27397ee8ecbc6864484f",
+          "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+          "parquet_read_calls": 188,
+          "phase": "REPLAY",
+          "target_projection_calls": 0
+        },
+        "run_id": "RUN-61FA52B644C91D3601EA65ED"
+      },
+      "response": {
+        "capability_result": {
+          "claim_level": "EXPLORATORY_PROXY",
+          "labeled_net_return": false,
+          "provider_api_rpc_wss_calls": 0,
+          "result_sha256": "17a72ac0a292b4d2cbe17811c12d525739dafcd0d823f49ee0398eec4856d25c",
+          "source_lineage": {
+            "candidate_id": "HFIC-CAND-E8B09968FD73",
+            "critic_input_packet_sha256": "aa20a0769bed6c93668c1908e5fadf07c0472ac46de5d305d9909ca84fb8bea3",
+            "critic_result_sha256": "a2593b5b0a6f4dc2093519040bb5c64510ef7528a4ee6a100c99e3a350e1dc17",
+            "definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+            "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+            "existing_look_ref": "HFIC-ART-DISCOVERY-2343F3CD4420326E30DC817817ABBC4F2419E048",
+            "grounded_result_sha256": "17a72ac0a292b4d2cbe17811c12d525739dafcd0d823f49ee0398eec4856d25c",
+            "market_evidence_epoch_sha256": "159d07d03a4e82789bb52ab0525df41d8920e5deeffac026fbf8a62700f1a933",
+            "new_scientific_look": false,
+            "scientific_terminal": "PASS_FAST_LANE_READY",
+            "session_id": "HFIC-SESS-5B8B6A825BF334C8"
+          },
+          "spec_sha256": "c34ecb1f6d432d320d589427cb7054fe2cc5370c6c0d4c6860ba3e569d683d8e",
+          "status": "COMPLETE",
+          "summary": {
+            "ablations": [],
+            "anchor_kind": "NOMINATION_T0",
+            "base_x_n": 24,
+            "baseline": {
+              "downside": {
+                "es10_return": -0.135,
+                "es10_tail_mass_n": 2.0,
+                "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                "le_minus_20_n": 0,
+                "le_minus_20_rate": 0.0,
+                "le_minus_50_n": 0,
+                "le_minus_50_rate": 0.0,
+                "missing_n": 0,
+                "negative_mass": 1.1300000000000001,
+                "negative_n": 16,
+                "observed_n": 20,
+                "p05": -0.1305,
+                "p10": -0.121,
+                "p25": -0.1,
+                "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                "status": "OBSERVED",
+                "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                "worst_negative_share": 0.1238938053097345,
+                "zero_n": 2
+              },
+              "mean_target": -0.05500000000000001,
+              "mean_target_kind": "PRICE_RELATIVE_PROXY",
+              "median_target": -0.05,
+              "observed_n": 20,
+              "view": "BASELINE_DECISION_ELIGIBLE"
+            },
+            "block_count": 2,
+            "by_calendar_block": [
+              {
+                "downside": {
+                  "es10_return": -0.1,
+                  "es10_tail_mass_n": 0.5,
+                  "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                  "le_minus_20_n": 0,
+                  "le_minus_20_rate": 0.0,
+                  "le_minus_50_n": 0,
+                  "le_minus_50_rate": 0.0,
+                  "missing_n": 0,
+                  "negative_mass": 0.4000000000000001,
+                  "negative_n": 5,
+                  "observed_n": 5,
+                  "p05": -0.098,
+                  "p10": -0.096,
+                  "p25": -0.09,
+                  "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                  "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                  "status": "OBSERVED",
+                  "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                  "worst_negative_share": 0.24999999999999994,
+                  "zero_n": 0
+                },
+                "mean_target": -0.08000000000000002,
+                "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "median_target": -0.08,
+                "observed_n": 5,
+                "view": "2026-10-01"
+              },
+              {
+                "downside": {
+                  "es10_return": -0.14,
+                  "es10_tail_mass_n": 0.5,
+                  "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                  "le_minus_20_n": 0,
+                  "le_minus_20_rate": 0.0,
+                  "le_minus_50_n": 0,
+                  "le_minus_50_rate": 0.0,
+                  "missing_n": 0,
+                  "negative_mass": 0.6,
+                  "negative_n": 5,
+                  "observed_n": 5,
+                  "p05": -0.138,
+                  "p10": -0.136,
+                  "p25": -0.13,
+                  "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                  "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                  "status": "OBSERVED",
+                  "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                  "worst_negative_share": 0.23333333333333334,
+                  "zero_n": 0
+                },
+                "mean_target": -0.12,
+                "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "median_target": -0.12,
+                "observed_n": 5,
+                "view": "2026-10-05"
+              }
+            ],
+            "by_cohort": [
+              {
+                "base_x_n": 12,
+                "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+                "decision_eligible_n": 10,
+                "denominator_base_x": 12,
+                "downside": {
+                  "es10_return": -0.1,
+                  "es10_tail_mass_n": 0.5,
+                  "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                  "le_minus_20_n": 0,
+                  "le_minus_20_rate": 0.0,
+                  "le_minus_50_n": 0,
+                  "le_minus_50_rate": 0.0,
+                  "missing_n": 0,
+                  "negative_mass": 0.4000000000000001,
+                  "negative_n": 5,
+                  "observed_n": 5,
+                  "p05": -0.098,
+                  "p10": -0.096,
+                  "p25": -0.09,
+                  "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                  "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                  "status": "OBSERVED",
+                  "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                  "worst_negative_share": 0.24999999999999994,
+                  "zero_n": 0
+                },
+                "exclusion_reasons": {
+                  "ABSENT": 1,
+                  "UNIVERSE_FAIL": 1
+                },
+                "feature_admissible": 10,
+                "feature_unknown_n": 0,
+                "independent_replication": false,
+                "matched_n": 5,
+                "mean_target": -0.08000000000000002,
+                "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "median_target": -0.08,
+                "membership": "DESCRIPTIVE_NOT_INDEPENDENT",
+                "missing_target_n": 0,
+                "observed_target_n": 5,
+                "population_n": 12,
+                "shared_decision_n": 0,
+                "target_exclusion_reasons": {},
+                "target_observed_after_decision": 5,
+                "view": "REL-20261001T000000Z-20261002T000000Z"
+              },
+              {
+                "base_x_n": 12,
+                "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+                "decision_eligible_n": 10,
+                "denominator_base_x": 12,
+                "downside": {
+                  "es10_return": -0.14,
+                  "es10_tail_mass_n": 0.5,
+                  "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                  "le_minus_20_n": 0,
+                  "le_minus_20_rate": 0.0,
+                  "le_minus_50_n": 0,
+                  "le_minus_50_rate": 0.0,
+                  "missing_n": 0,
+                  "negative_mass": 0.6,
+                  "negative_n": 5,
+                  "observed_n": 5,
+                  "p05": -0.138,
+                  "p10": -0.136,
+                  "p25": -0.13,
+                  "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                  "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                  "status": "OBSERVED",
+                  "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                  "worst_negative_share": 0.23333333333333334,
+                  "zero_n": 0
+                },
+                "exclusion_reasons": {
+                  "ABSENT": 1,
+                  "UNIVERSE_FAIL": 1
+                },
+                "feature_admissible": 10,
+                "feature_unknown_n": 0,
+                "independent_replication": false,
+                "matched_n": 5,
+                "mean_target": -0.12,
+                "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "median_target": -0.12,
+                "membership": "DESCRIPTIVE_NOT_INDEPENDENT",
+                "missing_target_n": 0,
+                "observed_target_n": 5,
+                "population_n": 12,
+                "shared_decision_n": 0,
+                "target_exclusion_reasons": {},
+                "target_observed_after_decision": 5,
+                "view": "REL-20261005T000000Z-20261006T000000Z"
+              }
+            ],
+            "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V3",
+            "claim_level": "EXPLORATORY_PROXY",
+            "cohort_independent_replication": false,
+            "cohort_slices_are_descriptive": true,
+            "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+            "cost": {
+              "decision_sensitivity": "NOT_EVALUATED",
+              "labeled_net_return": false,
+              "scenarios": {},
+              "source_status": null,
+              "status": "ABSENT"
+            },
+            "decision_eligible_n": 20,
+            "downside": {
+              "es10_return": -0.14,
+              "es10_tail_mass_n": 1.0,
+              "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+              "le_minus_20_n": 0,
+              "le_minus_20_rate": 0.0,
+              "le_minus_50_n": 0,
+              "le_minus_50_rate": 0.0,
+              "missing_n": 0,
+              "negative_mass": 1.0,
+              "negative_n": 10,
+              "observed_n": 10,
+              "p05": -0.1355,
+              "p10": -0.131,
+              "p25": -0.1175,
+              "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+              "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+              "status": "OBSERVED",
+              "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+              "worst_negative_share": 0.13999999999999999,
+              "zero_n": 0
+            },
+            "downside_readout_exposure": {
+              "fixed_metrics": [
+                "p05",
+                "p10",
+                "p25",
+                "le_minus_20_rate",
+                "le_minus_50_rate",
+                "es10_return",
+                "negative_mass",
+                "worst_negative_share"
+              ],
+              "new_threshold_trials": false,
+              "profile": "DOWNSIDE_DESCRIPTIVE_V1"
+            },
+            "duplicate_delivery_count": 0,
+            "eligibility_uses_target": false,
+            "engine_emits_alpha": false,
+            "episode_counts": {
+              "n_admitted": 24,
+              "n_decision_eligible": 20,
+              "n_joint_feature_supported": 20,
+              "n_matched": 10,
+              "n_target_available": 10,
+              "repeated_mint_n": 1,
+              "unique_episode_n": 24,
+              "unique_mint_n": 23
+            },
+            "episode_target_attrition": {
+              "adjustment": "NONE_REPORTED_ONLY",
+              "decision_baseline": {},
+              "matched": {}
+            },
+            "exclusion_reasons": {
+              "ABSENT": 2,
+              "UNIVERSE_FAIL": 2
+            },
+            "experiment_recipe": {
+              "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+              "cost_label": "ABSENT",
+              "frozen_input": [
+                {
+                  "census_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261001T000000Z-20261002T000000Z/eb1e3a7a011342d8/census.parquet",
+                  "census_sha256": "aa7049dc03b5aab16763d47660b635c38d67eed9e1f16e77ed214c51dbeb3799",
+                  "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+                  "dataset_id": "DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001",
+                  "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+                  "evidence_role": "EXPLORATORY_REUSE",
+                  "holdout": false,
+                  "observations_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261001T000000Z-20261002T000000Z/eb1e3a7a011342d8/observations.parquet",
+                  "observations_sha256": "c3c1dab3824737e25f449d8de771f27b0cc59328766a0d1d9384a651626d4aa2",
+                  "population": "OPPORTUNITY_EPISODES",
+                  "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+                  "schedule_binding": {
+                    "availability_grace_seconds": 300,
+                    "dense_step_seconds": 300,
+                    "dense_until_seconds": 21600,
+                    "dispatch_window_seconds": 60,
+                    "horizon_seconds": 259200,
+                    "hourly_step_seconds": 3600,
+                    "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                    "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+                    "witness_max_age_seconds": 120
+                  },
+                  "schedule_lateness_seconds": null,
+                  "schedule_point_due_offset_seconds": null,
+                  "schedule_point_lateness": null,
+                  "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+                },
+                {
+                  "census_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261005T000000Z-20261006T000000Z/ddd968a703422711/census.parquet",
+                  "census_sha256": "00031b6fb7b266fb637cf6f89c4ee31aa0cbeee5bb0eb0bafa27fee94470c624",
+                  "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+                  "dataset_id": "DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001",
+                  "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+                  "evidence_role": "EXPLORATORY_REUSE",
+                  "holdout": false,
+                  "observations_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261005T000000Z-20261006T000000Z/ddd968a703422711/observations.parquet",
+                  "observations_sha256": "aee6efbb100c767813390a13a83185cc17243d826080475993eb447fb0f15c20",
+                  "population": "OPPORTUNITY_EPISODES",
+                  "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+                  "schedule_binding": {
+                    "availability_grace_seconds": 300,
+                    "dense_step_seconds": 300,
+                    "dense_until_seconds": 21600,
+                    "dispatch_window_seconds": 60,
+                    "horizon_seconds": 259200,
+                    "hourly_step_seconds": 3600,
+                    "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                    "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+                    "witness_max_age_seconds": 120
+                  },
+                  "schedule_lateness_seconds": null,
+                  "schedule_point_due_offset_seconds": null,
+                  "schedule_point_lateness": null,
+                  "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+                }
+              ],
+              "labeled_net_return": false,
+              "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1",
+              "research_scope_evidence": {
+                "bindings": [
+                  {
+                    "adapter": "ADMISSION_FRAME_V1",
+                    "census_sha256": "aa7049dc03b5aab16763d47660b635c38d67eed9e1f16e77ed214c51dbeb3799",
+                    "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+                    "frames_sha256": "ec153501e623f839d2f0614a623980cec3ed3f6ef6b09282217ae81a54f2ccef",
+                    "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+                    "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+                  },
+                  {
+                    "adapter": "ADMISSION_FRAME_V1",
+                    "census_sha256": "00031b6fb7b266fb637cf6f89c4ee31aa0cbeee5bb0eb0bafa27fee94470c624",
+                    "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+                    "frames_sha256": "ef248994a75af4b4d708ba7d8c114ca12f94c32d110dbb68b3c7376d8be3624f",
+                    "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+                    "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+                  }
+                ],
+                "evidence_sha256": "8342e5af3c09536dd9cc9fb923b22b237f78083f4917951b5b48d6d096d158db"
+              },
+              "research_scope_rule_sha256": "f4691c8a3f72dde5d96c18a33db845ea2d68dbb1c940d1bd02392d5e53740257",
+              "schema": "smial.hfic-temporal-query",
+              "schema_version": "1.2",
+              "scientific_identity": "c34ecb1f6d432d320d589427cb7054fe2cc5370c6c0d4c6860ba3e569d683d8e",
+              "spec": {
+                "adaptation_of": null,
+                "budget_allocation": "COMPOUND_FIRST",
+                "query_id": "LAV-LIST_CONTRAST",
+                "schema": "smial.hfic-temporal-query",
+                "schema_version": "1.2",
+                "scientific_body": {
+                  "anchor_kind": "NOMINATION_T0",
+                  "contrast": "MATCHED_VS_ELIGIBLE_COMPLEMENT",
+                  "cost_profile": null,
+                  "decision_point": "E1800",
+                  "diagnostic_slices": [],
+                  "entry_model": {
+                    "assumed_latency_seconds": 0,
+                    "kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT"
+                  },
+                  "evaluation": {
+                    "ablations": "DROP_ONE_CONDITION",
+                    "baseline": "SAME_DECISION_ELIGIBLE",
+                    "calendar_block": "UTC_DAY_OF_DECISION"
+                  },
+                  "features": [],
+                  "hypothesis_kind": "LIST_CONTRAST",
+                  "list_condition": {
+                    "clauses": [
+                      {
+                        "all_of": [
+                          "JUPITER:toporganicscore:5m"
+                        ],
+                        "any_of": [],
+                        "count": null,
+                        "none_of": []
+                      }
+                    ],
+                    "definition_refs": {
+                      "JUPITER:toporganicscore:5m": "8a35ad6835c5cd2a6c7fe772002f3c2a4d616d53479297130f88f25e978b48c0"
+                    },
+                    "required_observed_lists": [
+                      "JUPITER:toporganicscore:5m"
+                    ],
+                    "schema": "smial.list-selector",
+                    "schema_version": "1.0"
+                  },
+                  "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1",
+                  "population": "OPPORTUNITY_EPISODES",
+                  "predicates": [],
+                  "research_scope": {
+                    "anchor_kind": "NOMINATION_T0",
+                    "coverage_policy": "REQUIRE_KNOWN_REFERENCED",
+                    "definition_refs": {},
+                    "evidence_selection": {
+                      "kind": "EXPLICIT_VERIFIED_RELEASE_SET"
+                    },
+                    "membership_time_basis": "EPISODE_T0",
+                    "population": "OPPORTUNITY_EPISODES",
+                    "schema": "smial.research-scope",
+                    "schema_version": "2.0",
+                    "universe_selector": {
+                      "clauses": [
+                        {
+                          "all_of": [],
+                          "any_of": [],
+                          "count": null,
+                          "none_of": []
+                        }
+                      ],
+                      "required_observed_lists": [],
+                      "schema": "smial.list-selector",
+                      "schema_version": "1.0"
+                    }
+                  },
+                  "target": {
+                    "exit_point": "E14400",
+                    "field_id": "FIELD-USD-PRICE-001",
+                    "kind": "PRICE_RELATIVE_PROXY",
+                    "reference_point": "E1800"
+                  },
+                  "time_contract": {
+                    "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                    "time_feature_clock": "FIRST_RELIABLE_AVAILABLE_AT"
+                  }
+                },
+                "search_tier": "COMPOUND_SCREEN",
+                "spec_sha256": "c34ecb1f6d432d320d589427cb7054fe2cc5370c6c0d4c6860ba3e569d683d8e"
+              },
+              "target_kind": "PRICE_RELATIVE_PROXY",
+              "universe_policy": {
+                "holder_field_id": "FIELD-HOLDER-COUNT-001",
+                "liquidity_field_id": "FIELD-LIQUIDITY-USD-001",
+                "min_holders": "50",
+                "min_liquidity_usd": "5000",
+                "rule": "ALL_OF_AT_DECISION_TIME",
+                "semantic_sha256": "63b33150869273e8f5a0d5d214c8c679e24b5468125164ddcf95326bac4d533a"
+              }
+            },
+            "feature_admissible_n": 20,
+            "feature_unknown_n": 0,
+            "independence": "UNKNOWN",
+            "independent_replication": null,
+            "integrity_conflict_count": 0,
+            "labeled_net_return": false,
+            "later_target_observed_n": 10,
+            "main_question_count_includes_variants": false,
+            "matched_feature_means": {},
+            "matched_n": 10,
+            "mean_target": -0.1,
+            "mean_target_kind": "PRICE_RELATIVE_PROXY",
+            "mean_target_units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+            "median_target": -0.1,
+            "missing_is_not_zero": true,
+            "missing_stress_model": {
+              "label": "MODEL",
+              "mean_target": -0.1,
+              "stress_return": -1.0,
+              "writes_raw_history": false
+            },
+            "missing_target_mean_to_zero": null,
+            "missing_target_n": 0,
+            "non_claims": [
+              "NO_ALPHA",
+              "NO_NET_RETURN",
+              "NO_INTRABAR_STOP",
+              "NO_CAUSAL_IDENTIFICATION",
+              "NO_SOURCE_PRICE_EVENT_TIME",
+              "MEMBERSHIP_IS_OBSERVATIONAL_NOT_CAUSAL",
+              "NO_IID_CLAIM",
+              "NOT_NEWBORN_BIRTH_POPULATION",
+              "TARGET_ATTRITION_NOT_ADJUSTED"
+            ],
+            "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1",
+            "observation_index_passes": 1,
+            "observed_target_n": 10,
+            "pooled": {
+              "denominator_base_x": 24,
+              "downside": {
+                "es10_return": -0.14,
+                "es10_tail_mass_n": 1.0,
+                "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                "le_minus_20_n": 0,
+                "le_minus_20_rate": 0.0,
+                "le_minus_50_n": 0,
+                "le_minus_50_rate": 0.0,
+                "missing_n": 0,
+                "negative_mass": 1.0,
+                "negative_n": 10,
+                "observed_n": 10,
+                "p05": -0.1355,
+                "p10": -0.131,
+                "p25": -0.1175,
+                "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                "status": "OBSERVED",
+                "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                "worst_negative_share": 0.13999999999999999,
+                "zero_n": 0
+              },
+              "feature_admissible": 20,
+              "independent_replication": null,
+              "mean_target": -0.1,
+              "mean_target_kind": "PRICE_RELATIVE_PROXY",
+              "median_target": -0.1,
+              "target_observed_after_decision": 10,
+              "view": "pooled"
+            },
+            "population": "OPPORTUNITY_EPISODES",
+            "population_n": 24,
+            "query_id": "LAV-LIST_CONTRAST",
+            "required_cohorts": [
+              "REL-20261001T000000Z-20261002T000000Z",
+              "REL-20261005T000000Z-20261006T000000Z"
+            ],
+            "research_scope": {
+              "applied_sha256": "eb67fc2f3bbbbb9bf0f7da31e9c3b3e5801dc83447cd41439d350728189b5d6b",
+              "base_admitted_n": 24,
+              "contrast": {
+                "comparator": {
+                  "distinct_day_n": 2,
+                  "distinct_mint_n": 10,
+                  "mean_target": -0.01,
+                  "n": 10,
+                  "target_missing_n": 0,
+                  "target_observed_n": 10
+                },
+                "kind": "MATCHED_VS_ELIGIBLE_COMPLEMENT",
+                "kind_of_claim": "OBSERVATIONAL_ASSOCIATION",
+                "observed_target_difference": -0.09000000000000002,
+                "status": "EVALUATED"
+              },
+              "coverage": {
+                "base_admitted_n": 24,
+                "signal_false_n": 12,
+                "signal_invalid_n": 0,
+                "signal_true_n": 12,
+                "signal_unknown_n": 0,
+                "universe_false_n": 0,
+                "universe_invalid_n": 0,
+                "universe_true_n": 24,
+                "universe_unknown_n": 0
+              },
+              "decision_eligible_n": 20,
+              "diagnostic_slices": [],
+              "disclosed_comparison_n": 2,
+              "disclosed_comparisons": [
+                {
+                  "id": "PRIMARY",
+                  "kind": "LIST_CONTRAST"
+                },
+                {
+                  "id": "CONTRAST",
+                  "kind": "MATCHED_VS_ELIGIBLE_COMPLEMENT"
+                }
+              ],
+              "evidence_sha256": "8342e5af3c09536dd9cc9fb923b22b237f78083f4917951b5b48d6d096d158db",
+              "hypothesis_kind": "LIST_CONTRAST",
+              "matched": {
+                "distinct_day_n": 2,
+                "distinct_mint_n": 9,
+                "mean_target": -0.10000000000000002,
+                "n": 10,
+                "target_missing_n": 0,
+                "target_observed_n": 10
+              },
+              "membership_time_basis": "EPISODE_T0",
+              "rule_sha256": "f4691c8a3f72dde5d96c18a33db845ea2d68dbb1c940d1bd02392d5e53740257",
+              "schema": "smial.research-scope-result",
+              "schema_version": "1.0",
+              "scope_sha256": "60ecc7e3bad76442d05e7ef6670ac8a593b6ca41ab6c9ccad5af62d812e04355",
+              "slices_overlap_not_additive": false,
+              "universe_pass_n": 24
+            },
+            "schema": "smial.hfic-temporal-query",
+            "search_tier": "COMPOUND_SCREEN",
+            "source_price_event_time": "UNKNOWN",
+            "spec_sha256": "c34ecb1f6d432d320d589427cb7054fe2cc5370c6c0d4c6860ba3e569d683d8e",
+            "target_exclusion_reasons": {
+              "by_cohort": {
+                "REL-20261001T000000Z-20261002T000000Z": {},
+                "REL-20261005T000000Z-20261006T000000Z": {}
+              },
+              "pooled": {}
+            },
+            "target_kind": "PRICE_RELATIVE_PROXY",
+            "time_feature_clock": "FIRST_RELIABLE_AVAILABLE_AT",
+            "unique_decision_n": 24,
+            "unique_mint_n": 23,
+            "universe_policy": {
+              "holder_field_id": "FIELD-HOLDER-COUNT-001",
+              "liquidity_field_id": "FIELD-LIQUIDITY-USD-001",
+              "min_holders": "50",
+              "min_liquidity_usd": "5000",
+              "n_base": 24,
+              "n_fail": 2,
+              "n_pass": 22,
+              "n_unknown": 0,
+              "rule": "ALL_OF_AT_DECISION_TIME",
+              "semantic_sha256": "63b33150869273e8f5a0d5d214c8c679e24b5468125164ddcf95326bac4d533a"
+            },
+            "viewed_variants": [
+              "MATCHED_OBSERVED",
+              "BASELINE_DECISION_ELIGIBLE",
+              "DOWNSIDE_DESCRIPTIVE_V1"
+            ],
+            "winner_share_of_positive": null
+          },
+          "target_kind": "PRICE_RELATIVE_PROXY",
+          "terminal": "INCONCLUSIVE"
+        },
+        "git_mutation_count": 0,
+        "lane": "FAST_LANE",
+        "next_action": "SEARCH_PRIOR_WORK",
+        "passport": {
+          "artifact_manifest_sha256": "a86782b351a74135ea0d5fbfd573cdb63f2d103ca2265bcada576fc1f592a6e2",
+          "as_of": "2026-10-14T15:33:59.395621Z",
+          "availability_cutoff": "2026-10-14T15:33:59.395621Z",
+          "capability_closure_sha256": "4cd69465927553f3c3531c272ec4e747f0e1cacc40f3cb84bb79a4a43e35aca9",
+          "cash_spend_usd_cents": 0,
+          "completed_at": "2026-10-14T15:33:59.395621Z",
+          "config_sha256": "f578d886bd5029234f741feb4592c9b80bfc0acfce7224a75274076320c5873d",
+          "dataset_fingerprints": [
+            "4511a1fe3d1e5394368f206e7edaa767304134584d0ddeefb0b83a6ad0347b4c"
+          ],
+          "dataset_manifest_ids": [
+            "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb"
+          ],
+          "execution_status": "COMPLETE",
+          "experiment_id": "EXP-SCIENCE-CHANGED-LIST-CONTRAST",
+          "experiment_spec_sha256": "a7a7ed48972351514342a9b8b39ee687f2bef9934b57804b50a5317e319b8f83",
+          "first_reliable_available_at": "2026-10-14T15:33:59.395621Z",
+          "holdout_consumption_ids": [],
+          "hypothesis_definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+          "hypothesis_version_id": "HYP-HFIC-CAND-E8B09968FD73",
+          "limitations": [],
+          "non_claims": [
+            "NO_ALPHA",
+            "NO_NETRETURN",
+            "NO_NEW_SCIENTIFIC_LOOK"
+          ],
+          "observation_panel_snapshot_sha256": null,
+          "observation_schedule_authority_sha256": null,
+          "observation_schedule_sha256": null,
+          "provider_calls_actual": 0,
+          "provider_calls_planned": 0,
+          "query_recipe_binding": {
+            "reason": "CAPABILITY_DESCRIPTOR_QUERY_RECIPE_NOT_REQUIRED",
+            "status": "NOT_APPLICABLE"
+          },
+          "query_recipe_ids": [],
+          "query_recipe_sha256s": [],
+          "random_seed_or_null": null,
+          "result_artifact_id": "RESULT-ARTIFACT-61FA52B644C91D3601EA65ED",
+          "result_artifact_logical_uri": "smial-data://research/artifacts/results/RESULT-ARTIFACT-61FA52B644C91D3601EA65ED.json",
+          "result_digest_sha256": "a86782b351a74135ea0d5fbfd573cdb63f2d103ca2265bcada576fc1f592a6e2",
+          "run_id": "RUN-61FA52B644C91D3601EA65ED",
+          "run_key_sha256": "61fa52b644c91d3601ea65ed03a3f33afeac126b2440d6313be352bed1ecbbde",
+          "runner_capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+          "runner_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+          "scientific_terminal": "INCONCLUSIVE",
+          "source_lineage": {
+            "candidate_id": "HFIC-CAND-E8B09968FD73",
+            "critic_input_packet_sha256": "aa20a0769bed6c93668c1908e5fadf07c0472ac46de5d305d9909ca84fb8bea3",
+            "critic_result_sha256": "a2593b5b0a6f4dc2093519040bb5c64510ef7528a4ee6a100c99e3a350e1dc17",
+            "definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+            "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+            "existing_look_ref": "HFIC-ART-DISCOVERY-2343F3CD4420326E30DC817817ABBC4F2419E048",
+            "grounded_result_sha256": "17a72ac0a292b4d2cbe17811c12d525739dafcd0d823f49ee0398eec4856d25c",
+            "market_evidence_epoch_sha256": "159d07d03a4e82789bb52ab0525df41d8920e5deeffac026fbf8a62700f1a933",
+            "new_scientific_look": false,
+            "scientific_terminal": "PASS_FAST_LANE_READY",
+            "session_id": "HFIC-SESS-5B8B6A825BF334C8"
+          },
+          "started_at": "2026-10-14T15:33:59.395621Z",
+          "trial_id": "HFIC-ART-DISCOVERY-2343F3CD4420326E30DC817817ABBC4F2419E048",
+          "trial_outcome": "INCONCLUSIVE",
+          "uv_lock_sha256": "3b75cc1c5a2c0c83560beaf1a57c4543b885e0909c75db6d1939e90d09eefedb"
+        },
+        "prior_run_id": null,
+        "provider_calls_actual": 0,
+        "reason_codes": [],
+        "run_id_or_null": "RUN-61FA52B644C91D3601EA65ED",
+        "run_key_sha256": "61fa52b644c91d3601ea65ed03a3f33afeac126b2440d6313be352bed1ecbbde",
+        "scientific_terminal": "INCONCLUSIVE",
+        "status": "COMPLETE"
+      },
+      "spec_pin": {
+        "canonical_sha256": "a7a7ed48972351514342a9b8b39ee687f2bef9934b57804b50a5317e319b8f83",
+        "experiment_id": "EXP-SCIENCE-CHANGED-LIST-CONTRAST",
+        "file_sha256": "69466b55f8e274c7408a93eddf0024ec7c06dbe9bbee1b49dda2f00f91c3bbf1",
+        "slot": "configs/experiment_specs/science-changed-list_contrast.yaml"
+      }
+    },
+    "MIXED_LIST_NUMERIC": {
+      "after": {
+        "completion_ids": [
+          "RUN-COMPLETED-8A460511B31D41D3",
+          "RUN-COMPLETED-C7147634BBBE4407",
+          "RUN-COMPLETED-E51CABC8B8F04243"
+        ],
+        "logical_sha256": "29c7d515e09ba31317244d7cc748b868d67abd51e9a2cfd620a8b888143b042f",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 4,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 41,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 3,
+          "RUN_STARTED": 3
+        }
+      },
+      "artifact": {
+        "artifact_kind": "CAPABILITY_RESULT",
+        "capability_result_sha256": "26b3b2b3b59d27e0f7862ca192ad1c3e5914b997a643eb697a87c4e8f313e6f1",
+        "first_reliable_available_at": "2026-10-14T15:34:42.069680Z",
+        "logical_uri": "smial-data://research/artifacts/results/RESULT-ARTIFACT-9AF479821C5F5274A9E11D68.json",
+        "research_artifact_id": "RESULT-ARTIFACT-9AF479821C5F5274A9E11D68"
+      },
+      "artifact_file_sha256": "3459666afb62b58e63e42fa2b7bd06da7a3574d218e0a19fa895e95ddc9a7b6a",
+      "before": {
+        "completion_ids": [
+          "RUN-COMPLETED-C7147634BBBE4407",
+          "RUN-COMPLETED-E51CABC8B8F04243"
+        ],
+        "logical_sha256": "2bcdea4d5d22620a7656be697d72044ae8b7a2bf98022eba94444ced3752fdd0",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 3,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 40,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 2,
+          "RUN_STARTED": 2
+        }
+      },
+      "classifier": {
+        "episode_outcome_binding": {
+          "admissions_n": 24,
+          "anchor_kind": "NOMINATION_T0",
+          "binding_sha256": "627226fbca6c96bb632d4e1687be28f98446e19aee9708f1398d2083e44acb05",
+          "comparator_n": 20,
+          "contract": "EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1",
+          "current_protection_sha256": "dab071270b999ce9e011a434fd84eaa77773fb0d58aa7d5df5716cb5f4af9bc5",
+          "decision_n": 20,
+          "definition_sha256": "ffb8bca42497867b574c0b5f12d74233a4a50eb352a53e3edd38a393b9a355b0",
+          "experiment_spec_sha256": "8752f8908424c8be2eb32fce6935f711c649f5016a03ad6cc0135e9c2ebe217a",
+          "matched_n": 10,
+          "membership": [
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-013dd4cfaa8aeb09f61870a767d8e5fe",
+              "matched": true,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-0611bac616834f2c78f7b6a3ac116aec",
+              "matched": false,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-08ddaf01ab9d04cb7a7bc9aa6fd06f92",
+              "matched": false,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-1888ac631a560676249b9ec3673a7325",
+              "matched": false,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": false,
+              "decision_eligible": false,
+              "episode_id": "EP-2eba7c8572988b55db03dd004be5bbf6",
+              "matched": false,
+              "reason": "UNIVERSE_FAIL",
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "FAIL"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-3382902b72258d74b4da38fb87e2a6db",
+              "matched": false,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-3e02274345df4c5cc7d918f587a5e278",
+              "matched": true,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-42e14d2ad14738c3d84a67bd76d65d67",
+              "matched": false,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-546926d5fa141db52d4d5041ab3f5eda",
+              "matched": true,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": false,
+              "decision_eligible": false,
+              "episode_id": "EP-5531d331aee58de7e41d088c5920db02",
+              "matched": false,
+              "reason": "ABSENT",
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-5b7758429af08ffe6edd30e95264c529",
+              "matched": false,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-67725c4a4072933dca6a8c6e5fa65fd1",
+              "matched": true,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-7ce8b2ae9f5a403059df4df14a4cda26",
+              "matched": false,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-7d66a3a5defcae0609780443eb794594",
+              "matched": false,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-8a629ced120b4ee48b53e7ce5a7344dd",
+              "matched": true,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-8ab26e7faa48387e7cdef43a12a5a422",
+              "matched": true,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-a61423ea563194ecc0ccf78c70468cf4",
+              "matched": true,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": false,
+              "decision_eligible": false,
+              "episode_id": "EP-a66e7f1a673d88552a2261c191027330",
+              "matched": false,
+              "reason": "ABSENT",
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": false,
+              "decision_eligible": false,
+              "episode_id": "EP-a807d9a06e3febc7b5c9421b5011da5d",
+              "matched": false,
+              "reason": "UNIVERSE_FAIL",
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "FAIL"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-af1087bbc9a2f1e4d305707647486710",
+              "matched": true,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-bb276d007a9dae3456b6c512a460daa8",
+              "matched": false,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-d41409d987eb1e69d865a3b5aea0d9b7",
+              "matched": true,
+              "reason": null,
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-d6cd78255f5c5627a1a0c2f409ef0ef6",
+              "matched": false,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            },
+            {
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "comparator": true,
+              "decision_eligible": true,
+              "episode_id": "EP-f6218a9dc1caf4cd5ed0026b6b63aa67",
+              "matched": true,
+              "reason": null,
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "universe_status": "PASS"
+            }
+          ],
+          "membership_sha256": "f1822d1b07eb2a0f2c8d8bb5f5b16c69657e72c72f5a163174474ddab0dd086f",
+          "non_claims": [
+            "NO_SCIENTIFIC_ACCEPTANCE",
+            "NO_CHRONOLOGICAL_CONFIRMATION",
+            "NO_PROMOTION_AUTHORITY"
+          ],
+          "readiness": "COMPLETE",
+          "reads": {
+            "new_scientific_looks": 0,
+            "outcome_evaluations": 0,
+            "prefix_value_cells_read": 94,
+            "target_value_cells_materialized": 0
+          },
+          "recipe_scientific_identity": "b0f8b6a0978ea2d56c74d97cf13ed9e9411951783291da0ee11bfadafcafd52b",
+          "required_coverage": [
+            {
+              "counts": {
+                "ABSENT": 0,
+                "CENSORED": 0,
+                "INVALID": 0,
+                "LATE": 0,
+                "MISSING_TYPED": 0,
+                "OBSERVED": 20
+              },
+              "denominator_n": 20,
+              "field_id": "FIELD-USD-PRICE-001",
+              "point_id": "E14400",
+              "role": "PRIMARY"
+            }
+          ],
+          "schema": "smial.episode-required-outcome-binding",
+          "schema_version": "1.0",
+          "scope_applied_sha256": "eb67fc2f3bbbbb9bf0f7da31e9c3b3e5801dc83447cd41439d350728189b5d6b",
+          "scope_rule_sha256": "f4691c8a3f72dde5d96c18a33db845ea2d68dbb1c940d1bd02392d5e53740257",
+          "sources": [
+            {
+              "census_sha256": "aa7049dc03b5aab16763d47660b635c38d67eed9e1f16e77ed214c51dbeb3799",
+              "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+              "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+              "observations_sha256": "c3c1dab3824737e25f449d8de771f27b0cc59328766a0d1d9384a651626d4aa2",
+              "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+              "schedule_binding": {
+                "availability_grace_seconds": 300,
+                "dense_step_seconds": 300,
+                "dense_until_seconds": 21600,
+                "dispatch_window_seconds": 60,
+                "horizon_seconds": 259200,
+                "hourly_step_seconds": 3600,
+                "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+                "witness_max_age_seconds": 120
+              },
+              "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+            },
+            {
+              "census_sha256": "00031b6fb7b266fb637cf6f89c4ee31aa0cbeee5bb0eb0bafa27fee94470c624",
+              "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+              "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+              "observations_sha256": "aee6efbb100c767813390a13a83185cc17243d826080475993eb447fb0f15c20",
+              "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+              "schedule_binding": {
+                "availability_grace_seconds": 300,
+                "dense_step_seconds": 300,
+                "dense_until_seconds": 21600,
+                "dispatch_window_seconds": 60,
+                "horizon_seconds": 259200,
+                "hourly_step_seconds": 3600,
+                "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+                "witness_max_age_seconds": 120
+              },
+              "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+            }
+          ],
+          "time_contract": {
+            "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+            "time_feature_clock": "FIRST_RELIABLE_AVAILABLE_AT"
+          },
+          "universe_policy": {
+            "holder_field_id": "FIELD-HOLDER-COUNT-001",
+            "liquidity_field_id": "FIELD-LIQUIDITY-USD-001",
+            "min_holders": "50",
+            "min_liquidity_usd": "5000",
+            "rule": "ALL_OF_AT_DECISION_TIME",
+            "semantic_sha256": "63b33150869273e8f5a0d5d214c8c679e24b5468125164ddcf95326bac4d533a"
+          },
+          "unresolved_n": 0
+        },
+        "experiment_spec_sha256": "8752f8908424c8be2eb32fce6935f711c649f5016a03ad6cc0135e9c2ebe217a",
+        "hypothesis_version": "HYP-HFIC-CAND-FFB8BCA42497",
+        "lane": "FAST_LANE",
+        "lane_classifier_terminal": "FAST_LANE_READY",
+        "network_free": true,
+        "next_action": "EXECUTE_ACCEPTED_CAPABILITY",
+        "provider_calls_actual": 0,
+        "reason_codes": [],
+        "schema": "smial.hfic-classifier-receipt",
+        "schema_version": "1.0",
+        "selected_candidate_id": "HFIC-CAND-FFB8BCA42497",
+        "selected_definition_sha256": "ffb8bca42497867b574c0b5f12d74233a4a50eb352a53e3edd38a393b9a355b0",
+        "session_id": "HFIC-SESS-8FEA8B334628164C"
+      },
+      "experiment_id": "EXP-SCIENCE-CHANGED-MIXED-LIST-NUMERIC",
+      "lineage": {
+        "candidate_id": "HFIC-CAND-FFB8BCA42497",
+        "critic_input_packet_sha256": "4b827055baf29370e35025c7ca5ad87aef37cdeb46d434ab5c26c486601880f9",
+        "critic_result_sha256": "33cd3a98851e10c24360b3e8823d01614c79aefc9c127a3b2c4ae0be195c2f28",
+        "definition_sha256": "ffb8bca42497867b574c0b5f12d74233a4a50eb352a53e3edd38a393b9a355b0",
+        "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+        "existing_look_ref": "HFIC-ART-DISCOVERY-3BCD9E6CE48AE4B32E992BDE19C645893682ACF6",
+        "grounded_result_sha256": "f3374a023b2e96c4958ad372adb4dea069c867401d5eaf06bb0d16efedb3cfe9",
+        "market_evidence_epoch_sha256": "159d07d03a4e82789bb52ab0525df41d8920e5deeffac026fbf8a62700f1a933",
+        "new_scientific_look": false,
+        "scientific_terminal": "PASS_FAST_LANE_READY",
+        "session_id": "HFIC-SESS-8FEA8B334628164C"
+      },
+      "reads": {
+        "decoded_target_value_rows": 50688,
+        "evaluator_invocations": 1,
+        "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+        "full_trace_retained": true,
+        "full_trace_sha256": "4d6c2dfd10d5e90081077760ae888ae8011a2eb9d9b577461db537cbbf01fadd",
+        "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+        "parquet_read_calls": 248,
+        "phase": "NUMERIC",
+        "target_projection_calls": 22
+      },
+      "records": [
+        {
+          "id": "EVIDENCE-BINDING-001-B31D41D3",
+          "kind": "EVIDENCE_BINDING",
+          "payload": {
+            "binding_id": "BINDING-TEMPORAL-CORPUS-001",
+            "content_sha256": null,
+            "dataset_fingerprint": "4511a1fe3d1e5394368f206e7edaa767304134584d0ddeefb0b83a6ad0347b4c",
+            "evidence_binding_id": "EVIDENCE-BINDING-001-B31D41D3",
+            "first_reliable_available_at": "2026-10-08T06:00:00.000000Z",
+            "logical_uri": "smial-data://datasets/manifests/dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb.json",
+            "source_kind": "DATASET_MANIFEST",
+            "stable_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb"
+          },
+          "payload_sha256": "a999903fd42c3119a1d24f652c3c9cfec40f6ade10527f5dd7c09489992e61a4",
+          "producer_capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+          "producer_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+          "run_id": "RUN-9AF479821C5F5274A9E11D68",
+          "transaction_id": "RESEARCH-TXN-8A460511B31D41D3"
+        },
+        {
+          "compact_payload": "RECONSTRUCT_ORIGINAL_WITH_RESPONSE_CAPABILITY_RESULT; ORIGINAL_NATIVE_HASH_RETAINED",
+          "id": "RESULT-ARTIFACT-9AF479821C5F5274A9E11D68",
+          "kind": "RESEARCH_ARTIFACT",
+          "payload": {
+            "artifact_kind": "CAPABILITY_RESULT",
+            "capability_result_sha256": "26b3b2b3b59d27e0f7862ca192ad1c3e5914b997a643eb697a87c4e8f313e6f1",
+            "content_sha256": "26b3b2b3b59d27e0f7862ca192ad1c3e5914b997a643eb697a87c4e8f313e6f1",
+            "logical_uri": "smial-data://research/artifacts/results/RESULT-ARTIFACT-9AF479821C5F5274A9E11D68.json",
+            "research_artifact_id": "RESULT-ARTIFACT-9AF479821C5F5274A9E11D68",
+            "result_digest_sha256": "26b3b2b3b59d27e0f7862ca192ad1c3e5914b997a643eb697a87c4e8f313e6f1"
+          },
+          "payload_sha256": "fde30d694336ad177870fc351d8bee6d4ac00a54ed454c48837c92017650fe32",
+          "producer_capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+          "producer_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+          "run_id": "RUN-9AF479821C5F5274A9E11D68",
+          "transaction_id": "RESEARCH-TXN-8A460511B31D41D3"
+        },
+        {
+          "id": "RUN-COMPLETED-8A460511B31D41D3",
+          "kind": "RUN_COMPLETED",
+          "payload": {
+            "artifact_manifest_sha256": "26b3b2b3b59d27e0f7862ca192ad1c3e5914b997a643eb697a87c4e8f313e6f1",
+            "as_of": "2026-10-14T15:34:42.069680Z",
+            "availability_cutoff": "2026-10-14T15:34:42.069680Z",
+            "capability_closure_sha256": "00e35454243dc0d23fcf08a4c25d60991f1d9c2f128f1eb50cf3cb80f3984274",
+            "cash_spend_usd_cents": 0,
+            "completed_at": "2026-10-14T15:34:42.069680Z",
+            "config_sha256": "16e5fce4a4121acf0269685b68d92559524127baa3fe89f295bb8bd3cb1e100a",
+            "dataset_fingerprints": [
+              "4511a1fe3d1e5394368f206e7edaa767304134584d0ddeefb0b83a6ad0347b4c"
+            ],
+            "dataset_manifest_ids": [
+              "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb"
+            ],
+            "execution_status": "COMPLETE",
+            "experiment_id": "EXP-SCIENCE-CHANGED-MIXED-LIST-NUMERIC",
+            "experiment_spec_sha256": "8752f8908424c8be2eb32fce6935f711c649f5016a03ad6cc0135e9c2ebe217a",
+            "first_reliable_available_at": "2026-10-14T15:34:42.069680Z",
+            "git_mutation_count": 0,
+            "holdout_consumption_ids": [],
+            "hypothesis_definition_sha256": "ffb8bca42497867b574c0b5f12d74233a4a50eb352a53e3edd38a393b9a355b0",
+            "hypothesis_version_id": "HYP-HFIC-CAND-FFB8BCA42497",
+            "limitations": [],
+            "non_claims": [
+              "NO_ALPHA",
+              "NO_NETRETURN",
+              "NO_NEW_SCIENTIFIC_LOOK"
+            ],
+            "observation_panel_snapshot_sha256": null,
+            "observation_schedule_authority_sha256": null,
+            "observation_schedule_sha256": null,
+            "provider_calls_actual": 0,
+            "provider_calls_planned": 0,
+            "query_recipe_binding": {
+              "reason": "CAPABILITY_DESCRIPTOR_QUERY_RECIPE_NOT_REQUIRED",
+              "status": "NOT_APPLICABLE"
+            },
+            "query_recipe_ids": [],
+            "query_recipe_sha256s": [],
+            "random_seed_or_null": null,
+            "result_artifact_id": "RESULT-ARTIFACT-9AF479821C5F5274A9E11D68",
+            "result_artifact_logical_uri": "smial-data://research/artifacts/results/RESULT-ARTIFACT-9AF479821C5F5274A9E11D68.json",
+            "result_digest_sha256": "26b3b2b3b59d27e0f7862ca192ad1c3e5914b997a643eb697a87c4e8f313e6f1",
+            "run_id": "RUN-9AF479821C5F5274A9E11D68",
+            "run_key_sha256": "9af479821c5f5274a9e11d685a8108a458d5116336ee5ba19933e0410163fc7c",
+            "runner_capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+            "runner_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+            "scientific_terminal": "INCONCLUSIVE",
+            "source_lineage": {
+              "candidate_id": "HFIC-CAND-FFB8BCA42497",
+              "critic_input_packet_sha256": "4b827055baf29370e35025c7ca5ad87aef37cdeb46d434ab5c26c486601880f9",
+              "critic_result_sha256": "33cd3a98851e10c24360b3e8823d01614c79aefc9c127a3b2c4ae0be195c2f28",
+              "definition_sha256": "ffb8bca42497867b574c0b5f12d74233a4a50eb352a53e3edd38a393b9a355b0",
+              "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+              "existing_look_ref": "HFIC-ART-DISCOVERY-3BCD9E6CE48AE4B32E992BDE19C645893682ACF6",
+              "grounded_result_sha256": "f3374a023b2e96c4958ad372adb4dea069c867401d5eaf06bb0d16efedb3cfe9",
+              "market_evidence_epoch_sha256": "159d07d03a4e82789bb52ab0525df41d8920e5deeffac026fbf8a62700f1a933",
+              "new_scientific_look": false,
+              "scientific_terminal": "PASS_FAST_LANE_READY",
+              "session_id": "HFIC-SESS-8FEA8B334628164C"
+            },
+            "started_at": "2026-10-14T15:34:42.069680Z",
+            "trial_id": "HFIC-ART-DISCOVERY-3BCD9E6CE48AE4B32E992BDE19C645893682ACF6",
+            "trial_outcome": "INCONCLUSIVE",
+            "uv_lock_sha256": "3b75cc1c5a2c0c83560beaf1a57c4543b885e0909c75db6d1939e90d09eefedb"
+          },
+          "payload_sha256": "64a8d9b05a76eabcc7289bcee93015fc85aebf06726de2a4088f5177300afa0c",
+          "producer_capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+          "producer_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+          "run_id": "RUN-9AF479821C5F5274A9E11D68",
+          "transaction_id": "RESEARCH-TXN-8A460511B31D41D3"
+        },
+        {
+          "id": "RUN-STARTED-8A460511B31D41D3",
+          "kind": "RUN_STARTED",
+          "payload": {
+            "experiment_id": "EXP-SCIENCE-CHANGED-MIXED-LIST-NUMERIC",
+            "experiment_spec_sha256": "8752f8908424c8be2eb32fce6935f711c649f5016a03ad6cc0135e9c2ebe217a",
+            "run_id": "RUN-9AF479821C5F5274A9E11D68",
+            "run_key_sha256": "9af479821c5f5274a9e11d685a8108a458d5116336ee5ba19933e0410163fc7c"
+          },
+          "payload_sha256": "d21ccd5a0cae95724c3b24bc7bd58f464fde95a868165ae9173c06323538f1ee",
+          "producer_capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+          "producer_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+          "run_id": "RUN-9AF479821C5F5274A9E11D68",
+          "transaction_id": "RESEARCH-TXN-8A460511B31D41D3"
+        }
+      ],
+      "replay": {
+        "after": {
+          "completion_ids": [
+            "RUN-COMPLETED-8A460511B31D41D3",
+            "RUN-COMPLETED-C7147634BBBE4407",
+            "RUN-COMPLETED-E51CABC8B8F04243"
+          ],
+          "logical_sha256": "29c7d515e09ba31317244d7cc748b868d67abd51e9a2cfd620a8b888143b042f",
+          "record_counts": {
+            "DECISION_EVENT": 2,
+            "EVIDENCE_BINDING": 4,
+            "EXPERIMENT_METRIC": 1,
+            "HYPOTHESIS_VERSION": 3,
+            "RESEARCH_ARTIFACT": 41,
+            "RESEARCH_CYCLE": 6,
+            "RUN_COMPLETED": 3,
+            "RUN_STARTED": 3
+          }
+        },
+        "before": {
+          "completion_ids": [
+            "RUN-COMPLETED-8A460511B31D41D3",
+            "RUN-COMPLETED-C7147634BBBE4407",
+            "RUN-COMPLETED-E51CABC8B8F04243"
+          ],
+          "logical_sha256": "29c7d515e09ba31317244d7cc748b868d67abd51e9a2cfd620a8b888143b042f",
+          "record_counts": {
+            "DECISION_EVENT": 2,
+            "EVIDENCE_BINDING": 4,
+            "EXPERIMENT_METRIC": 1,
+            "HYPOTHESIS_VERSION": 3,
+            "RESEARCH_ARTIFACT": 41,
+            "RESEARCH_CYCLE": 6,
+            "RUN_COMPLETED": 3,
+            "RUN_STARTED": 3
+          }
+        },
+        "entry_lane": "REPLAY_AVAILABLE",
+        "reads": {
+          "decoded_target_value_rows": 0,
+          "evaluator_invocations": 0,
+          "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+          "full_trace_retained": true,
+          "full_trace_sha256": "6bef9984e56cefe4f542fb945d0389cd8f8f7f7db46bd4b2dcb68c885c3594d6",
+          "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+          "parquet_read_calls": 236,
+          "phase": "REPLAY",
+          "target_projection_calls": 0
+        },
+        "run_id": "RUN-9AF479821C5F5274A9E11D68"
+      },
+      "response": {
+        "capability_result": {
+          "claim_level": "EXPLORATORY_PROXY",
+          "labeled_net_return": false,
+          "provider_api_rpc_wss_calls": 0,
+          "result_sha256": "f3374a023b2e96c4958ad372adb4dea069c867401d5eaf06bb0d16efedb3cfe9",
+          "source_lineage": {
+            "candidate_id": "HFIC-CAND-FFB8BCA42497",
+            "critic_input_packet_sha256": "4b827055baf29370e35025c7ca5ad87aef37cdeb46d434ab5c26c486601880f9",
+            "critic_result_sha256": "33cd3a98851e10c24360b3e8823d01614c79aefc9c127a3b2c4ae0be195c2f28",
+            "definition_sha256": "ffb8bca42497867b574c0b5f12d74233a4a50eb352a53e3edd38a393b9a355b0",
+            "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+            "existing_look_ref": "HFIC-ART-DISCOVERY-3BCD9E6CE48AE4B32E992BDE19C645893682ACF6",
+            "grounded_result_sha256": "f3374a023b2e96c4958ad372adb4dea069c867401d5eaf06bb0d16efedb3cfe9",
+            "market_evidence_epoch_sha256": "159d07d03a4e82789bb52ab0525df41d8920e5deeffac026fbf8a62700f1a933",
+            "new_scientific_look": false,
+            "scientific_terminal": "PASS_FAST_LANE_READY",
+            "session_id": "HFIC-SESS-8FEA8B334628164C"
+          },
+          "spec_sha256": "b0f8b6a0978ea2d56c74d97cf13ed9e9411951783291da0ee11bfadafcafd52b",
+          "status": "COMPLETE",
+          "summary": {
+            "ablations": [
+              {
+                "downside": {
+                  "es10_return": -0.14,
+                  "es10_tail_mass_n": 1.0,
+                  "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                  "le_minus_20_n": 0,
+                  "le_minus_20_rate": 0.0,
+                  "le_minus_50_n": 0,
+                  "le_minus_50_rate": 0.0,
+                  "missing_n": 0,
+                  "negative_mass": 1.0,
+                  "negative_n": 10,
+                  "observed_n": 10,
+                  "p05": -0.1355,
+                  "p10": -0.131,
+                  "p25": -0.1175,
+                  "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                  "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                  "status": "OBSERVED",
+                  "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                  "worst_negative_share": 0.13999999999999999,
+                  "zero_n": 0
+                },
+                "dropped_feature": "d_holders",
+                "list_condition_preserved": true,
+                "mean_target": -0.1,
+                "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "median_target": -0.1,
+                "observed_n": 10,
+                "selection_relevant": true,
+                "view": "ABLATION_DROP_d_holders"
+              }
+            ],
+            "anchor_kind": "NOMINATION_T0",
+            "base_x_n": 24,
+            "baseline": {
+              "downside": {
+                "es10_return": -0.135,
+                "es10_tail_mass_n": 2.0,
+                "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                "le_minus_20_n": 0,
+                "le_minus_20_rate": 0.0,
+                "le_minus_50_n": 0,
+                "le_minus_50_rate": 0.0,
+                "missing_n": 0,
+                "negative_mass": 1.1300000000000001,
+                "negative_n": 16,
+                "observed_n": 20,
+                "p05": -0.1305,
+                "p10": -0.121,
+                "p25": -0.1,
+                "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                "status": "OBSERVED",
+                "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                "worst_negative_share": 0.1238938053097345,
+                "zero_n": 2
+              },
+              "mean_target": -0.05500000000000001,
+              "mean_target_kind": "PRICE_RELATIVE_PROXY",
+              "median_target": -0.05,
+              "observed_n": 20,
+              "view": "BASELINE_DECISION_ELIGIBLE"
+            },
+            "block_count": 2,
+            "by_calendar_block": [
+              {
+                "downside": {
+                  "es10_return": -0.1,
+                  "es10_tail_mass_n": 0.5,
+                  "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                  "le_minus_20_n": 0,
+                  "le_minus_20_rate": 0.0,
+                  "le_minus_50_n": 0,
+                  "le_minus_50_rate": 0.0,
+                  "missing_n": 0,
+                  "negative_mass": 0.4000000000000001,
+                  "negative_n": 5,
+                  "observed_n": 5,
+                  "p05": -0.098,
+                  "p10": -0.096,
+                  "p25": -0.09,
+                  "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                  "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                  "status": "OBSERVED",
+                  "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                  "worst_negative_share": 0.24999999999999994,
+                  "zero_n": 0
+                },
+                "mean_target": -0.08000000000000002,
+                "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "median_target": -0.08,
+                "observed_n": 5,
+                "view": "2026-10-01"
+              },
+              {
+                "downside": {
+                  "es10_return": -0.14,
+                  "es10_tail_mass_n": 0.5,
+                  "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                  "le_minus_20_n": 0,
+                  "le_minus_20_rate": 0.0,
+                  "le_minus_50_n": 0,
+                  "le_minus_50_rate": 0.0,
+                  "missing_n": 0,
+                  "negative_mass": 0.6,
+                  "negative_n": 5,
+                  "observed_n": 5,
+                  "p05": -0.138,
+                  "p10": -0.136,
+                  "p25": -0.13,
+                  "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                  "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                  "status": "OBSERVED",
+                  "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                  "worst_negative_share": 0.23333333333333334,
+                  "zero_n": 0
+                },
+                "mean_target": -0.12,
+                "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "median_target": -0.12,
+                "observed_n": 5,
+                "view": "2026-10-05"
+              }
+            ],
+            "by_cohort": [
+              {
+                "base_x_n": 12,
+                "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+                "decision_eligible_n": 10,
+                "denominator_base_x": 12,
+                "downside": {
+                  "es10_return": -0.1,
+                  "es10_tail_mass_n": 0.5,
+                  "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                  "le_minus_20_n": 0,
+                  "le_minus_20_rate": 0.0,
+                  "le_minus_50_n": 0,
+                  "le_minus_50_rate": 0.0,
+                  "missing_n": 0,
+                  "negative_mass": 0.4000000000000001,
+                  "negative_n": 5,
+                  "observed_n": 5,
+                  "p05": -0.098,
+                  "p10": -0.096,
+                  "p25": -0.09,
+                  "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                  "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                  "status": "OBSERVED",
+                  "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                  "worst_negative_share": 0.24999999999999994,
+                  "zero_n": 0
+                },
+                "exclusion_reasons": {
+                  "ABSENT": 1,
+                  "UNIVERSE_FAIL": 1
+                },
+                "feature_admissible": 10,
+                "feature_unknown_n": 0,
+                "independent_replication": false,
+                "matched_n": 5,
+                "mean_target": -0.08000000000000002,
+                "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "median_target": -0.08,
+                "membership": "DESCRIPTIVE_NOT_INDEPENDENT",
+                "missing_target_n": 0,
+                "observed_target_n": 5,
+                "population_n": 12,
+                "shared_decision_n": 0,
+                "target_exclusion_reasons": {},
+                "target_observed_after_decision": 5,
+                "view": "REL-20261001T000000Z-20261002T000000Z"
+              },
+              {
+                "base_x_n": 12,
+                "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+                "decision_eligible_n": 10,
+                "denominator_base_x": 12,
+                "downside": {
+                  "es10_return": -0.14,
+                  "es10_tail_mass_n": 0.5,
+                  "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                  "le_minus_20_n": 0,
+                  "le_minus_20_rate": 0.0,
+                  "le_minus_50_n": 0,
+                  "le_minus_50_rate": 0.0,
+                  "missing_n": 0,
+                  "negative_mass": 0.6,
+                  "negative_n": 5,
+                  "observed_n": 5,
+                  "p05": -0.138,
+                  "p10": -0.136,
+                  "p25": -0.13,
+                  "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                  "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                  "status": "OBSERVED",
+                  "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                  "worst_negative_share": 0.23333333333333334,
+                  "zero_n": 0
+                },
+                "exclusion_reasons": {
+                  "ABSENT": 1,
+                  "UNIVERSE_FAIL": 1
+                },
+                "feature_admissible": 10,
+                "feature_unknown_n": 0,
+                "independent_replication": false,
+                "matched_n": 5,
+                "mean_target": -0.12,
+                "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "median_target": -0.12,
+                "membership": "DESCRIPTIVE_NOT_INDEPENDENT",
+                "missing_target_n": 0,
+                "observed_target_n": 5,
+                "population_n": 12,
+                "shared_decision_n": 0,
+                "target_exclusion_reasons": {},
+                "target_observed_after_decision": 5,
+                "view": "REL-20261005T000000Z-20261006T000000Z"
+              }
+            ],
+            "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V3",
+            "claim_level": "EXPLORATORY_PROXY",
+            "cohort_independent_replication": false,
+            "cohort_slices_are_descriptive": true,
+            "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+            "cost": {
+              "decision_sensitivity": "NOT_EVALUATED",
+              "labeled_net_return": false,
+              "scenarios": {},
+              "source_status": null,
+              "status": "ABSENT"
+            },
+            "decision_eligible_n": 20,
+            "downside": {
+              "es10_return": -0.14,
+              "es10_tail_mass_n": 1.0,
+              "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+              "le_minus_20_n": 0,
+              "le_minus_20_rate": 0.0,
+              "le_minus_50_n": 0,
+              "le_minus_50_rate": 0.0,
+              "missing_n": 0,
+              "negative_mass": 1.0,
+              "negative_n": 10,
+              "observed_n": 10,
+              "p05": -0.1355,
+              "p10": -0.131,
+              "p25": -0.1175,
+              "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+              "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+              "status": "OBSERVED",
+              "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+              "worst_negative_share": 0.13999999999999999,
+              "zero_n": 0
+            },
+            "downside_readout_exposure": {
+              "fixed_metrics": [
+                "p05",
+                "p10",
+                "p25",
+                "le_minus_20_rate",
+                "le_minus_50_rate",
+                "es10_return",
+                "negative_mass",
+                "worst_negative_share"
+              ],
+              "new_threshold_trials": false,
+              "profile": "DOWNSIDE_DESCRIPTIVE_V1"
+            },
+            "duplicate_delivery_count": 0,
+            "eligibility_uses_target": false,
+            "engine_emits_alpha": false,
+            "episode_counts": {
+              "n_admitted": 24,
+              "n_decision_eligible": 20,
+              "n_joint_feature_supported": 20,
+              "n_matched": 10,
+              "n_target_available": 10,
+              "repeated_mint_n": 1,
+              "unique_episode_n": 24,
+              "unique_mint_n": 23
+            },
+            "episode_target_attrition": {
+              "adjustment": "NONE_REPORTED_ONLY",
+              "decision_baseline": {},
+              "matched": {}
+            },
+            "exclusion_reasons": {
+              "ABSENT": 2,
+              "UNIVERSE_FAIL": 2
+            },
+            "experiment_recipe": {
+              "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+              "cost_label": "ABSENT",
+              "frozen_input": [
+                {
+                  "census_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261001T000000Z-20261002T000000Z/eb1e3a7a011342d8/census.parquet",
+                  "census_sha256": "aa7049dc03b5aab16763d47660b635c38d67eed9e1f16e77ed214c51dbeb3799",
+                  "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+                  "dataset_id": "DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001",
+                  "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+                  "evidence_role": "EXPLORATORY_REUSE",
+                  "holdout": false,
+                  "observations_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261001T000000Z-20261002T000000Z/eb1e3a7a011342d8/observations.parquet",
+                  "observations_sha256": "c3c1dab3824737e25f449d8de771f27b0cc59328766a0d1d9384a651626d4aa2",
+                  "population": "OPPORTUNITY_EPISODES",
+                  "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+                  "schedule_binding": {
+                    "availability_grace_seconds": 300,
+                    "dense_step_seconds": 300,
+                    "dense_until_seconds": 21600,
+                    "dispatch_window_seconds": 60,
+                    "horizon_seconds": 259200,
+                    "hourly_step_seconds": 3600,
+                    "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                    "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+                    "witness_max_age_seconds": 120
+                  },
+                  "schedule_lateness_seconds": null,
+                  "schedule_point_due_offset_seconds": null,
+                  "schedule_point_lateness": null,
+                  "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+                },
+                {
+                  "census_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261005T000000Z-20261006T000000Z/ddd968a703422711/census.parquet",
+                  "census_sha256": "00031b6fb7b266fb637cf6f89c4ee31aa0cbeee5bb0eb0bafa27fee94470c624",
+                  "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+                  "dataset_id": "DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001",
+                  "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+                  "evidence_role": "EXPLORATORY_REUSE",
+                  "holdout": false,
+                  "observations_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261005T000000Z-20261006T000000Z/ddd968a703422711/observations.parquet",
+                  "observations_sha256": "aee6efbb100c767813390a13a83185cc17243d826080475993eb447fb0f15c20",
+                  "population": "OPPORTUNITY_EPISODES",
+                  "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+                  "schedule_binding": {
+                    "availability_grace_seconds": 300,
+                    "dense_step_seconds": 300,
+                    "dense_until_seconds": 21600,
+                    "dispatch_window_seconds": 60,
+                    "horizon_seconds": 259200,
+                    "hourly_step_seconds": 3600,
+                    "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                    "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+                    "witness_max_age_seconds": 120
+                  },
+                  "schedule_lateness_seconds": null,
+                  "schedule_point_due_offset_seconds": null,
+                  "schedule_point_lateness": null,
+                  "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+                }
+              ],
+              "labeled_net_return": false,
+              "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1",
+              "research_scope_evidence": {
+                "bindings": [
+                  {
+                    "adapter": "ADMISSION_FRAME_V1",
+                    "census_sha256": "aa7049dc03b5aab16763d47660b635c38d67eed9e1f16e77ed214c51dbeb3799",
+                    "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+                    "frames_sha256": "ec153501e623f839d2f0614a623980cec3ed3f6ef6b09282217ae81a54f2ccef",
+                    "release_id": "eb1e3a7a011342d8f5960c92a1ba77151eaee2c51d7c422fca301e535b108daa",
+                    "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+                  },
+                  {
+                    "adapter": "ADMISSION_FRAME_V1",
+                    "census_sha256": "00031b6fb7b266fb637cf6f89c4ee31aa0cbeee5bb0eb0bafa27fee94470c624",
+                    "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+                    "frames_sha256": "ef248994a75af4b4d708ba7d8c114ca12f94c32d110dbb68b3c7376d8be3624f",
+                    "release_id": "ddd968a703422711ffc45416fef35db9a381999c3b0d9f9ea1d9bb15debd9229",
+                    "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+                  }
+                ],
+                "evidence_sha256": "8342e5af3c09536dd9cc9fb923b22b237f78083f4917951b5b48d6d096d158db"
+              },
+              "research_scope_rule_sha256": "f4691c8a3f72dde5d96c18a33db845ea2d68dbb1c940d1bd02392d5e53740257",
+              "schema": "smial.hfic-temporal-query",
+              "schema_version": "1.2",
+              "scientific_identity": "b0f8b6a0978ea2d56c74d97cf13ed9e9411951783291da0ee11bfadafcafd52b",
+              "spec": {
+                "adaptation_of": null,
+                "budget_allocation": "COMPOUND_FIRST",
+                "query_id": "LAV-MIXED_LIST_NUMERIC",
+                "schema": "smial.hfic-temporal-query",
+                "schema_version": "1.2",
+                "scientific_body": {
+                  "anchor_kind": "NOMINATION_T0",
+                  "contrast": "MATCHED_VS_DECISION_ELIGIBLE",
+                  "cost_profile": null,
+                  "decision_point": "E1800",
+                  "diagnostic_slices": [],
+                  "entry_model": {
+                    "assumed_latency_seconds": 0,
+                    "kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT"
+                  },
+                  "evaluation": {
+                    "ablations": "DROP_ONE_CONDITION",
+                    "baseline": "SAME_DECISION_ELIGIBLE",
+                    "calendar_block": "UTC_DAY_OF_DECISION"
+                  },
+                  "features": [
+                    {
+                      "end": "E1800",
+                      "field_id": "FIELD-HOLDER-COUNT-001",
+                      "name": "d_holders",
+                      "op": "delta",
+                      "start": "E300"
+                    }
+                  ],
+                  "hypothesis_kind": "MIXED_LIST_NUMERIC",
+                  "list_condition": {
+                    "clauses": [
+                      {
+                        "all_of": [
+                          "JUPITER:toporganicscore:5m"
+                        ],
+                        "any_of": [],
+                        "count": null,
+                        "none_of": []
+                      }
+                    ],
+                    "definition_refs": {
+                      "JUPITER:toporganicscore:5m": "8a35ad6835c5cd2a6c7fe772002f3c2a4d616d53479297130f88f25e978b48c0"
+                    },
+                    "required_observed_lists": [
+                      "JUPITER:toporganicscore:5m"
+                    ],
+                    "schema": "smial.list-selector",
+                    "schema_version": "1.0"
+                  },
+                  "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1",
+                  "population": "OPPORTUNITY_EPISODES",
+                  "predicates": [
+                    {
+                      "feature": "d_holders",
+                      "op": "gt",
+                      "value": 0.0
+                    }
+                  ],
+                  "research_scope": {
+                    "anchor_kind": "NOMINATION_T0",
+                    "coverage_policy": "REQUIRE_KNOWN_REFERENCED",
+                    "definition_refs": {},
+                    "evidence_selection": {
+                      "kind": "EXPLICIT_VERIFIED_RELEASE_SET"
+                    },
+                    "membership_time_basis": "EPISODE_T0",
+                    "population": "OPPORTUNITY_EPISODES",
+                    "schema": "smial.research-scope",
+                    "schema_version": "2.0",
+                    "universe_selector": {
+                      "clauses": [
+                        {
+                          "all_of": [],
+                          "any_of": [],
+                          "count": null,
+                          "none_of": []
+                        }
+                      ],
+                      "required_observed_lists": [],
+                      "schema": "smial.list-selector",
+                      "schema_version": "1.0"
+                    }
+                  },
+                  "target": {
+                    "exit_point": "E14400",
+                    "field_id": "FIELD-USD-PRICE-001",
+                    "kind": "PRICE_RELATIVE_PROXY",
+                    "reference_point": "E1800"
+                  },
+                  "time_contract": {
+                    "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                    "time_feature_clock": "FIRST_RELIABLE_AVAILABLE_AT"
+                  }
+                },
+                "search_tier": "COMPOUND_SCREEN",
+                "spec_sha256": "b0f8b6a0978ea2d56c74d97cf13ed9e9411951783291da0ee11bfadafcafd52b"
+              },
+              "target_kind": "PRICE_RELATIVE_PROXY",
+              "universe_policy": {
+                "holder_field_id": "FIELD-HOLDER-COUNT-001",
+                "liquidity_field_id": "FIELD-LIQUIDITY-USD-001",
+                "min_holders": "50",
+                "min_liquidity_usd": "5000",
+                "rule": "ALL_OF_AT_DECISION_TIME",
+                "semantic_sha256": "63b33150869273e8f5a0d5d214c8c679e24b5468125164ddcf95326bac4d533a"
+              }
+            },
+            "feature_admissible_n": 20,
+            "feature_unknown_n": 0,
+            "independence": "UNKNOWN",
+            "independent_replication": null,
+            "integrity_conflict_count": 0,
+            "labeled_net_return": false,
+            "later_target_observed_n": 10,
+            "main_question_count_includes_variants": false,
+            "matched_feature_means": {
+              "d_holders": 15.0
+            },
+            "matched_n": 10,
+            "mean_target": -0.1,
+            "mean_target_kind": "PRICE_RELATIVE_PROXY",
+            "mean_target_units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+            "median_target": -0.1,
+            "missing_is_not_zero": true,
+            "missing_stress_model": {
+              "label": "MODEL",
+              "mean_target": -0.1,
+              "stress_return": -1.0,
+              "writes_raw_history": false
+            },
+            "missing_target_mean_to_zero": null,
+            "missing_target_n": 0,
+            "non_claims": [
+              "NO_ALPHA",
+              "NO_NET_RETURN",
+              "NO_INTRABAR_STOP",
+              "NO_CAUSAL_IDENTIFICATION",
+              "NO_SOURCE_PRICE_EVENT_TIME",
+              "MEMBERSHIP_IS_OBSERVATIONAL_NOT_CAUSAL",
+              "NO_IID_CLAIM",
+              "NOT_NEWBORN_BIRTH_POPULATION",
+              "TARGET_ATTRITION_NOT_ADJUSTED"
+            ],
+            "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1",
+            "observation_index_passes": 1,
+            "observed_target_n": 10,
+            "pooled": {
+              "denominator_base_x": 24,
+              "downside": {
+                "es10_return": -0.14,
+                "es10_tail_mass_n": 1.0,
+                "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                "le_minus_20_n": 0,
+                "le_minus_20_rate": 0.0,
+                "le_minus_50_n": 0,
+                "le_minus_50_rate": 0.0,
+                "missing_n": 0,
+                "negative_mass": 1.0,
+                "negative_n": 10,
+                "observed_n": 10,
+                "p05": -0.1355,
+                "p10": -0.131,
+                "p25": -0.1175,
+                "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                "status": "OBSERVED",
+                "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                "worst_negative_share": 0.13999999999999999,
+                "zero_n": 0
+              },
+              "feature_admissible": 20,
+              "independent_replication": null,
+              "mean_target": -0.1,
+              "mean_target_kind": "PRICE_RELATIVE_PROXY",
+              "median_target": -0.1,
+              "target_observed_after_decision": 10,
+              "view": "pooled"
+            },
+            "population": "OPPORTUNITY_EPISODES",
+            "population_n": 24,
+            "query_id": "LAV-MIXED_LIST_NUMERIC",
+            "required_cohorts": [
+              "REL-20261001T000000Z-20261002T000000Z",
+              "REL-20261005T000000Z-20261006T000000Z"
+            ],
+            "research_scope": {
+              "applied_sha256": "eb67fc2f3bbbbb9bf0f7da31e9c3b3e5801dc83447cd41439d350728189b5d6b",
+              "base_admitted_n": 24,
+              "contrast": {
+                "comparator": {
+                  "distinct_day_n": 2,
+                  "distinct_mint_n": 19,
+                  "mean_target": -0.05500000000000001,
+                  "n": 20,
+                  "target_missing_n": 0,
+                  "target_observed_n": 20
+                },
+                "kind": "MATCHED_VS_DECISION_ELIGIBLE",
+                "kind_of_claim": "OBSERVATIONAL_ASSOCIATION",
+                "observed_target_difference": -0.04500000000000001,
+                "status": "EVALUATED"
+              },
+              "coverage": {
+                "base_admitted_n": 24,
+                "signal_false_n": 12,
+                "signal_invalid_n": 0,
+                "signal_true_n": 12,
+                "signal_unknown_n": 0,
+                "universe_false_n": 0,
+                "universe_invalid_n": 0,
+                "universe_true_n": 24,
+                "universe_unknown_n": 0
+              },
+              "decision_eligible_n": 20,
+              "diagnostic_slices": [],
+              "disclosed_comparison_n": 2,
+              "disclosed_comparisons": [
+                {
+                  "id": "PRIMARY",
+                  "kind": "MIXED_LIST_NUMERIC"
+                },
+                {
+                  "id": "CONTRAST",
+                  "kind": "MATCHED_VS_DECISION_ELIGIBLE"
+                }
+              ],
+              "evidence_sha256": "8342e5af3c09536dd9cc9fb923b22b237f78083f4917951b5b48d6d096d158db",
+              "hypothesis_kind": "MIXED_LIST_NUMERIC",
+              "matched": {
+                "distinct_day_n": 2,
+                "distinct_mint_n": 9,
+                "mean_target": -0.10000000000000002,
+                "n": 10,
+                "target_missing_n": 0,
+                "target_observed_n": 10
+              },
+              "membership_time_basis": "EPISODE_T0",
+              "rule_sha256": "f4691c8a3f72dde5d96c18a33db845ea2d68dbb1c940d1bd02392d5e53740257",
+              "schema": "smial.research-scope-result",
+              "schema_version": "1.0",
+              "scope_sha256": "60ecc7e3bad76442d05e7ef6670ac8a593b6ca41ab6c9ccad5af62d812e04355",
+              "slices_overlap_not_additive": false,
+              "universe_pass_n": 24
+            },
+            "schema": "smial.hfic-temporal-query",
+            "search_tier": "COMPOUND_SCREEN",
+            "source_price_event_time": "UNKNOWN",
+            "spec_sha256": "b0f8b6a0978ea2d56c74d97cf13ed9e9411951783291da0ee11bfadafcafd52b",
+            "target_exclusion_reasons": {
+              "by_cohort": {
+                "REL-20261001T000000Z-20261002T000000Z": {},
+                "REL-20261005T000000Z-20261006T000000Z": {}
+              },
+              "pooled": {}
+            },
+            "target_kind": "PRICE_RELATIVE_PROXY",
+            "time_feature_clock": "FIRST_RELIABLE_AVAILABLE_AT",
+            "unique_decision_n": 24,
+            "unique_mint_n": 23,
+            "universe_policy": {
+              "holder_field_id": "FIELD-HOLDER-COUNT-001",
+              "liquidity_field_id": "FIELD-LIQUIDITY-USD-001",
+              "min_holders": "50",
+              "min_liquidity_usd": "5000",
+              "n_base": 24,
+              "n_fail": 2,
+              "n_pass": 22,
+              "n_unknown": 0,
+              "rule": "ALL_OF_AT_DECISION_TIME",
+              "semantic_sha256": "63b33150869273e8f5a0d5d214c8c679e24b5468125164ddcf95326bac4d533a"
+            },
+            "viewed_variants": [
+              "MATCHED_OBSERVED",
+              "BASELINE_DECISION_ELIGIBLE",
+              "ABLATION_DROP_d_holders",
+              "DOWNSIDE_DESCRIPTIVE_V1"
+            ],
+            "winner_share_of_positive": null
+          },
+          "target_kind": "PRICE_RELATIVE_PROXY",
+          "terminal": "INCONCLUSIVE"
+        },
+        "git_mutation_count": 0,
+        "lane": "FAST_LANE",
+        "next_action": "SEARCH_PRIOR_WORK",
+        "passport": {
+          "artifact_manifest_sha256": "26b3b2b3b59d27e0f7862ca192ad1c3e5914b997a643eb697a87c4e8f313e6f1",
+          "as_of": "2026-10-14T15:34:42.069680Z",
+          "availability_cutoff": "2026-10-14T15:34:42.069680Z",
+          "capability_closure_sha256": "00e35454243dc0d23fcf08a4c25d60991f1d9c2f128f1eb50cf3cb80f3984274",
+          "cash_spend_usd_cents": 0,
+          "completed_at": "2026-10-14T15:34:42.069680Z",
+          "config_sha256": "16e5fce4a4121acf0269685b68d92559524127baa3fe89f295bb8bd3cb1e100a",
+          "dataset_fingerprints": [
+            "4511a1fe3d1e5394368f206e7edaa767304134584d0ddeefb0b83a6ad0347b4c"
+          ],
+          "dataset_manifest_ids": [
+            "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb"
+          ],
+          "execution_status": "COMPLETE",
+          "experiment_id": "EXP-SCIENCE-CHANGED-MIXED-LIST-NUMERIC",
+          "experiment_spec_sha256": "8752f8908424c8be2eb32fce6935f711c649f5016a03ad6cc0135e9c2ebe217a",
+          "first_reliable_available_at": "2026-10-14T15:34:42.069680Z",
+          "holdout_consumption_ids": [],
+          "hypothesis_definition_sha256": "ffb8bca42497867b574c0b5f12d74233a4a50eb352a53e3edd38a393b9a355b0",
+          "hypothesis_version_id": "HYP-HFIC-CAND-FFB8BCA42497",
+          "limitations": [],
+          "non_claims": [
+            "NO_ALPHA",
+            "NO_NETRETURN",
+            "NO_NEW_SCIENTIFIC_LOOK"
+          ],
+          "observation_panel_snapshot_sha256": null,
+          "observation_schedule_authority_sha256": null,
+          "observation_schedule_sha256": null,
+          "provider_calls_actual": 0,
+          "provider_calls_planned": 0,
+          "query_recipe_binding": {
+            "reason": "CAPABILITY_DESCRIPTOR_QUERY_RECIPE_NOT_REQUIRED",
+            "status": "NOT_APPLICABLE"
+          },
+          "query_recipe_ids": [],
+          "query_recipe_sha256s": [],
+          "random_seed_or_null": null,
+          "result_artifact_id": "RESULT-ARTIFACT-9AF479821C5F5274A9E11D68",
+          "result_artifact_logical_uri": "smial-data://research/artifacts/results/RESULT-ARTIFACT-9AF479821C5F5274A9E11D68.json",
+          "result_digest_sha256": "26b3b2b3b59d27e0f7862ca192ad1c3e5914b997a643eb697a87c4e8f313e6f1",
+          "run_id": "RUN-9AF479821C5F5274A9E11D68",
+          "run_key_sha256": "9af479821c5f5274a9e11d685a8108a458d5116336ee5ba19933e0410163fc7c",
+          "runner_capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+          "runner_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+          "scientific_terminal": "INCONCLUSIVE",
+          "source_lineage": {
+            "candidate_id": "HFIC-CAND-FFB8BCA42497",
+            "critic_input_packet_sha256": "4b827055baf29370e35025c7ca5ad87aef37cdeb46d434ab5c26c486601880f9",
+            "critic_result_sha256": "33cd3a98851e10c24360b3e8823d01614c79aefc9c127a3b2c4ae0be195c2f28",
+            "definition_sha256": "ffb8bca42497867b574c0b5f12d74233a4a50eb352a53e3edd38a393b9a355b0",
+            "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+            "existing_look_ref": "HFIC-ART-DISCOVERY-3BCD9E6CE48AE4B32E992BDE19C645893682ACF6",
+            "grounded_result_sha256": "f3374a023b2e96c4958ad372adb4dea069c867401d5eaf06bb0d16efedb3cfe9",
+            "market_evidence_epoch_sha256": "159d07d03a4e82789bb52ab0525df41d8920e5deeffac026fbf8a62700f1a933",
+            "new_scientific_look": false,
+            "scientific_terminal": "PASS_FAST_LANE_READY",
+            "session_id": "HFIC-SESS-8FEA8B334628164C"
+          },
+          "started_at": "2026-10-14T15:34:42.069680Z",
+          "trial_id": "HFIC-ART-DISCOVERY-3BCD9E6CE48AE4B32E992BDE19C645893682ACF6",
+          "trial_outcome": "INCONCLUSIVE",
+          "uv_lock_sha256": "3b75cc1c5a2c0c83560beaf1a57c4543b885e0909c75db6d1939e90d09eefedb"
+        },
+        "prior_run_id": null,
+        "provider_calls_actual": 0,
+        "reason_codes": [],
+        "run_id_or_null": "RUN-9AF479821C5F5274A9E11D68",
+        "run_key_sha256": "9af479821c5f5274a9e11d685a8108a458d5116336ee5ba19933e0410163fc7c",
+        "scientific_terminal": "INCONCLUSIVE",
+        "status": "COMPLETE"
+      },
+      "spec_pin": {
+        "canonical_sha256": "8752f8908424c8be2eb32fce6935f711c649f5016a03ad6cc0135e9c2ebe217a",
+        "experiment_id": "EXP-SCIENCE-CHANGED-MIXED-LIST-NUMERIC",
+        "file_sha256": "48198b67521f79af969ffcbb44ae36a374dff3ba16231af9e2cbfb7630c32e63",
+        "slot": "configs/experiment_specs/science-changed-mixed_list_numeric.yaml"
+      }
+    }
+  },
+  "tested_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+  "world": "changed"
+}

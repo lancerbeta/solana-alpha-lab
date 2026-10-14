@@ -1,4 +1,4 @@
-# Воспроизведение saved checkpoint
+# Воспроизведение окончательного bounded audit
 
 Рабочая база продукта: `fbac5449f6dd22a7bc066114109be8bbed830447`; runtime source
 read-only. Первичное evidence — base-v3; base-v2 и failed Windows capture retained.
@@ -68,7 +68,49 @@ host — NTFS allocation с file identity dedup. Directory metadata и shared VH
 growth не zero-filled. `finish_packet.py` пересчитывает отчет/ledger из saved
 native evidence и этих measurements; export — audit data, не product carriers.
 
-Next exact gate: SC06 ещё не начинался. Для него нужен owner budget replan;
-текущий cap 512 MiB нельзя расширить постфактум. Ни `prepare-changed`, ни `changed`
-пока не являются доказанной successful execution командой. B execution по current
-main недоступен: не создавать 64-day worlds и самописный confirmer.
+## SC06: выполненные native команды и границы повторения
+
+```powershell
+& tests/fixtures/science_lifecycle_smoke_v1/launch.ps1 -RuntimeRoot '..\smial-science-lifecycle-smoke-v1-runtime' -Phase prepare-changed -Attempt prepare-changed-a1 -UseVolumes
+& tests/fixtures/science_lifecycle_smoke_v1/launch.ps1 -RuntimeRoot '..\smial-science-lifecycle-smoke-v1-runtime' -Phase changed -Attempt changed-a1 -UseVolumes
+& tests/fixtures/science_lifecycle_smoke_v1/launch.ps1 -RuntimeRoot '..\smial-science-lifecycle-smoke-v1-runtime' -Phase replay-changed -Attempt replay-changed-a1 -UseVolumes
+```
+
+Это исторические receipts, не инструкция заново открыть MAIN: все три attempts
+уже immutable. Current MAIN=6/6, evaluator=10/12. Fresh campaign/prepare requires
+отдельную authority; новый Attempt не сбрасывает cap. Разрешённый cold repeat
+uses новый уникальный Attempt, `replay-changed` и retained stores, без evaluator.
+changed future source публиковался штатным generator до native MAIN. Immutable
+base capture/old worlds не переписывались; product snapshot и image переиспользованы.
+[sc06.json](../../evidence/science_lifecycle_smoke_v1/sc06.json) содержит actual
+artifacts/passports/committed records, independent oracle и filtered native prefix
+hashes. Prefix E0..E1800 неизменен; release_id меняется вместе с future source bytes.
+Offline verifier проверяет −0.09 / −0.045, unchanged D/M/C, current lineage,
+zero-evaluator cold replay. Девять тестов дополнительно отвергают changed prefix,
+changed membership/denominator и unchanged future oracle.
+
+## Конкретные ограничения воспроизведения
+
+1. Пакет Git содержит компактные actual witnesses, а не полную копию datasets.
+   Offline PASS воспроизводит проверку сохранённых receipts, не runtime experiment.
+2. Native cold replay зависит от retained campaign volumes, marker и локального
+   image ID. Этот ID не опубликован как переносимый registry digest. При потере
+   volumes/image одного Git clone недостаточно. В этой кампании dependencies
+   не устанавливались и image не строился. Shared locked uv runtime pre-existed.
+3. Первичная подготовка Linux owned volumes потребовала ручного seed/UID repair;
+   launcher их только проверяет. Windows bind capture превысил 600s. Поэтому
+   clean-host one-command bootstrap не доказан; не выдавать Linux reuse за него.
+4. Definition registration — explicit fixture, Actor/Critic scripted. Reproduce
+   не проверяет blind-agent behavior или обычное authoring/registration UI.
+5. Mandatory Git hook при checkpoint создал .venv и нарушил прежний 512 MiB cap.
+   Owner разрешил только её проверенное удаление и forward cap 640 MiB. Для Git
+   commands заранее задаётся UV_PROJECT_ENVIRONMENT к existing shared runtime;
+   hooks остаются включёнными. Если .venv появится снова, она входит в cap.
+6. B execution недоступен: accepted confirming producer/reservation absent.
+   Не создавать 64-day worlds, новый estimator или authored scientific carriers.
+
+Original budget breach и authorized cleanup сохранены в budget-continuation.json.
+Финальный live footprint после Git content — local/delivery_harness/science-final-footprint.json;
+его timestamp/measurement stage не подменяют исторический committed snapshot.
+Stores/receipts/trial history/caches не удалять. Docker VHD/log-directory physical
+allocation остаётся UNKNOWN; logical log size не служит физическим замером.

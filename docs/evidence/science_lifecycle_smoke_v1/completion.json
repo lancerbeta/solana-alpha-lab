@@ -1,0 +1,66 @@
+{
+  "acceptance_id": "SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1-BOUNDED-AUDIT",
+  "active_stop_conditions": [],
+  "as_of": "2026-10-14",
+  "base_main": "fbac5449f6dd22a7bc066114109be8bbed830447",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/science_lifecycle_smoke_v1/factory-fit.json",
+    "sha256": "PENDING",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {},
+  "non_claims": [
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_CHRONOLOGICAL_CONFIRMATION",
+    "NO_QUALIFYING_EVIDENCE",
+    "NO_FULL_LIFECYCLE",
+    "AGENT_BEHAVIOR_UNVERIFIED",
+    "NO_STRATEGY_ACTIVATION_PAPER_DEPLOY_MONEY"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "actual_evaluator_invocations": 10,
+    "authorized_local_venv_deleted_bytes": 172621496,
+    "conditional_b_trials": 0,
+    "deleted_scientific_artifacts": 0,
+    "inherited_main_separate": 22,
+    "new_main": 6,
+    "product_repairs": 0,
+    "production_writes": 0,
+    "provider_calls": 0,
+    "real_data_reads": 0,
+    "spend": 0,
+    "strategy_activation_paper_writes": 0
+  },
+  "state_change": "COMPLETE_WITH_FINDINGS: A/C/SC06 native numeric persistence, independent prefix/roles and cold replay; B earliest accepted confirmer/reservation gap proved. No product repair or science acceptance. Original512 breach preserved; owner forward cap640 applied. Git CI/readiness remain enforced separately.",
+  "task_id": "SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/science_lifecycle_smoke_v1/independent-review.json",
+      "sha256": "PENDING",
+      "verdict": "NOT_READY"
+    },
+    "project_checks": [
+      "PASS_SAVED_ATOMIC_RESULT_PASSPORT_RECORDS",
+      "PASS_CAPTURED_PREFIX_AND_EXACT_ROLE_INVARIANCE",
+      "PASS_COLD_ZERO_EVALUATOR_REPLAY",
+      "PASS_EXPECTED_RUNNER_AND_SCIENCE_GUARDS",
+      "PASS_FORWARD_640_MIB_WITH_ORIGINAL_BREACH_PRESERVED"
+    ],
+    "targeted": "PASS_NATIVE_A_C_SC06_AND_9_OFFLINE_FALSIFIERS"
+  }
+}
