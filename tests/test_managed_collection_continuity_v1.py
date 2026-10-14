@@ -991,6 +991,39 @@ class ManagedRevocationRollbackTests(ManagedBase):
         self.assertEqual(resumed["terminal"], "MANAGED_APPLIED", resumed)
         self.assertEqual(sql(sc.ops_path, "SELECT desired_state, intake_revoked_at FROM managed_control"), [("RUN", None)])
 
+    def test_weaker_backup_source_counts_as_wider_and_unreadable_sink_is_unknown(self) -> None:
+        import copy
+        import os
+
+        sc = self.sc
+        self.commission_profile()
+        body = store_profile(sc)
+        offhost = copy.deepcopy(body)
+        offhost["resource_policy"]["backup_source"] = "OFFHOST_VERIFIED"
+        local = copy.deepcopy(body)
+        local["resource_policy"]["backup_source"] = "LOCAL_BUNDLE"
+        self.assertFalse(mc._not_wider(local, offhost))
+        self.assertTrue(mc._not_wider(offhost, local))
+        # An existing sink that cannot be read completely is UNKNOWN, an absent sink is zero.
+        sc.backup(D1)
+        real_walk = os.walk
+
+        def broken(path, onerror=None, **kwargs):
+            if str(path) == str(sc.sink) and onerror is not None:
+                onerror(OSError("denied"))
+            return real_walk(path, onerror=onerror, **kwargs)
+
+        from solana_alpha_lab.factory.remote_ops import BACKUP_SINK_ENV
+
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            env = {BACKUP_SINK_ENV: str(sc.sink)}
+            with patch.object(mc.os, "walk", side_effect=broken):
+                unreadable = mc.measure_whole_factory(store=store, data_root=sc.data_root, root=ROOT_DIR, environ=env)
+            self.assertEqual(unreadable["backup_sink_bytes"], "UNKNOWN")
+            absent = mc.measure_whole_factory(store=store, data_root=sc.data_root, root=ROOT_DIR,
+                                              environ={BACKUP_SINK_ENV: str(sc.sink / "missing")})
+            self.assertEqual(absent["backup_sink_bytes"], 0)
+
     def test_earlier_handover_or_changed_template_counts_as_wider(self) -> None:
         import copy
 

@@ -1,14 +1,14 @@
 [
   {
     "logical_ref": "docs/evidence/i3_managed_collection_continuity_v1/proof.json",
-    "sha256_or_fingerprint": "d15da072adc1bdc6a0e35f8208830f07964034ad3018e206addf4d1b430e6214"
+    "sha256_or_fingerprint": "09995d867f01be99390817b3337f5292975bac4d2e8ccddedac723713959755d"
   },
   {
     "logical_ref": "docs/evidence/i3_managed_collection_continuity_v1/OPERATE_PACKET.md",
-    "sha256_or_fingerprint": "8f13157d28fdd1ce08aab1e30099bf802c3a4c17ca4bde313f3f2e19608fe3e7"
+    "sha256_or_fingerprint": "5a5987efd5eb73ca46af22c34f3fc4b47cf21306fe63a813fa3853e03bffaf68"
   },
   {
     "logical_ref": "docs/evidence/i3_managed_collection_continuity_v1/OWNER_READOUT.md",
-    "sha256_or_fingerprint": "ee62f596c5dafd7046155b2c301095b55e2cb2be286ac0bc9e0569f65c6e35b1"
+    "sha256_or_fingerprint": "553155fce4a235ccfb6da3e0bb1820f2246e52567bc14141327053f216ea31c6"
   }
 ]

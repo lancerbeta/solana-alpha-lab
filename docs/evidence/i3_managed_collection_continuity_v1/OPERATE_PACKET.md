@@ -70,7 +70,7 @@ owner approves numbers, not a hash.
 
 Resource inputs that must be decided in the same gate: the target acceptance (none by
 default: the controller then blocks new intake at TARGET 40 GiB and never forges PASS),
-the backup receipt maximum age (default 30 h) and the measured growth bytes/day (unknown
+the backup freshness maximum age (default 30 h) and the measured growth bytes/day (unknown
 until measured; runway then reports `UNKNOWN_GROWTH_NOT_MEASURED` and recommends the I2
 action).
 

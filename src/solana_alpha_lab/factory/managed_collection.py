@@ -342,6 +342,8 @@ def _not_wider(new: Mapping[str, Any], old: Mapping[str, Any]) -> bool:
         "backup_max_age_seconds"
     ] > op_["backup_max_age_seconds"]:
         return False
+    if op_.get("backup_source") == "OFFHOST_VERIFIED" and np_.get("backup_source") != "OFFHOST_VERIFIED":
+        return False  # a local-only backup is weaker durability evidence than the off-host one
     oa, na = op_.get("target_acceptance"), np_.get("target_acceptance")
     if na and (not oa or int(na.get("max_projected_bytes", 0)) > int(oa.get("max_projected_bytes", 0))):
         return False
@@ -541,6 +543,26 @@ def _file_bytes(path: Path) -> int:
         return 0
 
 
+def _walk_bytes(path: Path) -> Any:
+    """Regular-file bytes under ``path``; any unreadable entry makes the whole measure UNKNOWN."""
+
+    failed = {"value": False}
+
+    def onerror(_error: OSError) -> None:
+        failed["value"] = True
+
+    total = 0
+    for current, _dirs, files in os.walk(path, onerror=onerror, followlinks=False):
+        for name in files:
+            full = os.path.join(current, name)
+            try:
+                if not os.path.islink(full):
+                    total += os.lstat(full).st_size
+            except OSError:
+                failed["value"] = True
+    return _UNKNOWN if failed["value"] else total
+
+
 def measure_whole_factory(
     *, store: ObservationScheduleStore, data_root: Path, root: Path, environ: Mapping[str, str] | None = None
 ) -> dict[str, Any]:
@@ -553,7 +575,6 @@ def measure_whole_factory(
 
     from solana_alpha_lab.factory.collector_operational_packet import (
         _rdp_inventory_bytes,
-        _tree_bytes,
         resident_rdp_bytes,
     )
     from solana_alpha_lab.factory.remote_ops import load_config, resolve_backup_sink
@@ -572,8 +593,9 @@ def measure_whole_factory(
     sink_bytes: Any = _UNKNOWN
     try:
         sink = resolve_backup_sink(Path(root), load_config(Path(root)), environ if environ is not None else os.environ)
-        measured = _tree_bytes(sink)
-        sink_bytes = 0 if measured is None else int(measured)
+        # A sink that does not exist holds nothing; one that exists but cannot be read completely is
+        # UNKNOWN, never a smaller number.
+        sink_bytes = _walk_bytes(sink) if sink.exists() else 0
     except Exception:  # noqa: BLE001 - an unresolvable sink is UNKNOWN, never zero
         sink_bytes = _UNKNOWN
     return {

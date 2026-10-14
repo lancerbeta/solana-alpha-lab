@@ -114,7 +114,7 @@ def _managed_incident_detail(item: Mapping[str, Any]) -> str:
     )
     prefix = str(item.get("incident_key") or "").split(":", 1)[0]
     owner = {
-        "STORAGE_BLOCKED": "место/backup/бюджет: восстановить ресурс или записать свежий backup-receipt; бюджет и TARGET решает владелец",
+        "STORAGE_BLOCKED": "место/backup/бюджет: проверить backup-владельца (off-host CURRENT или опубликованный BACKUP bundle) и footprint; бюджет и TARGET решает владелец",
         "INTAKE_HELD": "ничего: приём возобновится сам, когда вернётся свободное место",
         "INTAKE_OWNER_MISSING": "проверить collection-status; если причина PEER/closure не уходит - инженеру, право не менять",
         "GRANT_INVALID": "владельцу не подтверждать ничего; инженеру сверить целостность grant (collection-status), store не править",

@@ -11,7 +11,7 @@
   },
   "risk_matrix": {
     "suite": "tests/test_managed_collection_continuity_v1.py",
-    "tests": 34,
+    "tests": 35,
     "result": "PASS",
     "oracles": "authored UTC timeline and raw SQL; managed helpers are never the oracle for day ownership, receipts, admissions or counters",
     "cases": {
@@ -46,7 +46,8 @@
       "p0b_offhost": "test_offhost_source_requires_the_owner_state_current",
       "p0c_authority_event": "test_authority_event_is_rebuilt_not_reissued",
       "p0d_stop_sticky": "test_rollback_after_stop_keeps_intake_stopped_until_a_fresh_apply",
-      "p0d_scope": "test_earlier_handover_or_changed_template_counts_as_wider"
+      "p0d_scope": "test_earlier_handover_or_changed_template_counts_as_wider",
+      "sink_unknown_and_backup_source_wider": "test_weaker_backup_source_counts_as_wider_and_unreadable_sink_is_unknown"
     },
     "seam_suite": "tests/test_managed_collection_release_seam_v1.py: 1 test, PASS (4 managed UTC days, weekly boundary, one failing child, capture/freeze/export, production unpack verify+import of 5 cohorts, Forge discovery preflight, typed missingness, one scope per cohort)"
   },
@@ -56,7 +57,7 @@
     "M3_storage_never_blocks": "killed",
     "M4_no_event_repair": "killed",
     "M5_hold_disabled_sticky_drain": "killed",
-    "baseline": "34 pass",
+    "baseline": "35 pass",
     "M6_no_authority_event_repair": "killed",
     "M7_rollback_always_not_wider": "killed"
   },
@@ -95,9 +96,7 @@
   "owner_burden": {
     "approvals_first_profile": 1,
     "approvals_per_child": 0,
-    "remaining_manual": [
-      "record backup receipt after a verified checkpoint (until wired into the backup unit)"
-    ]
+    "remaining_manual": []
   },
   "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_managed_collection_continuity_v1",
   "follow_up_before_after": {

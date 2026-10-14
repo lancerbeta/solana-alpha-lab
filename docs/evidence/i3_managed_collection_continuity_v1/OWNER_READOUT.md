@@ -43,7 +43,7 @@ JSON на каждое окно. Это код, проверенный на од
 
 ## EVIDENCE
 
-- 34 целевых теста + seam-тест релиза: 3 UTC-границы с одной фразой и 3 производными receipts, raw-SQL
+- 35 целевых тестов + seam-тест релиза: 3 UTC-границы с одной фразой и 3 производными receipts, raw-SQL
   oracle владельца дня; handover/plan-отказы; crash после activation до event и после
   register до authorize; конкурирующий reconciler; tamper grant (derive и tick); stop/
   re-apply/rollback; finite validity; матрица storage/backup/TARGET/HARD; weekly dedup и
@@ -109,6 +109,10 @@ JSON на каждое окно. Это код, проверенный на од
 - Если сам tick-timer мёртв, срабатывают только общие stale/timer алерты.
 - Свежесть backup — это то, что сообщают существующие владельцы (off-host CURRENT или
   опубликованный bundle); содержимое архива код не проверяет.
+
+- `LOCAL_BUNDLE` как источник backup не даёт off-host гарантии (нужен `OFFHOST_VERIFIED`);
+  откат с off-host на local требует фразу. Событие authority, восстановленное после падения,
+  несёт время восстановления; время выдачи берётся из receipt.
 
 ## Что код не утверждает
 
