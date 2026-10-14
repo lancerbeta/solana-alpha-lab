@@ -7832,13 +7832,16 @@ def apply_classification(
     if existing is None:
         raise HficSessionError("SESSION_NOT_FOUND")
     if existing.get("session_state") == "SYNTHESIS_COMPLETE":
-        nested = experiment_spec_packet.get("experiment_spec", experiment_spec_packet)
-        if isinstance(nested, Mapping) and nested.get("schema_version") == "1.4":
+        stored = existing.get("classifier_receipt") or {}
+        # Persisted type selects the action gate; caller version cannot bypass it.
+        if stored.get("episode_outcome_binding") is not None:
+            nested = experiment_spec_packet.get("experiment_spec", experiment_spec_packet)
+            if not isinstance(nested, Mapping) or nested.get("schema_version") != "1.4":
+                raise HficSessionError("EPISODE_CLASSIFICATION_REVALIDATION_DENIED")
             critic = dict(existing.get("critic_result") or {})
             critic["experiment_spec_packet"] = dict(experiment_spec_packet)
             critic.pop("classifier_receipt", None)
             fresh = run_live_classifier(critic, _classifier_frozen_view(existing, critic), repo_root=repo_root, data_root=data_root)
-            stored = existing.get("classifier_receipt") or {}
             if fresh != stored:
                 raise HficSessionError("EPISODE_CLASSIFICATION_REVALIDATION_DENIED", detail={"reason_codes": fresh["reason_codes"]})
         return existing

@@ -187,7 +187,7 @@ def _frozen_hfic_replay_lineage(
     native_alias = str(spec.get("hypothesis_version", "")).startswith("HYP-HFIC-CAND-")
     is_reuse = (spec.get("schema_version") in {"1.3", "1.4"}
                 and (spec.get("observation_request") or {}).get("collection_mode") == "REUSE_ONLY")
-    if session_id is None and not (native_alias and is_reuse):
+    if session_id is None and not (native_alias and is_reuse) and spec.get("schema_version") != "1.4":
         return None
     if (
         not isinstance(session_id, str)
@@ -246,6 +246,21 @@ class DocumentRunner(ExperimentRunner):
         """Execute a classified Fast Lane document without mutating Git."""
 
         lane = run_context.lane_decision
+        if spec.get("schema_version") == "1.4":
+            from solana_alpha_lab.factory.lane_classifier import classify_lane
+
+            fresh = classify_lane({"experiment_spec": spec,
+                "hypothesis_definition_sha256": run_context.hypothesis_definition_sha256},
+                root=self.root, data_root=run_context.data_root,
+                as_of=run_context.classifier_evaluated_at or _event_time(spec))
+            if (fresh.terminal not in {"FAST_LANE_READY", "REPLAY_AVAILABLE"}
+                    or fresh.run_key_sha256 != lane.run_key_sha256):
+                return _document_response(lane_decision=fresh,
+                    execution_status="INVALID_EVIDENCE", scientific_terminal="INVALID",
+                    reason_codes=fresh.reason_codes or ("EPISODE_CLASSIFIER_CONTEXT_MISMATCH",),
+                    run_id=None, git_mutation_count=0, provider_calls_actual=0,
+                    next_action=fresh.next_action)
+            lane = fresh
         if lane.lane == Lane.PROMOTION_LANE:
             return _document_response(
                 lane_decision=lane,

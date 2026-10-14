@@ -4870,6 +4870,16 @@ def bind_frozen_fixed_time_inputs(
     frozen_input = recipe.get("frozen_input")
     if not isinstance(frozen_input, list) or not frozen_input:
         raise GroundedDiscoveryError("FROZEN_INPUT_REQUIRED")
+    if spec.get("schema_version") == "1.4":
+        sources = {}
+        for item in frozen_input:
+            if not isinstance(item, Mapping):
+                raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH")
+            key = (item.get("cohort_id"), item.get("release_id"))
+            if key in sources and sources[key] != item:
+                raise GroundedDiscoveryError("EPISODE_SOURCE_BINDING_CONFLICT")
+            sources[key] = item
+        frozen_input = list(sources.values())
     from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
     from solana_alpha_lab.factory.data_resolver import _safe_relative_path, EvidenceResolutionError
 

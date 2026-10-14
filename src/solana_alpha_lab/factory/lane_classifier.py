@@ -475,8 +475,10 @@ def classify_lane(
 
     try:
         runner_git_sha = _runner_git_sha(submission, root=root)
+        from solana_alpha_lab.factory.data_resolver import episode_implementation_descriptor
+
         implementation_assets = verify_implementation_assets(
-            descriptor,
+            episode_implementation_descriptor(descriptor, spec),
             root=root,
             runner_git_sha=runner_git_sha,
             git_show_bytes=_git_show_bytes,
@@ -549,7 +551,6 @@ def classify_lane(
     episode_binding = None
     if episode_route:
         from solana_alpha_lab.factory.episode_required_outcomes import project_episode_required_outcomes
-        from solana_alpha_lab.factory.hfic_grounded_discovery import GroundedDiscoveryError
         from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
             apply_selection_gate_to_preflight, load_applicable_gate_receipt,
         )
@@ -559,9 +560,9 @@ def classify_lane(
                 spec, data_root=Path(data_root), definition_sha256=_hypothesis_definition_sha256(submission))
         except (OSError, ValueError, KeyError, TypeError) as exc:
             code = str(getattr(exc, "code", "EPISODE_SOURCE_BINDING_CONFLICT"))
-            if isinstance(exc, GroundedDiscoveryError) and code in {
+            if code in {
                 "EPISODE_REQUIRED_OUTCOME_INVALID", "EPISODE_PRIMARY_TARGET_UNBOUND",
-                "EPISODE_QUERY_UNSUPPORTED", "EPISODE_TARGET_UNSUPPORTED", "POINT_NOT_IN_ALLOWLIST",
+                "EPISODE_QUERY_UNSUPPORTED", "EPISODE_TARGET_UNSUPPORTED", "EPISODE_POINT_UNKNOWN",
             }:
                 return _decision(Lane.DENY, "DENY_INVALID_SPEC", reason_codes=(code,), next_action="CORRECT_EXPERIMENT_SPEC")
             if code in {"SCOPE_COVERAGE_UNRESOLVED", "SCOPE_EVIDENCE_INVALID", "HOLDOUT_PROTECTED", "HOLDOUT_UNRESOLVED", "CUTOFF_REJECTED"}:

@@ -55,6 +55,16 @@ def _json(root: Path, relative: str) -> dict[str, Any]:
 
 
 def verify_frozen_episode_sources(data_root: Path, frozen: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """Adapt native integrity failures to the shared typed consumer boundary."""
+    try:
+        return _verify_frozen_episode_sources(data_root, frozen)
+    except GroundedDiscoveryError:
+        raise
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        raise GroundedDiscoveryError(str(getattr(exc, "code", "EPISODE_SOURCE_BINDING_CONFLICT"))) from exc
+
+
+def _verify_frozen_episode_sources(data_root: Path, frozen: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """Source/protection gate shared by classifier and fixed-time binder.
 
     Frozen paths and manifests select the scope; the current corpus pointer never
@@ -67,7 +77,8 @@ def verify_frozen_episode_sources(data_root: Path, frozen: Sequence[Mapping[str,
         OBSERVATION_SCHEDULE_ARTIFACT_NAME, decode_schedule_artifact,
     )
     from solana_alpha_lab.factory.opportunity_episode_release import (
-        REQUIRED_EPISODE_LABELS, frozen_protection_from_release, verify_episode_release,
+        REQUIRED_EPISODE_LABELS, CORPUS_SCHEMA_ID, episode_corpus_schema_sha256,
+        frozen_protection_from_release, verify_episode_release,
     )
 
     admit_discovery_binding(frozen)
@@ -100,6 +111,17 @@ def verify_frozen_episode_sources(data_root: Path, frozen: Sequence[Mapping[str,
                      "EPISODE_SOURCE_BINDING_CONFLICT")
             validation = json.loads(validation_bytes)
             labels = _json(data_root, prefix + ".labels.json")
+            published = _json(data_root, prefix + ".published")
+            composition = validation.get("corpus_composition") or []
+            _require(dataset.schema_id == CORPUS_SCHEMA_ID
+                     and dataset.schema_sha256 == episode_corpus_schema_sha256()
+                     and validation.get("dataset_id") == dataset.dataset_id
+                     and validation.get("dataset_version") == dataset.dataset_version
+                     and labels.get("dataset_version") == dataset.dataset_version
+                     and labels.get("cohort_lineage") == [c["cohort_id"] for c in composition]
+                     and published.get("dataset_manifest_id") == manifest_id
+                     and published.get("dataset_fingerprint") == dataset.dataset_fingerprint,
+                     "CANONICAL_METADATA_CONFLICT")
             _require(all(labels.get(k) == v for k, v in REQUIRED_EPISODE_LABELS.items()), "DISCOVERY_AUTHORITY_ABSENT")
             parts = []
             for part_id in validation["partition_manifest_ids"]:
@@ -111,6 +133,10 @@ def verify_frozen_episode_sources(data_root: Path, frozen: Sequence[Mapping[str,
             _require(dataset.dataset_manifest_id == manifest_id and dataset.dataset_id == item["dataset_id"],
                      "EPISODE_SOURCE_BINDING_CONFLICT")
             manifest_parts[manifest_id] = parts
+        composition = _json(data_root, f"datasets/manifests/{manifest_id}.validation.json")["corpus_composition"]
+        _require({"cohort_id": item["cohort_id"], "release_id": item["release_id"],
+                  "content_sha256": release["source_sha256"]} in composition,
+                 "CANONICAL_METADATA_CONFLICT")
         for rel_key, hash_key in (("census_rel", "census_sha256"), ("observations_rel", "observations_sha256")):
             matching = [p for p in manifest_parts[manifest_id] if p.logical_location == item[rel_key]]
             _require(len(matching) == 1 and matching[0].file_sha256 == item[hash_key]
@@ -159,6 +185,12 @@ def _metadata_status(row: Mapping[str, Any], item: Mapping[str, Any], t0, cutoff
               "request_not_before": window.request_not_before, "availability_deadline": window.availability_deadline}
     if any(_parse_time(row.get(k)) != v for k, v in clocks.items()):
         return "INVALID"
+    # Native closure can censor an unexecuted slot: no acquisition occurred.
+    # Such metadata never qualifies as an observed outcome.
+    if row.get("state") in {"CENSORED", "CENSORED_LATE"}:
+        return "CENSORED" if row.get("missing_reason") else "INVALID"
+    if row.get("state") in {"DEPENDENCY_MISSING", "BLOCKED_BUDGET", "IN_FLIGHT_CALL_INDETERMINATE"}:
+        return "MISSING_TYPED" if row.get("missing_reason") else "INVALID"
     reason = temporal._snapshot_lineage_reason(
         row, query_policy=temporal.OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
         point_due_at=window.request_not_before, outer_deadline=min(window.availability_deadline, cutoff))
@@ -168,8 +200,6 @@ def _metadata_status(row: Mapping[str, Any], item: Mapping[str, Any], t0, cutoff
         return "INVALID"
     if row.get("state") == "OBSERVED" and row.get("value_kind") == "DECIMAL":
         return "OBSERVED"
-    if row.get("state") in {"CENSORED", "CENSORED_LATE"}:
-        return "CENSORED"
     if row.get("state") in {"MISSING_TYPED", "DISAPPEARED", "DEPENDENCY_MISSING", "BLOCKED_BUDGET", "IN_FLIGHT_CALL_INDETERMINATE"}:
         return "MISSING_TYPED"
     return "INVALID"

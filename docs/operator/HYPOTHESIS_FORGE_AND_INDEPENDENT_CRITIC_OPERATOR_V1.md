@@ -1182,7 +1182,7 @@ evidence that upgrade unlocks
 
 ### Если `FAST_LANE_CANDIDATE`
 
-Подготовь draft, совместимый с `ExperimentSpec` 1.3 (`required_outcomes` обязателен), но не запускай его. `primary_y` / `horizon_notional` остаются identity text. Разреши реальные stable IDs, hashes/fingerprints, recipe IDs и capabilities; не выдумывай отсутствующие bindings.
+Подготовь draft, совместимый с `ExperimentSpec` 1.3 для raw X/Y либо 1.4 для frozen native episode fixed-time recipe (`required_outcomes` обязателен), но не запускай его. `primary_y` / `horizon_notional` остаются identity text. Разреши реальные stable IDs, hashes/fingerprints, recipe IDs и capabilities; не выдумывай отсутствующие bindings.
 
 Выведи:
 
@@ -1547,7 +1547,13 @@ OWNER_DECISION_REQUIRED
 ## B5. Если terminal = PASS_TO_CLASSIFICATION
 
 1. Сформируй финальный frozen Hypothesis Contract.
-2. Подготовь machine-valid ExperimentSpec **1.3** с явным `required_outcomes`.
+2. Выбери machine-valid ExperimentSpec по population и frozen recipe: raw X/Y —
+   **1.3**; native OPPORTUNITY_EPISODES / episode_query 1.2 fixed-time proxy —
+   **1.4**, REUSE_ONLY / EXPLORATORY_REUSE с native E `required_outcomes`.
+   Exact bindings, native D/M/C и protection replay описаны в
+   `docs/contracts/episode_native_required_outcomes_v1.md`.
+   COMPLETE/FAST_LANE_READY — готовность reusable artifact; scientific acceptance
+   и execution authority проверяются отдельно. Не переводить E в X/Y.
    `primary_y` / `horizon_notional` остаются identity text, не parser.
    Не создавай и не редактируй `CRITIC_INPUT_PACKET`: его owner — freeze.
 3. Разреши stable IDs, hashes/fingerprints, capabilities, query recipes и parameter schema. Отсутствующие значения не выдумывай.
@@ -1559,7 +1565,10 @@ OWNER_DECISION_REQUIRED
    Не штампуй `outcome_readiness=COMPLETE`. Classifier принимает COMPLETE
    только из live release projection. Attached/self-hashed stamps fail closed.
    `COMPLETE` значит: каждый required `(point_id, field_id)` имеет
-   `state == OBSERVED` для каждого member в `base_x`.
+   `state == OBSERVED` для каждого member в `base_x` (raw 1.3) либо native
+   decision denominator D (episode 1.4). Episode missingness сохраняет D и
+   возвращает EPISODE_OUTCOME_COVERAGE_UNRESOLVED; historical readback не выдаёт
+   новую готовность, повтор действия проверяет current source/protection.
    `CENSORED_LATE` / `MISSING_TYPED` / absent — это coverage, не наблюдение
    required value, и дают `MISSINGNESS_UNRESOLVED`. Это не complete-case и
    не сжимает `base_x.n`.

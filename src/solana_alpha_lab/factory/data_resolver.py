@@ -470,6 +470,17 @@ def resolve_query_recipe_hashes(
     return tuple(resolved)
 
 
+def episode_implementation_descriptor(descriptor: Mapping[str, Any], spec: Mapping[str, Any]) -> Mapping[str, Any]:
+    """Version-isolated closure; legacy registry lists and run keys stay intact."""
+    if spec.get("schema_version") != "1.4":
+        return descriptor
+    return {**descriptor, "implementation_asset_ids": [
+        *descriptor["implementation_asset_ids"],
+        "MODULE-EPISODE-REQUIRED-OUTCOMES-001",
+        "SCHEMA-EXPERIMENT-SPEC-V1-4-001",
+    ]}
+
+
 def verify_implementation_assets(
     descriptor: Mapping[str, Any],
     *,

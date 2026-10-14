@@ -94,13 +94,18 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         before = self.store.diagnostics().committed_inventory_sha256
         for kind in ("LIST_CONTRAST", "MIXED_LIST_NUMERIC"):
             spec, frozen = load_case(self.template, kind)
+            expected = copy.deepcopy(oracle)
+            # The native numeric contrast permits overlap: comparator is D.
+            if kind == "MIXED_LIST_NUMERIC":
+                for row in expected:
+                    row["comparator"] = row["decision_eligible"]
             recorder = ReaderOracle()
             with patch("pyarrow.parquet.read_table", recorder.read), patch(
                     "solana_alpha_lab.factory.hfic_temporal_discovery._target_projection", side_effect=AssertionError("OUTCOME_EVALUATOR")), patch(
                     "solana_alpha_lab.factory.hfic_temporal_discovery.execute_temporal_discovery", side_effect=AssertionError("MAIN")):
                 result = project_episode_required_outcomes(spec, data_root=self.plane, definition_sha256=frozen["selected_definition_sha256"])
-            self.assertEqual(membership_view(result["membership"]), oracle)
-            self.assertEqual((result["admissions_n"], result["decision_n"], result["matched_n"], result["comparator_n"]), (24, 20, 10, 10))
+            self.assertEqual(membership_view(result["membership"]), expected)
+            self.assertEqual((result["admissions_n"], result["decision_n"], result["matched_n"], result["comparator_n"]), (24, 20, 10, 20 if kind == "MIXED_LIST_NUMERIC" else 10))
             self.assertEqual(result["readiness"], "COMPLETE")
             values = [t for t in recorder.trace if "typed_value" in t["columns"]]
             self.assertEqual(sum(len(t["filters"]) == 4 for t in values), result["reads"]["prefix_value_cells_read"])
@@ -108,7 +113,7 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
             corrupt = copy.deepcopy(result["membership"])
             corrupt[0]["matched"] = not corrupt[0]["matched"]
             with self.assertRaises(AssertionError):
-                self.assertEqual(membership_view(corrupt), oracle)
+                self.assertEqual(membership_view(corrupt), expected)
             with self.assertRaisesRegex(AssertionError, "TARGET_VALUE_READER"):
                 recorder.read(Path("observations.parquet"), columns=["typed_value"], filters=[("episode_id", "=", "canary"), ("field_id", "=", "FIELD-USD-PRICE-001"), ("point_id", "=", "E14400")])
             with self.assertRaisesRegex(AssertionError, "UNBOUNDED_VALUE_READER"):
@@ -159,6 +164,18 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         with path.open("ab") as stream: stream.write(b"SOURCE-DRIFT")
         self.assertEqual(self.classify().terminal, "DENY_INTEGRITY_MISMATCH")
 
+    def test_identical_source_dedup_and_conflicting_identity(self):
+        baseline = self.project()
+        spec = copy.deepcopy(self.spec)
+        recipe = spec["parameters"]["temporal_recipe"]
+        recipe["frozen_input"].append(copy.deepcopy(recipe["frozen_input"][0]))
+        duplicate = self.project(spec)
+        self.assertEqual(duplicate["membership"], baseline["membership"])
+        self.assertEqual(duplicate["required_coverage"], baseline["required_coverage"])
+        recipe["frozen_input"][-1]["observations_sha256"] = "0" * 64
+        with self.assertRaisesRegex(GroundedDiscoveryError, "EPISODE_SOURCE_BINDING_CONFLICT"):
+            self.project(spec)
+
     def test_current_protection_denies_before_values(self):
         import pyarrow.parquet as pq
         item = self.spec["parameters"]["temporal_recipe"]["frozen_input"][0]
@@ -173,7 +190,7 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
             self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
 
     def test_authoritative_persistence_exact_repeat_cold_readback_and_guard(self):
-        from solana_alpha_lab.factory.experiment_evidence import science_guard
+        from solana_alpha_lab.factory.experiment_evidence import science_guard, _build_obligations
         from solana_alpha_lab.factory.document_runner import _frozen_hfic_replay_lineage, RunContext
         validated = validate_experiment_document(self.spec, root=ROOT)
         self.assertEqual(validated["schema_version"], "1.4")
@@ -200,14 +217,113 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         readback = json.loads(cold.stdout)
         self.assertEqual(readback["receipt"], bundle["classifier_receipt"])
         self.assertEqual(readback["inventory"], before)
+        lineage = _frozen_hfic_replay_lineage(self.spec, RunContext(self.plane, self.definition, decision))
+        self.assertFalse(lineage["new_scientific_look"])
+        self.assertEqual(lineage["session_id"], self.frozen["session_id"])
+        from solana_alpha_lab.factory.document_runner import DocumentRunner
+        from solana_alpha_lab.factory.run_passport import experiment_spec_sha256
+        # Corrupt native schedule after READY. Real direct dispatch must refuse
+        # before any evaluator, value materialization or new store event.
+        item = self.spec["parameters"]["temporal_recipe"]["frozen_input"][0]
+        source_dir = (self.plane / item["census_rel"]).parent
+        from solana_alpha_lab.factory.live_cohort_schedule_artifact import OBSERVATION_SCHEDULE_ARTIFACT_NAME
+        schedule_path = source_dir / OBSERVATION_SCHEDULE_ARTIFACT_NAME
+        schedule_bytes = schedule_path.read_bytes()
+        schedule_path.write_bytes(schedule_bytes + b" ")
+        recorder = ReaderOracle()
+        with patch("pyarrow.parquet.read_table", recorder.read), patch(
+                "solana_alpha_lab.factory.hfic_temporal_discovery.run_temporal_fixed_time_from_spec", side_effect=AssertionError("NUMERIC_RUN")):
+            refused = DocumentRunner(ROOT, self.store).start_document(self.spec,
+                spec_sha256=experiment_spec_sha256(self.spec), run_context=RunContext(self.plane, self.definition, decision, AS_OF + timedelta(hours=3)))
+        self.assertEqual(refused["status"], "INVALID_EVIDENCE")
+        self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
+        self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
+        schedule_path.write_bytes(schedule_bytes)
+        # Optional retained proof is outside Git; compact receipt has no host paths.
+        if os.environ.get("ERNOC_PROOF_OUT"):
+            out = Path(os.environ["ERNOC_PROOF_OUT"])
+            out.mkdir(parents=True, exist_ok=True)
+            shutil.copytree(self.plane, out / "classified-plane", dirs_exist_ok=True)
+            (out / "positive.json").write_text(json.dumps({
+                "classifier_receipt": bundle["classifier_receipt"], "cold_inventory_sha256": before,
+                "cold_readback_equal": True, "repeat_write_count": 0,
+                "reader_trace": recorder.trace, "direct_lineage": lineage,
+            }, indent=2, default=str) + "\n", encoding="utf-8")
         # Native promotion gate remains semantic; accepted schema reaches it.
-        guard = science_guard([])
+        guard = science_guard(_build_obligations(self.spec, entity={},
+            direct=[{"record_kind": "RESEARCH_ARTIFACT", "payload": bundle["classifier_receipt"]}],
+            records=tuple(self.store.iter_committed_records()), records_status="AVAILABLE", root=ROOT))
         self.assertFalse(guard["allowed"])
-        self.assertEqual(guard["terminal"], "PROMOTE_BLOCKED")
+        self.assertEqual(guard["meaning"], "PROMOTE_BLOCKED")
         forged = copy.deepcopy(self.spec)
         forged["parameters"]["temporal_recipe"]["scientific_identity"] = "0" * 64
         with self.assertRaisesRegex(HficSessionError, "EPISODE_FROZEN_RECIPE_MISMATCH"):
             run_live_classifier({"experiment_spec_packet": self.packet(forged)}, self.frozen, repo_root=ROOT, data_root=self.plane)
+        import pyarrow.parquet as pq
+        item = self.spec["parameters"]["temporal_recipe"]["frozen_input"][0]
+        mint = pq.read_table(self.plane / item["census_rel"], columns=["mint"]).column("mint")[0].as_py()
+        write_assignment(self.plane, [{"identity_kind": "MINT", "identity": mint, "role": "UNTOUCHED_FORWARD_HOLDOUT", "scope": {"kind": "ALL_TIME"}}])
+        guarded_inventory = self.store.diagnostics().committed_inventory_sha256
+        recorder = ReaderOracle()
+        with patch("pyarrow.parquet.read_table", recorder.read), self.assertRaisesRegex(HficSessionError, "EPISODE_CLASSIFICATION_REVALIDATION_DENIED"):
+            apply_classification(self.frozen, self.packet(), store=self.store, repo_root=ROOT, data_root=self.plane)
+        self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
+        self.assertEqual(load_session_bundle(self.store, self.frozen["session_id"])["classifier_receipt"], bundle["classifier_receipt"])
+        self.assertEqual(self.store.diagnostics().committed_inventory_sha256, guarded_inventory)
+        for forged_packet in ({}, {"experiment_spec": {"schema_version": "1.3"}}):
+            with self.assertRaisesRegex(HficSessionError, "EPISODE_CLASSIFICATION_REVALIDATION_DENIED"):
+                apply_classification(self.frozen, forged_packet, store=self.store, repo_root=ROOT, data_root=self.plane)
+
+    def test_republished_numeric_values_and_missing_target_keep_denominator(self):
+        variants = os.environ.get("ERNOC_VARIANTS")
+        if not variants:
+            self.skipTest("Native republished variant stores supplied by the reproducible proof campaign")
+        baseline = self.project()
+        for name, expected_observed in (("world-values-v2", 20), ("world-missing-v2", 19)):
+            world = Path(variants) / name
+            spec, frozen = load_case(world)
+            recorder = ReaderOracle()
+            with patch("pyarrow.parquet.read_table", recorder.read):
+                result = project_episode_required_outcomes(spec, data_root=world / "plane", definition_sha256=frozen["selected_definition_sha256"])
+            self.assertEqual(membership_view(result["membership"]), membership_view(baseline["membership"]))
+            self.assertEqual(result["decision_n"], 20)
+            self.assertEqual(result["required_coverage"][0]["counts"]["OBSERVED"], expected_observed)
+            self.assertEqual(result["readiness"], "COMPLETE" if expected_observed == 20 else "UNRESOLVED")
+            self.assertNotEqual(result["sources"], baseline["sources"])
+            self.assertTrue(all(point_offset(dict((k,v) for k,op,v in t["filters"] if op == "=")["point_id"]) <= 1800 for t in recorder.trace if "typed_value" in t["columns"]))
+
+    def test_authoritative_missing_target_block_and_cold_readback(self):
+        fixture = os.environ.get("ERNOC_MISSING_FIXTURE")
+        if not fixture:
+            self.skipTest("Current-candidate native missingness campaign fixture supplied explicitly")
+        spec, frozen = load_case(fixture)
+        plane = self.work / "missing-plane"
+        shutil.copytree(Path(fixture) / "plane", plane)
+        store = ResearchStore(plane)
+        store.prepare_write_lookup()
+        packet = {"experiment_spec": spec, "hypothesis_definition_sha256": frozen["selected_definition_sha256"],
+                  "classifier_evaluated_at": (AS_OF + timedelta(hours=3)).isoformat()}
+        recorder = ReaderOracle()
+        with patch("pyarrow.parquet.read_table", recorder.read):
+            finalize_session(frozen, _critic_result(frozen, "PASS_TO_CLASSIFICATION"), store=store, repo_root=ROOT, data_root=plane)
+            done = apply_classification(frozen, packet, store=store, repo_root=ROOT, data_root=plane)
+        receipt = done["classifier_receipt"]
+        self.assertEqual(receipt["lane_classifier_terminal"], "BLOCKED_DATA")
+        binding = receipt["episode_outcome_binding"]
+        self.assertEqual(binding["decision_n"], 20)
+        self.assertEqual(binding["required_coverage"][0]["counts"]["OBSERVED"], 19)
+        before = store.diagnostics().committed_inventory_sha256
+        code = "from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; from solana_alpha_lab.factory.hfic_session import load_session_bundle; import json,sys; s=ResearchStore(Path(sys.argv[1])); b=load_session_bundle(s,sys.argv[2]); print(json.dumps({'receipt':b['classifier_receipt'],'inventory':s.diagnostics().committed_inventory_sha256}))"
+        cold = subprocess.run([sys.executable, "-B", "-c", code, str(plane), frozen["session_id"]], cwd=ROOT, capture_output=True, encoding="utf-8", timeout=180, env={**os.environ, "PYTHONPATH": str(ROOT / "src")})
+        self.assertEqual(cold.returncode, 0, cold.stderr)
+        self.assertEqual(json.loads(cold.stdout), {"receipt": receipt, "inventory": before})
+        if os.environ.get("ERNOC_PROOF_OUT"):
+            out = Path(os.environ["ERNOC_PROOF_OUT"])
+            out.mkdir(parents=True, exist_ok=True)
+            shutil.copytree(plane, out / "blocked-plane", dirs_exist_ok=True)
+            (out / "blocked.json").write_text(json.dumps({"classifier_receipt": receipt,
+                "cold_inventory_sha256": before, "cold_readback_equal": True,
+                "reader_trace": recorder.trace}, indent=2, default=str) + "\n", encoding="utf-8")
 
     def test_off_grid_deadline_boundaries_use_native_clock(self):
         import pyarrow.parquet as pq
@@ -224,6 +340,84 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         for delta, expected in ((-1, "OBSERVED"), (0, "OBSERVED"), (1, "LATE")):
             row["first_reliable_available_at"] = (window.availability_deadline + timedelta(microseconds=delta)).isoformat()
             self.assertEqual(_metadata_status(row, item, t0, AS_OF), expected)
+
+    def test_native_unexecuted_censored_metadata_is_not_corrupt_or_observed(self):
+        import pyarrow.parquet as pq
+        item = self.spec["parameters"]["temporal_recipe"]["frozen_input"][0]
+        rows = pq.read_table(self.plane / item["observations_rel"], filters=[("state", "=", "CENSORED"), ("field_id", "=", "FIELD-USD-PRICE-001")], columns=[
+            "episode_id", "point_id", "state", "missing_reason", "first_reliable_available_at",
+            "nominal_due_at", "assigned_at", "request_not_before", "availability_deadline"]).to_pylist()
+        census = {r["episode_id"]: r for r in pq.read_table(self.plane / item["census_rel"], columns=["episode_id", "t0"]).to_pylist()}
+        from solana_alpha_lab.factory.hfic_grounded_discovery import _parse_time
+        self.assertTrue(rows)
+        for row in rows:
+            self.assertEqual(_metadata_status(row, item, _parse_time(census[row["episode_id"]]["t0"]), AS_OF), "CENSORED")
+
+    def test_historical_publication_metadata_is_required(self):
+        item = self.spec["parameters"]["temporal_recipe"]["frozen_input"][0]
+        prefix = self.plane / "datasets/manifests" / item["dataset_manifest_id"]
+        for suffix in (".published", ".labels.json"):
+            path = Path(str(prefix) + suffix)
+            original = path.read_bytes()
+            value = json.loads(original)
+            if suffix == ".published": value["dataset_fingerprint"] = "0" * 64
+            else: value["cohort_lineage"] = ["FOREIGN"]
+            path.write_text(json.dumps(value), encoding="utf-8")
+            recorder = ReaderOracle()
+            with patch("pyarrow.parquet.read_table", recorder.read):
+                self.assertNotEqual(self.classify().terminal, "FAST_LANE_READY")
+            self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
+            path.write_bytes(original)
+
+    def test_completed_run_replay_fixture_rechecks_current_protection(self):
+        from dataclasses import replace
+        from tests.test_fast_lane_classifier import completed_run_event
+        decision = self.classify()
+        self.assertEqual(decision.terminal, "FAST_LANE_READY")
+        event = completed_run_event("RUN-EPISODE-REPLAY-FIXTURE", decision.run_key_sha256)
+        payload = json.loads(event.payload_json)
+        payload["non_claims"] = ["EXPLICIT_RUN_PASSPORT_FIXTURE_NO_EXPERIMENT_EXECUTION"]
+        text = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+        import hashlib
+        self.store.append([replace(event, payload_json=text, payload_sha256=hashlib.sha256(text.encode()).hexdigest())])
+        self.assertEqual(self.classify().terminal, "REPLAY_AVAILABLE")
+        import pyarrow.parquet as pq
+        item = self.spec["parameters"]["temporal_recipe"]["frozen_input"][0]
+        mint = pq.read_table(self.plane / item["census_rel"], columns=["mint"]).column("mint")[0].as_py()
+        write_assignment(self.plane, [{"identity_kind": "MINT", "identity": mint, "role": "UNTOUCHED_FORWARD_HOLDOUT", "scope": {"kind": "ALL_TIME"}}])
+        before = self.store.diagnostics().committed_inventory_sha256
+        recorder = ReaderOracle()
+        with patch("pyarrow.parquet.read_table", recorder.read):
+            self.assertEqual(self.classify().terminal, "BLOCKED_DATA")
+        self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
+        self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
+
+    def test_registered_unavailable_referenced_list_is_unknown_not_false(self):
+        from solana_alpha_lab.factory import hfic_research_scope as rs, hfic_temporal_discovery as temporal
+        from solana_alpha_lab.factory.hfic_grounded_discovery import resolve_research_scope
+        from tests.test_hfic_research_scope_v1 import _snapshot
+        from tests.test_hfic_list_aware_vertical_v1 import draft
+        spec = copy.deepcopy(self.spec)
+        recipe = spec["parameters"]["temporal_recipe"]
+        path = self.work / "snapshot.json"
+        path.write_text(json.dumps(_snapshot(["irrelevant-mint"])), encoding="utf-8")
+        rs.register_local_snapshot(self.plane, path, registered_at=AS_OF + timedelta(hours=1))
+        evidence = rs.load_corpus_membership(self.plane, only_release_ids={i["release_id"] for i in recipe["frozen_input"]}, local_list_ids={"OWNER:D"})
+        query = rs.canonicalize_query_scope(draft("LIST_CONTRAST", list_condition={"clauses": [{"all_of": ["OWNER:D"]}]}), evidence)
+        pre = temporal.validate_temporal_query(query)
+        recipe["spec"], recipe["scientific_identity"] = pre, pre["spec_sha256"]
+        body = pre["scientific_body"]
+        import pyarrow.parquet as pq
+        census = [row for item in recipe["frozen_input"] for row in pq.read_table(self.plane / item["census_rel"]).to_pylist()]
+        resolved = resolve_research_scope(body, self.plane, census, recipe["frozen_input"])
+        self.assertEqual(resolved.coverage()["signal_unknown_n"], 24)
+        recipe["research_scope_evidence"] = {"evidence_sha256": resolved.evidence_sha256, "bindings": resolved.evidence_bindings}
+        recipe["research_scope_rule_sha256"] = resolved.rule_sha256
+        recorder = ReaderOracle()
+        with patch("pyarrow.parquet.read_table", recorder.read):
+            refused = self.classify(spec)
+        self.assertEqual(refused.reason_codes, ("SCOPE_COVERAGE_UNRESOLVED",))
+        self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
 
 
 if __name__ == "__main__":
