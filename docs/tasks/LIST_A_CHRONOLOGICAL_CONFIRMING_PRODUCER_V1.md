@@ -85,6 +85,8 @@ context_requirements:
     - docs/design/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1_PRD_SSD.md
     DELIVERY_EVIDENCE:
     - docs/evidence/list_a_confirming_producer_v1/completion.json
+    - docs/evidence/list_a_confirming_producer_v1/independent-review.json
+    - docs/evidence/list_a_confirming_producer_v1/factory-fit.json
 ---
 
 Owner EXECUTE: implement the attached exact PRD+SSD. ENTRY=START_AS_WRITTEN;
