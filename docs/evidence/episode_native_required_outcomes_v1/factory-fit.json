@@ -2,7 +2,7 @@
   "as_of": "2026-10-14",
   "capability_radar": {
     "now": "NONE: current bounded seam uses existing native owners, capability and harness",
-    "watch": "Accepted chronological producer/consumer for exact estimand requires separate owner Science/task authority"
+    "watch": "Accepted chronological producer/consumer for same estimand; value: qualifying confirmation handoff, owner: exact Science/task authority, trigger: owner selects that next bounded atom, cost: separately bounded offline analysis before any implementation. This repair grants no chronological execution or new dependency."
   },
   "dimensions": {
     "build_vs_buy": "WRAP existing native release/binder/prefix/scope/protection/clock/storage owners; no new dependency/environment/service",
@@ -24,8 +24,8 @@
   "mode": "FULL_REVIEW",
   "recovery": "Ordinary revert of new schema/code/docs; preserve all frozen trials and historical receipts; no ledger reset",
   "review_id": "EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1-FACTORY-FIT",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "083a4cbdebf25364330344eae4e7c571e780f0cb52112e2a6c4cd9c135009aa1",
+  "reviewed_inventory_sha256": "9cd64f163293d8abee5ef6e9e511bdddde8692dd78ceaa98d30a1900813a0f2e",
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
   "task_id": "EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1",

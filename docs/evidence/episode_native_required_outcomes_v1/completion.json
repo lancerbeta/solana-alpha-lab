@@ -42,7 +42,7 @@
     "strategy_activation_paper_writes": 0,
     "target_values_materialized_in_repair_path": 0
   },
-  "state_change": "Native Spec1.4 required-outcome handoff reaches stored READY20/20 and BLOCKED19/20 with fixedD20, cold readback and current guards; bounded proof PASS, independent delivery review pending",
+  "state_change": "Native Spec1.4 required-outcome handoff reaches stored READY20/20 and BLOCKED19/20 with fixedD20, cold readback and current guards;16native+84selectedlegacy and four isolated exact-inventory reviews PASS; CI and guarded delivery enforced separately",
   "task_id": "EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1",
   "validation": {
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
@@ -50,7 +50,7 @@
     "independent_review": {
       "path": "docs/evidence/episode_native_required_outcomes_v1/independent-review.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     "project_checks": [
       "PASS_NATIVE_AUTHORITATIVE_READY_AND_BLOCKED",
