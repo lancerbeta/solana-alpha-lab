@@ -7,7 +7,10 @@ ordinary dossier. Scientific core и смысл legacy 1.0–1.4 сохране�
 
 Base: `07c81a99f2d0f385df66de2e1a5254e224c6b3b3`. Численный acceptance выполнен
 на committed implementation `989cee4ccd676716421752ce3f8a6ef42a794bd1`.
-Позднее добавлены негативные assertions и delivery evidence; final exact head,
+После independent review исправлены readout consumed charge/UNKNOWN, terminal
+native numeric refusals и штатный exact owner revoke; inference core не изменён.
+Все шесть исторических результатов вновь прошли cold readback на исправленном
+runtime с 0 source decoder/evaluator/writes. Final exact head,
 CI, readiness и fresh owner merge phrase проверяются отдельно Delivery Harness.
 Это implementation delivery, не FULL_PRODUCT_PATH до стратегии или торговли.
 
@@ -58,6 +61,13 @@ revoke после values, strict result/hash/carrier identity и stale owner dec
 Legacy classifier и decision checks проходят; episode 1.4: 14 PASS / 2 штатных
 SKIP. Две SKIP требуют отдельных предыдущих campaign fixtures; их повтор здесь
 не заявлен. Подробности и engineering failures — в validation evidence.
+
+Owner может отозвать точный grant через `revoke`: первый вызов показывает request,
+второй принимает отдельную exact phrase. После reservation prepare/authorize
+показывают ALREADY_RESERVED и прежний trial; classify/submit сохраняют charge 1.
+Native nonfinite/unrepresentable input становится durable INVALID_AFTER_RESERVE.
+Недоступная история даёт UNKNOWN; повреждённый result сохраняет видимую reservation
+и consumed charge при evidence CONFLICT. Новый allowance эти действия не создают.
 
 Ресурсы: snapshot regular-file allocation **187.861 MiB owned**, conservative cap
 charge **219.401 MiB**, включая полный резерв общего Git object store. Это ниже

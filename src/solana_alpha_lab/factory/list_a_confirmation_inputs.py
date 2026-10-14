@@ -524,10 +524,25 @@ def inspect_confirmation(definition: dict, sample_ref: str, *, root: Path, data_
     return {"binding": binding, "metadata": metadata, "sample": sample}
 
 
+def spent_confirmation_checkpoint(store, binding_id: str, binding: dict) -> dict:
+    """Project existing consumption even across metadata/implementation aliases."""
+    from solana_alpha_lab.factory.list_a_confirmation import confirmation_checkpoint
+    spent = [r for r in records(store) if r["kind"] == "RESEARCH_ARTIFACT" and
+             r["payload"].get("type") == "CONFIRMATION_RESERVATION" and
+             (r["payload"].get("study_budget_sha256") == binding["study_budget_sha256"] or
+              set(r["payload"].get("acquisition_keys", [])).intersection(binding["acquisition_keys"]))]
+    require(len(spent) <= 1, "COMMITTED_RESERVATION_CONFLICT")
+    return confirmation_checkpoint(store, spent[0]["payload"]["execution_binding_sha256"] if spent else binding_id)
+
+
 def prepare_confirmation(definition: dict, sample_ref: str, *, root: Path, store: ResearchStore, now: datetime) -> dict:
     context = inspect_confirmation(definition, sample_ref, root=root, data_root=store.root, now=now)
     body = context["binding"]
     sha = digest(body)
+    checkpoint = spent_confirmation_checkpoint(store, sha, body)
+    if checkpoint["scientific_charge"] == 1:
+        return {"status": "ALREADY_RESERVED", "binding_id": sha, "scientific_charge": 1,
+                "prior_scientific_checkpoint": checkpoint, "next_action": "READ_ORIGINAL_TRIAL_KEEP_CONSUMED_ALLOWANCE"}
     relative = f"confirmation/bindings/{sha}.json"
     publish(store.root, relative, finite_bytes(body))
     txn = "RESEARCH-TXN-LA-PREPARE-" + sha[:24].upper()
@@ -547,6 +562,10 @@ def authorize_confirmation(definition: dict, binding_id: str, *, root: Path, sto
     require(digest(body) == binding_id == digest(fresh), "EXECUTION_BINDING_STALE")
     request = digest({"binding": binding_id, "purpose": "ALLOW_EXACT_CONFIRMATION"})
     require(owner_phrase == f"AUTHORIZE {body['domain']} LIST A {request}", "EXACT_GRANT_PHRASE_REQUIRED")
+    checkpoint = spent_confirmation_checkpoint(store, binding_id, body)
+    if checkpoint["scientific_charge"] == 1:
+        return {"status": "ALREADY_RESERVED", "binding_id": binding_id, "scientific_charge": 1,
+                "prior_scientific_checkpoint": checkpoint, "next_action": "READ_ORIGINAL_TRIAL_KEEP_CONSUMED_ALLOWANCE"}
     require(utc(valid_until) > now, "GRANT_EXPIRED")
     grant = {"type": "CONFIRMATION_GRANT", "request_sha256": request,
         "execution_binding_sha256": binding_id, "study_budget_sha256": body["study_budget_sha256"],
@@ -560,6 +579,37 @@ def authorize_confirmation(definition: dict, binding_id: str, *, root: Path, sto
         store.append([event(root, record_id="LA-GRANT-" + sha, kind=RecordKind.RESEARCH_ARTIFACT,
             transaction_id=txn, payload=grant)], transaction_id=txn)
     return {"status": "AUTHORIZED", "grant_id": "LA-GRANT-" + sha, "request_sha256": request, "scientific_charge": 0}
+
+
+def revoke_confirmation(binding_id: str, *, root: Path, store: ResearchStore, owner_phrase: str | None = None) -> dict:
+    """Exact owner revoke; available even when current execution is inadmissible."""
+    from solana_alpha_lab.factory.list_a_confirmation import confirmation_checkpoint
+    require(bool(re.fullmatch(r"[0-9a-f]{64}", binding_id)), "BINDING_ID_INVALID")
+    binding = load_json(safe_path(store.root, f"confirmation/bindings/{binding_id}.json"))
+    require(digest(binding) == binding_id, "EXECUTION_BINDING_STALE")
+    history = records(store)
+    grants = [r for r in history if r["payload"].get("type") == "CONFIRMATION_GRANT" and
+              r["payload"].get("execution_binding_sha256") == binding_id]
+    require(len(grants) == 1, "EXACT_GRANT_UNBOUND_OR_CONFLICT")
+    grant = grants[0]
+    validate_exact_grant(grant, binding, binding_id)
+    checkpoint = confirmation_checkpoint(store, binding_id)
+    request = digest({"binding": binding_id, "grant": grant["record_id"], "purpose": "REVOKE_EXACT_CONFIRMATION"})
+    phrase = f"REVOKE {binding['domain']} LIST A {request}"
+    response = {**checkpoint, "grant_id": grant["record_id"], "request_sha256": request}
+    if owner_phrase is None:
+        return {**response, "status": "REVOKE_REQUESTED", "owner_phrase": phrase,
+                "next_action": "OWNER_EXACT_REVOKE_PHRASE_REQUIRED"}
+    require(owner_phrase == phrase, "EXACT_REVOKE_PHRASE_REQUIRED")
+    sha = digest({"grant": grant["record_id"], "purpose": "REVOKE_EXACT_CONFIRMATION"})
+    txn = "RESEARCH-TXN-LA-REVOKE-" + sha[:24].upper()
+    if not any(r["payload"].get("type") == "GRANT_REVOKED" and
+               r["payload"].get("grant_id") == grant["record_id"] for r in history):
+        store.append([event(root, record_id="LA-GRANT-REVOKED-" + sha, kind=RecordKind.RESEARCH_ARTIFACT,
+            transaction_id=txn, payload={"type": "GRANT_REVOKED", "grant_id": grant["record_id"],
+            "execution_binding_sha256": binding_id, "domain": binding["domain"],
+            "purpose": "REVOKE_EXACT_CONFIRMATION", "request_sha256": request})], transaction_id=txn)
+    return {**response, "status": "REVOKED", "next_action": "READ_SAVED_STATE_NO_NEW_EXECUTION_AUTHORITY"}
 
 
 def validate_exact_grant(record: dict, binding: dict, binding_id: str) -> None:

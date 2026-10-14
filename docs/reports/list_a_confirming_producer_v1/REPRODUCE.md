@@ -38,6 +38,10 @@ python -B scripts/list_a_confirmation.py status --data-root /proof/plane --trial
 protection для нового submit/resume проверяются заново; сохранённый historic
 result не превращается в текущую authority. При orphan/pending статус INTERRUPTED,
 next_action RESUME_EXACT_TRIAL; invalid-after-reserve не получает новую попытку.
+После current отказа classify/submit сохраняют phase BLOCKED_AFTER_RESERVE и
+charge=1. Prepare/authorize не переоткрывают consumed trial: ALREADY_RESERVED,
+prior_scientific_checkpoint и исходный trial. Недоступная история даёт UNKNOWN/null;
+повреждённый result оставляет reservation/charge видимыми при evidence CONFLICT.
 
 Native operating sequence для **отдельно разрешённого** нового sample:
 
@@ -56,6 +60,17 @@ frames, observations и protection documents. Raw manifest/`untouched:true`/call
 COMPLETE без committed ingress/source authority недостаточны. Source registration
 и grant — разные exact действия. REAL values/registration/grant не разрешены
 текущим implementation atom.
+
+Штатный отзыв exact grant (в текущей кампании только SYNTHETIC):
+
+```text
+python -B scripts/list_a_confirmation.py revoke --data-root <same-plane> --binding-id <original-binding>
+python -B scripts/list_a_confirmation.py revoke --data-root <same-plane> --binding-id <original-binding> --owner-phrase "REVOKE <domain> LIST A <returned-request-sha>"
+```
+
+Первый вызов read-only показывает точную фразу. Второй требует её совпадения;
+`approved:true` не принимается. Отзыв не возвращает scientific allowance,
+сохраняет cold result и не требует текущей admissibility для нового исполнения.
 
 ## Qualification and tests
 

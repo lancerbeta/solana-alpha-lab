@@ -34693,7 +34693,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 778deafe6fab5d0c3c8b177a9aa0bfebc5d886e20276449fe691e0f0701f7bb1}
+  integrity: {kind: sha256, sha256: 708537eeda15644f7fc480fa9c2a57757ff204a66242775646efc35eccc8342b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001}
@@ -42261,7 +42261,7 @@ records:
     repository_path: docs/contracts/list_a_confirming_execution_v1.md
   integrity:
     kind: sha256
-    sha256: f61aff77e76eb2951477db5138c92035ec3044bc48aab99b36869234c76f11c8
+    sha256: c9ae0eebbeb65ea6f79f110db6e437d5c1ea2b2ed9ae48a886175579eb92aeac
   access:
     mode: read_only
     method: file
@@ -42526,7 +42526,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/list_a_confirmation_inputs.py
   integrity:
     kind: sha256
-    sha256: e634b781929662541edc5245d0ecd439dbe713aa59e79669522e994e905f31e9
+    sha256: 13e42c209828458f0e1d31ea6a9ce1696eb553787edbb99223071de57b0f4527
   access:
     mode: read_only
     method: file
@@ -42640,7 +42640,7 @@ records:
     repository_path: scripts/list_a_confirmation.py
   integrity:
     kind: sha256
-    sha256: 755215d52469abf1d607106a572ec93ed62622dd52f56ca2466f880c5f2ed9e6
+    sha256: 5d3759ab76f66dc05ffd424115f362a338b0c76bafe970f9de697c366c5bb982
   access:
     mode: read_only
     method: file
@@ -42716,7 +42716,7 @@ records:
     repository_path: tests/test_list_a_confirmation_admission_v1.py
   integrity:
     kind: sha256
-    sha256: dc2cafa4a045e860b958c774f96939ec2922bbc1968de374c9f7ae9bada7cf4c
+    sha256: d1c2a96cbf0c6bf94ce93b1af1a5fd89abe7bb9a07d3b05d3e607c6d1150ecef
   access:
     mode: read_only
     method: file
@@ -42754,7 +42754,7 @@ records:
     repository_path: tests/test_list_a_confirmation_vertical_v1.py
   integrity:
     kind: sha256
-    sha256: 00ab6d27c27c90a9c1b9ac8df7310ffba05deee3f0face07e185a17ff577be16
+    sha256: 64ccfd72707f4bfab91a80bedb81fe9f7f5b5f57e25e05a56266d0f010457ffc
   access:
     mode: read_only
     method: file
@@ -42869,7 +42869,7 @@ records:
     repository_path: docs/reports/list_a_confirming_producer_v1/OWNER_REPORT.md
   integrity:
     kind: sha256
-    sha256: 516072f7778476f7a7f989631c07379b96165b82ac91cb7ab02e1dd82380ea87
+    sha256: 5eb803a2c798423efe6d0967046cda962546bf6a5e798eafd05ae45c70c43d81
   access:
     mode: read_only
     method: file
@@ -42908,7 +42908,7 @@ records:
     repository_path: docs/reports/list_a_confirming_producer_v1/REPRODUCE.md
   integrity:
     kind: sha256
-    sha256: 5d7d86b0b9a15000f5f33f30fe40282368ab9b63b5d79dfdbac9a48f50e6106d
+    sha256: 7c2da2026017eaa1083a82f6bda614cc95347bdfdace510fb1b20b8fcd525545
   access:
     mode: read_only
     method: file

@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
 from solana_alpha_lab.factory.list_a_confirmation_inputs import (
     DEFINITION, ConfirmationError, authorize_confirmation, load_json,
-    prepare_confirmation, utc, write_native_confirmation_sample, register_source_authority,
+    prepare_confirmation, revoke_confirmation, utc, write_native_confirmation_sample, register_source_authority,
 )
 from solana_alpha_lab.factory.list_a_confirmation import confirmation_checkpoint, read_confirmation, resume_confirmation
 from solana_alpha_lab.factory.lane_classifier import classify_lane
@@ -35,7 +35,7 @@ def public_response(response: dict) -> dict:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Точный native List A confirmation; grant требует exact domain phrase.")
-    parser.add_argument("command", choices=["register-source", "prepare", "authorize", "classify", "submit", "status", "show", "resume"])
+    parser.add_argument("command", choices=["register-source", "prepare", "authorize", "revoke", "classify", "submit", "status", "show", "resume"])
     parser.add_argument("--data-root", required=True, type=Path)
     parser.add_argument("--sample-ref")
     parser.add_argument("--source-input", type=Path)
@@ -62,6 +62,8 @@ def main(argv=None) -> int:
         elif args.command == "authorize":
             result = authorize_confirmation(spec, args.binding_id or "", root=ROOT, store=store, now=now,
                 owner_phrase=args.owner_phrase or "", valid_until=args.valid_until or "")
+        elif args.command == "revoke":
+            result = revoke_confirmation(args.binding_id or "", root=ROOT, store=store, owner_phrase=args.owner_phrase)
         elif args.command in {"show", "status"}:
             result = read_confirmation(store, trial_id=args.trial_id or "", root=ROOT)
         elif args.command == "resume":
@@ -85,7 +87,7 @@ def main(argv=None) -> int:
         return 0
     except (ValueError, OSError, KeyError, TypeError, RuntimeError) as exc:
         checkpoint = {"scientific_charge": None}
-        if args.command in {"submit", "resume", "classify"} and args.binding_id:
+        if args.command in {"submit", "resume", "classify", "authorize", "revoke"} and args.binding_id:
             try:
                 checkpoint = confirmation_checkpoint(ResearchStore(args.data_root, create_if_missing=False), args.binding_id)
             except (ValueError, OSError, KeyError, TypeError, RuntimeError):

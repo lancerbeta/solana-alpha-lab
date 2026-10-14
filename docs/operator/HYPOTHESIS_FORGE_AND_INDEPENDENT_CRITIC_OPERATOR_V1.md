@@ -2207,6 +2207,10 @@ Operator entry: `scripts/list_a_confirmation.py`; exact source-owner registratio
 metadata prepare и execution grant — отдельные шаги. `classify` не читает outcomes;
 `submit` резервирует одну scientific attempt до values; `status/show` читают сохранённое;
 `resume` требует прежний binding/grant/qualification. При crash charge остаётся 1.
+`revoke --binding-id <binding>` показывает отдельную exact owner phrase;
+повтор с ней в `--owner-phrase` отзывает grant, сохраняя charge/history.
+Повтор prepare/authorize после reservation возвращает ALREADY_RESERVED и исходный
+trial; classify/submit показывают BLOCKED_AFTER_RESERVE. Недоступная история UNKNOWN.
 Contract: `docs/contracts/list_a_confirming_execution_v1.md`.
 Ordinary research locator: `EXP-LIST-A-CHRONOLOGICAL-CONFIRMATION-V1 / GIT / EXPERIMENT_SPEC`.
 PAUSE сохраняется штатно; synthetic supported не разрешает PROMOTE.

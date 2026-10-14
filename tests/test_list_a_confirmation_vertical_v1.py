@@ -31,6 +31,8 @@ def bound(store, *, case="POSITIVE", missing_a=0, source_id="SYNTH-LIST-A-V1", o
     sample, oracle = ingress(ROOT, store, case, missing_a=missing_a, source_id=source_id, origin_label=origin_label)
     spec = load_experiment_spec(ROOT, DEFINITION)
     prepared = prepare_confirmation(spec, sample, root=ROOT, store=store, now=NOW)
+    if prepared["status"] == "ALREADY_RESERVED":
+        return spec, prepared, oracle
     authorize_confirmation(spec, prepared["binding_id"], root=ROOT, store=store, now=NOW,
         valid_until="2027-02-01T00:00:00Z", owner_phrase="AUTHORIZE SYNTHETIC LIST A " + prepared["request_sha256"])
     return spec, prepared, oracle

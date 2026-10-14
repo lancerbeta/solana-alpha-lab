@@ -135,9 +135,11 @@ class AdmissionTests(unittest.TestCase):
             self.execute(fail)
         spec, renamed, _ = bound(self.store, source_id="SYNTH-RENAMED-SAME-ACQUISITION", origin_label="SYNTH-LIST-A-V1")
         reader = ValueReader(self.store)
-        with patch.object(pq, "read_table", reader.read), self.assertRaisesRegex(ConfirmationError, "SCIENTIFIC_ALLOWANCE_EXHAUSTED"):
-            execute_capability(spec, root=ROOT, capture_hooks={"execution_context": {
-                "data_root": self.store.root, "binding_id": renamed["binding_id"], "now": NOW}})
+        with patch.object(pq, "read_table", reader.read):
+            self.assertEqual(renamed["status"], "ALREADY_RESERVED")
+            self.assertEqual(renamed["scientific_charge"], 1)
+            self.assertEqual(renamed["prior_scientific_checkpoint"]["execution_binding_sha256"], self.p["binding_id"])
+            self.assertFalse((self.store.root / ("confirmation/bindings/" + renamed["binding_id"] + ".json")).exists())
         self.assertEqual(reader.reads, [])
         self.assertEqual(sum(r["kind"] == "RUN_STARTED" for r in records(self.store)), 1)
 
@@ -260,9 +262,10 @@ class AdmissionTests(unittest.TestCase):
             self.execute(fail)
         reservation = next(r["payload"] for r in records(self.store) if r["kind"] == "RUN_STARTED")
         grant = next(r for r in records(self.store) if r["payload"].get("type") == "CONFIRMATION_GRANT")
-        txn = "RESEARCH-TXN-LA-CLI-REVOKE"
-        self.store.append([event(ROOT, record_id="LA-CLI-REVOKE", kind=RecordKind.RESEARCH_ARTIFACT,
-            transaction_id=txn, payload={"type": "GRANT_REVOKED", "grant_id": grant["record_id"]})], transaction_id=txn)
+        preview = self.cli_response("revoke", "--binding-id", self.p["binding_id"])
+        self.assertEqual((preview["status"], preview["scientific_charge"]), ("REVOKE_REQUESTED", 1))
+        revoked = self.cli_response("revoke", "--binding-id", self.p["binding_id"], "--owner-phrase", preview["owner_phrase"])
+        self.assertEqual((revoked["status"], revoked["grant_id"], revoked["scientific_charge"]), ("REVOKED", grant["record_id"], 1))
         self.assert_cli_checkpoint(self.p["binding_id"], 1, "BLOCKED_AFTER_RESERVE", reservation["trial_id"])
         self.assert_cli_checkpoint("0" * 64, 0, "BLOCKED_BEFORE_RESERVE")
         with patch.object(ResearchStore, "iter_committed_records", side_effect=RuntimeError("UNAVAILABLE")):
@@ -270,6 +273,32 @@ class AdmissionTests(unittest.TestCase):
             with contextlib.redirect_stdout(output):
                 self.assertEqual(cli.main(["submit", "--data-root", str(self.store.root), "--binding-id", self.p["binding_id"]]), 2)
             self.assertIsNone(json.loads(output.getvalue())["scientific_charge"])
+
+    def cli_response(self, command, *arguments, expected_code=0):
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            code = cli.main([command, "--data-root", str(self.store.root), "--as-of", "2027-01-04T00:00:00Z", *arguments])
+        self.assertEqual(code, expected_code)
+        return json.loads(output.getvalue())
+
+    def test_cli_revoke_exact_phrase_pre_values_and_idempotent(self):
+        reader = ValueReader(self.store)
+        before = self.store.diagnostics().committed_inventory_sha256
+        with patch.object(pq, "read_table", reader.read):
+            preview = self.cli_response("revoke", "--binding-id", self.p["binding_id"])
+            self.assertEqual(before, self.store.diagnostics().committed_inventory_sha256)
+            refused = self.cli_response("revoke", "--binding-id", self.p["binding_id"], "--owner-phrase", "approved:true", expected_code=2)
+            self.assertEqual(refused["reason_codes"], ["EXACT_REVOKE_PHRASE_REQUIRED"])
+            self.assertEqual(before, self.store.diagnostics().committed_inventory_sha256)
+            revoked = self.cli_response("revoke", "--binding-id", self.p["binding_id"], "--owner-phrase", preview["owner_phrase"])
+            self.assertEqual((revoked["status"], revoked["scientific_charge"]), ("REVOKED", 0))
+            after = self.store.diagnostics().committed_inventory_sha256
+            with patch.object(ResearchStore, "append", side_effect=AssertionError("REVOKE_REPEAT_NO_WRITE")):
+                repeated = self.cli_response("revoke", "--binding-id", self.p["binding_id"], "--owner-phrase", preview["owner_phrase"])
+            self.assertEqual(repeated["status"], "REVOKED")
+            self.assertEqual(after, self.store.diagnostics().committed_inventory_sha256)
+        self.assertEqual(reader.reads, [])
+        self.assert_cli_checkpoint(self.p["binding_id"], 0, "BLOCKED_BEFORE_RESERVE")
 
     def test_native_numeric_refusals_are_terminal_with_consumed_charge(self):
         from tests.fixtures.list_a_confirmation_v1 import native
@@ -294,4 +323,15 @@ class AdmissionTests(unittest.TestCase):
                 self.assertEqual((saved["status"], saved["scientific_charge"], saved["reason_codes"]),
                                  ("INVALID_AFTER_RESERVE", 1, [reason]))
                 self.assert_cli_checkpoint(prepared["binding_id"], 1, "BLOCKED_AFTER_RESERVE", reservation["trial_id"])
+                reader = ValueReader(self.store)
+                before = self.store.diagnostics().committed_inventory_sha256
+                with patch.object(pq, "read_table", reader.read), patch.object(ResearchStore, "append", side_effect=AssertionError("NO_REOPEN")):
+                    for command, arguments in (("prepare", ["--sample-ref", "confirmation/sources/SYNTH-" + reason.replace("_", "-") + "/sample.json"]),
+                            ("authorize", ["--binding-id", prepared["binding_id"], "--valid-until", "2027-02-01T00:00:00Z",
+                                "--owner-phrase", "AUTHORIZE SYNTHETIC LIST A " + prepared["request_sha256"]])):
+                        repeated = self.cli_response(command, *arguments)
+                        self.assertEqual((repeated["status"], repeated["scientific_charge"]), ("ALREADY_RESERVED", 1))
+                        self.assertEqual(repeated["prior_scientific_checkpoint"]["trial_id"], reservation["trial_id"])
+                self.assertEqual(reader.reads, [])
+                self.assertEqual(before, self.store.diagnostics().committed_inventory_sha256)
                 self.assertFalse(any(r["kind"] == "RUN_COMPLETED" for r in records(self.store)))

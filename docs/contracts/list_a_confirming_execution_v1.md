@@ -45,6 +45,12 @@ DENY, revoke, unknown scope и incomplete inventory блокируют его.
 перепроверяется перед reserve, первым value read, resume и completion. Exact resume
 может повторить техническое вычисление, не выдавая новую scientific attempt.
 
+Повторные prepare/authorize показывают ALREADY_RESERVED и исходный checkpoint,
+включая overlap/alias; charge не обнуляется и новый grant не выдаётся. Classify/submit
+при отказе после reservation показывают BLOCKED_AFTER_RESERVE с charge 1 и
+исходными trial/run. Недоступная история даёт UNKNOWN/null. Native nonfinite или
+unrepresentable target сохраняет INVALID_AFTER_RESERVE; это не resumable crash.
+
 Метод: native E1800 decision mask, E14400 observed price-relative returns;
 episode-weighted A−eligible complement C. Два pooled crossed bootstrap partition
 86400/172800, 4096 local seeded replicates, nearest-rank indices 102/3993,
@@ -63,11 +69,18 @@ Ordinary dossier показывает отдельные trials/bindings, condit
 SYNTHETIC, nonpositive, insufficient и invalid confirmation запрещают PROMOTE даже
 при generic fillers. VERIFIED REAL supported может пройти только прежние science
 guards; подтверждённый proxy сам по себе не доказывает net alpha/executability.
+Если result не верифицируется, committed reservation и consumed charge остаются
+видимыми; execution UNKNOWN, evidence CONFLICT. NO_RUN/NO_DECISION требуют полного
+доступного чтения истории. Недоступность не является доказательством отсутствия.
 
-CLI: `scripts/list_a_confirmation.py register-source|prepare|authorize|classify|submit|status|show|resume`.
+CLI: `scripts/list_a_confirmation.py register-source|prepare|authorize|revoke|classify|submit|status|show|resume`.
 `--data-root` должен быть exact owned plane. Source paths относительные, traversal,
 symlink/junction и foreign observation identities запрещены. Cold status по trial ID
 не переоформляет исторический результат как свежую authority.
+`revoke --binding-id <binding>` только показывает request и exact owner phrase;
+повтор с `--owner-phrase "REVOKE <domain> LIST A <request-sha>"` записывает отзыв
+именно этого grant. Отзыв доступен и после current incompatibility/expiry, не
+возвращает allowance и не скрывает сохранённый результат; exact repeat идемпотентен.
 
 Acceptance, ресурсы и воспроизведение: `docs/reports/list_a_confirming_producer_v1/`.
 Никакой StrategyVersion/activation/provider call/deploy этим producer не создаётся.
