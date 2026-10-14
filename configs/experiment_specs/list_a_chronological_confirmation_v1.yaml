@@ -1,0 +1,16 @@
+schema: smial.experiment-spec
+schema_version: '1.5'
+experiment_id: EXP-LIST-A-CHRONOLOGICAL-CONFIRMATION-V1
+hypothesis_version: HYP-LIST-A-CONDITIONAL-EPISODE-CONTRAST-V1
+question: List A membership at episode T0 predicts a greater conditional observed E1800 to E14400 price relative than its eligible complement.
+estimand: CONDITIONAL_EPISODE_WEIGHTED_PRICE_RELATIVE_CONTRAST
+population: OPPORTUNITY_EPISODES
+capability_id: CAP-LIST-A-CHRONOLOGICAL-CONFIRMATION-001
+parameters:
+  protocol_ref: repo://configs/list_a_chronological_confirmation_v1.yaml
+  protocol_core_sha256: 3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252
+  input_contract: NATIVE_EPISODE_CONFIRMATION_SAMPLE_V1
+required_outcomes:
+- point_id: E14400
+  field_ids: [FIELD-USD-PRICE-001]
+  role: PRIMARY

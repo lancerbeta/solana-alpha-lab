@@ -1,0 +1,114 @@
+---
+task_id: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+task_version: '1.0'
+status: READY
+as_of: '2026-10-14'
+owner: GOAL_OWNER
+allowed_routes: [DIRECT_CODEX_DELIVERY]
+required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
+expected_repository: lancerbeta/solana-alpha-lab
+git_binding:
+  expected_base: 07c81a99f2d0f385df66de2e1a5254e224c6b3b3
+  expected_upstream: origin/main
+  expected_upstream_oid: 07c81a99f2d0f385df66de2e1a5254e224c6b3b3
+  expected_branch: codex/list-a-chronological-confirming-producer-v1
+  dirty_mode: ALLOW_REPORTED
+objective: Implement the accepted List A chronological confirming producer as a complete version-isolated Spec 1.5 vertical with native synthetic source admission, pre-values reservation, deterministic accepted inference and verified ordinary dossier, preserving the frozen scientific core and all real-data authority boundaries.
+managed_write_set:
+- docs/tasks/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1.md
+- docs/design/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1_PRD_SSD.md
+- docs/contracts/list_a_confirming_execution_v1.md
+- docs/contracts/list_a_chronological_confirmation_v1.md
+- catalog/schemas/experiment_spec_v1_5.schema.json
+- catalog/schemas/list_a_confirmation_input_v1.schema.json
+- catalog/schemas/list_a_confirmation_result_v1.schema.json
+- configs/experiment_specs/list_a_chronological_confirmation_v1.yaml
+- configs/experiment_capability_registry_v2.yaml
+- src/solana_alpha_lab/factory/list_a_confirmation.py
+- src/solana_alpha_lab/factory/list_a_confirmation_inputs.py
+- src/solana_alpha_lab/factory/list_a_confirmation_method.py
+- src/solana_alpha_lab/factory/experiment_spec.py
+- src/solana_alpha_lab/factory/lane_classifier.py
+- src/solana_alpha_lab/factory/capabilities.py
+- src/solana_alpha_lab/factory/document_runner.py
+- src/solana_alpha_lab/factory/data_resolver.py
+- src/solana_alpha_lab/factory/run_passport.py
+- src/solana_alpha_lab/factory/experiment_evidence.py
+- src/solana_alpha_lab/factory/application.py
+- src/solana_alpha_lab/factory/research_workbench.py
+- src/solana_alpha_lab/factory/lifecycle_projection.py
+- src/solana_alpha_lab/factory/workbench.py
+- src/solana_alpha_lab/factory/opportunity_episode_release.py
+- src/solana_alpha_lab/factory/opportunity_episodes.py
+- src/solana_alpha_lab/factory/hfic_research_scope.py
+- src/solana_alpha_lab/factory/hfic_temporal_discovery.py
+- src/solana_alpha_lab/factory/research_store.py
+- scripts/list_a_confirmation.py
+- tests/test_list_a_confirmation_method_v1.py
+- tests/test_list_a_confirmation_admission_v1.py
+- tests/test_list_a_confirmation_vertical_v1.py
+- tests/fixtures/list_a_confirmation_v1/**
+- docs/evidence/list_a_confirming_producer_v1/**
+- docs/evidence/list_a_confirmation_protocol_freeze_v1/main-refresh.json
+- docs/reports/list_a_confirming_producer_v1/**
+- docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
+- catalog/assets/**
+- catalog/catalog_manifest.yaml
+- catalog/generated/**
+- docs/generated/**
+- docs/PROJECT_MAP.md
+- docs/FACTORY_SEMANTIC_MAP.md
+external_caps:
+  network: false
+  credentials: false
+  external_system: false
+  signing_or_financial_action: false
+  cash_spend: false
+  deployment: false
+stop_conditions:
+- STOP_CHANGED_PROTOCOL_CORE_ESTIMAND_FLOORS_RNG_CHRONOLOGY_OR_THRESHOLDS
+- STOP_REAL_VALUES_GRANT_PROVIDER_PRODUCTION_CREDENTIALS_DEPLOY_OR_MONEY
+- STOP_NEW_PLATFORM_SERVICE_DEPENDENCY_OR_UNSAFE_ISOLATION
+- STOP_ENGINEERING_OWNED_BYTES_GT_1073741824_OR_UNKNOWN
+- STOP_EXACT_HEAD_CI_AND_READINESS_THEN_NEW_OWNER_MERGE_PHRASE
+context_requirements:
+  catalog_asset_ids: []
+  l2_roles: [ARCHITECTURE_DECISIONS]
+  l3_roles: []
+  roadmap_path: null
+  exact_role_paths:
+    LIFECYCLE: []
+    EXTERNAL_ROUTE_KNOWLEDGE: []
+    HISTORICAL_CONTEXT: []
+    ARCHITECTURE_DECISIONS:
+    - docs/design/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1_PRD_SSD.md
+    DELIVERY_EVIDENCE: []
+---
+
+Owner EXECUTE: implement the attached exact PRD+SSD. ENTRY=START_AS_WRITTEN;
+SPEC_ROUTE=BOTH; DIRECT_CODEX_DELIVERY / CODEX. SOL_XHIGH recommended.
+Existing delivery-harness, Git/gh and locked CPython 3.13.14; new tools NONE.
+DECISION_DELTA: replace the proved missing accepted confirming producer with a
+source-bound production capability; real sample remains UNBOUND.
+UNCERTAINTY_REMOVED: lawful native admission, charge-before-values, accepted
+crossed bootstrap, crash/concurrency continuity and typed cold consumer.
+CAPABILITY_OR_EVIDENCE: complete registered Spec 1.5 vertical with independently
+checked synthetic supported/null/insufficient trials and ordinary PAUSE.
+Consumers: ordinary classifier/runner, research dossier and owner.
+Cheapest falsifier: exact runtime/core/registry probe, then one positive native
+256-episode vertical before delivery ceremony. No target reads at metadata gate.
+DoD: attached sections 13-19, including independent arithmetic and clock oracles,
+source/protection failures, OS process isolation, retained charges, zero-call
+cold readback, promotion denial and legacy regression.
+Engineering cap: 1073741824 owned bytes forward-only; target <=256 MiB incremental.
+Shared pre-existing runtime/cache disclosed separately; no new .venv/images.
+Scientific cap: one attempt per frozen synthetic study, adaptive allowance zero.
+Named acceptance/fault stores and failed witnesses retained. Unit-test-only
+temporary stores may use ordinary automatic cleanup. Prior campaigns immutable.
+STOP: material scope/semantic/resource blocker or fresh exact-head merge phrase.
+NEXT: separately authorize real source provisioning and exact real grant.
+REPLAN_TRIGGER: semantic change, repeated material blocker, impossible falsifier,
+new provider/route pivot or cap breach. Git task transport is the policy exception
+to network=false. Factory Fit FULL_REVIEW; horizon NOW=this vertical, WATCH=real
+upstream provisioning. Any historical pin notice is append-only and names the
+original frozen commit/hash; it does not requalify historical science.

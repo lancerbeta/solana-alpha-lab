@@ -2199,3 +2199,16 @@ successor не установлен: BLOCKED_SCIENTIFIC_PROTOCOL_C. Следую
 Проверки, исходные 56 obligations и ограничения:
 `docs/reports/forge_trust_closure_v1/READOUT.md`. Повторяемый offline entry и
 exact prerequisites: `docs/reports/forge_trust_closure_v1/REPRODUCE.md`.
+
+## List A confirming producer / ExperimentSpec 1.5
+
+Native definition: `configs/experiment_specs/list_a_chronological_confirmation_v1.yaml`.
+Operator entry: `scripts/list_a_confirmation.py`; exact source-owner registration,
+metadata prepare и execution grant — отдельные шаги. `classify` не читает outcomes;
+`submit` резервирует одну scientific attempt до values; `status/show` читают сохранённое;
+`resume` требует прежний binding/grant/qualification. При crash charge остаётся 1.
+Contract: `docs/contracts/list_a_confirming_execution_v1.md`.
+Ordinary research locator: `EXP-LIST-A-CHRONOLOGICAL-CONFIRMATION-V1 / GIT / EXPERIMENT_SPEC`.
+PAUSE сохраняется штатно; synthetic supported не разрешает PROMOTE.
+Real source/grant не выданы. Полный engineering proof и exact prerequisites:
+`docs/reports/list_a_confirming_producer_v1/REPRODUCE.md`.

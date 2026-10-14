@@ -737,6 +737,12 @@ def execute_capability(
     capture_hooks: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     capabilities = list(spec.get("capabilities") or [])
+    if spec.get("schema_version") == "1.5":
+        from solana_alpha_lab.factory.list_a_confirmation import execute_list_a_confirmation
+        from solana_alpha_lab.factory.experiment_spec import validate_experiment_document
+        validate_experiment_document(spec, root=root)
+        return execute_list_a_confirmation(spec, root=root, authority_phrase=authority_phrase,
+                                           capture_hooks=capture_hooks)
     if len(capabilities) != 1:
         raise CapabilityError("CAPABILITY_SET_NOT_SINGLE")
     capability_id = str(capabilities[0])

@@ -25664,7 +25664,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: 6e88094c7bb9f9bbd13cd5316c8ac20001592eb1782fe1243b805fe949814e13}
+  integrity: {kind: sha256, sha256: 3b6f0c00cec42fcc60ebbb56f3d56c9ceadf0c6c65e1a9ae545b79176c391065}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25874,7 +25874,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/experiment_spec.py', repository_path: src/solana_alpha_lab/factory/experiment_spec.py}
-  integrity: {kind: sha256, sha256: 2666e9f45cdcbf32b0bc2cb3333407c9ca6bdc05700e5719f8cc75bd907f9a98}
+  integrity: {kind: sha256, sha256: e0536158c67f008894854c698a702f58057993a6ea2a1ea97c2e48e378a308a4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
@@ -25987,7 +25987,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: 6e88094c7bb9f9bbd13cd5316c8ac20001592eb1782fe1243b805fe949814e13}
+  integrity: {kind: sha256, sha256: 3b6f0c00cec42fcc60ebbb56f3d56c9ceadf0c6c65e1a9ae545b79176c391065}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
@@ -32052,7 +32052,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lane_classifier.py', repository_path: src/solana_alpha_lab/factory/lane_classifier.py}
-  integrity: {kind: sha256, sha256: 8653cd6fc9972d3f2c716209ca9936e6f94f302f63857d6ae1d3d1135d271903}
+  integrity: {kind: sha256, sha256: 24f2513c006b0de883d3f1963cec95c201fa22d5f31061eb269aa6b3260cf735}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32089,7 +32089,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_store.py', repository_path: src/solana_alpha_lab/factory/research_store.py}
-  integrity: {kind: sha256, sha256: 38d6c17bea38a4388fa14509dfb401b1f4e6cdda74de7e41cf032debe080ef49}
+  integrity: {kind: sha256, sha256: c4c102b35c683eadfc06f8bbd92d6b4b23c53ec6dbf491b36fb02a8f5caa42d9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -33195,7 +33195,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/experiment_capability_registry_v2.yaml', repository_path: configs/experiment_capability_registry_v2.yaml}
-  integrity: {kind: sha256, sha256: 49edf7b770d37db38edb89a49dcb66f73b6212d62642cda2faa14880456e4430}
+  integrity: {kind: sha256, sha256: b6173a99298eac12bec314decafb80a272c13235bdaa9226f63782ed1351db3f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -34693,7 +34693,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: bd479ac7341e46f028d073707d4d88432ba5424172a13e588aed1efee6e144ff}
+  integrity: {kind: sha256, sha256: 778deafe6fab5d0c3c8b177a9aa0bfebc5d886e20276449fe691e0f0701f7bb1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001}
@@ -36264,7 +36264,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: RESEARCH_LIFECYCLE_WORKBENCH_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_workbench.py', repository_path: src/solana_alpha_lab/factory/research_workbench.py}
-  integrity: {kind: sha256, sha256: 853e93169771badd998a788368b0fed5cc7ef73c56de8f64164c0aec4b9a6b1f}
+  integrity: {kind: sha256, sha256: acc9cb3b07e920b41187d300b33beda7e27987a9efaf09f212139227e836aeca}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001}
@@ -36343,7 +36343,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/experiment_evidence.py', repository_path: src/solana_alpha_lab/factory/experiment_evidence.py}
-  integrity: {kind: sha256, sha256: 8cdc314f482297420c08f81523273439654aa42c0c8d915462d55c861d404eb5}
+  integrity: {kind: sha256, sha256: a4c2721cbf046de4b381f0c6f8bcc74ca85956949b7b471e048105dde271c9d0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -38031,7 +38031,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: fe12a389083b0cea995e22014aa470fd5fc866e07efe6a0c66f387d6b8450a91}
+  integrity: {kind: sha256, sha256: f5b38fa0da3766f8d19424b379bcea0ca92ecb90fb94b34d04c827f734c51c22}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -41986,7 +41986,7 @@ records:
   as_of: '2026-10-12'
   truth_owner: LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/list_a_chronological_confirmation_v1.md', repository_path: docs/contracts/list_a_chronological_confirmation_v1.md}
-  integrity: {kind: sha256, sha256: 4be4f46884ed742adbabaf5bb14f7ee37fa84e3a57263adf8162c609c5c94d6c}
+  integrity: {kind: sha256, sha256: 186284a72d82cd8ef5620ec97b9528663ebdedae0e00a6123f6add15f6de0df1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-FORGE-LIST-AWARE-RESEARCH-SCOPE-001}]
   consumers: [OWNER-SCIENCE-REVIEW, SEPARATE-AUTHORIZED-NATIVE-CONFIRMER]
@@ -42246,3 +42246,612 @@ records:
   evidence: []
   search_terms: [SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1, native numeric, chronological confirmation, synthetic audit, SC06]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Native confirmation input/authority/reservation/typed consumer contract
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/list_a_confirming_execution_v1.md
+    repository_path: docs/contracts/list_a_confirming_execution_v1.md
+  integrity:
+    kind: sha256
+    sha256: fae258cfd31c4a8851a156a4c4ade1a9f40d470e0b7330843f0792a0a894c31f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations: []
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: DESIGN-LIST-A-CONFIRMING-PRODUCER-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Accepted bounded native confirming producer design; real authority absent
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/design/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1_PRD_SSD.md
+    repository_path: docs/design/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1_PRD_SSD.md
+  integrity:
+    kind: sha256
+    sha256: efca7842cc32e359baa4d550b02c89fb5c5c337a2369dea599fbbcee0ca2e5ca
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCHEMA-EXPERIMENT-SPEC-V1-5-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed version-isolated concrete List A confirming definition
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/schemas/experiment_spec_v1_5.schema.json
+    repository_path: catalog/schemas/experiment_spec_v1_5.schema.json
+  integrity:
+    kind: sha256
+    sha256: ee696d1d29e009abb354c87c0a225836783ab5e317c35ae304ddfd57362bcd57
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCHEMA-LIST-A-CONFIRMATION-INPUT-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed source-owned native sample/exposure input
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/schemas/list_a_confirmation_input_v1.schema.json
+    repository_path: catalog/schemas/list_a_confirmation_input_v1.schema.json
+  integrity:
+    kind: sha256
+    sha256: b32d6fa347b9970f971e9a559a86983a3f5761cd70fe38f1b73549bc027d35a0
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCHEMA-LIST-A-CONFIRMATION-RESULT-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed nested authoritative conditional result with lineage
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/schemas/list_a_confirmation_result_v1.schema.json
+    repository_path: catalog/schemas/list_a_confirmation_result_v1.schema.json
+  integrity:
+    kind: sha256
+    sha256: 3080d2ed200050802f7c83e5d4aec77e329aac478c68a38c38dde212e456e350
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CONFIG-LIST-A-CONFIRMATION-SPEC-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Concrete registered List A native confirming definition
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://configs/experiment_specs/list_a_chronological_confirmation_v1.yaml
+    repository_path: configs/experiment_specs/list_a_chronological_confirmation_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: 789118443839aba34a1a979c611ed4a37b0c675cb5f3b0bb8aebd2b21b44341b
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: MODULE-LIST-A-CONFIRMATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Reserved single evaluator, crash/resume, atomic completion and typed dossier
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/factory/list_a_confirmation.py
+    repository_path: src/solana_alpha_lab/factory/list_a_confirmation.py
+  integrity:
+    kind: sha256
+    sha256: 328219e7ea38a25370c0018fb23429d318c911e7f704fec18c9bb844bd8739a5
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: MODULE-LIST-A-CONFIRMATION-INPUTS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Native source-owner registration, metadata binding and purpose-specific
+    guards
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/factory/list_a_confirmation_inputs.py
+    repository_path: src/solana_alpha_lab/factory/list_a_confirmation_inputs.py
+  integrity:
+    kind: sha256
+    sha256: e634b781929662541edc5245d0ecd439dbe713aa59e79669522e994e905f31e9
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: MODULE-LIST-A-CONFIRMATION-METHOD-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Accepted pure crossed bootstrap method; no authority
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/factory/list_a_confirmation_method.py
+    repository_path: src/solana_alpha_lab/factory/list_a_confirmation_method.py
+  integrity:
+    kind: sha256
+    sha256: c3b2bf4f12b3a4ff8d311b411d1cd48ba905e236447d193a632c25a063d244f4
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: MODULE-FACTORY-V1-DOCUMENT-RUNNER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Existing ordinary runner with pre-values reserved Spec1.5 dispatch
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/factory/document_runner.py
+    repository_path: src/solana_alpha_lab/factory/document_runner.py
+  integrity:
+    kind: sha256
+    sha256: e6bef62f301b159d916e01e09cb83b8b6931caf76dafb3e0d4dc29a96a36fd9d
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCRIPT-LIST-A-CONFIRMATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Exact local source/prepare/grant/submit/status/resume operator surface
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/list_a_confirmation.py
+    repository_path: scripts/list_a_confirmation.py
+  integrity:
+    kind: sha256
+    sha256: d74d86e0146e75fdfb11f5858a84f39dc90c0d64efa7183bdd369cb842c5b1b2
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-LIST-A-CONFIRMATION-METHOD-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Independent Fraction/seed/quantile/coverage/off-grid clock witnesses
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_list_a_confirmation_method_v1.py
+    repository_path: tests/test_list_a_confirmation_method_v1.py
+  integrity:
+    kind: sha256
+    sha256: 7d79e08de3b3eb8f1423f9596a99ad3b2b2673af8e5b6917fca46218c2a4b67c
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-LIST-A-CONFIRMATION-ADMISSION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pre-values source/exposure/protection/grant and retained allowance refusals
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_list_a_confirmation_admission_v1.py
+    repository_path: tests/test_list_a_confirmation_admission_v1.py
+  integrity:
+    kind: sha256
+    sha256: 104628bf27cf162d752a84d70e5bb4f3de661919469a13e96323305295512a75
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-LIST-A-CONFIRMATION-VERTICAL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Ordinary native numeric, cold reader, dossier and decision tests
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_list_a_confirmation_vertical_v1.py
+    repository_path: tests/test_list_a_confirmation_vertical_v1.py
+  integrity:
+    kind: sha256
+    sha256: ac1b5c6b787205b0d83e2873aad3e917225bba282d76ef3062188163d4c4f9cd
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: FIXTURE-LIST-A-CONFIRMATION-NATIVE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Controlled native market inputs through source owners; no forged science
+    carriers
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/list_a_confirmation_v1/native.py
+    repository_path: tests/fixtures/list_a_confirmation_v1/native.py
+  integrity:
+    kind: sha256
+    sha256: 15b74edf47a6383d7f19f86fec893b7e2fce8909b06918f457910ea3a7ff8e6c
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: PROOF-LIST-A-CONFIRMATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Contained retained OS process concurrency/crash/cold acceptance
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/fixtures/list_a_confirmation_v1/proof.py
+    repository_path: tests/fixtures/list_a_confirmation_v1/proof.py
+  integrity:
+    kind: sha256
+    sha256: 36b1e9bd3513a384303354a028a456b0f886a7d032f2781ade2cedc48921a17b
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET

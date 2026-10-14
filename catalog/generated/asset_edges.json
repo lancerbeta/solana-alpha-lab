@@ -978,6 +978,11 @@
       "target_asset_id": "DOC-FORGE-LIST-AWARE-RESEARCH-SCOPE-001"
     },
     {
+      "source_asset_id": "CONFIG-LIST-A-CONFIRMATION-SPEC-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
+    },
+    {
       "source_asset_id": "CONFIG-MARKET-CONTEXT-DEFINITION-001",
       "relation": "consumes",
       "target_asset_id": "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"
@@ -5943,6 +5948,11 @@
       "target_asset_id": "EVIDENCE-T25-A4-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "DESIGN-LIST-A-CONFIRMING-PRODUCER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
+    },
+    {
       "source_asset_id": "DOC-BIG-AGENTIC-AUDIT-V1-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-EXPERIMENT-EVIDENCE-DECISION-001"
@@ -10603,6 +10613,11 @@
       "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
+      "source_asset_id": "FIXTURE-LIST-A-CONFIRMATION-NATIVE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
+    },
+    {
       "source_asset_id": "FIXTURE-OWNER-AUTHORITY-PACKET-001",
       "relation": "derived_from",
       "target_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001"
@@ -11723,6 +11738,11 @@
       "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-DOCUMENT-RUNNER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-EXPERIMENT-SPEC-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
@@ -12186,6 +12206,21 @@
       "source_asset_id": "MODULE-IN-SCOPE-POPULATION-SUPPLY-GATE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "MODULE-LIST-A-CONFIRMATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
+    },
+    {
+      "source_asset_id": "MODULE-LIST-A-CONFIRMATION-INPUTS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
+    },
+    {
+      "source_asset_id": "MODULE-LIST-A-CONFIRMATION-METHOD-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
     },
     {
       "source_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001",
@@ -14448,6 +14483,11 @@
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "PROOF-LIST-A-CONFIRMATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
+    },
+    {
       "source_asset_id": "PROTOCOL-DELIVERY-CONTEXT-001",
       "relation": "advises",
       "target_asset_id": "ARCH-INTENT-004"
@@ -15153,6 +15193,11 @@
       "target_asset_id": "CTRL-EPISODE-REQUIRED-OUTCOMES-001"
     },
     {
+      "source_asset_id": "SCHEMA-EXPERIMENT-SPEC-V1-5-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
+    },
+    {
       "source_asset_id": "SCHEMA-FACTORY-REMOTE-OPERATIONS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
@@ -15271,6 +15316,16 @@
       "source_asset_id": "SCHEMA-HYPOTHESIS-FORGE-SYNTHESIS-HANDOFF-V1-1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-LIST-A-CONFIRMATION-INPUT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-LIST-A-CONFIRMATION-RESULT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
     },
     {
       "source_asset_id": "SCHEMA-MARKET-CONTEXT-DEFINITION-001",
@@ -16266,6 +16321,11 @@
       "source_asset_id": "SCRIPT-IN-SCOPE-POPULATION-SUPPLY-GATE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-IN-SCOPE-POPULATION-SUPPLY-GATE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-LIST-A-CONFIRMATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
     },
     {
       "source_asset_id": "SCRIPT-M1-CALIBRATION-REPORT-001",
@@ -18056,6 +18116,21 @@
       "source_asset_id": "TEST-KCDN-ATOM-B-STABLE-CONTEXT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-KCDN-ATOM-B-001"
+    },
+    {
+      "source_asset_id": "TEST-LIST-A-CONFIRMATION-ADMISSION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
+    },
+    {
+      "source_asset_id": "TEST-LIST-A-CONFIRMATION-METHOD-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
+    },
+    {
+      "source_asset_id": "TEST-LIST-A-CONFIRMATION-VERTICAL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
     },
     {
       "source_asset_id": "TEST-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001",

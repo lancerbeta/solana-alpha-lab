@@ -347,6 +347,33 @@ def classify_lane(
 ) -> LaneDecision:
     """Return one deterministic lane decision without executing a capability."""
 
+    candidate = submission.get("experiment_spec")
+    if isinstance(candidate, Mapping) and candidate.get("schema_version") == "1.5":
+        from solana_alpha_lab.factory.experiment_spec import validate_experiment_document
+        from solana_alpha_lab.factory.list_a_confirmation import current_context, committed, read_confirmation, run_identity
+        from solana_alpha_lab.factory.list_a_confirmation_inputs import ConfirmationError
+        try:
+            validate_experiment_document(candidate, root=root)
+            descriptor = _load_capabilities(root, registry_relative=CAPABILITY_REGISTRY_V2_RELATIVE).get(candidate["capability_id"])
+            if not descriptor or descriptor["status"] != "ACCEPTED":
+                return _change_lane("CAPABILITY_NOT_ACCEPTED")
+            store = ResearchStore(data_root, create_if_missing=False)
+            binding_id = str(submission.get("execution_binding_id") or "")
+            context = current_context(dict(candidate), binding_id, root=root, store=store, now=as_of)
+            reservation = committed(store, context["reservation_id"])
+            identity = reservation["payload"] if reservation else run_identity(context, root)
+            terminal = "FAST_LANE_READY"
+            if reservation:
+                saved = read_confirmation(store, trial_id=context["trial_id"], root=root)
+                terminal = "REPLAY_AVAILABLE" if saved["status"] == "COMPLETED" else "RESUME_REQUIRED"
+                if saved["status"] == "INVALID_AFTER_RESERVE":
+                    raise ConfirmationError("TRIAL_INVALID_NO_RESUME")
+            return _decision(Lane.FAST_LANE, terminal, reason_codes=(), run_key_sha256=identity["run_key_sha256"],
+                prior_run_id=identity["run_id"] if reservation else None,
+                next_action="READ_SAVED_RESULT" if terminal == "REPLAY_AVAILABLE" else "SUBMIT_EXACT_BINDING")
+        except (ConfirmationError, ValueError, OSError, KeyError) as exc:
+            return _decision(Lane.DENY, "BLOCKED_BEFORE_RESERVE", reason_codes=(getattr(exc, "code", "CONFIRMATION_BINDING_INVALID"),),
+                             next_action="CORRECT_EXACT_CONFIRMATION_BINDING")
     spec = _validate_spec(submission, root=root, as_of=as_of)
     if spec is None:
         return _decision(
