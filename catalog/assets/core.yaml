@@ -42086,7 +42086,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_episode_native_required_outcome_contract_v1.py', repository_path: tests/test_episode_native_required_outcome_contract_v1.py}
-  integrity: {kind: sha256, sha256: 0b0c7a5e3febde58aa6aa594ed608b7b07b16e0ed6cb99bf816c631db6521339}
+  integrity: {kind: sha256, sha256: 88354bf7cee85e751638df12c6287b4b47ae8217cac88ff69fac3d81a423bc56}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]

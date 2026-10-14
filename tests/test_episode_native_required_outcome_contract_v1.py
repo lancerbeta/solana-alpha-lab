@@ -233,7 +233,8 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         recorder = ReaderOracle()
         with patch("pyarrow.parquet.read_table", recorder.read), patch(
                 "solana_alpha_lab.factory.hfic_temporal_discovery.run_temporal_fixed_time_from_spec", side_effect=AssertionError("NUMERIC_RUN")):
-            refused = DocumentRunner(ROOT, self.store).start_document(self.spec,
+            from solana_alpha_lab.factory.operational_store import OperationalStore
+            refused = DocumentRunner(root=ROOT, store=OperationalStore(self.work / "direct-ops.sqlite")).start_document(self.spec,
                 spec_sha256=experiment_spec_sha256(self.spec), run_context=RunContext(self.plane, self.definition, decision, AS_OF + timedelta(hours=3)))
         self.assertEqual(refused["status"], "INVALID_EVIDENCE")
         self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
@@ -378,7 +379,7 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         payload["non_claims"] = ["EXPLICIT_RUN_PASSPORT_FIXTURE_NO_EXPERIMENT_EXECUTION"]
         text = json.dumps(payload, sort_keys=True, separators=(",", ":"))
         import hashlib
-        self.store.append([event.model_copy(update={"payload_json": text, "payload_sha256": hashlib.sha256(text.encode()).hexdigest()})])
+        self.store.append([event.model_copy(update={"payload_json": text, "payload_sha256": hashlib.sha256(text.encode()).hexdigest()})], transaction_id=event.transaction_id)
         self.assertEqual(self.classify().terminal, "REPLAY_AVAILABLE")
         import pyarrow.parquet as pq
         item = self.spec["parameters"]["temporal_recipe"]["frozen_input"][0]

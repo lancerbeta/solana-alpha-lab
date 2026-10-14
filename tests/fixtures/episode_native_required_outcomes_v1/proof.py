@@ -25,16 +25,20 @@ def dump(path, value):
     Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
 
 
-def prepare(work: Path, *, target_price: float = 1.10, missing_target: bool = False):
+def prepare(work: Path, *, target_price: float = 1.10, missing_target: bool = False, reuse_ingress: Path | None = None):
     """24 admissions, frozen oracle before MAIN; only market ingress is authored."""
     work = work.resolve()
     work.mkdir(parents=True, exist_ok=True)
     descriptor = {"benchmark": "EPISODE-NATIVE-REQUIRED-OUTCOMES-V1", "target_price": target_price, "missing_target": missing_target,
                   "admissions_n": 24, "decision_n": 20, "matched_n": 10, "comparator_n": 10,
-                  "fixture_setup_looks": 2, "scientific_acceptance": False}
+                  "fixture_setup_looks": 2, "scientific_acceptance": False,
+                  "ingress_reused": reuse_ingress is not None}
     if (work / "fixture.json").exists():
         saved = json.loads((work / "fixture.json").read_text())
         saved.setdefault("missing_target", False)
+        saved.setdefault("ingress_reused", False)
+        if reuse_ingress is None:
+            descriptor["ingress_reused"] = saved["ingress_reused"]
         assert saved == descriptor
         return
     dump(work / "oracle-plan.json", descriptor)
@@ -57,8 +61,15 @@ def prepare(work: Path, *, target_price: float = 1.10, missing_target: bool = Fa
             price = None  # exactly one required future cell; repeated mint in B stays observed
         return token_object(mint, price=price, liquidity=12000, holders=holders)
 
-    with patch.object(lav, "COHORT_A", tables["A"]), patch.object(lav, "COHORT_B", tables["B"]), patch.object(lav, "market_row", market_row):
-        source, packets = lav._capture_fresh(work)
+    if reuse_ingress is not None:
+        # Existing registered ingress, native copy/import; old worlds and looks
+        # remain intact. Fresh scientific setup/freeze is counted in this store.
+        import os
+        with patch.dict(os.environ, {"LAV_CACHE_DIR": str(reuse_ingress.resolve())}):
+            source, packets = lav.capture(work)
+    else:
+        with patch.object(lav, "COHORT_A", tables["A"]), patch.object(lav, "COHORT_B", tables["B"]), patch.object(lav, "market_row", market_row):
+            source, packets = lav._capture_fresh(work)
     plane = work / "plane"
     plane.mkdir()
     store = ResearchStore(plane)
