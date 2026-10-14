@@ -1,0 +1,33 @@
+{
+  "schema": "smial.hypothesis-critic-result",
+  "schema_version": "1.1",
+  "session_id": "HFIC-SESS-3C473AA4550B430D",
+  "critic_input_packet_sha256": "7b4faf7ceb2e1c32b90c948417dc3d8d03fb8dbca89f0511fa715c8cda2608db",
+  "selected_candidate_id": "HFIC-CAND-E161BC9E75F3",
+  "selected_definition_sha256": "e161bc9e75f3d3106e8d59f56b6bdfeee24cf88922cb871e7ef817f6d20fb64c",
+  "critic_prompt_version": "HFIC-V1.1",
+  "isolated_context_attestation": "NEW_CONTEXT_REQUIRED",
+  "critic_terminal": "KILL_UNBOUND_EVIDENCE",
+  "next": "STOP",
+  "material_defects": [
+    "CONFIRMATION_CONTRACT_UNBOUND: accepted independent chronological/OOS consumer and frozen acceptance semantics are absent.",
+    "NEGATIVE_CONTROL_BINDINGS_UNBOUND: named NULL/DECOY fixtures have no packet-bound definition, measurement or comparison receipt.",
+    "EXPERIMENT_SPEC_1_3_CONSUMPTION_UNBOUND: missing dataset fingerprints and observation/required-outcome consumption contract."
+  ],
+  "revision_receipt": null,
+  "classifier_receipt": null,
+  "experiment_spec": null,
+  "experiment_spec_packet": null,
+  "authority": {
+    "git_mutation": 0,
+    "experiment_execution": 0,
+    "provider_api_rpc_wss_calls": 0
+  },
+  "non_claims": [
+    "TECHNICAL_STOP_NOT_SCIENTIFIC_NEGATIVE",
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_FAMILY_CLOSE",
+    "PACKET_ONLY_CRITIC"
+  ]
+}

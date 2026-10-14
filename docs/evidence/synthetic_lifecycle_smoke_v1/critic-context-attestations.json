@@ -1,0 +1,10 @@
+{
+  "schema": "sls.critic-context-attestations.v1",
+  "context_launch": "TWO_SEPARATE_COLLABORATION_AGENTS_FORK_NONE",
+  "input_scope": "ONE_NATIVE_FROZEN_PACKET_EACH_PLUS_PUBLIC_CRITIC_METHOD_SCHEMA",
+  "actor_os_blindness": "NOT_CLAIMED",
+  "model_diversity": "UNPROVEN",
+  "simple": {"decision": "KILL_UNBOUND_EVIDENCE", "schema_validated": true, "store_or_oracle_access_reported": false, "runtime": "EXISTING_LOCKED_HOST_ENVIRONMENT_NO_SYNC"},
+  "compound": {"decision": "KILL_UNBOUND_EVIDENCE", "schema_validated": true, "store_or_oracle_access_reported": false, "runtime_deviation": "FIRST_SCHEMA_CHECK_CREATED_DUPLICATE_SOURCE_VENV_WITH_LOCKED_PACKAGES", "production_execution_dependency": false, "cleanup": "DEFERRED_TO_OWNER"},
+  "limits": ["SELF_REPORTED_RESEARCH_INFORMATION_PATH_WITH_OBSERVED_FRESH_CONTEXT_LAUNCH", "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY", "NO_SCIENTIFIC_NEGATIVE_OR_FAMILY_CLOSE"]
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "smial.hypothesis-critic-result",
+  "schema_version": "1.1",
+  "session_id": "HFIC-SESS-A2C472E331496A73",
+  "critic_input_packet_sha256": "cdd88224881628c9b075f2672e8bcb6b8b98899e79a363ccf63639b66e8df948",
+  "selected_candidate_id": "HFIC-CAND-262CE50D712A",
+  "selected_definition_sha256": "262ce50d712a0e4ce66cd9b1fb82aa2060563d2f200bbb2e5c306793932c3852",
+  "critic_prompt_version": "HFIC-V1.1",
+  "isolated_context_attestation": "NEW_CONTEXT_REQUIRED",
+  "critic_terminal": "KILL_UNBOUND_EVIDENCE",
+  "next": "STOP",
+  "material_defects": [
+    "Independent chronological validation and PASS/FAIL/INCONCLUSIVE semantics are not bound in the permitted packet.",
+    "Named NULL/DECOY controls have no bound definition/results in the packet.",
+    "Manifest IDs and frozen file hashes do not supply dataset fingerprint, availability closure and required-outcome binding."
+  ],
+  "revision_receipt": null,
+  "classifier_receipt": null,
+  "experiment_spec": null,
+  "experiment_spec_packet": null,
+  "authority": {
+    "git_mutation": 0,
+    "experiment_execution": 0,
+    "provider_api_rpc_wss_calls": 0
+  },
+  "non_claims": [
+    "TECHNICAL_STOP_NOT_SCIENTIFIC_NEGATIVE",
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_FAMILY_CLOSE",
+    "PACKET_ONLY_CRITIC"
+  ]
+}

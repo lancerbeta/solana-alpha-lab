@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1",
+  "review_id": "SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1-FIT",
+  "as_of": "2026-10-14",
+  "reviewed_bindings_sha256": "6707f9d948d7faa04503fc098a2ae7699dc8ca8f1b97bed6f2373643191b67b2",
+  "reviewed_inventory_sha256": "85deecf88d54fc6ee430e268626ab065827780967d048d90d4a9171cfb1ceef4",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "Owner-requested one audit package: frozen product, native authored Forge terminal, explicit BR-01 PAPER/recovery segments, all 15 scenarios accounted and retained bytes measured. Blind actor and original scientific continuation remain BLOCKED.",
+    "flexibility_and_history": "Original failures, both genuine technical Critic stops and separate strategy/spec identities retained. No scientific family closure, raw-to-episode relabeling or production promotion.",
+    "context_efficiency": "One delivery checkout plus immutable execution snapshot; scoped existing owners and tests. Independent exact-inventory critics; no pre-PR local full gate. Compact committed numbers and hashes, large stores outside Git.",
+    "research_truth": "Source-bound discovery arithmetic is exploratory proxy only. Independent lab validation/NULL/DECOY is MODEL_ONLY. Native accepted chronological confirmation not established for these packets. Typed UNKNOWN preserved.",
+    "owner_operability": "Russian owner report, exact replay/retention commands and one NOW confirmation-contract outcome. Native human CLI and fresh WAL-aware readback tested; browser UI and feedback continuation UNKNOWN. Nothing deleted.",
+    "execution_to_cashflow": "Two synthetic PAPER roundtrips and literal two-week model arithmetic only; no chain fill, wallet equity, alpha, NetReturn or FCF claim.",
+    "monitoring_and_recovery": "Original identity/reservation/cost floor and old exits survive selected native cut/switch/UNKNOWN/recovery cases. Process reply loss and fresh readback tested; hardware power loss and live runtime unproved.",
+    "build_vs_buy": "ADOPT existing Forge, Science/Handoff, coordinator, SQLite and Docker runtime. WRAP existing fixtures and stdlib observer; no new dependency/provider/platform choice. One erroneous duplicate locked .venv bootstrap is disclosed and measured.",
+    "security": "No-network readonly-source UID1000 product containers, capability drop and resource limits; no production data/provider/signer/deploy/money. Existing Git/gh delivery transport only. Shared resources untouched; exact retained ownership and no cleanup.",
+    "red_team": "Numeric corruption, unvisited/empty/failed scope, SEGMENT aggregation, source-hash guard and replay negatives. Historical invalid attempts preserved. Final independent reviews must assess overclaim risk despite green tests."
+  },
+  "capability_radar": {
+    "now": "NONE: reuse existing Docker/runtime/CLI and native product owners. No install/activation authority.",
+    "watch": "Only separately authorized scientific confirmation design, OS-confined actor availability and scoped consumer coverage. Data contracts/estimand/model transport rights remain owner-owned."
+  },
+  "recovery": "Frozen product unchanged. Retain snapshots, exact decisions, per-attempt kits, logs and all owned directories/volumes/stopped containers. Ordinary Git revert may disable the new audit entrypoint; no runtime cleanup or shared-resource deletion.",
+  "limits": [
+    "NO_BLIND_DISCOVERY",
+    "NO_NATIVE_OOS",
+    "NO_RAW_TO_PAPER_CONTINUITY",
+    "NO_MARKET_ALPHA_NETRETURN_FCF",
+    "NO_BROWSER_OR_FEEDBACK_CONTINUATION_PROOF",
+    "NO_MODEL_DIVERSITY_PROVEN",
+    "NO_CANONICAL_DONE_OR_MERGE_AUTHORITY"
+  ]
+}
