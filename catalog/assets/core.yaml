@@ -42869,7 +42869,7 @@ records:
     repository_path: docs/reports/list_a_confirming_producer_v1/OWNER_REPORT.md
   integrity:
     kind: sha256
-    sha256: 65f259b900ad969875bc462639ec55a682ae339c280719a7e061cf4456fbe4c2
+    sha256: bbf02228d452feffadf6bc5b7215a4aa95d368e33ee0351b5dd8ef2abdea8a78
   access:
     mode: read_only
     method: file
@@ -43005,6 +43005,80 @@ records:
   - native confirming
   - SYNTHETIC
   - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVID-LIST-A-CONFIRMING-OWNER-DECISION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact owner acceptance of one retained empty review environment deviation for Git delivery
+    only; no merge/scientific authority
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-10-15'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/list_a_confirming_producer_v1/owner-decision.json
+    repository_path: docs/evidence/list_a_confirming_producer_v1/owner-decision.json
+  integrity:
+    kind: sha256
+    sha256: d3f5c026a4dcc81da3cda41c8e6a537f666a8c14413386bec494d27279339a48
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - Git delivery only
+  - retained review deviation
+  - owner-decision
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVID-LIST-A-CONFIRMING-REVIEW-HISTORY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen Git object index preserving actual initial NOT_READY receipts before new isolated owner-authorized
+    review
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-10-15'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/list_a_confirming_producer_v1/review-history.json
+    repository_path: docs/evidence/list_a_confirming_producer_v1/review-history.json
+  integrity:
+    kind: sha256
+    sha256: 2b9cb1ef48b651455c7a5fe14a2a5f46b6f8eed4f1c1866902a7c064ccad93aa
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - Git delivery only
+  - retained review deviation
+  - review-history
   classification:
     contains_secrets: false
     contains_raw_data: false

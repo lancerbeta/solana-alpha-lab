@@ -1,8 +1,6 @@
 {
   "acceptance_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-SYNTHETIC-NATIVE",
-  "active_stop_conditions": [
-    "OWNER_ACCEPTANCE_REQUIRED_RETAINED_NO_NEW_VENV_CONTRACT_DEVIATION"
-  ],
+  "active_stop_conditions": [],
   "as_of": "2026-10-15",
   "base_main": "07c81a99f2d0f385df66de2e1a5254e224c6b3b3",
   "capability_radar_now": "NONE",
@@ -25,10 +23,13 @@
     "NO_CLEAN_HOST_BOOTSTRAP_PROOF",
     "EARLY_P0_NUMERIC_DECODER_COUNT_UNKNOWN"
   ],
+  "owner_approvals": [
+    "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-OWNER-DEVIATION-ACCEPTANCE-20261015; record=docs/evidence/list_a_confirming_producer_v1/owner-decision.json; Git delivery only, no merge"
+  ],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "external_material_action": false,
-    "material_owner_decision": true,
+    "material_owner_decision": false,
     "unresolved_safety_or_truth_conflict": false,
     "user_only_activation": false
   },

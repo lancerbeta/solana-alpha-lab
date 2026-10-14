@@ -5,12 +5,17 @@
 путь definition → prepare/grant → classifier → DocumentRunner → typed result →
 ordinary dossier. Scientific core и смысл legacy 1.0–1.4 сохранены.
 
-**DELIVERY_BLOCKED_OWNER_CONTRACT_DEVIATION:** при isolated code review создана
-пустая .venv вопреки literal no-new-environment clause. Она сохранена в owned
-archive, не использована, её footprint учтён. Это delivery-process deviation;
-архивирование не отменяет исторического создания. Для дальнейшего Git delivery
-нужно точное owner принятие именно этого отклонения; alpha/real/data authority
-оно не выдаёт. PR/push/CI/readiness/merge пока не выполнены.
+**OWNER_ACCEPTED_RETAINED_DEVIATION_GIT_DELIVERY_ONLY:** 15 октября owner
+принял ровно одно историческое создание пустой review .venv: без установки
+dependencies, product/science use, с сохранённым архивом и учтённым footprint.
+Исходный запрет и факт его нарушения сохранены; прежние NOT_READY остаются в
+frozen Git snapshot и [review history](../../evidence/list_a_confirming_producer_v1/review-history.json).
+[Exact owner decision](../../evidence/list_a_confirming_producer_v1/owner-decision.json)
+разрешает только новый review/bindings/preflight/push/PR/exact-head CI.
+Новые среды/scientific campaign/charges/results/contracts/thresholds не разрешены;
+real/grants/provider/deploy/merge исключены. Новый NOT_READY или machine DENY
+останавливает delivery. Fresh merge phrase запрашивается только после CI и
+merge-readiness PASS. На момент этого content freeze новый review/PR/CI ещё pending.
 
 Base: `07c81a99f2d0f385df66de2e1a5254e224c6b3b3`. Численный acceptance выполнен
 на committed implementation `989cee4ccd676716421752ce3f8a6ef42a794bd1`.
@@ -107,8 +112,8 @@ Real sample **UNBOUND**, real executions/values/grants/provider calls = **0**.
 Синтетический supported proxy не доказывает causal effect, net alpha, execution
 feasibility, StrategyVersion, activation, PAPER или blind Actor.
 
-**NOW:** owner acceptance точного retained delivery-process deviation, затем
-обычный Git delivery до fresh merge phrase. После интеграции — один отдельно
+**NOW:** разрешённый Git delivery текущего кандидата через новый isolated review,
+bindings, preflight, PR и exact-head CI до отдельной fresh merge phrase. После интеграции — один отдельно
 разрешённый sample-readiness/confirmation decision через
 новую capability при source-bound пригодном sample. Ценность — использовать
 закрытый producer gap; стоимость/риск — отдельная source и exact data authority;

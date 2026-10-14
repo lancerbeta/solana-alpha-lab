@@ -22,13 +22,13 @@
     "Clean-host bootstrap and shared Docker VHDX/log-directory growth UNKNOWN",
     "Two legacy campaign-specific tests skipped",
     "Early P0 decoder count UNKNOWN; interrupted original charge retained",
-    "Product fit PASS is not delivery readiness: retained reviewer-created empty environment violates no-new-.venv contract; exact owner acceptance absent and architecture review NOT_READY."
+    "Historical empty review-environment violation retained and accepted by exact owner decision for Git delivery only; new isolated review/bindings/CI/readiness remain required; no merge grant."
   ],
   "mode": "FULL_REVIEW",
   "recovery": "Ordinary code/schema/registry revert preserves all scientific state/charges; incompatible pending trial remains exposed",
   "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-FACTORY-FIT",
-  "reviewed_bindings_sha256": "32ed869bbd8e6eadfdbc596ae72edb1ff24eadaab754612aae9bea44f9c8f5b5",
-  "reviewed_inventory_sha256": "cd8eb8ab51fec3e3a57d36723013a9864f91128a4da494081ca06a28e4cfa4ff",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",

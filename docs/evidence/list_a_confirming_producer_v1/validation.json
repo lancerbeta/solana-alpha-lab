@@ -160,6 +160,18 @@
   ],
   "exact_head_ci": "ENFORCED_LIVE_BEFORE_MERGE_READINESS",
   "full_local_gate": "NOT_EXECUTED_PRE_PR; GUARDED_MERGE_IS_SOLE_EXECUTOR",
+  "git_delivery_continuation": {
+    "as_of": "2026-10-15",
+    "contracts_or_threshold_changes": 0,
+    "historical_process_limit_retained": true,
+    "historical_review_ref": "repo://docs/evidence/list_a_confirming_producer_v1/review-history.json",
+    "merge_authority": false,
+    "new_environments": 0,
+    "new_scientific_runs": 0,
+    "owner_decision_ref": "repo://docs/evidence/list_a_confirming_producer_v1/owner-decision.json",
+    "scientific_result_or_charge_changes": 0,
+    "scope": "Git delivery metadata, fresh isolated review/bindings/preflight/PR/exact-head CI only; historical NOT_READY preserved."
+  },
   "implementation_head": "989cee4ccd676716421752ce3f8a6ef42a794bd1",
   "legacy_skips": [
     "authoritative missing target campaign fixture",

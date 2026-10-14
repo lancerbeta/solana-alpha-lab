@@ -1,0 +1,21 @@
+{
+  "as_of": "2026-10-15",
+  "historical_snapshot": {
+    "git_object": "871682f5ff23fadb053647db146479444b58c073:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+    "git_object_sha256": "06cd44aa4076c8dedaae9ca65018286538a83dd96bf87069e227fece1ce9d258",
+    "reason": "Unaccepted historical no-new-environment deviation; actual NOT_READY preserved, not retroactively changed.",
+    "reviewed_candidate_head": "c1c626f68a4a9abad2ab03cafd410c50dcd1e4b2",
+    "roles": {
+      "ARCHITECTURE_CRITIC": "NOT_READY",
+      "CODE_REVIEWER": "PASS",
+      "GOAL_DOD_CRITIC": "NOT_READY",
+      "OWNER_UX_CRITIC": "PASS"
+    },
+    "verdict": "PENDING"
+  },
+  "history_policy": "Original Git object and all remediation history remain immutable; current review is a separate later assessment.",
+  "next_review": "NEW_ISOLATED_REVIEW_REQUIRED_AFTER_OWNER_DECISION",
+  "schema": "smial.list-a-confirmation-review-history",
+  "schema_version": "1.0",
+  "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1"
+}

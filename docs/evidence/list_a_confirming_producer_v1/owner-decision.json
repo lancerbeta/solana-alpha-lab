@@ -1,0 +1,53 @@
+{
+  "allowed": [
+    "GIT_DELIVERY_METADATA",
+    "NEW_ISOLATED_REVIEW",
+    "EVIDENCE_BINDINGS",
+    "PREFLIGHT",
+    "TASK_BRANCH_PUSH",
+    "PR",
+    "EXACT_HEAD_CI",
+    "READ_ONLY_MERGE_READINESS"
+  ],
+  "as_of": "2026-10-15",
+  "candidate_checkpoint_head": "871682f5ff23fadb053647db146479444b58c073",
+  "conditions": {
+    "archive_preserved": true,
+    "archive_ref": "local/list_a_confirming_producer_v1/attempts/accidental-review-environment",
+    "created": 1,
+    "files": 16,
+    "footprint_counted": true,
+    "footprint_ref": "repo://docs/evidence/list_a_confirming_producer_v1/footprint-checkpoint.json",
+    "footprint_sha256": "a2efeed5b5fab246527d819729b202f758ce45e6260e818d4e4ee841f60433c2",
+    "logical_bytes": 509868,
+    "packages_installed": 0,
+    "used_for_product_or_science": false
+  },
+  "decision": "ACCEPT_ONE_RETAINED_REVIEW_ENVIRONMENT_DEVIATION_GIT_DELIVERY_ONLY",
+  "decision_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-OWNER-DEVIATION-ACCEPTANCE-20261015",
+  "exact_owner_text": "**Owner decision — `LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1`**\nПринимаю одно документированное отклонение: создание при review пустой локальной `.venv` (~0.49 MiB) вопреки исходному запрету. Условия принятия: зависимости не устанавливались, среда не использовалась продуктом или научными вычислениями, архив сохранён, footprint учтён.\nРазрешаю продолжить **только Git delivery** текущего кандидата: устранить delivery blockers, провести необходимые повторные независимые review, обновить evidence bindings, выполнить preflight, push, создать PR и пройти exact-head CI.\nНе переписывать историю нарушения и не представлять первоначальные `NOT_READY` как `PASS` без нового review. Не создавать новые среды, не перезапускать scientific campaign и не менять scientific charges, результаты, контракты или пороги ради delivery.\nЭто разрешение не распространяется на реальные данные, grants, provider calls, deploy и merge. Если независимый review остаётся `NOT_READY` или machine gate возвращает `DENY`, остановиться с точным blocker.\nПосле полного CI PASS и `merge-readiness PASS` запросить отдельную exact owner phrase для merge.",
+  "failure_stop": "NEW_INDEPENDENT_NOT_READY_OR_MACHINE_DENY",
+  "forbidden": [
+    "NEW_ENVIRONMENT",
+    "NEW_SCIENTIFIC_CAMPAIGN",
+    "SCIENTIFIC_CHARGE_OR_RESULT_CHANGES",
+    "CONTRACT_OR_THRESHOLD_CHANGES_FOR_DELIVERY",
+    "REAL_DATA_OR_GRANTS",
+    "PROVIDER_CALLS",
+    "DEPLOY",
+    "MERGE"
+  ],
+  "historical_review_git_object": "871682f5ff23fadb053647db146479444b58c073:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+  "historical_review_git_object_sha256": "06cd44aa4076c8dedaae9ca65018286538a83dd96bf87069e227fece1ce9d258",
+  "historical_violation_preserved": true,
+  "merge_stop": "EXACT_HEAD_CI_PASS_THEN_READINESS_PASS_THEN_FRESH_OWNER_PHRASE",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_OWNER_IDENTITY",
+    "NO_REAL_OR_SCIENTIFIC_OR_MERGE_AUTHORITY"
+  ],
+  "origin": "DIRECT_OWNER_MESSAGE",
+  "owner": "GOAL_OWNER",
+  "schema": "smial.list-a-confirmation-owner-delivery-decision",
+  "schema_version": "1.0",
+  "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1"
+}
