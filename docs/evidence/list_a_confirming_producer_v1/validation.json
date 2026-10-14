@@ -1,0 +1,103 @@
+{
+  "checks": {
+    "admission": "11 PASS plus 2 added final checks PASS (3 malformed-observation subcases + after-values revoke)",
+    "legacy_classifier": "31 PASS",
+    "legacy_episode_1_4": "14 PASS / 2 existing SKIP",
+    "legacy_evidence_decision": "12 PASS",
+    "method": "5 PASS",
+    "vertical": "2 PASS; null/missing/empty subcases; final exact membership equality recheck PASS"
+  },
+  "engineering_history": [
+    {
+      "attempt": "initial host",
+      "reason": "Reader instrumentation assumed filters on identity-only projection; fixed test oracle",
+      "status": "FAIL"
+    },
+    {
+      "attempt": "unit-pass1",
+      "reason": "Expected refusal code obsolete after source-authority before metadata; assertion corrected",
+      "status": "FAIL"
+    },
+    {
+      "attempt": "unit-pass2",
+      "checks": 13,
+      "status": "PASS"
+    },
+    {
+      "attempt": "unit-pass3",
+      "reason": "Idempotent PAUSE asserted stale; uncommitted implementation asset qualification; tmpfs drain reserve. No guards bypassed.",
+      "status": "FAIL"
+    },
+    {
+      "attempt": "unit-pass4",
+      "checks": 15,
+      "status": "PASS"
+    },
+    {
+      "attempt": "admission-pass5",
+      "checks": 11,
+      "status": "PASS"
+    },
+    {
+      "attempt": "accepted-tests",
+      "reason": "GIT_MUTATION_DETECTED on shared mutable Git snapshot",
+      "status": "61 CHECKS PASS; LEGACY FIXTURE ERROR"
+    },
+    {
+      "attempt": "regression-replay",
+      "reason": "PREFLIGHT_GIT_COMPOSITE_MISMATCH; readonly mounts alone do not freeze live checkout/refs",
+      "status": "FIXTURE ERROR"
+    },
+    {
+      "attempt": "regression-frozen",
+      "reason": "PRODUCER_GIT_SHA_UNAVAILABLE: copied tree omitted .git entry; exact identity probe added",
+      "status": "FIXTURE ERROR"
+    },
+    {
+      "attempt": "regression-final",
+      "checks": 16,
+      "skipped": 2,
+      "source": "Frozen owned byte checkout and refs; no guard override",
+      "status": "PASS"
+    },
+    {
+      "attempt": "final-admission-first",
+      "reason": "Executor raises typed ConfirmationError after durable INVALID_AFTER_RESERVE; test expected return object",
+      "status": "FAIL_ASSERTION"
+    },
+    {
+      "attempt": "final-admission-repeat",
+      "checks": 2,
+      "production_change": false,
+      "status": "PASS"
+    },
+    {
+      "attempt": "membership-final",
+      "checks": 1,
+      "status": "PASS"
+    }
+  ],
+  "exact_head_ci": "ENFORCED_LIVE_BEFORE_MERGE_READINESS",
+  "full_local_gate": "NOT_EXECUTED_PRE_PR; GUARDED_MERGE_IS_SOLE_EXECUTOR",
+  "implementation_head": "989cee4ccd676716421752ce3f8a6ef42a794bd1",
+  "legacy_skips": [
+    "authoritative missing target campaign fixture",
+    "republished numeric/missing campaign fixtures"
+  ],
+  "limits": [
+    "Clean-host bootstrap unverified",
+    "Legacy two campaign-specific tests skipped, not counted PASS",
+    "Early P0 actual numeric decoder count UNKNOWN",
+    "Unit stores have explicit disposable TEST scope; named stores retained"
+  ],
+  "os_acceptance": "PASS actual process exit 86 and same-trial resume; separate from unit mocks",
+  "production_bytes_unchanged_since_native_acceptance": true,
+  "schema": "smial.list-a-confirmation-validation",
+  "schema_version": "1.0",
+  "test_artifacts": [
+    "tests/test_list_a_confirmation_method_v1.py",
+    "tests/test_list_a_confirmation_admission_v1.py",
+    "tests/test_list_a_confirmation_vertical_v1.py",
+    "tests/fixtures/list_a_confirmation_v1/proof.py"
+  ]
+}

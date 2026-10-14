@@ -4,7 +4,7 @@ contract_version: '1.0'
 as_of: '2026-10-14'
 owner: GOAL_OWNER
 task: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
-status: IMPLEMENTED_UNVERIFIED
+status: IMPLEMENTED_AND_VERIFIED_IN_SYNTHETIC_SCOPE
 ---
 
 # List A: native confirming producer

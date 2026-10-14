@@ -1,0 +1,817 @@
+{
+  "cases": [
+    {
+      "binding_sha256": "d4c72653fa868660bd18b52d6990ea7ebf5c8c95520a78e65e14d08312289381",
+      "case": "positive",
+      "cold": {
+        "actual_evaluator_invocations": 0,
+        "actual_value_decoder_calls": 0,
+        "actual_writes": 0,
+        "domain": "SYNTHETIC",
+        "execution_binding_sha256": "d4c72653fa868660bd18b52d6990ea7ebf5c8c95520a78e65e14d08312289381",
+        "independent_native_membership": "PASS",
+        "inventory_unchanged": true,
+        "new_evaluator_invocations": 0,
+        "next_action": "READ_SAVED_RESULT_OR_RECORD_OWNER_DECISION",
+        "protocol_terminal": "ASSOCIATION_SUPPORTED_CONDITIONAL",
+        "reason_codes": [],
+        "result_digest_sha256": "8440f65943cbb8040854dc3a1b8d163a175391cdbb4a22ae0521442094fc547d",
+        "run_id": "RUN-E4BDA12F4EFA5675513EE0FD",
+        "scientific_charge": 1,
+        "status": "COMPLETED",
+        "trial_id": "LA-TRIAL-204361B9128D79D7728E63FE53BF0B4BB8B8B01ACCB262E619003EEE337D41F9"
+      },
+      "grant_id": "LA-GRANT-2b6f918ee6bbd86221fd77ecdce6482dffd8796ff2d66baf4e125024209a988c",
+      "input_oracle_sha256": "74f3987a2f4e256d16f16a11d1716246587fec43299743e71a6330ae7f623d72",
+      "method": {
+        "contrast": 0.125,
+        "coverage": {
+          "A": 1.0,
+          "C": 1.0
+        },
+        "leave_one": {
+          "count": 319,
+          "digest_sha256": "769bb1b437a6b3ca648fed5cecd3e612819cfc83a8e79ff18c0e3c79a1c4dfc0",
+          "max": 0.125,
+          "min": 0.125,
+          "valid_count": 319
+        },
+        "means": {
+          "A": 0.125,
+          "C": 0.0
+        },
+        "numeric_order": "CANONICAL_EPISODE_ID_MATH_FSUM",
+        "observed_mask_sha256": "0065a77f62a28533feab7c02122a4f2082ef40378f20cc77ea7ea7b0b4b4de99",
+        "partitions": {
+          "172800": {
+            "interval": [
+              0.125,
+              0.125
+            ],
+            "invalid_replicates": 0,
+            "replicate_digest_sha256": "1b48c6e2b4294209500fa99b6d8bc762848f4c29e2e5fb92cc957f17da375ca7",
+            "seed": 3449030900544075880,
+            "valid_replicates": 4096
+          },
+          "86400": {
+            "interval": [
+              0.125,
+              0.125
+            ],
+            "invalid_replicates": 0,
+            "replicate_digest_sha256": "1b48c6e2b4294209500fa99b6d8bc762848f4c29e2e5fb92cc957f17da375ca7",
+            "seed": 2055296707731192101,
+            "valid_replicates": 4096
+          }
+        },
+        "pooled_blocks": {
+          "172800": 32,
+          "86400": 32
+        },
+        "pooled_mints": 255,
+        "protocol_core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+        "quantile_indices": [
+          102,
+          3993
+        ],
+        "reason_codes": [],
+        "replicates_per_partition": 4096,
+        "support": {
+          "A": {
+            "blocks": {
+              "172800": 32,
+              "86400": 32
+            },
+            "decision_denominator": 128,
+            "mints": 127,
+            "observed": 128
+          },
+          "C": {
+            "blocks": {
+              "172800": 32,
+              "86400": 32
+            },
+            "decision_denominator": 128,
+            "mints": 128,
+            "observed": 128
+          }
+        },
+        "terminal": "ASSOCIATION_SUPPORTED_CONDITIONAL"
+      },
+      "population": {
+        "admitted": 256,
+        "decision_denominators": {
+          "A": 128,
+          "C": 128
+        },
+        "decision_mask_sha256": "421ca6c7081761c991af5de4996e3150b98a103f849ed0c0c6b2d4bf460aadeb",
+        "observed": 256,
+        "observed_mask_sha256": "0065a77f62a28533feab7c02122a4f2082ef40378f20cc77ea7ea7b0b4b4de99",
+        "repeated_mints": 1,
+        "scope_known": 256,
+        "typed_missing_counts": {}
+      },
+      "reservation_id": "LA-RESERVATION-204361B9128D79D7728E63FE53BF0B4BB8B8B01ACCB262E619003EEE337D41F9",
+      "result_digest_sha256": "8440f65943cbb8040854dc3a1b8d163a175391cdbb4a22ae0521442094fc547d",
+      "result_ref": "confirmation/attempts/LA-TRIAL-204361B9128D79D7728E63FE53BF0B4BB8B8B01ACCB262E619003EEE337D41F9/a8bbf9988f4748a993f263f5fe484404/result-8440f65943cbb8040854dc3a1b8d163a175391cdbb4a22ae0521442094fc547d.json",
+      "source_authority_id": "LA-SOURCE-bc938c86ac85920e1752f7c6c32f4b8d3718b6efd5ff45200462eaa6bc6c8431",
+      "source_hashes": {
+        "confirmation/sources/SYNTH-PROOF-POSITIVE/admissions.json": "db95d34a4e4f0e150d45f852c11f95080f49214acf37c04d1d50bf9307bc10dd",
+        "confirmation/sources/SYNTH-PROOF-POSITIVE/census.parquet": "7373563811fffb372e81a02d6db38a62d2a120636e8a505e8b441e3c99ec94c7",
+        "confirmation/sources/SYNTH-PROOF-POSITIVE/frames.json": "65499d425a413dd9e677c154dbe10c54b9f370796b1ac2c3b8fb108073532112",
+        "confirmation/sources/SYNTH-PROOF-POSITIVE/observations.parquet": "5fdd1a459ad33ee97bb66fd4c0e2e0a5799288ec229b18a0e9c0536e8fcd160d",
+        "confirmation/sources/SYNTH-PROOF-POSITIVE/protection.json": "60a5ff6c441ec7e624a721af75fa7fffbe2e519c585da338281bad743f5ca9b3",
+        "confirmation/sources/SYNTH-PROOF-POSITIVE/schedule.json": "35264dcade5d601d907ec7e2f383d9e31e504b5859c3dc24fcc1e2f9db86886e"
+      },
+      "source_set_sha256": "5e287bf0dc7bb1ecd26b9360e6f09b224cdad9e2c6c763fe8d892bb702ef7d12",
+      "study_budget_sha256": "844dc4fc56fdd195502dd7243f876a92ddfe895437e9cc191ced47d4b58ccfdc",
+      "trial_id": "LA-TRIAL-204361B9128D79D7728E63FE53BF0B4BB8B8B01ACCB262E619003EEE337D41F9"
+    },
+    {
+      "binding_sha256": "3c4de20d38b05c285281c0bab828b6e187477cfaede1554b520ccbb09dcc3d8b",
+      "case": "null",
+      "cold": {
+        "actual_evaluator_invocations": 0,
+        "actual_value_decoder_calls": 0,
+        "actual_writes": 0,
+        "domain": "SYNTHETIC",
+        "execution_binding_sha256": "3c4de20d38b05c285281c0bab828b6e187477cfaede1554b520ccbb09dcc3d8b",
+        "independent_native_membership": "PASS",
+        "inventory_unchanged": true,
+        "new_evaluator_invocations": 0,
+        "next_action": "READ_SAVED_RESULT_OR_RECORD_OWNER_DECISION",
+        "protocol_terminal": "ASSOCIATION_NOT_SUPPORTED_AT_FROZEN_BOUNDARY",
+        "reason_codes": [],
+        "result_digest_sha256": "2d11e6cf4b8593ad8e58d84a93d998caf6d824af626b060166f3f10a80a7686e",
+        "run_id": "RUN-F2E66C29D593DD1021AF177A",
+        "scientific_charge": 1,
+        "status": "COMPLETED",
+        "trial_id": "LA-TRIAL-72590FFF9CCEB323CBB5E259FC5A6E8BBE9C1AE6481A5B1B8D30AA8BBC6EC79A"
+      },
+      "grant_id": "LA-GRANT-6e79e710ef1039356cc3bc8b9cd560d4531cddb81452aa7c743751537c77f6aa",
+      "input_oracle_sha256": "a5e54b0927fe1d804103bb54af509cd1007bd6469f09725fa58663ff4e22136c",
+      "method": {
+        "contrast": 0.0,
+        "coverage": {
+          "A": 1.0,
+          "C": 1.0
+        },
+        "leave_one": {
+          "count": 319,
+          "digest_sha256": "a3beeb95089a366e81a9c505d0650163ed5f1e97c18a0d50012b492423c8fedf",
+          "max": 0.0,
+          "min": 0.0,
+          "valid_count": 319
+        },
+        "means": {
+          "A": 0.0,
+          "C": 0.0
+        },
+        "numeric_order": "CANONICAL_EPISODE_ID_MATH_FSUM",
+        "observed_mask_sha256": "f41988ba20f0a0e92ba49a3237b15d69344f1f5597897fc3582fa5dab3b3700d",
+        "partitions": {
+          "172800": {
+            "interval": [
+              0.0,
+              0.0
+            ],
+            "invalid_replicates": 0,
+            "replicate_digest_sha256": "c313a5c182bdc7d0d74fb909444335473e39fa517fac405c288c534e29d85243",
+            "seed": 3449030900544075880,
+            "valid_replicates": 4096
+          },
+          "86400": {
+            "interval": [
+              0.0,
+              0.0
+            ],
+            "invalid_replicates": 0,
+            "replicate_digest_sha256": "c313a5c182bdc7d0d74fb909444335473e39fa517fac405c288c534e29d85243",
+            "seed": 2055296707731192101,
+            "valid_replicates": 4096
+          }
+        },
+        "pooled_blocks": {
+          "172800": 32,
+          "86400": 32
+        },
+        "pooled_mints": 255,
+        "protocol_core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+        "quantile_indices": [
+          102,
+          3993
+        ],
+        "reason_codes": [],
+        "replicates_per_partition": 4096,
+        "support": {
+          "A": {
+            "blocks": {
+              "172800": 32,
+              "86400": 32
+            },
+            "decision_denominator": 128,
+            "mints": 127,
+            "observed": 128
+          },
+          "C": {
+            "blocks": {
+              "172800": 32,
+              "86400": 32
+            },
+            "decision_denominator": 128,
+            "mints": 128,
+            "observed": 128
+          }
+        },
+        "terminal": "ASSOCIATION_NOT_SUPPORTED_AT_FROZEN_BOUNDARY"
+      },
+      "population": {
+        "admitted": 256,
+        "decision_denominators": {
+          "A": 128,
+          "C": 128
+        },
+        "decision_mask_sha256": "c5e7aa8b883f16509802c96f0460c62984b562b711265e3ca4a5624dedcdb39d",
+        "observed": 256,
+        "observed_mask_sha256": "f41988ba20f0a0e92ba49a3237b15d69344f1f5597897fc3582fa5dab3b3700d",
+        "repeated_mints": 1,
+        "scope_known": 256,
+        "typed_missing_counts": {}
+      },
+      "reservation_id": "LA-RESERVATION-72590FFF9CCEB323CBB5E259FC5A6E8BBE9C1AE6481A5B1B8D30AA8BBC6EC79A",
+      "result_digest_sha256": "2d11e6cf4b8593ad8e58d84a93d998caf6d824af626b060166f3f10a80a7686e",
+      "result_ref": "confirmation/attempts/LA-TRIAL-72590FFF9CCEB323CBB5E259FC5A6E8BBE9C1AE6481A5B1B8D30AA8BBC6EC79A/cf55faea5f1d481690628385ed4c0e25/result-2d11e6cf4b8593ad8e58d84a93d998caf6d824af626b060166f3f10a80a7686e.json",
+      "source_authority_id": "LA-SOURCE-37bc00a3e51565815dee62e3b7770a45ec1a19be004629922ed8310cce067559",
+      "source_hashes": {
+        "confirmation/sources/SYNTH-PROOF-NULL/admissions.json": "f9b1d215ba0612d31af1125016ddba999eeaca785deee9be387c2bf97ff14d44",
+        "confirmation/sources/SYNTH-PROOF-NULL/census.parquet": "ee0a7032876f0f2811a96281719df02894d17ed32873d575152ac2ef54da757b",
+        "confirmation/sources/SYNTH-PROOF-NULL/frames.json": "508e16b0da3c2325a0c034aa143e20dbf949207765f4c68a13f35a817d051f36",
+        "confirmation/sources/SYNTH-PROOF-NULL/observations.parquet": "685a1ec0bafc1d116919529ba5baea5b128d6e899258eb661c9a2027db2b2af7",
+        "confirmation/sources/SYNTH-PROOF-NULL/protection.json": "60a5ff6c441ec7e624a721af75fa7fffbe2e519c585da338281bad743f5ca9b3",
+        "confirmation/sources/SYNTH-PROOF-NULL/schedule.json": "35264dcade5d601d907ec7e2f383d9e31e504b5859c3dc24fcc1e2f9db86886e"
+      },
+      "source_set_sha256": "bb1530cdc8e84708a0682a5a502dbfd49d39ad9d6e6b0f1639af10ce1ee04aae",
+      "study_budget_sha256": "f378d325d51249fe48bc28a4044c2f7aab65f3eab843ede2ec9e43623565868b",
+      "trial_id": "LA-TRIAL-72590FFF9CCEB323CBB5E259FC5A6E8BBE9C1AE6481A5B1B8D30AA8BBC6EC79A"
+    },
+    {
+      "binding_sha256": "b79736984a70171700623cb3b0b017b2eab7059960c7e7f362e167e84087b007",
+      "case": "missing8",
+      "cold": {
+        "actual_evaluator_invocations": 0,
+        "actual_value_decoder_calls": 0,
+        "actual_writes": 0,
+        "domain": "SYNTHETIC",
+        "execution_binding_sha256": "b79736984a70171700623cb3b0b017b2eab7059960c7e7f362e167e84087b007",
+        "independent_native_membership": "PASS",
+        "inventory_unchanged": true,
+        "new_evaluator_invocations": 0,
+        "next_action": "READ_SAVED_RESULT_OR_RECORD_OWNER_DECISION",
+        "protocol_terminal": "INSUFFICIENT",
+        "reason_codes": [
+          "TARGET_COVERAGE_BELOW_95_PERCENT",
+          "MISSING_RATE_GAP_ABOVE_5_PERCENT"
+        ],
+        "result_digest_sha256": "6f7d6eef8f0c071d9e47cd0f67d21f62551ef4c39d30592bd5d4d973e368f12a",
+        "run_id": "RUN-5B7C1592471D4244120EB2CB",
+        "scientific_charge": 1,
+        "status": "COMPLETED",
+        "trial_id": "LA-TRIAL-54819442A30BC6EAD832D78061B5DAB61A51413CEB3C01B27F3FA9F480B92D86"
+      },
+      "grant_id": "LA-GRANT-d4a08cef02d2294b21880491b9bcaedadf26861d0cf34659630fac40304b1c3f",
+      "input_oracle_sha256": "d0094c917d4c8491fbfe04bc5b30d7dc0f2a2454f1a0391dcca530d350b11b05",
+      "method": {
+        "contrast": 0.125,
+        "coverage": {
+          "A": 0.9375,
+          "C": 1.0
+        },
+        "leave_one": {},
+        "means": {
+          "A": 0.125,
+          "C": 0.0
+        },
+        "numeric_order": "CANONICAL_EPISODE_ID_MATH_FSUM",
+        "observed_mask_sha256": "fd2cd5408cee73ebbf8df7851ed5c1a44344e41b16a73f2a82e406821e01ac69",
+        "partitions": {},
+        "pooled_blocks": {
+          "172800": 32,
+          "86400": 32
+        },
+        "pooled_mints": 248,
+        "protocol_core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+        "quantile_indices": [
+          102,
+          3993
+        ],
+        "reason_codes": [
+          "TARGET_COVERAGE_BELOW_95_PERCENT",
+          "MISSING_RATE_GAP_ABOVE_5_PERCENT"
+        ],
+        "replicates_per_partition": 4096,
+        "support": {
+          "A": {
+            "blocks": {
+              "172800": 30,
+              "86400": 30
+            },
+            "decision_denominator": 128,
+            "mints": 120,
+            "observed": 120
+          },
+          "C": {
+            "blocks": {
+              "172800": 32,
+              "86400": 32
+            },
+            "decision_denominator": 128,
+            "mints": 128,
+            "observed": 128
+          }
+        },
+        "terminal": "INSUFFICIENT"
+      },
+      "population": {
+        "admitted": 256,
+        "decision_denominators": {
+          "A": 128,
+          "C": 128
+        },
+        "decision_mask_sha256": "594bef9baf966f9d2aaeafd2c26d75500aac31050d86c405fa7a1a14c976c6e1",
+        "observed": 248,
+        "observed_mask_sha256": "fd2cd5408cee73ebbf8df7851ed5c1a44344e41b16a73f2a82e406821e01ac69",
+        "repeated_mints": 1,
+        "scope_known": 256,
+        "typed_missing_counts": {
+          "A:MISSING_TYPED": 8
+        }
+      },
+      "reservation_id": "LA-RESERVATION-54819442A30BC6EAD832D78061B5DAB61A51413CEB3C01B27F3FA9F480B92D86",
+      "result_digest_sha256": "6f7d6eef8f0c071d9e47cd0f67d21f62551ef4c39d30592bd5d4d973e368f12a",
+      "result_ref": "confirmation/attempts/LA-TRIAL-54819442A30BC6EAD832D78061B5DAB61A51413CEB3C01B27F3FA9F480B92D86/8632e362e9464db49c795899decb6a13/result-6f7d6eef8f0c071d9e47cd0f67d21f62551ef4c39d30592bd5d4d973e368f12a.json",
+      "source_authority_id": "LA-SOURCE-4b7de522fcf1c58486be4d45bfd8a12ff1a59d886652082cc382da858c0e6ae0",
+      "source_hashes": {
+        "confirmation/sources/SYNTH-PROOF-MISSING8/admissions.json": "bbe02e6b368031531a48354117852e45590e25b6b608f473e37eb081a95bfcf3",
+        "confirmation/sources/SYNTH-PROOF-MISSING8/census.parquet": "f85a511a19f3d5f431fdc03c89566df74ab9644a77d51d9c038b1dec715d877a",
+        "confirmation/sources/SYNTH-PROOF-MISSING8/frames.json": "7a349c87d0bf66c846f4fb78433727912abd3aef33a9b8ed2728f91921f211b0",
+        "confirmation/sources/SYNTH-PROOF-MISSING8/observations.parquet": "fc6413aa9dc45c17f78df68b8d14ba64dfb27701ce8799893dfad9edff7fa6f0",
+        "confirmation/sources/SYNTH-PROOF-MISSING8/protection.json": "60a5ff6c441ec7e624a721af75fa7fffbe2e519c585da338281bad743f5ca9b3",
+        "confirmation/sources/SYNTH-PROOF-MISSING8/schedule.json": "35264dcade5d601d907ec7e2f383d9e31e504b5859c3dc24fcc1e2f9db86886e"
+      },
+      "source_set_sha256": "4e06357c748602ad43dab55bc0358e70beb7813d2348078775faff492f2e4d86",
+      "study_budget_sha256": "bc5b4ab345ea8260c2169198cf8c1a68390b43a30b8947a6c8f7e2c670a40b7a",
+      "trial_id": "LA-TRIAL-54819442A30BC6EAD832D78061B5DAB61A51413CEB3C01B27F3FA9F480B92D86"
+    },
+    {
+      "binding_sha256": "ab2dbdabbcfcc870ac6f745de044caa505a7606d7bd373f3e26cfd379dcca59d",
+      "case": "fault-reservation",
+      "cold": {
+        "actual_evaluator_invocations": 0,
+        "actual_value_decoder_calls": 0,
+        "actual_writes": 0,
+        "domain": "SYNTHETIC",
+        "execution_binding_sha256": "ab2dbdabbcfcc870ac6f745de044caa505a7606d7bd373f3e26cfd379dcca59d",
+        "independent_native_membership": "PASS",
+        "inventory_unchanged": true,
+        "new_evaluator_invocations": 0,
+        "next_action": "READ_SAVED_RESULT_OR_RECORD_OWNER_DECISION",
+        "protocol_terminal": "ASSOCIATION_SUPPORTED_CONDITIONAL",
+        "reason_codes": [],
+        "result_digest_sha256": "76ff6e8ea316abe184dd2bd51aad4866986d039a793e06a6b2ec13f165c4161d",
+        "run_id": "RUN-3FEFD3AEAD1BAC0F0FC9EB03",
+        "scientific_charge": 1,
+        "status": "COMPLETED",
+        "trial_id": "LA-TRIAL-2AFAE97091E843DBDBE7F5A8D94D539852AB5CFDC53368684FC4B6B9BDF28B8D"
+      },
+      "grant_id": "LA-GRANT-4896c603d3675efbe4ecb1ee05f7c10a95925a21290ff1ed6afa607a86a43769",
+      "input_oracle_sha256": "9b7dcf798b9eb059421907cfc3c27b1eaf655ca671df02fb8765d6dcbdbe5138",
+      "method": {
+        "contrast": 0.125,
+        "coverage": {
+          "A": 1.0,
+          "C": 1.0
+        },
+        "leave_one": {
+          "count": 319,
+          "digest_sha256": "00dad38a809b77186fb645f56af3b636797725451acbd87f3cfc02b3e88426c9",
+          "max": 0.125,
+          "min": 0.125,
+          "valid_count": 319
+        },
+        "means": {
+          "A": 0.125,
+          "C": 0.0
+        },
+        "numeric_order": "CANONICAL_EPISODE_ID_MATH_FSUM",
+        "observed_mask_sha256": "7f7324bd9dc10e1aaf26cef8154d7c0cc37206a4b9e827cfdae0797a12e02491",
+        "partitions": {
+          "172800": {
+            "interval": [
+              0.125,
+              0.125
+            ],
+            "invalid_replicates": 0,
+            "replicate_digest_sha256": "1b48c6e2b4294209500fa99b6d8bc762848f4c29e2e5fb92cc957f17da375ca7",
+            "seed": 3449030900544075880,
+            "valid_replicates": 4096
+          },
+          "86400": {
+            "interval": [
+              0.125,
+              0.125
+            ],
+            "invalid_replicates": 0,
+            "replicate_digest_sha256": "1b48c6e2b4294209500fa99b6d8bc762848f4c29e2e5fb92cc957f17da375ca7",
+            "seed": 2055296707731192101,
+            "valid_replicates": 4096
+          }
+        },
+        "pooled_blocks": {
+          "172800": 32,
+          "86400": 32
+        },
+        "pooled_mints": 255,
+        "protocol_core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+        "quantile_indices": [
+          102,
+          3993
+        ],
+        "reason_codes": [],
+        "replicates_per_partition": 4096,
+        "support": {
+          "A": {
+            "blocks": {
+              "172800": 32,
+              "86400": 32
+            },
+            "decision_denominator": 128,
+            "mints": 127,
+            "observed": 128
+          },
+          "C": {
+            "blocks": {
+              "172800": 32,
+              "86400": 32
+            },
+            "decision_denominator": 128,
+            "mints": 128,
+            "observed": 128
+          }
+        },
+        "terminal": "ASSOCIATION_SUPPORTED_CONDITIONAL"
+      },
+      "population": {
+        "admitted": 256,
+        "decision_denominators": {
+          "A": 128,
+          "C": 128
+        },
+        "decision_mask_sha256": "077858504a2da1435dfceaa8a911d63d46e9cb14683e077931fa1654216bdbb0",
+        "observed": 256,
+        "observed_mask_sha256": "7f7324bd9dc10e1aaf26cef8154d7c0cc37206a4b9e827cfdae0797a12e02491",
+        "repeated_mints": 1,
+        "scope_known": 256,
+        "typed_missing_counts": {}
+      },
+      "reservation_id": "LA-RESERVATION-2AFAE97091E843DBDBE7F5A8D94D539852AB5CFDC53368684FC4B6B9BDF28B8D",
+      "result_digest_sha256": "76ff6e8ea316abe184dd2bd51aad4866986d039a793e06a6b2ec13f165c4161d",
+      "result_ref": "confirmation/attempts/LA-TRIAL-2AFAE97091E843DBDBE7F5A8D94D539852AB5CFDC53368684FC4B6B9BDF28B8D/df2309e15a3342dd915d0625391b7251/result-76ff6e8ea316abe184dd2bd51aad4866986d039a793e06a6b2ec13f165c4161d.json",
+      "source_authority_id": "LA-SOURCE-7d5a4958291cbf85ff2da1f539ad94e9eccc6d966f2de69ae6a8e57caf7219b4",
+      "source_hashes": {
+        "confirmation/sources/SYNTH-PROOF-FAULT-RESERVATION/admissions.json": "4ae10366ca2891c259c38c4b774987b81a604670e12dce9e24373eb8295ac617",
+        "confirmation/sources/SYNTH-PROOF-FAULT-RESERVATION/census.parquet": "27f0436949d2e6f93020af5943d7e35cc62dc26ce543528e659dc4514aad41f2",
+        "confirmation/sources/SYNTH-PROOF-FAULT-RESERVATION/frames.json": "30a46d7f822a855cc427df4a0cd15986651b02e8cf6e6b5ed07dd2fc54eb7c25",
+        "confirmation/sources/SYNTH-PROOF-FAULT-RESERVATION/observations.parquet": "6fe1ef10ec3af9fb78afa188d29bb02b6b5da4793fdd80d316a40fc746fe5141",
+        "confirmation/sources/SYNTH-PROOF-FAULT-RESERVATION/protection.json": "60a5ff6c441ec7e624a721af75fa7fffbe2e519c585da338281bad743f5ca9b3",
+        "confirmation/sources/SYNTH-PROOF-FAULT-RESERVATION/schedule.json": "35264dcade5d601d907ec7e2f383d9e31e504b5859c3dc24fcc1e2f9db86886e"
+      },
+      "source_set_sha256": "998ef35e36042516412c735ec980fc4bab7e84fb1f6852ef2f088e6afa1a54ec",
+      "study_budget_sha256": "e17d52196e1bb271bedb332e7afcadab7360b273a5a909d42204ca58a5b1bf61",
+      "trial_id": "LA-TRIAL-2AFAE97091E843DBDBE7F5A8D94D539852AB5CFDC53368684FC4B6B9BDF28B8D"
+    },
+    {
+      "binding_sha256": "f2ac79eced4afc21f6dbc155c598809e0f150a8f9ffd705e11946ab8f0162a63",
+      "case": "fault-bootstrap",
+      "cold": {
+        "actual_evaluator_invocations": 0,
+        "actual_value_decoder_calls": 0,
+        "actual_writes": 0,
+        "domain": "SYNTHETIC",
+        "execution_binding_sha256": "f2ac79eced4afc21f6dbc155c598809e0f150a8f9ffd705e11946ab8f0162a63",
+        "independent_native_membership": "PASS",
+        "inventory_unchanged": true,
+        "new_evaluator_invocations": 0,
+        "next_action": "READ_SAVED_RESULT_OR_RECORD_OWNER_DECISION",
+        "protocol_terminal": "ASSOCIATION_SUPPORTED_CONDITIONAL",
+        "reason_codes": [],
+        "result_digest_sha256": "471104f13e89d68ac758e08bedcc2276024d08fe1fc0e2dced65eebc68539541",
+        "run_id": "RUN-7DDDC28F033E488A0CE6F304",
+        "scientific_charge": 1,
+        "status": "COMPLETED",
+        "trial_id": "LA-TRIAL-0360ADE8BCBE61CA6E50D3219739404806AA2FDF0F2B38976D427E8CB53866BE"
+      },
+      "grant_id": "LA-GRANT-3930d9aa79628e680eba2d6fa4c710995cfbd020c3542f9614406c6c7fd6eec4",
+      "input_oracle_sha256": "4aba90a928a4ad868c322f28e4a316d6940ed3c05231c939b8acba6b7ea04ae8",
+      "method": {
+        "contrast": 0.125,
+        "coverage": {
+          "A": 1.0,
+          "C": 1.0
+        },
+        "leave_one": {
+          "count": 319,
+          "digest_sha256": "d9d5ae33d5a6db5c2651285c26a529b039b7915e5219b7f2ebb061b3e7e293a4",
+          "max": 0.125,
+          "min": 0.125,
+          "valid_count": 319
+        },
+        "means": {
+          "A": 0.125,
+          "C": 0.0
+        },
+        "numeric_order": "CANONICAL_EPISODE_ID_MATH_FSUM",
+        "observed_mask_sha256": "fabea32aee76a0de45d24f601c8478df7672028a39b90a702db538c64b97b598",
+        "partitions": {
+          "172800": {
+            "interval": [
+              0.125,
+              0.125
+            ],
+            "invalid_replicates": 0,
+            "replicate_digest_sha256": "1b48c6e2b4294209500fa99b6d8bc762848f4c29e2e5fb92cc957f17da375ca7",
+            "seed": 3449030900544075880,
+            "valid_replicates": 4096
+          },
+          "86400": {
+            "interval": [
+              0.125,
+              0.125
+            ],
+            "invalid_replicates": 0,
+            "replicate_digest_sha256": "1b48c6e2b4294209500fa99b6d8bc762848f4c29e2e5fb92cc957f17da375ca7",
+            "seed": 2055296707731192101,
+            "valid_replicates": 4096
+          }
+        },
+        "pooled_blocks": {
+          "172800": 32,
+          "86400": 32
+        },
+        "pooled_mints": 255,
+        "protocol_core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+        "quantile_indices": [
+          102,
+          3993
+        ],
+        "reason_codes": [],
+        "replicates_per_partition": 4096,
+        "support": {
+          "A": {
+            "blocks": {
+              "172800": 32,
+              "86400": 32
+            },
+            "decision_denominator": 128,
+            "mints": 127,
+            "observed": 128
+          },
+          "C": {
+            "blocks": {
+              "172800": 32,
+              "86400": 32
+            },
+            "decision_denominator": 128,
+            "mints": 128,
+            "observed": 128
+          }
+        },
+        "terminal": "ASSOCIATION_SUPPORTED_CONDITIONAL"
+      },
+      "population": {
+        "admitted": 256,
+        "decision_denominators": {
+          "A": 128,
+          "C": 128
+        },
+        "decision_mask_sha256": "0a6f5ed526d3c73c298b0b657f4fb0dd70eded21a5a9be2dccba0701085c0cc3",
+        "observed": 256,
+        "observed_mask_sha256": "fabea32aee76a0de45d24f601c8478df7672028a39b90a702db538c64b97b598",
+        "repeated_mints": 1,
+        "scope_known": 256,
+        "typed_missing_counts": {}
+      },
+      "reservation_id": "LA-RESERVATION-0360ADE8BCBE61CA6E50D3219739404806AA2FDF0F2B38976D427E8CB53866BE",
+      "result_digest_sha256": "471104f13e89d68ac758e08bedcc2276024d08fe1fc0e2dced65eebc68539541",
+      "result_ref": "confirmation/attempts/LA-TRIAL-0360ADE8BCBE61CA6E50D3219739404806AA2FDF0F2B38976D427E8CB53866BE/22261907aad645b494d6246afbfad1fb/result-471104f13e89d68ac758e08bedcc2276024d08fe1fc0e2dced65eebc68539541.json",
+      "source_authority_id": "LA-SOURCE-105eb1e9c0ed52c28481cd8fcb844477bdba3218eaedf5094708c7bb0788e4b1",
+      "source_hashes": {
+        "confirmation/sources/SYNTH-PROOF-FAULT-BOOTSTRAP/admissions.json": "94bcfc81e821aa63001c666e291fe734056d414f603a1f61eba84461ba43ef81",
+        "confirmation/sources/SYNTH-PROOF-FAULT-BOOTSTRAP/census.parquet": "efb95797a5057a5395ed182b16fddbf98700837b70c277c6d333d84d704df409",
+        "confirmation/sources/SYNTH-PROOF-FAULT-BOOTSTRAP/frames.json": "bd758a980ec9a076a15d5c5dbcedc071d53f1e2cf342d4b50cc105108cab7e90",
+        "confirmation/sources/SYNTH-PROOF-FAULT-BOOTSTRAP/observations.parquet": "f951d38af8dccb2484f0f71b548adfcfb5081aa07d52e1155525a64540a2d5aa",
+        "confirmation/sources/SYNTH-PROOF-FAULT-BOOTSTRAP/protection.json": "60a5ff6c441ec7e624a721af75fa7fffbe2e519c585da338281bad743f5ca9b3",
+        "confirmation/sources/SYNTH-PROOF-FAULT-BOOTSTRAP/schedule.json": "35264dcade5d601d907ec7e2f383d9e31e504b5859c3dc24fcc1e2f9db86886e"
+      },
+      "source_set_sha256": "febbd94bf7f3b6af87a52f34b72fcefa0dc0251ba4991ff9f1d6f2f7d6980694",
+      "study_budget_sha256": "fd1a8740d25215b3e4cb68d4d0052643afd628a851a86a75e4399791ceeb3c68",
+      "trial_id": "LA-TRIAL-0360ADE8BCBE61CA6E50D3219739404806AA2FDF0F2B38976D427E8CB53866BE"
+    },
+    {
+      "binding_sha256": "bc49ffdf0e3ee137e5271c3efde81907ada1a88f5d282fb311a789f7f8a22d65",
+      "case": "fault-publication",
+      "cold": {
+        "actual_evaluator_invocations": 0,
+        "actual_value_decoder_calls": 0,
+        "actual_writes": 0,
+        "domain": "SYNTHETIC",
+        "execution_binding_sha256": "bc49ffdf0e3ee137e5271c3efde81907ada1a88f5d282fb311a789f7f8a22d65",
+        "independent_native_membership": "PASS",
+        "inventory_unchanged": true,
+        "new_evaluator_invocations": 0,
+        "next_action": "READ_SAVED_RESULT_OR_RECORD_OWNER_DECISION",
+        "protocol_terminal": "ASSOCIATION_SUPPORTED_CONDITIONAL",
+        "reason_codes": [],
+        "result_digest_sha256": "70134ca61a1a67fa7c65e467f6b7c4b10db250ed35b8757ad33f4178cc0c88ac",
+        "run_id": "RUN-693CCA9E01500763182D6DEA",
+        "scientific_charge": 1,
+        "status": "COMPLETED",
+        "trial_id": "LA-TRIAL-12D0DA2B2882457B738A9DBD0B8CBA1392CE590FB24529E2168EF49F002F97E6"
+      },
+      "grant_id": "LA-GRANT-08b1f4b02dd0ae736aef8a1f82868f0aa65314cef780bfe274f8bde81f160e84",
+      "input_oracle_sha256": "58f9bec8cf7bffe0c3c1f1f9046567a536d6cf10d409d2873fabe9b64c682db3",
+      "method": {
+        "contrast": 0.125,
+        "coverage": {
+          "A": 1.0,
+          "C": 1.0
+        },
+        "leave_one": {
+          "count": 319,
+          "digest_sha256": "87759b29dcb6247ddbdb2767d936c76a2c48a400642dd1b6af7527cce62fdce7",
+          "max": 0.125,
+          "min": 0.125,
+          "valid_count": 319
+        },
+        "means": {
+          "A": 0.125,
+          "C": 0.0
+        },
+        "numeric_order": "CANONICAL_EPISODE_ID_MATH_FSUM",
+        "observed_mask_sha256": "25e0566bfe14a8f398714645b0550d9bf7c6160636383c85272ecd9835230150",
+        "partitions": {
+          "172800": {
+            "interval": [
+              0.125,
+              0.125
+            ],
+            "invalid_replicates": 0,
+            "replicate_digest_sha256": "1b48c6e2b4294209500fa99b6d8bc762848f4c29e2e5fb92cc957f17da375ca7",
+            "seed": 3449030900544075880,
+            "valid_replicates": 4096
+          },
+          "86400": {
+            "interval": [
+              0.125,
+              0.125
+            ],
+            "invalid_replicates": 0,
+            "replicate_digest_sha256": "1b48c6e2b4294209500fa99b6d8bc762848f4c29e2e5fb92cc957f17da375ca7",
+            "seed": 2055296707731192101,
+            "valid_replicates": 4096
+          }
+        },
+        "pooled_blocks": {
+          "172800": 32,
+          "86400": 32
+        },
+        "pooled_mints": 255,
+        "protocol_core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+        "quantile_indices": [
+          102,
+          3993
+        ],
+        "reason_codes": [],
+        "replicates_per_partition": 4096,
+        "support": {
+          "A": {
+            "blocks": {
+              "172800": 32,
+              "86400": 32
+            },
+            "decision_denominator": 128,
+            "mints": 127,
+            "observed": 128
+          },
+          "C": {
+            "blocks": {
+              "172800": 32,
+              "86400": 32
+            },
+            "decision_denominator": 128,
+            "mints": 128,
+            "observed": 128
+          }
+        },
+        "terminal": "ASSOCIATION_SUPPORTED_CONDITIONAL"
+      },
+      "population": {
+        "admitted": 256,
+        "decision_denominators": {
+          "A": 128,
+          "C": 128
+        },
+        "decision_mask_sha256": "fe162f0282069933071b714ff11852daec31d217c0937958796143b0647da9f2",
+        "observed": 256,
+        "observed_mask_sha256": "25e0566bfe14a8f398714645b0550d9bf7c6160636383c85272ecd9835230150",
+        "repeated_mints": 1,
+        "scope_known": 256,
+        "typed_missing_counts": {}
+      },
+      "reservation_id": "LA-RESERVATION-12D0DA2B2882457B738A9DBD0B8CBA1392CE590FB24529E2168EF49F002F97E6",
+      "result_digest_sha256": "70134ca61a1a67fa7c65e467f6b7c4b10db250ed35b8757ad33f4178cc0c88ac",
+      "result_ref": "confirmation/attempts/LA-TRIAL-12D0DA2B2882457B738A9DBD0B8CBA1392CE590FB24529E2168EF49F002F97E6/13db07fcd1394195a3d64448f8141c0f/result-70134ca61a1a67fa7c65e467f6b7c4b10db250ed35b8757ad33f4178cc0c88ac.json",
+      "source_authority_id": "LA-SOURCE-52a0060086a0ed9a58f86beb438ff5f833265939c4fe2481446574b758dba84b",
+      "source_hashes": {
+        "confirmation/sources/SYNTH-PROOF-FAULT-PUBLICATION/admissions.json": "571695d2a7cec237e0e9e6dd27e24437873e25fc44a0fd817a5027f9713f6b59",
+        "confirmation/sources/SYNTH-PROOF-FAULT-PUBLICATION/census.parquet": "c1487df120a6d9fef14c41e3259e4d1f509d797fd99be90fac033b44398b45ec",
+        "confirmation/sources/SYNTH-PROOF-FAULT-PUBLICATION/frames.json": "d6f7c5bb385d16aedcfb47265e9283aff0cb0d089a0046cc51da9cd17df16d58",
+        "confirmation/sources/SYNTH-PROOF-FAULT-PUBLICATION/observations.parquet": "fe6f275b44d4a5abc6bca82f50f0cf58bc0348a295ac9b501e7e1900f7d1cb04",
+        "confirmation/sources/SYNTH-PROOF-FAULT-PUBLICATION/protection.json": "60a5ff6c441ec7e624a721af75fa7fffbe2e519c585da338281bad743f5ca9b3",
+        "confirmation/sources/SYNTH-PROOF-FAULT-PUBLICATION/schedule.json": "35264dcade5d601d907ec7e2f383d9e31e504b5859c3dc24fcc1e2f9db86886e"
+      },
+      "source_set_sha256": "bea4db0548db98db4c941cd11317cf32c5128ae449283b1577a0544d9bf05c8b",
+      "study_budget_sha256": "c3a10f717bf1e01829573957165691696155a1ec086c9a7bed788698f8472ff5",
+      "trial_id": "LA-TRIAL-12D0DA2B2882457B738A9DBD0B8CBA1392CE590FB24529E2168EF49F002F97E6"
+    }
+  ],
+  "fixed_plan_sha256": "58ec07f4192cd306fe0c337421fcaaf479b3e2417605e8297aead682c69e90cc",
+  "implementation_head": "989cee4ccd676716421752ce3f8a6ef42a794bd1",
+  "independent_oracles": [
+    "literal prices 8/9 -> 1/8",
+    "Fraction crossed weights -> 1/5",
+    "fixed nondegenerate crossed draws",
+    "literal SHA seeds and rank indices 102/3993",
+    "native input identity and label membership before submit",
+    "off-grid request_not_before vs nominal_due",
+    "exact decision membership equality when only future outcomes/missingness change"
+  ],
+  "native_completion": {
+    "actual_evaluator_invocations": 8,
+    "adaptive_allowance": 0,
+    "cases": [
+      [
+        "positive",
+        "POSITIVE",
+        0
+      ],
+      [
+        "null",
+        "NULL",
+        0
+      ],
+      [
+        "missing8",
+        "POSITIVE",
+        8
+      ],
+      [
+        "fault-reservation",
+        "POSITIVE",
+        0
+      ],
+      [
+        "fault-bootstrap",
+        "POSITIVE",
+        0
+      ],
+      [
+        "fault-publication",
+        "POSITIVE",
+        0
+      ]
+    ],
+    "charges": 6,
+    "cold_evaluator_invocations": 0,
+    "cold_value_reads": 0,
+    "concurrency": "ONE_EVALUATOR",
+    "crash_exact_resume": "PASS",
+    "ordinary_dossier": "PRESENT",
+    "ordinary_pause": "RECORDED",
+    "promote": "BLOCKED",
+    "real_binding": "UNBOUND",
+    "real_executions": 0,
+    "result_refs": [
+      "confirmation/attempts/LA-TRIAL-0360ADE8BCBE61CA6E50D3219739404806AA2FDF0F2B38976D427E8CB53866BE/22261907aad645b494d6246afbfad1fb/result-471104f13e89d68ac758e08bedcc2276024d08fe1fc0e2dced65eebc68539541.json",
+      "confirmation/attempts/LA-TRIAL-72590FFF9CCEB323CBB5E259FC5A6E8BBE9C1AE6481A5B1B8D30AA8BBC6EC79A/cf55faea5f1d481690628385ed4c0e25/result-2d11e6cf4b8593ad8e58d84a93d998caf6d824af626b060166f3f10a80a7686e.json",
+      "confirmation/attempts/LA-TRIAL-12D0DA2B2882457B738A9DBD0B8CBA1392CE590FB24529E2168EF49F002F97E6/13db07fcd1394195a3d64448f8141c0f/result-70134ca61a1a67fa7c65e467f6b7c4b10db250ed35b8757ad33f4178cc0c88ac.json",
+      "confirmation/attempts/LA-TRIAL-2AFAE97091E843DBDBE7F5A8D94D539852AB5CFDC53368684FC4B6B9BDF28B8D/df2309e15a3342dd915d0625391b7251/result-76ff6e8ea316abe184dd2bd51aad4866986d039a793e06a6b2ec13f165c4161d.json",
+      "confirmation/attempts/LA-TRIAL-204361B9128D79D7728E63FE53BF0B4BB8B8B01ACCB262E619003EEE337D41F9/a8bbf9988f4748a993f263f5fe484404/result-8440f65943cbb8040854dc3a1b8d163a175391cdbb4a22ae0521442094fc547d.json",
+      "confirmation/attempts/LA-TRIAL-54819442A30BC6EAD832D78061B5DAB61A51413CEB3C01B27F3FA9F480B92D86/8632e362e9464db49c795899decb6a13/result-6f7d6eef8f0c071d9e47cd0f67d21f62551ef4c39d30592bd5d4d973e368f12a.json"
+    ],
+    "scientific_attempts": 6,
+    "status": "PASS"
+  },
+  "schema": "smial.list-a-native-confirmation-acceptance",
+  "schema_version": "1.0",
+  "verdict": "PASS_IN_SYNTHETIC_SCOPE"
+}

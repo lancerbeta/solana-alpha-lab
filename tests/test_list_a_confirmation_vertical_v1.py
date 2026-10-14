@@ -133,6 +133,7 @@ class VerticalTests(unittest.TestCase):
             self.assertEqual(next(o for o in conflict["obligations"] if o["code"]=="RESULT")["status"],"CONFLICT")
 
     def test_null_and_insufficient_native_path(self):
+        fixed_mask = None
         for case, missing, terminal in (("NULL", 0, "ASSOCIATION_NOT_SUPPORTED_AT_FROZEN_BOUNDARY"),
                                        ("POSITIVE", 8, "INSUFFICIENT"),
                                        ("EMPTY_DECISION_A", 0, "INSUFFICIENT")):
@@ -144,6 +145,12 @@ class VerticalTests(unittest.TestCase):
                 self.assertEqual(response["protocol_terminal"], terminal)
                 self.assertEqual(response["result"]["population"]["decision_denominators"],
                                  {"A": 0 if case == "EMPTY_DECISION_A" else 128, "C": 128})
+                if case != "EMPTY_DECISION_A":
+                    mask = response["result"]["population"]["membership"]
+                    if fixed_mask is None:
+                        fixed_mask = mask
+                    else:
+                        self.assertEqual(mask, fixed_mask)
                 if case == "EMPTY_DECISION_A":
                     self.assertIsNone(response["result"]["method"]["coverage"]["A"])
                     self.assertIn("EMPTY_DECISION_GROUP", response["reason_codes"])

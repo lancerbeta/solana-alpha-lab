@@ -1,0 +1,76 @@
+{
+  "coverage": [
+    {
+      "evidence": "Spec1.5 + registered capability + classifier/DocumentRunner + ordinary locator",
+      "requirement": "ordinary route/definition",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Six hash-bound native sources; source-owner ingress/admissions/frame nomination; exact source registration",
+      "requirement": "native input/source authority",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Actual reader counter + intentional forbidden-read canary; refusal before reserve charges zero",
+      "requirement": "preflight no outcomes",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Independent inventories; target availability tail; incomplete/unknown/DENY/revoke refused",
+      "requirement": "frozen/current purpose protection",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Strict purge equality refusal; CPython3.13.14; committed/working/Catalog assets; native off-grid clock oracle",
+      "requirement": "chronology/runtime",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Fraction 1/5, fixed nondegenerate draws, exact seeds/ranks, actual positive/null/insufficient bootstrap/LOO",
+      "requirement": "accepted numeric method",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Native oracle; repeated mint; exact future-only target/missingness counterfactual retains membership/D",
+      "requirement": "membership/estimand",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Committed reserve before decoder; overlap alias no reset; two real processes one evaluator/charge",
+      "requirement": "reservation/budget/concurrency",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Actual OS exits; same trial/charge; orphan not qualifying; response loss cold zero calls/writes",
+      "requirement": "crash/publication/replay",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Closed saved result/schema/identity/hash/all carriers one txn; foreign carrier conflict; ordinary PAUSE/REJECT/stale; PROMOTE blocked",
+      "requirement": "typed result and decisions",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Actual native foreign/conflicting/late observation decoder; durable invalid charge; after-values grant revoke prevents completion",
+      "requirement": "malformed observations/current revoke",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Classifier/decisions; episode1.4 14 PASS/2 SKIP",
+      "requirement": "legacy",
+      "status": "PASS_WITH_EXPLICIT_SKIPS"
+    },
+    {
+      "evidence": "Measured allocation under target/cap; named failed P0/OS attempts retained, no image/.venv/new dependencies",
+      "requirement": "resources/history",
+      "status": "PASS"
+    },
+    {
+      "evidence": "UNBOUND/0 real executions; no alpha/execution/StrategyVersion/activation/PAPER/blind Actor",
+      "requirement": "real sample/science/strategy/Actor",
+      "status": "NOT_CLAIMED"
+    }
+  ],
+  "schema": "smial.list-a-confirmation-coverage",
+  "schema_version": "1.0"
+}

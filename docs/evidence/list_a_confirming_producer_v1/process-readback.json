@@ -1,0 +1,425 @@
+{
+  "actual_evaluator_invocations": 8,
+  "actual_numeric_decoder_calls": 4096,
+  "actual_observation_decoder_calls": 4104,
+  "completed_trials": 6,
+  "concurrent_loser": {
+    "evaluator_invocations": 0,
+    "numeric_decoder_calls": 0,
+    "observation_decoder_calls": 0,
+    "reason": "STUDY_EVALUATOR_BUSY"
+  },
+  "observability": "Actual pq.read_table interception plus fsynced traces; not producer-declared counters",
+  "orphan_qualified_before_completion": false,
+  "os_faults": {
+    "fault-bootstrap-first-process-exit.json": {
+      "evaluator_invocations": 1,
+      "numeric_decoder_calls": 512,
+      "observation_decoder_calls": 513,
+      "phase": "AFTER_BOOTSTRAP"
+    },
+    "fault-publication-first-process-exit.json": {
+      "evaluator_invocations": 1,
+      "numeric_decoder_calls": 512,
+      "observation_decoder_calls": 513,
+      "phase": "AFTER_RESULT_PUBLICATION"
+    },
+    "fault-reservation-first-process-exit.json": {
+      "evaluator_invocations": 0,
+      "numeric_decoder_calls": 0,
+      "observation_decoder_calls": 0,
+      "phase": "AFTER_RESERVATION"
+    },
+    "positive-first-process-exit.json": {
+      "evaluator_invocations": 1,
+      "numeric_decoder_calls": 512,
+      "observation_decoder_calls": 513,
+      "phase": "AFTER_COMPLETION"
+    }
+  },
+  "pending_readbacks": {
+    "fault-bootstrap-pending-cold-readback.json": {
+      "actual_evaluator_invocations": 0,
+      "actual_value_decoder_calls": 0,
+      "actual_writes": 0,
+      "domain": "SYNTHETIC",
+      "execution_binding_sha256": "f2ac79eced4afc21f6dbc155c598809e0f150a8f9ffd705e11946ab8f0162a63",
+      "independent_native_membership": "PENDING",
+      "inventory_unchanged": true,
+      "new_evaluator_invocations": 0,
+      "next_action": "RESUME_EXACT_TRIAL",
+      "protocol_terminal": null,
+      "reason_codes": [],
+      "result_digest_sha256": null,
+      "run_id": "RUN-7DDDC28F033E488A0CE6F304",
+      "scientific_charge": 1,
+      "status": "INTERRUPTED",
+      "trial_id": "LA-TRIAL-0360ADE8BCBE61CA6E50D3219739404806AA2FDF0F2B38976D427E8CB53866BE"
+    },
+    "fault-publication-pending-cold-readback.json": {
+      "actual_evaluator_invocations": 0,
+      "actual_value_decoder_calls": 0,
+      "actual_writes": 0,
+      "domain": "SYNTHETIC",
+      "execution_binding_sha256": "bc49ffdf0e3ee137e5271c3efde81907ada1a88f5d282fb311a789f7f8a22d65",
+      "independent_native_membership": "PENDING",
+      "inventory_unchanged": true,
+      "new_evaluator_invocations": 0,
+      "next_action": "RESUME_EXACT_TRIAL",
+      "protocol_terminal": null,
+      "reason_codes": [],
+      "result_digest_sha256": null,
+      "run_id": "RUN-693CCA9E01500763182D6DEA",
+      "scientific_charge": 1,
+      "status": "INTERRUPTED",
+      "trial_id": "LA-TRIAL-12D0DA2B2882457B738A9DBD0B8CBA1392CE590FB24529E2168EF49F002F97E6"
+    },
+    "fault-reservation-pending-cold-readback.json": {
+      "actual_evaluator_invocations": 0,
+      "actual_value_decoder_calls": 0,
+      "actual_writes": 0,
+      "domain": "SYNTHETIC",
+      "execution_binding_sha256": "ab2dbdabbcfcc870ac6f745de044caa505a7606d7bd373f3e26cfd379dcca59d",
+      "independent_native_membership": "PENDING",
+      "inventory_unchanged": true,
+      "new_evaluator_invocations": 0,
+      "next_action": "RESUME_EXACT_TRIAL",
+      "protocol_terminal": null,
+      "reason_codes": [],
+      "result_digest_sha256": null,
+      "run_id": "RUN-3FEFD3AEAD1BAC0F0FC9EB03",
+      "scientific_charge": 1,
+      "status": "INTERRUPTED",
+      "trial_id": "LA-TRIAL-2AFAE97091E843DBDBE7F5A8D94D539852AB5CFDC53368684FC4B6B9BDF28B8D"
+    }
+  },
+  "publication_orphan_count": 1,
+  "repeat_counters": {
+    "evaluator_invocations": 0,
+    "numeric_decoder_calls": 0,
+    "observation_decoder_calls": 0
+  },
+  "result_files_retained": 7,
+  "schema": "smial.list-a-confirmation-process-readback",
+  "schema_version": "1.0",
+  "traces": [
+    {
+      "attempt": "fault-bootstrap-first",
+      "committed_reservation_before_each_decoder": true,
+      "evaluator_invocations": 1,
+      "numeric_decoder_calls": 512,
+      "observation_decoder_calls": 513,
+      "phases": [
+        {
+          "evaluator_invocations": 0,
+          "numeric_decoder_calls": 0,
+          "observation_decoder_calls": 0,
+          "phase": "AFTER_RESERVATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_VALUES"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_BOOTSTRAP"
+        }
+      ],
+      "trace_sha256": "72e57bfeb5bde87825407511672347dcdb0a14e8ca46212e2b7a80192714c464"
+    },
+    {
+      "attempt": "fault-bootstrap-resume",
+      "committed_reservation_before_each_decoder": true,
+      "evaluator_invocations": 1,
+      "numeric_decoder_calls": 512,
+      "observation_decoder_calls": 513,
+      "phases": [
+        {
+          "evaluator_invocations": 0,
+          "numeric_decoder_calls": 0,
+          "observation_decoder_calls": 0,
+          "phase": "AFTER_RESERVATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_VALUES"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_BOOTSTRAP"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_RESULT_PUBLICATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_COMPLETION"
+        }
+      ],
+      "trace_sha256": "a7c4df469f6edf8829f44ec28977e59a7e124549998daf0c4a6d3fd1bdab2398"
+    },
+    {
+      "attempt": "fault-publication-first",
+      "committed_reservation_before_each_decoder": true,
+      "evaluator_invocations": 1,
+      "numeric_decoder_calls": 512,
+      "observation_decoder_calls": 513,
+      "phases": [
+        {
+          "evaluator_invocations": 0,
+          "numeric_decoder_calls": 0,
+          "observation_decoder_calls": 0,
+          "phase": "AFTER_RESERVATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_VALUES"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_BOOTSTRAP"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_RESULT_PUBLICATION"
+        }
+      ],
+      "trace_sha256": "34afb7a40d301fa66de4b957136ccae9aec41cf21035b02229748f1ab1385e31"
+    },
+    {
+      "attempt": "fault-publication-resume",
+      "committed_reservation_before_each_decoder": true,
+      "evaluator_invocations": 1,
+      "numeric_decoder_calls": 512,
+      "observation_decoder_calls": 513,
+      "phases": [
+        {
+          "evaluator_invocations": 0,
+          "numeric_decoder_calls": 0,
+          "observation_decoder_calls": 0,
+          "phase": "AFTER_RESERVATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_VALUES"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_BOOTSTRAP"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_RESULT_PUBLICATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_COMPLETION"
+        }
+      ],
+      "trace_sha256": "62eccd8973e66415c7a36a3dc62c5db2318eb797cc03a2f933e4325d347f3c78"
+    },
+    {
+      "attempt": "fault-reservation-first",
+      "committed_reservation_before_each_decoder": true,
+      "evaluator_invocations": 0,
+      "numeric_decoder_calls": 0,
+      "observation_decoder_calls": 0,
+      "phases": [
+        {
+          "evaluator_invocations": 0,
+          "numeric_decoder_calls": 0,
+          "observation_decoder_calls": 0,
+          "phase": "AFTER_RESERVATION"
+        }
+      ],
+      "trace_sha256": "b2c9d74705273b56fe06c103f2769fc6a95b5c80eb00886786b9c7416f4c8ed6"
+    },
+    {
+      "attempt": "fault-reservation-resume",
+      "committed_reservation_before_each_decoder": true,
+      "evaluator_invocations": 1,
+      "numeric_decoder_calls": 512,
+      "observation_decoder_calls": 513,
+      "phases": [
+        {
+          "evaluator_invocations": 0,
+          "numeric_decoder_calls": 0,
+          "observation_decoder_calls": 0,
+          "phase": "AFTER_RESERVATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_VALUES"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_BOOTSTRAP"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_RESULT_PUBLICATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_COMPLETION"
+        }
+      ],
+      "trace_sha256": "eaf3d4126bd65daf78bafcde4d80a57adce8174cedf848bb2f861a3b494db0ca"
+    },
+    {
+      "attempt": "missing8-first",
+      "committed_reservation_before_each_decoder": true,
+      "evaluator_invocations": 1,
+      "numeric_decoder_calls": 512,
+      "observation_decoder_calls": 513,
+      "phases": [
+        {
+          "evaluator_invocations": 0,
+          "numeric_decoder_calls": 0,
+          "observation_decoder_calls": 0,
+          "phase": "AFTER_RESERVATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_VALUES"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_BOOTSTRAP"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_RESULT_PUBLICATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_COMPLETION"
+        }
+      ],
+      "trace_sha256": "05180adb47b9052457c7d4f753cd95398050f2d2e62b79fca73ab6c7a2b5df80"
+    },
+    {
+      "attempt": "null-first",
+      "committed_reservation_before_each_decoder": true,
+      "evaluator_invocations": 1,
+      "numeric_decoder_calls": 512,
+      "observation_decoder_calls": 513,
+      "phases": [
+        {
+          "evaluator_invocations": 0,
+          "numeric_decoder_calls": 0,
+          "observation_decoder_calls": 0,
+          "phase": "AFTER_RESERVATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_VALUES"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_BOOTSTRAP"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_RESULT_PUBLICATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_COMPLETION"
+        }
+      ],
+      "trace_sha256": "b09433a5a61e42920bcaab3a4c85905653d9e9eeaeb30217e265f86cc9036aeb"
+    },
+    {
+      "attempt": "positive-first",
+      "committed_reservation_before_each_decoder": true,
+      "evaluator_invocations": 1,
+      "numeric_decoder_calls": 512,
+      "observation_decoder_calls": 513,
+      "phases": [
+        {
+          "evaluator_invocations": 0,
+          "numeric_decoder_calls": 0,
+          "observation_decoder_calls": 0,
+          "phase": "AFTER_RESERVATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_VALUES"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_BOOTSTRAP"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_RESULT_PUBLICATION"
+        },
+        {
+          "evaluator_invocations": 1,
+          "numeric_decoder_calls": 512,
+          "observation_decoder_calls": 513,
+          "phase": "AFTER_COMPLETION"
+        }
+      ],
+      "trace_sha256": "4b45589e5ff5f884898836b1d192f6ccb56438dd8e6ba861c7bbf2eb3b4e9dff"
+    }
+  ]
+}

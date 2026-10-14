@@ -4,8 +4,13 @@ task_version: '1.0'
 status: READY
 as_of: '2026-10-14'
 owner: GOAL_OWNER
-allowed_routes: [DIRECT_CODEX_DELIVERY]
-required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
+allowed_routes:
+- DIRECT_CODEX_DELIVERY
+required_review_roles:
+- CODE_REVIEWER
+- GOAL_DOD_CRITIC
+- ARCHITECTURE_CRITIC
+- OWNER_UX_CRITIC
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
   expected_base: 07c81a99f2d0f385df66de2e1a5254e224c6b3b3
@@ -13,51 +18,46 @@ git_binding:
   expected_upstream_oid: 07c81a99f2d0f385df66de2e1a5254e224c6b3b3
   expected_branch: codex/list-a-chronological-confirming-producer-v1
   dirty_mode: ALLOW_REPORTED
-objective: Implement the accepted List A chronological confirming producer as a complete version-isolated Spec 1.5 vertical with native synthetic source admission, pre-values reservation, deterministic accepted inference and verified ordinary dossier, preserving the frozen scientific core and all real-data authority boundaries.
+objective: Implement the accepted List A chronological confirming producer as a complete
+  version-isolated Spec 1.5 vertical with native synthetic source admission, pre-values
+  reservation, deterministic accepted inference and verified ordinary dossier, preserving
+  the frozen scientific core and all real-data authority boundaries.
 managed_write_set:
-- docs/tasks/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1.md
-- docs/design/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1_PRD_SSD.md
-- docs/contracts/list_a_confirming_execution_v1.md
-- docs/contracts/list_a_chronological_confirmation_v1.md
+- catalog/catalog_manifest.yaml
 - catalog/schemas/experiment_spec_v1_5.schema.json
 - catalog/schemas/list_a_confirmation_input_v1.schema.json
 - catalog/schemas/list_a_confirmation_result_v1.schema.json
-- configs/experiment_specs/list_a_chronological_confirmation_v1.yaml
 - configs/experiment_capability_registry_v2.yaml
+- configs/experiment_specs/list_a_chronological_confirmation_v1.yaml
+- docs/PROJECT_MAP.md
+- docs/contracts/list_a_chronological_confirmation_v1.md
+- docs/contracts/list_a_confirming_execution_v1.md
+- docs/design/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1_PRD_SSD.md
+- docs/evidence/list_a_confirmation_protocol_freeze_v1/main-refresh.json
+- docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
+- docs/tasks/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1.md
+- scripts/list_a_confirmation.py
+- src/solana_alpha_lab/factory/capabilities.py
+- src/solana_alpha_lab/factory/document_runner.py
+- src/solana_alpha_lab/factory/experiment_evidence.py
+- src/solana_alpha_lab/factory/experiment_spec.py
+- src/solana_alpha_lab/factory/hfic_temporal_discovery.py
+- src/solana_alpha_lab/factory/lane_classifier.py
 - src/solana_alpha_lab/factory/list_a_confirmation.py
 - src/solana_alpha_lab/factory/list_a_confirmation_inputs.py
 - src/solana_alpha_lab/factory/list_a_confirmation_method.py
-- src/solana_alpha_lab/factory/experiment_spec.py
-- src/solana_alpha_lab/factory/lane_classifier.py
-- src/solana_alpha_lab/factory/capabilities.py
-- src/solana_alpha_lab/factory/document_runner.py
-- src/solana_alpha_lab/factory/data_resolver.py
-- src/solana_alpha_lab/factory/run_passport.py
-- src/solana_alpha_lab/factory/experiment_evidence.py
-- src/solana_alpha_lab/factory/application.py
-- src/solana_alpha_lab/factory/research_workbench.py
-- src/solana_alpha_lab/factory/lifecycle_projection.py
-- src/solana_alpha_lab/factory/workbench.py
-- src/solana_alpha_lab/factory/opportunity_episode_release.py
-- src/solana_alpha_lab/factory/opportunity_episodes.py
-- src/solana_alpha_lab/factory/hfic_research_scope.py
-- src/solana_alpha_lab/factory/hfic_temporal_discovery.py
 - src/solana_alpha_lab/factory/research_store.py
-- scripts/list_a_confirmation.py
-- tests/test_list_a_confirmation_method_v1.py
+- src/solana_alpha_lab/factory/research_workbench.py
+- tests/fixtures/list_a_confirmation_v1/native.py
+- tests/fixtures/list_a_confirmation_v1/proof.py
 - tests/test_list_a_confirmation_admission_v1.py
+- tests/test_list_a_confirmation_method_v1.py
 - tests/test_list_a_confirmation_vertical_v1.py
-- tests/fixtures/list_a_confirmation_v1/**
-- docs/evidence/list_a_confirming_producer_v1/**
-- docs/evidence/list_a_confirmation_protocol_freeze_v1/main-refresh.json
-- docs/reports/list_a_confirming_producer_v1/**
-- docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
 - catalog/assets/**
-- catalog/catalog_manifest.yaml
 - catalog/generated/**
 - docs/generated/**
-- docs/PROJECT_MAP.md
-- docs/FACTORY_SEMANTIC_MAP.md
+- docs/evidence/list_a_confirming_producer_v1/**
+- docs/reports/list_a_confirming_producer_v1/**
 external_caps:
   network: false
   credentials: false
@@ -73,7 +73,8 @@ stop_conditions:
 - STOP_EXACT_HEAD_CI_AND_READINESS_THEN_NEW_OWNER_MERGE_PHRASE
 context_requirements:
   catalog_asset_ids: []
-  l2_roles: [ARCHITECTURE_DECISIONS]
+  l2_roles:
+  - ARCHITECTURE_DECISIONS
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
@@ -82,7 +83,8 @@ context_requirements:
     HISTORICAL_CONTEXT: []
     ARCHITECTURE_DECISIONS:
     - docs/design/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1_PRD_SSD.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/list_a_confirming_producer_v1/completion.json
 ---
 
 Owner EXECUTE: implement the attached exact PRD+SSD. ENTRY=START_AS_WRITTEN;

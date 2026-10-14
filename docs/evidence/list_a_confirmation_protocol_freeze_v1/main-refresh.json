@@ -167,5 +167,33 @@
     "new_list_a_scientific_acceptance": false,
     "new_list_a_scientific_looks": 0,
     "meaning": "Append-only delivery dependency record. Original source_commit/delivery_base_commit checks, scientific terminal, seeds and authorization describe only the preserved historical snapshot. Current hash does not transfer previous PASS or establish List A compatibility; repair evidence is independent."
+  },
+  "confirming_producer_dependency_notice": {
+    "as_of": "2026-10-14",
+    "current_implementation_binding": [
+      {
+        "implementation_head": "989cee4ccd676716421752ce3f8a6ef42a794bd1",
+        "path": "src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
+        "sha256": "f5b38fa0da3766f8d19424b379bcea0ca92ecb90fb94b34d04c827f734c51c22"
+      },
+      {
+        "implementation_head": "989cee4ccd676716421752ce3f8a6ef42a794bd1",
+        "path": "docs/contracts/list_a_chronological_confirmation_v1.md",
+        "sha256": "186284a72d82cd8ef5620ec97b9528663ebdedae0e00a6123f6add15f6de0df1"
+      }
+    ],
+    "historical_checks_reexecuted": false,
+    "historical_owner_authorization_applies_to_repair": false,
+    "historical_receipt": {
+      "all_original_fields_and_values_preserved": true,
+      "frozen_git_ref": "07c81a99f2d0f385df66de2e1a5254e224c6b3b3:docs/evidence/list_a_confirmation_protocol_freeze_v1/main-refresh.json",
+      "sha256": "112a5c65c1b29d42f041127610743dec8f1929c615cb617f9c1040dde574d137"
+    },
+    "meaning": "Append-only dependency notice; old core/source pins/sample UNBOUND/checks/authorization/results remain exact historical facts. New synthetic receipts live in separate producer evidence; no prior PASS transferred.",
+    "new_real_list_a_scientific_acceptance": false,
+    "repair_task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
+    "schema": "smial.historical-delivery-dependency-change",
+    "schema_version": "1.0",
+    "verdict": "CURRENT_CONFIRMING_PRODUCER_SYNTHETIC_VERIFIED; HISTORICAL_CHECKS_REMAIN_HISTORICAL"
   }
 }

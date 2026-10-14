@@ -42251,7 +42251,7 @@ records:
   record_version: '1.0'
   asset_type: control_document
   purpose: Native confirmation input/authority/reservation/typed consumer contract
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42261,7 +42261,7 @@ records:
     repository_path: docs/contracts/list_a_confirming_execution_v1.md
   integrity:
     kind: sha256
-    sha256: fae258cfd31c4a8851a156a4c4ade1a9f40d470e0b7330843f0792a0a894c31f
+    sha256: f61aff77e76eb2951477db5138c92035ec3044bc48aab99b36869234c76f11c8
   access:
     mode: read_only
     method: file
@@ -42287,7 +42287,7 @@ records:
   record_version: '1.0'
   asset_type: control_document
   purpose: Accepted bounded native confirming producer design; real authority absent
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42325,7 +42325,7 @@ records:
   record_version: '1.0'
   asset_type: schema
   purpose: Closed version-isolated concrete List A confirming definition
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42363,7 +42363,7 @@ records:
   record_version: '1.0'
   asset_type: schema
   purpose: Closed source-owned native sample/exposure input
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42401,7 +42401,7 @@ records:
   record_version: '1.0'
   asset_type: schema
   purpose: Closed nested authoritative conditional result with lineage
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42439,7 +42439,7 @@ records:
   record_version: '1.0'
   asset_type: configuration
   purpose: Concrete registered List A native confirming definition
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42477,7 +42477,7 @@ records:
   record_version: '1.0'
   asset_type: script
   purpose: Reserved single evaluator, crash/resume, atomic completion and typed dossier
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42516,7 +42516,7 @@ records:
   asset_type: script
   purpose: Native source-owner registration, metadata binding and purpose-specific
     guards
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42554,7 +42554,7 @@ records:
   record_version: '1.0'
   asset_type: script
   purpose: Accepted pure crossed bootstrap method; no authority
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42592,7 +42592,7 @@ records:
   record_version: '1.0'
   asset_type: script
   purpose: Existing ordinary runner with pre-values reserved Spec1.5 dispatch
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42630,7 +42630,7 @@ records:
   record_version: '1.0'
   asset_type: script
   purpose: Exact local source/prepare/grant/submit/status/resume operator surface
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42668,7 +42668,7 @@ records:
   record_version: '1.0'
   asset_type: script
   purpose: Independent Fraction/seed/quantile/coverage/off-grid clock witnesses
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42706,7 +42706,7 @@ records:
   record_version: '1.0'
   asset_type: script
   purpose: Pre-values source/exposure/protection/grant and retained allowance refusals
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42716,7 +42716,7 @@ records:
     repository_path: tests/test_list_a_confirmation_admission_v1.py
   integrity:
     kind: sha256
-    sha256: 104628bf27cf162d752a84d70e5bb4f3de661919469a13e96323305295512a75
+    sha256: e855dcdb29d8146ddb4e45ccbe1f353754fafe12dbf8e1e4922eb7c3578f6ca7
   access:
     mode: read_only
     method: file
@@ -42744,7 +42744,7 @@ records:
   record_version: '1.0'
   asset_type: script
   purpose: Ordinary native numeric, cold reader, dossier and decision tests
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42754,7 +42754,7 @@ records:
     repository_path: tests/test_list_a_confirmation_vertical_v1.py
   integrity:
     kind: sha256
-    sha256: ac1b5c6b787205b0d83e2873aad3e917225bba282d76ef3062188163d4c4f9cd
+    sha256: 6c95969a58789461476ca83c92ef003ebc7a621cd9a05764fd60ba800d147b2a
   access:
     mode: read_only
     method: file
@@ -42783,7 +42783,7 @@ records:
   asset_type: script
   purpose: Controlled native market inputs through source owners; no forged science
     carriers
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42821,7 +42821,7 @@ records:
   record_version: '1.0'
   asset_type: script
   purpose: Contained retained OS process concurrency/crash/cold acceptance
-  status: IMPLEMENTED_UNVERIFIED
+  status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-10-14'
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
@@ -42832,6 +42832,160 @@ records:
   integrity:
     kind: sha256
     sha256: 36b1e9bd3513a384303354a028a456b0f886a7d032f2781ade2cedc48921a17b
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: DOC-LIST-A-CONFIRMING-OWNER-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Synthetic verified implementation outcome, limits and next authority boundary
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/reports/list_a_confirming_producer_v1/OWNER_REPORT.md
+    repository_path: docs/reports/list_a_confirming_producer_v1/OWNER_REPORT.md
+  integrity:
+    kind: sha256
+    sha256: 516072f7778476f7a7f989631c07379b96165b82ac91cb7ab02e1dd82380ea87
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: DOC-LIST-A-CONFIRMING-REPRODUCE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact ordinary source/grant/prepare/submit/status/resume and retained proof
+    reproduction
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/reports/list_a_confirming_producer_v1/REPRODUCE.md
+    repository_path: docs/reports/list_a_confirming_producer_v1/REPRODUCE.md
+  integrity:
+    kind: sha256
+    sha256: 5d7d86b0b9a15000f5f33f30fe40282368ab9b63b5d79dfdbac9a48f50e6106d
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVID-LIST-A-CONFIRMING-ACCEPTANCE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Compact native confirming positive/null/insufficient results and source
+    lineage
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/list_a_confirming_producer_v1/acceptance.json
+    repository_path: docs/evidence/list_a_confirming_producer_v1/acceptance.json
+  integrity:
+    kind: sha256
+    sha256: 6cc57d3eb15d7545c7d20279c258f0952154c77038716d493e50622a031f618d
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVID-LIST-A-CONFIRMING-QUALIFICATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Current implementation runtime/assets separate from frozen science
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/list_a_confirming_producer_v1/qualification.json
+    repository_path: docs/evidence/list_a_confirming_producer_v1/qualification.json
+  integrity:
+    kind: sha256
+    sha256: 782eb211f3fdcfdf5ede8269ca35af909303c8a64934278223620c22c8679cf0
   access:
     mode: read_only
     method: file

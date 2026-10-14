@@ -1,0 +1,35 @@
+{
+  "as_of": "2026-10-14",
+  "capability_radar": {
+    "now": "NONE: existing skills/CLIs/runtime/native owners suffice; no install",
+    "watch": "No new tooling trigger identified"
+  },
+  "dimensions": {
+    "build_vs_buy": "ADOPT native source/scope/schedule/resolver/ResearchStore/Git/runtime; WRAP only value-neutral facades; no dependency/service",
+    "context_efficiency": "One elected checkout; bounded design/owners; no new platform or general audit; fixed engineering envelope",
+    "execution_to_cashflow": "Qualifying confirmation artifact only; no strategy/live execution or alpha claim",
+    "flexibility_and_history": "Core/history immutable; one scientific charge per study; P0 and all named fault witnesses retained",
+    "mission": "Closes proved confirmer/input/reservation/consumer gap with registered native vertical",
+    "monitoring_and_recovery": "Kernel lock, durable pre-values reservation, atomic completion, actual OS faults and zero-call cold processes",
+    "owner_operability": "Russian readout, exact source registration vs grant, typed status/resume and ordinary decisions; no permission laundering",
+    "red_team": "Foreign identity/grant/carrier, role/chronology/protection, aliases, after-values revoke and stale snapshot tested",
+    "research_truth": "Conditional observed estimand; literal/Fraction/draw/clock/membership oracles; exact frozen thresholds and seeds",
+    "security": "No-network/nonroot/read-only containment; safe relative refs; source values only after exact authority/committed reserve"
+  },
+  "limits": [
+    "No adversarial source-owner attestation guarantee outside authorized owned plane",
+    "CPython3.13.14 required",
+    "Clean-host bootstrap and shared Docker VHDX/log-directory growth UNKNOWN",
+    "Two legacy campaign-specific tests skipped",
+    "Early P0 decoder count UNKNOWN; interrupted original charge retained"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "Ordinary code/schema/registry revert preserves all scientific state/charges; incompatible pending trial remains exposed",
+  "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-FACTORY-FIT",
+  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
+  "verdict": "PASS"
+}

@@ -1,0 +1,69 @@
+{
+  "acceptance_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-SYNTHETIC-NATIVE",
+  "active_stop_conditions": [],
+  "as_of": "2026-10-14",
+  "base_main": "07c81a99f2d0f385df66de2e1a5254e224c6b3b3",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/list_a_confirming_producer_v1/factory-fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "non_claims": [
+    "NO_REAL_SCIENTIFIC_ACCEPTANCE",
+    "NO_ALPHA_OR_CAUSAL_CLAIM",
+    "NO_STRATEGY_ACTIVATION_PAPER_DEPLOY_MONEY",
+    "AGENT_BEHAVIOR_UNVERIFIED",
+    "NO_CLEAN_HOST_BOOTSTRAP_PROOF",
+    "EARLY_P0_NUMERIC_DECODER_COUNT_UNKNOWN"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "acceptance_evaluator_invocations": 8,
+    "acceptance_scientific_charges": 6,
+    "named_scientific_charges": 7,
+    "named_stores_deleted": 0,
+    "new_dependencies_images_venv": 0,
+    "p0_evaluator_lower_bound": 1,
+    "production_writes": 0,
+    "provider_calls": 0,
+    "real_data_reads": 0,
+    "real_executions": 0,
+    "real_grants": 0,
+    "spend": 0,
+    "strategy_activation_paper_writes": 0
+  },
+  "state_change": "IMPLEMENTED_AND_VERIFIED_IN_SYNTHETIC_SCOPE: version-isolated Spec1.5 native confirmer, accepted method, pre-values reservation, single evaluator, source-owned typed completion and ordinary dossier; real sample UNBOUND.",
+  "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "project_checks": [
+      "PASS_ACTUAL_PRE_VALUES_RESERVATION",
+      "PASS_INDEPENDENT_NUMERIC_CLOCK_MEMBERSHIP_ORACLES",
+      "PASS_OS_CONCURRENCY_CRASH_COLD_REPLAY",
+      "PASS_TYPED_ATOMIC_COMPLETION_DOSSIER_AND_PROMOTE_REFUSAL",
+      "PASS_MEASURED_FORWARD_RESOURCE_ENVELOPE"
+    ],
+    "targeted": "PASS_BOUNDED_NATIVE_METHOD_ADMISSION_VERTICAL_LEGACY_WITH_2_EXPLICIT_SKIPS"
+  },
+  "implementation_bindings": {
+    "docs/tasks/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

@@ -178,3 +178,53 @@ class AdmissionTests(unittest.TestCase):
         for stage in ("FROZEN","CURRENT"):
             with self.assertRaisesRegex(ConfirmationError,stage+"_NATIVE_PROTECTION_DENY"):
                 purpose_protection(sample,metadata,inventory,stage)
+
+    def test_native_bad_observations_keep_charge_and_never_complete(self):
+        from tests.fixtures.list_a_confirmation_v1 import native
+        original = native.write_native_confirmation_sample
+        for variant, reason in (("foreign", "FOREIGN_OBSERVATION_IDENTITY"),
+                                ("conflict", "OBSERVATION_CELL_CONFLICT"),
+                                ("late", "OBSERVED_CLOCK_OR_VALUE_INVALID")):
+            with self.subTest(variant=variant):
+                def ingress(**kwargs):
+                    rows = copy.deepcopy(kwargs["observations"])
+                    if variant == "foreign":
+                        rows[0]["episode_id"] = "FOREIGN-EPISODE"
+                    elif variant == "conflict":
+                        duplicate = copy.deepcopy(rows[0])
+                        duplicate["typed_value"] = "10"
+                        rows.append(duplicate)
+                    else:
+                        rows[0]["first_reliable_available_at"] = "2027-01-31T00:00:00Z"
+                    return original(**{**kwargs, "observations": rows})
+                with patch.object(native, "write_native_confirmation_sample", ingress):
+                    spec, prepared, _ = bound(self.store, source_id="SYNTH-BAD-" + variant.upper())
+                reader = ValueReader(self.store)
+                with patch.object(pq, "read_table", reader.read), self.assertRaisesRegex(ConfirmationError, reason):
+                    execute_capability(spec, root=ROOT, capture_hooks={"execution_context": {
+                        "binding_id": prepared["binding_id"], "data_root": self.store.root, "now": NOW}})
+                self.assertTrue(reader.reads)
+                reservation = next(r["payload"] for r in records(self.store) if r["kind"] == "RUN_STARTED" and
+                    r["payload"].get("execution_binding_sha256") == prepared["binding_id"])
+                saved = read_confirmation(self.store, trial_id=reservation["trial_id"], root=ROOT)
+                self.assertEqual(saved["status"], "INVALID_AFTER_RESERVE")
+                self.assertEqual(saved["reason_codes"], [reason])
+                self.assertEqual(saved["scientific_charge"], 1)
+                self.assertFalse(any(r["kind"] == "RUN_COMPLETED" and r["payload"].get("trial_id") == reservation["trial_id"] for r in records(self.store)))
+
+    def test_revoke_after_values_blocks_completion_without_new_charge(self):
+        grant = next(r for r in records(self.store) if r["payload"].get("type") == "CONFIRMATION_GRANT")
+        def revoke(phase):
+            if phase == "AFTER_VALUES":
+                txn = "RESEARCH-TXN-LA-AFTER-VALUES-REVOKE"
+                self.store.append([event(ROOT, record_id="LA-AFTER-VALUES-REVOKE", kind=RecordKind.RESEARCH_ARTIFACT,
+                    transaction_id=txn, payload={"type": "GRANT_REVOKED", "grant_id": grant["record_id"]})], transaction_id=txn)
+        with self.assertRaisesRegex(ConfirmationError, "GRANT_REVOKED"):
+            self.execute(revoke)
+        reservation = next(r["payload"] for r in records(self.store) if r["kind"] == "RUN_STARTED")
+        saved = read_confirmation(self.store, trial_id=reservation["trial_id"], root=ROOT)
+        self.assertEqual(saved["status"], "INVALID_AFTER_RESERVE")
+        self.assertEqual(saved["reason_codes"], ["GRANT_REVOKED"])
+        self.assertEqual(saved["scientific_charge"], 1)
+        self.assertFalse(any(r["kind"] == "RUN_COMPLETED" for r in records(self.store)))
+        self.assertEqual(sum(r["kind"] == "RUN_STARTED" for r in records(self.store)), 1)

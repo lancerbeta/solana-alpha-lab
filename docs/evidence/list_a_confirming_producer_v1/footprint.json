@@ -1,0 +1,202 @@
+{
+  "as_of": "2026-10-14",
+  "baseline_correction": "Earlier GetCompressedFileSizeW values were logical bytes, not FileStandardInfo allocation; baseline history retained, final allocation measured independently.",
+  "cap_charged_upper_bound_bytes": 230058136,
+  "cap_charged_upper_bound_mib": 219.401,
+  "conservative_common_git_objects_reserve": {
+    "allocated_bytes": 33071288,
+    "dedup": "NTFS_DEVICE_FILE_ID",
+    "files": 132,
+    "logical_bytes": 32843243
+  },
+  "containers": [
+    {
+      "exit_code": 0,
+      "name": "list-a-confirmation-footprint",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 8192,
+      "status": "exited"
+    },
+    {
+      "exit_code": 0,
+      "name": "list-a-confirmation-membership-final",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 8192,
+      "status": "exited"
+    },
+    {
+      "exit_code": 0,
+      "name": "list-a-confirmation-regression-final",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 12288,
+      "status": "exited"
+    },
+    {
+      "exit_code": 1,
+      "name": "list-a-confirmation-regression-frozen",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 8192,
+      "status": "exited"
+    },
+    {
+      "exit_code": 0,
+      "name": "list-a-confirmation-final-admission",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 12288,
+      "status": "exited"
+    },
+    {
+      "exit_code": 1,
+      "name": "list-a-confirmation-regression-replay",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 12288,
+      "status": "exited"
+    },
+    {
+      "exit_code": 0,
+      "name": "list-a-confirmation-native-acceptance",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 20480,
+      "status": "exited"
+    },
+    {
+      "exit_code": 1,
+      "name": "list-a-confirmation-accepted-tests",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 12288,
+      "status": "exited"
+    },
+    {
+      "exit_code": 0,
+      "name": "list-a-confirmation-admission-pass5",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 12288,
+      "status": "exited"
+    },
+    {
+      "exit_code": 0,
+      "name": "list-a-confirmation-unit-pass4",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 12288,
+      "status": "exited"
+    },
+    {
+      "exit_code": 1,
+      "name": "list-a-confirmation-unit-pass3",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 12288,
+      "status": "exited"
+    },
+    {
+      "exit_code": 0,
+      "name": "list-a-confirmation-unit-pass2",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 12288,
+      "status": "exited"
+    },
+    {
+      "exit_code": 0,
+      "name": "list-a-confirmation-volume-check",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 8192,
+      "status": "exited"
+    },
+    {
+      "exit_code": 1,
+      "name": "list-a-confirmation-volume-init-root",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 8192,
+      "status": "exited"
+    },
+    {
+      "exit_code": 1,
+      "name": "list-a-confirmation-unit-pass1",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 12288,
+      "status": "exited"
+    },
+    {
+      "exit_code": 1,
+      "name": "list-a-confirmation-volume-init",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 8192,
+      "status": "exited"
+    },
+    {
+      "exit_code": 0,
+      "name": "list-a-confirmation-runtime-canary",
+      "network": "none",
+      "read_only_root": true,
+      "rw_bytes": 8192,
+      "status": "exited"
+    }
+  ],
+  "forward_hard_cap_bytes": 1073741824,
+  "host": {
+    "owned_checkout": {
+      "allocated_bytes": 76641424,
+      "dedup": "NTFS_DEVICE_FILE_ID",
+      "files": 4388,
+      "logical_bytes": 67874334
+    },
+    "owned_git_worktree_metadata": {
+      "allocated_bytes": 602952,
+      "dedup": "NTFS_DEVICE_FILE_ID",
+      "files": 7,
+      "logical_bytes": 600525
+    },
+    "owned_host_runtime": {
+      "allocated_bytes": 720904,
+      "dedup": "NTFS_DEVICE_FILE_ID",
+      "files": 22,
+      "logical_bytes": 674624
+    }
+  },
+  "measurement": "Windows FileStandardInfo.AllocationSize + Linux st_blocks*512 + Docker SizeRw",
+  "named_scientific_stores_deleted": 0,
+  "new_images": 0,
+  "new_venv": false,
+  "owned_allocated_bytes": 196986848,
+  "owned_volume": {
+    "allocated_bytes": 118833152,
+    "dedup": "LINUX_DEVICE_INODE",
+    "files": 4677,
+    "logical_bytes": 108609196,
+    "name": "list-a-confirmation-v1-proof"
+  },
+  "preexisting_shared": {
+    "git": "Full present common object allocation conservatively charged; preexisting baseline logical bytes 30953188.",
+    "image_id": "sha256:24756b930a05912affa82c7c801cbb8704b0a132da72d6b412ca338219f07387",
+    "image_size_bytes": 654798693,
+    "runtime": "EXISTING_PRIMARY_LOCKED_CPYTHON_3_13_14",
+    "uv_cache": "PREEXISTING_SHARED_NOT_DELETED"
+  },
+  "schema": "smial.list-a-confirmation-footprint",
+  "schema_version": "1.0",
+  "scope": "Owned regular files, campaign volume and writable layers measured. Shared infrastructure and directory metadata are separately disclosed, not zero-filled.",
+  "scratch_retained": true,
+  "separately_unmeasured": [
+    "SHARED_DOCKER_VHDX_PHYSICAL_GROWTH",
+    "DAEMON_CONTAINER_LOG_AND_DIRECTORY_METADATA_ALLOCATION",
+    "PREEXISTING_SHARED_RUNTIME_AND_UV_CACHE_TOTAL"
+  ],
+  "target_bytes": 268435456,
+  "within_hard_cap": true,
+  "within_target": true
+}
