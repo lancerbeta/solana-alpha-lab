@@ -53,7 +53,7 @@
     "independent_review": {
       "path": "docs/evidence/science_lifecycle_smoke_v1/independent-review.json",
       "sha256": "PENDING",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     "project_checks": [
       "PASS_SAVED_ATOMIC_RESULT_PASSPORT_RECORDS",
