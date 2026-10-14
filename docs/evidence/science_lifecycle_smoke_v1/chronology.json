@@ -1,0 +1,230 @@
+{
+  "B_attempts": 0,
+  "actual_dispatch": [
+    {
+      "handler": "replay_canonical_receipts",
+      "key": "CAP_OFFLINE_CANONICAL_RECEIPT_REPLAY"
+    },
+    {
+      "handler": "capture_quote_native_free_key",
+      "key": "CAP_JUPITER_FREE_KEY_QUOTE_NATIVE_BOUNDED_CAPTURE"
+    },
+    {
+      "handler": "capture_forward_h900_quote",
+      "key": "CAP_JUPITER_FREE_KEY_FORWARD_H900_QUOTE_CAPTURE"
+    },
+    {
+      "handler": "capture_early_icp_first_hit_mix_falsifier",
+      "key": "CAP_JUPITER_FREE_KEY_EARLY_ICP_FIRST_HIT_MIX_FALSIFIER"
+    },
+    {
+      "handler": "resolve_market_feature_surface",
+      "key": "CAP_OFFLINE_MARKET_FEATURE_RESOLVE"
+    },
+    {
+      "handler": "compile_observation_schedule",
+      "key": "CAP_OBSERVATION_SCHEDULE_COMPILE_BIND"
+    },
+    {
+      "handler": "run_censoring_ignorability_diagnostic",
+      "key": "CAP_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC"
+    },
+    {
+      "handler": "run_selection_robustness_gate",
+      "key": "CAP_HFIC_SELECTION_ROBUSTNESS_GATE"
+    },
+    {
+      "handler": "run_temporal_fixed_time_proxy",
+      "key": "'CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001'"
+    }
+  ],
+  "alternatives": [
+    {
+      "route": "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+      "why_not_equivalent": "Saved canonical receipt replay does not execute accepted independent List A confirmation"
+    },
+    {
+      "route": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+      "why_not_equivalent": "Same explored frozen sources, exploratory proxy, no durable confirmation reservation"
+    },
+    {
+      "route": "observation schedule compile/reuse",
+      "why_not_equivalent": "Schedule/panel binding, not inference or source-owned confirming metric"
+    },
+    {
+      "route": "censoring/selection robustness gates",
+      "why_not_equivalent": "Other registered diagnostic estimands, not frozen List A confirmation protocol"
+    },
+    {
+      "route": "provider quote/forward capture",
+      "why_not_equivalent": "Different entry/exit/quote contract and external authority; not episode E14400 confirmation"
+    }
+  ],
+  "audit_gap_tag": "MISSING_CONFIRMATION_PRODUCER",
+  "conditional_scenarios": {
+    "SC10": "BLOCKED_PRODUCT/CONTRACT",
+    "SC11": "BLOCKED_PRODUCT/CONTRACT",
+    "SC12": "BLOCKED_PRODUCT/CONTRACT"
+  },
+  "consumer": "compose_experiment_dossier + science_guard consume source-owned EXPERIMENT_METRIC/EVIDENCE_BINDING/PROMOTION_CANDIDATE; technical COMPLETE does not satisfy scientific obligations",
+  "existing_input": "Frozen exploratory HFIC recipe/releases, not accepted new immutable confirmation sample/reservation",
+  "existing_output": "COMPLETE / INCONCLUSIVE / EXPLORATORY_PROXY; result/passport/RUN_COMPLETED; no new scientific look",
+  "existing_route": "DocumentRunner.start_document -> execute_capability -> run_temporal_fixed_time_proxy -> run_temporal_fixed_time_from_spec -> bind_frozen_fixed_time_inputs -> explored-source loader -> execute_temporal_discovery",
+  "missing_bindings": [
+    "EXACT_APPROVED_SAMPLE_SCOPE_AND_END",
+    "CONFIRMATORY_REUSE_COMPATIBLE_SOURCE_ROLE",
+    "SUFFICIENT_POTENTIAL_MINT_AND_TIME_SUPPORT",
+    "COMPLETE_SOURCE_EXPOSURE_PROVENANCE",
+    "FROZEN_AND_CURRENT_PROTECTION_VALIDATION",
+    "ACTUAL_SAMPLE_CHRONOLOGY_AND_QUERY_SPEC_IDENTITY"
+  ],
+  "native_terminal": null,
+  "not_only_sample_unbound": true,
+  "registry_routes": [
+    {
+      "capability_id": "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+      "entrypoint": "solana_alpha_lab.factory.capabilities:replay_canonical_receipts",
+      "input_kinds": [
+        "CATALOG_ASSET"
+      ],
+      "max_provider_calls": 0,
+      "output_kinds": [
+        "SCIENTIFIC_RESULT"
+      ],
+      "promotion_authority": "NONE",
+      "status": "ACCEPTED"
+    },
+    {
+      "capability_id": "CAP-FIXTURE-GIT-RECEIPT-WRITER-001",
+      "entrypoint": "solana_alpha_lab.factory.capabilities:capture_quote_native_free_key",
+      "input_kinds": [
+        "CATALOG_ASSET"
+      ],
+      "max_provider_calls": 0,
+      "output_kinds": [
+        "GIT_RECEIPT"
+      ],
+      "promotion_authority": "NONE",
+      "status": "ACCEPTED"
+    },
+    {
+      "capability_id": "CAP-FIXTURE-PROVIDER-READ-ONLY-001",
+      "entrypoint": "solana_alpha_lab.factory.capabilities:capture_quote_native_free_key",
+      "input_kinds": [
+        "CATALOG_ASSET"
+      ],
+      "max_provider_calls": 1,
+      "output_kinds": [
+        "RAW_API_EVENT"
+      ],
+      "promotion_authority": "NONE",
+      "status": "ACCEPTED"
+    },
+    {
+      "capability_id": "CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001",
+      "entrypoint": "solana_alpha_lab.factory.capabilities:capture_quote_native_free_key",
+      "input_kinds": [
+        "CATALOG_ASSET"
+      ],
+      "max_provider_calls": 60,
+      "output_kinds": [
+        "RAW_API_EVENT"
+      ],
+      "promotion_authority": "NONE",
+      "status": "ACCEPTED"
+    },
+    {
+      "capability_id": "CAP-JUPITER-FREE-KEY-FORWARD-H900-QUOTE-CAPTURE-001",
+      "entrypoint": "solana_alpha_lab.factory.capabilities:capture_forward_h900_quote",
+      "input_kinds": [
+        "CATALOG_ASSET"
+      ],
+      "max_provider_calls": 60,
+      "output_kinds": [
+        "RAW_API_EVENT"
+      ],
+      "promotion_authority": "NONE",
+      "status": "ACCEPTED"
+    },
+    {
+      "capability_id": "CAP-JUPITER-FREE-KEY-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "entrypoint": "solana_alpha_lab.factory.capabilities:capture_early_icp_first_hit_mix_falsifier",
+      "input_kinds": [
+        "CATALOG_ASSET"
+      ],
+      "max_provider_calls": 60,
+      "output_kinds": [
+        "RAW_API_EVENT"
+      ],
+      "promotion_authority": "NONE",
+      "status": "ACCEPTED"
+    },
+    {
+      "capability_id": "CAP-OBSERVATION-SCHEDULE-COMPILE-BIND-001",
+      "entrypoint": "solana_alpha_lab.factory.capabilities:compile_observation_schedule",
+      "input_kinds": [
+        "CATALOG_ASSET"
+      ],
+      "max_provider_calls": 0,
+      "output_kinds": [
+        "RESEARCH_ARTIFACT"
+      ],
+      "promotion_authority": "NONE",
+      "status": "ACCEPTED"
+    },
+    {
+      "capability_id": "CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001",
+      "entrypoint": "solana_alpha_lab.factory.capabilities:run_censoring_ignorability_diagnostic",
+      "input_kinds": [
+        "CATALOG_ASSET"
+      ],
+      "max_provider_calls": 0,
+      "output_kinds": [
+        "RESEARCH_ARTIFACT"
+      ],
+      "promotion_authority": "NONE",
+      "status": "ACCEPTED"
+    },
+    {
+      "capability_id": "CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001",
+      "entrypoint": "solana_alpha_lab.factory.capabilities:run_selection_robustness_gate",
+      "input_kinds": [
+        "CATALOG_ASSET"
+      ],
+      "max_provider_calls": 0,
+      "output_kinds": [
+        "RESEARCH_ARTIFACT"
+      ],
+      "promotion_authority": "NONE",
+      "status": "ACCEPTED"
+    },
+    {
+      "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+      "entrypoint": "solana_alpha_lab.factory.hfic_temporal_discovery:execute_fixed_time_proxy_capability",
+      "input_kinds": [
+        "CATALOG_ASSET"
+      ],
+      "max_provider_calls": 0,
+      "output_kinds": [
+        "RESEARCH_ARTIFACT"
+      ],
+      "promotion_authority": "NONE",
+      "status": "ACCEPTED"
+    }
+  ],
+  "reservation_gap": "DocumentRunner writes result file and commits RUN_STARTED/COMPLETED after capability/evaluator; not a pre-values reservation",
+  "sample_value_reads": 0,
+  "scope": "Bounded accepted registry/public dispatch owners, not a claim that no statistical code exists anywhere",
+  "source_pins": {
+    "configs/experiment_capability_registry_v2.yaml": "49edf7b770d37db38edb89a49dcb66f73b6212d62642cda2faa14880456e4430",
+    "configs/list_a_chronological_confirmation_v1.yaml": "4bfd2c80526d617f664e047ffa38f802722c5ca96211aed06992506bbc29be12",
+    "docs/contracts/list_a_chronological_confirmation_v1.md": "4be4f46884ed742adbabaf5bb14f7ee37fa84e3a57263adf8162c609c5c94d6c",
+    "src/solana_alpha_lab/factory/application.py": "73e02402a8f6e0a294a9c580a64c623f3c6bb6fe4f1afd31557edc0cf3ea6fc3",
+    "src/solana_alpha_lab/factory/capabilities.py": "6e88094c7bb9f9bbd13cd5316c8ac20001592eb1782fe1243b805fe949814e13",
+    "src/solana_alpha_lab/factory/document_runner.py": "03d159d71b179776970068ff4e3bd6a04b4f5b95feafa16501e30372950211f2",
+    "src/solana_alpha_lab/factory/experiment_evidence.py": "8cdc314f482297420c08f81523273439654aa42c0c8d915462d55c861d404eb5",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "fe12a389083b0cea995e22014aa470fd5fc866e07efe6a0c66f387d6b8450a91"
+  },
+  "status": "METADATA_PROBE_COMPLETE",
+  "tested_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447"
+}

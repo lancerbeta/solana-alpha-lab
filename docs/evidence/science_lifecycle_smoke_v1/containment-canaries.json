@@ -1,0 +1,19 @@
+{
+  "facts": {
+    "child_inherits_boundary": true,
+    "egress_denied_locally": true,
+    "head_exact": true,
+    "kit_readonly": true,
+    "loopback_only": true,
+    "no_accessible_socket_or_credentials": true,
+    "no_default_route": true,
+    "no_secret_environment": true,
+    "nonroot": true,
+    "own_output_writable": true,
+    "product_readonly": true,
+    "root_readonly": true,
+    "tracked_bytes_exact": true
+  },
+  "pass": true,
+  "scope": "OS_CONTAINER_BOUNDARY; host orchestration is outside; no blind Actor claim"
+}

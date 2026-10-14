@@ -1,0 +1,106 @@
+{
+  "as_of": "2026-10-14",
+  "non_claims": [
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SCIENTIFIC_ACCEPTANCE"
+  ],
+  "remediation_history": [
+    {
+      "finding": "Owned-child lifetime, short-child postcheck and footprint recomputation findings closed by audit-kit resource guards/finally stop; actual allocation-only and telemetry probes retained.",
+      "observed_head": "8585dc775947282ecca1e14dbdcd58748af4d79e",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "86f78a098d07613a25f60bcd07587bbfc027d81d",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Unknown Docker writable allocation previously zero-filled; strict typed integer allocation now fails closed,0 accepted only as actual known0.",
+      "observed_head": "8585dc775947282ecca1e14dbdcd58748af4d79e",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "86f78a098d07613a25f60bcd07587bbfc027d81d",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Native repeat aliases can overwrite prior raw traces despite unique attempt. New native repeats on original retained worlds prohibited; earlier trace history remains disclosed INCOMPLETE/UNAVAILABLE.",
+      "observed_head": "8585dc775947282ecca1e14dbdcd58748af4d79e",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "86f78a098d07613a25f60bcd07587bbfc027d81d",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MAJOR"
+    }
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "review_id": "SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1-INDEPENDENT",
+  "reviewed_bindings_sha256": "1185bc0d6bd8ab750e1cb088581eeb40cc7b002d89996f9f24fc18cba5801a9b",
+  "reviewed_inventory_sha256": "492feab1b214e737e9a936ae8773fe9b91a45b5100640e04d9e3924456cd4893",
+  "reviews": [
+    {
+      "findings": [
+        "ISOLATED_READ_ONLY_FINAL_REVIEW; reviewed_head=86f78a098d07613a25f60bcd07587bbfc027d81d",
+        "candidate_patch_sha256=517ec87aaca257cbf621a0cd440a0f8f08858c8f8b6cd7fc998f5f1cf951503f",
+        "reviewed_bindings_sha256=1185bc0d6bd8ab750e1cb088581eeb40cc7b002d89996f9f24fc18cba5801a9b",
+        "reviewed_inventory_sha256=492feab1b214e737e9a936ae8773fe9b91a45b5100640e04d9e3924456cd4893",
+        "PASS: all49 native implementation bindings match; no product repair or scientific acceptance.",
+        "Offline saved verifier and10/10 tests PASS; real numeric, recovery and native receipt witnesses retained, scientific charges6 MAIN/10 evaluator/0 B.",
+        "Prior resource findings closed: owned child stop/readback in finally on telemetry loss; mandatory full mounted cap measurement before/after short children; saved footprint independently recomputed.",
+        "Native replay trace aliases previously overwrote early raw traces. F07 remains INCOMPLETE/UNAVAILABLE; runbook forbids new native repeats on retained worlds. No erasure or refund of scientific attempts."
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "ISOLATED_READ_ONLY_FINAL_REVIEW; reviewed_head=86f78a098d07613a25f60bcd07587bbfc027d81d",
+        "candidate_patch_sha256=517ec87aaca257cbf621a0cd440a0f8f08858c8f8b6cd7fc998f5f1cf951503f",
+        "reviewed_bindings_sha256=1185bc0d6bd8ab750e1cb088581eeb40cc7b002d89996f9f24fc18cba5801a9b",
+        "reviewed_inventory_sha256=492feab1b214e737e9a936ae8773fe9b91a45b5100640e04d9e3924456cd4893",
+        "PASS: all49 native implementation bindings match; no product repair or scientific acceptance.",
+        "PASS for bounded COMPLETE_WITH_FINDINGS. A/C/SC06 saved witnesses and scientific counters unchanged; accepted confirming producer/reservation remains earliest product-contract gap.",
+        "F07 narrows preservation/reproduction claims without invalidating retained current SC02/SC06 witnesses. Early per-attempt replay raw trace history remains INCOMPLETE/UNAVAILABLE.",
+        "Offline saved verifier and10/10 tests PASS. Full scientific lifecycle and science acceptance remain unclaimed."
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "ISOLATED_READ_ONLY_FINAL_REVIEW; reviewed_head=86f78a098d07613a25f60bcd07587bbfc027d81d",
+        "candidate_patch_sha256=517ec87aaca257cbf621a0cd440a0f8f08858c8f8b6cd7fc998f5f1cf951503f",
+        "reviewed_bindings_sha256=1185bc0d6bd8ab750e1cb088581eeb40cc7b002d89996f9f24fc18cba5801a9b",
+        "reviewed_inventory_sha256=492feab1b214e737e9a936ae8773fe9b91a45b5100640e04d9e3924456cd4893",
+        "PASS: all49 native implementation bindings match; no product repair or scientific acceptance.",
+        "STANDARD / NO_SEMANTIC_TRIGGER; audit kit/evidence only, no product contract, guard, threshold, registry or estimand mutation.",
+        "Allocation UNKNOWN now fails closed; missing/null/bool/negative/noninteger SizeRw cannot become0. Full pre/post resource guards and finally recovery remain owned-process only.",
+        "What can pass tests and still break research validity: synthetic metadata/PIT and fixture lineage do not prove accepted independent chronological confirmation. Numeric COMPLETE/INCONCLUSIVE and ordinary PAUSE cannot acquire qualifying DIRECT evidence or promotion authority.",
+        "Scientific history, previous512 breach and forward640 limit remain distinct. Early replay trace loss and clean-host/bootstrap/blind Actor limits remain explicit."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "ISOLATED_READ_ONLY_FINAL_REVIEW; reviewed_head=86f78a098d07613a25f60bcd07587bbfc027d81d",
+        "candidate_patch_sha256=517ec87aaca257cbf621a0cd440a0f8f08858c8f8b6cd7fc998f5f1cf951503f",
+        "reviewed_bindings_sha256=1185bc0d6bd8ab750e1cb088581eeb40cc7b002d89996f9f24fc18cba5801a9b",
+        "reviewed_inventory_sha256=492feab1b214e737e9a936ae8773fe9b91a45b5100640e04d9e3924456cd4893",
+        "PASS: all49 native implementation bindings match; no product repair or scientific acceptance.",
+        "Owner report, coverage and REPRODUCE align with bounded COMPLETE_WITH_FINDINGS, exact6/10/0 counters, cap and one separately authorized NOW repair.",
+        "Replay retention trap closed for future owner usage by an explicit prohibition on native repeats on original worlds; historical commands are not safe rerun instructions. Old raw traces remain INCOMPLETE/UNAVAILABLE.",
+        "Known measured file allocation is distinct from shared existing image, physical Docker VHD/log allocation UNKNOWN, scientific acceptance and merge authority."
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1",
+  "verdict": "PASS"
+}

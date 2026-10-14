@@ -1,0 +1,2792 @@
+{
+  "cold_dossier": {
+    "authority_granted": false,
+    "decision_history": [
+      {
+        "creates_strategy_version": false,
+        "decision_kind": "PAUSE",
+        "effective_at": "2026-10-14 13:26:25+00:00",
+        "evidence_snapshot_sha256": "6c528c17beccffb46d895985601b93daca48120fd7a6bbf5cf926674e6dc508a",
+        "next_condition": "Accepted chronological producer, source-bound reservation and independent validation evidence.",
+        "promotion_handoff_manifest_sha256": null,
+        "rationale": "\u0427\u0438\u0441\u043b\u0435\u043d\u043d\u044b\u0439 replay \u043f\u0440\u043e\u0432\u0435\u0440\u0435\u043d; \u043d\u0435\u0437\u0430\u0432\u0438\u0441\u0438\u043c\u043e\u0435 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u0435 \u043d\u0435 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d\u043e.",
+        "record_id": "DECISION-EVENT-D19C410F5ED59D7E45CA3E20D69B7C37",
+        "relation": "DIRECT"
+      }
+    ],
+    "direct_evidence": [
+      {
+        "effective_at": "2026-10-14 13:18:35.501664+00:00",
+        "entity_id": "EVIDENCE-BINDING-001-C4A7443C",
+        "first_reliable_available_at": "2026-10-14 13:18:35.501664+00:00",
+        "hypothesis_version_id": "HYP-HFIC-CAND-E8B09968FD73",
+        "payload_sha256": "0dcc93cc8891311d14755f3e055e12ebdc5c7e24f3ba2222846ca119637b1a48",
+        "record_id": "EVIDENCE-BINDING-001-C4A7443C",
+        "record_kind": "EVIDENCE_BINDING",
+        "relation": "DIRECT",
+        "run_id": "RUN-51D10BA94E5BA32F3E726C2D",
+        "summary_fields": {}
+      },
+      {
+        "effective_at": "2026-10-14 13:18:35.501664+00:00",
+        "entity_id": "RESULT-ARTIFACT-51D10BA94E5BA32F3E726C2D",
+        "first_reliable_available_at": "2026-10-14 13:18:35.501664+00:00",
+        "hypothesis_version_id": "HYP-HFIC-CAND-E8B09968FD73",
+        "payload_sha256": "8e179bc5abb6ebdc3c831ca088e1268cfd223aa56018ffb5e273debc07c42daa",
+        "record_id": "RESULT-ARTIFACT-51D10BA94E5BA32F3E726C2D",
+        "record_kind": "RESEARCH_ARTIFACT",
+        "relation": "DIRECT",
+        "run_id": "RUN-51D10BA94E5BA32F3E726C2D",
+        "summary_fields": {}
+      },
+      {
+        "effective_at": "2026-10-14 13:18:35.501664+00:00",
+        "entity_id": "RUN-51D10BA94E5BA32F3E726C2D",
+        "first_reliable_available_at": "2026-10-14 13:18:35.501664+00:00",
+        "hypothesis_version_id": "HYP-HFIC-CAND-E8B09968FD73",
+        "payload_sha256": "1c4b3f31285d55dcccf126f650f146f481d604a5b57eb662cec5ba02adba2dd0",
+        "record_id": "RUN-COMPLETED-14AE4343C4A7443C",
+        "record_kind": "RUN_COMPLETED",
+        "relation": "DIRECT",
+        "run_id": "RUN-51D10BA94E5BA32F3E726C2D",
+        "summary_fields": {}
+      },
+      {
+        "effective_at": "2026-10-14 13:18:35.501664+00:00",
+        "entity_id": "RUN-51D10BA94E5BA32F3E726C2D",
+        "first_reliable_available_at": "2026-10-14 13:18:35.501664+00:00",
+        "hypothesis_version_id": "HYP-HFIC-CAND-E8B09968FD73",
+        "payload_sha256": "115703f3067c4ca6475722806ced2c8239fdbb7b1d9be48e67865796a6de0cb8",
+        "record_id": "RUN-STARTED-14AE4343C4A7443C",
+        "record_kind": "RUN_STARTED",
+        "relation": "DIRECT",
+        "run_id": "RUN-51D10BA94E5BA32F3E726C2D",
+        "summary_fields": {}
+      },
+      {
+        "effective_at": "2026-10-14 13:26:25+00:00",
+        "entity_id": "DECISION-EVENT-D19C410F5ED59D7E45CA3E20D69B7C37",
+        "first_reliable_available_at": "2026-10-14 13:26:25+00:00",
+        "hypothesis_version_id": "HYP-HFIC-CAND-E8B09968FD73",
+        "payload_sha256": "115ec031bc5b4bcc54e0686e00136076a4e646280ea31806de5f9105a7bfbe22",
+        "record_id": "DECISION-EVENT-D19C410F5ED59D7E45CA3E20D69B7C37",
+        "record_kind": "DECISION_EVENT",
+        "relation": "DIRECT",
+        "run_id": null,
+        "summary_fields": {
+          "decision_kind": "PAUSE"
+        }
+      }
+    ],
+    "evidence_snapshot_sha256": "89854aca0836034dbba51a0d433a1c31216329fc429e8c0d509c2fdd742eb51e",
+    "execution_relation_gaps": [],
+    "experiment_spec_binding": {
+      "canonical_spec_sha256": "037a9f53dc6b066d10521219b2082fd1f48bc177bf983f725c3353668d69b640",
+      "source_kind": "git_path",
+      "source_value": "configs/experiment_specs/science-base-v3-list_contrast.yaml",
+      "spec_sha256": "91b5e47b74ce30c60e9f67566731b5b79916521c5f6f3f720990b7dacb72ad16"
+    },
+    "locator": {
+      "entity_id": "EXP-SCIENCE-BASE-V3-LIST-CONTRAST",
+      "native_kind": "EXPERIMENT_SPEC",
+      "truth_plane": "GIT"
+    },
+    "obligations": [
+      {
+        "code": "FALSIFIER",
+        "note": null,
+        "source": "ExperimentSpec",
+        "status": "PRESENT",
+        "values": {
+          "falsifier": "No supported fixed contrast, incorrect prefix membership, unavailable required outcome or PIT failure."
+        }
+      },
+      {
+        "code": "PIT_AVAILABILITY",
+        "note": "cutoff \u0438\u043b\u0438 first_reliable_available_at \u043d\u0435\u043f\u043e\u043b\u043d\u044b",
+        "source": "ResearchStore",
+        "status": "UNKNOWN",
+        "values": {
+          "availability_cutoff": null,
+          "availability_provenance": null,
+          "first_reliable_available_at": "2026-10-08T06:00:00.000000Z"
+        }
+      },
+      {
+        "code": "POPULATION_N",
+        "note": null,
+        "source": "ExperimentSpec+ResearchStore",
+        "status": "UNKNOWN",
+        "values": {
+          "observed_n": null,
+          "population": "OPPORTUNITY_EPISODES"
+        }
+      },
+      {
+        "code": "MISSINGNESS",
+        "note": "\u043e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0438\u0435 missingness \u043d\u0435 \u0440\u0430\u0432\u043d\u043e \u043d\u0443\u043b\u044e",
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "missing_count": null
+        }
+      },
+      {
+        "code": "SURVIVAL",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "survival": null
+        }
+      },
+      {
+        "code": "HOLDOUT",
+        "note": "\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430 \u0435\u0441\u0442\u044c, \u044f\u0432\u043d\u043e\u0439 \u0441\u0432\u044f\u0437\u0438 \u043f\u043e\u0442\u0440\u0435\u0431\u043b\u0435\u043d\u0438\u044f \u043d\u0435\u0442",
+        "source": "ExperimentSpec",
+        "status": "UNKNOWN",
+        "values": {
+          "holdout_policy": "EXPLORATORY_REUSE of already explored synthetic releases; no new holdout or scientific confirmation."
+        }
+      },
+      {
+        "code": "ENTRY_EXECUTABILITY",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "entry": null
+        }
+      },
+      {
+        "code": "EXIT_EXECUTABILITY",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "exit": null
+        }
+      },
+      {
+        "code": "COST_EVIDENCE",
+        "note": "\u043d\u0430\u0440\u0440\u0430\u0442\u0438\u0432 \u043f\u0440\u043e fees \u043d\u0435 \u0437\u0430\u043c\u0435\u043d\u044f\u0435\u0442 \u043c\u0430\u0448\u0438\u043d\u043d\u043e\u0435 \u0434\u043e\u043a\u0430\u0437\u0430\u0442\u0435\u043b\u044c\u0441\u0442\u0432\u043e",
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "cost": null
+        }
+      },
+      {
+        "code": "EXECUTION_REGIME_BINDING",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "binding_id": null
+        }
+      },
+      {
+        "code": "RESULT",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "result": null
+        }
+      },
+      {
+        "code": "UNCERTAINTY",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "uncertainty": null
+        }
+      },
+      {
+        "code": "ROBUSTNESS",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "robustness": null
+        }
+      },
+      {
+        "code": "EVIDENCE_CLASS",
+        "note": "Git evidence_class \u043d\u0435 \u044f\u0432\u043b\u044f\u0435\u0442\u0441\u044f scientific evidence",
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "evidence_class": null
+        }
+      }
+    ],
+    "owner_decision_kinds": [
+      "REJECT",
+      "REVISE",
+      "PAUSE",
+      "PROMOTE"
+    ],
+    "planes": {
+      "decision": "PAUSE",
+      "evidence": "BLOCKED",
+      "execution": "COMPLETED"
+    },
+    "promote_creates_strategy_version": false,
+    "promotion_packet_sha256": null,
+    "records_status": "AVAILABLE",
+    "related_prior_memory": [],
+    "result": {
+      "result": null
+    },
+    "schema": "smial.experiment-evidence-dossier",
+    "schema_version": "1.0",
+    "science_guard": {
+      "allowed": false,
+      "blocked_codes": [
+        "PIT_AVAILABILITY",
+        "POPULATION_N",
+        "MISSINGNESS",
+        "SURVIVAL",
+        "HOLDOUT",
+        "ENTRY_EXECUTABILITY",
+        "EXIT_EXECUTABILITY",
+        "COST_EVIDENCE",
+        "EXECUTION_REGIME_BINDING",
+        "RESULT",
+        "UNCERTAINTY",
+        "ROBUSTNESS",
+        "EVIDENCE_CLASS"
+      ],
+      "meaning": "PROMOTE_BLOCKED"
+    },
+    "science_to_strategy_handoff": {
+      "activation_created": false,
+      "authority": {
+        "activation_created": false,
+        "authority_granted": false
+      },
+      "authority_granted": false,
+      "field_provenance": {
+        "authority_class": "EXECUTION_CONTRACT_FIXED",
+        "created_at": "SCIENCE_DERIVED",
+        "exit_input.contract": "EXECUTION_CONTRACT_FIXED",
+        "exit_input.contract_version": "EXECUTION_CONTRACT_FIXED",
+        "mode_eligibility.micro_live": "EXECUTION_CONTRACT_FIXED",
+        "mode_eligibility.paper": "EXECUTION_CONTRACT_FIXED",
+        "mode_eligibility.shadow": "EXPLICIT_EXECUTION_INPUT",
+        "notional_policy.fee_bps": "EXPLICIT_EXECUTION_INPUT",
+        "notional_policy.notional_usd": "EXPLICIT_EXECUTION_INPUT",
+        "population_ref": "SCIENCE_DERIVED",
+        "risk_policy.max_open_positions": "EXPLICIT_EXECUTION_INPUT",
+        "schema": "EXECUTION_CONTRACT_FIXED",
+        "schema_version": "EXECUTION_CONTRACT_FIXED",
+        "signal_input.contract": "EXECUTION_CONTRACT_FIXED",
+        "signal_input.contract_version": "EXECUTION_CONTRACT_FIXED",
+        "signal_input.enter_actions": "EXECUTION_CONTRACT_FIXED",
+        "signal_input.max_age_seconds": "EXPLICIT_EXECUTION_INPUT",
+        "source_decision_asset_id": "SCIENCE_DERIVED",
+        "source_hypothesis_refs": "SCIENCE_DERIVED",
+        "strategy_id": "SCIENCE_DERIVED",
+        "strategy_version": "SCIENCE_DERIVED",
+        "title": "SCIENCE_DERIVED"
+      },
+      "identity": {
+        "decision_event_id": null,
+        "experiment_id": "EXP-SCIENCE-BASE-V3-LIST-CONTRAST",
+        "hypothesis_version_id": null
+      },
+      "materialization": {
+        "strategy_id": null,
+        "strategy_relation": "ABSENT",
+        "strategy_version": null
+      },
+      "provenance": {
+        "direct_evidence": [],
+        "execution_evidence_binding": null,
+        "experiment_spec_binding": null,
+        "manifest_status": "ABSENT",
+        "source_revalidation": "UNKNOWN"
+      },
+      "schema": "smial.science-to-strategy-handoff",
+      "schema_version": "1.0",
+      "science": {
+        "decision_effective_at": null,
+        "decision_kind": null,
+        "evidence_snapshot_sha256": null,
+        "handoff_manifest_sha256": null,
+        "obligations": []
+      },
+      "state": {
+        "blocker_codes": [],
+        "handoff_state": "NOT_PROMOTED",
+        "next_safe_action": "NO_SCIENTIFIC_PROMOTE"
+      }
+    },
+    "tested": {
+      "estimand": "Mean(P(E14400)/P(E1800)-1 | matched list A) minus mean of the same proxy in eligible complement of list A",
+      "falsifier": "No supported fixed contrast, incorrect prefix membership, unavailable required outcome or PIT failure.",
+      "holdout_policy": "EXPLORATORY_REUSE of already explored synthetic releases; no new holdout or scientific confirmation.",
+      "hypothesis_version_id": "HYP-HFIC-CAND-E8B09968FD73",
+      "legacy_source_language": "EN",
+      "method": "frozen_episode_price_relative_proxy",
+      "population": "OPPORTUNITY_EPISODES",
+      "question": "Does list A separate the frozen E1800 to E14400 price-relative proxy from eligible complement of list A?"
+    },
+    "write_capability": {
+      "read": "AVAILABLE",
+      "reason": null,
+      "write": "AVAILABLE"
+    }
+  },
+  "cold_pause": {
+    "business_state_unchanged": true,
+    "decision_history": [
+      {
+        "creates_strategy_version": false,
+        "decision_kind": "PAUSE",
+        "effective_at": "2026-10-14 13:26:25+00:00",
+        "evidence_snapshot_sha256": "6c528c17beccffb46d895985601b93daca48120fd7a6bbf5cf926674e6dc508a",
+        "next_condition": "Accepted chronological producer, source-bound reservation and independent validation evidence.",
+        "promotion_handoff_manifest_sha256": null,
+        "rationale": "\u0427\u0438\u0441\u043b\u0435\u043d\u043d\u044b\u0439 replay \u043f\u0440\u043e\u0432\u0435\u0440\u0435\u043d; \u043d\u0435\u0437\u0430\u0432\u0438\u0441\u0438\u043c\u043e\u0435 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u0435 \u043d\u0435 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d\u043e.",
+        "record_id": "DECISION-EVENT-D19C410F5ED59D7E45CA3E20D69B7C37",
+        "relation": "DIRECT"
+      }
+    ],
+    "result": {
+      "creates_strategy_version": false,
+      "decision_event_id": "DECISION-EVENT-D19C410F5ED59D7E45CA3E20D69B7C37",
+      "disposition": "REPLAY_IDENTICAL",
+      "status": "DECISION_RECORDED",
+      "transaction_id": "RESEARCH-TXN-DEC-D19C410F5ED59D7E45CA3E20D69B7C37"
+    },
+    "state": {
+      "completion_ids": [
+        "RUN-COMPLETED-14AE4343C4A7443C",
+        "RUN-COMPLETED-1F8C4DADAA734A45",
+        "RUN-COMPLETED-F57389B914AA48A8"
+      ],
+      "logical_sha256": "bc22c9cf4b63623690cff5aca5807525eda8de34fc9f4256811e11c7cf30fc50",
+      "record_counts": {
+        "DECISION_EVENT": 3,
+        "EVIDENCE_BINDING": 4,
+        "EXPERIMENT_METRIC": 1,
+        "HYPOTHESIS_VERSION": 3,
+        "RESEARCH_ARTIFACT": 41,
+        "RESEARCH_CYCLE": 6,
+        "RUN_COMPLETED": 3,
+        "RUN_STARTED": 3
+      }
+    },
+    "status": "PASS"
+  },
+  "consumer_check": {
+    "activation_or_PAPER_calls": 0,
+    "after": {
+      "completion_ids": [
+        "RUN-COMPLETED-14AE4343C4A7443C",
+        "RUN-COMPLETED-1F8C4DADAA734A45",
+        "RUN-COMPLETED-F57389B914AA48A8"
+      ],
+      "logical_sha256": "bc22c9cf4b63623690cff5aca5807525eda8de34fc9f4256811e11c7cf30fc50",
+      "record_counts": {
+        "DECISION_EVENT": 3,
+        "EVIDENCE_BINDING": 4,
+        "EXPERIMENT_METRIC": 1,
+        "HYPOTHESIS_VERSION": 3,
+        "RESEARCH_ARTIFACT": 41,
+        "RESEARCH_CYCLE": 6,
+        "RUN_COMPLETED": 3,
+        "RUN_STARTED": 3
+      },
+      "records": [
+        [
+          "DECISION-EVENT-D19C410F5ED59D7E45CA3E20D69B7C37",
+          "DECISION_EVENT",
+          "115ec031bc5b4bcc54e0686e00136076a4e646280ea31806de5f9105a7bfbe22",
+          "RESEARCH-TXN-DEC-D19C410F5ED59D7E45CA3E20D69B7C37"
+        ],
+        [
+          "EVIDENCE-BINDING-001-14AA48A8",
+          "EVIDENCE_BINDING",
+          "4d93cff0d8bbbd662fa2ab4e49b933c20fea7cc6c1a502fea574a6a2f6084b66",
+          "RESEARCH-TXN-F57389B914AA48A8"
+        ],
+        [
+          "EVIDENCE-BINDING-001-AA734A45",
+          "EVIDENCE_BINDING",
+          "0a46332099947d65c24bdf3c4ff7d57301b26faa3fb4543a2641aba5c134f42a",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "EVIDENCE-BINDING-001-C4A7443C",
+          "EVIDENCE_BINDING",
+          "0dcc93cc8891311d14755f3e055e12ebdc5c7e24f3ba2222846ca119637b1a48",
+          "RESEARCH-TXN-14AE4343C4A7443C"
+        ],
+        [
+          "EVIDENCE-BINDING-002-AA734A45",
+          "EVIDENCE_BINDING",
+          "0d5f864f51bb16de3787ed281beb2c7d3be3cf13a43b1b515ca01779499d7361",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "FORGE-UNIVERSE-A820B3D281B01E50",
+          "RESEARCH_ARTIFACT",
+          "33a0eba4412373827631c71e7fc9fd5a51953b2384367a3f1acaa22920e35d11",
+          "RESEARCH-TXN-FORGE-UNIVERSE-0001"
+        ],
+        [
+          "HFIC-ART-CLASSIFIER-HFIC-SESS-66851CEC7A916A35",
+          "RESEARCH_ARTIFACT",
+          "297caf32d40cecba0f640a06f7c05d84cf05fc9497695e1dd4df4ab321e582a5",
+          "RESEARCH-TXN-HFICFIN-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-ART-CLASSIFIER-HFIC-SESS-8347911081CC7F7D",
+          "RESEARCH_ARTIFACT",
+          "693374791badbd2141378212dc06e8d67a127419edd97e2e9459466998fac5f8",
+          "RESEARCH-TXN-HFICFIN-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-ART-CRITIC-INPUT-HFIC-SESS-66851CEC7A916A35",
+          "RESEARCH_ARTIFACT",
+          "bd47f66692f129620ef876ed1312c8f662f757c2438413b63541d6e0713e4a78",
+          "RESEARCH-TXN-HFIC-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-ART-CRITIC-INPUT-HFIC-SESS-8347911081CC7F7D",
+          "RESEARCH_ARTIFACT",
+          "7d8d85a3e2b1aab6580a03766f64246b5da9239c6f67e6bddaf69b190d720a7f",
+          "RESEARCH-TXN-HFIC-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-ART-CRITIC-RESULT-HFIC-SESS-66851CEC7A916A35-9174537B8BA2",
+          "RESEARCH_ARTIFACT",
+          "edcfa3e93b825e267b9f03e663886e0ed48f41cf7df6f58cd966ee0195db2c8c",
+          "RESEARCH-TXN-HFICFIN-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-ART-CRITIC-RESULT-HFIC-SESS-66851CEC7A916A35-C97C1A49BF11",
+          "RESEARCH_ARTIFACT",
+          "dcb412a57f367bdfb3f2d14eb43e4320a54991511ccae42247cc47fa9432707d",
+          "RESEARCH-TXN-HFICINT-CLS-1CEC7A916A35-0002"
+        ],
+        [
+          "HFIC-ART-CRITIC-RESULT-HFIC-SESS-8347911081CC7F7D-2291B61533CD",
+          "RESEARCH_ARTIFACT",
+          "757924bd0cd9d9cbd54f5341d6c1abd96ce9f08fbaacdc1fbe14a80293b24a17",
+          "RESEARCH-TXN-HFICFIN-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-ART-CRITIC-RESULT-HFIC-SESS-8347911081CC7F7D-E11DA2C5AD5B",
+          "RESEARCH_ARTIFACT",
+          "17f7a0ec00bf2bb8d4bd21968c3250f0f05597ad33d158762a11fbfa02fe3fbe",
+          "RESEARCH-TXN-HFICINT-CLS-911081CC7F7D-0002"
+        ],
+        [
+          "HFIC-ART-DISCOVERY-5BB6F3A47E05023E110C15643E7D3EC40C8E4B76",
+          "RESEARCH_ARTIFACT",
+          "401614842c14bcd5756612b8c7890d414502d78edea1eef8ba11f9ba422c0452",
+          "RESEARCH-TXN-DISCOVERY-5BB6F3A47E05023E110C1564"
+        ],
+        [
+          "HFIC-ART-DISCOVERY-8DFDF68B101F4AC1AE3DD66AADD3F88691143C9A",
+          "RESEARCH_ARTIFACT",
+          "77e3d925ad2b5e812b65ffc0801cad30018503e81b929df743464c31b5971494",
+          "RESEARCH-TXN-DISCOVERY-8DFDF68B101F4AC1AE3DD66A"
+        ],
+        [
+          "HFIC-ART-FORGE-CONTEXT-60EFBFCDF8196EE3",
+          "RESEARCH_ARTIFACT",
+          "41c188323a387eca2f9e8e76b619ebd9b821b8122d52a1e0e6e99a5f7b060610",
+          "RESEARCH-TXN-FORGECTX-60EFBFCDF8196EE3"
+        ],
+        [
+          "HFIC-ART-FORGE-CONTEXT-8E9CDD8605F0BB9E",
+          "RESEARCH_ARTIFACT",
+          "d5fe62e09886bd731c2df2fd0db52708eb138fd7cc7523ba8ed97526f20f3de1",
+          "RESEARCH-TXN-FORGECTX-8E9CDD8605F0BB9E"
+        ],
+        [
+          "HFIC-ART-FORGE-CONTEXT-B4E8B5B4968C6A82",
+          "RESEARCH_ARTIFACT",
+          "05cbd461d41ea271bfaccb88bfc29a0707983d8d984dc092a4aa08ac440682fe",
+          "RESEARCH-TXN-FORGECTX-B4E8B5B4968C6A82"
+        ],
+        [
+          "HFIC-ART-FORGE-CONTEXT-B67027AAF9196F48",
+          "RESEARCH_ARTIFACT",
+          "af880406f2aa96b86b81f4f4aa111b0e373dfc61d436ed455bbea353c3165faa",
+          "RESEARCH-TXN-FORGECTX-B67027AAF9196F48"
+        ],
+        [
+          "HFIC-ART-FORGE-CONTEXT-CB597A259A101955",
+          "RESEARCH_ARTIFACT",
+          "8a8874a03add203b6da506e550cdb99e0fbb35c8e4c238cf8673baa253c3318e",
+          "RESEARCH-TXN-FORGECTX-CB597A259A101955"
+        ],
+        [
+          "HFIC-ART-FORGE-CONTEXT-ECF87CBC73848B38",
+          "RESEARCH_ARTIFACT",
+          "c7652aab3130db9d88ba5e151a5b45fb3b23ac909a55363a9d11e9f9747e45ac",
+          "RESEARCH-TXN-FORGECTX-ECF87CBC73848B38"
+        ],
+        [
+          "HFIC-ART-FORGE-DRAFT-GENERATED-B2042C885A30F6FE",
+          "RESEARCH_ARTIFACT",
+          "50049ff855913f068f99617ca1d5688c151c79367a15ba60aeda92478de6b8a1",
+          "RESEARCH-TXN-GENERATED-DRAFT-E44EE729639032BF08400B6BFFAED30AA6781F011BF0950F8415926FC4FBB7A7"
+        ],
+        [
+          "HFIC-ART-FORGE-DRAFT-GENERATED-D1DF82745447998D",
+          "RESEARCH_ARTIFACT",
+          "944b975885821430a2bec013bd4d7bfc6c2d4ffc42e8bafcf81ef6823c8156be",
+          "RESEARCH-TXN-GENERATED-DRAFT-685F43510DD3BD8801D3F7A0F3FAB6333C11D0ACBBAFC73A158916E94CDC40A6"
+        ],
+        [
+          "HFIC-ART-FORGE-DRAFT-HFIC-SESS-66851CEC7A916A35",
+          "RESEARCH_ARTIFACT",
+          "cf8ad527f4d3dbc71f965288d7823250cb9646d934bbfa09c9dbaa785a0e4625",
+          "RESEARCH-TXN-HFIC-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-ART-FORGE-DRAFT-HFIC-SESS-8347911081CC7F7D",
+          "RESEARCH_ARTIFACT",
+          "0acfe0ca5bbb4fd81b49f1f34e037841df609653ad4848876672cd2159a9f96e",
+          "RESEARCH-TXN-HFIC-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-ART-INTENT-9B282D241C49344F2C9AFE1A9D55220AB39731B8",
+          "RESEARCH_ARTIFACT",
+          "9284ac744bead9128f2fa3d3df6ae5b194eb6853c5971fd2a8c9e8b56fc107be",
+          "RESEARCH-TXN-INTENT-9B282D241C49344F2C9AFE1A"
+        ],
+        [
+          "HFIC-ART-INTENT-B8F734E5758616F5FF070AD2D42CE423E7485328",
+          "RESEARCH_ARTIFACT",
+          "ffb2a67c559580b48b525e27c045d975bfa3ee6b54151efe06b252145ab8bb33",
+          "RESEARCH-TXN-INTENT-B8F734E5758616F5FF070AD2"
+        ],
+        [
+          "HFIC-ART-OP-0EB91D705F547684C9B49ACA7A9A29006B6614E5",
+          "RESEARCH_ARTIFACT",
+          "945461f02b7209e5c166b0d182520f9361376c2ae0abef0b38527b414ff08a95",
+          "RESEARCH-TXN-OP-0EB91D705F547684C9B49ACA"
+        ],
+        [
+          "HFIC-ART-OP-16B30D9532F8EB4D52A9E998A44C5F1B7A6D20AB",
+          "RESEARCH_ARTIFACT",
+          "6d5b85d498934efd1772a8d91c7dbad9b8be83cd238589f09e36a604eab9ddd7",
+          "RESEARCH-TXN-OP-16B30D9532F8EB4D52A9E998"
+        ],
+        [
+          "HFIC-ART-OP-39FD302C99F90B2A4B2CC98C65033EC5E9DFD5B1",
+          "RESEARCH_ARTIFACT",
+          "f9665048e8b9589e6bd74291dcdcf33c5a39bc1e88cd089ade0e3c5a213af557",
+          "RESEARCH-TXN-OP-39FD302C99F90B2A4B2CC98C"
+        ],
+        [
+          "HFIC-ART-OP-81461E98580DC961950AF9DA43F4C2D08D1BCA8D",
+          "RESEARCH_ARTIFACT",
+          "34b9cc9b8913391436939d13400fbeae89d6eddbe03c0a7613aaeae404af890d",
+          "RESEARCH-TXN-OP-81461E98580DC961950AF9DA"
+        ],
+        [
+          "HFIC-ART-OP-AAAF00A5B88338FBC70064A029DDEB3A0422CFCA",
+          "RESEARCH_ARTIFACT",
+          "072792d99fcb30a11fe94e7d9c5cc1924b16a1e4effb91971569cdb07ee477c7",
+          "RESEARCH-TXN-OP-AAAF00A5B88338FBC70064A0"
+        ],
+        [
+          "HFIC-ART-OP-FE3B1869B95057E92BA74CD693EC4DF5B93B3B81",
+          "RESEARCH_ARTIFACT",
+          "96dfca7a52f2e0d2a02b3ebe449e0a3895426fff7c5c59522b82309ccf5c8f7c",
+          "RESEARCH-TXN-OP-FE3B1869B95057E92BA74CD6"
+        ],
+        [
+          "HFIC-ART-OPRES-C94018623113E3E8114AEB146F6A292010DC7735",
+          "RESEARCH_ARTIFACT",
+          "1ed5cd8fab6151b2dfa6432ed9f10e7acdbc27e2183006d29528bf69c295a52c",
+          "RESEARCH-TXN-OPRES-C94018623113E3E8114AEB14"
+        ],
+        [
+          "HFIC-ART-OPRES-E7557FB5715D672AD1D8712D3387CF1688155B8C",
+          "RESEARCH_ARTIFACT",
+          "123d664b67b14fd6440ae28bccad6b0b375e4bc64fe58ba00a2da42cfb6a9512",
+          "RESEARCH-TXN-OPRES-E7557FB5715D672AD1D8712D"
+        ],
+        [
+          "HFIC-ART-RPSNAP-0E81E34A7F4C5706553A597A4B3171F0BB4DE060",
+          "RESEARCH_ARTIFACT",
+          "d0ae8bb668dc12f7e36b64a761893482608c4e25b16d55778cba5e756396b085",
+          "RESEARCH-TXN-HFIC-ART-RPSNAP-0E81E34A7F4C5706553A597A"
+        ],
+        [
+          "HFIC-ART-RPSNAP-5E344E4296F45B5B87C82716081205AF1BBD82AC",
+          "RESEARCH_ARTIFACT",
+          "811c9410454943c365018f10a81a3a0679dc192f1ab51d9d937cf10629ecdf4b",
+          "RESEARCH-TXN-HFIC-ART-RPSNAP-5E344E4296F45B5B87C82716"
+        ],
+        [
+          "HFIC-ART-RPSNAP-D3B56A5E7C4DBDCC95CAEEE3B590585EDCE1A321",
+          "RESEARCH_ARTIFACT",
+          "c886ea4bab898fac7f6c2a496160c28738239ffb905c4880237523e1e345dd44",
+          "RESEARCH-TXN-HFIC-ART-RPSNAP-D3B56A5E7C4DBDCC95CAEEE3"
+        ],
+        [
+          "HFIC-ART-SESSION-RECEIPT-HFIC-SESS-66851CEC7A916A35",
+          "RESEARCH_ARTIFACT",
+          "6b468452c50f9c22bf330a8c2f7784fe811d03c73dcd023deb422186ee45695e",
+          "RESEARCH-TXN-HFICFIN-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-ART-SESSION-RECEIPT-HFIC-SESS-8347911081CC7F7D",
+          "RESEARCH_ARTIFACT",
+          "0c82170072821dc49751b47217589b0346aa94f6df3ac8259bf932d1146f04b6",
+          "RESEARCH-TXN-HFICFIN-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-ART-SLOT-ADMISSION-685F43510DD3BD8801D3F7A0F3FAB6333C11D0ACBBAFC73A158916E94CDC40A6",
+          "RESEARCH_ARTIFACT",
+          "b9556b607663a63599255281563dc358ecd4dbb192a710ea8b0f71f0ba785666",
+          "RESEARCH-TXN-GENERATED-DRAFT-685F43510DD3BD8801D3F7A0F3FAB6333C11D0ACBBAFC73A158916E94CDC40A6"
+        ],
+        [
+          "HFIC-ART-SLOT-ADMISSION-E44EE729639032BF08400B6BFFAED30AA6781F011BF0950F8415926FC4FBB7A7",
+          "RESEARCH_ARTIFACT",
+          "9a08967abeee59931bd077bae911b200a1617d3e8fe256612bc06f319cf5a84a",
+          "RESEARCH-TXN-GENERATED-DRAFT-E44EE729639032BF08400B6BFFAED30AA6781F011BF0950F8415926FC4FBB7A7"
+        ],
+        [
+          "HFIC-CYCLE-HFIC-SESS-66851CEC7A916A35-AWAITING_CLASSIFICATION-2",
+          "RESEARCH_CYCLE",
+          "39b8c58c423fb5166f6340ff0a9e49037fb88c0e6870ba1df4d25f6dccd4f607",
+          "RESEARCH-TXN-HFICINT-CLS-1CEC7A916A35-0002"
+        ],
+        [
+          "HFIC-CYCLE-HFIC-SESS-66851CEC7A916A35-COMPLETE",
+          "RESEARCH_CYCLE",
+          "41feb5788f62ef36398aa3aef352a3af4607787d4900879df51747bb4fbb2c68",
+          "RESEARCH-TXN-HFICFIN-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-CYCLE-HFIC-SESS-66851CEC7A916A35-FROZEN",
+          "RESEARCH_CYCLE",
+          "f2e6a97db3251f95c55b0bd1dab1e0578352e3f6bf85032e3183ee75f7a26756",
+          "RESEARCH-TXN-HFIC-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-CYCLE-HFIC-SESS-8347911081CC7F7D-AWAITING_CLASSIFICATION-2",
+          "RESEARCH_CYCLE",
+          "2b846a5f4de245f9928405c481879e526b995828f272d85b68d85962f7d4525c",
+          "RESEARCH-TXN-HFICINT-CLS-911081CC7F7D-0002"
+        ],
+        [
+          "HFIC-CYCLE-HFIC-SESS-8347911081CC7F7D-COMPLETE",
+          "RESEARCH_CYCLE",
+          "9b34598610638dd547a95593d1dfe353d69716fd5fb806507274604b10fca563",
+          "RESEARCH-TXN-HFICFIN-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-CYCLE-HFIC-SESS-8347911081CC7F7D-FROZEN",
+          "RESEARCH_CYCLE",
+          "c8ba70755a2c57f6b3def780734e312b550361ebbfb304faacc79a6a077ae1cf",
+          "RESEARCH-TXN-HFIC-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-DEC-HFIC-CAND-E8B09968FD73-HFIC-SESS-66851CEC7A916A35",
+          "DECISION_EVENT",
+          "b9748bc71cb9352e53bba2fcd12164caadfdcad58a005300b006486e784fca9f",
+          "RESEARCH-TXN-HFICFIN-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-DEC-HFIC-CAND-FFB8BCA42497-HFIC-SESS-8347911081CC7F7D",
+          "DECISION_EVENT",
+          "27cedda10c9649a25c0f4152142a5fec2d021ac17401840804e68131c2210b1c",
+          "RESEARCH-TXN-HFICFIN-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-HYP-HFIC-CAND-E8B09968FD73-HFIC-SESS-66851CEC7A916A35",
+          "HYPOTHESIS_VERSION",
+          "92528d1c41cd6f3c1aee4a1c746a31d35b7abd76960f6945ff6996fb2ac4f35d",
+          "RESEARCH-TXN-HFIC-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-HYP-HFIC-CAND-FFB8BCA42497-HFIC-SESS-8347911081CC7F7D",
+          "HYPOTHESIS_VERSION",
+          "1446404a3320a7d8ad1af17af6e7470cfdacfbbc68e6fa2ad1659a81b249f746",
+          "RESEARCH-TXN-HFIC-8347911081CC7F7D"
+        ],
+        [
+          "HYPOTHESIS-VERSION-1F8C4DADAA734A45",
+          "HYPOTHESIS_VERSION",
+          "7c47d4a2b89caf51d1dc418d560710759acaf008dab9149e8d4b8cb471a32eaf",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "METRIC-TERMINAL-MATCH-AA734A45",
+          "EXPERIMENT_METRIC",
+          "2a7e66fe6e927d31865a6907e2fdc591a3b449c7a5470b3e3b499a30afd44baf",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "RESULT-ARTIFACT-343D4A154D6F1A3B3582558D",
+          "RESEARCH_ARTIFACT",
+          "cfc6c268b32cdf389a833858bd521c9fab5afe98483f1dcf41f79d9c6354a94c",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "RESULT-ARTIFACT-51D10BA94E5BA32F3E726C2D",
+          "RESEARCH_ARTIFACT",
+          "8e179bc5abb6ebdc3c831ca088e1268cfd223aa56018ffb5e273debc07c42daa",
+          "RESEARCH-TXN-14AE4343C4A7443C"
+        ],
+        [
+          "RESULT-ARTIFACT-86D8BDFBF3E9CCE726094766",
+          "RESEARCH_ARTIFACT",
+          "1ebf291c4e875030e3238608bfd20a16d8f85f95f8b08e6f0d37d30ffbb1b2ae",
+          "RESEARCH-TXN-F57389B914AA48A8"
+        ],
+        [
+          "RUN-COMPLETED-14AE4343C4A7443C",
+          "RUN_COMPLETED",
+          "1c4b3f31285d55dcccf126f650f146f481d604a5b57eb662cec5ba02adba2dd0",
+          "RESEARCH-TXN-14AE4343C4A7443C"
+        ],
+        [
+          "RUN-COMPLETED-1F8C4DADAA734A45",
+          "RUN_COMPLETED",
+          "916f6a0fd47be8cf8c90407ad7c7b0807d4fb95269a8a788a15221608cbe965d",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "RUN-COMPLETED-F57389B914AA48A8",
+          "RUN_COMPLETED",
+          "122764fc786a11bda183dade2de9b72069ed57ea0bfd7d20783a090c39b0bdd3",
+          "RESEARCH-TXN-F57389B914AA48A8"
+        ],
+        [
+          "RUN-STARTED-14AE4343C4A7443C",
+          "RUN_STARTED",
+          "115703f3067c4ca6475722806ced2c8239fdbb7b1d9be48e67865796a6de0cb8",
+          "RESEARCH-TXN-14AE4343C4A7443C"
+        ],
+        [
+          "RUN-STARTED-1F8C4DADAA734A45",
+          "RUN_STARTED",
+          "7da2ec72bcb1032d7652e56c3835fbe04c7f60bb2f6ba81b2549ddc8c2bc91ef",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "RUN-STARTED-F57389B914AA48A8",
+          "RUN_STARTED",
+          "23614027e14325024cf8aa0d6add4d81539217aee461284d2333f8aebbdd03dd",
+          "RESEARCH-TXN-F57389B914AA48A8"
+        ]
+      ]
+    },
+    "before": {
+      "completion_ids": [
+        "RUN-COMPLETED-14AE4343C4A7443C",
+        "RUN-COMPLETED-1F8C4DADAA734A45",
+        "RUN-COMPLETED-F57389B914AA48A8"
+      ],
+      "logical_sha256": "c95e8cf213577fa9d17500db1f274f6b661c000c8989b65f9f02d8757413d16b",
+      "record_counts": {
+        "DECISION_EVENT": 2,
+        "EVIDENCE_BINDING": 4,
+        "EXPERIMENT_METRIC": 1,
+        "HYPOTHESIS_VERSION": 3,
+        "RESEARCH_ARTIFACT": 41,
+        "RESEARCH_CYCLE": 6,
+        "RUN_COMPLETED": 3,
+        "RUN_STARTED": 3
+      },
+      "records": [
+        [
+          "EVIDENCE-BINDING-001-14AA48A8",
+          "EVIDENCE_BINDING",
+          "4d93cff0d8bbbd662fa2ab4e49b933c20fea7cc6c1a502fea574a6a2f6084b66",
+          "RESEARCH-TXN-F57389B914AA48A8"
+        ],
+        [
+          "EVIDENCE-BINDING-001-AA734A45",
+          "EVIDENCE_BINDING",
+          "0a46332099947d65c24bdf3c4ff7d57301b26faa3fb4543a2641aba5c134f42a",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "EVIDENCE-BINDING-001-C4A7443C",
+          "EVIDENCE_BINDING",
+          "0dcc93cc8891311d14755f3e055e12ebdc5c7e24f3ba2222846ca119637b1a48",
+          "RESEARCH-TXN-14AE4343C4A7443C"
+        ],
+        [
+          "EVIDENCE-BINDING-002-AA734A45",
+          "EVIDENCE_BINDING",
+          "0d5f864f51bb16de3787ed281beb2c7d3be3cf13a43b1b515ca01779499d7361",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "FORGE-UNIVERSE-A820B3D281B01E50",
+          "RESEARCH_ARTIFACT",
+          "33a0eba4412373827631c71e7fc9fd5a51953b2384367a3f1acaa22920e35d11",
+          "RESEARCH-TXN-FORGE-UNIVERSE-0001"
+        ],
+        [
+          "HFIC-ART-CLASSIFIER-HFIC-SESS-66851CEC7A916A35",
+          "RESEARCH_ARTIFACT",
+          "297caf32d40cecba0f640a06f7c05d84cf05fc9497695e1dd4df4ab321e582a5",
+          "RESEARCH-TXN-HFICFIN-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-ART-CLASSIFIER-HFIC-SESS-8347911081CC7F7D",
+          "RESEARCH_ARTIFACT",
+          "693374791badbd2141378212dc06e8d67a127419edd97e2e9459466998fac5f8",
+          "RESEARCH-TXN-HFICFIN-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-ART-CRITIC-INPUT-HFIC-SESS-66851CEC7A916A35",
+          "RESEARCH_ARTIFACT",
+          "bd47f66692f129620ef876ed1312c8f662f757c2438413b63541d6e0713e4a78",
+          "RESEARCH-TXN-HFIC-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-ART-CRITIC-INPUT-HFIC-SESS-8347911081CC7F7D",
+          "RESEARCH_ARTIFACT",
+          "7d8d85a3e2b1aab6580a03766f64246b5da9239c6f67e6bddaf69b190d720a7f",
+          "RESEARCH-TXN-HFIC-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-ART-CRITIC-RESULT-HFIC-SESS-66851CEC7A916A35-9174537B8BA2",
+          "RESEARCH_ARTIFACT",
+          "edcfa3e93b825e267b9f03e663886e0ed48f41cf7df6f58cd966ee0195db2c8c",
+          "RESEARCH-TXN-HFICFIN-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-ART-CRITIC-RESULT-HFIC-SESS-66851CEC7A916A35-C97C1A49BF11",
+          "RESEARCH_ARTIFACT",
+          "dcb412a57f367bdfb3f2d14eb43e4320a54991511ccae42247cc47fa9432707d",
+          "RESEARCH-TXN-HFICINT-CLS-1CEC7A916A35-0002"
+        ],
+        [
+          "HFIC-ART-CRITIC-RESULT-HFIC-SESS-8347911081CC7F7D-2291B61533CD",
+          "RESEARCH_ARTIFACT",
+          "757924bd0cd9d9cbd54f5341d6c1abd96ce9f08fbaacdc1fbe14a80293b24a17",
+          "RESEARCH-TXN-HFICFIN-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-ART-CRITIC-RESULT-HFIC-SESS-8347911081CC7F7D-E11DA2C5AD5B",
+          "RESEARCH_ARTIFACT",
+          "17f7a0ec00bf2bb8d4bd21968c3250f0f05597ad33d158762a11fbfa02fe3fbe",
+          "RESEARCH-TXN-HFICINT-CLS-911081CC7F7D-0002"
+        ],
+        [
+          "HFIC-ART-DISCOVERY-5BB6F3A47E05023E110C15643E7D3EC40C8E4B76",
+          "RESEARCH_ARTIFACT",
+          "401614842c14bcd5756612b8c7890d414502d78edea1eef8ba11f9ba422c0452",
+          "RESEARCH-TXN-DISCOVERY-5BB6F3A47E05023E110C1564"
+        ],
+        [
+          "HFIC-ART-DISCOVERY-8DFDF68B101F4AC1AE3DD66AADD3F88691143C9A",
+          "RESEARCH_ARTIFACT",
+          "77e3d925ad2b5e812b65ffc0801cad30018503e81b929df743464c31b5971494",
+          "RESEARCH-TXN-DISCOVERY-8DFDF68B101F4AC1AE3DD66A"
+        ],
+        [
+          "HFIC-ART-FORGE-CONTEXT-60EFBFCDF8196EE3",
+          "RESEARCH_ARTIFACT",
+          "41c188323a387eca2f9e8e76b619ebd9b821b8122d52a1e0e6e99a5f7b060610",
+          "RESEARCH-TXN-FORGECTX-60EFBFCDF8196EE3"
+        ],
+        [
+          "HFIC-ART-FORGE-CONTEXT-8E9CDD8605F0BB9E",
+          "RESEARCH_ARTIFACT",
+          "d5fe62e09886bd731c2df2fd0db52708eb138fd7cc7523ba8ed97526f20f3de1",
+          "RESEARCH-TXN-FORGECTX-8E9CDD8605F0BB9E"
+        ],
+        [
+          "HFIC-ART-FORGE-CONTEXT-B4E8B5B4968C6A82",
+          "RESEARCH_ARTIFACT",
+          "05cbd461d41ea271bfaccb88bfc29a0707983d8d984dc092a4aa08ac440682fe",
+          "RESEARCH-TXN-FORGECTX-B4E8B5B4968C6A82"
+        ],
+        [
+          "HFIC-ART-FORGE-CONTEXT-B67027AAF9196F48",
+          "RESEARCH_ARTIFACT",
+          "af880406f2aa96b86b81f4f4aa111b0e373dfc61d436ed455bbea353c3165faa",
+          "RESEARCH-TXN-FORGECTX-B67027AAF9196F48"
+        ],
+        [
+          "HFIC-ART-FORGE-CONTEXT-CB597A259A101955",
+          "RESEARCH_ARTIFACT",
+          "8a8874a03add203b6da506e550cdb99e0fbb35c8e4c238cf8673baa253c3318e",
+          "RESEARCH-TXN-FORGECTX-CB597A259A101955"
+        ],
+        [
+          "HFIC-ART-FORGE-CONTEXT-ECF87CBC73848B38",
+          "RESEARCH_ARTIFACT",
+          "c7652aab3130db9d88ba5e151a5b45fb3b23ac909a55363a9d11e9f9747e45ac",
+          "RESEARCH-TXN-FORGECTX-ECF87CBC73848B38"
+        ],
+        [
+          "HFIC-ART-FORGE-DRAFT-GENERATED-B2042C885A30F6FE",
+          "RESEARCH_ARTIFACT",
+          "50049ff855913f068f99617ca1d5688c151c79367a15ba60aeda92478de6b8a1",
+          "RESEARCH-TXN-GENERATED-DRAFT-E44EE729639032BF08400B6BFFAED30AA6781F011BF0950F8415926FC4FBB7A7"
+        ],
+        [
+          "HFIC-ART-FORGE-DRAFT-GENERATED-D1DF82745447998D",
+          "RESEARCH_ARTIFACT",
+          "944b975885821430a2bec013bd4d7bfc6c2d4ffc42e8bafcf81ef6823c8156be",
+          "RESEARCH-TXN-GENERATED-DRAFT-685F43510DD3BD8801D3F7A0F3FAB6333C11D0ACBBAFC73A158916E94CDC40A6"
+        ],
+        [
+          "HFIC-ART-FORGE-DRAFT-HFIC-SESS-66851CEC7A916A35",
+          "RESEARCH_ARTIFACT",
+          "cf8ad527f4d3dbc71f965288d7823250cb9646d934bbfa09c9dbaa785a0e4625",
+          "RESEARCH-TXN-HFIC-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-ART-FORGE-DRAFT-HFIC-SESS-8347911081CC7F7D",
+          "RESEARCH_ARTIFACT",
+          "0acfe0ca5bbb4fd81b49f1f34e037841df609653ad4848876672cd2159a9f96e",
+          "RESEARCH-TXN-HFIC-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-ART-INTENT-9B282D241C49344F2C9AFE1A9D55220AB39731B8",
+          "RESEARCH_ARTIFACT",
+          "9284ac744bead9128f2fa3d3df6ae5b194eb6853c5971fd2a8c9e8b56fc107be",
+          "RESEARCH-TXN-INTENT-9B282D241C49344F2C9AFE1A"
+        ],
+        [
+          "HFIC-ART-INTENT-B8F734E5758616F5FF070AD2D42CE423E7485328",
+          "RESEARCH_ARTIFACT",
+          "ffb2a67c559580b48b525e27c045d975bfa3ee6b54151efe06b252145ab8bb33",
+          "RESEARCH-TXN-INTENT-B8F734E5758616F5FF070AD2"
+        ],
+        [
+          "HFIC-ART-OP-0EB91D705F547684C9B49ACA7A9A29006B6614E5",
+          "RESEARCH_ARTIFACT",
+          "945461f02b7209e5c166b0d182520f9361376c2ae0abef0b38527b414ff08a95",
+          "RESEARCH-TXN-OP-0EB91D705F547684C9B49ACA"
+        ],
+        [
+          "HFIC-ART-OP-16B30D9532F8EB4D52A9E998A44C5F1B7A6D20AB",
+          "RESEARCH_ARTIFACT",
+          "6d5b85d498934efd1772a8d91c7dbad9b8be83cd238589f09e36a604eab9ddd7",
+          "RESEARCH-TXN-OP-16B30D9532F8EB4D52A9E998"
+        ],
+        [
+          "HFIC-ART-OP-39FD302C99F90B2A4B2CC98C65033EC5E9DFD5B1",
+          "RESEARCH_ARTIFACT",
+          "f9665048e8b9589e6bd74291dcdcf33c5a39bc1e88cd089ade0e3c5a213af557",
+          "RESEARCH-TXN-OP-39FD302C99F90B2A4B2CC98C"
+        ],
+        [
+          "HFIC-ART-OP-81461E98580DC961950AF9DA43F4C2D08D1BCA8D",
+          "RESEARCH_ARTIFACT",
+          "34b9cc9b8913391436939d13400fbeae89d6eddbe03c0a7613aaeae404af890d",
+          "RESEARCH-TXN-OP-81461E98580DC961950AF9DA"
+        ],
+        [
+          "HFIC-ART-OP-AAAF00A5B88338FBC70064A029DDEB3A0422CFCA",
+          "RESEARCH_ARTIFACT",
+          "072792d99fcb30a11fe94e7d9c5cc1924b16a1e4effb91971569cdb07ee477c7",
+          "RESEARCH-TXN-OP-AAAF00A5B88338FBC70064A0"
+        ],
+        [
+          "HFIC-ART-OP-FE3B1869B95057E92BA74CD693EC4DF5B93B3B81",
+          "RESEARCH_ARTIFACT",
+          "96dfca7a52f2e0d2a02b3ebe449e0a3895426fff7c5c59522b82309ccf5c8f7c",
+          "RESEARCH-TXN-OP-FE3B1869B95057E92BA74CD6"
+        ],
+        [
+          "HFIC-ART-OPRES-C94018623113E3E8114AEB146F6A292010DC7735",
+          "RESEARCH_ARTIFACT",
+          "1ed5cd8fab6151b2dfa6432ed9f10e7acdbc27e2183006d29528bf69c295a52c",
+          "RESEARCH-TXN-OPRES-C94018623113E3E8114AEB14"
+        ],
+        [
+          "HFIC-ART-OPRES-E7557FB5715D672AD1D8712D3387CF1688155B8C",
+          "RESEARCH_ARTIFACT",
+          "123d664b67b14fd6440ae28bccad6b0b375e4bc64fe58ba00a2da42cfb6a9512",
+          "RESEARCH-TXN-OPRES-E7557FB5715D672AD1D8712D"
+        ],
+        [
+          "HFIC-ART-RPSNAP-0E81E34A7F4C5706553A597A4B3171F0BB4DE060",
+          "RESEARCH_ARTIFACT",
+          "d0ae8bb668dc12f7e36b64a761893482608c4e25b16d55778cba5e756396b085",
+          "RESEARCH-TXN-HFIC-ART-RPSNAP-0E81E34A7F4C5706553A597A"
+        ],
+        [
+          "HFIC-ART-RPSNAP-5E344E4296F45B5B87C82716081205AF1BBD82AC",
+          "RESEARCH_ARTIFACT",
+          "811c9410454943c365018f10a81a3a0679dc192f1ab51d9d937cf10629ecdf4b",
+          "RESEARCH-TXN-HFIC-ART-RPSNAP-5E344E4296F45B5B87C82716"
+        ],
+        [
+          "HFIC-ART-RPSNAP-D3B56A5E7C4DBDCC95CAEEE3B590585EDCE1A321",
+          "RESEARCH_ARTIFACT",
+          "c886ea4bab898fac7f6c2a496160c28738239ffb905c4880237523e1e345dd44",
+          "RESEARCH-TXN-HFIC-ART-RPSNAP-D3B56A5E7C4DBDCC95CAEEE3"
+        ],
+        [
+          "HFIC-ART-SESSION-RECEIPT-HFIC-SESS-66851CEC7A916A35",
+          "RESEARCH_ARTIFACT",
+          "6b468452c50f9c22bf330a8c2f7784fe811d03c73dcd023deb422186ee45695e",
+          "RESEARCH-TXN-HFICFIN-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-ART-SESSION-RECEIPT-HFIC-SESS-8347911081CC7F7D",
+          "RESEARCH_ARTIFACT",
+          "0c82170072821dc49751b47217589b0346aa94f6df3ac8259bf932d1146f04b6",
+          "RESEARCH-TXN-HFICFIN-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-ART-SLOT-ADMISSION-685F43510DD3BD8801D3F7A0F3FAB6333C11D0ACBBAFC73A158916E94CDC40A6",
+          "RESEARCH_ARTIFACT",
+          "b9556b607663a63599255281563dc358ecd4dbb192a710ea8b0f71f0ba785666",
+          "RESEARCH-TXN-GENERATED-DRAFT-685F43510DD3BD8801D3F7A0F3FAB6333C11D0ACBBAFC73A158916E94CDC40A6"
+        ],
+        [
+          "HFIC-ART-SLOT-ADMISSION-E44EE729639032BF08400B6BFFAED30AA6781F011BF0950F8415926FC4FBB7A7",
+          "RESEARCH_ARTIFACT",
+          "9a08967abeee59931bd077bae911b200a1617d3e8fe256612bc06f319cf5a84a",
+          "RESEARCH-TXN-GENERATED-DRAFT-E44EE729639032BF08400B6BFFAED30AA6781F011BF0950F8415926FC4FBB7A7"
+        ],
+        [
+          "HFIC-CYCLE-HFIC-SESS-66851CEC7A916A35-AWAITING_CLASSIFICATION-2",
+          "RESEARCH_CYCLE",
+          "39b8c58c423fb5166f6340ff0a9e49037fb88c0e6870ba1df4d25f6dccd4f607",
+          "RESEARCH-TXN-HFICINT-CLS-1CEC7A916A35-0002"
+        ],
+        [
+          "HFIC-CYCLE-HFIC-SESS-66851CEC7A916A35-COMPLETE",
+          "RESEARCH_CYCLE",
+          "41feb5788f62ef36398aa3aef352a3af4607787d4900879df51747bb4fbb2c68",
+          "RESEARCH-TXN-HFICFIN-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-CYCLE-HFIC-SESS-66851CEC7A916A35-FROZEN",
+          "RESEARCH_CYCLE",
+          "f2e6a97db3251f95c55b0bd1dab1e0578352e3f6bf85032e3183ee75f7a26756",
+          "RESEARCH-TXN-HFIC-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-CYCLE-HFIC-SESS-8347911081CC7F7D-AWAITING_CLASSIFICATION-2",
+          "RESEARCH_CYCLE",
+          "2b846a5f4de245f9928405c481879e526b995828f272d85b68d85962f7d4525c",
+          "RESEARCH-TXN-HFICINT-CLS-911081CC7F7D-0002"
+        ],
+        [
+          "HFIC-CYCLE-HFIC-SESS-8347911081CC7F7D-COMPLETE",
+          "RESEARCH_CYCLE",
+          "9b34598610638dd547a95593d1dfe353d69716fd5fb806507274604b10fca563",
+          "RESEARCH-TXN-HFICFIN-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-CYCLE-HFIC-SESS-8347911081CC7F7D-FROZEN",
+          "RESEARCH_CYCLE",
+          "c8ba70755a2c57f6b3def780734e312b550361ebbfb304faacc79a6a077ae1cf",
+          "RESEARCH-TXN-HFIC-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-DEC-HFIC-CAND-E8B09968FD73-HFIC-SESS-66851CEC7A916A35",
+          "DECISION_EVENT",
+          "b9748bc71cb9352e53bba2fcd12164caadfdcad58a005300b006486e784fca9f",
+          "RESEARCH-TXN-HFICFIN-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-DEC-HFIC-CAND-FFB8BCA42497-HFIC-SESS-8347911081CC7F7D",
+          "DECISION_EVENT",
+          "27cedda10c9649a25c0f4152142a5fec2d021ac17401840804e68131c2210b1c",
+          "RESEARCH-TXN-HFICFIN-8347911081CC7F7D"
+        ],
+        [
+          "HFIC-HYP-HFIC-CAND-E8B09968FD73-HFIC-SESS-66851CEC7A916A35",
+          "HYPOTHESIS_VERSION",
+          "92528d1c41cd6f3c1aee4a1c746a31d35b7abd76960f6945ff6996fb2ac4f35d",
+          "RESEARCH-TXN-HFIC-66851CEC7A916A35"
+        ],
+        [
+          "HFIC-HYP-HFIC-CAND-FFB8BCA42497-HFIC-SESS-8347911081CC7F7D",
+          "HYPOTHESIS_VERSION",
+          "1446404a3320a7d8ad1af17af6e7470cfdacfbbc68e6fa2ad1659a81b249f746",
+          "RESEARCH-TXN-HFIC-8347911081CC7F7D"
+        ],
+        [
+          "HYPOTHESIS-VERSION-1F8C4DADAA734A45",
+          "HYPOTHESIS_VERSION",
+          "7c47d4a2b89caf51d1dc418d560710759acaf008dab9149e8d4b8cb471a32eaf",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "METRIC-TERMINAL-MATCH-AA734A45",
+          "EXPERIMENT_METRIC",
+          "2a7e66fe6e927d31865a6907e2fdc591a3b449c7a5470b3e3b499a30afd44baf",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "RESULT-ARTIFACT-343D4A154D6F1A3B3582558D",
+          "RESEARCH_ARTIFACT",
+          "cfc6c268b32cdf389a833858bd521c9fab5afe98483f1dcf41f79d9c6354a94c",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "RESULT-ARTIFACT-51D10BA94E5BA32F3E726C2D",
+          "RESEARCH_ARTIFACT",
+          "8e179bc5abb6ebdc3c831ca088e1268cfd223aa56018ffb5e273debc07c42daa",
+          "RESEARCH-TXN-14AE4343C4A7443C"
+        ],
+        [
+          "RESULT-ARTIFACT-86D8BDFBF3E9CCE726094766",
+          "RESEARCH_ARTIFACT",
+          "1ebf291c4e875030e3238608bfd20a16d8f85f95f8b08e6f0d37d30ffbb1b2ae",
+          "RESEARCH-TXN-F57389B914AA48A8"
+        ],
+        [
+          "RUN-COMPLETED-14AE4343C4A7443C",
+          "RUN_COMPLETED",
+          "1c4b3f31285d55dcccf126f650f146f481d604a5b57eb662cec5ba02adba2dd0",
+          "RESEARCH-TXN-14AE4343C4A7443C"
+        ],
+        [
+          "RUN-COMPLETED-1F8C4DADAA734A45",
+          "RUN_COMPLETED",
+          "916f6a0fd47be8cf8c90407ad7c7b0807d4fb95269a8a788a15221608cbe965d",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "RUN-COMPLETED-F57389B914AA48A8",
+          "RUN_COMPLETED",
+          "122764fc786a11bda183dade2de9b72069ed57ea0bfd7d20783a090c39b0bdd3",
+          "RESEARCH-TXN-F57389B914AA48A8"
+        ],
+        [
+          "RUN-STARTED-14AE4343C4A7443C",
+          "RUN_STARTED",
+          "115703f3067c4ca6475722806ced2c8239fdbb7b1d9be48e67865796a6de0cb8",
+          "RESEARCH-TXN-14AE4343C4A7443C"
+        ],
+        [
+          "RUN-STARTED-1F8C4DADAA734A45",
+          "RUN_STARTED",
+          "7da2ec72bcb1032d7652e56c3835fbe04c7f60bb2f6ba81b2549ddc8c2bc91ef",
+          "RESEARCH-TXN-1F8C4DADAA734A45"
+        ],
+        [
+          "RUN-STARTED-F57389B914AA48A8",
+          "RUN_STARTED",
+          "23614027e14325024cf8aa0d6add4d81539217aee461284d2333f8aebbdd03dd",
+          "RESEARCH-TXN-F57389B914AA48A8"
+        ]
+      ]
+    },
+    "creates_strategy_version": false,
+    "definition_fidelity": "DEFINITION_INGRESS_FIXTURE",
+    "native_compose_calls": 1,
+    "protected_files_unchanged": true,
+    "refusals": {
+      "promote": "PROMOTE_BLOCKED",
+      "stale": "STALE_EVIDENCE_SNAPSHOT"
+    },
+    "registration_edge": "SEGMENT/UNKNOWN",
+    "status": "PASS"
+  },
+  "definition_ingress": {
+    "created_before_final_classification": true,
+    "fidelity": "DEFINITION_INGRESS_FIXTURE",
+    "foreign_experiment_id": "EXP-SCIENCE-BASE-V3-FOREIGN-SAME-HYPOTHESIS",
+    "pins": [
+      {
+        "canonical_sha256": "037a9f53dc6b066d10521219b2082fd1f48bc177bf983f725c3353668d69b640",
+        "experiment_id": "EXP-SCIENCE-BASE-V3-LIST-CONTRAST",
+        "file_sha256": "91b5e47b74ce30c60e9f67566731b5b79916521c5f6f3f720990b7dacb72ad16",
+        "slot": "configs/experiment_specs/science-base-v3-list_contrast.yaml"
+      },
+      {
+        "canonical_sha256": "980fe52830689b3ff350aefa848458ea58eb8632bf94b844a9cc47fd0a721bb2",
+        "experiment_id": "EXP-SCIENCE-BASE-V3-MIXED-LIST-NUMERIC",
+        "file_sha256": "3ed3bdf156fa6ecf47ee987cae78668b9c4f84c98e66e1ff31955d1f7ac918c9",
+        "slot": "configs/experiment_specs/science-base-v3-mixed_list_numeric.yaml"
+      }
+    ],
+    "product_source_imports": "IMMUTABLE /repo; copied definition view is not runtime code",
+    "registration_edge": "SEGMENT/UNKNOWN"
+  },
+  "fault_specimen_world": "base-v2; same frozen recipe/source/masks; quote prose invalid for science; persistence/guard segment only",
+  "faults": {
+    "after-commit": {
+      "interruption": {
+        "boundary": "COMPLETION_COMMITTED_BEFORE_CALLER_RESPONSE",
+        "reads": {
+          "decoded_target_value_rows": 50688,
+          "evaluator_invocations": 1,
+          "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+          "full_trace_retained": true,
+          "full_trace_sha256": "907ec5ca2d56fddd5e15a3c89a8fcdfc51fd9550ef064a5f3666291d63974364",
+          "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+          "parquet_read_calls": 200,
+          "phase": "NUMERIC",
+          "target_projection_calls": 22
+        },
+        "state": {
+          "completion_ids": [
+            "RUN-COMPLETED-9EB0448060B84643",
+            "RUN-COMPLETED-C84AF57B1A6041F9"
+          ],
+          "logical_sha256": "989818454432d4d3ae11c0ff56fbab188aa3f3192fb6fb4dcb09084b2156cd88",
+          "record_counts": {
+            "DECISION_EVENT": 2,
+            "EVIDENCE_BINDING": 4,
+            "EXPERIMENT_METRIC": 1,
+            "HYPOTHESIS_VERSION": 3,
+            "RESEARCH_ARTIFACT": 40,
+            "RESEARCH_CYCLE": 6,
+            "RUN_COMPLETED": 2,
+            "RUN_STARTED": 2
+          }
+        }
+      },
+      "matching_committed_completions": 1,
+      "recovery": {
+        "after": {
+          "completion_ids": [
+            "RUN-COMPLETED-9EB0448060B84643",
+            "RUN-COMPLETED-C84AF57B1A6041F9"
+          ],
+          "logical_sha256": "989818454432d4d3ae11c0ff56fbab188aa3f3192fb6fb4dcb09084b2156cd88",
+          "record_counts": {
+            "DECISION_EVENT": 2,
+            "EVIDENCE_BINDING": 4,
+            "EXPERIMENT_METRIC": 1,
+            "HYPOTHESIS_VERSION": 3,
+            "RESEARCH_ARTIFACT": 40,
+            "RESEARCH_CYCLE": 6,
+            "RUN_COMPLETED": 2,
+            "RUN_STARTED": 2
+          }
+        },
+        "before": {
+          "completion_ids": [
+            "RUN-COMPLETED-9EB0448060B84643",
+            "RUN-COMPLETED-C84AF57B1A6041F9"
+          ],
+          "logical_sha256": "989818454432d4d3ae11c0ff56fbab188aa3f3192fb6fb4dcb09084b2156cd88",
+          "record_counts": {
+            "DECISION_EVENT": 2,
+            "EVIDENCE_BINDING": 4,
+            "EXPERIMENT_METRIC": 1,
+            "HYPOTHESIS_VERSION": 3,
+            "RESEARCH_ARTIFACT": 40,
+            "RESEARCH_CYCLE": 6,
+            "RUN_COMPLETED": 2,
+            "RUN_STARTED": 2
+          }
+        },
+        "entry_lane": "REPLAY_AVAILABLE",
+        "reads": {
+          "decoded_target_value_rows": 0,
+          "evaluator_invocations": 0,
+          "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+          "full_trace_retained": true,
+          "full_trace_sha256": "f41688613ed76bf3d85412d47a654688811324e01b9e27397ee8ecbc6864484f",
+          "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+          "parquet_read_calls": 188,
+          "phase": "REPLAY",
+          "target_projection_calls": 0
+        },
+        "response": {
+          "git_mutation_count": 0,
+          "lane": "FAST_LANE",
+          "next_action": "REPLAY_PRIOR_RUN",
+          "prior_run_id": "RUN-A30B6618369314CE983648B6",
+          "provider_calls_actual": 0,
+          "reason_codes": [
+            "EXACT_DUPLICATE_COMPLETED"
+          ],
+          "run_id_or_null": "RUN-A30B6618369314CE983648B6",
+          "run_key_sha256": "a30b6618369314ce983648b60aed1a31aec2693fec0f0ebec10bc42f57f3da20",
+          "scientific_terminal": "INCONCLUSIVE",
+          "status": "COMPLETE"
+        },
+        "spec_sha256": "ef35bc19704ae2bf98ba07780c1300af128170cf21c857e68b4660610205c871"
+      }
+    },
+    "before-commit": {
+      "interruption": {
+        "artifact": "RESULT-ARTIFACT-A30B6618369314CE983648B6.json",
+        "artifact_sha256": "a791621acdef0ec06cf306ba522b1e1d5d7fefcf2fbad6092fd72b8e3789ab49",
+        "boundary": "RESULT_FILE_WRITTEN_BEFORE_COMPLETION_COMMIT",
+        "reads": {
+          "decoded_target_value_rows": 50688,
+          "evaluator_invocations": 1,
+          "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+          "full_trace_retained": true,
+          "full_trace_sha256": "907ec5ca2d56fddd5e15a3c89a8fcdfc51fd9550ef064a5f3666291d63974364",
+          "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+          "parquet_read_calls": 200,
+          "phase": "NUMERIC",
+          "target_projection_calls": 22
+        },
+        "state": {
+          "completion_ids": [
+            "RUN-COMPLETED-C84AF57B1A6041F9"
+          ],
+          "logical_sha256": "35dd95f340bb0b31b31ca6771555a079ea00f9b8aa4f55ca5eb9b01c5113951d",
+          "record_counts": {
+            "DECISION_EVENT": 2,
+            "EVIDENCE_BINDING": 2,
+            "EXPERIMENT_METRIC": 1,
+            "HYPOTHESIS_VERSION": 3,
+            "RESEARCH_ARTIFACT": 39,
+            "RESEARCH_CYCLE": 6,
+            "RUN_COMPLETED": 1,
+            "RUN_STARTED": 1
+          }
+        }
+      },
+      "matching_committed_completions": 1,
+      "recovery": {
+        "after": {
+          "completion_ids": [
+            "RUN-COMPLETED-C614AA20FCC04999",
+            "RUN-COMPLETED-C84AF57B1A6041F9"
+          ],
+          "logical_sha256": "77657b6ad81a3ca9df1aa638834c3c3370f49726e949fd116e93220725b9d9a4",
+          "record_counts": {
+            "DECISION_EVENT": 2,
+            "EVIDENCE_BINDING": 4,
+            "EXPERIMENT_METRIC": 1,
+            "HYPOTHESIS_VERSION": 3,
+            "RESEARCH_ARTIFACT": 40,
+            "RESEARCH_CYCLE": 6,
+            "RUN_COMPLETED": 2,
+            "RUN_STARTED": 2
+          }
+        },
+        "before": {
+          "completion_ids": [
+            "RUN-COMPLETED-C84AF57B1A6041F9"
+          ],
+          "logical_sha256": "35dd95f340bb0b31b31ca6771555a079ea00f9b8aa4f55ca5eb9b01c5113951d",
+          "record_counts": {
+            "DECISION_EVENT": 2,
+            "EVIDENCE_BINDING": 2,
+            "EXPERIMENT_METRIC": 1,
+            "HYPOTHESIS_VERSION": 3,
+            "RESEARCH_ARTIFACT": 39,
+            "RESEARCH_CYCLE": 6,
+            "RUN_COMPLETED": 1,
+            "RUN_STARTED": 1
+          }
+        },
+        "entry_lane": "FAST_LANE_READY",
+        "reads": {
+          "decoded_target_value_rows": 50688,
+          "evaluator_invocations": 1,
+          "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+          "full_trace_retained": true,
+          "full_trace_sha256": "907ec5ca2d56fddd5e15a3c89a8fcdfc51fd9550ef064a5f3666291d63974364",
+          "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+          "parquet_read_calls": 200,
+          "phase": "NUMERIC",
+          "target_projection_calls": 22
+        },
+        "response": {
+          "capability_result": {
+            "claim_level": "EXPLORATORY_PROXY",
+            "labeled_net_return": false,
+            "provider_api_rpc_wss_calls": 0,
+            "result_sha256": "095e13a28ab9376c54c2548b38d5453446754c73fcac2d30c2f3f1eb88740a04",
+            "source_lineage": {
+              "candidate_id": "HFIC-CAND-E8B09968FD73",
+              "critic_input_packet_sha256": "3912cd66647ba1e5a8933e4c387b9b14087730478da54e60ecf7958f7f69cf41",
+              "critic_result_sha256": "80aa1289a9e707dd9f9db4e41b88bfad7e603ce013f11a15e0b3001eaa2b7aed",
+              "definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+              "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+              "existing_look_ref": "HFIC-ART-DISCOVERY-AEB6785226438165C934A314C6126BDAA5444432",
+              "grounded_result_sha256": "095e13a28ab9376c54c2548b38d5453446754c73fcac2d30c2f3f1eb88740a04",
+              "market_evidence_epoch_sha256": "382fa6960603587547296b1c992f5ca470c165ed12079b1b8474725371d13e20",
+              "new_scientific_look": false,
+              "scientific_terminal": "PASS_FAST_LANE_READY",
+              "session_id": "HFIC-SESS-13570E02BFD3C2CB"
+            },
+            "spec_sha256": "c34ecb1f6d432d320d589427cb7054fe2cc5370c6c0d4c6860ba3e569d683d8e",
+            "status": "COMPLETE",
+            "summary": {
+              "ablations": [],
+              "anchor_kind": "NOMINATION_T0",
+              "base_x_n": 24,
+              "baseline": {
+                "downside": {
+                  "es10_return": -0.035,
+                  "es10_tail_mass_n": 2.0,
+                  "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                  "le_minus_20_n": 0,
+                  "le_minus_20_rate": 0.0,
+                  "le_minus_50_n": 0,
+                  "le_minus_50_rate": 0.0,
+                  "missing_n": 0,
+                  "negative_mass": 0.13,
+                  "negative_n": 6,
+                  "observed_n": 20,
+                  "p05": -0.0305,
+                  "p10": -0.021,
+                  "p25": -0.01,
+                  "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                  "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                  "status": "OBSERVED",
+                  "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                  "worst_negative_share": 0.3076923076923077,
+                  "zero_n": 2
+                },
+                "mean_target": 0.045000000000000005,
+                "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "median_target": 0.04,
+                "observed_n": 20,
+                "view": "BASELINE_DECISION_ELIGIBLE"
+              },
+              "block_count": 2,
+              "by_calendar_block": [
+                {
+                  "downside": {
+                    "es10_return": 0.1,
+                    "es10_tail_mass_n": 0.5,
+                    "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                    "le_minus_20_n": 0,
+                    "le_minus_20_rate": 0.0,
+                    "le_minus_50_n": 0,
+                    "le_minus_50_rate": 0.0,
+                    "missing_n": 0,
+                    "negative_mass": 0.0,
+                    "negative_n": 0,
+                    "observed_n": 5,
+                    "p05": 0.102,
+                    "p10": 0.104,
+                    "p25": 0.11,
+                    "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                    "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                    "status": "OBSERVED",
+                    "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                    "worst_negative_share": null,
+                    "zero_n": 0
+                  },
+                  "mean_target": 0.12000000000000002,
+                  "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                  "median_target": 0.12,
+                  "observed_n": 5,
+                  "view": "2026-10-01"
+                },
+                {
+                  "downside": {
+                    "es10_return": 0.06,
+                    "es10_tail_mass_n": 0.5,
+                    "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                    "le_minus_20_n": 0,
+                    "le_minus_20_rate": 0.0,
+                    "le_minus_50_n": 0,
+                    "le_minus_50_rate": 0.0,
+                    "missing_n": 0,
+                    "negative_mass": 0.0,
+                    "negative_n": 0,
+                    "observed_n": 5,
+                    "p05": 0.062,
+                    "p10": 0.064,
+                    "p25": 0.07,
+                    "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                    "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                    "status": "OBSERVED",
+                    "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                    "worst_negative_share": null,
+                    "zero_n": 0
+                  },
+                  "mean_target": 0.08,
+                  "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                  "median_target": 0.08,
+                  "observed_n": 5,
+                  "view": "2026-10-05"
+                }
+              ],
+              "by_cohort": [
+                {
+                  "base_x_n": 12,
+                  "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+                  "decision_eligible_n": 10,
+                  "denominator_base_x": 12,
+                  "downside": {
+                    "es10_return": 0.1,
+                    "es10_tail_mass_n": 0.5,
+                    "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                    "le_minus_20_n": 0,
+                    "le_minus_20_rate": 0.0,
+                    "le_minus_50_n": 0,
+                    "le_minus_50_rate": 0.0,
+                    "missing_n": 0,
+                    "negative_mass": 0.0,
+                    "negative_n": 0,
+                    "observed_n": 5,
+                    "p05": 0.102,
+                    "p10": 0.104,
+                    "p25": 0.11,
+                    "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                    "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                    "status": "OBSERVED",
+                    "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                    "worst_negative_share": null,
+                    "zero_n": 0
+                  },
+                  "exclusion_reasons": {
+                    "ABSENT": 1,
+                    "UNIVERSE_FAIL": 1
+                  },
+                  "feature_admissible": 10,
+                  "feature_unknown_n": 0,
+                  "independent_replication": false,
+                  "matched_n": 5,
+                  "mean_target": 0.12000000000000002,
+                  "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                  "median_target": 0.12,
+                  "membership": "DESCRIPTIVE_NOT_INDEPENDENT",
+                  "missing_target_n": 0,
+                  "observed_target_n": 5,
+                  "population_n": 12,
+                  "shared_decision_n": 0,
+                  "target_exclusion_reasons": {},
+                  "target_observed_after_decision": 5,
+                  "view": "REL-20261001T000000Z-20261002T000000Z"
+                },
+                {
+                  "base_x_n": 12,
+                  "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+                  "decision_eligible_n": 10,
+                  "denominator_base_x": 12,
+                  "downside": {
+                    "es10_return": 0.06,
+                    "es10_tail_mass_n": 0.5,
+                    "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                    "le_minus_20_n": 0,
+                    "le_minus_20_rate": 0.0,
+                    "le_minus_50_n": 0,
+                    "le_minus_50_rate": 0.0,
+                    "missing_n": 0,
+                    "negative_mass": 0.0,
+                    "negative_n": 0,
+                    "observed_n": 5,
+                    "p05": 0.062,
+                    "p10": 0.064,
+                    "p25": 0.07,
+                    "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                    "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                    "status": "OBSERVED",
+                    "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                    "worst_negative_share": null,
+                    "zero_n": 0
+                  },
+                  "exclusion_reasons": {
+                    "ABSENT": 1,
+                    "UNIVERSE_FAIL": 1
+                  },
+                  "feature_admissible": 10,
+                  "feature_unknown_n": 0,
+                  "independent_replication": false,
+                  "matched_n": 5,
+                  "mean_target": 0.08,
+                  "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                  "median_target": 0.08,
+                  "membership": "DESCRIPTIVE_NOT_INDEPENDENT",
+                  "missing_target_n": 0,
+                  "observed_target_n": 5,
+                  "population_n": 12,
+                  "shared_decision_n": 0,
+                  "target_exclusion_reasons": {},
+                  "target_observed_after_decision": 5,
+                  "view": "REL-20261005T000000Z-20261006T000000Z"
+                }
+              ],
+              "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V3",
+              "claim_level": "EXPLORATORY_PROXY",
+              "cohort_independent_replication": false,
+              "cohort_slices_are_descriptive": true,
+              "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+              "cost": {
+                "decision_sensitivity": "NOT_EVALUATED",
+                "labeled_net_return": false,
+                "scenarios": {},
+                "source_status": null,
+                "status": "ABSENT"
+              },
+              "decision_eligible_n": 20,
+              "downside": {
+                "es10_return": 0.06,
+                "es10_tail_mass_n": 1.0,
+                "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                "le_minus_20_n": 0,
+                "le_minus_20_rate": 0.0,
+                "le_minus_50_n": 0,
+                "le_minus_50_rate": 0.0,
+                "missing_n": 0,
+                "negative_mass": 0.0,
+                "negative_n": 0,
+                "observed_n": 10,
+                "p05": 0.0645,
+                "p10": 0.069,
+                "p25": 0.0825,
+                "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                "status": "OBSERVED",
+                "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                "worst_negative_share": null,
+                "zero_n": 0
+              },
+              "downside_readout_exposure": {
+                "fixed_metrics": [
+                  "p05",
+                  "p10",
+                  "p25",
+                  "le_minus_20_rate",
+                  "le_minus_50_rate",
+                  "es10_return",
+                  "negative_mass",
+                  "worst_negative_share"
+                ],
+                "new_threshold_trials": false,
+                "profile": "DOWNSIDE_DESCRIPTIVE_V1"
+              },
+              "duplicate_delivery_count": 0,
+              "eligibility_uses_target": false,
+              "engine_emits_alpha": false,
+              "episode_counts": {
+                "n_admitted": 24,
+                "n_decision_eligible": 20,
+                "n_joint_feature_supported": 20,
+                "n_matched": 10,
+                "n_target_available": 10,
+                "repeated_mint_n": 1,
+                "unique_episode_n": 24,
+                "unique_mint_n": 23
+              },
+              "episode_target_attrition": {
+                "adjustment": "NONE_REPORTED_ONLY",
+                "decision_baseline": {},
+                "matched": {}
+              },
+              "exclusion_reasons": {
+                "ABSENT": 2,
+                "UNIVERSE_FAIL": 2
+              },
+              "experiment_recipe": {
+                "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+                "cost_label": "ABSENT",
+                "frozen_input": [
+                  {
+                    "census_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261001T000000Z-20261002T000000Z/6efb454b7acf19f6/census.parquet",
+                    "census_sha256": "5e72a1701d9a146e0c855011cf62bfc5b69967c9117957dff510a38b27e8d139",
+                    "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+                    "dataset_id": "DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001",
+                    "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+                    "evidence_role": "EXPLORATORY_REUSE",
+                    "holdout": false,
+                    "observations_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261001T000000Z-20261002T000000Z/6efb454b7acf19f6/observations.parquet",
+                    "observations_sha256": "4fde6f0bae6b1ed4144bb5f5365618dfe2f08009163ed0f905c59cff75187505",
+                    "population": "OPPORTUNITY_EPISODES",
+                    "release_id": "6efb454b7acf19f6dd4db235e8d07ada26faf94d53f7a425074e56fbb3be0541",
+                    "schedule_binding": {
+                      "availability_grace_seconds": 300,
+                      "dense_step_seconds": 300,
+                      "dense_until_seconds": 21600,
+                      "dispatch_window_seconds": 60,
+                      "horizon_seconds": 259200,
+                      "hourly_step_seconds": 3600,
+                      "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                      "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+                      "witness_max_age_seconds": 120
+                    },
+                    "schedule_lateness_seconds": null,
+                    "schedule_point_due_offset_seconds": null,
+                    "schedule_point_lateness": null,
+                    "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+                  },
+                  {
+                    "census_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261005T000000Z-20261006T000000Z/7d01a7cf3c357815/census.parquet",
+                    "census_sha256": "d895badc51cf31d0d298a389c09255213387e9c7e71046179eb4ef02e68119ae",
+                    "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+                    "dataset_id": "DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001",
+                    "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+                    "evidence_role": "EXPLORATORY_REUSE",
+                    "holdout": false,
+                    "observations_rel": "datasets/opportunity_episodes_corpus/cohorts/REL-20261005T000000Z-20261006T000000Z/7d01a7cf3c357815/observations.parquet",
+                    "observations_sha256": "55fb8e96e6915ccbc396e613d69b8183456618e707caacc94701211b40436d29",
+                    "population": "OPPORTUNITY_EPISODES",
+                    "release_id": "7d01a7cf3c35781535dabffaca72c6398f931c8ea77ce4e3eb1bfcbb228397ee",
+                    "schedule_binding": {
+                      "availability_grace_seconds": 300,
+                      "dense_step_seconds": 300,
+                      "dense_until_seconds": 21600,
+                      "dispatch_window_seconds": 60,
+                      "horizon_seconds": 259200,
+                      "hourly_step_seconds": 3600,
+                      "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                      "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+                      "witness_max_age_seconds": 120
+                    },
+                    "schedule_lateness_seconds": null,
+                    "schedule_point_due_offset_seconds": null,
+                    "schedule_point_lateness": null,
+                    "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+                  }
+                ],
+                "labeled_net_return": false,
+                "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1",
+                "research_scope_evidence": {
+                  "bindings": [
+                    {
+                      "adapter": "ADMISSION_FRAME_V1",
+                      "census_sha256": "5e72a1701d9a146e0c855011cf62bfc5b69967c9117957dff510a38b27e8d139",
+                      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+                      "frames_sha256": "ec153501e623f839d2f0614a623980cec3ed3f6ef6b09282217ae81a54f2ccef",
+                      "release_id": "6efb454b7acf19f6dd4db235e8d07ada26faf94d53f7a425074e56fbb3be0541",
+                      "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+                    },
+                    {
+                      "adapter": "ADMISSION_FRAME_V1",
+                      "census_sha256": "d895badc51cf31d0d298a389c09255213387e9c7e71046179eb4ef02e68119ae",
+                      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+                      "frames_sha256": "ef248994a75af4b4d708ba7d8c114ca12f94c32d110dbb68b3c7376d8be3624f",
+                      "release_id": "7d01a7cf3c35781535dabffaca72c6398f931c8ea77ce4e3eb1bfcbb228397ee",
+                      "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+                    }
+                  ],
+                  "evidence_sha256": "261dea0ac14d4d82a40bf27d75ecb622e3163f71b6f32378bbdb36ba68641e2e"
+                },
+                "research_scope_rule_sha256": "f4691c8a3f72dde5d96c18a33db845ea2d68dbb1c940d1bd02392d5e53740257",
+                "schema": "smial.hfic-temporal-query",
+                "schema_version": "1.2",
+                "scientific_identity": "c34ecb1f6d432d320d589427cb7054fe2cc5370c6c0d4c6860ba3e569d683d8e",
+                "spec": {
+                  "adaptation_of": null,
+                  "budget_allocation": "COMPOUND_FIRST",
+                  "query_id": "LAV-LIST_CONTRAST",
+                  "schema": "smial.hfic-temporal-query",
+                  "schema_version": "1.2",
+                  "scientific_body": {
+                    "anchor_kind": "NOMINATION_T0",
+                    "contrast": "MATCHED_VS_ELIGIBLE_COMPLEMENT",
+                    "cost_profile": null,
+                    "decision_point": "E1800",
+                    "diagnostic_slices": [],
+                    "entry_model": {
+                      "assumed_latency_seconds": 0,
+                      "kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT"
+                    },
+                    "evaluation": {
+                      "ablations": "DROP_ONE_CONDITION",
+                      "baseline": "SAME_DECISION_ELIGIBLE",
+                      "calendar_block": "UTC_DAY_OF_DECISION"
+                    },
+                    "features": [],
+                    "hypothesis_kind": "LIST_CONTRAST",
+                    "list_condition": {
+                      "clauses": [
+                        {
+                          "all_of": [
+                            "JUPITER:toporganicscore:5m"
+                          ],
+                          "any_of": [],
+                          "count": null,
+                          "none_of": []
+                        }
+                      ],
+                      "definition_refs": {
+                        "JUPITER:toporganicscore:5m": "8a35ad6835c5cd2a6c7fe772002f3c2a4d616d53479297130f88f25e978b48c0"
+                      },
+                      "required_observed_lists": [
+                        "JUPITER:toporganicscore:5m"
+                      ],
+                      "schema": "smial.list-selector",
+                      "schema_version": "1.0"
+                    },
+                    "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1",
+                    "population": "OPPORTUNITY_EPISODES",
+                    "predicates": [],
+                    "research_scope": {
+                      "anchor_kind": "NOMINATION_T0",
+                      "coverage_policy": "REQUIRE_KNOWN_REFERENCED",
+                      "definition_refs": {},
+                      "evidence_selection": {
+                        "kind": "EXPLICIT_VERIFIED_RELEASE_SET"
+                      },
+                      "membership_time_basis": "EPISODE_T0",
+                      "population": "OPPORTUNITY_EPISODES",
+                      "schema": "smial.research-scope",
+                      "schema_version": "2.0",
+                      "universe_selector": {
+                        "clauses": [
+                          {
+                            "all_of": [],
+                            "any_of": [],
+                            "count": null,
+                            "none_of": []
+                          }
+                        ],
+                        "required_observed_lists": [],
+                        "schema": "smial.list-selector",
+                        "schema_version": "1.0"
+                      }
+                    },
+                    "target": {
+                      "exit_point": "E14400",
+                      "field_id": "FIELD-USD-PRICE-001",
+                      "kind": "PRICE_RELATIVE_PROXY",
+                      "reference_point": "E1800"
+                    },
+                    "time_contract": {
+                      "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                      "time_feature_clock": "FIRST_RELIABLE_AVAILABLE_AT"
+                    }
+                  },
+                  "search_tier": "COMPOUND_SCREEN",
+                  "spec_sha256": "c34ecb1f6d432d320d589427cb7054fe2cc5370c6c0d4c6860ba3e569d683d8e"
+                },
+                "target_kind": "PRICE_RELATIVE_PROXY",
+                "universe_policy": {
+                  "holder_field_id": "FIELD-HOLDER-COUNT-001",
+                  "liquidity_field_id": "FIELD-LIQUIDITY-USD-001",
+                  "min_holders": "50",
+                  "min_liquidity_usd": "5000",
+                  "rule": "ALL_OF_AT_DECISION_TIME",
+                  "semantic_sha256": "63b33150869273e8f5a0d5d214c8c679e24b5468125164ddcf95326bac4d533a"
+                }
+              },
+              "feature_admissible_n": 20,
+              "feature_unknown_n": 0,
+              "independence": "UNKNOWN",
+              "independent_replication": null,
+              "integrity_conflict_count": 0,
+              "labeled_net_return": false,
+              "later_target_observed_n": 10,
+              "main_question_count_includes_variants": false,
+              "matched_feature_means": {},
+              "matched_n": 10,
+              "mean_target": 0.1,
+              "mean_target_kind": "PRICE_RELATIVE_PROXY",
+              "mean_target_units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+              "median_target": 0.1,
+              "missing_is_not_zero": true,
+              "missing_stress_model": {
+                "label": "MODEL",
+                "mean_target": 0.1,
+                "stress_return": -1.0,
+                "writes_raw_history": false
+              },
+              "missing_target_mean_to_zero": null,
+              "missing_target_n": 0,
+              "non_claims": [
+                "NO_ALPHA",
+                "NO_NET_RETURN",
+                "NO_INTRABAR_STOP",
+                "NO_CAUSAL_IDENTIFICATION",
+                "NO_SOURCE_PRICE_EVENT_TIME",
+                "MEMBERSHIP_IS_OBSERVATIONAL_NOT_CAUSAL",
+                "NO_IID_CLAIM",
+                "NOT_NEWBORN_BIRTH_POPULATION",
+                "TARGET_ATTRITION_NOT_ADJUSTED"
+              ],
+              "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1",
+              "observation_index_passes": 1,
+              "observed_target_n": 10,
+              "pooled": {
+                "denominator_base_x": 24,
+                "downside": {
+                  "es10_return": 0.06,
+                  "es10_tail_mass_n": 1.0,
+                  "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                  "le_minus_20_n": 0,
+                  "le_minus_20_rate": 0.0,
+                  "le_minus_50_n": 0,
+                  "le_minus_50_rate": 0.0,
+                  "missing_n": 0,
+                  "negative_mass": 0.0,
+                  "negative_n": 0,
+                  "observed_n": 10,
+                  "p05": 0.0645,
+                  "p10": 0.069,
+                  "p25": 0.0825,
+                  "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                  "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                  "status": "OBSERVED",
+                  "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                  "worst_negative_share": null,
+                  "zero_n": 0
+                },
+                "feature_admissible": 20,
+                "independent_replication": null,
+                "mean_target": 0.1,
+                "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "median_target": 0.1,
+                "target_observed_after_decision": 10,
+                "view": "pooled"
+              },
+              "population": "OPPORTUNITY_EPISODES",
+              "population_n": 24,
+              "query_id": "LAV-LIST_CONTRAST",
+              "required_cohorts": [
+                "REL-20261001T000000Z-20261002T000000Z",
+                "REL-20261005T000000Z-20261006T000000Z"
+              ],
+              "research_scope": {
+                "applied_sha256": "91f8093c6dfcd7080a2ca724c9d4fa72c9e151d1055916a7b7e5cff73f805199",
+                "base_admitted_n": 24,
+                "contrast": {
+                  "comparator": {
+                    "distinct_day_n": 2,
+                    "distinct_mint_n": 10,
+                    "mean_target": -0.01,
+                    "n": 10,
+                    "target_missing_n": 0,
+                    "target_observed_n": 10
+                  },
+                  "kind": "MATCHED_VS_ELIGIBLE_COMPLEMENT",
+                  "kind_of_claim": "OBSERVATIONAL_ASSOCIATION",
+                  "observed_target_difference": 0.11,
+                  "status": "EVALUATED"
+                },
+                "coverage": {
+                  "base_admitted_n": 24,
+                  "signal_false_n": 12,
+                  "signal_invalid_n": 0,
+                  "signal_true_n": 12,
+                  "signal_unknown_n": 0,
+                  "universe_false_n": 0,
+                  "universe_invalid_n": 0,
+                  "universe_true_n": 24,
+                  "universe_unknown_n": 0
+                },
+                "decision_eligible_n": 20,
+                "diagnostic_slices": [],
+                "disclosed_comparison_n": 2,
+                "disclosed_comparisons": [
+                  {
+                    "id": "PRIMARY",
+                    "kind": "LIST_CONTRAST"
+                  },
+                  {
+                    "id": "CONTRAST",
+                    "kind": "MATCHED_VS_ELIGIBLE_COMPLEMENT"
+                  }
+                ],
+                "evidence_sha256": "261dea0ac14d4d82a40bf27d75ecb622e3163f71b6f32378bbdb36ba68641e2e",
+                "hypothesis_kind": "LIST_CONTRAST",
+                "matched": {
+                  "distinct_day_n": 2,
+                  "distinct_mint_n": 9,
+                  "mean_target": 0.1,
+                  "n": 10,
+                  "target_missing_n": 0,
+                  "target_observed_n": 10
+                },
+                "membership_time_basis": "EPISODE_T0",
+                "rule_sha256": "f4691c8a3f72dde5d96c18a33db845ea2d68dbb1c940d1bd02392d5e53740257",
+                "schema": "smial.research-scope-result",
+                "schema_version": "1.0",
+                "scope_sha256": "60ecc7e3bad76442d05e7ef6670ac8a593b6ca41ab6c9ccad5af62d812e04355",
+                "slices_overlap_not_additive": false,
+                "universe_pass_n": 24
+              },
+              "schema": "smial.hfic-temporal-query",
+              "search_tier": "COMPOUND_SCREEN",
+              "source_price_event_time": "UNKNOWN",
+              "spec_sha256": "c34ecb1f6d432d320d589427cb7054fe2cc5370c6c0d4c6860ba3e569d683d8e",
+              "target_exclusion_reasons": {
+                "by_cohort": {
+                  "REL-20261001T000000Z-20261002T000000Z": {},
+                  "REL-20261005T000000Z-20261006T000000Z": {}
+                },
+                "pooled": {}
+              },
+              "target_kind": "PRICE_RELATIVE_PROXY",
+              "time_feature_clock": "FIRST_RELIABLE_AVAILABLE_AT",
+              "unique_decision_n": 24,
+              "unique_mint_n": 23,
+              "universe_policy": {
+                "holder_field_id": "FIELD-HOLDER-COUNT-001",
+                "liquidity_field_id": "FIELD-LIQUIDITY-USD-001",
+                "min_holders": "50",
+                "min_liquidity_usd": "5000",
+                "n_base": 24,
+                "n_fail": 2,
+                "n_pass": 22,
+                "n_unknown": 0,
+                "rule": "ALL_OF_AT_DECISION_TIME",
+                "semantic_sha256": "63b33150869273e8f5a0d5d214c8c679e24b5468125164ddcf95326bac4d533a"
+              },
+              "viewed_variants": [
+                "MATCHED_OBSERVED",
+                "BASELINE_DECISION_ELIGIBLE",
+                "DOWNSIDE_DESCRIPTIVE_V1"
+              ],
+              "winner_share_of_positive": 0.1400000000000001
+            },
+            "target_kind": "PRICE_RELATIVE_PROXY",
+            "terminal": "INCONCLUSIVE"
+          },
+          "git_mutation_count": 0,
+          "lane": "FAST_LANE",
+          "next_action": "SEARCH_PRIOR_WORK",
+          "passport": {
+            "artifact_manifest_sha256": "02c0c48d4675b461dbbfed59d4bd4899322a1ae5f1d2ccaaee957a4e6ccd4bd0",
+            "as_of": "2026-10-14T12:12:30.560388Z",
+            "availability_cutoff": "2026-10-14T12:12:30.560388Z",
+            "capability_closure_sha256": "4284a2b6ff60c2ad2c33e70653cfee0e5085f6f0bcdfd6adb935c3bad159db12",
+            "cash_spend_usd_cents": 0,
+            "completed_at": "2026-10-14T12:12:30.560388Z",
+            "config_sha256": "2ef86bb9ddf64cf3f252bcd758c82e2a012876a871e87dddd3a43c4a0bde6375",
+            "dataset_fingerprints": [
+              "fe417b100592c2cee8ec3d116e7e2bc0b3e34d529e34f9c5923cca2f522e6eac"
+            ],
+            "dataset_manifest_ids": [
+              "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb"
+            ],
+            "execution_status": "COMPLETE",
+            "experiment_id": "EXP-SCIENCE-BASE-V2-LIST-CONTRAST",
+            "experiment_spec_sha256": "ef35bc19704ae2bf98ba07780c1300af128170cf21c857e68b4660610205c871",
+            "first_reliable_available_at": "2026-10-14T12:12:30.560388Z",
+            "holdout_consumption_ids": [],
+            "hypothesis_definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+            "hypothesis_version_id": "HYP-HFIC-CAND-E8B09968FD73",
+            "limitations": [],
+            "non_claims": [
+              "NO_ALPHA",
+              "NO_NETRETURN",
+              "NO_NEW_SCIENTIFIC_LOOK"
+            ],
+            "observation_panel_snapshot_sha256": null,
+            "observation_schedule_authority_sha256": null,
+            "observation_schedule_sha256": null,
+            "provider_calls_actual": 0,
+            "provider_calls_planned": 0,
+            "query_recipe_binding": {
+              "reason": "CAPABILITY_DESCRIPTOR_QUERY_RECIPE_NOT_REQUIRED",
+              "status": "NOT_APPLICABLE"
+            },
+            "query_recipe_ids": [],
+            "query_recipe_sha256s": [],
+            "random_seed_or_null": null,
+            "result_artifact_id": "RESULT-ARTIFACT-A30B6618369314CE983648B6",
+            "result_artifact_logical_uri": "smial-data://research/artifacts/results/RESULT-ARTIFACT-A30B6618369314CE983648B6.json",
+            "result_digest_sha256": "02c0c48d4675b461dbbfed59d4bd4899322a1ae5f1d2ccaaee957a4e6ccd4bd0",
+            "run_id": "RUN-A30B6618369314CE983648B6",
+            "run_key_sha256": "a30b6618369314ce983648b60aed1a31aec2693fec0f0ebec10bc42f57f3da20",
+            "runner_capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+            "runner_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+            "scientific_terminal": "INCONCLUSIVE",
+            "source_lineage": {
+              "candidate_id": "HFIC-CAND-E8B09968FD73",
+              "critic_input_packet_sha256": "3912cd66647ba1e5a8933e4c387b9b14087730478da54e60ecf7958f7f69cf41",
+              "critic_result_sha256": "80aa1289a9e707dd9f9db4e41b88bfad7e603ce013f11a15e0b3001eaa2b7aed",
+              "definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+              "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+              "existing_look_ref": "HFIC-ART-DISCOVERY-AEB6785226438165C934A314C6126BDAA5444432",
+              "grounded_result_sha256": "095e13a28ab9376c54c2548b38d5453446754c73fcac2d30c2f3f1eb88740a04",
+              "market_evidence_epoch_sha256": "382fa6960603587547296b1c992f5ca470c165ed12079b1b8474725371d13e20",
+              "new_scientific_look": false,
+              "scientific_terminal": "PASS_FAST_LANE_READY",
+              "session_id": "HFIC-SESS-13570E02BFD3C2CB"
+            },
+            "started_at": "2026-10-14T12:12:30.560388Z",
+            "trial_id": "HFIC-ART-DISCOVERY-AEB6785226438165C934A314C6126BDAA5444432",
+            "trial_outcome": "INCONCLUSIVE",
+            "uv_lock_sha256": "3b75cc1c5a2c0c83560beaf1a57c4543b885e0909c75db6d1939e90d09eefedb"
+          },
+          "prior_run_id": null,
+          "provider_calls_actual": 0,
+          "reason_codes": [],
+          "run_id_or_null": "RUN-A30B6618369314CE983648B6",
+          "run_key_sha256": "a30b6618369314ce983648b60aed1a31aec2693fec0f0ebec10bc42f57f3da20",
+          "scientific_terminal": "INCONCLUSIVE",
+          "status": "COMPLETE"
+        },
+        "spec_sha256": "ef35bc19704ae2bf98ba07780c1300af128170cf21c857e68b4660610205c871"
+      }
+    }
+  },
+  "foreign_dossier": {
+    "authority_granted": false,
+    "decision_history": [],
+    "direct_evidence": [],
+    "evidence_snapshot_sha256": "40f1f90eea066a7d852eb9f68e203e01c041080d145d805dd887dbbda05d60c0",
+    "execution_relation_gaps": [],
+    "experiment_spec_binding": {
+      "canonical_spec_sha256": "f0a040e46785c384da7e76ca20e49575707791c88f0f576d88642e261dee5f1e",
+      "source_kind": "git_path",
+      "source_value": "configs/experiment_specs/science-base-v3-foreign.yaml",
+      "spec_sha256": "088338af212d7877f9654f497fb56b81ad9c4aa6295331fdcbe4165a06659951"
+    },
+    "locator": {
+      "entity_id": "EXP-SCIENCE-BASE-V3-FOREIGN-SAME-HYPOTHESIS",
+      "native_kind": "EXPERIMENT_SPEC",
+      "truth_plane": "GIT"
+    },
+    "obligations": [
+      {
+        "code": "FALSIFIER",
+        "note": null,
+        "source": "ExperimentSpec",
+        "status": "PRESENT",
+        "values": {
+          "falsifier": "No supported fixed contrast, incorrect prefix membership, unavailable required outcome or PIT failure."
+        }
+      },
+      {
+        "code": "PIT_AVAILABILITY",
+        "note": "RUN_COMPLETED \u043d\u0435 \u0434\u043e\u043a\u0430\u0437\u044b\u0432\u0430\u0435\u0442 PIT",
+        "source": "NONE",
+        "status": "MISSING",
+        "values": {
+          "availability_cutoff": null,
+          "availability_provenance": null,
+          "first_reliable_available_at": null
+        }
+      },
+      {
+        "code": "POPULATION_N",
+        "note": "\u0438\u043c\u044f \u043f\u043e\u043f\u0443\u043b\u044f\u0446\u0438\u0438 \u043d\u0435 \u0437\u0430\u043c\u0435\u043d\u044f\u0435\u0442 N",
+        "source": "ExperimentSpec+ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "observed_n": null,
+          "population": "OPPORTUNITY_EPISODES"
+        }
+      },
+      {
+        "code": "MISSINGNESS",
+        "note": "\u043e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0438\u0435 missingness \u043d\u0435 \u0440\u0430\u0432\u043d\u043e \u043d\u0443\u043b\u044e",
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "missing_count": null
+        }
+      },
+      {
+        "code": "SURVIVAL",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "survival": null
+        }
+      },
+      {
+        "code": "HOLDOUT",
+        "note": "\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430 \u0435\u0441\u0442\u044c, \u044f\u0432\u043d\u043e\u0439 \u0441\u0432\u044f\u0437\u0438 \u043f\u043e\u0442\u0440\u0435\u0431\u043b\u0435\u043d\u0438\u044f \u043d\u0435\u0442",
+        "source": "ExperimentSpec",
+        "status": "UNKNOWN",
+        "values": {
+          "holdout_policy": "EXPLORATORY_REUSE of already explored synthetic releases; no new holdout or scientific confirmation."
+        }
+      },
+      {
+        "code": "ENTRY_EXECUTABILITY",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "entry": null
+        }
+      },
+      {
+        "code": "EXIT_EXECUTABILITY",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "exit": null
+        }
+      },
+      {
+        "code": "COST_EVIDENCE",
+        "note": "\u043d\u0430\u0440\u0440\u0430\u0442\u0438\u0432 \u043f\u0440\u043e fees \u043d\u0435 \u0437\u0430\u043c\u0435\u043d\u044f\u0435\u0442 \u043c\u0430\u0448\u0438\u043d\u043d\u043e\u0435 \u0434\u043e\u043a\u0430\u0437\u0430\u0442\u0435\u043b\u044c\u0441\u0442\u0432\u043e",
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "cost": null
+        }
+      },
+      {
+        "code": "EXECUTION_REGIME_BINDING",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "binding_id": null
+        }
+      },
+      {
+        "code": "RESULT",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "result": null
+        }
+      },
+      {
+        "code": "UNCERTAINTY",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "uncertainty": null
+        }
+      },
+      {
+        "code": "ROBUSTNESS",
+        "note": null,
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "robustness": null
+        }
+      },
+      {
+        "code": "EVIDENCE_CLASS",
+        "note": "Git evidence_class \u043d\u0435 \u044f\u0432\u043b\u044f\u0435\u0442\u0441\u044f scientific evidence",
+        "source": "ResearchStore",
+        "status": "MISSING",
+        "values": {
+          "evidence_class": null
+        }
+      }
+    ],
+    "owner_decision_kinds": [
+      "REJECT",
+      "REVISE",
+      "PAUSE",
+      "PROMOTE"
+    ],
+    "planes": {
+      "decision": "NO_DECISION",
+      "evidence": "BLOCKED",
+      "execution": "NO_RUN"
+    },
+    "promote_creates_strategy_version": false,
+    "promotion_packet_sha256": null,
+    "records_status": "AVAILABLE",
+    "related_prior_memory": [
+      {
+        "effective_at": "2026-10-14 13:26:25+00:00",
+        "entity_id": "DECISION-EVENT-D19C410F5ED59D7E45CA3E20D69B7C37",
+        "first_reliable_available_at": "2026-10-14 13:26:25+00:00",
+        "hypothesis_version_id": "HYP-HFIC-CAND-E8B09968FD73",
+        "payload_sha256": "115ec031bc5b4bcc54e0686e00136076a4e646280ea31806de5f9105a7bfbe22",
+        "record_id": "DECISION-EVENT-D19C410F5ED59D7E45CA3E20D69B7C37",
+        "record_kind": "DECISION_EVENT",
+        "relation": "RELATED",
+        "run_id": null,
+        "summary_fields": {
+          "decision_kind": "PAUSE"
+        }
+      },
+      {
+        "effective_at": "2026-10-14T13:26:25Z",
+        "entity_id": "DECISION-EVENT-D19C410F5ED59D7E45CA3E20D69B7C37",
+        "first_reliable_available_at": "",
+        "hypothesis_version_id": "HYP-HFIC-CAND-E8B09968FD73",
+        "payload_sha256": null,
+        "record_id": null,
+        "record_kind": "DECISION_EVENT",
+        "relation": "RELATED",
+        "run_id": null,
+        "source": "LifecycleProjection",
+        "summary_fields": {
+          "summary": null
+        }
+      }
+    ],
+    "result": {
+      "result": null
+    },
+    "schema": "smial.experiment-evidence-dossier",
+    "schema_version": "1.0",
+    "science_guard": {
+      "allowed": false,
+      "blocked_codes": [
+        "PIT_AVAILABILITY",
+        "POPULATION_N",
+        "MISSINGNESS",
+        "SURVIVAL",
+        "HOLDOUT",
+        "ENTRY_EXECUTABILITY",
+        "EXIT_EXECUTABILITY",
+        "COST_EVIDENCE",
+        "EXECUTION_REGIME_BINDING",
+        "RESULT",
+        "UNCERTAINTY",
+        "ROBUSTNESS",
+        "EVIDENCE_CLASS"
+      ],
+      "meaning": "PROMOTE_BLOCKED"
+    },
+    "science_to_strategy_handoff": {
+      "activation_created": false,
+      "authority": {
+        "activation_created": false,
+        "authority_granted": false
+      },
+      "authority_granted": false,
+      "field_provenance": {
+        "authority_class": "EXECUTION_CONTRACT_FIXED",
+        "created_at": "SCIENCE_DERIVED",
+        "exit_input.contract": "EXECUTION_CONTRACT_FIXED",
+        "exit_input.contract_version": "EXECUTION_CONTRACT_FIXED",
+        "mode_eligibility.micro_live": "EXECUTION_CONTRACT_FIXED",
+        "mode_eligibility.paper": "EXECUTION_CONTRACT_FIXED",
+        "mode_eligibility.shadow": "EXPLICIT_EXECUTION_INPUT",
+        "notional_policy.fee_bps": "EXPLICIT_EXECUTION_INPUT",
+        "notional_policy.notional_usd": "EXPLICIT_EXECUTION_INPUT",
+        "population_ref": "SCIENCE_DERIVED",
+        "risk_policy.max_open_positions": "EXPLICIT_EXECUTION_INPUT",
+        "schema": "EXECUTION_CONTRACT_FIXED",
+        "schema_version": "EXECUTION_CONTRACT_FIXED",
+        "signal_input.contract": "EXECUTION_CONTRACT_FIXED",
+        "signal_input.contract_version": "EXECUTION_CONTRACT_FIXED",
+        "signal_input.enter_actions": "EXECUTION_CONTRACT_FIXED",
+        "signal_input.max_age_seconds": "EXPLICIT_EXECUTION_INPUT",
+        "source_decision_asset_id": "SCIENCE_DERIVED",
+        "source_hypothesis_refs": "SCIENCE_DERIVED",
+        "strategy_id": "SCIENCE_DERIVED",
+        "strategy_version": "SCIENCE_DERIVED",
+        "title": "SCIENCE_DERIVED"
+      },
+      "identity": {
+        "decision_event_id": null,
+        "experiment_id": "EXP-SCIENCE-BASE-V3-FOREIGN-SAME-HYPOTHESIS",
+        "hypothesis_version_id": null
+      },
+      "materialization": {
+        "strategy_id": null,
+        "strategy_relation": "ABSENT",
+        "strategy_version": null
+      },
+      "provenance": {
+        "direct_evidence": [],
+        "execution_evidence_binding": null,
+        "experiment_spec_binding": null,
+        "manifest_status": "ABSENT",
+        "source_revalidation": "UNKNOWN"
+      },
+      "schema": "smial.science-to-strategy-handoff",
+      "schema_version": "1.0",
+      "science": {
+        "decision_effective_at": null,
+        "decision_kind": null,
+        "evidence_snapshot_sha256": null,
+        "handoff_manifest_sha256": null,
+        "obligations": []
+      },
+      "state": {
+        "blocker_codes": [],
+        "handoff_state": "NOT_PROMOTED",
+        "next_safe_action": "NO_SCIENTIFIC_PROMOTE"
+      }
+    },
+    "tested": {
+      "estimand": "Mean(P(E14400)/P(E1800)-1 | matched list A) minus mean of the same proxy in eligible complement of list A",
+      "falsifier": "No supported fixed contrast, incorrect prefix membership, unavailable required outcome or PIT failure.",
+      "holdout_policy": "EXPLORATORY_REUSE of already explored synthetic releases; no new holdout or scientific confirmation.",
+      "hypothesis_version_id": "HYP-HFIC-CAND-E8B09968FD73",
+      "legacy_source_language": "EN",
+      "method": "frozen_episode_price_relative_proxy",
+      "population": "OPPORTUNITY_EPISODES",
+      "question": "Does list A separate the frozen E1800 to E14400 price-relative proxy from eligible complement of list A?"
+    },
+    "write_capability": {
+      "read": "AVAILABLE",
+      "reason": null,
+      "write": "AVAILABLE"
+    }
+  },
+  "guard_refusals": {
+    "promote": "PROMOTE_BLOCKED",
+    "stale": "STALE_EVIDENCE_SNAPSHOT"
+  },
+  "missing_403": {
+    "fidelity": "RETAINED_403_WORLD_MISSING_A7",
+    "inherited_fixture_clocks": "PRESERVED; ONLY METADATA/PREFIX REVALIDATION; NO NEW VALUE EXPOSURE",
+    "receipt": {
+      "after": {
+        "completion_ids": [
+          "RUN-COMPLETED-E52F315910234267"
+        ],
+        "logical_sha256": "e4fe6c7a7690844e43bb18107859d69ea2a4d8323c4827be30cf228909ebbecb",
+        "record_counts": {
+          "EVIDENCE_BINDING": 2,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 31,
+          "RESEARCH_CYCLE": 2,
+          "RUN_COMPLETED": 1,
+          "RUN_STARTED": 1
+        }
+      },
+      "before": {
+        "completion_ids": [
+          "RUN-COMPLETED-E52F315910234267"
+        ],
+        "logical_sha256": "e4fe6c7a7690844e43bb18107859d69ea2a4d8323c4827be30cf228909ebbecb",
+        "record_counts": {
+          "EVIDENCE_BINDING": 2,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 31,
+          "RESEARCH_CYCLE": 2,
+          "RUN_COMPLETED": 1,
+          "RUN_STARTED": 1
+        }
+      },
+      "entry_lane": "BLOCKED_DATA",
+      "reads": {
+        "decoded_target_value_rows": 0,
+        "evaluator_invocations": 0,
+        "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+        "full_trace_retained": true,
+        "full_trace_sha256": "1409c9510002883f132e30cd1226a1f01a8d266afa3445c5dce1f23d7be3b130",
+        "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+        "parquet_read_calls": 188,
+        "phase": "CLASSIFY",
+        "target_projection_calls": 0
+      },
+      "response": {
+        "git_mutation_count": 0,
+        "lane": "FAST_LANE",
+        "next_action": "REPORT_OUTCOME_COVERAGE_KEEP_DECISION_DENOMINATOR",
+        "prior_run_id": null,
+        "provider_calls_actual": 0,
+        "reason_codes": [
+          "EPISODE_OUTCOME_COVERAGE_UNRESOLVED"
+        ],
+        "run_id_or_null": null,
+        "run_key_sha256": null,
+        "scientific_terminal": "INVALID",
+        "status": "INVALID_EVIDENCE"
+      },
+      "spec_sha256": "b773767290ab7e1dfe3dd9ff9d85029048e0a05d30ce579a7d8a461d2e8a4144"
+    },
+    "status": "PASS_EXPECTED_REFUSAL"
+  },
+  "negative_runner_receipts": {
+    "definition-foreign": {
+      "after": {
+        "completion_ids": [
+          "RUN-COMPLETED-C84AF57B1A6041F9"
+        ],
+        "logical_sha256": "35dd95f340bb0b31b31ca6771555a079ea00f9b8aa4f55ca5eb9b01c5113951d",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 2,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 39,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 1,
+          "RUN_STARTED": 1
+        }
+      },
+      "before": {
+        "completion_ids": [
+          "RUN-COMPLETED-C84AF57B1A6041F9"
+        ],
+        "logical_sha256": "35dd95f340bb0b31b31ca6771555a079ea00f9b8aa4f55ca5eb9b01c5113951d",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 2,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 39,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 1,
+          "RUN_STARTED": 1
+        }
+      },
+      "entry_lane": "FAST_LANE_READY",
+      "reads": {
+        "decoded_target_value_rows": 0,
+        "evaluator_invocations": 0,
+        "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+        "full_trace_retained": true,
+        "full_trace_sha256": "1f639a5e0974e5a92a33612a11f25597de629f0553a8a209703f8eccf9a9edf3",
+        "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+        "parquet_read_calls": 188,
+        "phase": "CLASSIFY",
+        "target_projection_calls": 0
+      },
+      "response": {
+        "git_mutation_count": 0,
+        "lane": "FAST_LANE",
+        "next_action": "EXECUTE_ACCEPTED_CAPABILITY",
+        "prior_run_id": null,
+        "provider_calls_actual": 0,
+        "reason_codes": [
+          "EPISODE_CLASSIFIER_CONTEXT_MISMATCH"
+        ],
+        "run_id_or_null": null,
+        "run_key_sha256": "6a1a5ba8390e60d95c0abe86b1c6ab9347693ed271143a9cd6c1fcb1c2ae65c6",
+        "scientific_terminal": "INVALID",
+        "status": "INVALID_EVIDENCE"
+      },
+      "spec_sha256": "ef35bc19704ae2bf98ba07780c1300af128170cf21c857e68b4660610205c871"
+    },
+    "historical-protection": {
+      "after": {
+        "completion_ids": [
+          "RUN-COMPLETED-C43A5484444745EA",
+          "RUN-COMPLETED-C6472B4042F64EA7",
+          "RUN-COMPLETED-C84AF57B1A6041F9"
+        ],
+        "logical_sha256": "96b9f6da2222f83238eefdf91dfb38cf19df0676c917c39169496f8ce326eff3",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 6,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 41,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 3,
+          "RUN_STARTED": 3
+        }
+      },
+      "before": {
+        "completion_ids": [
+          "RUN-COMPLETED-C43A5484444745EA",
+          "RUN-COMPLETED-C6472B4042F64EA7",
+          "RUN-COMPLETED-C84AF57B1A6041F9"
+        ],
+        "logical_sha256": "96b9f6da2222f83238eefdf91dfb38cf19df0676c917c39169496f8ce326eff3",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 6,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 41,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 3,
+          "RUN_STARTED": 3
+        }
+      },
+      "entry_lane": "REPLAY_AVAILABLE",
+      "reads": {
+        "decoded_target_value_rows": 0,
+        "evaluator_invocations": 0,
+        "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+        "full_trace_retained": true,
+        "full_trace_sha256": "81424fb9180267e070e7ea908f09fa65198fa7e70399ef3d954459df86a861a0",
+        "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+        "parquet_read_calls": 96,
+        "phase": "REPLAY",
+        "target_projection_calls": 0
+      },
+      "response": {
+        "git_mutation_count": 0,
+        "lane": "FAST_LANE",
+        "next_action": "REVIEW_PROTECTION_KEEP_FROZEN_SCOPE",
+        "prior_run_id": null,
+        "provider_calls_actual": 0,
+        "reason_codes": [
+          "HOLDOUT_PROTECTED"
+        ],
+        "run_id_or_null": null,
+        "run_key_sha256": null,
+        "scientific_terminal": "INVALID",
+        "status": "INVALID_EVIDENCE"
+      },
+      "spec_sha256": "ef35bc19704ae2bf98ba07780c1300af128170cf21c857e68b4660610205c871"
+    },
+    "protection": {
+      "after": {
+        "completion_ids": [
+          "RUN-COMPLETED-C84AF57B1A6041F9"
+        ],
+        "logical_sha256": "35dd95f340bb0b31b31ca6771555a079ea00f9b8aa4f55ca5eb9b01c5113951d",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 2,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 39,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 1,
+          "RUN_STARTED": 1
+        }
+      },
+      "before": {
+        "completion_ids": [
+          "RUN-COMPLETED-C84AF57B1A6041F9"
+        ],
+        "logical_sha256": "35dd95f340bb0b31b31ca6771555a079ea00f9b8aa4f55ca5eb9b01c5113951d",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 2,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 39,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 1,
+          "RUN_STARTED": 1
+        }
+      },
+      "entry_lane": "FAST_LANE_READY",
+      "reads": {
+        "decoded_target_value_rows": 0,
+        "evaluator_invocations": 0,
+        "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+        "full_trace_retained": true,
+        "full_trace_sha256": "c0f524fb0a95a37dfcdc4d15a90a757b78c807b77dd5e558219e00cd8a887d89",
+        "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+        "parquet_read_calls": 96,
+        "phase": "CLASSIFY",
+        "target_projection_calls": 0
+      },
+      "response": {
+        "git_mutation_count": 0,
+        "lane": "FAST_LANE",
+        "next_action": "REVIEW_PROTECTION_KEEP_FROZEN_SCOPE",
+        "prior_run_id": null,
+        "provider_calls_actual": 0,
+        "reason_codes": [
+          "HOLDOUT_PROTECTED"
+        ],
+        "run_id_or_null": null,
+        "run_key_sha256": null,
+        "scientific_terminal": "INVALID",
+        "status": "INVALID_EVIDENCE"
+      },
+      "spec_sha256": "ef35bc19704ae2bf98ba07780c1300af128170cf21c857e68b4660610205c871"
+    },
+    "source-missing": {
+      "after": {
+        "completion_ids": [
+          "RUN-COMPLETED-C84AF57B1A6041F9"
+        ],
+        "logical_sha256": "35dd95f340bb0b31b31ca6771555a079ea00f9b8aa4f55ca5eb9b01c5113951d",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 2,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 39,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 1,
+          "RUN_STARTED": 1
+        }
+      },
+      "before": {
+        "completion_ids": [
+          "RUN-COMPLETED-C84AF57B1A6041F9"
+        ],
+        "logical_sha256": "35dd95f340bb0b31b31ca6771555a079ea00f9b8aa4f55ca5eb9b01c5113951d",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 2,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 39,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 1,
+          "RUN_STARTED": 1
+        }
+      },
+      "entry_lane": "FAST_LANE_READY",
+      "reads": {
+        "decoded_target_value_rows": 0,
+        "evaluator_invocations": 0,
+        "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+        "full_trace_retained": true,
+        "full_trace_sha256": "faed6d612c333b76b6055d4e5d655d65f5abd834d5626091885761690f15aa5b",
+        "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+        "parquet_read_calls": 94,
+        "phase": "CLASSIFY",
+        "target_projection_calls": 0
+      },
+      "response": {
+        "git_mutation_count": 0,
+        "lane": "FAST_LANE",
+        "next_action": "RESOLVE_IMMUTABLE_DATA_BINDINGS",
+        "prior_run_id": null,
+        "provider_calls_actual": 0,
+        "reason_codes": [
+          "EPISODE_SOURCE_UNAVAILABLE"
+        ],
+        "run_id_or_null": null,
+        "run_key_sha256": null,
+        "scientific_terminal": "INVALID",
+        "status": "INVALID_EVIDENCE"
+      },
+      "spec_sha256": "ef35bc19704ae2bf98ba07780c1300af128170cf21c857e68b4660610205c871"
+    },
+    "source-stale": {
+      "after": {
+        "completion_ids": [
+          "RUN-COMPLETED-C84AF57B1A6041F9"
+        ],
+        "logical_sha256": "35dd95f340bb0b31b31ca6771555a079ea00f9b8aa4f55ca5eb9b01c5113951d",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 2,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 39,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 1,
+          "RUN_STARTED": 1
+        }
+      },
+      "before": {
+        "completion_ids": [
+          "RUN-COMPLETED-C84AF57B1A6041F9"
+        ],
+        "logical_sha256": "35dd95f340bb0b31b31ca6771555a079ea00f9b8aa4f55ca5eb9b01c5113951d",
+        "record_counts": {
+          "DECISION_EVENT": 2,
+          "EVIDENCE_BINDING": 2,
+          "EXPERIMENT_METRIC": 1,
+          "HYPOTHESIS_VERSION": 3,
+          "RESEARCH_ARTIFACT": 39,
+          "RESEARCH_CYCLE": 6,
+          "RUN_COMPLETED": 1,
+          "RUN_STARTED": 1
+        }
+      },
+      "entry_lane": "FAST_LANE_READY",
+      "reads": {
+        "decoded_target_value_rows": 0,
+        "evaluator_invocations": 0,
+        "fidelity": "REAL_READ_TABLE_AND_EVALUATOR_ENTRYPOINTS; A bulk explored-source reads allowed",
+        "full_trace_retained": true,
+        "full_trace_sha256": "faed6d612c333b76b6055d4e5d655d65f5abd834d5626091885761690f15aa5b",
+        "opaque_hash_bytes": "UNKNOWN_NOT_INSTRUMENTED",
+        "parquet_read_calls": 94,
+        "phase": "CLASSIFY",
+        "target_projection_calls": 0
+      },
+      "response": {
+        "git_mutation_count": 0,
+        "lane": "DENY",
+        "next_action": "CORRECT_IMMUTABLE_EVIDENCE_BINDING",
+        "prior_run_id": null,
+        "provider_calls_actual": 0,
+        "reason_codes": [
+          "FROZEN_INPUT_MISMATCH"
+        ],
+        "run_id_or_null": null,
+        "run_key_sha256": null,
+        "scientific_terminal": "INVALID",
+        "status": "INVALID_EVIDENCE"
+      },
+      "spec_sha256": "ef35bc19704ae2bf98ba07780c1300af128170cf21c857e68b4660610205c871"
+    }
+  }
+}

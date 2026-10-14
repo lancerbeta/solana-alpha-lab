@@ -1,0 +1,60 @@
+{
+  "allocation_scope": "File blocks, identity-deduplicated; directory metadata and Docker log allocation UNKNOWN; not physical VHD growth",
+  "cap_semantics": "OWNER_FORWARD_ONLY; ORIGINAL_512_MIB_BREACH_PRESERVED",
+  "explicit_authorized_cleanup": "elected_checkout/.venv ONLY; budget-continuation.json",
+  "frozen_cap_bytes": 671088640,
+  "host": {
+    "allocated_unique_bytes": 196490688,
+    "cleanup_performed": false,
+    "common_git_objects_runtime_cache_existing_worlds": "EXCLUDED_SHARED_OR_PREEXISTING",
+    "directory_metadata_and_output_receipt": "EXCLUDED",
+    "groups": {
+      "elected_checkout": {
+        "allocated_unique_bytes": 73017720,
+        "files": 4312,
+        "logical_bytes": 64368417
+      },
+      "runtime_snapshot_and_retained_host_output": {
+        "allocated_unique_bytes": 123472968,
+        "files": 8405,
+        "logical_bytes": 105591371
+      }
+    },
+    "logical_bytes": 169959788,
+    "measurement_errors": []
+  },
+  "known_file_remaining_bytes": 87095872,
+  "known_owned_file_allocation_bytes": 583992768,
+  "known_test_environment_excluding_checkout_bytes": 510975048,
+  "measurement_stage": "FINAL_AUDIT_CONTENT_BEFORE_DELIVERY_METADATA; final live receipt follows separately",
+  "new_image_build_or_pull_bytes": 0,
+  "no_automatic_cleanup": true,
+  "owned_container_metadata": {
+    "cleanup_performed": false,
+    "container_metadata_directory_allocation": "UNKNOWN_NOT_EXPOSED_BY_DOCKER_INSPECT",
+    "container_rw_known_bytes": 1187840,
+    "docker_log_stream_bytes": 503347,
+    "running_owned_processes": 0,
+    "shared_docker_vhd_growth": "UNKNOWN_NO_BEFORE_BASELINE"
+  },
+  "owned_volumes": {
+    "allocated_unique_bytes": 386314240,
+    "cleanup_performed": false,
+    "directory_metadata": "EXCLUDED",
+    "groups": {
+      "/audit": {
+        "allocated_unique_bytes": 295710720,
+        "files": 20437,
+        "logical_bytes": 239267259
+      },
+      "/repo": {
+        "allocated_unique_bytes": 90603520,
+        "files": 4284,
+        "logical_bytes": 81512144
+      }
+    },
+    "logical_bytes": 320779403,
+    "shared_image_runtime_cache": "EXCLUDED_EXISTING"
+  },
+  "shared_preexisting_image_bytes": 533691498
+}

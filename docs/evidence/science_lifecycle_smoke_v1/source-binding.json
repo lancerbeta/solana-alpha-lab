@@ -1,0 +1,26 @@
+{
+  "chronology_geometry_sha256": "72ea1af4cb5be88d66040aec033c457a6d80e916648d724488dede96fb15d55c",
+  "full_source_artifact_locators": {
+    "faults": [
+      "fault-before-commit",
+      "fault-after-commit"
+    ],
+    "preclassify_store": "base-v2/classified-plane",
+    "volume": "science-lifecycle-v1-output",
+    "world": "base-v3"
+  },
+  "immutable_source_hashes": {
+    "AGENTS.md": "eaa6bdd038ef7f265fbbb7d2daeb2e84a34455e330be35c7f9366a283e99dc0c",
+    "src/solana_alpha_lab/factory/episode_required_outcomes.py": "1db37becb39b458afe6e730aceb38894642b9f356574808a36ff41d37b47c082",
+    "src/solana_alpha_lab/factory/hfic_session.py": "e42bd8ef3da249461d21661bbada5d35d1dea17a139854441300d4c8c707a6c4",
+    "src/solana_alpha_lab/factory/lane_classifier.py": "8653cd6fc9972d3f2c716209ca9936e6f94f302f63857d6ae1d3d1135d271903",
+    "src/solana_alpha_lab/factory/research_store.py": "38d6c17bea38a4388fa14509dfb401b1f4e6cdda74de7e41cf032debe080ef49",
+    "src/solana_alpha_lab/factory/run_passport.py": "50cdc6d938c0a28f01734140938c026a6203ab69b775940fd2dc2cf37070e5a5",
+    "uv.lock": "3b75cc1c5a2c0c83560beaf1a57c4543b885e0909c75db6d1939e90d09eefedb"
+  },
+  "ledger_fidelity": "Original native sequence plus separately clocked owned operations; not an invented total causal order",
+  "native_ledger_sha256": "dd0e5e0b1466f9cdc482f777861be6b3b343a80691fd850b2f9dffc7ada5354c",
+  "operational_retention": "OWNED_RUNTIME_AND_VOLUMES; prior failed attempts retained; no automatic cleanup",
+  "registered_before_MAIN": true,
+  "tested_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447"
+}

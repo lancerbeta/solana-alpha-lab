@@ -1,0 +1,158 @@
+{
+  "consumer_planes": {
+    "decision": "PAUSE",
+    "evidence": "CONFLICT",
+    "execution": "COMPLETED"
+  },
+  "corrected_before_v3_classification_and_execution": true,
+  "invalidated_semantic_claim": "Inherited quote question/estimand/prose and unrelated canonical binding; not primary A/C proof",
+  "retained": true,
+  "runs": {
+    "LIST_CONTRAST": {
+      "artifact_file_sha256": "a791621acdef0ec06cf306ba522b1e1d5d7fefcf2fbad6092fd72b8e3789ab49",
+      "contrast": 0.11,
+      "experiment_id": "EXP-SCIENCE-BASE-V2-LIST-CONTRAST",
+      "lineage": {
+        "candidate_id": "HFIC-CAND-E8B09968FD73",
+        "critic_input_packet_sha256": "3912cd66647ba1e5a8933e4c387b9b14087730478da54e60ecf7958f7f69cf41",
+        "critic_result_sha256": "80aa1289a9e707dd9f9db4e41b88bfad7e603ce013f11a15e0b3001eaa2b7aed",
+        "definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+        "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+        "existing_look_ref": "HFIC-ART-DISCOVERY-AEB6785226438165C934A314C6126BDAA5444432",
+        "grounded_result_sha256": "095e13a28ab9376c54c2548b38d5453446754c73fcac2d30c2f3f1eb88740a04",
+        "market_evidence_epoch_sha256": "382fa6960603587547296b1c992f5ca470c165ed12079b1b8474725371d13e20",
+        "new_scientific_look": false,
+        "scientific_terminal": "PASS_FAST_LANE_READY",
+        "session_id": "HFIC-SESS-13570E02BFD3C2CB"
+      },
+      "mean_target": 0.1,
+      "recipe_scientific_identity": "c34ecb1f6d432d320d589427cb7054fe2cc5370c6c0d4c6860ba3e569d683d8e",
+      "result_digest_sha256": "02c0c48d4675b461dbbfed59d4bd4899322a1ae5f1d2ccaaee957a4e6ccd4bd0",
+      "run_id": "RUN-A30B6618369314CE983648B6",
+      "sources": [
+        {
+          "census_sha256": "5e72a1701d9a146e0c855011cf62bfc5b69967c9117957dff510a38b27e8d139",
+          "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+          "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+          "observations_sha256": "4fde6f0bae6b1ed4144bb5f5365618dfe2f08009163ed0f905c59cff75187505",
+          "release_id": "6efb454b7acf19f6dd4db235e8d07ada26faf94d53f7a425074e56fbb3be0541",
+          "schedule_binding": {
+            "availability_grace_seconds": 300,
+            "dense_step_seconds": 300,
+            "dense_until_seconds": 21600,
+            "dispatch_window_seconds": 60,
+            "horizon_seconds": 259200,
+            "hourly_step_seconds": 3600,
+            "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+            "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+            "witness_max_age_seconds": 120
+          },
+          "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+        },
+        {
+          "census_sha256": "d895badc51cf31d0d298a389c09255213387e9c7e71046179eb4ef02e68119ae",
+          "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+          "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+          "observations_sha256": "55fb8e96e6915ccbc396e613d69b8183456618e707caacc94701211b40436d29",
+          "release_id": "7d01a7cf3c35781535dabffaca72c6398f931c8ea77ce4e3eb1bfcbb228397ee",
+          "schedule_binding": {
+            "availability_grace_seconds": 300,
+            "dense_step_seconds": 300,
+            "dense_until_seconds": 21600,
+            "dispatch_window_seconds": 60,
+            "horizon_seconds": 259200,
+            "hourly_step_seconds": 3600,
+            "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+            "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+            "witness_max_age_seconds": 120
+          },
+          "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+        }
+      ],
+      "spec_pin": {
+        "canonical_sha256": "ef35bc19704ae2bf98ba07780c1300af128170cf21c857e68b4660610205c871",
+        "experiment_id": "EXP-SCIENCE-BASE-V2-LIST-CONTRAST",
+        "file_sha256": "b31e064ca5f641c2dac703dde6a7774d2d3e530dcc4fc28b9c0bc5aa992caa9a",
+        "slot": "configs/experiment_specs/science-list_contrast.yaml"
+      }
+    },
+    "MIXED_LIST_NUMERIC": {
+      "artifact_file_sha256": "9cc628d4e9a2b102202d43762560798235e7ca4b886b4731aee918d90bcc75f8",
+      "contrast": 0.055,
+      "experiment_id": "EXP-SCIENCE-BASE-V2-MIXED-LIST-NUMERIC",
+      "lineage": {
+        "candidate_id": "HFIC-CAND-FFB8BCA42497",
+        "critic_input_packet_sha256": "4f2f48454ab28d8c3b07ad5a5585e5c2f0e88943628ce47f0fd4eba233326d4a",
+        "critic_result_sha256": "4e6a93bb8f04e1b6c0d2d2c386c9e7df6d7e4e216a8b5978035a8aa3a03b4e28",
+        "definition_sha256": "ffb8bca42497867b574c0b5f12d74233a4a50eb352a53e3edd38a393b9a355b0",
+        "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+        "existing_look_ref": "HFIC-ART-DISCOVERY-BBB53342D143ED5A2EB901B6812720358D22429B",
+        "grounded_result_sha256": "913ef6ea2aa5c7b65283a6aa8ffb2fc984bbe3ce7d789baf7e24b04864b55aaf",
+        "market_evidence_epoch_sha256": "382fa6960603587547296b1c992f5ca470c165ed12079b1b8474725371d13e20",
+        "new_scientific_look": false,
+        "scientific_terminal": "PASS_FAST_LANE_READY",
+        "session_id": "HFIC-SESS-E6BAD82C353B5EDB"
+      },
+      "mean_target": 0.1,
+      "recipe_scientific_identity": "b0f8b6a0978ea2d56c74d97cf13ed9e9411951783291da0ee11bfadafcafd52b",
+      "result_digest_sha256": "74e2272367735ae55e761b7129dc66c302681f08ad21b9f1896417dfc4a32219",
+      "run_id": "RUN-3D42AEF9E2B3C7C6BDC05F41",
+      "sources": [
+        {
+          "census_sha256": "5e72a1701d9a146e0c855011cf62bfc5b69967c9117957dff510a38b27e8d139",
+          "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+          "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+          "observations_sha256": "4fde6f0bae6b1ed4144bb5f5365618dfe2f08009163ed0f905c59cff75187505",
+          "release_id": "6efb454b7acf19f6dd4db235e8d07ada26faf94d53f7a425074e56fbb3be0541",
+          "schedule_binding": {
+            "availability_grace_seconds": 300,
+            "dense_step_seconds": 300,
+            "dense_until_seconds": 21600,
+            "dispatch_window_seconds": 60,
+            "horizon_seconds": 259200,
+            "hourly_step_seconds": 3600,
+            "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+            "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+            "witness_max_age_seconds": 120
+          },
+          "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+        },
+        {
+          "census_sha256": "d895badc51cf31d0d298a389c09255213387e9c7e71046179eb4ef02e68119ae",
+          "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+          "dataset_manifest_id": "dataset-3befa2e54951c1cdd0788d69fa64d5a41fb0be2edddc64fb59f03d20a247c0cb",
+          "observations_sha256": "55fb8e96e6915ccbc396e613d69b8183456618e707caacc94701211b40436d29",
+          "release_id": "7d01a7cf3c35781535dabffaca72c6398f931c8ea77ce4e3eb1bfcbb228397ee",
+          "schedule_binding": {
+            "availability_grace_seconds": 300,
+            "dense_step_seconds": 300,
+            "dense_until_seconds": 21600,
+            "dispatch_window_seconds": 60,
+            "horizon_seconds": 259200,
+            "hourly_step_seconds": 3600,
+            "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+            "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+            "witness_max_age_seconds": 120
+          },
+          "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+        }
+      ],
+      "spec_pin": {
+        "canonical_sha256": "a8ca7c61df028548db34156d307da363769a176ac4af2348ea4cd49fffe8742e",
+        "experiment_id": "EXP-SCIENCE-BASE-V2-MIXED-LIST-NUMERIC",
+        "file_sha256": "f6b47b66d6fb72abd741af43edf8ffb9f5e3b0f4199bbc7935de4cc12f43637d",
+        "slot": "configs/experiment_specs/science-mixed_list_numeric.yaml"
+      }
+    }
+  },
+  "tested": {
+    "estimand": "QuotedRoundTripFriction(t0) -> QuotedLiquidationRecovery(H900)",
+    "falsifier": "Re-derived terminal from the canonical runtime receipt disagrees with the Git-canonical acceptance terminal.",
+    "holdout_policy": "No new holdout is opened; this atom replays already-consumed A1 evidence and does not treat MOVE 2 as a new result.",
+    "hypothesis_version_id": "HYP-HFIC-CAND-E8B09968FD73",
+    "legacy_source_language": "EN",
+    "method": "classify_audition_terminal",
+    "population": "OPPORTUNITY_EPISODES",
+    "question": "Does frozen t0 quoted round-trip friction rank +15m quoted liquidation recovery on the admissible Free-key 6+6 cohort without a new live capture?"
+  }
+}

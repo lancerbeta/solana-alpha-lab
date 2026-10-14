@@ -1,0 +1,139 @@
+{
+  "admissions_n": 24,
+  "benchmark": "SCIENCE-LIFECYCLE-base-v3",
+  "clock_mode": "NATIVE_ASOF_AND_CLOCK_PARAMETERS; NO_SYSTEM_CLOCK_CHANGE",
+  "decision_n": 20,
+  "list_comparator_n": 10,
+  "matched_n": 10,
+  "mixed_comparator_n": 20,
+  "negative_world": false,
+  "new_fixture_main_cap": 2,
+  "scientific_acceptance": false,
+  "source_asof": "2026-10-08 06:00:00+00:00",
+  "table": {
+    "A": {
+      "scienceA00": [
+        "A",
+        true,
+        0.1
+      ],
+      "scienceA01": [
+        "B",
+        false,
+        -0.04
+      ],
+      "scienceA02": [
+        "A",
+        true,
+        0.11
+      ],
+      "scienceA03": [
+        "B",
+        false,
+        -0.03
+      ],
+      "scienceA04": [
+        "A",
+        true,
+        0.12
+      ],
+      "scienceA05": [
+        "B",
+        false,
+        -0.02
+      ],
+      "scienceA06": [
+        "A",
+        true,
+        0.13
+      ],
+      "scienceA07": [
+        "B",
+        false,
+        -0.01
+      ],
+      "scienceA08": [
+        "A",
+        true,
+        0.14
+      ],
+      "scienceA09": [
+        "B",
+        false,
+        0.0
+      ],
+      "scienceA10": [
+        "A",
+        true,
+        0.03
+      ],
+      "scienceA11": [
+        "B",
+        false,
+        0.03
+      ]
+    },
+    "B": {
+      "scienceA00": [
+        "A",
+        true,
+        0.06
+      ],
+      "scienceB01": [
+        "B",
+        false,
+        -0.02
+      ],
+      "scienceB02": [
+        "A",
+        true,
+        0.07
+      ],
+      "scienceB03": [
+        "B",
+        false,
+        -0.01
+      ],
+      "scienceB04": [
+        "A",
+        true,
+        0.08
+      ],
+      "scienceB05": [
+        "B",
+        false,
+        0.0
+      ],
+      "scienceB06": [
+        "A",
+        true,
+        0.09
+      ],
+      "scienceB07": [
+        "B",
+        false,
+        0.01
+      ],
+      "scienceB08": [
+        "A",
+        true,
+        0.1
+      ],
+      "scienceB09": [
+        "B",
+        false,
+        0.02
+      ],
+      "scienceB10": [
+        "A",
+        true,
+        0.03
+      ],
+      "scienceB11": [
+        "B",
+        false,
+        0.03
+      ]
+    }
+  }
+}

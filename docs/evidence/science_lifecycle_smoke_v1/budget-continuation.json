@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "owner_authorization": "BOUNDED_CONTINUATION_SC06_AND_AUDIT_HANDOFF",
+  "original_cap_bytes": 536870912,
+  "original_post_hook_known_allocation_bytes": 706668368,
+  "original_breach_bytes": 169797456,
+  "forward_only_cap_bytes": 671088640,
+  "history_recomputed": false,
+  "authorized_cleanup_scope": "elected_checkout/.venv",
+  "process_check": {
+    "method": "Win32_Process executable and command-line path match, excluding checker PID",
+    "status": "SUCCESS",
+    "references": 0,
+    "prior_attempts": [
+      "SANDBOX_CIM_ACCESS_FAILED_NOT_NEGATIVE_RESULT",
+      "SELF_COMMANDLINE_MATCH_DENIED_NO_DELETE"
+    ]
+  },
+  "sharing_check": {
+    "root_reparse": false,
+    "child_reparse_count": 0,
+    "shared_runtime_is_different": true,
+    "include_system_site_packages": false,
+    "cfg_sha256": "981d7567d42ebb8219e69d7618d8c3b9017d2f959959c0793fa59311b9c4f9e0"
+  },
+  "venv_before": {
+    "groups": {
+      "authorized_venv": {
+        "logical_bytes": 169602701,
+        "allocated_unique_bytes": 172621496,
+        "files": 1630
+      }
+    },
+    "allocated_unique_bytes": 172621496,
+    "logical_bytes": 169602701,
+    "measurement_errors": [],
+    "common_git_objects_runtime_cache_existing_worlds": "EXCLUDED_SHARED_OR_PREEXISTING",
+    "directory_metadata_and_output_receipt": "EXCLUDED",
+    "cleanup_performed": false
+  },
+  "cleanup_performed": true,
+  "cleanup_readback": "EXACT_LOCAL_VENV_ABSENT",
+  "scientific_stores_receipts_trials_caches": "PRESERVED"
+}

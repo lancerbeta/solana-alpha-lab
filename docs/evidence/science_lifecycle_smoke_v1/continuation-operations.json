@@ -1,0 +1,75 @@
+{
+  "operations": [
+    {
+      "attempt": "venv-process-check-sandbox",
+      "ledger_kind": "continuation_host_attempt",
+      "scientific_charges": 0,
+      "status": "CIM_ACCESS_FAILED_NOT_NEGATIVE_EVIDENCE",
+      "timestamp": "UNKNOWN"
+    },
+    {
+      "attempt": "venv-delete-check-a1",
+      "ledger_kind": "continuation_host_attempt",
+      "scientific_charges": 0,
+      "status": "DENIED_SELF_COMMANDLINE_MATCH; NO_DELETE",
+      "timestamp": "UNKNOWN"
+    },
+    {
+      "attempt": "venv-delete-check-a2",
+      "ledger_kind": "continuation_host_attempt",
+      "scientific_charges": 0,
+      "status": "CHECKER_PID_EXCLUDED; NO_OTHER_REFERENCE; AUTHORIZED_DELETE_EXACT_LOCAL_VENV",
+      "timestamp": "UNKNOWN"
+    },
+    {
+      "attempt": "kit-syntax-read-a1",
+      "ledger_kind": "continuation_host_attempt",
+      "scientific_charges": 0,
+      "status": "WINDOWS_DEFAULT_ENCODING_FAILED; UTF8_RETRY_PASS",
+      "timestamp": "UNKNOWN"
+    },
+    {
+      "attempt": "finish-packet-sc06-a1",
+      "ledger_kind": "continuation_host_attempt",
+      "scientific_charges": 0,
+      "status": "AUDIT_ASSERTION_FAILED_ON_EXPECTED_CHANGED_CONTENT_ADDRESSED_RELEASE_ID; STABLE_MEMBERSHIP_COMPARISON_CORRECTED",
+      "timestamp": "UNKNOWN"
+    },
+    {
+      "attempt": "finish-packet-sc06-a2",
+      "ledger_kind": "continuation_host_attempt",
+      "scientific_charges": 0,
+      "status": "PASS_NATIVE_SC06_WITNESSES_AND_9_OFFLINE_FALSIFIER_TESTS",
+      "timestamp": "UNKNOWN"
+    },
+    {
+      "attempt": "catalog-sync-final-a1",
+      "ledger_kind": "continuation_host_attempt",
+      "scientific_charges": 0,
+      "status": "DENIED_NEW_SUMMARY_HASH_STALE_AFTER_FINISH; PRIMARY_CATALOG_PIN_REFRESHED",
+      "timestamp": "UNKNOWN"
+    },
+    {
+      "attempt": "catalog-sync-final-a2",
+      "ledger_kind": "continuation_host_attempt",
+      "scientific_charges": 0,
+      "status": "DENIED_WINDOWS_CRLF_CANONICAL_HASH_MISMATCH; LF_WRITER_FIXED_AND_FINAL_SYNC_PASS",
+      "timestamp": "UNKNOWN"
+    },
+    {
+      "attempt": "resource-guard-a1-host",
+      "ledger_kind": "continuation_host_attempt",
+      "scientific_charges": 0,
+      "status": "DENIED_EXIT_BETWEEN_STATE_AND_EXEC; FINALLY_STOP_CONFIRMED; SHORT_CHILD_RACE_CORRECTED",
+      "timestamp": "UNKNOWN"
+    },
+    {
+      "attempt": "resource-telemetry-a1-host",
+      "ledger_kind": "continuation_host_attempt",
+      "scientific_charges": 0,
+      "status": "EXPECTED_TELEMETRY_FAILURE_AFTER_START; FINALLY_STOP_AND_STATE_SAVED",
+      "timestamp": "UNKNOWN"
+    }
+  ],
+  "scope": "Host audit-kit operations; no scientific invocation or refund"
+}
