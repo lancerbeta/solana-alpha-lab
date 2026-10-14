@@ -1,0 +1,51 @@
+{
+  "findings": [
+    {
+      "actual": "Accepted numerical route is explored frozen replay; RUN completion follows evaluator; confirming implementation explicitly absent",
+      "boundary": "accepted List A protocol -> native source-bound confirming producer/reservation -> substantive science evidence",
+      "class": "MISSING_PRODUCT_SEAM_CONTRACT_GAP",
+      "confidence": "HIGH",
+      "expected": "Native accepted producer reserves before values and emits protocol-owned evidence",
+      "id": "F01",
+      "proof": "chronology.json pinned registry/AST/contract/consumer + readback.json actual science refusal",
+      "repair": "One separately authorized List A chronological producer/reservation/consumer atom; no repair performed",
+      "severity": "MATERIAL",
+      "violated_promise": "Required lifecycle objective is unavailable; no claim that #403 promised the confirmer"
+    },
+    {
+      "actual": "base-v2 carried quote question/estimand/falsifier and unrelated Catalog binding; dossier PIT CONFLICT",
+      "boundary": "Legacy _bind_experiment helper -> audit-owned Spec prose/data bindings",
+      "class": "HARNESS_DEFECT_INVALID_RUN",
+      "confidence": "HIGH",
+      "fix": "New base-v3 registered before classification/run, proper episode question/estimand/method and only source corpus binding",
+      "id": "F02",
+      "retention": "All v2 specs/runs/attempts retained; no counter refund; v2 not primary scientific interpretation",
+      "severity": "MATERIAL"
+    },
+    {
+      "actual": "Numeric INCONCLUSIVE; dossier evidence BLOCKED, PIT/population/HOLDOUT UNKNOWN, other qualifying obligations MISSING; PROMOTE_BLOCKED",
+      "class": "EXPECTED_SCIENTIFIC_OR_AUTHORITY_REFUSAL",
+      "confidence": "HIGH",
+      "id": "F03",
+      "repair": "Do not lower scientific floor or author qualifying carriers; no guard repair",
+      "severity": "EXPECTED"
+    },
+    {
+      "actual": "Frozen storage cap leaves insufficient allocation after retained attempts; changed world not executed",
+      "boundary": "SC06 fresh market variation -> registered native capture",
+      "class": "COVERAGE_GAP_UNKNOWN",
+      "confidence": "HIGH",
+      "id": "F04",
+      "next_gate": "Owner budget replan required; all existing counters/history retained; no automatic cleanup",
+      "severity": "MATERIAL"
+    },
+    {
+      "actual": "Spec definition slot registered via explicit fixture; no ordinary authoring/registration edge proved",
+      "class": "COVERAGE_GAP_UNKNOWN",
+      "confidence": "HIGH",
+      "id": "F05",
+      "repair": "No product seam fabricated; SEGMENT_PRODUCT_PATH on registration",
+      "severity": "LIMITATION"
+    }
+  ]
+}

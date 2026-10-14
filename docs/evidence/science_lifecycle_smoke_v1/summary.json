@@ -1,0 +1,104 @@
+{
+  "audit_delivery": "REVIEWABLE_PARTIAL_CHECKPOINT; FULL_CAMPAIGN_DOD_NOT_CLOSED",
+  "campaign": "SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1",
+  "campaign_status": "PARTIAL_ENVIRONMENT",
+  "charges": {
+    "confirmation": 0,
+    "evaluator": 8,
+    "main": 4
+  },
+  "chronology_geometry": "PASS_METADATA_ONLY; 10 matched episodes, 20 E1800/E14400 cells, zero target-value reads",
+  "coverage": {
+    "SC00": {
+      "scope": "Actual OS/child canaries; scripted upstream, no blind Actor",
+      "status": "PASS_ENGINEERING"
+    },
+    "SC01": {
+      "scope": "Primary corrected base-v3 Spec1.4 LIST/MIXED numerical artifact+passport+atomic records; independent 20-cell E1800/E14400 metadata chronology",
+      "status": "PASS_ENGINEERING"
+    },
+    "SC02": {
+      "scope": "Fresh-container exact replay for both corrected specs, no evaluator/target decode or business write",
+      "status": "PASS_ENGINEERING"
+    },
+    "SC03": {
+      "scope": "base-v2 persistence/guard segment; same frozen recipe/source/masks as corrected v3; quote prose invalidated for science",
+      "status": "PASS_ENGINEERING"
+    },
+    "SC04": {
+      "scope": "base-v2 persistence/guard segment; same frozen recipe/source/masks as corrected v3; quote prose invalidated for science",
+      "status": "PASS_ENGINEERING"
+    },
+    "SC05A": {
+      "scope": "base-v2 persistence/guard segment; same frozen recipe/source/masks as corrected v3; quote prose invalidated for science",
+      "status": "PASS_ENGINEERING"
+    },
+    "SC05B": {
+      "scope": "base-v2 persistence/guard segment; same frozen recipe/source/masks as corrected v3; quote prose invalidated for science",
+      "status": "PASS_ENGINEERING"
+    },
+    "SC06": {
+      "scope": "No changed-world capture/MAIN/numeric attempt; standard fresh world ~43 MiB before classification; insufficient frozen allocation",
+      "status": "BLOCKED_BUDGET"
+    },
+    "SC07": {
+      "scope": "Actual corrected A RUN_COMPLETED DIRECT -> ordinary dossier COMPLETED/BLOCKED/PAUSE; cold identical decision zero writes",
+      "status": "PASS_ENGINEERING"
+    },
+    "SC08": {
+      "scope": "Foreign run excluded by conflicting identity, same-hypothesis PAUSE RELATED; actual stale and PROMOTE guards zero forbidden writes",
+      "status": "PASS_ENGINEERING"
+    },
+    "SC09": {
+      "scope": "Pinned accepted registry, actual dispatch, accepted contract and substantive consumer; no sample values read",
+      "status": "PASS_REACHABILITY_PROBE"
+    },
+    "SC10": {
+      "scope": "Accepted chronological confirming producer/pre-values reservation missing; no custom confirmer",
+      "status": "BLOCKED_PRODUCT_CONTRACT"
+    },
+    "SC11": {
+      "scope": "Accepted chronological confirming producer/pre-values reservation missing; no custom confirmer",
+      "status": "BLOCKED_PRODUCT_CONTRACT"
+    },
+    "SC12": {
+      "scope": "Accepted chronological confirming producer/pre-values reservation missing; no custom confirmer",
+      "status": "BLOCKED_PRODUCT_CONTRACT"
+    }
+  },
+  "fidelity_by_edge": {
+    "Spec1.4_to_committed_numeric_artifact": "FULL_PRODUCT_PATH",
+    "actual_run_to_ordinary_dossier_PAUSE": "FULL_PRODUCT_PATH",
+    "chronological_confirmation": "CONTRACT_ONLY",
+    "definition_ingress": "SEGMENT_PRODUCT_PATH",
+    "scripted_upstream": "SEGMENT_PRODUCT_PATH"
+  },
+  "forbidden_side_effects": {
+    "PAPER": 0,
+    "activation": 0,
+    "cash_spend": 0,
+    "merge": 0,
+    "new_dependencies": 0,
+    "product_repairs": 0,
+    "provider_calls": 0,
+    "real_data_reads": 0,
+    "strategy_version": 0
+  },
+  "historical_fixture_semantics": "base-v2 quote prose/binding invalidated for scientific interpretation; values and guard/recovery evidence retained",
+  "inherited_MAIN_looks": 22,
+  "inherited_new_charge": false,
+  "lanes": {
+    "chronological": "BLOCKED_PRODUCT_CONTRACT",
+    "evidence_consumer": "PASS",
+    "numerical": "PASS"
+  },
+  "owned_running_processes": 0,
+  "primary_world": "base-v3",
+  "science": {
+    "market_alpha_established": false,
+    "strategy_ready": false,
+    "synthetic_protocol_executed": false
+  },
+  "stop_reason": "FROZEN_OWNED_STORAGE_ENVELOPE; SC06_NOT_EXECUTED",
+  "tested_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447"
+}

@@ -1,0 +1,306 @@
+{
+  "cells": [
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "episode_id": "EP-013dd4cfaa8aeb09f61870a767d8e5fe",
+      "points": {
+        "E14400": {
+          "assigned_at": "2026-10-05T04:20:00Z",
+          "availability_deadline": "2026-10-05T04:25:00Z",
+          "first_reliable_available_at": "2026-10-05T04:20:06Z",
+          "nominal_due_at": "2026-10-05T04:15:18Z",
+          "request_not_before": "2026-10-05T04:20:00Z"
+        },
+        "E1800": {
+          "assigned_at": "2026-10-05T00:50:00Z",
+          "availability_deadline": "2026-10-05T00:55:00Z",
+          "first_reliable_available_at": "2026-10-05T00:50:06Z",
+          "nominal_due_at": "2026-10-05T00:45:18Z",
+          "request_not_before": "2026-10-05T00:50:00Z"
+        }
+      },
+      "t0": "2026-10-05T00:15:18Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "episode_id": "EP-3e02274345df4c5cc7d918f587a5e278",
+      "points": {
+        "E14400": {
+          "assigned_at": "2026-10-05T04:50:00Z",
+          "availability_deadline": "2026-10-05T04:55:00Z",
+          "first_reliable_available_at": "2026-10-05T04:50:06Z",
+          "nominal_due_at": "2026-10-05T04:45:18Z",
+          "request_not_before": "2026-10-05T04:50:00Z"
+        },
+        "E1800": {
+          "assigned_at": "2026-10-05T01:20:00Z",
+          "availability_deadline": "2026-10-05T01:25:00Z",
+          "first_reliable_available_at": "2026-10-05T01:20:06Z",
+          "nominal_due_at": "2026-10-05T01:15:18Z",
+          "request_not_before": "2026-10-05T01:20:00Z"
+        }
+      },
+      "t0": "2026-10-05T00:45:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "episode_id": "EP-546926d5fa141db52d4d5041ab3f5eda",
+      "points": {
+        "E14400": {
+          "assigned_at": "2026-10-01T06:05:00Z",
+          "availability_deadline": "2026-10-01T06:10:00Z",
+          "first_reliable_available_at": "2026-10-01T06:05:06Z",
+          "nominal_due_at": "2026-10-01T06:00:18Z",
+          "request_not_before": "2026-10-01T06:05:00Z"
+        },
+        "E1800": {
+          "assigned_at": "2026-10-01T02:35:00Z",
+          "availability_deadline": "2026-10-01T02:40:00Z",
+          "first_reliable_available_at": "2026-10-01T02:35:06Z",
+          "nominal_due_at": "2026-10-01T02:30:18Z",
+          "request_not_before": "2026-10-01T02:35:00Z"
+        }
+      },
+      "t0": "2026-10-01T02:00:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "episode_id": "EP-67725c4a4072933dca6a8c6e5fa65fd1",
+      "points": {
+        "E14400": {
+          "assigned_at": "2026-10-01T04:05:00Z",
+          "availability_deadline": "2026-10-01T04:10:00Z",
+          "first_reliable_available_at": "2026-10-01T04:05:06Z",
+          "nominal_due_at": "2026-10-01T04:00:14Z",
+          "request_not_before": "2026-10-01T04:05:00Z"
+        },
+        "E1800": {
+          "assigned_at": "2026-10-01T00:35:00Z",
+          "availability_deadline": "2026-10-01T00:40:00Z",
+          "first_reliable_available_at": "2026-10-01T00:35:06Z",
+          "nominal_due_at": "2026-10-01T00:30:14Z",
+          "request_not_before": "2026-10-01T00:35:00Z"
+        }
+      },
+      "t0": "2026-10-01T00:00:14Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "episode_id": "EP-8a629ced120b4ee48b53e7ce5a7344dd",
+      "points": {
+        "E14400": {
+          "assigned_at": "2026-10-01T05:35:00Z",
+          "availability_deadline": "2026-10-01T05:40:00Z",
+          "first_reliable_available_at": "2026-10-01T05:35:06Z",
+          "nominal_due_at": "2026-10-01T05:30:18Z",
+          "request_not_before": "2026-10-01T05:35:00Z"
+        },
+        "E1800": {
+          "assigned_at": "2026-10-01T02:05:00Z",
+          "availability_deadline": "2026-10-01T02:10:00Z",
+          "first_reliable_available_at": "2026-10-01T02:05:06Z",
+          "nominal_due_at": "2026-10-01T02:00:18Z",
+          "request_not_before": "2026-10-01T02:05:00Z"
+        }
+      },
+      "t0": "2026-10-01T01:30:18Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "episode_id": "EP-8ab26e7faa48387e7cdef43a12a5a422",
+      "points": {
+        "E14400": {
+          "assigned_at": "2026-10-05T06:50:00Z",
+          "availability_deadline": "2026-10-05T06:55:00Z",
+          "first_reliable_available_at": "2026-10-05T06:50:06Z",
+          "nominal_due_at": "2026-10-05T06:45:18Z",
+          "request_not_before": "2026-10-05T06:50:00Z"
+        },
+        "E1800": {
+          "assigned_at": "2026-10-05T03:20:00Z",
+          "availability_deadline": "2026-10-05T03:25:00Z",
+          "first_reliable_available_at": "2026-10-05T03:20:06Z",
+          "nominal_due_at": "2026-10-05T03:15:18Z",
+          "request_not_before": "2026-10-05T03:20:00Z"
+        }
+      },
+      "t0": "2026-10-05T02:45:18Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "episode_id": "EP-a61423ea563194ecc0ccf78c70468cf4",
+      "points": {
+        "E14400": {
+          "assigned_at": "2026-10-05T05:50:00Z",
+          "availability_deadline": "2026-10-05T05:55:00Z",
+          "first_reliable_available_at": "2026-10-05T05:50:06Z",
+          "nominal_due_at": "2026-10-05T05:45:18Z",
+          "request_not_before": "2026-10-05T05:50:00Z"
+        },
+        "E1800": {
+          "assigned_at": "2026-10-05T02:20:00Z",
+          "availability_deadline": "2026-10-05T02:25:00Z",
+          "first_reliable_available_at": "2026-10-05T02:20:06Z",
+          "nominal_due_at": "2026-10-05T02:15:18Z",
+          "request_not_before": "2026-10-05T02:20:00Z"
+        }
+      },
+      "t0": "2026-10-05T01:45:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "episode_id": "EP-af1087bbc9a2f1e4d305707647486710",
+      "points": {
+        "E14400": {
+          "assigned_at": "2026-10-01T05:05:00Z",
+          "availability_deadline": "2026-10-01T05:10:00Z",
+          "first_reliable_available_at": "2026-10-01T05:05:06Z",
+          "nominal_due_at": "2026-10-01T05:00:18Z",
+          "request_not_before": "2026-10-01T05:05:00Z"
+        },
+        "E1800": {
+          "assigned_at": "2026-10-01T01:35:00Z",
+          "availability_deadline": "2026-10-01T01:40:00Z",
+          "first_reliable_available_at": "2026-10-01T01:35:06Z",
+          "nominal_due_at": "2026-10-01T01:30:18Z",
+          "request_not_before": "2026-10-01T01:35:00Z"
+        }
+      },
+      "t0": "2026-10-01T01:00:18Z"
+    },
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "episode_id": "EP-d41409d987eb1e69d865a3b5aea0d9b7",
+      "points": {
+        "E14400": {
+          "assigned_at": "2026-10-05T05:20:00Z",
+          "availability_deadline": "2026-10-05T05:25:00Z",
+          "first_reliable_available_at": "2026-10-05T05:20:06Z",
+          "nominal_due_at": "2026-10-05T05:15:18Z",
+          "request_not_before": "2026-10-05T05:20:00Z"
+        },
+        "E1800": {
+          "assigned_at": "2026-10-05T01:50:00Z",
+          "availability_deadline": "2026-10-05T01:55:00Z",
+          "first_reliable_available_at": "2026-10-05T01:50:06Z",
+          "nominal_due_at": "2026-10-05T01:45:18Z",
+          "request_not_before": "2026-10-05T01:50:00Z"
+        }
+      },
+      "t0": "2026-10-05T01:15:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "episode_id": "EP-f6218a9dc1caf4cd5ed0026b6b63aa67",
+      "points": {
+        "E14400": {
+          "assigned_at": "2026-10-01T04:35:00Z",
+          "availability_deadline": "2026-10-01T04:40:00Z",
+          "first_reliable_available_at": "2026-10-01T04:35:06Z",
+          "nominal_due_at": "2026-10-01T04:30:18Z",
+          "request_not_before": "2026-10-01T04:35:00Z"
+        },
+        "E1800": {
+          "assigned_at": "2026-10-01T01:05:00Z",
+          "availability_deadline": "2026-10-01T01:10:00Z",
+          "first_reliable_available_at": "2026-10-01T01:05:06Z",
+          "nominal_due_at": "2026-10-01T01:00:18Z",
+          "request_not_before": "2026-10-01T01:05:00Z"
+        }
+      },
+      "t0": "2026-10-01T00:30:18Z"
+    }
+  ],
+  "checked_cells": 20,
+  "checked_matched_episodes": 10,
+  "checked_points": [
+    "E1800",
+    "E14400"
+  ],
+  "evaluator_invocations": 0,
+  "examples": [
+    {
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "episode_id": "EP-013dd4cfaa8aeb09f61870a767d8e5fe",
+      "points": {
+        "E14400": {
+          "assigned_at": "2026-10-05T04:20:00Z",
+          "availability_deadline": "2026-10-05T04:25:00Z",
+          "first_reliable_available_at": "2026-10-05T04:20:06Z",
+          "nominal_due_at": "2026-10-05T04:15:18Z",
+          "request_not_before": "2026-10-05T04:20:00Z"
+        },
+        "E1800": {
+          "assigned_at": "2026-10-05T00:50:00Z",
+          "availability_deadline": "2026-10-05T00:55:00Z",
+          "first_reliable_available_at": "2026-10-05T00:50:06Z",
+          "nominal_due_at": "2026-10-05T00:45:18Z",
+          "request_not_before": "2026-10-05T00:50:00Z"
+        }
+      },
+      "t0": "2026-10-05T00:15:18Z"
+    },
+    {
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "episode_id": "EP-546926d5fa141db52d4d5041ab3f5eda",
+      "points": {
+        "E14400": {
+          "assigned_at": "2026-10-01T06:05:00Z",
+          "availability_deadline": "2026-10-01T06:10:00Z",
+          "first_reliable_available_at": "2026-10-01T06:05:06Z",
+          "nominal_due_at": "2026-10-01T06:00:18Z",
+          "request_not_before": "2026-10-01T06:05:00Z"
+        },
+        "E1800": {
+          "assigned_at": "2026-10-01T02:35:00Z",
+          "availability_deadline": "2026-10-01T02:40:00Z",
+          "first_reliable_available_at": "2026-10-01T02:35:06Z",
+          "nominal_due_at": "2026-10-01T02:30:18Z",
+          "request_not_before": "2026-10-01T02:35:00Z"
+        }
+      },
+      "t0": "2026-10-01T02:00:18Z"
+    }
+  ],
+  "method": "Independent epoch-grid arithmetic and actual observation clock metadata; no typed_value column",
+  "schedule_bindings": {
+    "REL-20261001T000000Z-20261002T000000Z": {
+      "availability_grace_seconds": 300,
+      "dense_step_seconds": 300,
+      "dense_until_seconds": 21600,
+      "dispatch_window_seconds": 60,
+      "horizon_seconds": 259200,
+      "hourly_step_seconds": 3600,
+      "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+      "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+      "witness_max_age_seconds": 120
+    },
+    "REL-20261005T000000Z-20261006T000000Z": {
+      "availability_grace_seconds": 300,
+      "dense_step_seconds": 300,
+      "dense_until_seconds": 21600,
+      "dispatch_window_seconds": 60,
+      "horizon_seconds": 259200,
+      "hourly_step_seconds": 3600,
+      "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+      "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799",
+      "witness_max_age_seconds": 120
+    }
+  },
+  "source_hashes": [
+    {
+      "census_sha256": "5e72a1701d9a146e0c855011cf62bfc5b69967c9117957dff510a38b27e8d139",
+      "cohort_id": "REL-20261001T000000Z-20261002T000000Z",
+      "observations_sha256": "4fde6f0bae6b1ed4144bb5f5365618dfe2f08009163ed0f905c59cff75187505",
+      "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+    },
+    {
+      "census_sha256": "d895badc51cf31d0d298a389c09255213387e9c7e71046179eb4ef02e68119ae",
+      "cohort_id": "REL-20261005T000000Z-20261006T000000Z",
+      "observations_sha256": "55fb8e96e6915ccbc396e613d69b8183456618e707caacc94701211b40436d29",
+      "schedule_sha256": "89d29121d6d7d82e93ecb047bff0a21006ac5ec91b6f85ea875cb8de1cce8799"
+    }
+  ],
+  "status": "PASS_METADATA_ONLY",
+  "target_value_cells_read": 0
+}

@@ -1,0 +1,42 @@
+{
+  "campaign": "SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1",
+  "schema_version": "1.0",
+  "tested_git_sha": "fbac5449f6dd22a7bc066114109be8bbed830447",
+  "design_sha256": "cdf09e302c261ffc240f5e880a173ab1d67d86fe5e673f74256d77049b348b8a",
+  "mode": "SYNTHETIC_AUDIT_ONLY",
+  "budget": {"new_main": 6, "numerical_invocations": 12, "conditional_b_attempts": 3,
+    "owned_retained_allocation_bytes": 536870912, "git_evidence_bytes": 5242880,
+    "numeric_seconds": 180, "fixture_seconds": 600},
+  "absolute_numeric_tolerance": 1e-12,
+  "expected_base_contrast": {"LIST_CONTRAST": 0.11, "MIXED_LIST_NUMERIC": 0.055},
+  "expected_changed_contrast": {"LIST_CONTRAST": -0.09, "MIXED_LIST_NUMERIC": -0.045},
+  "changed_world_rule": "Subtract .20 from each matched return before capture; same prefix",
+  "inherited_main_looks": {"episode_native_required_outcomes_v1": 22, "new_charge": false},
+  "scenarios": {
+    "SC00": "Container and child canaries, native ingress, independent oracle corruption",
+    "SC01": "Actual asymmetric LIST/MIXED DocumentRunner results and passports",
+    "SC02": "Cold exact repeat, no evaluator or new scientific look",
+    "SC03": "Actual runner refuses missing/foreign/stale source or definition before evaluator",
+    "SC04": "Current protection revoke after READY; historical committed read remains accessible",
+    "SC05A": "Actual file write then owned process dies before completion commit; native recovery",
+    "SC05B": "Actual completion commit then response loss; native completed replay",
+    "SC06": "Registered changed numerical world; independent unchanged role oracle",
+    "SC07": "Actual A records in ordinary dossier, synthetic PAUSE, cold identical repeat",
+    "SC08": "Foreign RELATED, stale snapshot and genuine PROMOTE_BLOCKED, no forbidden writes",
+    "SC09": "Metadata-only accepted confirmation producer/dispatch/reservation/consumer probe",
+    "SC10": "Conditional native confirming positive/null/insufficient worlds; blocked without producer",
+    "SC11": "Conditional durable pre-values exposure reservation/recovery/concurrency",
+    "SC12": "Conditional source-owned substantive confirming evidence in cold dossier"
+  },
+  "non_claims": ["NO_BLIND_ACTOR", "NO_ALPHA", "NO_NET_RETURN", "NO_FULL_SCIENCE_FROM_REPLAY",
+    "NO_STRATEGY_ACTIVATION_PAPER", "NO_REAL_DATA_PROVIDER_CREDENTIALS_OR_MONEY"],
+  "scope": "Native scientific stores retained; audit observations never replace product records"
+  ,"primary_world": "base-v3",
+  "version_history": [
+    {"world":"base", "status":"INVALID_ENVIRONMENT_TIMEOUT", "retained":true},
+    {"world":"base-v2", "status":"SEMANTIC_SPEC_FIXTURE_INVALID; NUMERIC_GUARD_RECOVERY_SEGMENTS_RETAINED", "retained":true},
+    {"world":"base-v3", "status":"PRIMARY_CORRECTED_EPISODE_SPEC", "capture":"NATIVE_IMPORT_OF_SAME_ALREADY_EXPLORED_IMMUTABLE_CAPTURE", "retained":true}
+  ],
+  "sc06": "BLOCKED_BUDGET; NOT_EXECUTED; OWNER_REPLAN_REQUIRED",
+  "registration_edge": "DEFINITION_INGRESS_FIXTURE; SEGMENT_PRODUCT_PATH"
+}
