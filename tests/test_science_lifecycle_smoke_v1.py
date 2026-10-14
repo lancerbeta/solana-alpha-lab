@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 KIT=ROOT/'tests/fixtures/science_lifecycle_smoke_v1'
 sys.path.insert(0,str(KIT))
-from verify_saved import verify,verify_run,verify_failure_receipts,verify_sc06
+from verify_saved import verify,verify_run,verify_failure_receipts,verify_sc06,verify_footprint
 
 EVIDENCE=ROOT/'docs/evidence/science_lifecycle_smoke_v1'
 
@@ -41,6 +41,23 @@ class ScienceLifecycleSavedTests(unittest.TestCase):
         corrupt['runs']['LIST_CONTRAST']['classifier']['episode_outcome_binding']['decision_n']=19
         with self.assertRaises(AssertionError):
             verify_sc06(self.numeric,corrupt)
+
+    def test_unknown_allocation_and_false_remaining_are_denied(self):
+        from capture_host import known_allocation
+        from resource_guard import check_values
+        for unknown in (None,False,'0',-1,0.0):
+            with self.subTest(value=unknown),self.assertRaisesRegex(AssertionError,'OWNED_ALLOCATION_UNKNOWN'):
+                known_allocation(unknown)
+        self.assertEqual(known_allocation(0),0)
+        with self.assertRaisesRegex(AssertionError,'FORWARD_STORAGE_CAP_EXCEEDED'):
+            check_values(671088640,0,{'allocated_unique_bytes':0},671088640)
+        footprint=json.loads((EVIDENCE/'footprint.json').read_text(encoding='utf-8'))
+        corrupt=copy.deepcopy(footprint);corrupt['known_owned_file_allocation_bytes']=671088641
+        with self.assertRaisesRegex(AssertionError,'ALLOCATION_TOTAL_MISMATCH'):
+            verify_footprint(corrupt)
+        corrupt=copy.deepcopy(footprint);corrupt['known_file_remaining_bytes']+=1
+        with self.assertRaisesRegex(AssertionError,'ALLOCATION_REMAINING_MISMATCH'):
+            verify_footprint(corrupt)
 
     def test_forged_complete_without_native_commit_is_rejected(self):
         run=copy.deepcopy(self.numeric['runs']['LIST_CONTRAST']);run['records']=[]

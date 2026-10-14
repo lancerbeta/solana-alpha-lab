@@ -15,7 +15,7 @@
 | B, SC09–SC12 | SC09 reachability PASS; SC10–12 BLOCKED_PRODUCT_CONTRACT. Confirming trials не запускались | [chronology.json](../../evidence/science_lifecycle_smoke_v1/chronology.json) |
 | C, SC07–SC08 | Actual A completion DIRECT; dossier COMPLETED / BLOCKED / PAUSE; cold REPLAY_IDENTICAL. STALE_EVIDENCE_SNAPSHOT и PROMOTE_BLOCKED | [readback.json](../../evidence/science_lifecycle_smoke_v1/readback.json) |
 
-SC06 меняет matched future returns на −0.20, оставляя comparator неизменным:
+SC06 меняет matched future returns на −0.20, оставляя LIST comparator неизменным:
 
 | Метрика | base-v3 | changed |
 |---|---:|---:|
@@ -64,9 +64,9 @@ MAIN cap исчерпан. Все interrupted/failed invocations включен�
 attempts без достоверного времени сохранён timestamp UNKNOWN.
 
 [Footprint](../../evidence/science_lifecycle_smoke_v1/footprint.json) измеряет owned
-file allocation host + два volumes + container RW. На замере после SC06 известно
-**555.53 MiB из forward cap 640 MiB**, test environment без checkout —
-**486.67 MiB**; финальный live readback после Git content сохраняется отдельно.
+file allocation host + два volumes + container RW. На замере после SC06 и allocation-only probes известно
+**556.94 MiB из forward cap 640 MiB**, test environment без checkout —
+**487.30 MiB**; финальный live readback после Git content сохраняется отдельно.
 Shared preexisting image — ещё 508.97 MiB, новых images нет. Это не физический
 рост Docker VHD. VHD growth, allocation logs и directory metadata UNKNOWN.
 
@@ -82,7 +82,7 @@ Shared preexisting image — ещё 508.97 MiB, новых images нет. Это
 replay требует retained volumes и локального exact image ID. Fresh capture
 не разрешён exhausted MAIN cap. Первичная ручная подготовка Docker volumes
 не является clean-host one-command bootstrap; см. [REPRODUCE](REPRODUCE.md).
-Девять offline falsifier tests PASS.
+Десять offline falsifier tests PASS, включая UNKNOWN allocation и противоречивый footprint.
 
 **Один NOW repair:** [List A confirming producer/reservation/consumer](REPAIR_PRD_SSD.md),
 PROPOSED_ONLY. Сначала отдельный exact task и sample/data authority; method,
@@ -90,6 +90,19 @@ floors, estimand и scientific guards сохраняются. Новый сер�
 WATCH: после его cold substantive evidence повторно оценить science decision.
 Текущий audit не даёт repair, sample activation, provider или merge authority.
 
-Честные UNKNOWN: AGENT_BEHAVIOR_UNVERIFIED; ordinary definition registration;
+Честные UNKNOWN: AGENT_BEHAVIOR_UNVERIFIED; ordinary definition registration; неполная история ранних replay read traces;
 PIT/population/HOLDOUT в dossier; costs ABSENT и NetReturn false; opaque hash-byte
 reads не инструментированы; physical Docker storage рост не установлен.
+
+Финальный независимый review выявил и исправил audit-kit resource defects:
+UNKNOWN container allocation теперь запрещён; сумма и остаток cap пересчитываются;
+allocation checks работают до и после даже короткого child; telemetry exception
+останавливает только owned child через finally. Allocation-only probes не читают
+scientific sources и не добавляют MAIN/evaluator. Это kit correction, не product repair.
+
+Ранние replay receipts использовали общий alias и могли перезаписать прежний raw
+trace. Trial ledger/native stores и экспортированные current witnesses сохранены,
+но полный per-attempt replay trace history — INCOMPLETE/UNAVAILABLE. Повтор native
+replay на исходных retained worlds по этому runbook запрещён; доступны offline
+проверка и read-only export. Новая authority и сохранение прежних aliases обязательны
+до любого следующего native repeat. Этот дефект не выдаётся за сохранённую историю.

@@ -1,0 +1,78 @@
+{
+  "failed_short_child_race": {
+    "attempt": "resource-guard-a1",
+    "state": {
+      "Dead": false,
+      "Error": "",
+      "ExitCode": 0,
+      "FinishedAt": "2026-10-14T16:15:20.854789235Z",
+      "OOMKilled": false,
+      "Paused": false,
+      "Pid": 0,
+      "Restarting": false,
+      "Running": false,
+      "StartedAt": "2026-10-14T16:15:18.869154952Z",
+      "Status": "exited"
+    }
+  },
+  "scope": "ALLOCATION_ONLY; NO_CAMPAIGN_MAIN_EVALUATOR_OR_SCIENTIFIC_SOURCE_READ",
+  "short_child": {
+    "after": {
+      "cap_bytes": 671088640,
+      "container_rw_bound_bytes": 1142784,
+      "host_bound_bytes": 199794688,
+      "owned_volumes": {
+        "allocated_unique_bytes": 386310144,
+        "cleanup_performed": false,
+        "directory_metadata": "EXCLUDED",
+        "groups": {
+          "/audit": {
+            "allocated_unique_bytes": 295706624,
+            "files": 20436,
+            "logical_bytes": 239266710
+          },
+          "/repo": {
+            "allocated_unique_bytes": 90603520,
+            "files": 4284,
+            "logical_bytes": 81512144
+          }
+        },
+        "logical_bytes": 320778854,
+        "shared_image_runtime_cache": "EXCLUDED_EXISTING"
+      },
+      "stage": "after",
+      "total_bound_with_receipt_reserve": 587251712
+    },
+    "attempt": "resource-guard-a2",
+    "state": {
+      "Dead": false,
+      "Error": "",
+      "ExitCode": 0,
+      "FinishedAt": "2026-10-14T16:18:05.2954726Z",
+      "OOMKilled": false,
+      "Paused": false,
+      "Pid": 0,
+      "Restarting": false,
+      "Running": false,
+      "StartedAt": "2026-10-14T16:18:04.564980609Z",
+      "Status": "exited"
+    }
+  },
+  "telemetry_failure": {
+    "attempt": "resource-telemetry-a1",
+    "expected_host_exception": "EXPECTED_TELEMETRY_FAILURE_PROBE",
+    "state": {
+      "Dead": false,
+      "Error": "",
+      "ExitCode": 143,
+      "FinishedAt": "2026-10-14T16:16:40.867636475Z",
+      "OOMKilled": false,
+      "Paused": false,
+      "Pid": 0,
+      "Restarting": false,
+      "Running": false,
+      "StartedAt": "2026-10-14T16:16:40.599153954Z",
+      "Status": "exited"
+    }
+  }
+}

@@ -42188,7 +42188,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/science_lifecycle_smoke_v1/summary.json', repository_path: docs/evidence/science_lifecycle_smoke_v1/summary.json}
-  integrity: {kind: sha256, sha256: a39b2bfe5bf21078f7f4a25a68fa8923e2c226ee7edb6eb735b0546f943093ab}
+  integrity: {kind: sha256, sha256: 9a209696912df2ae83cb293ab5a3c86fdf20c34ef8af264d0c5931d2c9896b1a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: []
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -42205,7 +42205,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/science_lifecycle_smoke_v1/OWNER_REPORT.md', repository_path: docs/reports/science_lifecycle_smoke_v1/OWNER_REPORT.md}
-  integrity: {kind: sha256, sha256: c19b4f52e3fb94c1e932807b2b766f46d0f94f3fa9b0e295af75d294f464cb41}
+  integrity: {kind: sha256, sha256: cf2b1d95e9922e8a8920d1910256a032027b2617eff71d6a6646a1c866e77596}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: []
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -42222,7 +42222,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/science_lifecycle_smoke_v1/REPRODUCE.md', repository_path: docs/reports/science_lifecycle_smoke_v1/REPRODUCE.md}
-  integrity: {kind: sha256, sha256: 1964196b76715203b9fe560cd4c9340b438d14c0af1314a2ed4d9f1bde1466da}
+  integrity: {kind: sha256, sha256: 4ba3d8947f1d1efd0f77f38fcf63b9e85930e5de899c3b5c75aed6e86ad7d5c4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: []
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -42239,7 +42239,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_science_lifecycle_smoke_v1.py', repository_path: tests/test_science_lifecycle_smoke_v1.py}
-  integrity: {kind: sha256, sha256: f6b39f96245915526d604c7574e859ca32c9c63c91cb2705ddef67a5251b28c7}
+  integrity: {kind: sha256, sha256: f9f1b30ed636d1c803f4833d743cecfff459204c781153bdfb5904443fabb4af}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: []
   consumers: [FACTORY-001, GOAL-OWNER]

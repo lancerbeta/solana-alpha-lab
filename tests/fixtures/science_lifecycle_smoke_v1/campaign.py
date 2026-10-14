@@ -129,4 +129,9 @@ def main():
         raise AssertionError('UNKNOWN_PHASE')
 
 if __name__=='__main__':
-    main()
+    from resource_guard import check as allocation_check
+    allocation_check('before')
+    try:
+        main()
+    finally:
+        allocation_check('after')

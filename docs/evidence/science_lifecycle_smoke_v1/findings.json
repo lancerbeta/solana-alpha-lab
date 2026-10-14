@@ -55,6 +55,25 @@
       "proof": "budget-continuation.json; scientific stores/trials/caches preserved",
       "resolution": "Only owner-authorized unused local .venv deleted; shared runtime reused by mandatory hooks; forward-only cap 671088640",
       "severity": "MATERIAL"
+    },
+    {
+      "actual": "Early same-world replay writes used common alias; prior per-attempt raw read trace may be overwritten and is not reconstructed",
+      "class": "ORIGINAL_AUDIT_TRACE_RETENTION_LIMITATION",
+      "confidence": "HIGH",
+      "id": "F07",
+      "preserved": "Native scientific records/results, trial charges, operation ledger and current exported witnesses",
+      "resolution": "REPRODUCE forbids new native repeat on original retained worlds; offline verify/read-only export only until separately authorized preservation plan",
+      "severity": "LIMITATION",
+      "unknown": "EARLY_PER_ATTEMPT_REPLAY_READ_TRACE_HISTORY_INCOMPLETE"
+    },
+    {
+      "actual": "Independent review found telemetry finally-stop gap, short-phase allocation bypass, UNKNOWN SizeRw zero-fill and trusted claimed remainder",
+      "class": "RESOLVED_AUDIT_KIT_RESOURCE_GUARDS",
+      "confidence": "HIGH",
+      "id": "F08",
+      "resolution": "Bounded Docker client operations, mandatory finally stop/readback, child pre/post allocation, strict integer allocation and recomputed footprint; allocation-only probes and offline10 tests",
+      "scientific_rerun": false,
+      "severity": "HISTORICAL"
     }
   ]
 }

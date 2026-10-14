@@ -28,12 +28,12 @@ forged COMPLETE без native completion, неверный comparator, artifact 
 & tests/fixtures/science_lifecycle_smoke_v1/launch.ps1 -RuntimeRoot '..\smial-science-lifecycle-smoke-v1-runtime' -Phase replay-v3 -Attempt replay-v3-a1 -UseVolumes
 ```
 
-`replay-v3-a1` уже существует и immutable. Перед повторным cold replay выберите
-новый уникальный `-Attempt` и проверьте доступный budget; неизменённая команда
-выше остановится с `IMMUTABLE_ATTEMPT_ALREADY_PRESENT`. Новый Attempt не разрешает
-fresh scientific run. Launcher проверяет
+`replay-v3-a1` уже существует и immutable. Не повторяйте cold replay на исходных retained stores: старый kit пишет общий
+receipt alias и может уничтожить прежний raw trace. Уникальный `-Attempt` сохраняет
+kit/container, но не изолирует эти aliases. Историческая неизменённая команда
+выше остановится с `IMMUTABLE_ATTEMPT_ALREADY_PRESENT`. Новый Attempt не разрешает scientific run или replay на исходных stores. Launcher проверяет
 owned marker/labels, immutable image, nonroot/no-network/readonly boundary и
-потом child canaries. Повтор требует retained owned volumes; image ID
+потом child canaries. Исторический runtime использовал retained owned volumes; image ID
 `sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071`.
 Image/runtime install, изменения Docker settings и provider access не нужны.
 
@@ -43,7 +43,7 @@ Image/runtime install, изменения Docker settings и provider access н�
 - `base-v3/<kind>-run.json`, `<kind>-replay.json` и `base-v3/plane`;
 - `base-v3/plane/research/artifacts/results/<result_artifact_id>.json`;
 - `base-v2/classified-plane`, `fault-before-commit`, `fault-after-commit`, `negative-*`;
-- первоначальный `attempts.jsonl`, полные phase/read traces, прежние v2 results;
+- первоначальный `attempts.jsonl`, latest exported phase/read witnesses, прежние v2 results; ранняя per-attempt replay trace history INCOMPLETE;
 - `chronology-geometry.json` в output volume: независимо пересчитанные часы из
   metadata-only observation columns, 10 matched episodes и 20 E1800/E14400 cells;
 - `definition-ingress` — definition fixture; product imports всегда из `/repo`.
@@ -78,15 +78,16 @@ native evidence и этих measurements; export — audit data, не product ca
 
 Это исторические receipts, не инструкция заново открыть MAIN: все три attempts
 уже immutable. Current MAIN=6/6, evaluator=10/12. Fresh campaign/prepare requires
-отдельную authority; новый Attempt не сбрасывает cap. Разрешённый cold repeat
-uses новый уникальный Attempt, `replay-changed` и retained stores, без evaluator.
+отдельную authority; новый Attempt не сбрасывает cap. Новый cold repeat на исходных retained stores этим runbook не разрешён: он
+перезаписывает общий replay receipt. Сначала нужны отдельная authority и сохранение
+прежних raw aliases. Offline verifier и read-only Docker export остаются доступными.
 changed future source публиковался штатным generator до native MAIN. Immutable
 base capture/old worlds не переписывались; product snapshot и image переиспользованы.
 [sc06.json](../../evidence/science_lifecycle_smoke_v1/sc06.json) содержит actual
 artifacts/passports/committed records, independent oracle и filtered native prefix
 hashes. Prefix E0..E1800 неизменен; release_id меняется вместе с future source bytes.
 Offline verifier проверяет −0.09 / −0.045, unchanged D/M/C, current lineage,
-zero-evaluator cold replay. Девять тестов дополнительно отвергают changed prefix,
+zero-evaluator cold replay. Десять тестов дополнительно отвергают changed prefix,
 changed membership/denominator и unchanged future oracle.
 
 ## Конкретные ограничения воспроизведения
@@ -114,3 +115,14 @@ Original budget breach и authorized cleanup сохранены в budget-contin
 его timestamp/measurement stage не подменяют исторический committed snapshot.
 Stores/receipts/trial history/caches не удалять. Docker VHD/log-directory physical
 allocation остаётся UNKNOWN; logical log size не служит физическим замером.
+
+Известный дополнительный audit defect: ранние same-world replay attempts сохраняли
+общий `<kind>-replay.json`; полный старый read-trace witness мог быть перезаписан.
+Scientific ledger/counters/native records сохранены, current exported hashes проверены,
+но ранние per-attempt read traces не реконструированы: UNAVAILABLE. Не считать
+immutable kit/container доказательством сохранения всех response/read receipts.
+
+Allocation-only `resource-probe` используется только для проверки самого launcher:
+он не вызывает campaign, source reader или evaluator. Pre/post receipts уникальны
+по Attempt; `-TelemetryFailureProbe` намеренно отказывает после start и проверяет
+finally stop/readback. Это не scientific trial или способ получить PASS результата.

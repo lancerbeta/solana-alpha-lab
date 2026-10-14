@@ -86,7 +86,8 @@ def finish(evidence, runtime):
         'budget_history':load(evidence/'budget-continuation.json'),
         'unknowns':['AGENT_BEHAVIOR_UNVERIFIED','ORDINARY_DEFINITION_REGISTRATION_UNVERIFIED',
             'PIT_POPULATION_HOLDOUT_UNKNOWN_IN_DOSSIER','COST_ABSENT_NET_RETURN_FALSE',
-            'OPAQUE_HASH_BYTES_NOT_INSTRUMENTED','DOCKER_VHD_GROWTH_LOG_DIRECTORY_ALLOCATION_UNKNOWN']})
+            'OPAQUE_HASH_BYTES_NOT_INSTRUMENTED','DOCKER_VHD_GROWTH_LOG_DIRECTORY_ALLOCATION_UNKNOWN',
+            'EARLY_PER_ATTEMPT_REPLAY_READ_TRACE_HISTORY_INCOMPLETE']})
     write(evidence/'findings.json',{'findings':[
         {'id':'F01','class':'MISSING_PRODUCT_SEAM_CONTRACT_GAP','severity':'MATERIAL','confidence':'HIGH',
          'boundary':'accepted List A protocol -> native source-bound confirming producer/reservation -> substantive science evidence',
@@ -113,7 +114,17 @@ def finish(evidence, runtime):
         {'id':'F06','class':'HISTORICAL_ENGINEERING_ENVELOPE_BREACH','severity':'MATERIAL','confidence':'HIGH',
          'actual':'Mandatory Git hook created local .venv: known allocation 706668368 > original cap 536870912; breach 169797456, never recomputed',
          'resolution':'Only owner-authorized unused local .venv deleted; shared runtime reused by mandatory hooks; forward-only cap 671088640',
-         'proof':'budget-continuation.json; scientific stores/trials/caches preserved'}]})
+         'proof':'budget-continuation.json; scientific stores/trials/caches preserved'},
+        {'id':'F07','class':'ORIGINAL_AUDIT_TRACE_RETENTION_LIMITATION','severity':'LIMITATION','confidence':'HIGH',
+         'actual':'Early same-world replay writes used common alias; prior per-attempt raw read trace may be overwritten and is not reconstructed',
+         'preserved':'Native scientific records/results, trial charges, operation ledger and current exported witnesses',
+         'unknown':'EARLY_PER_ATTEMPT_REPLAY_READ_TRACE_HISTORY_INCOMPLETE',
+         'resolution':'REPRODUCE forbids new native repeat on original retained worlds; offline verify/read-only export only until separately authorized preservation plan'},
+        {'id':'F08','class':'RESOLVED_AUDIT_KIT_RESOURCE_GUARDS','severity':'HISTORICAL','confidence':'HIGH',
+         'actual':'Independent review found telemetry finally-stop gap, short-phase allocation bypass, UNKNOWN SizeRw zero-fill and trusted claimed remainder',
+         'resolution':'Bounded Docker client operations, mandatory finally stop/readback, child pre/post allocation, strict integer allocation and recomputed footprint; allocation-only probes and offline10 tests',
+         'scientific_rerun':False}]
+})
     return {'known_owned_allocation_bytes':known,'charges':counts,'campaign_status':'COMPLETE_WITH_FINDINGS'}
 
 if __name__=='__main__':

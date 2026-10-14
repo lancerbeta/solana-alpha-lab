@@ -146,6 +146,21 @@ def verify_sc06(base, changed):
     return contrasts
 
 
+def verify_footprint(value):
+    from capture_host import known_allocation
+    host=value['host'];volumes=value['owned_volumes'];containers=value['owned_container_metadata']
+    assert host['measurement_errors']==[], 'HOST_ALLOCATION_UNKNOWN'
+    for part in (host,volumes):
+        assert known_allocation(part['allocated_unique_bytes'])==sum(known_allocation(g['allocated_unique_bytes']) for g in part['groups'].values()), 'ALLOCATION_GROUP_SUM_MISMATCH'
+    total=host['allocated_unique_bytes']+volumes['allocated_unique_bytes']+known_allocation(containers['container_rw_known_bytes'])
+    assert containers['running_owned_processes']==0, 'OWNED_PROCESS_STILL_RUNNING'
+    assert value['known_owned_file_allocation_bytes']==total, 'ALLOCATION_TOTAL_MISMATCH'
+    assert value['known_test_environment_excluding_checkout_bytes']==total-host['groups']['elected_checkout']['allocated_unique_bytes'], 'TEST_ENVIRONMENT_ALLOCATION_MISMATCH'
+    assert value['frozen_cap_bytes']==671088640 and total<=671088640, 'FORWARD_STORAGE_CAP_EXCEEDED'
+    assert value['known_file_remaining_bytes']==671088640-total, 'ALLOCATION_REMAINING_MISMATCH'
+    return True
+
+
 def verify(directory):
     directory = Path(directory)
     numeric = json.loads((directory/'numerical.json').read_text(encoding='utf-8'))
@@ -186,7 +201,14 @@ def verify(directory):
     assert budget['original_post_hook_known_allocation_bytes']==706668368 and budget['history_recomputed'] is False
     assert budget['forward_only_cap_bytes']==671088640 and budget['cleanup_performed'] is True
     footprint=json.loads((directory/'footprint.json').read_text(encoding='utf-8'))
-    assert footprint['frozen_cap_bytes']==671088640 and footprint['known_file_remaining_bytes']>=0, 'FORWARD_STORAGE_CAP_EXCEEDED'
+    assert verify_footprint(footprint)
+    resources=json.loads((directory/'resource-guards.json').read_text(encoding='utf-8'))
+    assert resources['short_child']['state']['Running'] is False and resources['short_child']['state']['ExitCode']==0
+    assert resources['telemetry_failure']['state']['Running'] is False
+    assert resources['telemetry_failure']['expected_host_exception']=='EXPECTED_TELEMETRY_FAILURE_PROBE'
+    after=resources['short_child']['after']
+    from resource_guard import check_values
+    assert after['stage']=='after' and after['total_bound_with_receipt_reserve']==check_values(after['host_bound_bytes'],after['container_rw_bound_bytes'],after['owned_volumes'],after['cap_bytes'])
     assert all(summary['coverage'][s]['status'] == 'BLOCKED_PRODUCT_CONTRACT' for s in ('SC10','SC11','SC12'))
     assert all(value is False for value in summary['science'].values())
     chronology = json.loads((directory/'chronology.json').read_text(encoding='utf-8'))
