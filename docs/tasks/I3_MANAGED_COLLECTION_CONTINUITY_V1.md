@@ -29,6 +29,7 @@ managed_write_set:
 - scripts/observation_schedule.py
 - catalog/schemas/observation_schedule_authority_v1.schema.json
 - tests/test_managed_collection_continuity_v1.py
+- tests/test_managed_collection_release_seam_v1.py
 - catalog/assets/**
 - catalog/catalog_manifest.yaml
 - catalog/generated/**
