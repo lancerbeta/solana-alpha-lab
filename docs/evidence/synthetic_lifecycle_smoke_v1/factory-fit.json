@@ -4,8 +4,8 @@
   "task_id": "SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1",
   "review_id": "SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1-FIT",
   "as_of": "2026-10-14",
-  "reviewed_bindings_sha256": "",
-  "reviewed_inventory_sha256": "",
+  "reviewed_bindings_sha256": "6707f9d948d7faa04503fc098a2ae7699dc8ca8f1b97bed6f2373643191b67b2",
+  "reviewed_inventory_sha256": "85deecf88d54fc6ee430e268626ab065827780967d048d90d4a9171cfb1ceef4",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
