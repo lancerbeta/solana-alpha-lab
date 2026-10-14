@@ -5,6 +5,7 @@ import unittest
 from datetime import datetime
 from fractions import Fraction
 from types import SimpleNamespace
+from unittest.mock import patch
 
 from solana_alpha_lab.factory.list_a_confirmation_method import (
     CORE_SHA, draw_weights, nearest_rank_interval, seed_for, weighted_contrast, calculate_list_a,
@@ -22,6 +23,23 @@ class FixedDraw:
 
 
 class MethodTests(unittest.TestCase):
+    def test_native_numeric_unavailable_preserves_observed_counts_without_zero_fill(self):
+        rows = [{"episode_id": f"{g}{i:02d}", "group": g, "mint": f"{g}m{i}", "r": 0.125 if g == "A" else 0.0,
+                 "blocks": {str(h): i for h in (86400, 172800)}} for g in ("A", "C") for i in range(32)]
+        rows[0].update(r=None, numeric_refusal="TEMPORAL_TARGET_UNREPRESENTABLE")
+        with patch("solana_alpha_lab.factory.list_a_confirmation_method.draw_weights", side_effect=AssertionError("NO_NUMERIC_REROLL")):
+            result = calculate_list_a(rows, {"A": 32, "C": 32})
+        self.assertEqual(result["terminal"], "INSUFFICIENT")
+        self.assertEqual(result["coverage"], {"A": 1.0, "C": 1.0})
+        self.assertEqual((result["support"]["A"]["observed"], result["support"]["C"]["observed"]), (32, 32))
+        self.assertIsNone(result["contrast"])
+        self.assertIsNone(result["means"])
+        self.assertEqual(result["partitions"], {})
+        self.assertIn("TEMPORAL_TARGET_UNREPRESENTABLE", result["reason_codes"])
+        rows[0].pop("numeric_refusal")
+        with self.assertRaisesRegex(ValueError, "INVALID_OBSERVED_ROW"):
+            calculate_list_a(rows, {"A": 32, "C": 32})
+
     def test_independent_fraction_draw_and_weighting(self):
         # Independent labels and multiplicities. The production draw owner must
         # choose M draws before T, and use the same crossed weights in A and C.

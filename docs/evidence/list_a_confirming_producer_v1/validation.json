@@ -1,11 +1,17 @@
 {
+  "bounded_replan": {
+    "preserved": "Scientific core, finite method/seeds/thresholds/estimand; all named scientific history",
+    "scope": "Resolve shared metadata checkpoint once across ordinary entry points; typed numeric unavailable path only",
+    "stop": "No new named scientific campaign, real scope or infrastructure; final targeted tests and cold readbacks only",
+    "trigger": "f4 review: alias-before-reserve readout and frozen numeric terminal mismatch"
+  },
   "checks": {
-    "admission": "16 PASS on final production bytes",
+    "admission": "16 PASS on dbc production; final alias/numeric mapping validation pending",
     "legacy_classifier": "31 PASS",
     "legacy_episode_1_4": "14 PASS / 2 existing SKIP",
     "legacy_evidence_decision": "12 PASS",
-    "method": "5 PASS",
-    "vertical": "3 PASS on final production bytes; positive/null/missing/empty/UNKNOWN/conflicting result"
+    "method": "6 PASS host, including numeric-unavailable count oracle; native final validation pending",
+    "vertical": "3 PASS on dbc production; final production regression pending"
   },
   "distinct_targeted_unit_checks": 67,
   "engineering_history": [
@@ -81,6 +87,7 @@
       "attempt": "review-fixes",
       "checks": 66,
       "head": "44227e5101d6e5edfde195bbd8bceaee9fba4d80",
+      "limitation": "Historical numeric-refusal INVALID expectation superseded by frozen-contract INSUFFICIENT mapping; other checks retained",
       "scope": "Method/admission/vertical/legacy classifier/legacy evidence decision",
       "status": "PASS"
     },
@@ -88,6 +95,7 @@
       "attempt": "owner-path-final",
       "checks": 19,
       "head": "dbc77d49ef5437287635f23a9bd71e7e5cbbec87",
+      "limitation": "Historical numeric-refusal INVALID expectation superseded by frozen-contract INSUFFICIENT mapping; other checks retained",
       "scope": "All 16 admission and 3 vertical tests; actual ordinary CLI exact revoke and repeat metadata after invalid/alias",
       "status": "PASS"
     },
@@ -117,10 +125,11 @@
   "post_review_changes": [
     "Committed charge/identity remains visible on denied classify/submit and unverifiable result",
     "Unavailable history stays UNKNOWN; NO_RUN/NO_DECISION requires available complete history",
-    "Native nonfinite/unrepresentable refusal persists typed INVALID_AFTER_RESERVE",
+    "Native nonfinite/unrepresentable return completes typed INSUFFICIENT; observed counts retained, no zero fill/rounding/resampling",
     "Exact owner revoke preview/phrase/idempotence; no values or allowance refund",
     "Prepare/authorize returns original consumed checkpoint, including acquisition aliases; no new grant",
-    "Public facade for unchanged ordinary science obligations"
+    "Public facade for unchanged ordinary science obligations",
+    "Pre-reservation prepared aliases and early capability refusal retain original consumed checkpoint"
   ],
   "post_review_production_head": "dbc77d49ef5437287635f23a9bd71e7e5cbbec87",
   "production_bytes_unchanged_since_native_acceptance": false,

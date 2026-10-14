@@ -16,7 +16,7 @@ from solana_alpha_lab.factory.list_a_confirmation_inputs import (
     DEFINITION, ConfirmationError, authorize_confirmation, load_json,
     prepare_confirmation, revoke_confirmation, utc, write_native_confirmation_sample, register_source_authority,
 )
-from solana_alpha_lab.factory.list_a_confirmation import confirmation_checkpoint, read_confirmation, resume_confirmation
+from solana_alpha_lab.factory.list_a_confirmation import bound_confirmation_checkpoint, read_confirmation, resume_confirmation
 from solana_alpha_lab.factory.lane_classifier import classify_lane
 from solana_alpha_lab.factory.document_runner import DocumentRunner, RunContext
 from solana_alpha_lab.factory.research_store import ResearchStore
@@ -89,7 +89,7 @@ def main(argv=None) -> int:
         checkpoint = {"scientific_charge": None}
         if args.command in {"submit", "resume", "classify", "authorize", "revoke"} and args.binding_id:
             try:
-                checkpoint = confirmation_checkpoint(ResearchStore(args.data_root, create_if_missing=False), args.binding_id)
+                checkpoint = bound_confirmation_checkpoint(ResearchStore(args.data_root, create_if_missing=False), args.binding_id)
             except (ValueError, OSError, KeyError, TypeError, RuntimeError):
                 pass  # Unavailable committed metadata stays UNKNOWN/null.
         print(json.dumps({**checkpoint, "status": "REFUSED", "reason_codes": [getattr(exc, "code", "CONFIRMATION_INPUT_OR_RUNTIME_INVALID")],

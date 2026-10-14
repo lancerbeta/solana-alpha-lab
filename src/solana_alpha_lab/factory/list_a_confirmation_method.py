@@ -13,6 +13,7 @@ from datetime import UTC, datetime
 CORE_SHA = "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252"
 B = 4096
 PARTITIONS = (86400, 172800)
+NUMERIC_REFUSALS = frozenset({"TEMPORAL_TARGET_NONFINITE", "TEMPORAL_TARGET_UNREPRESENTABLE"})
 
 
 def finite_bytes(value: object) -> bytes:
@@ -90,7 +91,9 @@ def calculate_list_a(observed_rows: list[dict], denominators: dict[str, int], *,
     rows = sorted(observed_rows, key=lambda r: r["episode_id"])
     if len({r["episode_id"] for r in rows}) != len(rows):
         raise ValueError("DUPLICATE_EPISODE")
-    if any(r["group"] not in {"A", "C"} or not math.isfinite(r["r"]) for r in rows):
+    if any(r["group"] not in {"A", "C"} or
+           (r["r"] is None and r.get("numeric_refusal") not in NUMERIC_REFUSALS) or
+           (r["r"] is not None and (not math.isfinite(r["r"]) or "numeric_refusal" in r)) for r in rows):
         raise ValueError("INVALID_OBSERVED_ROW")
     count = Counter(r["group"] for r in rows)
     if any(type(denominators.get(g)) is not int or denominators[g] < count[g]
@@ -104,7 +107,7 @@ def calculate_list_a(observed_rows: list[dict], denominators: dict[str, int], *,
                    "blocks": {str(h): len({r["blocks"][str(h)] for r in rows if r["group"] == g})
                               for h in PARTITIONS}}
                for g in ("A", "C")}
-    reasons = []
+    reasons = sorted({r["numeric_refusal"] for r in rows if r["r"] is None})
     if any(denominators[g] == 0 for g in ("A", "C")):
         reasons.append("EMPTY_DECISION_GROUP")
     if len(mints) < 30 or any(len(v) < 30 for v in axes.values()) or any(
@@ -116,7 +119,7 @@ def calculate_list_a(observed_rows: list[dict], denominators: dict[str, int], *,
     if abs(count["A"] * denominators["C"] - count["C"] * denominators["A"]) * 100 > (
             5 * denominators["A"] * denominators["C"]):
         reasons.append("MISSING_RATE_GAP_ABOVE_5_PERCENT")
-    point = weighted_contrast(rows, [1] * len(rows))
+    point = None if any(r["r"] is None for r in rows) else weighted_contrast(rows, [1] * len(rows))
     if point is None:
         reasons.append("NONFINITE_OR_EMPTY_GROUP")
     result = {"protocol_core_sha256": CORE_SHA, "replicates_per_partition": B,

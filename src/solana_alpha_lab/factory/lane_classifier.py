@@ -357,7 +357,7 @@ def classify_lane(
     if isinstance(candidate, Mapping) and candidate.get("schema_version") == "1.5":
         from solana_alpha_lab.factory.experiment_spec import validate_experiment_document
         from solana_alpha_lab.factory.list_a_confirmation import (
-            confirmation_checkpoint, current_context, committed, read_confirmation, run_identity,
+            bound_confirmation_checkpoint, current_context, committed, read_confirmation, run_identity,
         )
         from solana_alpha_lab.factory.list_a_confirmation_inputs import ConfirmationError
         checkpoint = {"scientific_charge": None, "trial_id": None, "run_id": None,
@@ -365,11 +365,14 @@ def classify_lane(
         try:
             store = ResearchStore(data_root, create_if_missing=False)
             binding_id = str(submission.get("execution_binding_id") or "")
-            checkpoint = confirmation_checkpoint(store, binding_id)
+            checkpoint = bound_confirmation_checkpoint(store, binding_id)
             validate_experiment_document(candidate, root=root)
             descriptor = _load_capabilities(root, registry_relative=CAPABILITY_REGISTRY_V2_RELATIVE).get(candidate["capability_id"])
             if not descriptor or descriptor["status"] != "ACCEPTED":
-                return _change_lane("CAPABILITY_NOT_ACCEPTED")
+                return ConfirmationLaneDecision(Lane.CHANGE_LANE, "CHANGE_LANE_CAPABILITY_GAP",
+                    reason_codes=("CAPABILITY_NOT_ACCEPTED",), run_key_sha256=checkpoint["run_key_sha256"],
+                    prior_run_id=checkpoint["run_id"], next_action="READ_SAVED_CHECKPOINT_AND_REVIEW_CAPABILITY",
+                    confirmation_checkpoint=checkpoint)
             context = current_context(dict(candidate), binding_id, root=root, store=store, now=as_of)
             reservation = committed(store, context["reservation_id"])
             identity = reservation["payload"] if reservation else run_identity(context, root)

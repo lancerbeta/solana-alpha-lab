@@ -411,6 +411,10 @@ def validate_confirmation_result(result: dict, *, root: Path) -> None:
         if part["interval"] is not None:
             require(part["interval"][0] <= part["interval"][1], "RESULT_INTERVAL_CONFLICT")
     terminal = m["terminal"]
+    from solana_alpha_lab.factory.list_a_confirmation_method import NUMERIC_REFUSALS
+    if set(m["reason_codes"]).intersection(NUMERIC_REFUSALS):
+        require(terminal == "INSUFFICIENT" and m["means"] is None and m["contrast"] is None and
+                not m["partitions"] and not m["leave_one"], "RESULT_NUMERIC_REFUSAL_CONFLICT")
     if terminal == "INSUFFICIENT":
         require(bool(m["reason_codes"]), "RESULT_INSUFFICIENT_REASON_MISSING")
         return
@@ -526,12 +530,13 @@ def inspect_confirmation(definition: dict, sample_ref: str, *, root: Path, data_
 
 def spent_confirmation_checkpoint(store, binding_id: str, binding: dict) -> dict:
     """Project existing consumption even across metadata/implementation aliases."""
-    from solana_alpha_lab.factory.list_a_confirmation import confirmation_checkpoint
     spent = [r for r in records(store) if r["kind"] == "RESEARCH_ARTIFACT" and
              r["payload"].get("type") == "CONFIRMATION_RESERVATION" and
              (r["payload"].get("study_budget_sha256") == binding["study_budget_sha256"] or
               set(r["payload"].get("acquisition_keys", [])).intersection(binding["acquisition_keys"]))]
     require(len(spent) <= 1, "COMMITTED_RESERVATION_CONFLICT")
+    # Exact projection avoids recursively resolving this same prepared binding.
+    from solana_alpha_lab.factory.list_a_confirmation import confirmation_checkpoint
     return confirmation_checkpoint(store, spent[0]["payload"]["execution_binding_sha256"] if spent else binding_id)
 
 
@@ -583,7 +588,7 @@ def authorize_confirmation(definition: dict, binding_id: str, *, root: Path, sto
 
 def revoke_confirmation(binding_id: str, *, root: Path, store: ResearchStore, owner_phrase: str | None = None) -> dict:
     """Exact owner revoke; available even when current execution is inadmissible."""
-    from solana_alpha_lab.factory.list_a_confirmation import confirmation_checkpoint
+    from solana_alpha_lab.factory.list_a_confirmation import bound_confirmation_checkpoint
     require(bool(re.fullmatch(r"[0-9a-f]{64}", binding_id)), "BINDING_ID_INVALID")
     binding = load_json(safe_path(store.root, f"confirmation/bindings/{binding_id}.json"))
     require(digest(binding) == binding_id, "EXECUTION_BINDING_STALE")
@@ -593,7 +598,7 @@ def revoke_confirmation(binding_id: str, *, root: Path, store: ResearchStore, ow
     require(len(grants) == 1, "EXACT_GRANT_UNBOUND_OR_CONFLICT")
     grant = grants[0]
     validate_exact_grant(grant, binding, binding_id)
-    checkpoint = confirmation_checkpoint(store, binding_id)
+    checkpoint = bound_confirmation_checkpoint(store, binding_id)
     request = digest({"binding": binding_id, "grant": grant["record_id"], "purpose": "REVOKE_EXACT_CONFIRMATION"})
     phrase = f"REVOKE {binding['domain']} LIST A {request}"
     response = {**checkpoint, "grant_id": grant["record_id"], "request_sha256": request}

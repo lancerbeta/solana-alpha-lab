@@ -81,9 +81,9 @@
       "status": "PASS"
     },
     {
-      "evidence": "Actual source-owner registered nonfinite/unrepresentable positive-price cases; native refusal -> durable invalid consumed trial; repeat no new look",
+      "evidence": "Registered positive-price native nonfinite/unrepresentable cases -> typed INSUFFICIENT, charge1, full observed counts, null numeric result; final native regression pending",
       "requirement": "native numeric refusal",
-      "status": "PASS"
+      "status": "FINAL_VALIDATION_PENDING"
     }
   ],
   "schema": "smial.list-a-confirmation-coverage",

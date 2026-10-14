@@ -48,8 +48,11 @@ DENY, revoke, unknown scope и incomplete inventory блокируют его.
 Повторные prepare/authorize показывают ALREADY_RESERVED и исходный checkpoint,
 включая overlap/alias; charge не обнуляется и новый grant не выдаётся. Classify/submit
 при отказе после reservation показывают BLOCKED_AFTER_RESERVE с charge 1 и
-исходными trial/run. Недоступная история даёт UNKNOWN/null. Native nonfinite или
-unrepresentable target сохраняет INVALID_AFTER_RESERVE; это не resumable crash.
+исходными trial/run, в том числе для alias, подготовленного до original reservation.
+Недоступная история даёт UNKNOWN/null. Native nonfinite или unrepresentable return
+завершается typed INSUFFICIENT с consumed charge 1: observed counts, membership и
+denominators сохранены, means/contrast — null, resampling не запускается. Identity,
+protection, PIT и chronology failures сохраняют INVALID_AFTER_RESERVE.
 
 Метод: native E1800 decision mask, E14400 observed price-relative returns;
 episode-weighted A−eligible complement C. Два pooled crossed bootstrap partition

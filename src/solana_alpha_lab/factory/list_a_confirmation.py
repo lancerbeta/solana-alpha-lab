@@ -24,7 +24,7 @@ from solana_alpha_lab.factory.list_a_confirmation_inputs import (
     publish, records, require, safe_path, utc, validate_confirmation_result, SOURCE_OWNER, validate_exact_grant,
 )
 from solana_alpha_lab.factory.list_a_confirmation_method import (
-    CORE_SHA, PARTITIONS, block_for, calculate_list_a, digest, finite_bytes,
+    CORE_SHA, NUMERIC_REFUSALS, PARTITIONS, block_for, calculate_list_a, digest, finite_bytes,
 )
 from solana_alpha_lab.factory.hfic_temporal_discovery import (
     GroundedDiscoveryError, confirmation_price_cell, confirmation_price_relative,
@@ -96,6 +96,25 @@ def confirmation_checkpoint(store, binding_id: str) -> dict:
             payload["run_id"] == "RUN-" + payload["run_key_sha256"][:24].upper(), "COMMITTED_RESERVATION_INVALID")
     return {key: payload[key] for key in
             ("execution_binding_sha256", "scientific_charge", "trial_id", "run_id", "run_key_sha256", "domain")}
+
+
+def bound_confirmation_checkpoint(store, binding_id: str) -> dict:
+    """Include consumed acquisition of a previously prepared alias, no values."""
+    checkpoint = confirmation_checkpoint(store, binding_id)
+    if checkpoint["scientific_charge"] == 1:
+        return checkpoint
+    prepared = committed(store, "LA-BINDING-" + binding_id)
+    if prepared is None:
+        return checkpoint
+    binding = {k: v for k, v in prepared["payload"].items() if k not in {"execution_binding_sha256", "artifact_ref"}}
+    require(prepared["kind"] == "RESEARCH_ARTIFACT" and prepared["producer"] == CAPABILITY and
+            prepared["payload"]["execution_binding_sha256"] == digest(binding) == binding_id and
+            binding["type"] == "EXECUTION_BINDING", "COMMITTED_BINDING_INVALID")
+    from solana_alpha_lab.factory.list_a_confirmation_inputs import spent_confirmation_checkpoint
+    checkpoint = spent_confirmation_checkpoint(store, binding_id, binding)
+    if checkpoint["execution_binding_sha256"] != binding_id:
+        checkpoint = {**checkpoint, "requested_execution_binding_sha256": binding_id}
+    return checkpoint
 
 
 def current_context(spec: dict, binding_id: str, *, root: Path, store: ResearchStore, now: datetime) -> dict:
@@ -205,10 +224,14 @@ def evaluate_native(context: dict, *, store, phase=None) -> tuple[dict, dict]:
             try:
                 value = confirmation_price_relative(cells["E14400"]["value"], cells["E1800"]["value"])
             except GroundedDiscoveryError as exc:
-                # Native owner's deterministic numeric refusal is terminal for
-                # this immutable input, not a retryable infrastructure crash.
-                raise ConfirmationError(str(exc)) from exc
-            observed.append({**{k: population[-1][k] for k in ("episode_id", "mint", "group", "blocks")}, "r": value})
+                if exc.code not in NUMERIC_REFUSALS:
+                    raise ConfirmationError(exc.code) from exc
+                # Preserve native observed-price membership/counts. A numeric
+                # return unavailable in binary64 is neither missing nor zero.
+                observed.append({**{k: population[-1][k] for k in ("episode_id", "mint", "group", "blocks")},
+                                 "r": None, "numeric_refusal": exc.code})
+            else:
+                observed.append({**{k: population[-1][k] for k in ("episode_id", "mint", "group", "blocks")}, "r": value})
         else:
             missing[group + ":" + (source_rows[0]["state"] if source_rows else "ABSENT")] += 1
     if phase:

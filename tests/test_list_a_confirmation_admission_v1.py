@@ -216,6 +216,7 @@ class AdmissionTests(unittest.TestCase):
                 self.assertEqual(saved["reason_codes"], [reason])
                 self.assertEqual(saved["scientific_charge"], 1)
                 self.assertFalse(any(r["kind"] == "RUN_COMPLETED" and r["payload"].get("trial_id") == reservation["trial_id"] for r in records(self.store)))
+                self.assert_cli_consumed_metadata(prepared, reservation["trial_id"], "confirmation/sources/SYNTH-BAD-" + variant.upper() + "/sample.json")
 
     def test_revoke_after_values_blocks_completion_without_new_charge(self):
         grant = next(r for r in records(self.store) if r["payload"].get("type") == "CONFIRMATION_GRANT")
@@ -281,6 +282,32 @@ class AdmissionTests(unittest.TestCase):
         self.assertEqual(code, expected_code)
         return json.loads(output.getvalue())
 
+    def assert_cli_consumed_metadata(self, prepared, trial_id, sample_ref):
+        reader = ValueReader(self.store)
+        before = self.store.diagnostics().committed_inventory_sha256
+        with patch.object(pq, "read_table", reader.read), patch.object(ResearchStore, "append", side_effect=AssertionError("NO_REOPEN")):
+            for command, arguments in (("prepare", ["--sample-ref", sample_ref]),
+                    ("authorize", ["--binding-id", prepared["binding_id"], "--valid-until", "2027-02-01T00:00:00Z",
+                        "--owner-phrase", "AUTHORIZE SYNTHETIC LIST A " + prepared["request_sha256"]])):
+                repeated = self.cli_response(command, *arguments)
+                self.assertEqual((repeated["status"], repeated["scientific_charge"]), ("ALREADY_RESERVED", 1))
+                self.assertEqual(repeated["prior_scientific_checkpoint"]["trial_id"], trial_id)
+        self.assertEqual(reader.reads, [])
+        self.assertEqual(before, self.store.diagnostics().committed_inventory_sha256)
+
+    def test_prepared_alias_and_capability_refusal_keep_original_charge(self):
+        _, alias, _ = bound(self.store, source_id="SYNTH-PREPARED-ALIAS", origin_label="SYNTH-LIST-A-V1")
+        self.assertEqual(alias["status"], "PREPARED")
+        def fail(phase):
+            if phase == "AFTER_RESERVATION":
+                raise RuntimeError("CONTROLLED_PRE_VALUE_CRASH")
+        with self.assertRaises(RuntimeError):
+            self.execute(fail)
+        trial_id = next(r["payload"]["trial_id"] for r in records(self.store) if r["kind"] == "RUN_STARTED")
+        self.assert_cli_checkpoint(alias["binding_id"], 1, "BLOCKED_AFTER_RESERVE", trial_id)
+        with patch("solana_alpha_lab.factory.lane_classifier._load_capabilities", return_value={self.spec["capability_id"]: {"status": "DRAFT"}}):
+            self.assert_cli_checkpoint(alias["binding_id"], 1, "CHANGE_LANE_CAPABILITY_GAP", trial_id)
+
     def test_cli_revoke_exact_phrase_pre_values_and_idempotent(self):
         reader = ValueReader(self.store)
         before = self.store.diagnostics().committed_inventory_sha256
@@ -313,25 +340,28 @@ class AdmissionTests(unittest.TestCase):
                     return original(**{**kwargs, "observations": rows})
                 with patch.object(native, "write_native_confirmation_sample", ingress):
                     spec, prepared, _ = bound(self.store, source_id="SYNTH-" + reason.replace("_", "-"))
-                with patch("solana_alpha_lab.factory.list_a_confirmation.calculate_list_a", side_effect=AssertionError("NO_BOOTSTRAP")), self.assertRaisesRegex(
-                        ConfirmationError, reason):
-                    execute_capability(spec, root=ROOT, capture_hooks={"execution_context": {
+                with patch("solana_alpha_lab.factory.list_a_confirmation_method.draw_weights", side_effect=AssertionError("NO_BOOTSTRAP")):
+                    response = execute_capability(spec, root=ROOT, capture_hooks={"execution_context": {
                         "binding_id": prepared["binding_id"], "data_root": self.store.root, "now": NOW}})
                 reservation = next(r["payload"] for r in records(self.store) if r["kind"] == "RUN_STARTED" and
                     r["payload"].get("execution_binding_sha256") == prepared["binding_id"])
                 saved = read_confirmation(self.store, trial_id=reservation["trial_id"], root=ROOT)
-                self.assertEqual((saved["status"], saved["scientific_charge"], saved["reason_codes"]),
-                                 ("INVALID_AFTER_RESERVE", 1, [reason]))
-                self.assert_cli_checkpoint(prepared["binding_id"], 1, "BLOCKED_AFTER_RESERVE", reservation["trial_id"])
+                self.assertEqual((saved["status"], saved["scientific_charge"], saved["protocol_terminal"]), ("COMPLETED", 1, "INSUFFICIENT"))
+                self.assertIn(reason, saved["reason_codes"])
+                self.assertIsNone(response["result"]["method"]["contrast"])
+                self.assertIsNone(response["result"]["method"]["means"])
+                self.assertEqual(response["result"]["method"]["coverage"], {"A": 1.0, "C": 1.0})
+                self.assertEqual(response["result"]["population"]["decision_denominators"], {"A": 128, "C": 128})
+                self.assertEqual(response["result"]["population"]["observed"], 256)
+                self.assertEqual(response["result"]["population"]["typed_missing_counts"], {})
                 reader = ValueReader(self.store)
                 before = self.store.diagnostics().committed_inventory_sha256
                 with patch.object(pq, "read_table", reader.read), patch.object(ResearchStore, "append", side_effect=AssertionError("NO_REOPEN")):
-                    for command, arguments in (("prepare", ["--sample-ref", "confirmation/sources/SYNTH-" + reason.replace("_", "-") + "/sample.json"]),
-                            ("authorize", ["--binding-id", prepared["binding_id"], "--valid-until", "2027-02-01T00:00:00Z",
-                                "--owner-phrase", "AUTHORIZE SYNTHETIC LIST A " + prepared["request_sha256"]])):
-                        repeated = self.cli_response(command, *arguments)
-                        self.assertEqual((repeated["status"], repeated["scientific_charge"]), ("ALREADY_RESERVED", 1))
-                        self.assertEqual(repeated["prior_scientific_checkpoint"]["trial_id"], reservation["trial_id"])
+                    classified = self.cli_response("classify", "--binding-id", prepared["binding_id"])
+                    self.assertEqual(classified["terminal"], "REPLAY_AVAILABLE")
+                    repeated = self.cli_response("submit", "--binding-id", prepared["binding_id"])
+                    self.assertEqual((repeated["status"], repeated["protocol_terminal"], repeated["new_evaluator_invocations"]), ("COMPLETED", "INSUFFICIENT", 0))
                 self.assertEqual(reader.reads, [])
                 self.assertEqual(before, self.store.diagnostics().committed_inventory_sha256)
-                self.assertFalse(any(r["kind"] == "RUN_COMPLETED" for r in records(self.store)))
+                self.assert_cli_consumed_metadata(prepared, reservation["trial_id"], "confirmation/sources/SYNTH-" + reason.replace("_", "-") + "/sample.json")
+                self.assertFalse(any(r["kind"] == "RUN_INVALID" and r["payload"].get("trial_id") == reservation["trial_id"] for r in records(self.store)))

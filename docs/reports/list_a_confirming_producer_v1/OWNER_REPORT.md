@@ -65,7 +65,11 @@ SKIP. Две SKIP требуют отдельных предыдущих campaig
 Owner может отозвать точный grant через `revoke`: первый вызов показывает request,
 второй принимает отдельную exact phrase. После reservation prepare/authorize
 показывают ALREADY_RESERVED и прежний trial; classify/submit сохраняют charge 1.
-Native nonfinite/unrepresentable input становится durable INVALID_AFTER_RESERVE.
+Alias, подготовленный до original reservation, также показывает исходный spent
+checkpoint. Native nonfinite/unrepresentable return завершает typed INSUFFICIENT
+с charge 1, полными observed counts и прежними membership/denominators; means и
+contrast — null. Resampling не запускается. Identity/protection/PIT/chronology
+failures остаются INVALID_AFTER_RESERVE; frozen thresholds и estimand не меняются.
 Недоступная история даёт UNKNOWN; повреждённый result сохраняет видимую reservation
 и consumed charge при evidence CONFLICT. Новый allowance эти действия не создают.
 
