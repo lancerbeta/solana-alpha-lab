@@ -1,6 +1,6 @@
 ---
 task_id: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
-task_version: '1.0'
+task_version: '1.1'
 status: READY
 as_of: '2026-10-14'
 owner: GOAL_OWNER
@@ -31,6 +31,7 @@ managed_write_set:
 - tests/fixtures/episode_native_required_outcomes_v1/**
 - docs/contracts/episode_native_required_outcomes_v1.md
 - docs/evidence/episode_native_required_outcomes_v1/**
+- docs/evidence/list_a_confirmation_protocol_freeze_v1/main-refresh.json
 - docs/reports/episode_native_required_outcomes_v1/**
 - .agents/skills/independent-hypothesis-critic/SKILL.md
 - .agents/skills/hypothesis-forge/SKILL.md
@@ -102,3 +103,12 @@ STOP: delivery-ready exact candidate at owner merge phrase or material replan.
 NEXT: separately authorize accepted chronological producer/consumer analysis.
 Factory Fit FULL_REVIEW. Horizon NOW=this seam; WATCH=chronological continuation.
 Git task transport is the repository policy exception to network=false.
+
+Dependent delivery binding refresh: preflight found a SEPARATE historical pin
+from List A main-refresh.json to the shared temporal owner changed by this seam.
+Only append a dated implementation-change record to that exact receipt. Preserve
+every original historical field/value and source-commit pin; reference the whole
+original receipt through frozen Git ref/hash. No previous List A check is rerun,
+no List A compatibility or scientific acceptance is inferred, and its historical
+owner authorization does not apply to this repair. Machine guard policy remains
+unchanged. The final expanded inventory requires fresh independent reviews.

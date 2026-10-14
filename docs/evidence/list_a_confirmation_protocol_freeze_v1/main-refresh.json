@@ -145,5 +145,27 @@
     "provider_calls": 0,
     "spend": 0
   },
-  "review_scratch_lifecycle_owner": "completion.json#side_effects; remove after independent verdicts before readiness"
+  "review_scratch_lifecycle_owner": "completion.json#side_effects; remove after independent verdicts before readiness",
+  "subsequent_implementation_change": {
+    "schema": "smial.historical-delivery-dependency-change",
+    "schema_version": "1.0",
+    "as_of": "2026-10-14",
+    "repair_task_id": "EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1",
+    "historical_receipt": {
+      "frozen_git_ref": "dbe491595c7122735a418e67341be5cad9dbf45e:docs/evidence/list_a_confirmation_protocol_freeze_v1/main-refresh.json",
+      "sha256": "eefa3ecb5c679ca5aacbf8ff0c3e758c696c4a8ee727c99538209bbd7a19d47e",
+      "all_original_fields_and_values_preserved": true
+    },
+    "current_implementation_binding": {
+      "path": "src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
+      "sha256": "fe12a389083b0cea995e22014aa470fd5fc866e07efe6a0c66f387d6b8450a91",
+      "implementation_head": "1d84992ce033c6a80edc00356fa68a8607793be4"
+    },
+    "verdict": "IMPLEMENTATION_CHANGED_LIST_A_COMPATIBILITY_UNVERIFIED",
+    "historical_checks_reexecuted": false,
+    "historical_owner_authorization_applies_to_repair": false,
+    "new_list_a_scientific_acceptance": false,
+    "new_list_a_scientific_looks": 0,
+    "meaning": "Append-only delivery dependency record. Original source_commit/delivery_base_commit checks, scientific terminal, seeds and authorization describe only the preserved historical snapshot. Current hash does not transfer previous PASS or establish List A compatibility; repair evidence is independent."
+  }
 }

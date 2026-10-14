@@ -60,6 +60,13 @@ incomplete inventory блокирует READY, новое persisted action и re
 реальные неизвестные источники так подменять нельзя. Предыдущие worlds/receipts
 остались историческими, их положительный terminal не даёт fresh authority.
 
+Delivery preflight обнаружил отдельный старый pin List A на общий temporal owner.
+В прежний main-refresh receipt добавлена только датированная запись изменения
+implementation с current hash и Git ref/hash исходного receipt целиком. Все
+старые поля, checks, pins и scientific result сохранены. Это не повтор List A
+проверок и не подтверждение его совместимости с новым модулем; прежнее owner
+authorization не даёт merge authority этому repair. Machine policy не менялась.
+
 Repair worktree со всеми retained worlds и proof занимает **509 443 512 байт
 allocation — 485,84 MiB / 0,474 GiB** на момент измерения. Из них synthetic/proof
 — 438 093 624 байта; checkout/harness — 71 349 888. Это ниже cap 512 MiB.
