@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import json
 import copy
+import contextlib
+import io
 import tempfile
 import unittest
 from pathlib import Path
@@ -23,6 +25,7 @@ from solana_alpha_lab.factory.lane_classifier import classify_lane
 from solana_alpha_lab.factory.research_store import ResearchStore, RecordKind
 from solana_alpha_lab.factory.research_workbench import parse_locator
 from tests.fixtures.list_a_confirmation_v1.native import NOW, ingress
+from scripts import list_a_confirmation as cli
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -138,6 +141,38 @@ class VerticalTests(unittest.TestCase):
             checkpoint = conflict["result"]["trials"][0]
             self.assertEqual((checkpoint["trial_id"], checkpoint["scientific_charge"], checkpoint["status"]),
                              (response["trial_id"], 1, "UNVERIFIABLE"))
+            inventory = store.diagnostics().committed_inventory_sha256
+            with patch.object(pq, "read_table", cold_reader), patch(
+                    "solana_alpha_lab.factory.list_a_confirmation.evaluate_native", side_effect=AssertionError("NO_NEW_EVALUATOR")), patch.object(
+                    ResearchStore, "append", side_effect=AssertionError("NO_NEW_WRITE")):
+                for command in ("status", "show"):
+                    stdout = io.StringIO()
+                    with contextlib.redirect_stdout(stdout):
+                        code = cli.main([command, "--data-root", str(store.root), "--trial-id", response["trial_id"]])
+                    denied = json.loads(stdout.getvalue())
+                    self.assertEqual(code, 2)
+                    self.assertEqual(denied["status"], "UNVERIFIABLE")
+                    self.assertEqual(denied["scientific_charge"], 1)
+                    for key in ("trial_id", "run_id", "execution_binding_sha256"):
+                        self.assertEqual(denied[key], response[key])
+                    self.assertEqual(denied["next_action"], "VERIFY_SAVED_ARTIFACT_KEEP_CONSUMED_ALLOWANCE")
+                passport = next(json.loads(r.payload_json) for r in store.iter_committed_records()
+                                if str(r.record_kind) == "RUN_COMPLETED" and json.loads(r.payload_json).get("trial_id") == response["trial_id"])
+                artifact = store.root / passport["result_ref"]
+                backup = artifact.with_suffix(".unit-backup")
+                artifact.rename(backup)
+                try:
+                    for command in ("status", "show"):
+                        stdout = io.StringIO()
+                        with contextlib.redirect_stdout(stdout):
+                            code = cli.main([command, "--data-root", str(store.root), "--trial-id", response["trial_id"]])
+                        unavailable = json.loads(stdout.getvalue())
+                        self.assertEqual(code, 2)
+                        self.assertEqual((unavailable["scientific_charge"], unavailable["trial_id"], unavailable["status"]),
+                                         (1, response["trial_id"], "UNVERIFIABLE"))
+                finally:
+                    backup.rename(artifact)
+            self.assertEqual(inventory, store.diagnostics().committed_inventory_sha256)
 
     def test_unavailable_history_preserves_unknown_execution_and_decision(self):
         spec = load_experiment_spec(ROOT, DEFINITION)

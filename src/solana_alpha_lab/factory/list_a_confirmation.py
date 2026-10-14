@@ -98,6 +98,19 @@ def confirmation_checkpoint(store, binding_id: str) -> dict:
             ("execution_binding_sha256", "scientific_charge", "trial_id", "run_id", "run_key_sha256", "domain")}
 
 
+def trial_confirmation_checkpoint(store, trial_id: str) -> dict:
+    """Recover a validated consumed identity without opening result values."""
+    require(bool(re.fullmatch(r"LA-TRIAL-[0-9A-F]{64}", trial_id)), "TRIAL_ID_INVALID")
+    matches = [r for r in records(store) if r["kind"] == "RESEARCH_ARTIFACT" and
+               r["payload"].get("type") == "CONFIRMATION_RESERVATION" and
+               r["payload"].get("trial_id") == trial_id]
+    require(len(matches) == 1, "RESERVATION_NOT_FOUND_OR_CONFLICT")
+    checkpoint = confirmation_checkpoint(store, matches[0]["payload"]["execution_binding_sha256"])
+    require(checkpoint["scientific_charge"] == 1 and checkpoint["trial_id"] == trial_id,
+            "COMMITTED_RESERVATION_INVALID")
+    return checkpoint
+
+
 def bound_confirmation_checkpoint(store, binding_id: str) -> dict:
     """Include consumed acquisition of a previously prepared alias, no values."""
     checkpoint = confirmation_checkpoint(store, binding_id)

@@ -16,7 +16,9 @@ from solana_alpha_lab.factory.list_a_confirmation_inputs import (
     DEFINITION, ConfirmationError, authorize_confirmation, load_json,
     prepare_confirmation, revoke_confirmation, utc, write_native_confirmation_sample, register_source_authority,
 )
-from solana_alpha_lab.factory.list_a_confirmation import bound_confirmation_checkpoint, read_confirmation, resume_confirmation
+from solana_alpha_lab.factory.list_a_confirmation import (
+    bound_confirmation_checkpoint, trial_confirmation_checkpoint, read_confirmation, resume_confirmation,
+)
 from solana_alpha_lab.factory.lane_classifier import classify_lane
 from solana_alpha_lab.factory.document_runner import DocumentRunner, RunContext
 from solana_alpha_lab.factory.research_store import ResearchStore
@@ -87,13 +89,21 @@ def main(argv=None) -> int:
         return 0
     except (ValueError, OSError, KeyError, TypeError, RuntimeError) as exc:
         checkpoint = {"scientific_charge": None}
-        if args.command in {"submit", "resume", "classify", "authorize", "revoke"} and args.binding_id:
+        if args.command in {"status", "show"} and args.trial_id:
+            try:
+                checkpoint = trial_confirmation_checkpoint(ResearchStore(args.data_root, create_if_missing=False), args.trial_id)
+            except (ValueError, OSError, KeyError, TypeError, RuntimeError):
+                pass
+        elif args.command in {"submit", "resume", "classify", "authorize", "revoke"} and args.binding_id:
             try:
                 checkpoint = bound_confirmation_checkpoint(ResearchStore(args.data_root, create_if_missing=False), args.binding_id)
             except (ValueError, OSError, KeyError, TypeError, RuntimeError):
                 pass  # Unavailable committed metadata stays UNKNOWN/null.
-        print(json.dumps({**checkpoint, "status": "REFUSED", "reason_codes": [getattr(exc, "code", "CONFIRMATION_INPUT_OR_RUNTIME_INVALID")],
-                          "next_action": "VERIFY_EXACT_INPUT_AND_SAVED_CHECKPOINT"}))
+        charged_cold = args.command in {"status", "show"} and checkpoint.get("scientific_charge") == 1
+        print(json.dumps({**checkpoint, "status": "UNVERIFIABLE" if charged_cold else "REFUSED",
+                          "reason_codes": [getattr(exc, "code", "CONFIRMATION_INPUT_OR_RUNTIME_INVALID")],
+                          "next_action": "VERIFY_SAVED_ARTIFACT_KEEP_CONSUMED_ALLOWANCE" if charged_cold else
+                                         "VERIFY_EXACT_INPUT_AND_SAVED_CHECKPOINT"}))
         return 2
 
 
