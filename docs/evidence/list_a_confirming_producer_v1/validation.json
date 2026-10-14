@@ -6,14 +6,14 @@
     "trigger": "f4 review: alias-before-reserve readout and frozen numeric terminal mismatch"
   },
   "checks": {
-    "admission": "16 PASS on dbc production; final alias/numeric mapping validation pending",
+    "admission": "17 PASS on final production closure",
     "legacy_classifier": "31 PASS",
     "legacy_episode_1_4": "14 PASS / 2 existing SKIP",
     "legacy_evidence_decision": "12 PASS",
-    "method": "6 PASS host, including numeric-unavailable count oracle; native final validation pending",
-    "vertical": "3 PASS on dbc production; final production regression pending"
+    "method": "6 PASS native, including independent numeric-unavailable full-count oracle",
+    "vertical": "3 PASS on final production closure; positive/null/missing/empty/UNKNOWN/conflict"
   },
-  "distinct_targeted_unit_checks": 67,
+  "distinct_targeted_unit_checks": 69,
   "engineering_history": [
     {
       "attempt": "initial host",
@@ -105,6 +105,22 @@
       "head": "dbc77d49ef5437287635f23a9bd71e7e5cbbec87",
       "scope": "Retained named results, no source decoder/evaluator/ResearchStore writes",
       "status": "PASS"
+    },
+    {
+      "attempt": "frozen-boundary-final",
+      "checks": 26,
+      "elapsed_seconds": 335.93,
+      "head": "bbd12a38e55db23fdbbe59796a21f11cf275dbdf",
+      "scope": "Native method6/admission17/vertical3; alias-before-reserve, capability refusal, typed numeric INSUFFICIENT, exact metadata repeats",
+      "status": "PASS",
+      "trace_sha256": "dd25fc49fa81bd8b524bbfad6ca80b1dc5ad1a8191b74ca39074e083e8eaefab"
+    },
+    {
+      "attempt": "boundary-final-cold",
+      "checks": 6,
+      "head": "bbd12a38e55db23fdbbe59796a21f11cf275dbdf",
+      "scope": "Six retained named results, zero source decoder/evaluator/ResearchStore writes; current 22-path qualification",
+      "status": "PASS"
     }
   ],
   "exact_head_ci": "ENFORCED_LIVE_BEFORE_MERGE_READINESS",
@@ -131,7 +147,7 @@
     "Public facade for unchanged ordinary science obligations",
     "Pre-reservation prepared aliases and early capability refusal retain original consumed checkpoint"
   ],
-  "post_review_production_head": "dbc77d49ef5437287635f23a9bd71e7e5cbbec87",
+  "post_review_production_head": "bbd12a38e55db23fdbbe59796a21f11cf275dbdf",
   "production_bytes_unchanged_since_native_acceptance": false,
   "schema": "smial.list-a-confirmation-validation",
   "schema_version": "1.0",

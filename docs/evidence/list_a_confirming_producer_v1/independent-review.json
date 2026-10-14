@@ -53,6 +53,22 @@
       "resolved_by_head": "dbc77d49ef5437287635f23a9bd71e7e5cbbec87",
       "role": "OWNER_UX_CRITIC",
       "severity": "MAJOR"
+    },
+    {
+      "finding": "Prepared-before-reserve alias and early capability refusal hide original consumed checkpoint",
+      "observed_head": "f4d3b510e51604ce881fc257390ffbeadc0a2db0",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "bbd12a38e55db23fdbbe59796a21f11cf275dbdf",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Native numeric insufficiency incorrectly mapped INVALID against frozen contract",
+      "observed_head": "f4d3b510e51604ce881fc257390ffbeadc0a2db0",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "bbd12a38e55db23fdbbe59796a21f11cf275dbdf",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MAJOR"
     }
   ],
   "required_roles": [

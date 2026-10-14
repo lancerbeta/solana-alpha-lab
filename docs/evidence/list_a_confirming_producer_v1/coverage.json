@@ -71,7 +71,7 @@
       "status": "NOT_CLAIMED"
     },
     {
-      "evidence": "Actual CLI charge/identity + zero new decoder/evaluator/writes; UNKNOWN history and visible charged reservation on result conflict",
+      "evidence": "Actual CLI charge/identity + zero new decoder/evaluator/writes; UNKNOWN history and visible charged reservation on result conflict; prepared-before-reserve acquisition alias and early capability refusal retain original checkpoint",
       "requirement": "denied readout and unavailable/unverifiable history",
       "status": "PASS"
     },
@@ -81,9 +81,9 @@
       "status": "PASS"
     },
     {
-      "evidence": "Registered positive-price native nonfinite/unrepresentable cases -> typed INSUFFICIENT, charge1, full observed counts, null numeric result; final native regression pending",
+      "evidence": "Registered positive-price native nonfinite/unrepresentable returns -> typed INSUFFICIENT, charge1, full observed counts, null numeric result, zero bootstrap draws; repeat and cold saved result no new look",
       "requirement": "native numeric refusal",
-      "status": "FINAL_VALIDATION_PENDING"
+      "status": "PASS"
     }
   ],
   "schema": "smial.list-a-confirmation-coverage",

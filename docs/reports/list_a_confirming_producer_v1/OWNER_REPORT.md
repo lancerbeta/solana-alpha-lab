@@ -58,7 +58,8 @@ UNKNOWN, поскольку actual counter тогда не сохранялся.
 и admission identity, frozen/current protection до target availability tail,
 exact grant до values, alias/overlap budget, foreign/conflicting/late observations,
 revoke после values, strict result/hash/carrier identity и stale owner decision.
-Legacy classifier и decision checks проходят; episode 1.4: 14 PASS / 2 штатных
+Финальный native regression: method 6, admission 17, vertical 3 — **26 PASS**;
+с legacy classifier/decision проверены 69 targeted checks. Episode 1.4: 14 PASS / 2 штатных
 SKIP. Две SKIP требуют отдельных предыдущих campaign fixtures; их повтор здесь
 не заявлен. Подробности и engineering failures — в validation evidence.
 
@@ -73,12 +74,12 @@ failures остаются INVALID_AFTER_RESERVE; frozen thresholds и estimand �
 Недоступная история даёт UNKNOWN; повреждённый result сохраняет видимую reservation
 и consumed charge при evidence CONFLICT. Новый allowance эти действия не создают.
 
-Ресурсы: финальный snapshot 15 октября regular-file allocation **188.666 MiB owned**,
-conservative cap charge **222.461 MiB**, включая полный резерв общего Git object store. Это ниже
+Ресурсы: delivery snapshot 15 октября regular-file allocation **188.873 MiB owned**,
+conservative cap charge **223.518 MiB**, включая полный резерв общего Git object store. Это ниже
 target 256 MiB и hard cap 1 GiB. Оставлены named stores, receipts, copied regression
-checkout/Git snapshot и 22 stopped containers; новых image/.venv нет. Snapshot
-14 октября 187.861/219.401 MiB сохранён отдельно; последующие delivery metadata
-commits не включены в этот замер. Полный shared
+checkout/Git snapshot и 25 stopped containers; новых image/.venv нет. Snapshots
+14 октября 187.861/219.401 MiB и ранний 15 октября 188.666/222.461 MiB сохранены
+отдельно; последующие delivery metadata commits не включены в этот замер. Полный shared
 runtime/cache, daemon metadata/log allocation и физический Docker VHD growth
 измерением этого scope не установлены. Cleanup не выполнялся.
 
@@ -98,5 +99,5 @@ Evidence: [acceptance](../../evidence/list_a_confirming_producer_v1/acceptance.j
 [process readback](../../evidence/list_a_confirming_producer_v1/process-readback.json),
 [history](../../evidence/list_a_confirming_producer_v1/scientific-history.json),
 [qualification](../../evidence/list_a_confirming_producer_v1/qualification.json),
-[footprint](../../evidence/list_a_confirming_producer_v1/footprint-final.json),
+[footprint](../../evidence/list_a_confirming_producer_v1/footprint-delivery.json),
 [REPRODUCE](REPRODUCE.md).

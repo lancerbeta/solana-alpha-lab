@@ -85,7 +85,12 @@ python -B -m unittest tests.test_episode_native_required_outcome_contract_v1 -v
 ```
 
 Это disposable TEST stores с разрешённым обычным temporary cleanup, отдельно от
-named scientific history. Git fences снимают full snapshot до/после операций;
+named scientific history. Финальная production closure прошла 26 native checks
+в `list-a-confirmation-frozen-boundary-final`: 6 method, 17 admission, 3 vertical.
+Nonfinite/unrepresentable return — completed INSUFFICIENT с charge 1, полными
+observed counts и null means/contrast, без bootstrap draws. Предыдущая engineering
+проверка INVALID сохранена как superseded; identity/PIT/protection failures — INVALID.
+Git fences снимают full snapshot до/после операций;
 checkout **и весь refs set** должны оставаться неизменными весь fixture. Параллельные
 commits/отчёты/работа других worktrees могут вызвать GIT_MUTATION_DETECTED или
 PREFLIGHT_GIT_COMPOSITE_MISMATCH. Для длительного regression использован owned
@@ -126,9 +131,9 @@ image; build/pull/install не входит в authority. Core frozen source pin
 при новой разрешённой кампании. Early P0 точный reader count восстановить нельзя.
 Allocation измерена по regular files/owned volumes/SizeRw; physical Docker VHDX,
 daemon metadata/logs и total shared cache остаются отдельно UNKNOWN.
-Final snapshot 15 октября: 188.666 MiB owned / 222.461 MiB conservative charged,
-22 stopped containers. Старый snapshot 14 октября сохранён. См.
-`docs/evidence/list_a_confirming_producer_v1/footprint-final.json`.
+Delivery snapshot 15 октября: 188.873 MiB owned / 223.518 MiB conservative charged,
+25 stopped containers. Предыдущие snapshots сохранены. См.
+`docs/evidence/list_a_confirming_producer_v1/footprint-delivery.json`.
 
 Rollback: обычный code/schema/registry revert сохраняет stores, reservations,
 attempts/results и charges. Pending несовместимый trial не считается untouched;
