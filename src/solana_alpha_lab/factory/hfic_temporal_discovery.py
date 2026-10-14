@@ -3526,6 +3526,22 @@ def _project_episode_members(
     return members, cohort_membership, seen, duplicate_count, integrity_conflicts, episode_mints
 
 
+def project_episode_decision_prefix(census, observations, body, binding, *, universe_policy, scope):
+    """Shared native prefix selection; never calls the target evaluator."""
+    require_episode_binding_rows(binding)
+    _bind_scope_to_body(scope, body, census)
+    members, _cohorts, _seen, _duplicates, conflicts, _mints = _project_episode_members(
+        census, observations, body, binding, universe_policy=universe_policy, prefix_only=True, scope=scope)
+    if conflicts:
+        raise GroundedDiscoveryError("EPISODE_ADMISSION_IDENTITY_CONFLICT")
+    return members
+
+
+def require_episode_scope(resolved, body, census):
+    """The same frozen scope check for discovery and metadata readiness."""
+    _bind_scope_to_body(resolved, body, census)
+
+
 def _bind_scope_to_body(resolved: Any, body: Mapping[str, Any], census: Sequence[Mapping[str, Any]]) -> None:
     """The applied masks must be the frozen rule, over exactly the admitted episodes."""
 
@@ -4854,6 +4870,16 @@ def bind_frozen_fixed_time_inputs(
     frozen_input = recipe.get("frozen_input")
     if not isinstance(frozen_input, list) or not frozen_input:
         raise GroundedDiscoveryError("FROZEN_INPUT_REQUIRED")
+    if spec.get("schema_version") == "1.4":
+        sources = {}
+        for item in frozen_input:
+            if not isinstance(item, Mapping):
+                raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH")
+            key = (item.get("cohort_id"), item.get("release_id"))
+            if key in sources and sources[key] != item:
+                raise GroundedDiscoveryError("EPISODE_SOURCE_BINDING_CONFLICT")
+            sources[key] = item
+        frozen_input = list(sources.values())
     from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
     from solana_alpha_lab.factory.data_resolver import _safe_relative_path, EvidenceResolutionError
 
@@ -4880,6 +4906,8 @@ def bind_frozen_fixed_time_inputs(
             hashes_match = (sha256_file_streaming(census_path) == item.get("census_sha256")
                             and sha256_file_streaming(obs_path) == item.get("observations_sha256"))
         except OSError as exc:
+            if spec.get("schema_version") == "1.4" and isinstance(exc, FileNotFoundError):
+                raise GroundedDiscoveryError("EPISODE_SOURCE_UNAVAILABLE") from exc
             raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH") from exc
         if not hashes_match:
             raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH")
@@ -4899,6 +4927,10 @@ def bind_frozen_fixed_time_inputs(
                 raise GroundedDiscoveryError("FROZEN_INPUT_SCHEDULE_MISMATCH")
         partitions.append((str(item.get("cohort_id")), census_path, obs_path))
         binding_cohorts.append(dict(item))
+    if spec.get("schema_version") == "1.4":
+        from solana_alpha_lab.factory.episode_required_outcomes import verify_frozen_episode_sources
+
+        verify_frozen_episode_sources(data_root, binding_cohorts)
     return public, pre, partitions, binding_cohorts
 
 

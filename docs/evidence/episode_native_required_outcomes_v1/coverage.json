@@ -1,0 +1,80 @@
+{
+  "cases": [
+    {
+      "fidelity": "NATIVE_SPEC_CLASSIFIER",
+      "id": "T1",
+      "test": "test_version_and_required_target_refusals",
+      "verified": "Version/population/E allowlist and preserved baseline 1.3 failure"
+    },
+    {
+      "fidelity": "NATIVE_SPEC_CLASSIFIER",
+      "id": "T2",
+      "test": "test_version_and_required_target_refusals",
+      "verified": "Actual PRIMARY target, role conflicts and foreign field reject"
+    },
+    {
+      "fidelity": "NATIVE_FROZEN_SOURCES",
+      "id": "T3",
+      "test": "test_frozen_source_query_schedule_and_safe_path_integrity + test_historical_publication_metadata_is_required",
+      "verified": "Query/release/manifest/schedule/path/clock/publication lineage refusal before values"
+    },
+    {
+      "fidelity": "NATIVE_REPEATED_MINT_AND_READER_FAULT_CANARY",
+      "id": "T4",
+      "test": "test_republished_numeric_values_and_missing_target_keep_denominator + test_conflicting_admission_reader_injection_refuses_before_values",
+      "verified": "Two actual episodes of one mint; only one future missing. Duplicate admission is a test-only post-binding metadata injection, not claimed as valid publication"
+    },
+    {
+      "fidelity": "NATIVE_PERSISTED_MISSINGNESS_PLUS_NATIVE_CLOCK_UNIT",
+      "id": "T5",
+      "test": "test_authoritative_missing_target_block_and_cold_readback + test_native_unexecuted_censored_metadata_is_not_corrupt_or_observed",
+      "verified": "Actual typed missing target gives D20 / observed19. Censored and late statuses tested against real metadata/native resolver; no full republished late/censored world claim"
+    },
+    {
+      "fidelity": "NATIVE_RESOLVE_POINT_AND_REAL_READER_FILTERS",
+      "id": "T6",
+      "test": "test_off_grid_deadline_boundaries_use_native_clock + test_frozen_source_query_schedule_and_safe_path_integrity",
+      "verified": "Off-grid NOMINATION_T0, availability deadline +/-1 microsecond; exact prefix availability filters"
+    },
+    {
+      "fidelity": "NATIVE_SCOPE_AND_MEMBERSHIP",
+      "id": "T7",
+      "test": "test_list_and_numeric_masks_no_target_reader_and_canaries + test_registered_unavailable_referenced_list_is_unknown_not_false",
+      "verified": "Literal ID/mask oracle for LIST and MIXED; overlap allowed. Registered late list remains 24 UNKNOWN and blocks; existing scope regressions cover INVALID"
+    },
+    {
+      "fidelity": "NATIVE_CLASSIFIER_AND_COMPLETED_RUN_FIXTURE",
+      "id": "T8",
+      "test": "test_current_protection_denies_before_values + test_current_protection_missing_empty_unreadable_refuses_before_values + test_completed_run_replay_fixture_rechecks_current_protection + test_authoritative_persistence_exact_repeat_cold_readback_and_guard",
+      "verified": "Independent current completeness required; DENY/incomplete/missing/empty/unreadable refuse before values; removal on persisted action/replay. Stored RUN passport explicit fixture only, not numerical execution"
+    },
+    {
+      "fidelity": "NATIVE_CURRENT_ACTION_VS_HISTORICAL_READ",
+      "id": "T9",
+      "test": "test_source_change_and_forged_projection_are_not_authority + test_authoritative_persistence_exact_repeat_cold_readback_and_guard",
+      "verified": "Forged COMPLETE ignored; changed source/current protection refuses new action; historic receipt preserved"
+    },
+    {
+      "fidelity": "TWO_NATIVE_PUBLISHED_WORLDS",
+      "id": "T10",
+      "test": "test_republished_numeric_values_and_missing_target_keep_denominator",
+      "verified": "Target 1.10 vs1.35; same exact membership/coverage/readiness, different source hashes, target reader0"
+    },
+    {
+      "fidelity": "NATIVE_STORED_STATE_FRESH_PROCESS",
+      "id": "T11",
+      "test": "test_authoritative_persistence_exact_repeat_cold_readback_and_guard + test_authoritative_missing_target_block_and_cold_readback",
+      "verified": "READY and BLOCKED stored/cold; exact repeat inventory unchanged;84 selected legacy cases pass"
+    }
+  ],
+  "direct_runner_boundary": "Real positive frozen lineage helper plus real start_document negative guard; no numerical experiment run",
+  "non_claims": [
+    "NO_FULL_PRODUCT_LIFECYCLE",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_CHRONOLOGICAL_CONFIRMATION",
+    "NO_BLIND_ACTOR_VERIFICATION"
+  ],
+  "schema": "smial.episode-repair-coverage",
+  "schema_version": "1.0",
+  "verdict": "PASS_BOUNDED_REPAIR"
+}

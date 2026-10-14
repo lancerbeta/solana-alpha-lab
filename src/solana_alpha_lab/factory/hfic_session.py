@@ -7013,7 +7013,7 @@ def build_classifier_receipt(
     spec_sha256: str,
 ) -> dict[str, Any]:
     lane = getattr(decision.lane, "value", str(decision.lane))
-    return {
+    receipt = {
         "schema": _CLASSIFIER_RECEIPT_SCHEMA,
         "schema_version": "1.0",
         "session_id": frozen["session_id"],
@@ -7027,6 +7027,10 @@ def build_classifier_receipt(
         "provider_calls_actual": 0,
         "network_free": True,
     }
+    binding = getattr(decision, "episode_outcome_binding", None)
+    if binding is not None:
+        receipt["episode_outcome_binding"] = binding
+    return receipt
 
 
 def _caller_hypothesis_definition_sha256(
@@ -7100,6 +7104,13 @@ def run_live_classifier(
             raise HficSessionError(str(exc)) from exc
     else:
         selected = None
+    if validated.get("schema_version") == "1.4":
+        grounded = packet_in.get("grounded_evidence") if isinstance(packet_in, Mapping) else None
+        result = grounded.get("result") if isinstance(grounded, Mapping) else None
+        frozen_recipe = result.get("experiment_recipe") if isinstance(result, Mapping) else None
+        recipe = (validated.get("parameters") or {}).get("temporal_recipe")
+        if not isinstance(frozen_recipe, Mapping) or canonical_sha256(recipe) != canonical_sha256(frozen_recipe):
+            raise HficSessionError("EPISODE_FROZEN_RECIPE_MISMATCH")
     expected_hash = frozen.get("selected_definition_sha256")
     if not isinstance(caller_hash, str) or caller_hash != expected_hash:
         raise HficSessionError("HYPOTHESIS_DEFINITION_UNBOUND")
@@ -7122,16 +7133,18 @@ def run_live_classifier(
         try_project_scientific_eligibility_from_data_root,
     )
 
-    request = validated.get("observation_request")
-    try:
-        projected = try_project_scientific_eligibility_from_data_root(
-            Path(data_root),
-            repo_root=Path(repo_root),
-            spec=validated,
-            schedule=request if isinstance(request, Mapping) else None,
-        )
-    except ScientificEligibilityError:
-        projected = None
+    projected = None
+    if validated.get("schema_version") != "1.4":
+        request = validated.get("observation_request")
+        try:
+            projected = try_project_scientific_eligibility_from_data_root(
+                Path(data_root),
+                repo_root=Path(repo_root),
+                spec=validated,
+                schedule=request if isinstance(request, Mapping) else None,
+            )
+        except ScientificEligibilityError:
+            projected = None
     if projected is not None:
         packet["scientific_eligibility_projection"] = projected
     decision = classify_lane(
@@ -7213,6 +7226,8 @@ def validate_live_classifier_receipt(
     if list(observed.get("reason_codes") or []) != list(expected.get("reason_codes") or []):
         raise HficSessionError("CLASSIFIER_RECEIPT_INVALID")
     if int(observed.get("provider_calls_actual", -1)) != 0:
+        raise HficSessionError("CLASSIFIER_RECEIPT_INVALID")
+    if observed.get("episode_outcome_binding") != expected.get("episode_outcome_binding"):
         raise HficSessionError("CLASSIFIER_RECEIPT_INVALID")
     return expected
 
@@ -7817,6 +7832,18 @@ def apply_classification(
     if existing is None:
         raise HficSessionError("SESSION_NOT_FOUND")
     if existing.get("session_state") == "SYNTHESIS_COMPLETE":
+        stored = existing.get("classifier_receipt") or {}
+        # Persisted type selects the action gate; caller version cannot bypass it.
+        if stored.get("episode_outcome_binding") is not None:
+            nested = experiment_spec_packet.get("experiment_spec", experiment_spec_packet)
+            if not isinstance(nested, Mapping) or nested.get("schema_version") != "1.4":
+                raise HficSessionError("EPISODE_CLASSIFICATION_REVALIDATION_DENIED")
+            critic = dict(existing.get("critic_result") or {})
+            critic["experiment_spec_packet"] = dict(experiment_spec_packet)
+            critic.pop("classifier_receipt", None)
+            fresh = run_live_classifier(critic, _classifier_frozen_view(existing, critic), repo_root=repo_root, data_root=data_root)
+            if fresh != stored:
+                raise HficSessionError("EPISODE_CLASSIFICATION_REVALIDATION_DENIED", detail={"reason_codes": fresh["reason_codes"]})
         return existing
     if existing.get("session_state") != "AWAITING_CLASSIFICATION":
         raise HficSessionError("CLASSIFICATION_NOT_PENDING")

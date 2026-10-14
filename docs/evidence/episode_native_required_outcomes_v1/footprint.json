@@ -1,0 +1,42 @@
+{
+  "allocated_unique_bytes": 509443512,
+  "cap_bytes": 536870912,
+  "deleted": false,
+  "groups": {
+    "checkout_and_harness": {
+      "allocated_unique_bytes": 71349888,
+      "files": 4259,
+      "logical_bytes": 62801727
+    },
+    "synthetic_and_proof": {
+      "allocated_unique_bytes": 438093624,
+      "files": 43870,
+      "logical_bytes": 338983049
+    }
+  },
+  "limits": [
+    "File allocation deduplicated by NTFS identity within this worktree; directory metadata excluded",
+    "Existing common Git objects, host runtime, uv cache and previous audit Docker volumes excluded",
+    "Existing shared cache growth UNKNOWN without a pre-repair baseline; no cleanup authorized"
+  ],
+  "logical_bytes": 401784776,
+  "measured_at": "2026-10-14T08:33:52.796138+00:00",
+  "measurement_errors": [],
+  "measurement_method": "GetFileInformationByHandleEx FileStandardInfo.AllocationSize; per-NTFS-file identity deduplication",
+  "new_containers_or_images": 0,
+  "new_dependencies": 0,
+  "new_environments": 0,
+  "previous_audit_snapshot": {
+    "allocated_bytes": 818791160,
+    "deleted": false,
+    "measured_at": "2026-10-14T01:10:00.9887149Z",
+    "path": "docs/evidence/synthetic_lifecycle_targeted_v1/footprint.json",
+    "sha256": "b789b4a3b2bad23a61f4ad12ef5d8f2ede4fc26e2739b296cacd47998ac7adce",
+    "status": "HISTORICAL_SNAPSHOT_NOT_REMEASURED_BY_REPAIR"
+  },
+  "schema": "smial.episode-repair-footprint",
+  "schema_version": "1.0",
+  "scope": "OWNED_REPAIR_WORKTREE_INCLUDING_ALL_RETAINED_WORLDS",
+  "shared_existing_runtime_and_cache": "REUSED_NOT_CREATED",
+  "within_cap": true
+}

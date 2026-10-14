@@ -7,7 +7,7 @@ import json
 import re
 import subprocess
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path, PurePosixPath, PureWindowsPath
@@ -35,6 +35,7 @@ from solana_alpha_lab.factory.run_passport import (
 SPEC_SCHEMA_RELATIVE = "catalog/schemas/experiment_spec_v1_1.schema.json"
 SPEC_SCHEMA_V1_2_RELATIVE = "catalog/schemas/experiment_spec_v1_2.schema.json"
 SPEC_SCHEMA_V1_3_RELATIVE = "catalog/schemas/experiment_spec_v1_3.schema.json"
+SPEC_SCHEMA_V1_4_RELATIVE = "catalog/schemas/experiment_spec_v1_4.schema.json"
 DESCRIPTOR_SCHEMA_RELATIVE = (
     "catalog/schemas/experiment_capability_descriptor.schema.json"
 )
@@ -59,6 +60,7 @@ class LaneDecision:
     run_key_sha256: str | None
     prior_run_id: str | None
     next_action: str
+    episode_outcome_binding: dict[str, Any] | None = None
 
 
 def _decision(
@@ -129,7 +131,9 @@ def _validate_spec(
         return None
     version = spec.get("schema_version")
     schema_relative = SPEC_SCHEMA_RELATIVE
-    if version == "1.3":
+    if version == "1.4":
+        schema_relative = SPEC_SCHEMA_V1_4_RELATIVE
+    elif version == "1.3":
         schema_relative = SPEC_SCHEMA_V1_3_RELATIVE
     elif version == "1.2":
         schema_relative = SPEC_SCHEMA_V1_2_RELATIVE
@@ -309,6 +313,12 @@ def _blocked_data(reason_code: str) -> LaneDecision:
     next_action = "RESOLVE_IMMUTABLE_DATA_BINDINGS"
     if reason_code == "OUTCOME_MISSINGNESS_UNRESOLVED":
         next_action = "REPORT_OUTCOME_COVERAGE_KEEP_BASE_X"
+    elif reason_code == "EPISODE_OUTCOME_COVERAGE_UNRESOLVED":
+        next_action = "REPORT_OUTCOME_COVERAGE_KEEP_DECISION_DENOMINATOR"
+    elif reason_code in {"HOLDOUT_PROTECTED", "HOLDOUT_UNRESOLVED"}:
+        next_action = "REVIEW_PROTECTION_KEEP_FROZEN_SCOPE"
+    elif reason_code in {"SCOPE_COVERAGE_UNRESOLVED", "SCOPE_EVIDENCE_INVALID"}:
+        next_action = "REPORT_REFERENCED_SCOPE_COVERAGE"
     elif reason_code == "SELECTION_RECEIPT_INTEGRITY_INVALID":
         next_action = "REBIND_SELECTION_RECEIPT_IDENTITY"
     return _decision(
@@ -355,10 +365,11 @@ def classify_lane(
         )
 
     capability_id = str(spec["capability_id"])
+    episode_route = spec.get("schema_version") == "1.4"
     uses_observation_request = spec.get("schema_version") in {"1.2", "1.3"}
     registry_relative = (
         CAPABILITY_REGISTRY_V2_RELATIVE
-        if uses_observation_request
+        if uses_observation_request or episode_route
         else CAPABILITY_REGISTRY_RELATIVE
     )
     try:
@@ -470,8 +481,10 @@ def classify_lane(
 
     try:
         runner_git_sha = _runner_git_sha(submission, root=root)
+        from solana_alpha_lab.factory.data_resolver import episode_implementation_descriptor
+
         implementation_assets = verify_implementation_assets(
-            descriptor,
+            episode_implementation_descriptor(descriptor, spec),
             root=root,
             runner_git_sha=runner_git_sha,
             git_show_bytes=_git_show_bytes,
@@ -541,19 +554,46 @@ def classify_lane(
             next_action="CORRECT_EXPERIMENT_SPEC",
         )
 
+    episode_binding = None
+    if episode_route:
+        from solana_alpha_lab.factory.episode_required_outcomes import project_episode_required_outcomes
+        from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
+            apply_selection_gate_to_preflight, load_applicable_gate_receipt,
+        )
+
+        try:
+            episode_binding = project_episode_required_outcomes(
+                spec, data_root=Path(data_root), definition_sha256=_hypothesis_definition_sha256(submission))
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            code = str(getattr(exc, "code", "EPISODE_SOURCE_BINDING_CONFLICT"))
+            if code in {
+                "EPISODE_REQUIRED_OUTCOME_INVALID", "EPISODE_PRIMARY_TARGET_UNBOUND",
+                "EPISODE_QUERY_UNSUPPORTED", "EPISODE_TARGET_UNSUPPORTED", "EPISODE_POINT_UNKNOWN",
+            }:
+                return _decision(Lane.DENY, "DENY_INVALID_SPEC", reason_codes=(code,), next_action="CORRECT_EXPERIMENT_SPEC")
+            if code in {"SCOPE_COVERAGE_UNRESOLVED", "SCOPE_EVIDENCE_INVALID", "HOLDOUT_PROTECTED", "HOLDOUT_UNRESOLVED", "CUTOFF_REJECTED", "EPISODE_SOURCE_UNAVAILABLE"}:
+                return _blocked_data(code)
+            return _deny_integrity(code)
+        if episode_binding["readiness"] != "COMPLETE":
+            return replace(_blocked_data("EPISODE_OUTCOME_COVERAGE_UNRESOLVED"), episode_outcome_binding=episode_binding)
+        selection_view = apply_selection_gate_to_preflight(
+            "START_NEW_SESSION", load_applicable_gate_receipt(Path(data_root), root=Path(root)))
+        if selection_view.get("action") == "STOP":
+            return replace(_blocked_data("SELECTION_RECEIPT_INTEGRITY_INVALID"), episode_outcome_binding=episode_binding)
+
     try:
         prior_run = ResearchStore(data_root).find_completed_run(run_key_sha256)
     except ResearchStoreError:
         return _deny_integrity("RUN_COMPLETED_PASSPORT_INVALID")
     if prior_run is not None:
-        return _decision(
+        return replace(_decision(
             Lane.FAST_LANE,
             "REPLAY_AVAILABLE",
             reason_codes=("EXACT_DUPLICATE_COMPLETED",),
             run_key_sha256=run_key_sha256,
             prior_run_id=prior_run.run_id,
             next_action="REPLAY_PRIOR_RUN",
-        )
+        ), episode_outcome_binding=episode_binding)
 
     if spec.get("schema_version") == "1.3":
         from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
@@ -619,13 +659,13 @@ def classify_lane(
             next_action=observation_next or "EXECUTE_ACCEPTED_CAPABILITY",
         )
 
-    return _decision(
+    return replace(_decision(
         Lane.FAST_LANE,
         "FAST_LANE_READY",
         reason_codes=(),
         run_key_sha256=run_key_sha256,
         next_action="EXECUTE_ACCEPTED_CAPABILITY",
-    )
+    ), episode_outcome_binding=episode_binding)
 
 
 __all__ = ["Lane", "LaneDecision", "classify_lane"]

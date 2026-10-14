@@ -333,6 +333,14 @@ Hard boundaries — the slash does **not** authorize:
 - Autonomous Hypothesis Generator («magic ball»)
 
 For `PASS_FAST_LANE_READY`, stop before experiment execution.
+Native episode fixed-time handoff uses ExperimentSpec 1.4 with frozen
+`episode_query 1.2`, `REUSE_ONLY` / `EXPLORATORY_REUSE` and exact E required
+outcomes; raw X/Y retains 1.3. Resolve the contract in
+`docs/contracts/episode_native_required_outcomes_v1.md` before authoring the
+Spec. COMPLETE/FAST_LANE_READY means reusable artifact readiness, with native
+D/M/C and current protection rechecked on action; it does not accept the
+hypothesis, grant execution or promote. Historical cold readback grants no
+fresh authority. Do not change old KILL receipts to restart the route.
 For `PASS_CHANGE_LANE_REQUIRED`, return one PRD+SSD and stop; do not create the PR.
 For `PASS_DATA_OPTION_REQUIRED`, return the data option and stop; do not collect.
 

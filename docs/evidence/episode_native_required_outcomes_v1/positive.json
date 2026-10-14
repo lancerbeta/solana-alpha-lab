@@ -1,0 +1,405 @@
+{
+  "classifier_receipt": {
+    "episode_outcome_binding": {
+      "admissions_n": 24,
+      "anchor_kind": "NOMINATION_T0",
+      "binding_sha256": "3987ab1c7ed95222da618912bdf2464aa70fc4c3906e731b620d965e198dd83e",
+      "comparator_n": 10,
+      "contract": "EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1",
+      "current_protection_sha256": "dab071270b999ce9e011a434fd84eaa77773fb0d58aa7d5df5716cb5f4af9bc5",
+      "decision_n": 20,
+      "definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+      "experiment_spec_sha256": "d6d4cc2ae909c76af8c4317f9f5fbf22d597cbd7e84d512825490f282ca8730f",
+      "matched_n": 10,
+      "membership": [
+        {
+          "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
+          "comparator": false,
+          "decision_eligible": true,
+          "episode_id": "EP-096d73cc606f56fb609c8ea457852eb8",
+          "matched": true,
+          "reason": null,
+          "release_id": "a2f71a4272a4713574e1ffd830ef208809452aaf6361c5e39d39cf3bd18e51bc",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
+          "comparator": true,
+          "decision_eligible": true,
+          "episode_id": "EP-2850c59521718d6e779f4602a673afdf",
+          "matched": false,
+          "reason": null,
+          "release_id": "a2f71a4272a4713574e1ffd830ef208809452aaf6361c5e39d39cf3bd18e51bc",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
+          "comparator": false,
+          "decision_eligible": true,
+          "episode_id": "EP-29023f6e324da1b28a755a766dd40bec",
+          "matched": true,
+          "reason": null,
+          "release_id": "a2f71a4272a4713574e1ffd830ef208809452aaf6361c5e39d39cf3bd18e51bc",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
+          "comparator": true,
+          "decision_eligible": true,
+          "episode_id": "EP-29a5a0767bb8c0f0fc39558ff76ca9c7",
+          "matched": false,
+          "reason": null,
+          "release_id": "28e105f3d8fa58fc384431d8f176a4f83024cd465140151867cbc9e278537d6f",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
+          "comparator": false,
+          "decision_eligible": false,
+          "episode_id": "EP-3043daf74a8aed9b030bcd2ff08eae2a",
+          "matched": false,
+          "reason": "ABSENT",
+          "release_id": "28e105f3d8fa58fc384431d8f176a4f83024cd465140151867cbc9e278537d6f",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
+          "comparator": false,
+          "decision_eligible": true,
+          "episode_id": "EP-3084e3aa8e9b9a91c353fc9a997883b1",
+          "matched": true,
+          "reason": null,
+          "release_id": "a2f71a4272a4713574e1ffd830ef208809452aaf6361c5e39d39cf3bd18e51bc",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
+          "comparator": false,
+          "decision_eligible": true,
+          "episode_id": "EP-428dad9de770951add61ed897f4b535b",
+          "matched": true,
+          "reason": null,
+          "release_id": "28e105f3d8fa58fc384431d8f176a4f83024cd465140151867cbc9e278537d6f",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
+          "comparator": false,
+          "decision_eligible": true,
+          "episode_id": "EP-6ab995d156adf5be7dd7b8627eb6ed53",
+          "matched": true,
+          "reason": null,
+          "release_id": "28e105f3d8fa58fc384431d8f176a4f83024cd465140151867cbc9e278537d6f",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
+          "comparator": true,
+          "decision_eligible": true,
+          "episode_id": "EP-728c0dcd4e2388ce926eac4738ff4c0b",
+          "matched": false,
+          "reason": null,
+          "release_id": "a2f71a4272a4713574e1ffd830ef208809452aaf6361c5e39d39cf3bd18e51bc",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
+          "comparator": true,
+          "decision_eligible": true,
+          "episode_id": "EP-75a406133e7f8c41c3dc83e4a1ab5276",
+          "matched": false,
+          "reason": null,
+          "release_id": "28e105f3d8fa58fc384431d8f176a4f83024cd465140151867cbc9e278537d6f",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
+          "comparator": true,
+          "decision_eligible": true,
+          "episode_id": "EP-75aabf6dca62994bc0552684e908f4bf",
+          "matched": false,
+          "reason": null,
+          "release_id": "28e105f3d8fa58fc384431d8f176a4f83024cd465140151867cbc9e278537d6f",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
+          "comparator": true,
+          "decision_eligible": true,
+          "episode_id": "EP-7d7b6e93129a65e023be3e01bc7c9868",
+          "matched": false,
+          "reason": null,
+          "release_id": "a2f71a4272a4713574e1ffd830ef208809452aaf6361c5e39d39cf3bd18e51bc",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
+          "comparator": false,
+          "decision_eligible": true,
+          "episode_id": "EP-aaeb9a9945af3f679a4b0ad2c3bf200c",
+          "matched": true,
+          "reason": null,
+          "release_id": "28e105f3d8fa58fc384431d8f176a4f83024cd465140151867cbc9e278537d6f",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
+          "comparator": false,
+          "decision_eligible": true,
+          "episode_id": "EP-ad186b8829e2c5bbcccc72ac0cefe4b4",
+          "matched": true,
+          "reason": null,
+          "release_id": "a2f71a4272a4713574e1ffd830ef208809452aaf6361c5e39d39cf3bd18e51bc",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
+          "comparator": true,
+          "decision_eligible": true,
+          "episode_id": "EP-bd431fbe4857c21f593b2449c5fb6a0d",
+          "matched": false,
+          "reason": null,
+          "release_id": "a2f71a4272a4713574e1ffd830ef208809452aaf6361c5e39d39cf3bd18e51bc",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
+          "comparator": false,
+          "decision_eligible": false,
+          "episode_id": "EP-ce37705d0be14651a397fed2b385d95a",
+          "matched": false,
+          "reason": "UNIVERSE_FAIL",
+          "release_id": "28e105f3d8fa58fc384431d8f176a4f83024cd465140151867cbc9e278537d6f",
+          "universe_status": "FAIL"
+        },
+        {
+          "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
+          "comparator": false,
+          "decision_eligible": false,
+          "episode_id": "EP-d273bba7615926cb9b9d62b4f4579be8",
+          "matched": false,
+          "reason": "UNIVERSE_FAIL",
+          "release_id": "a2f71a4272a4713574e1ffd830ef208809452aaf6361c5e39d39cf3bd18e51bc",
+          "universe_status": "FAIL"
+        },
+        {
+          "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
+          "comparator": false,
+          "decision_eligible": true,
+          "episode_id": "EP-d46842a8242e45c1b4a3d7a4de438556",
+          "matched": true,
+          "reason": null,
+          "release_id": "28e105f3d8fa58fc384431d8f176a4f83024cd465140151867cbc9e278537d6f",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
+          "comparator": false,
+          "decision_eligible": false,
+          "episode_id": "EP-d67473c7629440d93ae2c9fda98c1a6e",
+          "matched": false,
+          "reason": "ABSENT",
+          "release_id": "a2f71a4272a4713574e1ffd830ef208809452aaf6361c5e39d39cf3bd18e51bc",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
+          "comparator": true,
+          "decision_eligible": true,
+          "episode_id": "EP-d7517a48dc8d697eb0c2533506d58197",
+          "matched": false,
+          "reason": null,
+          "release_id": "a2f71a4272a4713574e1ffd830ef208809452aaf6361c5e39d39cf3bd18e51bc",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
+          "comparator": true,
+          "decision_eligible": true,
+          "episode_id": "EP-db951380f6b8d2dc2b9117f44a6bda1e",
+          "matched": false,
+          "reason": null,
+          "release_id": "28e105f3d8fa58fc384431d8f176a4f83024cd465140151867cbc9e278537d6f",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
+          "comparator": false,
+          "decision_eligible": true,
+          "episode_id": "EP-e772f27d088d2fd957ffcf505e0378f8",
+          "matched": true,
+          "reason": null,
+          "release_id": "28e105f3d8fa58fc384431d8f176a4f83024cd465140151867cbc9e278537d6f",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
+          "comparator": false,
+          "decision_eligible": true,
+          "episode_id": "EP-f510209d10e0e28236e34ba24c420ac5",
+          "matched": true,
+          "reason": null,
+          "release_id": "a2f71a4272a4713574e1ffd830ef208809452aaf6361c5e39d39cf3bd18e51bc",
+          "universe_status": "PASS"
+        },
+        {
+          "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
+          "comparator": true,
+          "decision_eligible": true,
+          "episode_id": "EP-fa5e7551daaf50ef07546927432b481b",
+          "matched": false,
+          "reason": null,
+          "release_id": "28e105f3d8fa58fc384431d8f176a4f83024cd465140151867cbc9e278537d6f",
+          "universe_status": "PASS"
+        }
+      ],
+      "membership_sha256": "f214df7113befb07a89fd8b3d043826530bc4819dbe1813a9542e2a517173c2a",
+      "non_claims": [
+        "NO_SCIENTIFIC_ACCEPTANCE",
+        "NO_CHRONOLOGICAL_CONFIRMATION",
+        "NO_PROMOTION_AUTHORITY"
+      ],
+      "readiness": "COMPLETE",
+      "reads": {
+        "new_scientific_looks": 0,
+        "outcome_evaluations": 0,
+        "prefix_value_cells_read": 70,
+        "target_value_cells_materialized": 0
+      },
+      "recipe_scientific_identity": "c34ecb1f6d432d320d589427cb7054fe2cc5370c6c0d4c6860ba3e569d683d8e",
+      "required_coverage": [
+        {
+          "counts": {
+            "ABSENT": 0,
+            "CENSORED": 0,
+            "INVALID": 0,
+            "LATE": 0,
+            "MISSING_TYPED": 0,
+            "OBSERVED": 20
+          },
+          "denominator_n": 20,
+          "field_id": "FIELD-USD-PRICE-001",
+          "point_id": "E14400",
+          "role": "PRIMARY"
+        }
+      ],
+      "schema": "smial.episode-required-outcome-binding",
+      "schema_version": "1.0",
+      "scope_applied_sha256": "45a7728a6a4af479578b59aebadcea0ebd494fa1860dd851fbd87b8b9f5019ce",
+      "scope_rule_sha256": "f4691c8a3f72dde5d96c18a33db845ea2d68dbb1c940d1bd02392d5e53740257",
+      "sources": [
+        {
+          "census_sha256": "3e6d26c9e0f67adcc9ea5590135ac8265e89e6a4215eb75e2512f28adfb9eb77",
+          "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
+          "dataset_manifest_id": "dataset-20c91fe49fe6695b60770935ce51bf391dac252416c1bd96cfc8d9dabc53bea5",
+          "observations_sha256": "feca51b99a58a533baa2e9fc0de24436c2a3535f49e7d62b8697562c92576f57",
+          "release_id": "28e105f3d8fa58fc384431d8f176a4f83024cd465140151867cbc9e278537d6f",
+          "schedule_binding": {
+            "availability_grace_seconds": 300,
+            "dense_step_seconds": 300,
+            "dense_until_seconds": 21600,
+            "dispatch_window_seconds": 60,
+            "horizon_seconds": 259200,
+            "hourly_step_seconds": 3600,
+            "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+            "schedule_sha256": "1e957becc1f3b70cdf26e0cb3110a03cf314c2267dad35ad30911e1e0f9826bd",
+            "witness_max_age_seconds": 120
+          },
+          "schedule_sha256": "1e957becc1f3b70cdf26e0cb3110a03cf314c2267dad35ad30911e1e0f9826bd"
+        },
+        {
+          "census_sha256": "dcb4448e791dad98ea65c027d6a461e2b2ee0157a26995bb4d42b844e51f60c3",
+          "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
+          "dataset_manifest_id": "dataset-20c91fe49fe6695b60770935ce51bf391dac252416c1bd96cfc8d9dabc53bea5",
+          "observations_sha256": "f17be358d35b2cf2d84c4529f43e6c5901b544101f018e135b80b87ff5a5432d",
+          "release_id": "a2f71a4272a4713574e1ffd830ef208809452aaf6361c5e39d39cf3bd18e51bc",
+          "schedule_binding": {
+            "availability_grace_seconds": 300,
+            "dense_step_seconds": 300,
+            "dense_until_seconds": 21600,
+            "dispatch_window_seconds": 60,
+            "horizon_seconds": 259200,
+            "hourly_step_seconds": 3600,
+            "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+            "schedule_sha256": "1e957becc1f3b70cdf26e0cb3110a03cf314c2267dad35ad30911e1e0f9826bd",
+            "witness_max_age_seconds": 120
+          },
+          "schedule_sha256": "1e957becc1f3b70cdf26e0cb3110a03cf314c2267dad35ad30911e1e0f9826bd"
+        }
+      ],
+      "time_contract": {
+        "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+        "time_feature_clock": "FIRST_RELIABLE_AVAILABLE_AT"
+      },
+      "universe_policy": {
+        "holder_field_id": "FIELD-HOLDER-COUNT-001",
+        "liquidity_field_id": "FIELD-LIQUIDITY-USD-001",
+        "min_holders": "50",
+        "min_liquidity_usd": "5000",
+        "rule": "ALL_OF_AT_DECISION_TIME",
+        "semantic_sha256": "63b33150869273e8f5a0d5d214c8c679e24b5468125164ddcf95326bac4d533a"
+      },
+      "unresolved_n": 0
+    },
+    "experiment_spec_sha256": "d6d4cc2ae909c76af8c4317f9f5fbf22d597cbd7e84d512825490f282ca8730f",
+    "hypothesis_version": "HYP-HFIC-CAND-E8B09968FD73",
+    "lane": "FAST_LANE",
+    "lane_classifier_terminal": "FAST_LANE_READY",
+    "network_free": true,
+    "next_action": "EXECUTE_ACCEPTED_CAPABILITY",
+    "provider_calls_actual": 0,
+    "reason_codes": [],
+    "schema": "smial.hfic-classifier-receipt",
+    "schema_version": "1.0",
+    "selected_candidate_id": "HFIC-CAND-E8B09968FD73",
+    "selected_definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+    "session_id": "HFIC-SESS-9CC7B751BCADE2B7"
+  },
+  "cold_inventory_sha256": "547abc2f97092caa7f3fe41c57dcfefd785e860ef9e6075c5ca14dce64a2592d",
+  "cold_readback_equal": true,
+  "direct_guard": {
+    "changed_schedule_refused": true,
+    "numerical_execution": "NOT_RUN_IN_SCOPE",
+    "target_and_prefix_value_reads": 0,
+    "terminal": "INVALID_EVIDENCE",
+    "trace_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "direct_lineage": {
+    "candidate_id": "HFIC-CAND-E8B09968FD73",
+    "critic_input_packet_sha256": "b8b3b485052ac2bf764d239b16952a6a0bd3690fd71c48412b7930beab17502a",
+    "critic_result_sha256": "82d5186131aa10f4311ded71ab94a254153f260adb2dc212a4f79190c7373bce",
+    "definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
+    "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+    "existing_look_ref": "HFIC-ART-DISCOVERY-E91C14D26AD117C09103AC8D41DFA0C588A241EB",
+    "grounded_result_sha256": "e57ac32ff4bd8f7c5a6358616e8954427069b1bf461cc66445c5da8fb41baed6",
+    "market_evidence_epoch_sha256": "4732f42e355283ce1fa230b6ecfcb4a00a3f4d9998711c944f3ae4af90b0b468",
+    "new_scientific_look": false,
+    "scientific_terminal": "PASS_FAST_LANE_READY",
+    "session_id": "HFIC-SESS-9CC7B751BCADE2B7"
+  },
+  "fidelity": "NATIVE_REPAIR_BOUNDARY_WITH_SCRIPTED_CRITIC",
+  "non_claims": [
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_QUALIFYING_DIRECT_EVIDENCE",
+    "NO_FULL_LIFECYCLE",
+    "NO_GENUINE_BLIND_ACTOR"
+  ],
+  "reader_oracle": {
+    "canaries": [
+      "INTENTIONAL_TARGET_READ_REFUSED",
+      "INTENTIONAL_BROAD_READ_REFUSED",
+      "CORRUPT_MEMBERSHIP_MASK_DETECTED"
+    ],
+    "exact_prefix_value_reads": 140,
+    "metadata_reads": 4,
+    "real_boundary": "pyarrow.parquet.read_table",
+    "retained_trace": "local/episode-native-required-outcomes-v1/proof-a7/positive.json",
+    "target_value_reads": 0,
+    "trace_sha256": "8580982ad8aa0429d99fdcb56b0b390fbc389d224e726f0b8e493bdeaec34d47",
+    "unbounded_value_reads": 0
+  },
+  "repeat_write_count": 0,
+  "schema": "smial.episode-required-outcome-proof",
+  "schema_version": "1.0",
+  "tested_head": "9d88a80a10dbd28801203a67c6ffb46c769d8ae1"
+}

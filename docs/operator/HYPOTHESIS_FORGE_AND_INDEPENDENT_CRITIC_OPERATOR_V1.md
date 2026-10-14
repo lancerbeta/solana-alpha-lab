@@ -490,6 +490,7 @@ typed `AUTO_HANDOFF_UNAVAILABLE`.
 |---|---|
 | `PASS_FAST_LANE_READY` | Передать сюда итог Critic. После проверки отдельно разрешить no-Git run. |
 | `PASS_CHANGE_LANE_REQUIRED` | Передать сюда PRD+SSD capability-атома. После проверки отдельно разрешить один PR. |
+| Native episode data blocker | EPISODE_OUTCOME_COVERAGE_UNRESOLVED → REPORT_OUTCOME_COVERAGE_KEEP_DECISION_DENOMINATOR. HOLDOUT_PROTECTED / HOLDOUT_UNRESOLVED → REVIEW_PROTECTION_KEEP_FROZEN_SCOPE. SCOPE_COVERAGE_UNRESOLVED / SCOPE_EVIDENCE_INVALID → REPORT_REFERENCED_SCOPE_COVERAGE. Сохранить D и frozen scope; это не collection option. |
 | `PASS_DATA_OPTION_REQUIRED` | Смотри classifier `reason_codes`. `OUTCOME_MISSINGNESS_UNRESOLVED` = coverage report на `base_x` (`REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`), не collection. `SELECTION_RECEIPT_INTEGRITY_INVALID` = rebind receipt identity (`REBIND_SELECTION_RECEIPT_IDENTITY`). `CANONICAL_SCHEDULE_UNBOUND` / `CANONICAL_X300_SCHEDULE_INCOMPATIBLE` / `CANONICAL_RELEASE_IDENTITY_UNBOUND` / `CANONICAL_RELEASE_BIND_FAILED` = `RESOLVE_IMMUTABLE_DATA_BINDINGS`, не collection и не stamped N. Исторический FULL_LIFECYCLE receipt сам по себе = caveat, не auto-veto. Только residual data-gap без этих reason = collection option. |
 | `REVISE_ONCE` | Только primary/C1. Fallback: вернуть packet Forge ровно один раз. Slash path does this without an owner prompt. Если это Critic #2 / C2: **не** revise. `PAUSE` / `RUNNER_UP_REVISION_REQUIRED`. `OWNER NEXT=STOP`. |
 | `KILL_*` | Если это ещё primary/C1: same slash auto-screens the already-frozen runner-up once (`RUNNER_UP_AWAITING_CRITIC`). Do not regenerate, do not pick another portfolio candidate, do not start a new AUTO search. Если это уже C2: session complete, no survivor unless a PASS terminal. |
@@ -1182,7 +1183,7 @@ evidence that upgrade unlocks
 
 ### Если `FAST_LANE_CANDIDATE`
 
-Подготовь draft, совместимый с `ExperimentSpec` 1.3 (`required_outcomes` обязателен), но не запускай его. `primary_y` / `horizon_notional` остаются identity text. Разреши реальные stable IDs, hashes/fingerprints, recipe IDs и capabilities; не выдумывай отсутствующие bindings.
+Подготовь draft, совместимый с `ExperimentSpec` 1.3 для raw X/Y либо 1.4 для frozen native episode fixed-time recipe (`required_outcomes` обязателен), но не запускай его. `primary_y` / `horizon_notional` остаются identity text. Разреши реальные stable IDs, hashes/fingerprints, recipe IDs и capabilities; не выдумывай отсутствующие bindings.
 
 Выведи:
 
@@ -1547,7 +1548,13 @@ OWNER_DECISION_REQUIRED
 ## B5. Если terminal = PASS_TO_CLASSIFICATION
 
 1. Сформируй финальный frozen Hypothesis Contract.
-2. Подготовь machine-valid ExperimentSpec **1.3** с явным `required_outcomes`.
+2. Выбери machine-valid ExperimentSpec по population и frozen recipe: raw X/Y —
+   **1.3**; native OPPORTUNITY_EPISODES / episode_query 1.2 fixed-time proxy —
+   **1.4**, REUSE_ONLY / EXPLORATORY_REUSE с native E `required_outcomes`.
+   Exact bindings, native D/M/C и protection replay описаны в
+   `docs/contracts/episode_native_required_outcomes_v1.md`.
+   COMPLETE/FAST_LANE_READY — готовность reusable artifact; scientific acceptance
+   и execution authority проверяются отдельно. Не переводить E в X/Y.
    `primary_y` / `horizon_notional` остаются identity text, не parser.
    Не создавай и не редактируй `CRITIC_INPUT_PACKET`: его owner — freeze.
 3. Разреши stable IDs, hashes/fingerprints, capabilities, query recipes и parameter schema. Отсутствующие значения не выдумывай.
@@ -1559,8 +1566,15 @@ OWNER_DECISION_REQUIRED
    Не штампуй `outcome_readiness=COMPLETE`. Classifier принимает COMPLETE
    только из live release projection. Attached/self-hashed stamps fail closed.
    `COMPLETE` значит: каждый required `(point_id, field_id)` имеет
-   `state == OBSERVED` для каждого member в `base_x`.
-   `CENSORED_LATE` / `MISSING_TYPED` / absent — это coverage, не наблюдение
+   `state == OBSERVED` для каждого member в `base_x` (raw 1.3) либо native
+   decision denominator D (episode 1.4). Episode missingness сохраняет D и
+   возвращает EPISODE_OUTCOME_COVERAGE_UNRESOLVED; historical readback не выдаёт
+   новую готовность, повтор действия проверяет current source/protection.
+   Для episode 1.4 NEXT = REPORT_OUTCOME_COVERAGE_KEEP_DECISION_DENOMINATOR:
+   «Покрытие E14400 — 19/20; выборка не сокращена. Проверить указанный immutable
+   source; сбор не запускался». Protection → REVIEW_PROTECTION_KEEP_FROZEN_SCOPE;
+   scope UNKNOWN/INVALID → REPORT_REFERENCED_SCOPE_COVERAGE. Сохранить scope и D.
+   Для raw 1.3 `CENSORED_LATE` / `MISSING_TYPED` / absent — это coverage, не наблюдение
    required value, и дают `MISSINGNESS_UNRESOLVED`. Это не complete-case и
    не сжимает `base_x.n`.
    `MISSINGNESS_UNRESOLVED` fail-close в существующий data/science-option
@@ -1633,6 +1647,18 @@ Post-merge path back to no-Git Fast Lane
 ### Для `PASS_DATA_OPTION_REQUIRED`
 
 Сначала прочитай classifier `reason_codes` / NEXT. Один terminal не значит «заказать collection».
+
+- `EPISODE_OUTCOME_COVERAGE_UNRESOLVED` / `REPORT_OUTCOME_COVERAGE_KEEP_DECISION_DENOMINATOR`:
+  верни покрытие required E-клеток на неизменном D; не сокращай выборку и не
+  заказывай collection.
+- `HOLDOUT_PROTECTED` / `HOLDOUT_UNRESOLVED` / `REVIEW_PROTECTION_KEEP_FROZEN_SCOPE`:
+  останови новое действие и проверь current protection owner. Не отфильтровывать
+  защищённые episodes и не переходить к сбору.
+- `SCOPE_COVERAGE_UNRESOLVED` / `SCOPE_EVIDENCE_INVALID` / `REPORT_REFERENCED_SCOPE_COVERAGE`:
+  верни scope coverage/reasons. UNKNOWN не FALSE; scope и рецепт не сужать
+  автоматически. Collection authority из этого отказа не следует.
+- `EPISODE_SOURCE_UNAVAILABLE`: проверь exact immutable source; не подставляй
+  current/latest release и не заказывай collection.
 
 - `OUTCOME_MISSINGNESS_UNRESOLVED` / `REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`:
   верни coverage report на `base_x.n`. N не сжимать. Не заказывай collection.

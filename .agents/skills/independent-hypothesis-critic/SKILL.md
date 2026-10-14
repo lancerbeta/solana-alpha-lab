@@ -137,19 +137,31 @@ Hard boundaries — same as Forge:
 3. Execute **PROMPT B** attack matrix and terminal policy.
 4. Return critic sections B7 in order: one terminal, one NEXT, at most one execution
    unit.
-5. On `PASS_TO_CLASSIFICATION` path only: emit schema-valid **ExperimentSpec 1.3**
+5. On `PASS_TO_CLASSIFICATION` path only: select ExperimentSpec by the actual recipe:
+   raw X/Y uses **1.3**; frozen `OPPORTUNITY_EPISODES` / `episode_query 1.2`
+   fixed-time proxy uses **1.4**, `REUSE_ONLY` / `EXPLORATORY_REUSE`, native E points.
+   Read `docs/contracts/episode_native_required_outcomes_v1.md` for exact bindings,
+   native D/M/C and current-protection replay. Never translate E into X/Y.
+   Emit the selected schema-valid version
    with explicit `required_outcomes`. `primary_y` / `horizon_notional` remain
    identity text, not a parser. Critic never creates or edits `CRITIC_INPUT_PACKET`; freeze owns it.
    Historical selection receipts stay byte-immutable
    `FULL_LIFECYCLE_COMPLETENESS` caveats; do not globally veto
    `START_NEW_SESSION` and do not auto-veto ExperimentSpec 1.3 from Y-point-set
    equality alone. Invalid/stale receipt identity remains fail-closed.
-   Schema-validate the 1.3 spec and run deterministic lane classifier
+   Schema-validate the selected spec and run deterministic lane classifier
    **network-free**. Do not stamp `outcome_readiness=COMPLETE`. The
    classifier authorizes `COMPLETE` only from a live release projection;
    attached or self-hashed stamps fail closed.
    `COMPLETE` = every required `(point_id, field_id)` is `OBSERVED` for every
-   member of `base_x`. Censored / typed-missing / absent required outcomes are
+   member of native D (1.4) or `base_x` (raw 1.3).
+   Native 1.4 missing/late/censored/absent keeps D and returns
+   `EPISODE_OUTCOME_COVERAGE_UNRESOLVED`; NEXT is
+   `REPORT_OUTCOME_COVERAGE_KEEP_DECISION_DENOMINATOR`.
+   Protection refusal keeps the frozen scope; NEXT
+   `REVIEW_PROTECTION_KEEP_FROZEN_SCOPE`. UNKNOWN/INVALID referenced scope
+   returns `REPORT_REFERENCED_SCOPE_COVERAGE` before values; never shrink N.
+   For raw 1.3, censored / typed-missing / absent required outcomes are
    `MISSINGNESS_UNRESOLVED` coverage against `base_x.n`, not a complete-case
    shrink. `MISSINGNESS_UNRESOLVED` fail-closes into the existing
    data/science-option route (`PASS_DATA_OPTION_REQUIRED`, classifier NEXT
