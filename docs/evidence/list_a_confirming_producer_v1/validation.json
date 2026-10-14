@@ -13,6 +13,7 @@
     "method": "8 PASS native; Fraction/draw/clock/count plus negative/zero/ambiguous and empty-replicate/no-reroll oracles",
     "vertical": "3 PASS on final production closure; positive/null/missing/empty/UNKNOWN/conflict"
   },
+  "delivery_process_limit": "Exact owner acceptance required: retained accidental empty review environment violates literal no-new-.venv clause; archival does not erase creation",
   "distinct_targeted_unit_checks": 71,
   "engineering_history": [
     {
@@ -139,6 +140,22 @@
       "reason": "uv --no-sync without shared environment binding created empty ignored .venv; yaml import failed; no packages installed or product/science run",
       "remediation": "Exact owned non-reparse environment reversibly moved to local scratch archive; no deletion; existing shared runtime used thereafter; footprint-review-final includes archive",
       "status": "ENGINEERING_ERROR_RETAINED"
+    },
+    {
+      "attempt": "cold-cli-checkpoint",
+      "checks": 1,
+      "elapsed_seconds": 36.57,
+      "head": "b34ffd2dc481f18808530b22edfdc362efb92fb4",
+      "scope": "Extended native positive vertical includes actual status/show for conflicting and unavailable artifact; zero new decoder/evaluator/ResearchStore writes",
+      "status": "PASS",
+      "trace_sha256": "3b5995e0c5c2a5d011d8cdce99a2da307e96f7503c01612089fe0514c3a52f83"
+    },
+    {
+      "attempt": "cli-final-cold",
+      "checks": 6,
+      "head": "b34ffd2dc481f18808530b22edfdc362efb92fb4",
+      "scope": "Six retained historical results on final22-path production qualification; zero new values/evaluator/writes",
+      "status": "PASS"
     }
   ],
   "exact_head_ci": "ENFORCED_LIVE_BEFORE_MERGE_READINESS",
@@ -163,9 +180,10 @@
     "Exact owner revoke preview/phrase/idempotence; no values or allowance refund",
     "Prepare/authorize returns original consumed checkpoint, including acquisition aliases; no new grant",
     "Public facade for unchanged ordinary science obligations",
-    "Pre-reservation prepared aliases and early capability refusal retain original consumed checkpoint"
+    "Pre-reservation prepared aliases and early capability refusal retain original consumed checkpoint",
+    "Actual cold status/show on missing result/conflicting carriers retain validated original consumed trial/run/binding and safe NEXT; no decoder/evaluator/writes"
   ],
-  "post_review_production_head": "bbd12a38e55db23fdbbe59796a21f11cf275dbdf",
+  "post_review_production_head": "b34ffd2dc481f18808530b22edfdc362efb92fb4",
   "production_bytes_unchanged_since_native_acceptance": false,
   "schema": "smial.list-a-confirmation-validation",
   "schema_version": "1.0",

@@ -5,6 +5,13 @@
 путь definition → prepare/grant → classifier → DocumentRunner → typed result →
 ordinary dossier. Scientific core и смысл legacy 1.0–1.4 сохранены.
 
+**DELIVERY_BLOCKED_OWNER_CONTRACT_DEVIATION:** при isolated code review создана
+пустая .venv вопреки literal no-new-environment clause. Она сохранена в owned
+archive, не использована, её footprint учтён. Это delivery-process deviation;
+архивирование не отменяет исторического создания. Для дальнейшего Git delivery
+нужно точное owner принятие именно этого отклонения; alpha/real/data authority
+оно не выдаёт. PR/push/CI/readiness/merge пока не выполнены.
+
 Base: `07c81a99f2d0f385df66de2e1a5254e224c6b3b3`. Численный acceptance выполнен
 на committed implementation `989cee4ccd676716421752ce3f8a6ef42a794bd1`.
 После independent review исправлены readout consumed charge/UNKNOWN, terminal
@@ -75,11 +82,16 @@ contrast — null. Resampling не запускается. Identity/protection/P
 failures остаются INVALID_AFTER_RESERVE; frozen thresholds и estimand не меняются.
 Недоступная история даёт UNKNOWN; повреждённый result сохраняет видимую reservation
 и consumed charge при evidence CONFLICT. Новый allowance эти действия не создают.
+Cold `status/show --trial-id` при отсутствующем result/conflicting carriers также
+возвращают validated original trial/run/binding, charge 1, UNVERIFIABLE и
+VERIFY_SAVED_ARTIFACT_KEEP_CONSUMED_ALLOWANCE. Это проверено actual native CLI
+без нового decoder/evaluator/ResearchStore append; current 22-path qualification
+и все шесть saved results перепроверены на последнем production runtime.
 
-Ресурсы: review-final snapshot 15 октября regular-file allocation **189.460 MiB owned**,
-conservative cap charge **224.485 MiB**, включая полный резерв общего Git object store. Это ниже
+Ресурсы: checkpoint snapshot 15 октября regular-file allocation **189.605 MiB owned**,
+conservative cap charge **225.430 MiB**, включая полный резерв общего Git object store. Это ниже
 target 256 MiB и hard cap 1 GiB. Оставлены named stores, receipts, copied regression
-checkout/Git snapshot и 27 stopped containers; новых images/dependencies нет.
+checkout/Git snapshot и 30 stopped containers; новых images/dependencies нет.
 Production/tests используют existing shared runtime. При code review ошибочный
 `uv --no-sync` создал пустую ignored .venv: 16 файлов, 509868 logical bytes,
 packages installed=0, product/science uses=0. После проверки отсутствия процессов
@@ -95,7 +107,9 @@ Real sample **UNBOUND**, real executions/values/grants/provider calls = **0**.
 Синтетический supported proxy не доказывает causal effect, net alpha, execution
 feasibility, StrategyVersion, activation, PAPER или blind Actor.
 
-**NOW:** один отдельно разрешённый sample-readiness/confirmation decision через
+**NOW:** owner acceptance точного retained delivery-process deviation, затем
+обычный Git delivery до fresh merge phrase. После интеграции — один отдельно
+разрешённый sample-readiness/confirmation decision через
 новую capability при source-bound пригодном sample. Ценность — использовать
 закрытый producer gap; стоимость/риск — отдельная source и exact data authority;
 владелец GOAL_OWNER, trigger — явный scoped task. NEXT_MODEL_EFFORT=SOL_XHIGH.
@@ -107,5 +121,5 @@ Evidence: [acceptance](../../evidence/list_a_confirming_producer_v1/acceptance.j
 [process readback](../../evidence/list_a_confirming_producer_v1/process-readback.json),
 [history](../../evidence/list_a_confirming_producer_v1/scientific-history.json),
 [qualification](../../evidence/list_a_confirming_producer_v1/qualification.json),
-[footprint](../../evidence/list_a_confirming_producer_v1/footprint-review-final.json),
+[footprint](../../evidence/list_a_confirming_producer_v1/footprint-checkpoint.json),
 [REPRODUCE](REPRODUCE.md).

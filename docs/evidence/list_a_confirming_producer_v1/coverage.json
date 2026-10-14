@@ -71,7 +71,7 @@
       "status": "NOT_CLAIMED"
     },
     {
-      "evidence": "Actual CLI charge/identity + zero new decoder/evaluator/writes; UNKNOWN history and visible charged reservation on result conflict; prepared-before-reserve acquisition alias and early capability refusal retain original checkpoint",
+      "evidence": "Actual CLI charge/identity + zero new decoder/evaluator/writes; UNKNOWN history and visible charged reservation on result conflict; prepared-before-reserve acquisition alias and early capability refusal retain original checkpoint; actual status/show with only trial-id on missing/conflicting result retain validated consumed checkpoint",
       "requirement": "denied readout and unavailable/unverifiable history",
       "status": "PASS"
     },

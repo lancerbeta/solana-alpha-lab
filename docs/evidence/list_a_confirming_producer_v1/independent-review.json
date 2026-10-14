@@ -74,8 +74,24 @@
       "finding": "Required ambiguous numeric terminal lacked explicit independent pure-method oracle",
       "observed_head": "e5919ddf0352e9f70b947d2c504b063d46ea9fec",
       "prior_verdict": "NOT_READY",
-      "resolved_by_head": "PENDING_FINAL_TEST_COMMIT",
+      "resolved_by_head": "798822159d2c593e353501866b76b8903f7aa53c",
       "role": "GOAL_DOD_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Resource coverage falsely claimed no new environment after retained incident",
+      "observed_head": "798822159d2c593e353501866b76b8903f7aa53c",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "54502e4ab8a2cbbe58322493a9ff73d3f95fa0b4",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Cold status/show lost known consumed charge/identity on missing or conflicting result",
+      "observed_head": "54502e4ab8a2cbbe58322493a9ff73d3f95fa0b4",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "b34ffd2dc481f18808530b22edfdc362efb92fb4",
+      "role": "OWNER_UX_CRITIC",
       "severity": "MAJOR"
     }
   ],

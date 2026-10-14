@@ -133,12 +133,17 @@ image; build/pull/install не входит в authority. Core frozen source pin
 при новой разрешённой кампании. Early P0 точный reader count восстановить нельзя.
 Allocation измерена по regular files/owned volumes/SizeRw; physical Docker VHDX,
 daemon metadata/logs и total shared cache остаются отдельно UNKNOWN.
-Review-final snapshot 15 октября: 189.460 MiB owned / 224.485 MiB conservative charged,
-27 stopped containers. Предыдущие snapshots сохранены. См.
-`docs/evidence/list_a_confirming_producer_v1/footprint-review-final.json`.
+Checkpoint snapshot 15 октября: 189.605 MiB owned / 225.430 MiB conservative charged,
+30 stopped containers. Предыдущие snapshots сохранены. См.
+`docs/evidence/list_a_confirming_producer_v1/footprint-checkpoint.json`.
 Один ошибочный review запуск создал пустую .venv без установки пакетов; она
 перемещена в owned scratch archive после no-process/non-reparse проверки, не
 использовалась для product/science и не удалена. Archived files учтены в allocation.
+Этот факт нарушил literal no-new-.venv clause; delivery требует explicit owner
+acceptance, а не изменения прошлого receipt. Current CLI-specific positive test
+прошёл за 36.570s: actual status/show с одним trial-id на missing/conflicting result
+сохраняют committed consumed identity. Последние six cold receipts — cli-final,
+current production qualification — отдельная post_review_implementation запись.
 
 Rollback: обычный code/schema/registry revert сохраняет stores, reservations,
 attempts/results и charges. Pending несовместимый trial не считается untouched;

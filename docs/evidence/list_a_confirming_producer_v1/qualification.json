@@ -10,7 +10,7 @@
     "1.4"
   ],
   "post_review_implementation": {
-    "head": "bbd12a38e55db23fdbbe59796a21f11cf275dbdf",
+    "head": "b34ffd2dc481f18808530b22edfdc362efb92fb4",
     "qualification": {
       "closure": {
         "catalog/schemas/experiment_spec_v1_5.schema.json": "ee696d1d29e009abb354c87c0a225836783ab5e317c35ae304ddfd57362bcd57",
@@ -27,7 +27,7 @@
         "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
         "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "f5b38fa0da3766f8d19424b379bcea0ca92ecb90fb94b34d04c827f734c51c22",
         "src/solana_alpha_lab/factory/lane_classifier.py": "5cbb79ba8a2635d84d8daa27feca5aadf2cefdc524d815d1a31ac42435ef6168",
-        "src/solana_alpha_lab/factory/list_a_confirmation.py": "9e0cc82a50354f628c38f4ca34a4de37fe6caac83b536d83db28223316490481",
+        "src/solana_alpha_lab/factory/list_a_confirmation.py": "7965d68892e3666cd6e9aa5af266f11f094a2ae65429b1d67bc640dfd2b6473c",
         "src/solana_alpha_lab/factory/list_a_confirmation_inputs.py": "58e4b02ed0872ee9165ebb7ce09c31ae23feeebb45391a38c93ae4b50202507d",
         "src/solana_alpha_lab/factory/list_a_confirmation_method.py": "9f08291dd6d251b0030b121488a709ab8a502ca9a6c2e5b3b8a63201495cb9f5",
         "src/solana_alpha_lab/factory/opportunity_episodes.py": "3565d1dff50b3b4be630ec1ee737c81e4259b247dde702c2327f976cfae837cc",
@@ -49,7 +49,7 @@
         "version": "3.13.14"
       }
     },
-    "scope": "Final production closure; native and host qualification identical; frozen historical trials not rebound"
+    "scope": "Current production closure including validated trial checkpoint; native and host equal; historical science not rebound"
   },
   "protocol_core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
   "qualification": {
@@ -132,6 +132,48 @@
         }
       },
       "scope": "Current Catalog + committed Git + working bytes and exact runtime; original 989 qualification retained, historical trials not rebound."
+    },
+    {
+      "head": "bbd12a38e55db23fdbbe59796a21f11cf275dbdf",
+      "qualification": {
+        "closure": {
+          "catalog/schemas/experiment_spec_v1_5.schema.json": "ee696d1d29e009abb354c87c0a225836783ab5e317c35ae304ddfd57362bcd57",
+          "catalog/schemas/list_a_confirmation_input_v1.schema.json": "b32d6fa347b9970f971e9a559a86983a3f5761cd70fe38f1b73549bc027d35a0",
+          "catalog/schemas/list_a_confirmation_result_v1.schema.json": "3080d2ed200050802f7c83e5d4aec77e329aac478c68a38c38dde212e456e350",
+          "configs/experiment_capability_registry_v2.yaml": "b6173a99298eac12bec314decafb80a272c13235bdaa9226f63782ed1351db3f",
+          "configs/experiment_specs/list_a_chronological_confirmation_v1.yaml": "789118443839aba34a1a979c611ed4a37b0c675cb5f3b0bb8aebd2b21b44341b",
+          "configs/list_a_chronological_confirmation_v1.yaml": "4bfd2c80526d617f664e047ffa38f802722c5ca96211aed06992506bbc29be12",
+          "src/solana_alpha_lab/factory/capabilities.py": "3b6f0c00cec42fcc60ebbb56f3d56c9ceadf0c6c65e1a9ae545b79176c391065",
+          "src/solana_alpha_lab/factory/data_resolver.py": "f29d1abbdda524cfb900c250ccd2971510b5f099d1d4099c38f213746afcfa1c",
+          "src/solana_alpha_lab/factory/document_runner.py": "e6bef62f301b159d916e01e09cb83b8b6931caf76dafb3e0d4dc29a96a36fd9d",
+          "src/solana_alpha_lab/factory/experiment_evidence.py": "19ae7be1a60fd11913463adf140deef3023779d1fc968554629b6ffab24582b2",
+          "src/solana_alpha_lab/factory/experiment_spec.py": "e0536158c67f008894854c698a702f58057993a6ea2a1ea97c2e48e378a308a4",
+          "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+          "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "f5b38fa0da3766f8d19424b379bcea0ca92ecb90fb94b34d04c827f734c51c22",
+          "src/solana_alpha_lab/factory/lane_classifier.py": "5cbb79ba8a2635d84d8daa27feca5aadf2cefdc524d815d1a31ac42435ef6168",
+          "src/solana_alpha_lab/factory/list_a_confirmation.py": "9e0cc82a50354f628c38f4ca34a4de37fe6caac83b536d83db28223316490481",
+          "src/solana_alpha_lab/factory/list_a_confirmation_inputs.py": "58e4b02ed0872ee9165ebb7ce09c31ae23feeebb45391a38c93ae4b50202507d",
+          "src/solana_alpha_lab/factory/list_a_confirmation_method.py": "9f08291dd6d251b0030b121488a709ab8a502ca9a6c2e5b3b8a63201495cb9f5",
+          "src/solana_alpha_lab/factory/opportunity_episodes.py": "3565d1dff50b3b4be630ec1ee737c81e4259b247dde702c2327f976cfae837cc",
+          "src/solana_alpha_lab/factory/research_store.py": "c4c102b35c683eadfc06f8bbd92d6b4b23c53ec6dbf491b36fb02a8f5caa42d9",
+          "src/solana_alpha_lab/factory/research_workbench.py": "acc9cb3b07e920b41187d300b33beda7e27987a9efaf09f212139227e836aeca",
+          "src/solana_alpha_lab/factory/run_passport.py": "50cdc6d938c0a28f01734140938c026a6203ab69b775940fd2dc2cf37070e5a5",
+          "uv.lock": "3b75cc1c5a2c0c83560beaf1a57c4543b885e0909c75db6d1939e90d09eefedb"
+        },
+        "runtime": {
+          "core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+          "implementation": "CPython",
+          "mant_dig": 53,
+          "replicates": 4096,
+          "seeds": {
+            "172800": 3449030900544075880,
+            "86400": 2055296707731192101
+          },
+          "serialization": "FINITE_JSON_SHORTEST_ROUNDTRIP",
+          "version": "3.13.14"
+        }
+      },
+      "scope": "Final production closure; native and host qualification identical; frozen historical trials not rebound"
     }
   ],
   "schema": "smial.list-a-confirmation-qualification",
