@@ -18,7 +18,7 @@ coverage E14400 — 20/20, terminal `FAST_LANE_READY`, session
 не создал новых записей. Изменение текущей protection блокирует новое действие,
 включая replay; historical readback остаётся доступен.
 
-Проверки: **15/15 native**, без skips, и **84 selected legacy**, все PASS.
+Проверки: **16/16 native**, без skips, и **84 selected legacy**, все PASS.
 Reader oracle наблюдал реальные запросы Parquet: значения только exact prefix
 episode/point/field с availability filter, future target values — 0.
 Намеренно небезопасный reader и испорченный membership mask обнаружены.
@@ -46,14 +46,23 @@ fixture, а не заявленный новый научный результа
 проверен test-only reader fault после binding; late/censored — native metadata
 и clock cases, без заявления о полном перепубликованном late/censored world.
 
-Подготовка девяти сохранённых native worlds выполнила **18 MAIN looks**;
+Подготовка одиннадцати сохранённых native worlds выполнила **22 MAIN looks**;
 они учтены отдельно. Classify/projection/repeat/readback добавили 0. Предыдущие
 worlds и их trial history сохранены, scientific KILL из аудита не переписан.
 Новый benchmark не стирает старую кампанию.
 
-Repair worktree со всеми retained worlds и proof занимает **462 551 920 байт
-allocation — 441,12 MiB / 0,431 GiB** на момент измерения. Из них synthetic/proof
-— 391 304 784 байта; checkout/harness — 71 247 136. Это ниже cap 512 MiB.
+Независимое architecture review обнаружило и закрыло P1: отсутствие текущей
+protection раньше позволяло использовать admission-time completeness как
+текущее разрешение. Теперь новая ветка отдельно требует native current
+completeness proof до объединения с frozen protection. Missing/empty/unreadable/
+incomplete inventory блокирует READY, новое persisted action и replay до values.
+В новом fixture protection owner явно зарегистрировал complete-empty inventory;
+реальные неизвестные источники так подменять нельзя. Предыдущие worlds/receipts
+остались историческими, их положительный terminal не даёт fresh authority.
+
+Repair worktree со всеми retained worlds и proof занимает **509 443 512 байт
+allocation — 485,84 MiB / 0,474 GiB** на момент измерения. Из них synthetic/proof
+— 438 093 624 байта; checkout/harness — 71 349 888. Это ниже cap 512 MiB.
 Измерена фактическая NTFS allocation, hard links дедуплицированы. Новых venv,
 dependencies, containers и images — 0; существующие runtime/cache переиспользованы.
 Ничего не удалено. Старый audit footprint **0,763 GiB** — отдельный historical

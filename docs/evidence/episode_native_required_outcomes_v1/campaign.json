@@ -44,12 +44,27 @@
       "attempt": "full a6",
       "errors": 0,
       "failures": 0,
+      "limit": "Independent semantic review then found absent current completeness falling back to frozen ALLOW; earlier receipts preserved as historical, not fresh authority",
       "skipped": 0,
       "tests": 15,
+      "verdict": "PASS_PRE_HARDENING"
+    },
+    {
+      "attempt": "architecture packet 0ea597cc",
+      "finding": "P1 current protection missing became frozen ALLOW",
+      "resolved_by": "Independent native current completeness gate; explicit complete-empty fixture; removal before READY, persisted action and replay",
+      "verdict": "NOT_READY"
+    },
+    {
+      "attempt": "full a7",
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 16,
       "verdict": "PASS"
     }
   ],
-  "fixture_setup_main_looks": 18,
+  "fixture_setup_main_looks": 22,
   "limits": [
     "Template setup MAIN looks counted per newly initialized store; proof copies inherit them and are not counted again",
     "Selected legacy tests create their own temporary engineering fixtures, outside this campaign world registry",
@@ -141,6 +156,23 @@
           "record_id": "HFIC-ART-DISCOVERY-BA56A7D5208CEBD76728E2A4D08EC9E162631CFB"
         }
       ],
+      "fixture_sha256": "03088dd42aa0d31af9ab1db922bf9864f3361c673eb723ece5fd7f8d3115ed80",
+      "inventory_sha256": "1363ec0391538c6c4e768b5ecd0cf798321ff6f0da87dbd9edc26fecf9a1990c",
+      "world": "world-missing-a7"
+    },
+    {
+      "fixture_setup_main_looks": [
+        {
+          "operation_sha256": "0a98ff46bd63fdf851a9f2c1516028be318d383970785714baf68c7b187554a4",
+          "payload_sha256": "167958dfb39fbc1a868372079738a41aa87ac41a654d22d027b4c41bc55a1ff4",
+          "record_id": "HFIC-ART-DISCOVERY-772E31300FEED74BE5777CC07517AB53E648D152"
+        },
+        {
+          "operation_sha256": "f2d9c388b1e2cd66bbb77d98a31dc17dade119a81e19d876155e784661177dfb",
+          "payload_sha256": "833ebcca23a5fc045dae2a51c6291975ec41a339a2677ca9d27a25b41799ec14",
+          "record_id": "HFIC-ART-DISCOVERY-BA56A7D5208CEBD76728E2A4D08EC9E162631CFB"
+        }
+      ],
       "fixture_sha256": "fb1a7619f84853e6f91925461599eac3be211bc0d07483d9973823d32deaf20c",
       "inventory_sha256": "74bed89ca51ec0f77e88770f421883a5d05ec8878d22bde99d4bbd41f8b27d90",
       "world": "world-missing-v2"
@@ -195,6 +227,23 @@
       "fixture_sha256": "bac3caf882dc96d47a6ff6c84feee22ef076edb83ab520375a7efe50dbe959c0",
       "inventory_sha256": "1bbbf0d5307a13d94b45d3aee57f3227ae2954a6374b5a53daf19a90feeadc4e",
       "world": "world-ready-a6"
+    },
+    {
+      "fixture_setup_main_looks": [
+        {
+          "operation_sha256": "c76f5a2dec5f7782ba2c1c1319c5ae7ec21228e3eb0ed8149022e1e847e34501",
+          "payload_sha256": "882b28d841f5b3d4ccc8d72e7bcd96ec6f730a29f2437445a6ba1839f1971483",
+          "record_id": "HFIC-ART-DISCOVERY-24C2BB8A596DA00426EA3A99E1C901D76C993083"
+        },
+        {
+          "operation_sha256": "b0ca58f38ffa34102b297a930e6511849c0a32087e9b5f7077b1e2893f738c0b",
+          "payload_sha256": "516c57bfbd3c98bba77d085559e5f29623d542615210e2ba8dc2dd1bb47f45a2",
+          "record_id": "HFIC-ART-DISCOVERY-E91C14D26AD117C09103AC8D41DFA0C588A241EB"
+        }
+      ],
+      "fixture_sha256": "adac76b7fd6e2c1194a620dc83d9b4118d7fcaf6c43d537a3bb4ed302e38cda0",
+      "inventory_sha256": "fc43cda1ea71b5ec9aefa6066c11a7f61e398409423fd65d2bd3d5bb5e32bee5",
+      "world": "world-ready-a7"
     },
     {
       "fixture_setup_main_looks": [

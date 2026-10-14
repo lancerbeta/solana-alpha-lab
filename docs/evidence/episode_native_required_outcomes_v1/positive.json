@@ -3,10 +3,10 @@
     "episode_outcome_binding": {
       "admissions_n": 24,
       "anchor_kind": "NOMINATION_T0",
-      "binding_sha256": "6e85c315b191e4b057bee08c0bffb4d33f4851696f5590d1c82bd85885f098cc",
+      "binding_sha256": "3987ab1c7ed95222da618912bdf2464aa70fc4c3906e731b620d965e198dd83e",
       "comparator_n": 10,
       "contract": "EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1",
-      "current_protection_sha256": "062f157b140ce9c5aa89204e71181aaa19eedcc5cb0da1f807f726193e115b69",
+      "current_protection_sha256": "dab071270b999ce9e011a434fd84eaa77773fb0d58aa7d5df5716cb5f4af9bc5",
       "decision_n": 20,
       "definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
       "experiment_spec_sha256": "d6d4cc2ae909c76af8c4317f9f5fbf22d597cbd7e84d512825490f282ca8730f",
@@ -355,7 +355,7 @@
     "selected_definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
     "session_id": "HFIC-SESS-9CC7B751BCADE2B7"
   },
-  "cold_inventory_sha256": "bae00ad098c2c75c3204a393526ae617f5c35a04c0540d28242de8f8efd22b1a",
+  "cold_inventory_sha256": "547abc2f97092caa7f3fe41c57dcfefd785e860ef9e6075c5ca14dce64a2592d",
   "cold_readback_equal": true,
   "direct_guard": {
     "changed_schedule_refused": true,
@@ -366,8 +366,8 @@
   },
   "direct_lineage": {
     "candidate_id": "HFIC-CAND-E8B09968FD73",
-    "critic_input_packet_sha256": "fcd3b9bea78c7f5f05265820f9b10b51a5a9213181244f77843bb98806e96e58",
-    "critic_result_sha256": "e0324fd11d61e41238c72dcf4558a2a12ec3b137cf65150dcf19bfd6e737a7c8",
+    "critic_input_packet_sha256": "b8b3b485052ac2bf764d239b16952a6a0bd3690fd71c48412b7930beab17502a",
+    "critic_result_sha256": "82d5186131aa10f4311ded71ab94a254153f260adb2dc212a4f79190c7373bce",
     "definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
     "execution_kind": "FROZEN_EVIDENCE_REPLAY",
     "existing_look_ref": "HFIC-ART-DISCOVERY-E91C14D26AD117C09103AC8D41DFA0C588A241EB",
@@ -393,7 +393,7 @@
     "exact_prefix_value_reads": 140,
     "metadata_reads": 4,
     "real_boundary": "pyarrow.parquet.read_table",
-    "retained_trace": "local/episode-native-required-outcomes-v1/proof-a6/positive.json",
+    "retained_trace": "local/episode-native-required-outcomes-v1/proof-a7/positive.json",
     "target_value_reads": 0,
     "trace_sha256": "8580982ad8aa0429d99fdcb56b0b390fbc389d224e726f0b8e493bdeaec34d47",
     "unbounded_value_reads": 0
@@ -401,5 +401,5 @@
   "repeat_write_count": 0,
   "schema": "smial.episode-required-outcome-proof",
   "schema_version": "1.0",
-  "tested_head": "92e9ffda437540bc24bd66208f4098341a7b5afb"
+  "tested_head": "9d88a80a10dbd28801203a67c6ffb46c769d8ae1"
 }

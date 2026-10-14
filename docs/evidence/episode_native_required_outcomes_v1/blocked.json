@@ -3,10 +3,10 @@
     "episode_outcome_binding": {
       "admissions_n": 24,
       "anchor_kind": "NOMINATION_T0",
-      "binding_sha256": "cd87be608764e3fdcd3aab1dfc50c861171d988c2b7a9489d050798a326e86bb",
+      "binding_sha256": "c05258b60c54c97be1805412e2086dfe49d0e9255d928c11b715c49d0f5eff7d",
       "comparator_n": 10,
       "contract": "EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1",
-      "current_protection_sha256": "062f157b140ce9c5aa89204e71181aaa19eedcc5cb0da1f807f726193e115b69",
+      "current_protection_sha256": "dab071270b999ce9e011a434fd84eaa77773fb0d58aa7d5df5716cb5f4af9bc5",
       "decision_n": 20,
       "definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
       "experiment_spec_sha256": "b773767290ab7e1dfe3dd9ff9d85029048e0a05d30ce579a7d8a461d2e8a4144",
@@ -357,7 +357,7 @@
     "selected_definition_sha256": "e8b09968fd73d4bc6b0add3dc288b7cb8e065c26c4e1d5c0465e4186d9fb241e",
     "session_id": "HFIC-SESS-94F28A319CE46647"
   },
-  "cold_inventory_sha256": "25d2649b5c54835e02838e6d846385a1492dafa7587cff35db3784c1e3cff9de",
+  "cold_inventory_sha256": "932cbcdd23e5b8d5080268bf5e02f0d93ce7b2b02a3a3f3693cb880e17c0b2aa",
   "cold_readback_equal": true,
   "fidelity": "NATIVE_REPAIR_BOUNDARY_WITH_SCRIPTED_CRITIC",
   "non_claims": [
@@ -375,12 +375,12 @@
     "exact_prefix_value_reads": 140,
     "metadata_reads": 4,
     "real_boundary": "pyarrow.parquet.read_table",
-    "retained_trace": "local/episode-native-required-outcomes-v1/proof-a6/blocked.json",
+    "retained_trace": "local/episode-native-required-outcomes-v1/proof-a7/blocked.json",
     "target_value_reads": 0,
     "trace_sha256": "8580982ad8aa0429d99fdcb56b0b390fbc389d224e726f0b8e493bdeaec34d47",
     "unbounded_value_reads": 0
   },
   "schema": "smial.episode-required-outcome-proof",
   "schema_version": "1.0",
-  "tested_head": "92e9ffda437540bc24bd66208f4098341a7b5afb"
+  "tested_head": "9d88a80a10dbd28801203a67c6ffb46c769d8ae1"
 }

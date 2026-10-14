@@ -1,5 +1,5 @@
 {
-  "elapsed_seconds": 70.162,
+  "elapsed_seconds": 72.705,
   "errors": 0,
   "failures": 0,
   "legacy": [
@@ -19,9 +19,9 @@
   "local_full_gate": "NOT_RUN_PER_HARNESS_POLICY",
   "native_command": "uv run --locked --managed-python --no-sync python -B -m unittest tests.test_episode_native_required_outcome_contract_v1 -v",
   "native_environment": {
-    "ERNOC_FIXTURE": "local/episode-native-required-outcomes-v1/world-ready-a6",
-    "ERNOC_MISSING_FIXTURE": "local/episode-native-required-outcomes-v1/world-missing-a6",
-    "ERNOC_PROOF_OUT": "local/episode-native-required-outcomes-v1/proof-a6",
+    "ERNOC_FIXTURE": "local/episode-native-required-outcomes-v1/world-ready-a7",
+    "ERNOC_MISSING_FIXTURE": "local/episode-native-required-outcomes-v1/world-missing-a7",
+    "ERNOC_PROOF_OUT": "local/episode-native-required-outcomes-v1/proof-a7",
     "ERNOC_VARIANTS": "local/episode-native-required-outcomes-v1"
   },
   "process_budgets": {
@@ -32,7 +32,7 @@
   "schema": "smial.episode-repair-focused-checks",
   "schema_version": "1.0",
   "skipped": 0,
-  "tested_head": "92e9ffda437540bc24bd66208f4098341a7b5afb",
-  "tests_run": 15,
+  "tested_head": "9d88a80a10dbd28801203a67c6ffb46c769d8ae1",
+  "tests_run": 16,
   "verdict": "PASS"
 }

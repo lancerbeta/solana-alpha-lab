@@ -25,7 +25,9 @@ prepare(r / 'world-missing-v2', missing_target=True)
 
 This fresh reproduction performs six setup MAIN looks; it never erases prior
 campaign history. For a new Git candidate, reuse saved immutable ingress with
-`prepare(new_path, reuse_ingress=old_path)`; do not reuse a stale frozen session
+`prepare(new_path, reuse_ingress=old_path)` where old_path contains the registered
+`capture` directory. The source is shared and imported through native owners
+without duplicating capture bytes; do not reuse a stale frozen session
 as current action authority. `target_price` and `missing_target` must describe
 the selected reused ingress. Legacy tests have their own temporary fixtures.
 
@@ -44,9 +46,9 @@ Run the actual entry point in the existing locked environment:
 uv run --locked --managed-python --no-sync python -B -m unittest tests.test_episode_native_required_outcome_contract_v1 -v
 ```
 
-Require all 15 cases with zero skips. Missing variants are explicitly skipped by
+Require all 16 cases with zero skips. Missing variants are explicitly skipped by
 the general CI entry point; a skipped run does not reproduce this campaign's full
-15-case evidence. Saved positive/blocked receipts and raw reader traces remain
+16-case evidence. Saved positive/blocked receipts and raw reader traces remain
 under `ERNOC_PROOF_OUT`; compare logical bindings and native counters, not physical
 host locators or byte-identical SQLite files.
 

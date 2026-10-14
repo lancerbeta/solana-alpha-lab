@@ -45,8 +45,8 @@
     {
       "fidelity": "NATIVE_CLASSIFIER_AND_COMPLETED_RUN_FIXTURE",
       "id": "T8",
-      "test": "test_current_protection_denies_before_values + test_completed_run_replay_fixture_rechecks_current_protection + test_authoritative_persistence_exact_repeat_cold_readback_and_guard",
-      "verified": "ALLOW to DENY/unresolved before values; actual stored RUN passport explicit fixture only, not numerical execution"
+      "test": "test_current_protection_denies_before_values + test_current_protection_missing_empty_unreadable_refuses_before_values + test_completed_run_replay_fixture_rechecks_current_protection + test_authoritative_persistence_exact_repeat_cold_readback_and_guard",
+      "verified": "Independent current completeness required; DENY/incomplete/missing/empty/unreadable refuse before values; removal on persisted action/replay. Stored RUN passport explicit fixture only, not numerical execution"
     },
     {
       "fidelity": "NATIVE_CURRENT_ACTION_VS_HISTORICAL_READ",

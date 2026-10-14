@@ -42103,7 +42103,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/episode_native_required_outcomes_v1.md', repository_path: docs/contracts/episode_native_required_outcomes_v1.md}
-  integrity: {kind: sha256, sha256: dd867817965bbc491a257e7897a048a7745e67212cba3037200fcee6f637674b}
+  integrity: {kind: sha256, sha256: d0eaeb21638d9e93fdd2e2a3c830fa8c499d63f4026311fcedd6b243ba13a906}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]

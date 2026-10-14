@@ -12,7 +12,7 @@
     "mission": "One native source-bound required-outcome handoff through durable HFIC classification; positive and blocked witness",
     "monitoring_and_recovery": "Stored READY/BLOCKED, cold readback, exact repeat and current revalidation before replay; ordinary revert",
     "owner_operability": "Canonical contract, Forge/Critic version choice, operator NEXT; no automatic collection on missing outcome",
-    "red_team": "15 native cases, literal membership and unsafe-reader canaries,84 legacy checks; preview integrity/cache/CENSORED findings closed",
+    "red_team": "16 native cases, literal membership and unsafe-reader canaries,84 legacy checks; independent P1 missing-current completeness finding closed before fresh proof",
     "research_truth": "Decision denominator20 independent of future; native identities/clocks/masks, UNKNOWN fail-closed; readiness is not science",
     "security": "Disposable synthetic stores only; hash/path/protection checks before values; no provider/production/credentials"
   },

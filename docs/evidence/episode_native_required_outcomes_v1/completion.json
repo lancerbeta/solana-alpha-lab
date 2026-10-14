@@ -33,7 +33,7 @@
   "side_effects": {
     "classify_projection_readback_new_looks": 0,
     "deleted_campaign_artifacts": 0,
-    "fixture_setup_main_looks": 18,
+    "fixture_setup_main_looks": 22,
     "numerical_experiments": 0,
     "production_writes": 0,
     "provider_calls": 0,
@@ -59,6 +59,6 @@
       "PASS_CURRENT_PROTECTION_BEFORE_READY_AND_REPLAY",
       "PASS_OWNED_FOOTPRINT_WITHIN_512_MIB"
     ],
-    "targeted": "PASS_15_NATIVE_PLUS_84_SELECTED_LEGACY"
+    "targeted": "PASS_16_NATIVE_PLUS_84_SELECTED_LEGACY"
   }
 }

@@ -22,6 +22,9 @@ Schema: `catalog/schemas/experiment_spec_v1_4.schema.json`. Loader:
 пустой inventory выражается complete-empty assignment document существующего
 owner; missing/empty/unreadable/incomplete current source даёт HOLDOUT_UNRESOLVED.
 Историческая completeness frozen admission не заменяет текущую.
+Completeness приносит protection owner; агент не выставляет complete ради READY.
+Test fixture может заявить empty inventory только для полностью контролируемого
+disposable synthetic consumer.
 
 Весь existing envelope сохраняется. Обязательны exact selected definition,
 frozen `parameters.temporal_recipe` из Critic packet, native census/observations,
