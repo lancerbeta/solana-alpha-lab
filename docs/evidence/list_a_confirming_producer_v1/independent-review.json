@@ -69,6 +69,14 @@
       "resolved_by_head": "bbd12a38e55db23fdbbe59796a21f11cf275dbdf",
       "role": "GOAL_DOD_CRITIC",
       "severity": "MAJOR"
+    },
+    {
+      "finding": "Required ambiguous numeric terminal lacked explicit independent pure-method oracle",
+      "observed_head": "e5919ddf0352e9f70b947d2c504b063d46ea9fec",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "PENDING_FINAL_TEST_COMMIT",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MAJOR"
     }
   ],
   "required_roles": [

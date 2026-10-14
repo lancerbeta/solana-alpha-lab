@@ -10,10 +10,10 @@
     "legacy_classifier": "31 PASS",
     "legacy_episode_1_4": "14 PASS / 2 existing SKIP",
     "legacy_evidence_decision": "12 PASS",
-    "method": "6 PASS native, including independent numeric-unavailable full-count oracle",
+    "method": "8 PASS native; Fraction/draw/clock/count plus negative/zero/ambiguous and empty-replicate/no-reroll oracles",
     "vertical": "3 PASS on final production closure; positive/null/missing/empty/UNKNOWN/conflict"
   },
-  "distinct_targeted_unit_checks": 69,
+  "distinct_targeted_unit_checks": 71,
   "engineering_history": [
     {
       "attempt": "initial host",
@@ -121,6 +121,24 @@
       "head": "bbd12a38e55db23fdbbe59796a21f11cf275dbdf",
       "scope": "Six retained named results, zero source decoder/evaluator/ResearchStore writes; current 22-path qualification",
       "status": "PASS"
+    },
+    {
+      "attempt": "terminal-oracles",
+      "checks": 8,
+      "elapsed_seconds": 3.555,
+      "scope": "Pure TEST arithmetic only; production closure unchanged; no named scientific attempt",
+      "status": "PASS",
+      "test_bytes_sha256": "8fe3a820c65446f4e7a0f2a4c5885b92c2a4015b4f13c86a31d3fee9e75a8e89"
+    },
+    {
+      "attempt": "isolated-code-review-runtime",
+      "files": 16,
+      "logical_bytes": 509868,
+      "new_environments_created": 1,
+      "process_users_before_archive": 0,
+      "reason": "uv --no-sync without shared environment binding created empty ignored .venv; yaml import failed; no packages installed or product/science run",
+      "remediation": "Exact owned non-reparse environment reversibly moved to local scratch archive; no deletion; existing shared runtime used thereafter; footprint-review-final includes archive",
+      "status": "ENGINEERING_ERROR_RETAINED"
     }
   ],
   "exact_head_ci": "ENFORCED_LIVE_BEFORE_MERGE_READINESS",

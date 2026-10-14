@@ -58,8 +58,10 @@ UNKNOWN, поскольку actual counter тогда не сохранялся.
 и admission identity, frozen/current protection до target availability tail,
 exact grant до values, alias/overlap budget, foreign/conflicting/late observations,
 revoke после values, strict result/hash/carrier identity и stale owner decision.
-Финальный native regression: method 6, admission 17, vertical 3 — **26 PASS**;
-с legacy classifier/decision проверены 69 targeted checks. Episode 1.4: 14 PASS / 2 штатных
+Финальный native regression: **26 PASS** (method 6, admission 17, vertical 3),
+затем **8 method PASS** с negative/zero/ambiguous и empty-replicate oracles на тех же
+production bytes. С legacy classifier/decision проверены 71 distinct targeted checks.
+Episode 1.4: 14 PASS / 2 штатных
 SKIP. Две SKIP требуют отдельных предыдущих campaign fixtures; их повтор здесь
 не заявлен. Подробности и engineering failures — в validation evidence.
 
@@ -74,12 +76,18 @@ failures остаются INVALID_AFTER_RESERVE; frozen thresholds и estimand �
 Недоступная история даёт UNKNOWN; повреждённый result сохраняет видимую reservation
 и consumed charge при evidence CONFLICT. Новый allowance эти действия не создают.
 
-Ресурсы: delivery snapshot 15 октября regular-file allocation **188.873 MiB owned**,
-conservative cap charge **223.518 MiB**, включая полный резерв общего Git object store. Это ниже
+Ресурсы: review-final snapshot 15 октября regular-file allocation **189.460 MiB owned**,
+conservative cap charge **224.485 MiB**, включая полный резерв общего Git object store. Это ниже
 target 256 MiB и hard cap 1 GiB. Оставлены named stores, receipts, copied regression
-checkout/Git snapshot и 25 stopped containers; новых image/.venv нет. Snapshots
+checkout/Git snapshot и 27 stopped containers; новых images/dependencies нет.
+Production/tests используют existing shared runtime. При code review ошибочный
+`uv --no-sync` создал пустую ignored .venv: 16 файлов, 509868 logical bytes,
+packages installed=0, product/science uses=0. После проверки отсутствия процессов
+и reparse points она обратимо перемещена в owned scratch archive и учтена в footprint;
+удаление не выполнялось. Active worktree .venv отсутствует. Snapshots
 14 октября 187.861/219.401 MiB и ранний 15 октября 188.666/222.461 MiB сохранены
-отдельно; последующие delivery metadata commits не включены в этот замер. Полный shared
+и delivery snapshot 188.873/223.518 MiB сохранены отдельно; последующие delivery
+metadata commits не включены в этот замер. Полный shared
 runtime/cache, daemon metadata/log allocation и физический Docker VHD growth
 измерением этого scope не установлены. Cleanup не выполнялся.
 
@@ -99,5 +107,5 @@ Evidence: [acceptance](../../evidence/list_a_confirming_producer_v1/acceptance.j
 [process readback](../../evidence/list_a_confirming_producer_v1/process-readback.json),
 [history](../../evidence/list_a_confirming_producer_v1/scientific-history.json),
 [qualification](../../evidence/list_a_confirming_producer_v1/qualification.json),
-[footprint](../../evidence/list_a_confirming_producer_v1/footprint-delivery.json),
+[footprint](../../evidence/list_a_confirming_producer_v1/footprint-review-final.json),
 [REPRODUCE](REPRODUCE.md).

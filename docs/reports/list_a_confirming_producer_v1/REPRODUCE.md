@@ -87,6 +87,8 @@ python -B -m unittest tests.test_episode_native_required_outcome_contract_v1 -v
 Это disposable TEST stores с разрешённым обычным temporary cleanup, отдельно от
 named scientific history. Финальная production closure прошла 26 native checks
 в `list-a-confirmation-frozen-boundary-final`: 6 method, 17 admission, 3 vertical.
+Дополнительно 8 method checks прошли в `list-a-confirmation-terminal-oracles`;
+negative/zero/concentrated effect и пустые crossed replicates имеют literal oracle.
 Nonfinite/unrepresentable return — completed INSUFFICIENT с charge 1, полными
 observed counts и null means/contrast, без bootstrap draws. Предыдущая engineering
 проверка INVALID сохранена как superseded; identity/PIT/protection failures — INVALID.
@@ -131,9 +133,12 @@ image; build/pull/install не входит в authority. Core frozen source pin
 при новой разрешённой кампании. Early P0 точный reader count восстановить нельзя.
 Allocation измерена по regular files/owned volumes/SizeRw; physical Docker VHDX,
 daemon metadata/logs и total shared cache остаются отдельно UNKNOWN.
-Delivery snapshot 15 октября: 188.873 MiB owned / 223.518 MiB conservative charged,
-25 stopped containers. Предыдущие snapshots сохранены. См.
-`docs/evidence/list_a_confirming_producer_v1/footprint-delivery.json`.
+Review-final snapshot 15 октября: 189.460 MiB owned / 224.485 MiB conservative charged,
+27 stopped containers. Предыдущие snapshots сохранены. См.
+`docs/evidence/list_a_confirming_producer_v1/footprint-review-final.json`.
+Один ошибочный review запуск создал пустую .venv без установки пакетов; она
+перемещена в owned scratch archive после no-process/non-reparse проверки, не
+использовалась для product/science и не удалена. Archived files учтены в allocation.
 
 Rollback: обычный code/schema/registry revert сохраняет stores, reservations,
 attempts/results и charges. Pending несовместимый trial не считается untouched;

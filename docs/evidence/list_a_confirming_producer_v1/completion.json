@@ -12,6 +12,9 @@
     "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
     "verdict": "PASS"
   },
+  "implementation_bindings": {
+    "docs/tasks/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
   "non_claims": [
     "NO_REAL_SCIENTIFIC_ACCEPTANCE",
     "NO_ALPHA_OR_CAUSAL_CLAIM",
@@ -32,9 +35,13 @@
   "side_effects": {
     "acceptance_evaluator_invocations": 8,
     "acceptance_scientific_charges": 6,
+    "active_worktree_venv": 0,
     "named_scientific_charges": 7,
     "named_stores_deleted": 0,
-    "new_dependencies_images_venv": 0,
+    "new_dependencies": 0,
+    "new_dependencies_images_venv": 1,
+    "new_images": 0,
+    "new_virtual_environments_created": 1,
     "p0_evaluator_lower_bound": 1,
     "production_writes": 0,
     "provider_calls": 0,
@@ -62,8 +69,5 @@
       "PASS_MEASURED_FORWARD_RESOURCE_ENVELOPE"
     ],
     "targeted": "PASS_BOUNDED_NATIVE_METHOD_ADMISSION_VERTICAL_LEGACY_WITH_2_EXPLICIT_SKIPS"
-  },
-  "implementation_bindings": {
-    "docs/tasks/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
   }
 }

@@ -84,6 +84,11 @@
       "evidence": "Registered positive-price native nonfinite/unrepresentable returns -> typed INSUFFICIENT, charge1, full observed counts, null numeric result, zero bootstrap draws; repeat and cold saved result no new look",
       "requirement": "native numeric refusal",
       "status": "PASS"
+    },
+    {
+      "evidence": "Literal -1/8 and zero, concentrated point1/256 with LOOmin0/max1/248 and seeded intervals lower0 -> INCONCLUSIVE; actual pooled all-first-label draws -> 4096 invalid per partition, no reroll",
+      "requirement": "negative/zero/ambiguous and empty-bootstrap boundary predicates",
+      "status": "PASS"
     }
   ],
   "schema": "smial.list-a-confirmation-coverage",

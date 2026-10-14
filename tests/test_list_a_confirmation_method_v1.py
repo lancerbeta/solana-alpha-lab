@@ -23,6 +23,56 @@ class FixedDraw:
 
 
 class MethodTests(unittest.TestCase):
+    def test_negative_zero_and_concentrated_boundary_oracles(self):
+        # Literal rational worlds: a constant negative, exactly zero, and one
+        # positive mint whose removal gives zero. No fitted threshold/seed.
+        rows = [{"episode_id": f"{g}{i:02d}", "group": g, "mint": f"m{i:02d}",
+                 "r": -0.125 if g == "A" else 0.0,
+                 "blocks": {str(h): i for h in (86400, 172800)}}
+                for g in ("A", "C") for i in range(32)]
+        negative = calculate_list_a(rows, {"A": 32, "C": 32})
+        self.assertEqual(negative["terminal"], "ASSOCIATION_NOT_SUPPORTED_AT_FROZEN_BOUNDARY")
+        self.assertEqual(negative["contrast"], float(Fraction(-1, 8)))
+        for part in negative["partitions"].values():
+            self.assertEqual(part["interval"], [-0.125, -0.125])
+        for row in rows:
+            row["r"] = 0.0
+        zero = calculate_list_a(rows, {"A": 32, "C": 32})
+        self.assertEqual(zero["terminal"], "ASSOCIATION_NOT_SUPPORTED_AT_FROZEN_BOUNDARY")
+        self.assertEqual((zero["leave_one"]["min"], zero["leave_one"]["max"]), (0.0, 0.0))
+        rows[0]["r"] = 0.125
+        concentrated = calculate_list_a(rows, {"A": 32, "C": 32})
+        self.assertEqual(concentrated["contrast"], float(Fraction(1, 256)))
+        self.assertEqual(concentrated["terminal"], "INCONCLUSIVE_DEPENDENCE_OR_CONCENTRATION")
+        self.assertEqual(concentrated["leave_one"]["min"], 0.0)
+        self.assertEqual(concentrated["leave_one"]["max"], float(Fraction(1, 248)))
+        for part in concentrated["partitions"].values():
+            self.assertEqual(part["valid_replicates"], 4096)
+            self.assertEqual(part["interval"][0], 0.0)
+            self.assertGreater(part["interval"][1], 0.0)
+
+    def test_empty_crossed_replicates_are_counted_without_reroll(self):
+        rows = [{"episode_id": f"{g}{i:02d}", "group": g, "mint": f"{g}m{i:02d}",
+                 "r": 0.125 if g == "A" else 0.0,
+                 "blocks": {str(h): i for h in (86400, 172800)}}
+                for g in ("A", "C") for i in range(32)]
+        class FirstLabel:
+            calls = 0
+            def randrange(self, width):
+                self.calls += 1
+                return 0
+        rng = FirstLabel()
+        # Valid crossed draw: all pooled mint draws pick Am00 and all time
+        # draws pick block0. C has zero weight; actual draw/estimate are used.
+        with patch("solana_alpha_lab.factory.list_a_confirmation_method.random.Random", return_value=rng):
+            result = calculate_list_a(rows, {"A": 32, "C": 32})
+        self.assertEqual(result["terminal"], "INSUFFICIENT")
+        self.assertIn("EMPTY_OR_NONFINITE_REPLICATE", result["reason_codes"])
+        self.assertEqual(rng.calls, 2 * 4096 * (64 + 32))
+        for part in result["partitions"].values():
+            self.assertEqual((part["valid_replicates"], part["invalid_replicates"]), (0, 4096))
+            self.assertIsNone(part["interval"])
+
     def test_native_numeric_unavailable_preserves_observed_counts_without_zero_fill(self):
         rows = [{"episode_id": f"{g}{i:02d}", "group": g, "mint": f"{g}m{i}", "r": 0.125 if g == "A" else 0.0,
                  "blocks": {str(h): i for h in (86400, 172800)}} for g in ("A", "C") for i in range(32)]
