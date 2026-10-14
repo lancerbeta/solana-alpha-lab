@@ -9,10 +9,42 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/episode_native_required_outcomes_v1/factory-fit.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "ff83096b37691f87be8747ef0d98c3e76571562e17ae6ffa415e1932ca5489e9",
     "verdict": "PASS"
   },
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "a3474ff5ac1fbd9898c22e59c89d412b5d8eda4c512f6c0f4065881a579e6c9a",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "286d16f55dec15eb3b79f0585ae691ef198f473fd259e1419984b74663428a35",
+    "catalog/assets/core.yaml": "03631fd76ebc0a6047abba7b478277b2458e817d209a7b520d3da895ee75b816",
+    "catalog/assets/lifecycle.yaml": "5d71481a7a552ac6b6bf31df5ccf5a4b65f8bafb38e26e069bae18eca71fb65c",
+    "catalog/catalog_manifest.yaml": "cfd8f6aeabfb8202a8719519d204416b2d6a382d779360a18ff343d105f6e12b",
+    "catalog/generated/asset_edges.json": "e7b1d87bfedc5c9e827a8b3d959f9ffdbf3b601005fb1d8aad119edfdfc6ed9d",
+    "catalog/schemas/experiment_spec_v1_4.schema.json": "47f791c5f80de4606c5d68d26550bd4a669db4249cedfeba3c4fb1b184d07c28",
+    "docs/PROJECT_MAP.md": "1cf77b94bf6213d0c3d8dc2d5362542f1e248cc07f6583f58f03626352bd2402",
+    "docs/contracts/episode_native_required_outcomes_v1.md": "d0eaeb21638d9e93fdd2e2a3c830fa8c499d63f4026311fcedd6b243ba13a906",
+    "docs/design/EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1_PRD_SSD.md": "816b7990c5f5276649379dd56249d21015dbdd296bbc38f0c2f6001752417e59",
+    "docs/evidence/episode_native_required_outcomes_v1/baseline.json": "ec3f70620c2bf32d63b4beddbdb25b9823be0a072906425f6d572e2cecdd40b3",
+    "docs/evidence/episode_native_required_outcomes_v1/blocked.json": "076bf1693121a36e1906ac8bf8e51b507831c975ad373809dab1449b40c45a27",
+    "docs/evidence/episode_native_required_outcomes_v1/campaign.json": "30340312d9f8b0dd8cefc321ff9b25ac000291a2e58689efef2e249feaae26b3",
+    "docs/evidence/episode_native_required_outcomes_v1/coverage.json": "ac9c726d5728ec26fb97f581831f920e048b2ac5cb59b5e1f100a675e9978a5f",
+    "docs/evidence/episode_native_required_outcomes_v1/focused-checks.json": "f52e92a53b370ccb9d47ba480eeeacefafb544783a1e4c8314c29a7bd7f32058",
+    "docs/evidence/episode_native_required_outcomes_v1/footprint.json": "74a222b14a522b4f9bcc9a9d3cd1655d7ca82ee648a365d8c01304a973a0ee04",
+    "docs/evidence/episode_native_required_outcomes_v1/positive.json": "1806b504f101b9e290c80e2a6e3ec7c9fd6f39e1b2ed62111cc56101c50f3d4a",
+    "docs/evidence/episode_native_required_outcomes_v1/science-guard.json": "c3b9fb5d36bdea790a422392a23652c53e63a6984c6afbf842e00435d0697a5a",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "bd479ac7341e46f028d073707d4d88432ba5424172a13e588aed1efee6e144ff",
+    "docs/reports/episode_native_required_outcomes_v1/OWNER_REPORT.md": "234de927387c7e13cfb793e4c0845144ebd5bb4159cf1422eaeba1362260cde0",
+    "docs/reports/episode_native_required_outcomes_v1/REPRODUCE.md": "331a7f29cabf977926d2f6efe401a114a6ec8755eaf44a3442defe7ddf7c42f4",
+    "docs/tasks/EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1.md": "a798e4910c7a1700f20ace9e6bbb03f51f193567aaa9cca6788ad305d771f2d5",
+    "src/solana_alpha_lab/factory/data_resolver.py": "f29d1abbdda524cfb900c250ccd2971510b5f099d1d4099c38f213746afcfa1c",
+    "src/solana_alpha_lab/factory/document_runner.py": "03d159d71b179776970068ff4e3bd6a04b4f5b95feafa16501e30372950211f2",
+    "src/solana_alpha_lab/factory/episode_required_outcomes.py": "1db37becb39b458afe6e730aceb38894642b9f356574808a36ff41d37b47c082",
+    "src/solana_alpha_lab/factory/experiment_spec.py": "2666e9f45cdcbf32b0bc2cb3333407c9ca6bdc05700e5719f8cc75bd907f9a98",
+    "src/solana_alpha_lab/factory/hfic_session.py": "e42bd8ef3da249461d21661bbada5d35d1dea17a139854441300d4c8c707a6c4",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "fe12a389083b0cea995e22014aa470fd5fc866e07efe6a0c66f387d6b8450a91",
+    "src/solana_alpha_lab/factory/lane_classifier.py": "8653cd6fc9972d3f2c716209ca9936e6f94f302f63857d6ae1d3d1135d271903",
+    "tests/fixtures/episode_native_required_outcomes_v1/proof.py": "1cdbdad8ba66584444770ac03558a9246242eff37a30f6c513994915b6a52763",
+    "tests/test_episode_native_required_outcome_contract_v1.py": "58c7cbf7fbaf880b4c4172511879288dfcf0af8a3ae9a093902d6a8556fafa0d"
+  },
   "non_claims": [
     "NO_SCIENTIFIC_ACCEPTANCE",
     "NO_QUALIFYING_DIRECT_EVIDENCE",
@@ -49,7 +81,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/episode_native_required_outcomes_v1/independent-review.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "01c2a2f82e6b9712f0db78049bf5865d5b6336ef2050bc27a70e96b267f7f0c2",
       "verdict": "PASS"
     },
     "project_checks": [
