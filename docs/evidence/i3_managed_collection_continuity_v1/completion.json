@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "I3_MANAGED_COLLECTION_CONTINUITY_V1-SOFTWARE-CANDIDATE",
+  "as_of": "2026-10-14",
+  "task_id": "I3_MANAGED_COLLECTION_CONTINUITY_V1",
+  "state_change": "One owner-approved profile revision (standing grant) lets the ordinary tick derive child authority, activate one frozen one-UTC-day child per day inside the approved template, resume crash-safely, hold instead of drain on a short resource shortfall, decide new-intake resources without forging a storage PASS, and report incidents through the existing watch; default-off, prepared as a separate OPERATE packet.",
+  "base_main": "07c81a99f2d0f385df66de2e1a5254e224c6b3b3",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Git is the working context and evidence owner; no cloud export requested."
+  },
+  "capability_radar_now": "NONE: existing store, lifecycle owners, tick, watch, locked Python and SQLite suffice; no new package, connector, service, timer or automation.",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "",
+    "sha256": "",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_28_MANAGED_TESTS_47_MODULE_735_TEST_DIRECT_CONSUMER_REGRESSION_AND_5_MUTATION_CONTROLS",
+    "independent_review": {
+      "path": "",
+      "sha256": "",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_CONTEXT",
+      "PASS_CATALOG_PROPAGATION",
+      "PASS_ORIGINAL_FALSIFIER_AND_TARGETED_MUTATION",
+      "PASS_NO_RUNTIME_COLLECTOR_MUTATION"
+    ]
+  },
+  "non_claims": [
+    "NO_PRODUCTION_DEPLOY_PROFILE_APPLY_OR_LIVE_GRANT",
+    "NO_CHANGE_TO_A_ARMED_B_TIMER_C1_C2_OR_FROZEN_IDENTITIES",
+    "NO_ADMISSION_RATE_ABOVE_V1_CEILING_100_PER_DAY",
+    "NO_MONTHS_RUNWAY_CLAIM_I2_PACKAGING_NOT_APPLIED",
+    "NO_LIVE_TELEGRAM_DELIVERY_OR_HOST_LOSS_DETECTION_CLAIM",
+    "NO_NEW_SCIENTIFIC_ESTIMAND_ALPHA_OR_CASHFLOW",
+    "NO_CANONICAL_DONE_OR_OWNER_SEMANTIC_ACCEPTANCE"
+  ],
+  "side_effects": {
+    "repository": "bounded I3 managed-continuity branch files and Catalog hashes",
+    "local": "disposable SQLite roots only",
+    "external": "none: no provider call, deploy, production read/write or Drive write"
+  }
+}

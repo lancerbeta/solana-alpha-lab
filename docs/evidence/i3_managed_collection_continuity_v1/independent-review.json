@@ -1,0 +1,56 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "I3_MANAGED_COLLECTION_CONTINUITY_V1-FINAL",
+  "as_of": "2026-10-14",
+  "task_id": "I3_MANAGED_COLLECTION_CONTINUITY_V1",
+  "reviewed_bindings_sha256": "a22296d43976f77d2b668a069720a858e1524bee0d55344fb0ddfb663898667a",
+  "reviewed_inventory_sha256": "24c6b5f6b2626355ce948cd0017d19aab8cab2659568b5eef22238833074c16d",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only review of da297ff4, delta re-review on a3f7da9c321828e5f015ef594994fa3846d829f7: first review found one P1 (rollback widened validity/resources/routes without a phrase) and P2s (unmanaged multi-candidate semantics, controller failure invisible in exit code, hold incident first lineage only, masked successor gap, lease on storage walk). P1 and exit-code/hold/isolation fixed and re-verified (28 tests pass); no new defect. Residual P2 declared: unmanaged multi-candidate refusals are collected instead of returned first; lease is not renewed during the data-root size walk (surfaces as RECONCILE_FAILED, exit 2); one managed lineage per store."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "First review NOT_READY (narrow): PRD 12.2 rows not proven nor declared. Closed on a3f7da9c321828e5f015ef594994fa3846d829f7 by tests (clock backwards, rollback authority, exit code) and by naming the unproven items in the task contract (5+ UTC and weekly boundary, 180d/100w scale, seal/import/preflight, old-binary rejection, Telegram outage). Outcome stays CODE_READY_RUNTIME_PENDING; no overclaim found."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SEMANTIC_PREMISE=PASS; packet_fingerprint_sha256=bd9037e8530dd90a2503d01a00ffdf34a075403b6775b2ac749bcefb7efa389a (delta re-review on a3f7da9c; first packet d3d4cfe655de32e09d4ddcc0a610044f51495db8c520650ab05f15bbd359076b). PACKET_INFORMATION_PATH only; launch isolation is PROCESS_OBLIGATION; fingerprint was read from the packet (the reviewer environment lacked jsonschema) and recomputed by the coordinator with validate-launch. Named residuals: approval is integrity not provenance; HOLD round and mid-day window leave no per-round event so nomination gaps are UNKNOWN and statistics must key on the child window; controller-dead masking relies on generic alerts; backup receipt unauthenticated."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "First review NOT_READY (two P1 documentation items): packet did not show values bound only by the profile hash nor the stop/rollback commands. Fixed and re-reviewed on a3f7da9c321828e5f015ef594994fa3846d829f7 with per-code incident next steps, CLI refusal reason/next_action and backup attestation warning. Residual P2: managed incident codes do not page as owner-attention."
+      ]
+    }
+  ],
+  "remediation_history": [
+    "da297ff4 -> a3f7da9c: rollback _not_wider; tick exit code reflects failed controller step; isolation only for managed; per-lineage hold incident; packet/readout/contract residuals and commands; three tests added (28 total)."
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_REVIEW_MODEL_DIVERSITY_PROOF",
+    "NO_PRODUCTION_DEPLOY_OR_COMMISSIONING",
+    "NO_NEW_PIT_SCIENTIFIC_ALPHA_OR_CASHFLOW_VERDICT",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_REVIEW"
+  ]
+}
