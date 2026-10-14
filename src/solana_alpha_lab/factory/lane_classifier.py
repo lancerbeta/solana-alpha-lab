@@ -313,6 +313,12 @@ def _blocked_data(reason_code: str) -> LaneDecision:
     next_action = "RESOLVE_IMMUTABLE_DATA_BINDINGS"
     if reason_code == "OUTCOME_MISSINGNESS_UNRESOLVED":
         next_action = "REPORT_OUTCOME_COVERAGE_KEEP_BASE_X"
+    elif reason_code == "EPISODE_OUTCOME_COVERAGE_UNRESOLVED":
+        next_action = "REPORT_OUTCOME_COVERAGE_KEEP_DECISION_DENOMINATOR"
+    elif reason_code in {"HOLDOUT_PROTECTED", "HOLDOUT_UNRESOLVED"}:
+        next_action = "REVIEW_PROTECTION_KEEP_FROZEN_SCOPE"
+    elif reason_code in {"SCOPE_COVERAGE_UNRESOLVED", "SCOPE_EVIDENCE_INVALID"}:
+        next_action = "REPORT_REFERENCED_SCOPE_COVERAGE"
     elif reason_code == "SELECTION_RECEIPT_INTEGRITY_INVALID":
         next_action = "REBIND_SELECTION_RECEIPT_IDENTITY"
     return _decision(
@@ -565,7 +571,7 @@ def classify_lane(
                 "EPISODE_QUERY_UNSUPPORTED", "EPISODE_TARGET_UNSUPPORTED", "EPISODE_POINT_UNKNOWN",
             }:
                 return _decision(Lane.DENY, "DENY_INVALID_SPEC", reason_codes=(code,), next_action="CORRECT_EXPERIMENT_SPEC")
-            if code in {"SCOPE_COVERAGE_UNRESOLVED", "SCOPE_EVIDENCE_INVALID", "HOLDOUT_PROTECTED", "HOLDOUT_UNRESOLVED", "CUTOFF_REJECTED"}:
+            if code in {"SCOPE_COVERAGE_UNRESOLVED", "SCOPE_EVIDENCE_INVALID", "HOLDOUT_PROTECTED", "HOLDOUT_UNRESOLVED", "CUTOFF_REJECTED", "EPISODE_SOURCE_UNAVAILABLE"}:
                 return _blocked_data(code)
             return _deny_integrity(code)
         if episode_binding["readiness"] != "COMPLETE":

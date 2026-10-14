@@ -370,7 +370,6 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
             path.write_bytes(original)
 
     def test_completed_run_replay_fixture_rechecks_current_protection(self):
-        from dataclasses import replace
         from tests.test_fast_lane_classifier import completed_run_event
         decision = self.classify()
         self.assertEqual(decision.terminal, "FAST_LANE_READY")
@@ -379,7 +378,7 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         payload["non_claims"] = ["EXPLICIT_RUN_PASSPORT_FIXTURE_NO_EXPERIMENT_EXECUTION"]
         text = json.dumps(payload, sort_keys=True, separators=(",", ":"))
         import hashlib
-        self.store.append([replace(event, payload_json=text, payload_sha256=hashlib.sha256(text.encode()).hexdigest())])
+        self.store.append([event.model_copy(update={"payload_json": text, "payload_sha256": hashlib.sha256(text.encode()).hexdigest()})])
         self.assertEqual(self.classify().terminal, "REPLAY_AVAILABLE")
         import pyarrow.parquet as pq
         item = self.spec["parameters"]["temporal_recipe"]["frozen_input"][0]

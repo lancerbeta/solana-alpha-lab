@@ -4906,6 +4906,8 @@ def bind_frozen_fixed_time_inputs(
             hashes_match = (sha256_file_streaming(census_path) == item.get("census_sha256")
                             and sha256_file_streaming(obs_path) == item.get("observations_sha256"))
         except OSError as exc:
+            if spec.get("schema_version") == "1.4" and isinstance(exc, FileNotFoundError):
+                raise GroundedDiscoveryError("EPISODE_SOURCE_UNAVAILABLE") from exc
             raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH") from exc
         if not hashes_match:
             raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH")

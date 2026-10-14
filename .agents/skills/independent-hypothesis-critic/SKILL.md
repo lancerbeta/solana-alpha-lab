@@ -154,7 +154,14 @@ Hard boundaries — same as Forge:
    classifier authorizes `COMPLETE` only from a live release projection;
    attached or self-hashed stamps fail closed.
    `COMPLETE` = every required `(point_id, field_id)` is `OBSERVED` for every
-   member of `base_x`. Censored / typed-missing / absent required outcomes are
+   member of native D (1.4) or `base_x` (raw 1.3).
+   Native 1.4 missing/late/censored/absent keeps D and returns
+   `EPISODE_OUTCOME_COVERAGE_UNRESOLVED`; NEXT is
+   `REPORT_OUTCOME_COVERAGE_KEEP_DECISION_DENOMINATOR`.
+   Protection refusal keeps the frozen scope; NEXT
+   `REVIEW_PROTECTION_KEEP_FROZEN_SCOPE`. UNKNOWN/INVALID referenced scope
+   returns `REPORT_REFERENCED_SCOPE_COVERAGE` before values; never shrink N.
+   For raw 1.3, censored / typed-missing / absent required outcomes are
    `MISSINGNESS_UNRESOLVED` coverage against `base_x.n`, not a complete-case
    shrink. `MISSINGNESS_UNRESOLVED` fail-closes into the existing
    data/science-option route (`PASS_DATA_OPTION_REQUIRED`, classifier NEXT
