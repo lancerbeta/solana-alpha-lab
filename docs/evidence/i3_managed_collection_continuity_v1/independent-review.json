@@ -43,7 +43,30 @@
     }
   ],
   "remediation_history": [
-    "da297ff4 -> a3f7da9c: rollback _not_wider; tick exit code reflects failed controller step; isolation only for managed; per-lineage hold incident; packet/readout/contract residuals and commands; three tests added (28 total)."
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1: rollback widened validity, routes and resource policy without an owner phrase; closed by _not_wider covering limits, end date, routes, hard/target bytes, backup age, acceptance and family, used by rollback_profile and _approval_valid, with a test.",
+      "observed_head": "da297ff496fd3729f6110e23c2252a544dffa5a5",
+      "resolved_by_head": "a3f7da9c321828e5f015ef594994fa3846d829f7"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "PRD 12.2 rows (clock backwards, exit visibility, multi-boundary, scale, seal/import, old binary, Telegram outage) neither proven nor declared; closed with tests for clock and exit code and named limits for the rest.",
+      "observed_head": "da297ff496fd3729f6110e23c2252a544dffa5a5",
+      "resolved_by_head": "a3f7da9c321828e5f015ef594994fa3846d829f7"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1: OPERATE packet hid values bound only by the profile hash and lacked stop/rollback commands; closed in the packet with per-code incident next steps and refusal hints.",
+      "observed_head": "da297ff496fd3729f6110e23c2252a544dffa5a5",
+      "resolved_by_head": "a3f7da9c321828e5f015ef594994fa3846d829f7"
+    }
   ],
   "verdict": "PASS",
   "non_claims": [
