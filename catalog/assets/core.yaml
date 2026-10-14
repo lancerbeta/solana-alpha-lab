@@ -42069,7 +42069,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/episode_required_outcomes.py', repository_path: src/solana_alpha_lab/factory/episode_required_outcomes.py}
-  integrity: {kind: sha256, sha256: e719a1d737507916af03d602d648becaf795368edc82328fe54760161e4b7fe5}
+  integrity: {kind: sha256, sha256: 1db37becb39b458afe6e730aceb38894642b9f356574808a36ff41d37b47c082}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]
@@ -42086,7 +42086,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_episode_native_required_outcome_contract_v1.py', repository_path: tests/test_episode_native_required_outcome_contract_v1.py}
-  integrity: {kind: sha256, sha256: 35cbdca5f0431b8f0c8513bff167fbad524d476dfd3285d487be62c2484820d1}
+  integrity: {kind: sha256, sha256: 58c7cbf7fbaf880b4c4172511879288dfcf0af8a3ae9a093902d6a8556fafa0d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]
@@ -42103,7 +42103,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/episode_native_required_outcomes_v1.md', repository_path: docs/contracts/episode_native_required_outcomes_v1.md}
-  integrity: {kind: sha256, sha256: 632bf1e6b47d7e13b38080161194cb6729e0757eeef557b5360fcc190b74739e}
+  integrity: {kind: sha256, sha256: dd867817965bbc491a257e7897a048a7745e67212cba3037200fcee6f637674b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]

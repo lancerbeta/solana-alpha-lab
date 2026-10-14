@@ -18,6 +18,10 @@ Schema: `catalog/schemas/experiment_spec_v1_4.schema.json`. Loader:
 Штатная поверхность: existing `apply-classification` после сохранённого Critic
 `PASS_TO_CLASSIFICATION`; cold `load_session_bundle` возвращает старый receipt.
 Повтор действия классификации заново проверяет источники и current protection.
+Текущий inventory должен отдельно иметь native completeness proof. Законный
+пустой inventory выражается complete-empty assignment document существующего
+owner; missing/empty/unreadable/incomplete current source даёт HOLDOUT_UNRESOLVED.
+Историческая completeness frozen admission не заменяет текущую.
 
 Весь existing envelope сохраняется. Обязательны exact selected definition,
 frozen `parameters.temporal_recipe` из Critic packet, native census/observations,

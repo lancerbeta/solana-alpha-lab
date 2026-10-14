@@ -10,7 +10,7 @@ from unittest.mock import patch
 from tests import test_hfic_list_aware_vertical_v1 as lav
 from tests.test_forge_research_flow_reliability_v1 import EpisodeFlowTests
 from tests.test_hfic_temporal_production_runner_v1 import _bind_experiment
-from tests.test_opportunity_episodes_harness_v1 import token_object
+from tests.test_opportunity_episodes_harness_v1 import token_object, write_assignment
 from tests.test_opportunity_episodes_vertical_v1 import AS_OF
 from solana_alpha_lab.factory.research_store import ResearchStore
 from solana_alpha_lab.factory.hfic_research_universe_policy import preview_universe_policy, apply_universe_policy
@@ -39,6 +39,9 @@ def prepare(work: Path, *, target_price: float = 1.10, missing_target: bool = Fa
         saved.setdefault("ingress_reused", False)
         if reuse_ingress is None:
             descriptor["ingress_reused"] = saved["ingress_reused"]
+            for key in ("ingress_reuse_mode", "ingress_source_world"):
+                if key in saved:
+                    descriptor[key] = saved[key]
         assert saved == descriptor
         return
     dump(work / "oracle-plan.json", descriptor)
@@ -62,11 +65,16 @@ def prepare(work: Path, *, target_price: float = 1.10, missing_target: bool = Fa
         return token_object(mint, price=price, liquidity=12000, holders=holders)
 
     if reuse_ingress is not None:
-        # Existing registered ingress, native copy/import; old worlds and looks
-        # remain intact. Fresh scientific setup/freeze is counted in this store.
-        import os
-        with patch.dict(os.environ, {"LAV_CACHE_DIR": str(reuse_ingress.resolve())}):
-            source, packets = lav.capture(work)
+        # Reuse the exact already registered source; native unpack/verify/import
+        # owns the new mirror/consumer. Do not duplicate immutable capture bytes.
+        previous = json.loads((reuse_ingress / "fixture.json").read_text())
+        assert previous["target_price"] == target_price and previous["missing_target"] == missing_target
+        capture = reuse_ingress.resolve() / "capture"
+        assert capture.is_dir()
+        source = capture / "rdp"
+        packets = sorted(str(path) for path in capture.glob("packet-*.json"))
+        descriptor["ingress_reuse_mode"] = "SHARED_REGISTERED_SOURCE_NATIVE_IMPORT"
+        descriptor["ingress_source_world"] = reuse_ingress.name
     else:
         with patch.object(lav, "COHORT_A", tables["A"]), patch.object(lav, "COHORT_B", tables["B"]), patch.object(lav, "market_row", market_row):
             source, packets = lav._capture_fresh(work)
@@ -76,6 +84,9 @@ def prepare(work: Path, *, target_price: float = 1.10, missing_target: bool = Fa
     store.prepare_write_lookup()
     imported = lav._consume(packets, source=source, mirror=work / "mirror", plane=plane)
     assert imported["_exit_code"] == 0, imported
+    # Controlled synthetic consumer's explicit current completeness proof.
+    # Frozen admission metadata alone is not current protection authority.
+    write_assignment(plane, [])
     proposal = preview_universe_policy(store, min_holders=50, min_liquidity_usd=5000)["proposal"]
     apply_universe_policy(store, repo_root=ROOT, proposal=proposal, confirm_append_only=True)
     # Independent membership oracle: input label truth, native source identity;

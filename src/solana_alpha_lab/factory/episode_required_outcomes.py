@@ -83,8 +83,15 @@ def _verify_frozen_episode_sources(data_root: Path, frozen: Sequence[Mapping[str
 
     admit_discovery_binding(frozen)
     assignment_dir = _contained(data_root, ASSIGNMENT_DIR)
-    current = [_json(data_root, str(path.relative_to(data_root)).replace("\\", "/"))
-               for path in sorted(assignment_dir.glob("*.json"))] if assignment_dir.is_dir() else []
+    _require(assignment_dir.is_dir(), "HOLDOUT_UNRESOLVED")
+    try:
+        current = [_json(data_root, str(path.relative_to(data_root)).replace("\\", "/"))
+                   for path in sorted(assignment_dir.glob("*.json"))]
+    except (OSError, ValueError, GroundedDiscoveryError) as exc:
+        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED") from exc
+    # Historical admission completeness cannot establish current completeness.
+    # A legal empty current inventory is an explicit native complete-empty doc.
+    _require(inventory_from_documents(current).status == ALLOW, "HOLDOUT_UNRESOLVED")
     manifest_parts: dict[str, list[Any]] = {}
     protection = []
     source_refs = []

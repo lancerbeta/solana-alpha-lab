@@ -189,6 +189,23 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
             self.assertIn(decision.reason_codes[0], {"HOLDOUT_PROTECTED", "HOLDOUT_UNRESOLVED"})
             self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
 
+    def test_current_protection_missing_empty_unreadable_refuses_before_values(self):
+        from tests.test_opportunity_episodes_harness_v1 import ASSIGNMENT_ID
+        assignment_dir = self.plane / "protection/assignments"
+        backup = self.work / "current-protection-backup"
+        assignment_dir.rename(backup)
+        for variant in ("missing", "empty", "unreadable"):
+            if variant == "empty":
+                assignment_dir.mkdir()
+            elif variant == "unreadable":
+                (assignment_dir / f"{ASSIGNMENT_ID}.json").write_bytes(b"{")
+            recorder = ReaderOracle()
+            with self.subTest(variant=variant), patch("pyarrow.parquet.read_table", recorder.read):
+                decision = self.classify()
+            self.assertEqual(decision.terminal, "BLOCKED_DATA")
+            self.assertIn("HOLDOUT_UNRESOLVED", decision.reason_codes)
+            self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
+
     def test_conflicting_admission_reader_injection_refuses_before_values(self):
         import pyarrow as pa
         from solana_alpha_lab.factory.opportunity_episode_release import EPISODE_CENSUS_COLUMNS
@@ -301,6 +318,12 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         for forged_packet in ({}, {"experiment_spec": {"schema_version": "1.3"}}):
             with self.assertRaisesRegex(HficSessionError, "EPISODE_CLASSIFICATION_REVALIDATION_DENIED"):
                 apply_classification(self.frozen, forged_packet, store=self.store, repo_root=ROOT, data_root=self.plane)
+        (self.plane / "protection/assignments").rename(self.work / "unavailable-current-after-persist")
+        recorder = ReaderOracle()
+        with patch("pyarrow.parquet.read_table", recorder.read), self.assertRaisesRegex(HficSessionError, "EPISODE_CLASSIFICATION_REVALIDATION_DENIED"):
+            apply_classification(self.frozen, self.packet(), store=self.store, repo_root=ROOT, data_root=self.plane)
+        self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
+        self.assertEqual(self.store.diagnostics().committed_inventory_sha256, guarded_inventory)
 
     def test_republished_numeric_values_and_missing_target_keep_denominator(self):
         variants = os.environ.get("ERNOC_VARIANTS")
@@ -310,9 +333,15 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         for name, expected_observed in (("world-values-v2", 20), ("world-missing-v2", 19)):
             world = Path(variants) / name
             spec, frozen = load_case(world)
+            # Older retained worlds predate the explicit current-proof guard.
+            # Register the synthetic consumer's empty inventory in a test copy;
+            # never alter the old benchmark or its source/trial history.
+            variant_plane = self.work / name
+            shutil.copytree(world / "plane", variant_plane)
+            write_assignment(variant_plane, [])
             recorder = ReaderOracle()
             with patch("pyarrow.parquet.read_table", recorder.read):
-                result = project_episode_required_outcomes(spec, data_root=world / "plane", definition_sha256=frozen["selected_definition_sha256"])
+                result = project_episode_required_outcomes(spec, data_root=variant_plane, definition_sha256=frozen["selected_definition_sha256"])
             self.assertEqual(membership_view(result["membership"]), membership_view(baseline["membership"]))
             self.assertEqual(result["decision_n"], 20)
             self.assertEqual(result["required_coverage"][0]["counts"]["OBSERVED"], expected_observed)
@@ -408,6 +437,16 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         import hashlib
         self.store.append([event.model_copy(update={"payload_json": text, "payload_sha256": hashlib.sha256(text.encode()).hexdigest()})], transaction_id=event.transaction_id)
         self.assertEqual(self.classify().terminal, "REPLAY_AVAILABLE")
+        assignment = self.plane / "protection/assignments"
+        unavailable = self.work / "unavailable-current-on-replay"
+        assignment.rename(unavailable)
+        recorder = ReaderOracle()
+        with patch("pyarrow.parquet.read_table", recorder.read):
+            refused = self.classify()
+        self.assertEqual(refused.terminal, "BLOCKED_DATA")
+        self.assertIn("HOLDOUT_UNRESOLVED", refused.reason_codes)
+        self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
+        unavailable.rename(assignment)
         import pyarrow.parquet as pq
         item = self.spec["parameters"]["temporal_recipe"]["frozen_input"][0]
         mint = pq.read_table(self.plane / item["census_rel"], columns=["mint"]).column("mint")[0].as_py()
