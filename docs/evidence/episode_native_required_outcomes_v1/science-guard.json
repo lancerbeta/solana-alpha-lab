@@ -1,0 +1,19 @@
+{
+  "allowed": false,
+  "blocked_codes": [
+    "PIT_AVAILABILITY",
+    "POPULATION_N",
+    "MISSINGNESS",
+    "SURVIVAL",
+    "HOLDOUT",
+    "ENTRY_EXECUTABILITY",
+    "EXIT_EXECUTABILITY",
+    "COST_EVIDENCE",
+    "EXECUTION_REGIME_BINDING",
+    "RESULT",
+    "UNCERTAINTY",
+    "ROBUSTNESS",
+    "EVIDENCE_CLASS"
+  ],
+  "meaning": "PROMOTE_BLOCKED"
+}

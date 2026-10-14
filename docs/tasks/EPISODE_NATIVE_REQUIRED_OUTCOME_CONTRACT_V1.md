@@ -67,7 +67,9 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
     - docs/design/EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1_PRD_SSD.md
     DELIVERY_EVIDENCE:
-    - docs/evidence/episode_native_required_outcomes_v1/baseline.json
+    - docs/evidence/episode_native_required_outcomes_v1/completion.json
+    - docs/evidence/episode_native_required_outcomes_v1/independent-review.json
+    - docs/evidence/episode_native_required_outcomes_v1/factory-fit.json
 ---
 
 Owner EXECUTE on 2026-10-14: repair according to the attached exact PRD+SSD.

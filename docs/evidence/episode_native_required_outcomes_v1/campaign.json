@@ -1,0 +1,217 @@
+{
+  "benchmark": "EPISODE-NATIVE-REQUIRED-OUTCOMES-V1",
+  "classify_projection_repeat_readback_new_looks": 0,
+  "earlier_attempts": [
+    {
+      "attempt": "world",
+      "boundary": "OPS_STORE_PATH_NOT_ABSOLUTE",
+      "main_looks": 0
+    },
+    {
+      "attempt": "world-a2",
+      "boundary": "NTFS_HARDLINK_PERMISSION",
+      "main_looks": 0
+    },
+    {
+      "attempt": "first focused run",
+      "cause": "Test oracle disallowed native comparator overlap; frozen Git candidate stale. Fixture corrected, guards retained.",
+      "errors": 1,
+      "failures": 1,
+      "tests": 7
+    },
+    {
+      "attempt": "stateless focused run",
+      "cause": "Test-only ResearchEvent copy used wrong dataclass API.",
+      "errors": 1,
+      "failures": 0,
+      "tests": 12
+    },
+    {
+      "attempt": "two authoritative cases a4",
+      "cause": "Test-only runner constructor and append transaction argument; core persistence/readback passed.",
+      "errors": 2,
+      "failures": 0,
+      "tests": 2
+    },
+    {
+      "attempt": "full a5",
+      "cause": "Wrong immediate response field on blocked path; SQLite test handle not closed during temp cleanup.",
+      "errors": 2,
+      "failures": 0,
+      "tests": 14
+    },
+    {
+      "attempt": "full a6",
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 15,
+      "verdict": "PASS"
+    }
+  ],
+  "fixture_setup_main_looks": 18,
+  "limits": [
+    "Template setup MAIN looks counted per newly initialized store; proof copies inherit them and are not counted again",
+    "Selected legacy tests create their own temporary engineering fixtures, outside this campaign world registry",
+    "No numerical experiment or qualifying confirmation executed in repair proof"
+  ],
+  "old_audit_and_kill_rewritten": false,
+  "old_worlds_deleted": false,
+  "schema": "smial.episode-repair-campaign-history",
+  "schema_version": "1.0",
+  "worlds": [
+    {
+      "fixture_setup_main_looks": [
+        {
+          "operation_sha256": "c76f5a2dec5f7782ba2c1c1319c5ae7ec21228e3eb0ed8149022e1e847e34501",
+          "payload_sha256": "882b28d841f5b3d4ccc8d72e7bcd96ec6f730a29f2437445a6ba1839f1971483",
+          "record_id": "HFIC-ART-DISCOVERY-24C2BB8A596DA00426EA3A99E1C901D76C993083"
+        },
+        {
+          "operation_sha256": "b0ca58f38ffa34102b297a930e6511849c0a32087e9b5f7077b1e2893f738c0b",
+          "payload_sha256": "516c57bfbd3c98bba77d085559e5f29623d542615210e2ba8dc2dd1bb47f45a2",
+          "record_id": "HFIC-ART-DISCOVERY-E91C14D26AD117C09103AC8D41DFA0C588A241EB"
+        }
+      ],
+      "fixture_sha256": "f5acdecb17c09573bcbaae644c171d83e9c4558263f0363fea23ddbc9fc2b20d",
+      "inventory_sha256": "b608b64c2bf38848bbc8fb40e25285d9ea0742630ed0fc2562168f4524d550cc",
+      "world": "world-a3"
+    },
+    {
+      "fixture_setup_main_looks": [
+        {
+          "operation_sha256": "0a98ff46bd63fdf851a9f2c1516028be318d383970785714baf68c7b187554a4",
+          "payload_sha256": "167958dfb39fbc1a868372079738a41aa87ac41a654d22d027b4c41bc55a1ff4",
+          "record_id": "HFIC-ART-DISCOVERY-772E31300FEED74BE5777CC07517AB53E648D152"
+        },
+        {
+          "operation_sha256": "f2d9c388b1e2cd66bbb77d98a31dc17dade119a81e19d876155e784661177dfb",
+          "payload_sha256": "833ebcca23a5fc045dae2a51c6291975ec41a339a2677ca9d27a25b41799ec14",
+          "record_id": "HFIC-ART-DISCOVERY-BA56A7D5208CEBD76728E2A4D08EC9E162631CFB"
+        }
+      ],
+      "fixture_sha256": "fb1a7619f84853e6f91925461599eac3be211bc0d07483d9973823d32deaf20c",
+      "inventory_sha256": "3689abae91a3c995c9f170baa09a16599fed8e41bbbfd9992e9e9b2632aa45c7",
+      "world": "world-missing-a4"
+    },
+    {
+      "fixture_setup_main_looks": [
+        {
+          "operation_sha256": "0a98ff46bd63fdf851a9f2c1516028be318d383970785714baf68c7b187554a4",
+          "payload_sha256": "167958dfb39fbc1a868372079738a41aa87ac41a654d22d027b4c41bc55a1ff4",
+          "record_id": "HFIC-ART-DISCOVERY-772E31300FEED74BE5777CC07517AB53E648D152"
+        },
+        {
+          "operation_sha256": "f2d9c388b1e2cd66bbb77d98a31dc17dade119a81e19d876155e784661177dfb",
+          "payload_sha256": "833ebcca23a5fc045dae2a51c6291975ec41a339a2677ca9d27a25b41799ec14",
+          "record_id": "HFIC-ART-DISCOVERY-BA56A7D5208CEBD76728E2A4D08EC9E162631CFB"
+        }
+      ],
+      "fixture_sha256": "f77073321e9e48abf0e0087ef06bb13a1aea917401bdc69bfbca819af24b76fe",
+      "inventory_sha256": "a4e12077803b94fc6e6cf747abfe3d4c8e9d671d390698f1061ae8ffdf170326",
+      "world": "world-missing-a5"
+    },
+    {
+      "fixture_setup_main_looks": [
+        {
+          "operation_sha256": "0a98ff46bd63fdf851a9f2c1516028be318d383970785714baf68c7b187554a4",
+          "payload_sha256": "167958dfb39fbc1a868372079738a41aa87ac41a654d22d027b4c41bc55a1ff4",
+          "record_id": "HFIC-ART-DISCOVERY-772E31300FEED74BE5777CC07517AB53E648D152"
+        },
+        {
+          "operation_sha256": "f2d9c388b1e2cd66bbb77d98a31dc17dade119a81e19d876155e784661177dfb",
+          "payload_sha256": "833ebcca23a5fc045dae2a51c6291975ec41a339a2677ca9d27a25b41799ec14",
+          "record_id": "HFIC-ART-DISCOVERY-BA56A7D5208CEBD76728E2A4D08EC9E162631CFB"
+        }
+      ],
+      "fixture_sha256": "f77073321e9e48abf0e0087ef06bb13a1aea917401bdc69bfbca819af24b76fe",
+      "inventory_sha256": "c9cbcf0c3d01af2dfb2a976c0e6e103430aed48208ff6214d060a8e7b9c238f7",
+      "world": "world-missing-a6"
+    },
+    {
+      "fixture_setup_main_looks": [
+        {
+          "operation_sha256": "0a98ff46bd63fdf851a9f2c1516028be318d383970785714baf68c7b187554a4",
+          "payload_sha256": "167958dfb39fbc1a868372079738a41aa87ac41a654d22d027b4c41bc55a1ff4",
+          "record_id": "HFIC-ART-DISCOVERY-772E31300FEED74BE5777CC07517AB53E648D152"
+        },
+        {
+          "operation_sha256": "f2d9c388b1e2cd66bbb77d98a31dc17dade119a81e19d876155e784661177dfb",
+          "payload_sha256": "833ebcca23a5fc045dae2a51c6291975ec41a339a2677ca9d27a25b41799ec14",
+          "record_id": "HFIC-ART-DISCOVERY-BA56A7D5208CEBD76728E2A4D08EC9E162631CFB"
+        }
+      ],
+      "fixture_sha256": "fb1a7619f84853e6f91925461599eac3be211bc0d07483d9973823d32deaf20c",
+      "inventory_sha256": "74bed89ca51ec0f77e88770f421883a5d05ec8878d22bde99d4bbd41f8b27d90",
+      "world": "world-missing-v2"
+    },
+    {
+      "fixture_setup_main_looks": [
+        {
+          "operation_sha256": "c76f5a2dec5f7782ba2c1c1319c5ae7ec21228e3eb0ed8149022e1e847e34501",
+          "payload_sha256": "882b28d841f5b3d4ccc8d72e7bcd96ec6f730a29f2437445a6ba1839f1971483",
+          "record_id": "HFIC-ART-DISCOVERY-24C2BB8A596DA00426EA3A99E1C901D76C993083"
+        },
+        {
+          "operation_sha256": "b0ca58f38ffa34102b297a930e6511849c0a32087e9b5f7077b1e2893f738c0b",
+          "payload_sha256": "516c57bfbd3c98bba77d085559e5f29623d542615210e2ba8dc2dd1bb47f45a2",
+          "record_id": "HFIC-ART-DISCOVERY-E91C14D26AD117C09103AC8D41DFA0C588A241EB"
+        }
+      ],
+      "fixture_sha256": "1d1113d4eafe2d780d7c978c26fa0446b37076a50e95feab2bed7d0c3c418e19",
+      "inventory_sha256": "155ab13376616f00ea39d4d4f9a5a86bd8d322b41a890482cb4c6692b070c98d",
+      "world": "world-ready-a4"
+    },
+    {
+      "fixture_setup_main_looks": [
+        {
+          "operation_sha256": "c76f5a2dec5f7782ba2c1c1319c5ae7ec21228e3eb0ed8149022e1e847e34501",
+          "payload_sha256": "882b28d841f5b3d4ccc8d72e7bcd96ec6f730a29f2437445a6ba1839f1971483",
+          "record_id": "HFIC-ART-DISCOVERY-24C2BB8A596DA00426EA3A99E1C901D76C993083"
+        },
+        {
+          "operation_sha256": "b0ca58f38ffa34102b297a930e6511849c0a32087e9b5f7077b1e2893f738c0b",
+          "payload_sha256": "516c57bfbd3c98bba77d085559e5f29623d542615210e2ba8dc2dd1bb47f45a2",
+          "record_id": "HFIC-ART-DISCOVERY-E91C14D26AD117C09103AC8D41DFA0C588A241EB"
+        }
+      ],
+      "fixture_sha256": "bac3caf882dc96d47a6ff6c84feee22ef076edb83ab520375a7efe50dbe959c0",
+      "inventory_sha256": "c12372df88e394f756b3660abd1ff5828061d80e39997d731ecbbba1fedf2f2e",
+      "world": "world-ready-a5"
+    },
+    {
+      "fixture_setup_main_looks": [
+        {
+          "operation_sha256": "c76f5a2dec5f7782ba2c1c1319c5ae7ec21228e3eb0ed8149022e1e847e34501",
+          "payload_sha256": "882b28d841f5b3d4ccc8d72e7bcd96ec6f730a29f2437445a6ba1839f1971483",
+          "record_id": "HFIC-ART-DISCOVERY-24C2BB8A596DA00426EA3A99E1C901D76C993083"
+        },
+        {
+          "operation_sha256": "b0ca58f38ffa34102b297a930e6511849c0a32087e9b5f7077b1e2893f738c0b",
+          "payload_sha256": "516c57bfbd3c98bba77d085559e5f29623d542615210e2ba8dc2dd1bb47f45a2",
+          "record_id": "HFIC-ART-DISCOVERY-E91C14D26AD117C09103AC8D41DFA0C588A241EB"
+        }
+      ],
+      "fixture_sha256": "bac3caf882dc96d47a6ff6c84feee22ef076edb83ab520375a7efe50dbe959c0",
+      "inventory_sha256": "1bbbf0d5307a13d94b45d3aee57f3227ae2954a6374b5a53daf19a90feeadc4e",
+      "world": "world-ready-a6"
+    },
+    {
+      "fixture_setup_main_looks": [
+        {
+          "operation_sha256": "07d0e3821babf6183f4ed339326fd5df3f551f75d0ab845edc777e2fdb346e33",
+          "payload_sha256": "6209c3ee083429c353638a064352642c98fbbb9def936b2b0116229d156189ca",
+          "record_id": "HFIC-ART-DISCOVERY-6A93A92B81A200463B813FE8C9CAC41F00F77300"
+        },
+        {
+          "operation_sha256": "166c5b53233aa61d379e87f563562844db2db85119d9b255c0c90a82f002adb5",
+          "payload_sha256": "2587a09d2289ef5742712c8a6148aa6e24dac1ad79659b974857862c9812d06e",
+          "record_id": "HFIC-ART-DISCOVERY-A62A9E776F91311FACF2D2EF8B9800A896289457"
+        }
+      ],
+      "fixture_sha256": "629f053c4930cc8cd4fa17debf3562732b77cf48bf7deef5d2eb78b170ae4023",
+      "inventory_sha256": "d32a389de3e7f4db13c577a6fd577fdf50f0b60156ba2c046ce8e693549106dc",
+      "world": "world-values-v2"
+    }
+  ]
+}
