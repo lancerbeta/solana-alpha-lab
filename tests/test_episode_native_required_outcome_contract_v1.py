@@ -189,6 +189,27 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
             self.assertIn(decision.reason_codes[0], {"HOLDOUT_PROTECTED", "HOLDOUT_UNRESOLVED"})
             self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
 
+    def test_conflicting_admission_reader_injection_refuses_before_values(self):
+        import pyarrow as pa
+        from solana_alpha_lab.factory.opportunity_episode_release import EPISODE_CENSUS_COLUMNS
+        recorder = ReaderOracle()
+
+        def corrupt_metadata(path, *args, **kwargs):
+            table = recorder.read(path, *args, **kwargs)
+            # Test-only reader fault after the real pinned source checks. This
+            # proves the identity guard, not a valid republished source claim.
+            if Path(path).name == "census.parquet" and kwargs.get("columns") == list(EPISODE_CENSUS_COLUMNS):
+                row = table.slice(0, 1).to_pylist()[0]
+                row["mint"] = "conflicting-test-mint"
+                return pa.concat_tables([table, pa.Table.from_pylist([row], schema=table.schema)])
+            return table
+
+        with patch("pyarrow.parquet.read_table", corrupt_metadata):
+            decision = self.classify()
+        self.assertEqual(decision.terminal, "DENY_INTEGRITY_MISMATCH")
+        self.assertIn("EPISODE_ADMISSION_IDENTITY_CONFLICT", decision.reason_codes)
+        self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
+
     def test_authoritative_persistence_exact_repeat_cold_readback_and_guard(self):
         from solana_alpha_lab.factory.experiment_evidence import science_guard, _build_obligations
         from solana_alpha_lab.factory.document_runner import _frozen_hfic_replay_lineage, RunContext
@@ -202,6 +223,7 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         with patch("pyarrow.parquet.read_table", recorder.read):
             finalized = finalize_session(self.frozen, critic, store=self.store, repo_root=ROOT, data_root=self.plane)
             done = apply_classification(self.frozen, self.packet(), store=self.store, repo_root=ROOT, data_root=self.plane)
+        classification_trace = recorder.trace
         bundle = load_session_bundle(self.store, self.frozen["session_id"])
         self.assertEqual(bundle["session_state"], "SYNTHESIS_COMPLETE")
         self.assertEqual(bundle["classifier_receipt"]["lane_classifier_terminal"], "FAST_LANE_READY")
@@ -234,7 +256,9 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         with patch("pyarrow.parquet.read_table", recorder.read), patch(
                 "solana_alpha_lab.factory.hfic_temporal_discovery.run_temporal_fixed_time_from_spec", side_effect=AssertionError("NUMERIC_RUN")):
             from solana_alpha_lab.factory.operational_store import OperationalStore
-            refused = DocumentRunner(root=ROOT, store=OperationalStore(self.work / "direct-ops.sqlite")).start_document(self.spec,
+            operational = OperationalStore(self.work / "direct-ops.sqlite")
+            self.addCleanup(operational.close)
+            refused = DocumentRunner(root=ROOT, store=operational).start_document(self.spec,
                 spec_sha256=experiment_spec_sha256(self.spec), run_context=RunContext(self.plane, self.definition, decision, AS_OF + timedelta(hours=3)))
         self.assertEqual(refused["status"], "INVALID_EVIDENCE")
         self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
@@ -248,7 +272,7 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
             (out / "positive.json").write_text(json.dumps({
                 "classifier_receipt": bundle["classifier_receipt"], "cold_inventory_sha256": before,
                 "cold_readback_equal": True, "repeat_write_count": 0,
-                "reader_trace": recorder.trace, "direct_lineage": lineage,
+                "reader_trace": classification_trace, "direct_refusal_trace": recorder.trace, "direct_lineage": lineage,
             }, indent=2, default=str) + "\n", encoding="utf-8")
         # Native promotion gate remains semantic; accepted schema reaches it.
         guard = science_guard(_build_obligations(self.spec, entity={},
@@ -256,6 +280,9 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
             records=tuple(self.store.iter_committed_records()), records_status="AVAILABLE", root=ROOT))
         self.assertFalse(guard["allowed"])
         self.assertEqual(guard["meaning"], "PROMOTE_BLOCKED")
+        if os.environ.get("ERNOC_PROOF_OUT"):
+            (Path(os.environ["ERNOC_PROOF_OUT"]) / "science-guard.json").write_text(
+                json.dumps(guard, indent=2, default=str) + "\n", encoding="utf-8")
         forged = copy.deepcopy(self.spec)
         forged["parameters"]["temporal_recipe"]["scientific_identity"] = "0" * 64
         with self.assertRaisesRegex(HficSessionError, "EPISODE_FROZEN_RECIPE_MISMATCH"):
@@ -308,7 +335,7 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         with patch("pyarrow.parquet.read_table", recorder.read):
             finalize_session(frozen, _critic_result(frozen, "PASS_TO_CLASSIFICATION"), store=store, repo_root=ROOT, data_root=plane)
             done = apply_classification(frozen, packet, store=store, repo_root=ROOT, data_root=plane)
-        receipt = done["classifier_receipt"]
+        receipt = load_session_bundle(store, frozen["session_id"])["classifier_receipt"]
         self.assertEqual(receipt["lane_classifier_terminal"], "BLOCKED_DATA")
         binding = receipt["episode_outcome_binding"]
         self.assertEqual(binding["decision_n"], 20)
