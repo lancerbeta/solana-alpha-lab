@@ -5,7 +5,35 @@
   "as_of": "2026-10-14",
   "task_id": "SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1_TARGETED_CONTINUATION",
   "state_change": "Audit-only native episode continuation completed to actual KILL_LOW_INFORMATION_VALUE, separately proved necessary Spec 1.3 E-outcome contract gap, legacy DIRECT runtime replay with qualifying science blocked, preserved original audit and all trials, combined retained allocation measured. No FULL path, product repair, promotion or merge.",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "7de2dd7d022608e7eafa06c446e8e0f34aa07fac5d029b36e0d63ff16ec871cd",
+    "catalog/assets/lifecycle.yaml": "c4d2760db5abf138e6b9d70fdc07ba7025388b964523cfbb102958c626303f96",
+    "catalog/catalog_manifest.yaml": "2ff3a3cfad7b0acda3d47019379916f38b733389df5e4863f6436ea53d05cfe1",
+    "catalog/generated/asset_edges.json": "c95691e485b22ae59465e97976330fb1fd5c23fdeb33ae9d7a0a3d6b9548aa7e",
+    "docs/PROJECT_MAP.md": "9b3d7582578841eec4e6f1f083a13cac347ee07e7492197cbc417a9c20b60443",
+    "docs/evidence/synthetic_lifecycle_targeted_v1/attempts.json": "33ce2c82438127af15bf48cc801dd43577e0332b624d6c426f16a997859ece68",
+    "docs/evidence/synthetic_lifecycle_targeted_v1/campaign.json": "b568b5b368fcd348aa4714954709eabc1eccd0c319f6c6e6db9e3ed4d6847679",
+    "docs/evidence/synthetic_lifecycle_targeted_v1/contract-boundary.json": "af8c42fa248588daef68b8ba0171c17a82dde2601375f7c7135f6cf703307962",
+    "docs/evidence/synthetic_lifecycle_targeted_v1/coverage.json": "12167f40b341c95e537ca23c587e26c3cc92bfd9c1767b366ac2aed42e582379",
+    "docs/evidence/synthetic_lifecycle_targeted_v1/critic-context-attestations.json": "a1dcb55773884e53bf1c4d5a13bbd54d1960a059c696a988f7cba81f56248af4",
+    "docs/evidence/synthetic_lifecycle_targeted_v1/episode-critic-result.json": "535e92223ce10fc386a792672f8a4ccfbc410e4839ac7597a0c96f08a81c116b",
+    "docs/evidence/synthetic_lifecycle_targeted_v1/footprint.json": "b789b4a3b2bad23a61f4ad12ef5d8f2ede4fc26e2739b296cacd47998ac7adce",
+    "docs/evidence/synthetic_lifecycle_targeted_v1/legacy-segment.json": "6ade520a0df7b19a714ae5930e8c026e08bea7df2b0e55780eef57de04aefa6f",
+    "docs/evidence/synthetic_lifecycle_targeted_v1/old-kill-diagnosis.json": "88040bbae4a406cced66ec5e4badc5691f103aad7a276fcd0cf064f2d951eeca",
+    "docs/evidence/synthetic_lifecycle_targeted_v1/retention-pins.json": "6aeac290a3887f3c9bdbd67ff82295e957aeb710bcf8c262bde9d227c10c098c",
+    "docs/evidence/synthetic_lifecycle_targeted_v1/revised-episode-critic-result.json": "db9f6fef21602dd6d5ff86572fcf41e3ff37a1b2f9de2f92e6fa5426bbe62340",
+    "docs/reports/synthetic_lifecycle_targeted_v1/OWNER_REPORT.md": "7ad75f3e85482f0dac03104de5d1031abe3fe7d643ec02e7872e74076657b540",
+    "docs/reports/synthetic_lifecycle_targeted_v1/REPAIR_PRD_SSD.md": "ef53f263078d9f14cc820ad17ad5e6eca89c0fdd782fc85d7cd02548d3bb2f9f",
+    "docs/reports/synthetic_lifecycle_targeted_v1/REPLAY.md": "9a513d7ef663763f7791fa5783e9b257ecdeb010ad87780bd8b9c4b38e006ae2",
+    "docs/tasks/SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1_TARGETED_CONTINUATION.md": "90b735656920e3629c1cac546b20d8f564a966145b022ec78409eadd0e2e0d6e",
+    "tests/fixtures/synthetic_lifecycle_targeted_v1/campaign.py": "9c78e91359d809f4bcd06e111673ce15d8a3b921d7656c4a8c978466397b2af6",
+    "tests/fixtures/synthetic_lifecycle_targeted_v1/collect.py": "19d28bcddfc0f726f65157f2849ba9587c89bdd8f3cda85137d9d66bbf89f092",
+    "tests/fixtures/synthetic_lifecycle_targeted_v1/launch.ps1": "49775e660181e07767e6ecdbcabfe36c87f357249e62b7daddbca496823ab5cd",
+    "tests/fixtures/synthetic_lifecycle_targeted_v1/measure_docker.ps1": "75dfd90d342f8a88216c0597f781ae034f330aebe8584a24150f31ec8dc5ce56",
+    "tests/fixtures/synthetic_lifecycle_targeted_v1/measure_host.py": "e19114351b9a1200e4d3a0edcc6536304c3199094dc0ff98972d5f8a543d1e4f",
+    "tests/fixtures/synthetic_lifecycle_targeted_v1/safety.py": "debb909b405bbcbc40b1fa541f3c3e5989e68eefc9e424ad890abcc45f82df3e",
+    "tests/fixtures/synthetic_lifecycle_targeted_v1/verify.py": "69c15b10a971da7ca469541e695eebfc597c5eae8bfeac33d31be6d14d62692e"
+  },
   "base_main": "94b391d658b52035ae88e2da05f1ea25ff17b0f8",
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -17,14 +45,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/synthetic_lifecycle_targeted_v1/factory-fit.json",
-    "sha256": "dfd0de609e868899316b58c3228bcbfc6b7ac374bfae2fb0dcca522cc73f9a58",
+    "sha256": "c676b0676f44e9c9683fee71a049e41f2b3e3defbdbc639945612fee18284d8a",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_NATIVE_PREFIX_TERMINAL_AND_EXPLICIT_CONTRACT_GAP_WITH_RESIDUAL_LIMITS",
     "independent_review": {
       "path": "docs/evidence/synthetic_lifecycle_targeted_v1/independent-review.json",
-      "sha256": "a3a9f567c1ef2184f39dbfc895cc7102473f64887f14d5e09ddd158d7d0181bb",
+      "sha256": "b796a5fac30c392f58f7eb735cc3273f1c3770ddb9f523c61e21fea441dc90f8",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
