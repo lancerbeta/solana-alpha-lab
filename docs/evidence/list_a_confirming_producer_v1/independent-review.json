@@ -1,51 +1,101 @@
 {
-  "schema": "smial.delivery-independent-review-evidence",
-  "schema_version": "1.0",
-  "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-INDEPENDENT",
-  "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
   "as_of": "2026-10-15",
-  "verdict": "NOT_READY",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_REAL_SCIENTIFIC_ACCEPTANCE"
+  ],
+  "remediation_history": [
+    {
+      "finding": "Consumed charge hidden by denied submit",
+      "observed_head": "fe6ee0ff79451f6b14ad7dc03280e230960f834a",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "44227e5101d6e5edfde195bbd8bceaee9fba4d80",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Native numeric refusal falsely resumable",
+      "observed_head": "fe6ee0ff79451f6b14ad7dc03280e230960f834a",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "44227e5101d6e5edfde195bbd8bceaee9fba4d80",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Denied classify/submit falsely before reserve with charge0",
+      "observed_head": "fe6ee0ff79451f6b14ad7dc03280e230960f834a",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "44227e5101d6e5edfde195bbd8bceaee9fba4d80",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Unavailable/unverifiable history falsely NO_RUN/NO_DECISION",
+      "observed_head": "fe6ee0ff79451f6b14ad7dc03280e230960f834a",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "44227e5101d6e5edfde195bbd8bceaee9fba4d80",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Missing ordinary exact owner revoke path",
+      "observed_head": "44227e5101d6e5edfde195bbd8bceaee9fba4d80",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "dbc77d49ef5437287635f23a9bd71e7e5cbbec87",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Repeated prepare/authorize falsely unspent and new execution NEXT",
+      "observed_head": "44227e5101d6e5edfde195bbd8bceaee9fba4d80",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "dbc77d49ef5437287635f23a9bd71e7e5cbbec87",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MAJOR"
+    }
+  ],
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
     "ARCHITECTURE_CRITIC",
     "OWNER_UX_CRITIC"
   ],
+  "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-INDEPENDENT",
   "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "reviews": [
     {
+      "findings": [
+        "PENDING_ISOLATED_FINAL_REVIEW"
+      ],
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
-      "findings": [
-        "PENDING_ISOLATED_FINAL_REVIEW"
-      ]
+      "verdict": "NOT_READY"
     },
     {
+      "findings": [
+        "PENDING_ISOLATED_FINAL_REVIEW"
+      ],
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
-      "findings": [
-        "PENDING_ISOLATED_FINAL_REVIEW"
-      ]
+      "verdict": "NOT_READY"
     },
     {
+      "findings": [
+        "PENDING_ISOLATED_FINAL_REVIEW"
+      ],
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
-      "findings": [
-        "PENDING_ISOLATED_FINAL_REVIEW"
-      ]
+      "verdict": "NOT_READY"
     },
     {
-      "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY",
       "findings": [
         "PENDING_ISOLATED_FINAL_REVIEW"
-      ]
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "NOT_READY"
     }
   ],
-  "non_claims": [
-    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
-    "MODEL_DIVERSITY_UNPROVEN",
-    "NO_REAL_SCIENTIFIC_ACCEPTANCE"
-  ]
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
+  "verdict": "PENDING"
 }

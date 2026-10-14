@@ -126,6 +126,9 @@ image; build/pull/install не входит в authority. Core frozen source pin
 при новой разрешённой кампании. Early P0 точный reader count восстановить нельзя.
 Allocation измерена по regular files/owned volumes/SizeRw; physical Docker VHDX,
 daemon metadata/logs и total shared cache остаются отдельно UNKNOWN.
+Final snapshot 15 октября: 188.666 MiB owned / 222.461 MiB conservative charged,
+22 stopped containers. Старый snapshot 14 октября сохранён. См.
+`docs/evidence/list_a_confirming_producer_v1/footprint-final.json`.
 
 Rollback: обычный code/schema/registry revert сохраняет stores, reservations,
 attempts/results и charges. Pending несовместимый trial не считается untouched;

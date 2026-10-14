@@ -69,6 +69,21 @@
       "evidence": "UNBOUND/0 real executions; no alpha/execution/StrategyVersion/activation/PAPER/blind Actor",
       "requirement": "real sample/science/strategy/Actor",
       "status": "NOT_CLAIMED"
+    },
+    {
+      "evidence": "Actual CLI charge/identity + zero new decoder/evaluator/writes; UNKNOWN history and visible charged reservation on result conflict",
+      "requirement": "denied readout and unavailable/unverifiable history",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Read-only preview, wrong phrase refusal, exact revoke before/after reserve, idempotent repeat; prepare/authorize/alias ALREADY_RESERVED charge1",
+      "requirement": "owner exact revoke and repeated metadata commands",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Actual source-owner registered nonfinite/unrepresentable positive-price cases; native refusal -> durable invalid consumed trial; repeat no new look",
+      "requirement": "native numeric refusal",
+      "status": "PASS"
     }
   ],
   "schema": "smial.list-a-confirmation-coverage",

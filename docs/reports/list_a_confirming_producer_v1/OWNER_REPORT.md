@@ -69,10 +69,12 @@ Native nonfinite/unrepresentable input становится durable INVALID_AFTE
 Недоступная история даёт UNKNOWN; повреждённый result сохраняет видимую reservation
 и consumed charge при evidence CONFLICT. Новый allowance эти действия не создают.
 
-Ресурсы: snapshot regular-file allocation **187.861 MiB owned**, conservative cap
-charge **219.401 MiB**, включая полный резерв общего Git object store. Это ниже
+Ресурсы: финальный snapshot 15 октября regular-file allocation **188.666 MiB owned**,
+conservative cap charge **222.461 MiB**, включая полный резерв общего Git object store. Это ниже
 target 256 MiB и hard cap 1 GiB. Оставлены named stores, receipts, copied regression
-checkout/Git snapshot и 17 stopped containers; новых image/.venv нет. Полный shared
+checkout/Git snapshot и 22 stopped containers; новых image/.venv нет. Snapshot
+14 октября 187.861/219.401 MiB сохранён отдельно; последующие delivery metadata
+commits не включены в этот замер. Полный shared
 runtime/cache, daemon metadata/log allocation и физический Docker VHD growth
 измерением этого scope не установлены. Cleanup не выполнялся.
 
@@ -92,5 +94,5 @@ Evidence: [acceptance](../../evidence/list_a_confirming_producer_v1/acceptance.j
 [process readback](../../evidence/list_a_confirming_producer_v1/process-readback.json),
 [history](../../evidence/list_a_confirming_producer_v1/scientific-history.json),
 [qualification](../../evidence/list_a_confirming_producer_v1/qualification.json),
-[footprint](../../evidence/list_a_confirming_producer_v1/footprint.json),
+[footprint](../../evidence/list_a_confirming_producer_v1/footprint-final.json),
 [REPRODUCE](REPRODUCE.md).
