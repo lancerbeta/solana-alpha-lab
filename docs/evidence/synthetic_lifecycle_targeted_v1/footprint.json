@@ -1,0 +1,361 @@
+{
+  "deleted": false,
+  "docker": {
+    "all_campaign_containers_stopped": true,
+    "container_writable_layers_bytes": 909312,
+    "containers": [
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-tc-v1-diagnose-a1",
+        "running": false,
+        "writable_layer_bytes": 28672
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-tc-v1-diagnose-a2",
+        "running": false,
+        "writable_layer_bytes": 28672
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-tc-v1-diagnose-a3",
+        "running": false,
+        "writable_layer_bytes": 28672
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-tc-v1-episode-a1",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-tc-v1-episode-resume-a1",
+        "running": false,
+        "writable_layer_bytes": 28672
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-tc-v1-finalize-a1",
+        "running": false,
+        "writable_layer_bytes": 32768
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-tc-v1-inspect-a1",
+        "running": false,
+        "writable_layer_bytes": 12288
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-tc-v1-inspect-a2",
+        "running": false,
+        "writable_layer_bytes": 12288
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-tc-v1-legacy-a1",
+        "running": false,
+        "writable_layer_bytes": 28672
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-tc-v1-legacy-a2",
+        "running": false,
+        "writable_layer_bytes": 28672
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-tc-v1-revise-a1",
+        "running": false,
+        "writable_layer_bytes": 32768
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-finalize-a1",
+        "running": false,
+        "writable_layer_bytes": 32768
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-footprint-20261013232712",
+        "running": false,
+        "writable_layer_bytes": 12288
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-footprint-20261013232839",
+        "running": false,
+        "writable_layer_bytes": 12288
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-footprint-20261013234619",
+        "running": false,
+        "writable_layer_bytes": 12288
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-footprint-20261013235322",
+        "running": false,
+        "writable_layer_bytes": 12288
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-forge-a1",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-forge-a2",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-forge-tail-a1",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-fortnight-a1",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-handoff-a1",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-prepare-a1",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-prepare-a2",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-prepare-a3",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-recovery-a1",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-recovery-a2",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-scratch-owner",
+        "running": false,
+        "writable_layer_bytes": 8192
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-seams-a1",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-snapshot-copy",
+        "running": false,
+        "writable_layer_bytes": 12288
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-spine-a1",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-spine-a2",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-trading-a1",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-trading-tail-a1",
+        "running": false,
+        "writable_layer_bytes": 28672
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-trading-tail-a2",
+        "running": false,
+        "writable_layer_bytes": 28672
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-volume-owner",
+        "running": false,
+        "writable_layer_bytes": 8192
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-world-a1",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-world-a2",
+        "running": false,
+        "writable_layer_bytes": 24576
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-world-a2-look-inspect",
+        "running": false,
+        "writable_layer_bytes": 8192
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-world-a2-readback",
+        "running": false,
+        "writable_layer_bytes": 8192
+      },
+      {
+        "image": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+        "log_driver": "json-file",
+        "name": "sls-v1-world-a3",
+        "running": false,
+        "writable_layer_bytes": 24576
+      }
+    ],
+    "deleted": false,
+    "existing_image_reported_size_bytes": 533691498,
+    "image_id": "sha256:82dc449ba0e62a8cd2dd864a5b8130b93fe78dca4de6690d01a6332dda29c071",
+    "log_stat_failures": 0,
+    "logs_allocated_bytes": 1847296,
+    "logs_limit": "Exact owned Docker log paths only; failed read remains UNKNOWN. The final measurement helper log and directory metadata are excluded (one small JSON line).",
+    "logs_logical_bytes": 1726665,
+    "measured_at": "2026-10-14T01:10:00.9887149Z",
+    "measurement_helper": "sls-tc-v1-footprint-20261014010959",
+    "new_image_bytes": 0,
+    "reused_image": "smial-baa-v1:local",
+    "scope": "BOTH_EXACT_CAMPAIGN_LABELS_PLUS_TWO_PROVED_FAILED_LAUNCH_ALIASES",
+    "volumes": {
+      "invalid_alias_product": {
+        "allocated_bytes": 4096,
+        "logical_bytes": 0
+      },
+      "invalid_alias_scratch": {
+        "allocated_bytes": 4096,
+        "logical_bytes": 0
+      },
+      "product": {
+        "allocated_bytes": 135839744,
+        "logical_bytes": 119598586
+      },
+      "scratch": {
+        "allocated_bytes": 123822080,
+        "logical_bytes": 81233933
+      }
+    }
+  },
+  "host": {
+    "allocated_unique_owned_bytes": 556364536,
+    "allocation_limit": "NTFS allocation deduplicated within campaign; hardlinks to existing uv cache may overstate incremental allocation. Directory metadata and measurement receipt excluded.",
+    "deleted": false,
+    "groups": {
+      "continuation": {
+        "allocated_unique_owned_bytes": 70792168,
+        "files": 4231,
+        "logical_bytes": 62297998
+      },
+      "product": {
+        "allocated_unique_owned_bytes": 130566552,
+        "files": 5583,
+        "logical_bytes": 119598586
+      },
+      "retained": {
+        "allocated_unique_owned_bytes": 79004992,
+        "files": 3070,
+        "logical_bytes": 71871617
+      },
+      "source": {
+        "allocated_unique_owned_bytes": 103379328,
+        "files": 4332,
+        "logical_bytes": 94740183
+      },
+      "source/.venv": {
+        "allocated_unique_owned_bytes": 172621496,
+        "files": 1630,
+        "logical_bytes": 169602791
+      }
+    },
+    "logical_bytes": 518111175,
+    "measurement_errors": [],
+    "scope": "EXACT_CAMPAIGN_ROOT_ONLY"
+  },
+  "known_allocated_bytes": 818791160,
+  "known_allocated_gib": 0.7626,
+  "limit": "Snapshot includes both campaigns and continuation worktree. Existing image/VHDX excluded; hardlinks can overstate incremental allocation; final metadata/log growth excluded.",
+  "measured_at": "2026-10-14T01:10:00.9887149Z",
+  "new_images_bytes": 0,
+  "uv_shared_cache_growth": null,
+  "uv_shared_cache_growth_status": "UNKNOWN_NO_PRE_CAMPAIGN_BASELINE"
+}

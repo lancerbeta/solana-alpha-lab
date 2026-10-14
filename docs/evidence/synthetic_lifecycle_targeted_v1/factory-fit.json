@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1_TARGETED_CONTINUATION",
+  "review_id": "SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1_TARGETED_CONTINUATION-FIT",
+  "as_of": "2026-10-14",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "Bounded audit: exact old KILL diagnosis, native episode prefix, genuine revision/terminal, formal necessary Spec 1.3 gap and explicit downstream legacy probe. FULL false; no product repair.",
+    "flexibility_and_history": "Both registered benchmark versions and every attempt retained. No new looks during revision/recovery, no value/seed/threshold changes, no E-to-XY estimand conversion.",
+    "context_efficiency": "One continuation root; frozen product runtime. Compact canonical facts and 789 retained host pins; no pre-PR local full gate.",
+    "research_truth": "Actual earliest scientific stop KILL_LOW_INFORMATION_VALUE is separate from independently proved required-outcome schema constraint. Legacy carrier presence leaves all qualifying obligations blocked. Individual membership, real PIT and accepted chronological confirmation unverified.",
+    "owner_operability": "Russian report, exact receipts, readonly replay and 0.7626 GiB combined snapshot. One non-executable repair design; next owner version/meaning decision explicit. Blind actor AGENT_BEHAVIOR_UNVERIFIED.",
+    "execution_to_cashflow": "Original ordinary synthetic PAPER/reconciliation fixtures preserved, not linked to rejected new candidate. No alpha, live trading, NetReturn or FCF claim.",
+    "monitoring_and_recovery": "Fresh native cold readback retains final identity and inventory; legacy runner idempotent same-run replay. All failed observer attempts retained. No cleanup.",
+    "build_vs_buy": "Reuse existing capture generator, Forge, native packet Critic, accepted runner, source owners and existing pinned image/locked runtime. No new service, dependency, install or provider.",
+    "security": "Network-none readonly UID1000/cap-drop/no-new-privileges product runs, owned synthetic stores only. Protected actions all zero. Two mistakenly created empty volume aliases retained and ownership proved through exact failed container.",
+    "red_team": "Independent schema whole-spec control and single-field E negative; exact artifact hash/identity verifier; overclaim controls distinguish FULL, carrier kinds, Critic STOP, schema proof and rejected promotion. Four isolated exact-inventory reviews required."
+  },
+  "capability_radar": {
+    "now": "TOOLS NONE. Product horizon: one EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1 design only; owner product/data-contract decision and exact gate before implementation. Value explicit E outcomes; risk clock/identity/denominator drift.",
+    "watch": "After explicit episode binding passes, probe accepted chronological consumer for unchanged estimand; no wider repair or promotion authority."
+  },
+  "recovery": "Retain all raw receipts, per-attempt kits, owned world and stopped containers. Ordinary Git revert can remove audit entrypoint; no shared resource cleanup.",
+  "limits": [
+    "NO_FULL_PRODUCT_PATH",
+    "NO_BLIND_ACTOR_VERIFICATION",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_REAL_PIT_PROOF",
+    "NO_ACCEPTED_CHRONOLOGICAL_VALIDATION",
+    "NO_INDIVIDUAL_MEMBERSHIP_ORACLE",
+    "NO_PRODUCT_REPAIR_OR_MERGE"
+  ]
+}

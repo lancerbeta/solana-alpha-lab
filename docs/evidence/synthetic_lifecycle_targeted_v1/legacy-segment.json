@@ -1,0 +1,151 @@
+{
+  "accepted_chronological_validation": false,
+  "classifier_terminal": "REPLAY_AVAILABLE",
+  "confirmation_consumer": "ABSENT_IN_THIS_ROUTE",
+  "direct_records": [
+    {
+      "entity_id": "EVIDENCE-BINDING-001-7C9E42A5",
+      "hypothesis_version_id": "HYP-HFIC-CAND-EDA3E4414CCA",
+      "payload_sha256": "de47a6218de42661910bb96eb4fdcc69004b4bce42c27552b9e13827806265ed",
+      "record_id": "EVIDENCE-BINDING-001-7C9E42A5",
+      "record_kind": "EVIDENCE_BINDING",
+      "run_id": "RUN-868DA3FCF05C52398612C152"
+    },
+    {
+      "entity_id": "EVIDENCE-BINDING-002-7C9E42A5",
+      "hypothesis_version_id": "HYP-HFIC-CAND-EDA3E4414CCA",
+      "payload_sha256": "bed8d1ba581cc3cef6e7dccf8d2e707b61550609ccf5879289855c6ee2eaa987",
+      "record_id": "EVIDENCE-BINDING-002-7C9E42A5",
+      "record_kind": "EVIDENCE_BINDING",
+      "run_id": "RUN-868DA3FCF05C52398612C152"
+    },
+    {
+      "entity_id": "METRIC-TERMINAL-MATCH-7C9E42A5",
+      "hypothesis_version_id": "HYP-HFIC-CAND-EDA3E4414CCA",
+      "payload_sha256": "50473e910c922d7d555dc21792efbba5c638f9886a63bc54e988b138fc67a3be",
+      "record_id": "METRIC-TERMINAL-MATCH-7C9E42A5",
+      "record_kind": "EXPERIMENT_METRIC",
+      "run_id": "RUN-868DA3FCF05C52398612C152"
+    },
+    {
+      "entity_id": "RESULT-ARTIFACT-868DA3FCF05C52398612C152",
+      "hypothesis_version_id": "HYP-HFIC-CAND-EDA3E4414CCA",
+      "payload_sha256": "470084f9e65c52c041fa5b762f30e64ca0f3c5a6be469e78369b9e851fefff3d",
+      "record_id": "RESULT-ARTIFACT-868DA3FCF05C52398612C152",
+      "record_kind": "RESEARCH_ARTIFACT",
+      "run_id": "RUN-868DA3FCF05C52398612C152"
+    },
+    {
+      "entity_id": "RUN-868DA3FCF05C52398612C152",
+      "hypothesis_version_id": "HYP-HFIC-CAND-EDA3E4414CCA",
+      "payload_sha256": "cdd46a3a610554bbf750b16ee2605495d9b4027ac55e4a966197103220c81a6e",
+      "record_id": "RUN-COMPLETED-DB1CF1517C9E42A5",
+      "record_kind": "RUN_COMPLETED",
+      "run_id": "RUN-868DA3FCF05C52398612C152"
+    },
+    {
+      "entity_id": "RUN-868DA3FCF05C52398612C152",
+      "hypothesis_version_id": "HYP-HFIC-CAND-EDA3E4414CCA",
+      "payload_sha256": "0b5b85f4cae31f7025a07defed08d2025b8d950d8e0632abc7c87044f71fe948",
+      "record_id": "RUN-STARTED-DB1CF1517C9E42A5",
+      "record_kind": "RUN_STARTED",
+      "run_id": "RUN-868DA3FCF05C52398612C152"
+    }
+  ],
+  "direct_science_carrier_records": 3,
+  "exact_recipe_result_replayed": true,
+  "excluded_nonmatching_run_count": 1,
+  "experiment_id": "EXP-SLS-TC-EDA3E4414CCA",
+  "experiment_spec_sha256": "082ba79c4df57af03c57710d71b2630faecf2297ff7e19fbb2fef879870fa8d5",
+  "fixture_id": "TC-LEGACY-1.1-REPLAY",
+  "hypothesis_definition_sha256": "eda3e4414cca7325771264185555e559bf9f0db438f4337a64223621cd288f40",
+  "obligations": [
+    {
+      "code": "FALSIFIER",
+      "status": "PRESENT"
+    },
+    {
+      "code": "PIT_AVAILABILITY",
+      "status": "CONFLICT"
+    },
+    {
+      "code": "POPULATION_N",
+      "status": "UNKNOWN"
+    },
+    {
+      "code": "MISSINGNESS",
+      "status": "MISSING"
+    },
+    {
+      "code": "SURVIVAL",
+      "status": "MISSING"
+    },
+    {
+      "code": "HOLDOUT",
+      "status": "UNKNOWN"
+    },
+    {
+      "code": "ENTRY_EXECUTABILITY",
+      "status": "MISSING"
+    },
+    {
+      "code": "EXIT_EXECUTABILITY",
+      "status": "MISSING"
+    },
+    {
+      "code": "COST_EVIDENCE",
+      "status": "MISSING"
+    },
+    {
+      "code": "EXECUTION_REGIME_BINDING",
+      "status": "MISSING"
+    },
+    {
+      "code": "RESULT",
+      "status": "MISSING"
+    },
+    {
+      "code": "UNCERTAINTY",
+      "status": "MISSING"
+    },
+    {
+      "code": "ROBUSTNESS",
+      "status": "MISSING"
+    },
+    {
+      "code": "EVIDENCE_CLASS",
+      "status": "MISSING"
+    }
+  ],
+  "path_fidelity": "SEGMENT_PRODUCT_PATH",
+  "run_id": "RUN-868DA3FCF05C52398612C152",
+  "run_terminal": "COMPLETE",
+  "schema_version": "1.1",
+  "science_guard": {
+    "allowed": false,
+    "blocked_codes": [
+      "PIT_AVAILABILITY",
+      "POPULATION_N",
+      "MISSINGNESS",
+      "SURVIVAL",
+      "HOLDOUT",
+      "ENTRY_EXECUTABILITY",
+      "EXIT_EXECUTABILITY",
+      "COST_EVIDENCE",
+      "EXECUTION_REGIME_BINDING",
+      "RESULT",
+      "UNCERTAINTY",
+      "ROBUSTNESS",
+      "EVIDENCE_CLASS"
+    ],
+    "meaning": "PROMOTE_BLOCKED"
+  },
+  "scientific_decision_written": false,
+  "scientific_obligations_present": 0,
+  "scientific_terminal": "INCONCLUSIVE",
+  "scope": "EXPLICIT_DOWNSTREAM_PROBE_NOT_CRITIC_APPROVED_ADVANCEMENT",
+  "status": "PASS",
+  "strategy_version_created": false,
+  "synthetic_activation_or_paper_from_this_candidate": false,
+  "target_run_conflicted": false
+}

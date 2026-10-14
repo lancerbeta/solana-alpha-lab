@@ -1,0 +1,26 @@
+{
+  "task_id": "SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1_TARGETED_CONTINUATION",
+  "reviews": [
+    {
+      "agent_task": "/root/episode_packet_critic",
+      "fork_turns": "none",
+      "research_input": "Single native critic_input_packet; public method, schema and identity contract only",
+      "input_packet_sha256": "4a91c8aec2cf9b79be11bba384af87ec4f744b22fa105cb8aa8951bd763e037f",
+      "terminal": "REVISE_ONCE",
+      "attestation": "NEW_CONTEXT_REQUIRED",
+      "store_or_holdout_access_reported": false
+    },
+    {
+      "agent_task": "/root/episode_revised_packet_critic",
+      "fork_turns": "none",
+      "research_input": "Single revised native critic_input_packet; public method/schema/identity and public List A protocol core only",
+      "input_packet_sha256": "8acafcbf2a21a0c5a013733a44235d0c93d67ea8c5bd876128eed56be24d4c8e",
+      "terminal": "KILL_LOW_INFORMATION_VALUE",
+      "attestation": "NEW_CONTEXT_REQUIRED",
+      "store_or_holdout_access_reported": false
+    }
+  ],
+  "limits": ["NO_OS_CONFINEMENT_CLAIM", "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY", "NO_MODEL_DIVERSITY_PROVEN"],
+  "actor_status": "AGENT_BEHAVIOR_UNVERIFIED",
+  "native_finalize": "Both actual decisions submitted to unchanged native session API; no verdict substituted by orchestrator"
+}

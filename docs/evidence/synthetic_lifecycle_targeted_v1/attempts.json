@@ -1,0 +1,91 @@
+{
+  "all_attempts_preserved": true,
+  "attempts": [
+    {
+      "attempt_id": "sls-tc-v1-diagnose-a1",
+      "elapsed_seconds": null,
+      "exit_code": 1,
+      "running": false,
+      "source_unchanged": "UNKNOWN",
+      "status": "INVALID_HARNESS",
+      "stop_reason": null
+    },
+    {
+      "attempt_id": "sls-tc-v1-diagnose-a2",
+      "elapsed_seconds": 21.023777,
+      "exit_code": 0,
+      "running": false,
+      "source_unchanged": true,
+      "status": "PASS",
+      "stop_reason": null
+    },
+    {
+      "attempt_id": "sls-tc-v1-diagnose-a3",
+      "elapsed_seconds": 43.581722,
+      "exit_code": 0,
+      "running": false,
+      "source_unchanged": true,
+      "status": "PASS",
+      "stop_reason": null
+    },
+    {
+      "attempt_id": "sls-tc-v1-episode-a1",
+      "elapsed_seconds": 206.600757,
+      "exit_code": 1,
+      "running": false,
+      "source_unchanged": true,
+      "status": "HARNESS_ERROR",
+      "stop_reason": null
+    },
+    {
+      "attempt_id": "sls-tc-v1-episode-resume-a1",
+      "elapsed_seconds": 39.98772,
+      "exit_code": 0,
+      "running": false,
+      "source_unchanged": true,
+      "status": "PASS",
+      "stop_reason": null
+    },
+    {
+      "attempt_id": "sls-tc-v1-finalize-a1",
+      "elapsed_seconds": 13.648944,
+      "exit_code": 0,
+      "running": false,
+      "source_unchanged": true,
+      "status": "PASS",
+      "stop_reason": null
+    },
+    {
+      "attempt_id": "sls-tc-v1-legacy-a1",
+      "elapsed_seconds": 11.300755,
+      "exit_code": 1,
+      "running": false,
+      "source_unchanged": true,
+      "status": "HARNESS_ERROR",
+      "stop_reason": null
+    },
+    {
+      "attempt_id": "sls-tc-v1-legacy-a2",
+      "elapsed_seconds": 6.037754,
+      "exit_code": 0,
+      "running": false,
+      "source_unchanged": true,
+      "status": "PASS",
+      "stop_reason": null
+    },
+    {
+      "attempt_id": "sls-tc-v1-revise-a1",
+      "elapsed_seconds": 15.612493,
+      "exit_code": 0,
+      "running": false,
+      "source_unchanged": true,
+      "status": "PASS",
+      "stop_reason": null
+    }
+  ],
+  "invalid_attempt_causes": {
+    "sls-tc-v1-diagnose-a1": "AUDIT_LAUNCHER_VOLUME_ALIAS_CREATED_EMPTY_REPO",
+    "sls-tc-v1-episode-a1": "AUDIT_OBSERVER_WRONG_COMPARATOR_FIELD_AFTER_VALID_NATIVE_LOOK",
+    "sls-tc-v1-legacy-a1": "AUDIT_OBSERVER_EXPECTED_GLOBAL_CONFLICT_SET_EMPTY_IN_SHARED_SYNTHETIC_STORE"
+  }
+}

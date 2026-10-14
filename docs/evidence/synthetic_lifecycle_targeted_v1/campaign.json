@@ -1,0 +1,289 @@
+{
+  "benchmark_history": "Original raw benchmark plus separately registered episode v1; unchanged values/seed/thresholds after first look.",
+  "blind_actor": "AGENT_BEHAVIOR_UNVERIFIED",
+  "clock_limit": "Fixture commissioning generated_at/research_memory_as_of are synthetic nonchronological metadata, not real PIT availability proof.",
+  "downstream_probe": {
+    "accepted_chronological_validation": false,
+    "classifier_terminal": "REPLAY_AVAILABLE",
+    "confirmation_consumer": "ABSENT_IN_THIS_ROUTE",
+    "direct_records": [
+      {
+        "entity_id": "EVIDENCE-BINDING-001-7C9E42A5",
+        "hypothesis_version_id": "HYP-HFIC-CAND-EDA3E4414CCA",
+        "payload_sha256": "de47a6218de42661910bb96eb4fdcc69004b4bce42c27552b9e13827806265ed",
+        "record_id": "EVIDENCE-BINDING-001-7C9E42A5",
+        "record_kind": "EVIDENCE_BINDING",
+        "run_id": "RUN-868DA3FCF05C52398612C152"
+      },
+      {
+        "entity_id": "EVIDENCE-BINDING-002-7C9E42A5",
+        "hypothesis_version_id": "HYP-HFIC-CAND-EDA3E4414CCA",
+        "payload_sha256": "bed8d1ba581cc3cef6e7dccf8d2e707b61550609ccf5879289855c6ee2eaa987",
+        "record_id": "EVIDENCE-BINDING-002-7C9E42A5",
+        "record_kind": "EVIDENCE_BINDING",
+        "run_id": "RUN-868DA3FCF05C52398612C152"
+      },
+      {
+        "entity_id": "METRIC-TERMINAL-MATCH-7C9E42A5",
+        "hypothesis_version_id": "HYP-HFIC-CAND-EDA3E4414CCA",
+        "payload_sha256": "50473e910c922d7d555dc21792efbba5c638f9886a63bc54e988b138fc67a3be",
+        "record_id": "METRIC-TERMINAL-MATCH-7C9E42A5",
+        "record_kind": "EXPERIMENT_METRIC",
+        "run_id": "RUN-868DA3FCF05C52398612C152"
+      },
+      {
+        "entity_id": "RESULT-ARTIFACT-868DA3FCF05C52398612C152",
+        "hypothesis_version_id": "HYP-HFIC-CAND-EDA3E4414CCA",
+        "payload_sha256": "470084f9e65c52c041fa5b762f30e64ca0f3c5a6be469e78369b9e851fefff3d",
+        "record_id": "RESULT-ARTIFACT-868DA3FCF05C52398612C152",
+        "record_kind": "RESEARCH_ARTIFACT",
+        "run_id": "RUN-868DA3FCF05C52398612C152"
+      },
+      {
+        "entity_id": "RUN-868DA3FCF05C52398612C152",
+        "hypothesis_version_id": "HYP-HFIC-CAND-EDA3E4414CCA",
+        "payload_sha256": "cdd46a3a610554bbf750b16ee2605495d9b4027ac55e4a966197103220c81a6e",
+        "record_id": "RUN-COMPLETED-DB1CF1517C9E42A5",
+        "record_kind": "RUN_COMPLETED",
+        "run_id": "RUN-868DA3FCF05C52398612C152"
+      },
+      {
+        "entity_id": "RUN-868DA3FCF05C52398612C152",
+        "hypothesis_version_id": "HYP-HFIC-CAND-EDA3E4414CCA",
+        "payload_sha256": "0b5b85f4cae31f7025a07defed08d2025b8d950d8e0632abc7c87044f71fe948",
+        "record_id": "RUN-STARTED-DB1CF1517C9E42A5",
+        "record_kind": "RUN_STARTED",
+        "run_id": "RUN-868DA3FCF05C52398612C152"
+      }
+    ],
+    "direct_science_carrier_records": 3,
+    "exact_recipe_result_replayed": true,
+    "excluded_nonmatching_run_count": 1,
+    "experiment_id": "EXP-SLS-TC-EDA3E4414CCA",
+    "experiment_spec_sha256": "082ba79c4df57af03c57710d71b2630faecf2297ff7e19fbb2fef879870fa8d5",
+    "fixture_id": "TC-LEGACY-1.1-REPLAY",
+    "hypothesis_definition_sha256": "eda3e4414cca7325771264185555e559bf9f0db438f4337a64223621cd288f40",
+    "obligations": [
+      {
+        "code": "FALSIFIER",
+        "status": "PRESENT"
+      },
+      {
+        "code": "PIT_AVAILABILITY",
+        "status": "CONFLICT"
+      },
+      {
+        "code": "POPULATION_N",
+        "status": "UNKNOWN"
+      },
+      {
+        "code": "MISSINGNESS",
+        "status": "MISSING"
+      },
+      {
+        "code": "SURVIVAL",
+        "status": "MISSING"
+      },
+      {
+        "code": "HOLDOUT",
+        "status": "UNKNOWN"
+      },
+      {
+        "code": "ENTRY_EXECUTABILITY",
+        "status": "MISSING"
+      },
+      {
+        "code": "EXIT_EXECUTABILITY",
+        "status": "MISSING"
+      },
+      {
+        "code": "COST_EVIDENCE",
+        "status": "MISSING"
+      },
+      {
+        "code": "EXECUTION_REGIME_BINDING",
+        "status": "MISSING"
+      },
+      {
+        "code": "RESULT",
+        "status": "MISSING"
+      },
+      {
+        "code": "UNCERTAINTY",
+        "status": "MISSING"
+      },
+      {
+        "code": "ROBUSTNESS",
+        "status": "MISSING"
+      },
+      {
+        "code": "EVIDENCE_CLASS",
+        "status": "MISSING"
+      }
+    ],
+    "path_fidelity": "SEGMENT_PRODUCT_PATH",
+    "run_id": "RUN-868DA3FCF05C52398612C152",
+    "run_terminal": "COMPLETE",
+    "schema_version": "1.1",
+    "science_guard": {
+      "allowed": false,
+      "blocked_codes": [
+        "PIT_AVAILABILITY",
+        "POPULATION_N",
+        "MISSINGNESS",
+        "SURVIVAL",
+        "HOLDOUT",
+        "ENTRY_EXECUTABILITY",
+        "EXIT_EXECUTABILITY",
+        "COST_EVIDENCE",
+        "EXECUTION_REGIME_BINDING",
+        "RESULT",
+        "UNCERTAINTY",
+        "ROBUSTNESS",
+        "EVIDENCE_CLASS"
+      ],
+      "meaning": "PROMOTE_BLOCKED"
+    },
+    "scientific_decision_written": false,
+    "scientific_obligations_present": 0,
+    "scientific_terminal": "INCONCLUSIVE",
+    "scope": "EXPLICIT_DOWNSTREAM_PROBE_NOT_CRITIC_APPROVED_ADVANCEMENT",
+    "status": "PASS",
+    "strategy_version_created": false,
+    "synthetic_activation_or_paper_from_this_candidate": false,
+    "target_run_conflicted": false
+  },
+  "earliest_observed_scientific_stop": "KILL_LOW_INFORMATION_VALUE",
+  "earliest_product_contract_gap": {
+    "errors": [
+      {
+        "instance_path": "required_outcomes/0/point_id",
+        "schema_path": "properties/required_outcomes/items/properties/point_id/pattern",
+        "validator": "pattern",
+        "validator_value": "^[XY][0-9]{1,7}$"
+      }
+    ],
+    "legacy_1_1": "VALID_NATIVE_RESEARCH_ARTIFACT_ROUTE_WITHOUT_REQUIRED_OUTCOMES",
+    "mandatory_method": "PROMPT_B_REQUIRES_EXPERIMENT_SPEC_1_3_WITH_REQUIRED_OUTCOMES",
+    "native_error_code": "EXPERIMENT_SPEC_SCHEMA_INVALID",
+    "non_claims": [
+      "NO_E_TO_XY_CONVERSION",
+      "NO_SCHEDULE_ADAPTER",
+      "NO_SCIENCE_OR_PROMOTION_ACCEPTANCE"
+    ],
+    "point_controls": {
+      "E14400": false,
+      "E1800": false,
+      "E300": false,
+      "E900": false,
+      "X300": true,
+      "Y14400": true
+    },
+    "required_episode_outcome": "E14400",
+    "schema_sha256": "acea9c7813b591a83903d616d01f1a1b340c40e96161f65796b109888317a8ab",
+    "status": "PROVED_CONTRACT_GAP",
+    "whole_spec_raw_schema_control": "VALID_NOT_SEMANTICALLY_EQUIVALENT_EPISODE_ROUTE"
+  },
+  "episode_prefix": {
+    "benchmark_sha256": "7b236728a61bf2ab4cca944b6d8557ade4212184a0e9ac864fbabbc59dd56a8a",
+    "classifier_probe": {
+      "experiment_spec_sha256": "38e70f24e8317316bb655f81a06958bbc4f5b312ff7b10c5e8110b6fb3ca8f2f",
+      "hypothesis_version": "HYP-HFIC-CAND-D61121D16168",
+      "lane": "FAST_LANE",
+      "lane_classifier_terminal": "FAST_LANE_READY",
+      "network_free": true,
+      "next_action": "EXECUTE_ACCEPTED_CAPABILITY",
+      "provider_calls_actual": 0,
+      "reason_codes": [],
+      "schema": "smial.hfic-classifier-receipt",
+      "schema_version": "1.0",
+      "selected_candidate_id": "HFIC-CAND-D61121D16168",
+      "selected_definition_sha256": "d61121d16168822f2ee8ed0444873f412869395c2d2a0fce85b289869398faa7",
+      "session_id": "HFIC-SESS-36D02D8E2ADA224C"
+    },
+    "critic_input_packet_sha256": "4a91c8aec2cf9b79be11bba384af87ec4f744b22fa105cb8aa8951bd763e037f",
+    "discovery_import_only": true,
+    "genuine_actor": "AGENT_BEHAVIOR_UNVERIFIED",
+    "native_full_product_path": false,
+    "native_prefix": "EPISODE_NATIVE_CAPTURE -> IMPORT -> FORGE_MAIN -> PERSIST_DRAFT -> FREEZE",
+    "native_world_retained": "sls-v1-scratch:/sls-tc-episode-world-v1",
+    "oracle": {
+      "contrast": ".18",
+      "mean_A": ".14",
+      "mean_C": "-.04",
+      "n_A": 32,
+      "n_C": 32,
+      "status": "PASS"
+    },
+    "pre_critic_classifier_probe": "MECHANICAL_ONLY_NO_CRITIC_OR_SCIENCE_ACCEPTANCE",
+    "selected_candidate_id": "HFIC-CAND-D61121D16168",
+    "selected_definition_sha256": "d61121d16168822f2ee8ed0444873f412869395c2d2a0fce85b289869398faa7",
+    "source_packets": [
+      {
+        "name": "packet-0.json",
+        "sha256": "933c1fdf473f36c9fb4abd32067946971b5b6df03032f37e39f7e0277bdd60be"
+      },
+      {
+        "name": "packet-1.json",
+        "sha256": "cbd5d31f89a04a1365bb5c0c97c0712ea64c498d32be40d97a743c39d95af5e7"
+      }
+    ],
+    "status": "PASS",
+    "validation_imported_or_decoded": false
+  },
+  "fidelity": "SEGMENT_PRODUCT_PATH",
+  "holdout_limit": "Later source packet captured but never imported/decoded by evaluation; dependent synthetic template and one day/group do not satisfy accepted chronological inference.",
+  "known_retained_gib": 0.7626,
+  "native_full_product_path": false,
+  "oracle_scope": "Aggregate n/means/contrast independent Decimal checks; individual selected-ID membership not emitted and remains UNVERIFIED.",
+  "original_audit_head": "e6141191c185a5aa02c0bc3178b2efeaa534417b",
+  "original_audit_pr": 401,
+  "original_evidence_preserved": true,
+  "product_base": "94b391d658b52035ae88e2da05f1ea25ff17b0f8",
+  "product_gap_proof_scope": "Necessary ExperimentSpec 1.3 outcome expressibility constraint, independently probed; this candidate stopped earlier at Critic and was not advanced through it.",
+  "protected_actions": {
+    "cash": 0,
+    "cleanup": 0,
+    "deploy": 0,
+    "manual_scientific_promote": 0,
+    "merge": 0,
+    "product_repair": 0,
+    "production_writes": 0,
+    "provider": 0
+  },
+  "revision": {
+    "cold_action": "RESUME_CRITIC",
+    "cold_inventory_unchanged": true,
+    "critic_input_packet_sha256": "8acafcbf2a21a0c5a013733a44235d0c93d67ea8c5bd876128eed56be24d4c8e",
+    "critic_terminal": "REVISE_ONCE",
+    "native_critic_finalized": true,
+    "native_revision": true,
+    "new_look_count": 0,
+    "path_fidelity": "SEGMENT_PRODUCT_PATH",
+    "scientific_acceptance": false,
+    "selected_candidate_id": "HFIC-CAND-EDA3E4414CCA",
+    "selected_definition_sha256": "eda3e4414cca7325771264185555e559bf9f0db438f4337a64223621cd288f40",
+    "session_id": "HFIC-SESS-36D02D8E2ADA224C",
+    "session_state": "REVISED_AWAITING_CRITIC",
+    "status": "PASS"
+  },
+  "scientific_acceptance": false,
+  "status": "EARLIEST_REQUIRED_OUTCOME_CONTRACT_GAP_PROVED",
+  "task_id": "SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1_TARGETED_CONTINUATION",
+  "terminal": {
+    "cold_action": "RETURN_EXISTING_SESSION",
+    "cold_inventory_unchanged": true,
+    "critic_input_packet_sha256": "8acafcbf2a21a0c5a013733a44235d0c93d67ea8c5bd876128eed56be24d4c8e",
+    "critic_terminal": "KILL_LOW_INFORMATION_VALUE",
+    "native_critic_finalized": true,
+    "native_revision": false,
+    "new_look_count": 0,
+    "path_fidelity": "SEGMENT_PRODUCT_PATH",
+    "scientific_acceptance": false,
+    "selected_candidate_id": "HFIC-CAND-EDA3E4414CCA",
+    "selected_definition_sha256": null,
+    "session_id": "HFIC-SESS-36D02D8E2ADA224C",
+    "session_state": "SYNTHESIS_COMPLETE",
+    "status": "PASS"
+  }
+}

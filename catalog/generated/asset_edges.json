@@ -6383,6 +6383,11 @@
       "target_asset_id": "CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001"
     },
     {
+      "source_asset_id": "DOC-SYNTHETIC-LIFECYCLE-TARGETED-AUDIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-FORGE-LIST-AWARE-RESEARCH-SCOPE-001"
+    },
+    {
       "source_asset_id": "DOC-SYSTEM-OPERABILITY-SURFACE-001",
       "relation": "consumes",
       "target_asset_id": "DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001"
