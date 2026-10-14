@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-10-14",
+  "as_of": "2026-10-15",
   "capability_radar": {
     "now": "NONE: existing skills/CLIs/runtime/native owners suffice; no install",
     "watch": "No new tooling trigger identified"
@@ -21,13 +21,14 @@
     "CPython3.13.14 required",
     "Clean-host bootstrap and shared Docker VHDX/log-directory growth UNKNOWN",
     "Two legacy campaign-specific tests skipped",
-    "Early P0 decoder count UNKNOWN; interrupted original charge retained"
+    "Early P0 decoder count UNKNOWN; interrupted original charge retained",
+    "Product fit PASS is not delivery readiness: retained reviewer-created empty environment violates no-new-.venv contract; exact owner acceptance absent and architecture review NOT_READY."
   ],
   "mode": "FULL_REVIEW",
   "recovery": "Ordinary code/schema/registry revert preserves all scientific state/charges; incompatible pending trial remains exposed",
   "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-FACTORY-FIT",
-  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
-  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_bindings_sha256": "32ed869bbd8e6eadfdbc596ae72edb1ff24eadaab754612aae9bea44f9c8f5b5",
+  "reviewed_inventory_sha256": "cd8eb8ab51fec3e3a57d36723013a9864f91128a4da494081ca06a28e4cfa4ff",
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
