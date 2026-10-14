@@ -48,10 +48,16 @@ Critic для другого packet: exact packet/candidate hashes обязат�
 ```powershell
 $env:UV_PROJECT_ENVIRONMENT=Join-Path (Split-Path $campaignRoot -Parent) 'solana-alpha-lab/.venv'
 uv run --locked --managed-python --no-sync python -B tests/fixtures/synthetic_lifecycle_smoke_v1/observer.py --world-root (Join-Path $retained 'sls-v1-world-a3') --out (Join-Path $retained 'independent-observer-replay.json')
+if ($LASTEXITCODE -ne 0) { throw 'FRESH_OBSERVER_REPLAY_FAILED' }
 uv run --locked --managed-python --no-sync python -B tests/fixtures/synthetic_lifecycle_smoke_v1/collect.py --retained $retained --out ./local/sls-readout-replay
+if ($LASTEXITCODE -ne 0) { throw 'FROZEN_CAMPAIGN_READOUT_FAILED' }
 ```
 
 Observer проверяет сохранённые числа без product import и без MAIN.
+Его `*-replay.json` — отдельная свежая проверка, которая должна успешно завершиться.
+Collector восстанавливает исходную frozen campaign из canonical
+`independent-observer-v2.json`, сохранённых footprints и attempts; свежий replay
+receipt не заменяет эти исторические inputs и не является новым campaign result.
 Collector требует оригинальный frozen denominator, фактические native receipts,
 independent oracle и distinct scientific spec hashes; пустая/усечённая выборка
 не является PASS. Исторические failed records остаются в `attempts.jsonl`.
