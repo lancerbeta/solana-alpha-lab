@@ -1,0 +1,139 @@
+{
+  "schema": "smial.hypothesis-critic-result",
+  "schema_version": "1.1",
+  "session_id": "HFIC-SESS-36D02D8E2ADA224C",
+  "critic_input_packet_sha256": "4a91c8aec2cf9b79be11bba384af87ec4f744b22fa105cb8aa8951bd763e037f",
+  "selected_candidate_id": "HFIC-CAND-D61121D16168",
+  "selected_definition_sha256": "d61121d16168822f2ee8ed0444873f412869395c2d2a0fce85b289869398faa7",
+  "critic_prompt_version": "HFIC-V1.1",
+  "isolated_context_attestation": "NEW_CONTEXT_REQUIRED",
+  "critic_terminal": "REVISE_ONCE",
+  "next": "REVISE_FIXED_CONTRAST_DESIGN_WITHOUT_NEW_OUTCOMES",
+  "attack_matrix": {
+    "independent_reality_receipt": {
+      "context": "Новый subagent context. Единственный research input — переданный packet; дополнительно использованы публичные method/schema/identity. Outer envelope, другие retained artifacts, stores, raw RDP, старые Critic и holdout не открывались. OS confinement не утверждается.",
+      "input_schema": "PASS",
+      "candidate_identity": "PASS",
+      "result_hash": "PASS",
+      "result_schema": "PASS",
+      "git_head_matches_packet": true,
+      "selected_scope_matches_bound_look": true,
+      "base_admitted_n": 64,
+      "matched_n": 32,
+      "comparator_n": 32,
+      "matched_target_missing_n": 0,
+      "comparator_target_missing_n": 0,
+      "matched_mean_target": 0.14,
+      "comparator_mean_target": -0.04,
+      "observed_difference": 0.18,
+      "claim_level": "EXPLORATORY_PROXY",
+      "calendar_blocks": 1,
+      "independence": "UNKNOWN",
+      "chronological_provenance": "UNKNOWN: generated_at/research_memory_as_of=2026-08-25 предшествуют cohort 2026-10-08 и frozen research_log_cutoff 2026-10-14. Для synthetic packet это не доказательство реальной PIT chronology."
+    },
+    "strongest_kill_case": "Контраст может полностью отражать synthetic template и vendor selection. Повторная проверка тех же 64 эпизодов воспроизведёт +0.18, но не даст независимого подтверждения predictive claim.",
+    "novelty_memory": {
+      "status": "UNKNOWN",
+      "evidence": "Единственный HISTORICAL prior имеет неполный scope и не содержит recorded finding/close. Full-archive guard: NO_BLOCK_ESTABLISHED_BY_SCOPE_GUARD; active_scope_restriction_established=false. Это не запрет семьи и не доказательство 'First bound question'."
+    },
+    "mechanism_counterparty": {
+      "status": "PASS",
+      "evidence": "claim_form=PREDICTIVE; отсутствие actor/mechanism допустимо. Template/vendor explanation не устранена; causal claim не разрешается."
+    },
+    "estimand_universe_pit": {
+      "status": "UNKNOWN",
+      "evidence": "Scalar scope и rule hash совпадают с look: ALL universe, JUPITER:toporganicscore:5m, EPISODE_T0, matched vs eligible complement, E1800→E14400. eligibility_uses_target=false; coverage known=64/64. FIRST_RELIABLE_AVAILABLE_AT и provider snapshot — bound method; source_price_event_time=UNKNOWN. UNIQUE_PIT/UNIQUE_DEPENDENCY сохраняются как authored boundaries, не как измеренные отрицательные PIT observations."
+    },
+    "execution_economics": {
+      "status": "PASS",
+      "evidence": "Узкий claim относится к PRICE_RELATIVE_PROXY на synthetic corpus. executable notional не заявлен, costs=ABSENT, labeled_net_return=false. Вывод о торговой доходности из +0.18 недопустим."
+    },
+    "statistics_multiplicity": {
+      "status": "UNKNOWN",
+      "evidence": "Discovery support: 32/32, missing=0; +0.14 vs −0.04. Один day/cohort; independence=UNKNOWN, cohort_independent_replication=false. Два disclosed comparisons в одном MAIN look не дают двух подтверждений. Повторяющиеся значения и ES10 не доказывают precision или replication."
+    },
+    "alternative_world_falsifiability": {
+      "status": "FAIL",
+      "evidence": "'One fixed contrast; no retuning' и 'No supported contrast' не задают statistic, uncertainty, PASS/FAIL/INCONCLUSIVE или независимую validation boundary. Eligible complement является comparator на уже просмотренной evidence; сам по себе он не исключает synthetic-template explanation."
+    },
+    "information_value_opportunity_cost": {
+      "status": "UNKNOWN",
+      "evidence": "Named decision — оправдана ли отдельно авторизованная validation. Сейчас отсутствует правило, по которому её оправдывают или отклоняют. Узкая правка дизайна дешевле нового look; synthetic observation не решает market question."
+    },
+    "capability_data_delta": {
+      "status": "PASS",
+      "evidence": "Freeze-owned grounding=GROUNDED; accepted CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001, unresolved_requirements=[], authority_granted=false. PAUSED_CAP/candidate_ready=false — routing state, самостоятельный scientific kill из них не следует. Новая инфраструктура не требуется."
+    },
+    "b7": {
+      "critic_terminal": "REVISE_ONCE: discovery contrast сохранён; до classification нужен один проверяемый дизайн.",
+      "independent_reality_receipt": "Packet schema, copied identities, canonical selected hash и result hash проверены. Исходные dataset files не открывались.",
+      "strongest_kill_case": "Synthetic template объясняет наблюдение; повтор discovery не является независимой validation.",
+      "attack_matrix": "Восемь атак приведены выше.",
+      "material_defects": "Перечислены в material_defects.",
+      "revision_contract": "Приведён в revision_receipt.",
+      "final_hypothesis_contract": "NONE",
+      "validated_spec_and_classifier_receipt": "NONE",
+      "final_execution_unit": "NONE",
+      "non_claims": "Приведены в non_claims.",
+      "owner_next": "REVISE_FIXED_CONTRAST_DESIGN_WITHOUT_NEW_OUTCOMES"
+    }
+  },
+  "material_defects": [
+    "Не объявлены proposed_method и PASS/FAIL/INCONCLUSIVE; falsifier не задаёт различимое правило решения при одном зависимом synthetic cohort.",
+    "Не разделены повторная exploratory проверка уже просмотренного контраста и confirming evidence на независимой validation.",
+    "Фраза 'First bound question' сильнее frozen prior evidence: novelty остаётся UNKNOWN.",
+    "Top-level as-of timestamps предшествуют cohort и frozen memory cutoff; их нельзя использовать как доказательство реальной availability/chronology без явной source-bound synthetic provenance."
+  ],
+  "revision_receipt": {
+    "max_revisions": 1,
+    "scope": "PRIMARY_SELECTED_ONLY",
+    "preserve": [
+      "claim_form=PREDICTIVE",
+      "population=OPPORTUNITY_EPISODES",
+      "decision_timestamp=E1800",
+      "target=PRICE_RELATIVE_PROXY:E1800:E14400:FIELD-USD-PRICE-001",
+      "research_scope_rule_sha256=f4691c8a3f72dde5d96c18a33db845ea2d68dbb1c940d1bd02392d5e53740257",
+      "matched vs eligible complement",
+      "base_x.n=64"
+    ],
+    "required_changes": [
+      "Объявить фиксированный statistic и estimand контраста, dependence/uncertainty policy и PASS/FAIL/INCONCLUSIVE. Один synthetic block не должен выдавать независимое подтверждение.",
+      "Зафиксировать, что текущие +0.14/−0.04 — discovery support; повторный расчёт на тех же данных остаётся exploratory. Назвать независимую validation boundary без чтения, заказа или выполнения новых outcomes.",
+      "Сохранить novelty=UNKNOWN и NO_BLOCK_ESTABLISHED_BY_SCOPE_GUARD вместо неподтверждённого first-question assertion.",
+      "Разрешить as-of provenance через freeze-owned/public bindings либо явно маркировать timestamps как synthetic/nonchronological. Не выдумывать дату фактической доступности и не переписывать source history."
+    ],
+    "prohibited": [
+      "new look",
+      "new outcomes",
+      "holdout access",
+      "new features",
+      "population change",
+      "retuning",
+      "mechanism replacement",
+      "provider calls",
+      "experiment execution"
+    ],
+    "on_unresolved": "KILL_UNBOUND_EVIDENCE",
+    "new_execution_authority": 0
+  },
+  "classifier_receipt": null,
+  "experiment_spec": null,
+  "experiment_spec_packet": null,
+  "authority": {
+    "git_mutation": 0,
+    "experiment_execution": 0,
+    "provider_api_rpc_wss_calls": 0
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_CAUSAL_IDENTIFICATION",
+    "NO_IID_CLAIM",
+    "NO_INDEPENDENT_CONFIRMATION",
+    "SYNTHETIC_DEPENDENT_TEMPLATE",
+    "NO_OS_CONFINEMENT_ATTESTATION",
+    "NO_EXPERIMENT_EXECUTED",
+    "NO_HOLDOUT_ACCESSED",
+    "NO_FAMILY_CLOSE_AUTHORITY"
+  ]
+}

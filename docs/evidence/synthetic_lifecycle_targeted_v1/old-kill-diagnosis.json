@@ -1,0 +1,223 @@
+{
+  "non_claims": [
+    "NO_OOS_PROOF_FROM_CRITIC_TEXT",
+    "NO_ORIGINAL_SCIENTIFIC_ACCEPTANCE",
+    "NO_REWRITE_OF_OLD_KILL"
+  ],
+  "records": [
+    {
+      "authored_pit_risks": [
+        "NOT_DECLARED_IN_DRAFT"
+      ],
+      "classifier_probe_schema_version": "1.1",
+      "counterfactual_classifier": {
+        "experiment_spec_sha256": "cadbdfc441d282afe24efd0cabfdbe48b34a0958789505c9f6afcf846b7cb1fc",
+        "hypothesis_version": "HYP-HFIC-CAND-262CE50D712A",
+        "lane": "FAST_LANE",
+        "lane_classifier_terminal": "FAST_LANE_READY",
+        "network_free": true,
+        "next_action": "EXECUTE_ACCEPTED_CAPABILITY",
+        "provider_calls_actual": 0,
+        "reason_codes": [],
+        "schema": "smial.hfic-classifier-receipt",
+        "schema_version": "1.0",
+        "selected_candidate_id": "HFIC-CAND-262CE50D712A",
+        "selected_definition_sha256": "262ce50d712a0e4ce66cd9b1fb82aa2060563d2f200bbb2e5c306793932c3852",
+        "session_id": "HFIC-SESS-A2C472E331496A73"
+      },
+      "family": "SIMPLE",
+      "fidelity": "READ_ONLY_CLASSIFICATION_AUDIT_NOT_ORIGINAL_SESSION_ADVANCEMENT",
+      "grounding": {
+        "capability_bindings": [
+          {
+            "accepted": true,
+            "authority_granted": false,
+            "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+          }
+        ],
+        "context_packet_sha256": "40ba0a41e0d6d378a87e98d4a4167940216c0072ff332d1c2816d5f892b443da",
+        "feature_bindings": [],
+        "terminal": "GROUNDED",
+        "unresolved_requirements": []
+      },
+      "native_availability_denial_codes": [],
+      "original_classifier_reason_codes": null,
+      "original_classifier_reason_codes_presence": "ABSENT",
+      "original_classifier_receipt": null,
+      "original_critic_result_sha256": "75a87c6b1b7f45a2d939a1cb4a1fed0bf21200286e8677beab4de73e04073294",
+      "original_critic_terminal": "KILL_UNBOUND_EVIDENCE",
+      "original_definition_sha256": "262ce50d712a0e4ce66cd9b1fb82aa2060563d2f200bbb2e5c306793932c3852",
+      "original_material_defects": [
+        "Independent chronological validation and PASS/FAIL/INCONCLUSIVE semantics are not bound in the permitted packet.",
+        "Named NULL/DECOY controls have no bound definition/results in the packet.",
+        "Manifest IDs and frozen file hashes do not supply dataset fingerprint, availability closure and required-outcome binding."
+      ],
+      "original_packet_sha256": "cdd88224881628c9b075f2672e8bcb6b8b98899e79a363ccf63639b66e8df948",
+      "original_saved_decision": {
+        "HFIC-CAND-262CE50D712A": {
+          "decision_kind": "REJECT",
+          "reason_code": "KILL_UNBOUND_EVIDENCE"
+        }
+      },
+      "original_saved_diagnostics": {
+        "candidate_count": 1,
+        "candidate_with_forward_only_dependency_count": 0,
+        "candidate_with_historical_only_dependency_count": 0,
+        "candidate_with_known_prior_ref_count": 0,
+        "candidate_with_missing_dependency_count": 0,
+        "candidate_with_pit_ready_dependency_count": 0,
+        "candidate_with_unresolved_requirement_count": 0,
+        "closed_or_suppressed_collision_count": 0,
+        "critic_terminal": "KILL_UNBOUND_EVIDENCE",
+        "known_capability_reference_count": 1,
+        "known_feature_reference_count": 0,
+        "lane_classifier_terminal": null,
+        "next_action_type_if_any": null,
+        "no_worthy_hypothesis": false,
+        "selected_candidate_present": true,
+        "structural_repetition_count": 0,
+        "structural_repetition_ratio": 0.0,
+        "unique_actor_counterparty_count": 1,
+        "unique_horizon_notional_count": 1,
+        "unique_mechanism_count": 1,
+        "unique_primary_x_family_count": 1,
+        "unique_state_transition_count": 1,
+        "unique_structural_signature_count": 1,
+        "unresolved_requirement_count": 0
+      },
+      "pit_component_provenance": null,
+      "required_capability_ids": [
+        "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+      ],
+      "required_feature_ids": [],
+      "spec13_classifier": {
+        "experiment_spec_sha256": "b8637f604f27b2be647af481d5435ec063d80841e24b1be7adbbe655aa363de6",
+        "hypothesis_version": "HYP-HFIC-CAND-262CE50D712A",
+        "lane": "DENY",
+        "lane_classifier_terminal": "BLOCKED_BUDGET",
+        "network_free": true,
+        "next_action": "NARROW_RUNTIME_REQUEST",
+        "provider_calls_actual": 0,
+        "reason_codes": [
+          "NO_COVERING_SNAPSHOT"
+        ],
+        "schema": "smial.hfic-classifier-receipt",
+        "schema_version": "1.0",
+        "selected_candidate_id": "HFIC-CAND-262CE50D712A",
+        "selected_definition_sha256": "262ce50d712a0e4ce66cd9b1fb82aa2060563d2f200bbb2e5c306793932c3852",
+        "session_id": "HFIC-SESS-A2C472E331496A73"
+      },
+      "spec13_probe_schema_version": "1.3",
+      "spec13_request_fidelity": "PUBLIC_RAW_SCHEMA_CONTROL_NOT_A_FROZEN_SOURCE_SCHEDULE_BINDING",
+      "unresolved_requirements": []
+    },
+    {
+      "authored_pit_risks": [
+        "NOT_DECLARED_IN_DRAFT"
+      ],
+      "classifier_probe_schema_version": "1.1",
+      "counterfactual_classifier": {
+        "experiment_spec_sha256": "8058acdc32b2e464c3b1ce788f78bc1182aa8df4066b7ff0bc7fc913370f07dc",
+        "hypothesis_version": "HYP-HFIC-CAND-E161BC9E75F3",
+        "lane": "FAST_LANE",
+        "lane_classifier_terminal": "FAST_LANE_READY",
+        "network_free": true,
+        "next_action": "EXECUTE_ACCEPTED_CAPABILITY",
+        "provider_calls_actual": 0,
+        "reason_codes": [],
+        "schema": "smial.hfic-classifier-receipt",
+        "schema_version": "1.0",
+        "selected_candidate_id": "HFIC-CAND-E161BC9E75F3",
+        "selected_definition_sha256": "e161bc9e75f3d3106e8d59f56b6bdfeee24cf88922cb871e7ef817f6d20fb64c",
+        "session_id": "HFIC-SESS-3C473AA4550B430D"
+      },
+      "family": "COMPOUND",
+      "fidelity": "READ_ONLY_CLASSIFICATION_AUDIT_NOT_ORIGINAL_SESSION_ADVANCEMENT",
+      "grounding": {
+        "capability_bindings": [
+          {
+            "accepted": true,
+            "authority_granted": false,
+            "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+          }
+        ],
+        "context_packet_sha256": "8b7271ca9f9893bb95260bf7d7e41ebbdc0fbc39509d1cf2256898f53cc27765",
+        "feature_bindings": [],
+        "terminal": "GROUNDED",
+        "unresolved_requirements": []
+      },
+      "native_availability_denial_codes": [],
+      "original_classifier_reason_codes": null,
+      "original_classifier_reason_codes_presence": "ABSENT",
+      "original_classifier_receipt": null,
+      "original_critic_result_sha256": "e686777b0eb6b395ea7672427705a04567e9f51a545bc32a4e1ba7bd0c7c1420",
+      "original_critic_terminal": "KILL_UNBOUND_EVIDENCE",
+      "original_definition_sha256": "e161bc9e75f3d3106e8d59f56b6bdfeee24cf88922cb871e7ef817f6d20fb64c",
+      "original_material_defects": [
+        "CONFIRMATION_CONTRACT_UNBOUND: accepted independent chronological/OOS consumer and frozen acceptance semantics are absent.",
+        "NEGATIVE_CONTROL_BINDINGS_UNBOUND: named NULL/DECOY fixtures have no packet-bound definition, measurement or comparison receipt.",
+        "EXPERIMENT_SPEC_1_3_CONSUMPTION_UNBOUND: missing dataset fingerprints and observation/required-outcome consumption contract."
+      ],
+      "original_packet_sha256": "7b4faf7ceb2e1c32b90c948417dc3d8d03fb8dbca89f0511fa715c8cda2608db",
+      "original_saved_decision": {
+        "HFIC-CAND-E161BC9E75F3": {
+          "decision_kind": "REJECT",
+          "reason_code": "KILL_UNBOUND_EVIDENCE"
+        }
+      },
+      "original_saved_diagnostics": {
+        "candidate_count": 1,
+        "candidate_with_forward_only_dependency_count": 0,
+        "candidate_with_historical_only_dependency_count": 0,
+        "candidate_with_known_prior_ref_count": 0,
+        "candidate_with_missing_dependency_count": 0,
+        "candidate_with_pit_ready_dependency_count": 0,
+        "candidate_with_unresolved_requirement_count": 0,
+        "closed_or_suppressed_collision_count": 0,
+        "critic_terminal": "KILL_UNBOUND_EVIDENCE",
+        "known_capability_reference_count": 1,
+        "known_feature_reference_count": 0,
+        "lane_classifier_terminal": null,
+        "next_action_type_if_any": null,
+        "no_worthy_hypothesis": false,
+        "selected_candidate_present": true,
+        "structural_repetition_count": 0,
+        "structural_repetition_ratio": 0.0,
+        "unique_actor_counterparty_count": 1,
+        "unique_horizon_notional_count": 1,
+        "unique_mechanism_count": 1,
+        "unique_primary_x_family_count": 1,
+        "unique_state_transition_count": 1,
+        "unique_structural_signature_count": 1,
+        "unresolved_requirement_count": 0
+      },
+      "pit_component_provenance": null,
+      "required_capability_ids": [
+        "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+      ],
+      "required_feature_ids": [],
+      "spec13_classifier": {
+        "experiment_spec_sha256": "f2cb7cbbca98c47ef003607d6950bdf885eb2bf54b4d749f5b84a7e2c7e7ac85",
+        "hypothesis_version": "HYP-HFIC-CAND-E161BC9E75F3",
+        "lane": "DENY",
+        "lane_classifier_terminal": "BLOCKED_BUDGET",
+        "network_free": true,
+        "next_action": "NARROW_RUNTIME_REQUEST",
+        "provider_calls_actual": 0,
+        "reason_codes": [
+          "NO_COVERING_SNAPSHOT"
+        ],
+        "schema": "smial.hfic-classifier-receipt",
+        "schema_version": "1.0",
+        "selected_candidate_id": "HFIC-CAND-E161BC9E75F3",
+        "selected_definition_sha256": "e161bc9e75f3d3106e8d59f56b6bdfeee24cf88922cb871e7ef817f6d20fb64c",
+        "session_id": "HFIC-SESS-3C473AA4550B430D"
+      },
+      "spec13_probe_schema_version": "1.3",
+      "spec13_request_fidelity": "PUBLIC_RAW_SCHEMA_CONTROL_NOT_A_FROZEN_SOURCE_SCHEDULE_BINDING",
+      "unresolved_requirements": []
+    }
+  ],
+  "research_inventory_unchanged": true,
+  "status": "PASS"
+}

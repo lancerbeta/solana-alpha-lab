@@ -42025,3 +42025,20 @@ records:
   evidence: []
   search_terms: [LIST_A_CONFIRMATION_PROTOCOL_FREEZE_V1, List A, first-test, conditional contrast, BOUND_CONTRACT_NOT_READY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: DOC-SYNTHETIC-LIFECYCLE-TARGETED-AUDIT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Targeted synthetic audit; native episode Critic stop, explicit outcome-contract gap, blocked science and retained footprint. No FULL or product repair claim.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1_TARGETED_CONTINUATION
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/synthetic_lifecycle_targeted_v1/OWNER_REPORT.md', repository_path: docs/reports/synthetic_lifecycle_targeted_v1/OWNER_REPORT.md}
+  integrity: {kind: sha256, sha256: 7ad75f3e85482f0dac03104de5d1031abe3fe7d643ec02e7872e74076657b540}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: DOC-FORGE-LIST-AWARE-RESEARCH-SCOPE-001}]
+  consumers: [GOAL-OWNER, DIRECT-CODEX-DELIVERY]
+  evidence: []
+  search_terms: [SMIAL_SYNTHETIC_LIFECYCLE_SMOKE_V1_TARGETED_CONTINUATION, episode-native, required_outcomes, KILL_LOW_INFORMATION_VALUE, retained footprint]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

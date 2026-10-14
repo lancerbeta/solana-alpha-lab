@@ -1,0 +1,30 @@
+{
+  "errors": [
+    {
+      "instance_path": "required_outcomes/0/point_id",
+      "schema_path": "properties/required_outcomes/items/properties/point_id/pattern",
+      "validator": "pattern",
+      "validator_value": "^[XY][0-9]{1,7}$"
+    }
+  ],
+  "legacy_1_1": "VALID_NATIVE_RESEARCH_ARTIFACT_ROUTE_WITHOUT_REQUIRED_OUTCOMES",
+  "mandatory_method": "PROMPT_B_REQUIRES_EXPERIMENT_SPEC_1_3_WITH_REQUIRED_OUTCOMES",
+  "native_error_code": "EXPERIMENT_SPEC_SCHEMA_INVALID",
+  "non_claims": [
+    "NO_E_TO_XY_CONVERSION",
+    "NO_SCHEDULE_ADAPTER",
+    "NO_SCIENCE_OR_PROMOTION_ACCEPTANCE"
+  ],
+  "point_controls": {
+    "E14400": false,
+    "E1800": false,
+    "E300": false,
+    "E900": false,
+    "X300": true,
+    "Y14400": true
+  },
+  "required_episode_outcome": "E14400",
+  "schema_sha256": "acea9c7813b591a83903d616d01f1a1b340c40e96161f65796b109888317a8ab",
+  "status": "PROVED_CONTRACT_GAP",
+  "whole_spec_raw_schema_control": "VALID_NOT_SEMANTICALLY_EQUIVALENT_EPISODE_ROUTE"
+}
