@@ -315,10 +315,36 @@ def _approval_valid(store: ObservationScheduleStore, lineage: str, row: Mapping[
         if not _approval_valid(store, lineage, target):
             return False
         strip = lambda item: {k: v for k, v in item.items() if k not in {"revision", "previous_revision"}}  # noqa: E731
-        return strip(body) == strip(target["payload"]["profile"]) and _restrictive(
-            body["limits"], store.managed_profile(lineage, int(body["previous_revision"]))["payload"]["profile"]["limits"]
+        previous = store.managed_profile(lineage, int(body["previous_revision"]))
+        return (
+            previous is not None
+            and strip(body) == strip(target["payload"]["profile"])
+            and _not_wider(body, previous["payload"]["profile"])
         )
     return False
+
+
+def _not_wider(new: Mapping[str, Any], old: Mapping[str, Any]) -> bool:
+    """True when ``new`` grants nothing ``old`` did not: limits, validity, routes, resources, scope."""
+
+    if not _restrictive(new["limits"], old["limits"]) or new["limits"]["shared_account_scope"] != old["limits"]["shared_account_scope"]:
+        return False
+    nv, ov = new["validity"], old["validity"]
+    if ov["mode"] == "UNTIL_DATE" and (
+        nv["mode"] != "UNTIL_DATE" or parse_utc(str(nv["intake_until"])) > parse_utc(str(ov["intake_until"]))
+    ):
+        return False
+    if not set(new["provider_route_ids"]).issubset(set(old["provider_route_ids"])):
+        return False
+    np_, op_ = new["resource_policy"], old["resource_policy"]
+    if np_["hard_bytes"] > op_["hard_bytes"] or np_["target_bytes"] > op_["target_bytes"] or np_[
+        "backup_max_age_seconds"
+    ] > op_["backup_max_age_seconds"]:
+        return False
+    oa, na = op_.get("target_acceptance"), np_.get("target_acceptance")
+    if na and (not oa or int(na.get("max_projected_bytes", 0)) > int(oa.get("max_projected_bytes", 0))):
+        return False
+    return new["semantics"]["cohort_family_key"] == old["semantics"]["cohort_family_key"]
 
 
 def _restrictive(new: Mapping[str, Any], old: Mapping[str, Any]) -> bool:
@@ -895,10 +921,7 @@ def rollback_profile(
     new_body = copy.deepcopy(target_body)
     new_body["revision"] = int(expected_revision) + 1
     new_body["previous_revision"] = int(expected_revision)
-    restrictive = _restrictive(new_body["limits"], current_body["limits"]) and (
-        new_body["validity"] == current_body["validity"] or new_body["validity"]["mode"] == "UNTIL_DATE"
-    )
-    if restrictive:
+    if _not_wider(new_body, current_body):
         approval: dict[str, Any] = {"kind": "ROLLBACK_TO_APPROVED", "rollback_to_revision": int(to_revision),
                                     "approved_at": render_utc(now)}
     else:
@@ -1242,8 +1265,15 @@ def update_hold_incident(
     lineages = store.managed_lineages()
     if not lineages:
         return None
-    key = "INTAKE_HELD:" + lineages[0]
     held = [item for item in tick_results if str(item.get("stop_reason") or "").endswith("_HOLD")]
+    outcome = None
+    for lineage in lineages:
+        outcome = _update_hold_for(store, lineage, tick_results, held, now) or outcome
+    return outcome
+
+
+def _update_hold_for(store, lineage, tick_results, held, now):  # noqa: ANN001
+    key = "INTAKE_HELD:" + lineage
     if held:
         reserve = dict(held[0].get("drain_headroom") or {})
         store.managed_incident_open(
@@ -1254,7 +1284,7 @@ def update_hold_incident(
             clock=now)
         return {"incident": key, "state": "OPEN"}
     if any(str(item.get("activation_state")) == "ACTIVE" and not item.get("stop_reason") for item in tick_results):
-        _recover_all(store, lineages[0], ("INTAKE_HELD:",), now)
+        _recover_all(store, lineage, ("INTAKE_HELD:",), now)
     return None
 
 

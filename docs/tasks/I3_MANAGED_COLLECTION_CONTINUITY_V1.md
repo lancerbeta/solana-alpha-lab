@@ -121,6 +121,24 @@ Honest scope limits carried into the PR (not silently dropped):
 - Long-runway (`MONTHS_RUNWAY_SUPPORTED`) needs I2 packaging evidence; `plan`/`status`
   report the five I2 metrics and count expected savings as zero until applied.
 - The deadman for a lost VPS is not provided here (`HOST_LOSS_ALERT_UNPROVEN`).
+- Not proven here, named instead of implied: five or more UTC boundaries and a weekly
+  boundary (three child days are proven); 180-day/100-week time-advanced rollover and
+  bounded-metadata/RSS at scale; seal/import/metadata-preflight of managed children (only
+  the release cohort selector is exercised); a test that an older binary rejects derived
+  authority (stated as a rule: no binary rollback after the first managed child); Telegram
+  outage retry and delivery health; conservative debit of an uncertain HTTP send inside
+  managed scope (covered by the shared-account suite).
+- Approval is integrity, not provenance: the phrase hash is derived from the profile, so
+  write access to the OPS store equals grant authority, as with V1 phrases. Provenance is the
+  OPERATE process and the owner-attention gate, not this code.
+- A HOLD round and a window that opens mid-day leave no per-round ResearchEvent: the gap is
+  an incident plus the absence of nomination rows, so consumers must treat nomination gaps
+  as UNKNOWN, never as "no opportunity", and key cohort statistics on the actual child
+  window, not on the UTC date alone.
+- The controller runs inside the tick: if the tick timer itself is dead, only the existing
+  generic stale-collector and required-timer alerts fire, not a managed-owner incident.
+- The compact backup receipt is attested by the OPERATE agent from the backup owner; its
+  content is not authenticated.
 
 DoD before merge: derived child authority limited by the approved grant and tick-time
 immutable fit; one owner per UTC day (no fragmented day); crash resume from the saved

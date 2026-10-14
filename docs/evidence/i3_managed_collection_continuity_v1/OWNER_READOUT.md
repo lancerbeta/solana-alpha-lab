@@ -43,7 +43,7 @@ JSON на каждое окно. Это код, проверенный на од
 
 ## EVIDENCE
 
-- 25 целевых тестов: 3 UTC-границы с одной фразой и 3 производными receipts, raw-SQL
+- 28 целевых тестов: 3 UTC-границы с одной фразой и 3 производными receipts, raw-SQL
   oracle владельца дня; handover/plan-отказы; crash после activation до event и после
   register до authorize; конкурирующий reconciler; tamper grant (derive и tick); stop/
   re-apply/rollback; finite validity; матрица storage/backup/TARGET/HARD; weekly dedup и
@@ -94,6 +94,20 @@ JSON на каждое окно. Это код, проверенный на од
 - Зависимость: I2 packaging (runway) и измеренный managed adapter, если нужен rate > 100.
 - RESUME: `docs/tasks/I3_MANAGED_COLLECTION_CONTINUITY_V1.md`, ветка
   `claude/i3-managed-collection-continuity-v1`; не повторять I1, bridge, историю.
+
+## Остаточные риски (названы, не скрыты)
+
+- Утверждение профиля — целостность, а не происхождение: фраза выводится из профиля, поэтому
+  доступ на запись в store = право grant (как у V1-фраз). Происхождение обеспечивает процесс
+  OPERATE и owner-attention gate.
+- HOLD-раунд и окно, открывшееся посреди дня, не пишут per-round ResearchEvent: потребители
+  обязаны считать пропуски nomination UNKNOWN, а не «нет возможностей», и опираться на окно
+  child, а не только на дату UTC.
+- Не доказано здесь: ≥5 UTC-границ и недельная граница (доказаны 3 дня), 180d/100w масштаб,
+  seal/import/preflight managed child, тест отказа старого бинарника (правило: после первого
+  managed child бинарник не откатывать), Telegram retry/health.
+- Если сам tick-timer мёртв, срабатывают только общие stale/timer алерты.
+- Backup-receipt аттестует агент OPERATE; содержимое не аутентифицируется.
 
 ## Что код не утверждает
 

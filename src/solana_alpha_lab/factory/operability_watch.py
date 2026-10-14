@@ -112,11 +112,20 @@ def _managed_incident_detail(item: Mapping[str, Any]) -> str:
     cause = ",".join(str(r) for r in reasons) if isinstance(reasons, list) and reasons else str(
         item.get("reason") or "UNKNOWN"
     )
+    prefix = str(item.get("incident_key") or "").split(":", 1)[0]
+    owner = {
+        "STORAGE_BLOCKED": "место/backup/бюджет: восстановить ресурс или записать свежий backup-receipt; бюджет и TARGET решает владелец",
+        "INTAKE_HELD": "ничего: приём возобновится сам, когда вернётся свободное место",
+        "INTAKE_OWNER_MISSING": "проверить collection-status; если причина PEER/closure не уходит - инженеру, право не менять",
+        "GRANT_INVALID": "владельцу не подтверждать ничего; инженеру сверить целостность grant (collection-status), store не править",
+        "CHILD_STEP_FAILED": "ничего, пока следующий tick повторяет сохранённый шаг; при повторе - инженеру",
+        "RECONCILE_UNEXPECTED_ERROR": "инженеру: ошибка контроллера, хвосты обслуживаются",
+    }.get(prefix, "см. collection-status")
     return (
         f"Новые admissions остановлены ({cause}); scope={item.get('scope') or 'NEW_INTAKE'}; "
         "уже принятые эпизоды продолжают наблюдаться под выданным child-authority; "
         f"автоматически: {item.get('automatic_action') or 'повтор на следующем tick'}; "
-        "от владельца: ничего, пока причина не относится к бюджету, ресурсу или праву."
+        f"следующий шаг: {owner}."
     )
 OWNER_ATTENTION_CODES = frozenset({"CAMPAIGN_SUCCESSOR_REQUIRED"})
 

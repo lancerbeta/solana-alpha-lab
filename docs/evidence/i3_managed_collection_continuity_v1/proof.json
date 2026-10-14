@@ -11,7 +11,7 @@
   },
   "risk_matrix": {
     "suite": "tests/test_managed_collection_continuity_v1.py",
-    "tests": 25,
+    "tests": 28,
     "result": "PASS",
     "oracles": "authored UTC timeline and raw SQL; managed helpers are never the oracle for day ownership, receipts, admissions or counters",
     "cases": {
@@ -37,7 +37,10 @@
       "budget_tail": "test_new_intake_waits_when_committed_tail_would_not_be_covered",
       "hold_vs_drain": "test_pressure_holds_a_managed_child_but_still_drains_an_unmanaged_one",
       "restore_marker": "test_unresolved_restore_marker_blocks_the_controller_and_the_tick",
-      "alerts": "ManagedAlertTests"
+      "alerts": "ManagedAlertTests",
+      "rollback_authority": "test_rollback_never_widens_validity_or_resources_without_the_phrase",
+      "clock_backwards": "test_clock_going_backwards_cannot_create_or_backdate_anything",
+      "exit_code": "test_failed_controller_step_is_visible_in_the_tick_exit_code"
     }
   },
   "targeted_mutation": {
@@ -46,7 +49,7 @@
     "M3_storage_never_blocks": "killed",
     "M4_no_event_repair": "killed",
     "M5_hold_disabled_sticky_drain": "killed",
-    "baseline": "25 pass"
+    "baseline": "28 pass"
   },
   "regression_direct_consumers": {
     "modules": 47,

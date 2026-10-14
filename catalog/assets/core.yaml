@@ -33301,7 +33301,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/observation_schedule.py', repository_path: scripts/observation_schedule.py}
-  integrity: {kind: sha256, sha256: 936c03323d6b4baaf3964fe81e5ed73baa81b180e45220469e8fa0ee077affcb}
+  integrity: {kind: sha256, sha256: 9c585e7d35b2cd36d62bbe717f7c00c500fc14fa05b81700fb2f37cc466c13b3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPILER-001}
@@ -33673,7 +33673,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/managed_collection.py', repository_path: src/solana_alpha_lab/factory/managed_collection.py}
-  integrity: {kind: sha256, sha256: 2299648ad143f52290460cac706c6df939ba8656de7ae3fb554877018db2bd29}
+  integrity: {kind: sha256, sha256: 7ed06eaa94f3eec3b1907b0939966822f75b258da9061f1314d38332b07d9cae}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}

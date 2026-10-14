@@ -213,6 +213,11 @@ _CANDIDATE_EXCEPTIONS = (
 )
 
 
+_RECONCILE_FAILURE_TERMINALS = frozenset(
+    {"RECONCILE_FAILED", "RECONCILE_UNEXPECTED_ERROR", "RECONCILE_CHILD_STEP_FAILED"}
+)
+
+
 def _fresh_now(config: dict, physical_overrides: TickPhysicalOverrides | None, fallback: datetime) -> datetime:
     """Clock for work that follows provider ticks. A fixed test clock stays fixed."""
 
@@ -392,7 +397,11 @@ def _run_candidates(
         except _CANDIDATE_EXCEPTIONS as exc:
             if not isolate:
                 raise
-            results.append({"terminal": str(exc), "schedule_sha256": digest, "activation_id": activation_id})
+            failed = {"terminal": str(exc), "schedule_sha256": digest, "activation_id": activation_id}
+            next_action = owner_next_action_for_lifecycle_error(str(exc))
+            if next_action is not None:
+                failed["next_action"] = next_action
+            results.append(failed)
     return results
 
 
@@ -440,7 +449,7 @@ def _tick_command(
     results: list[dict] = []
     reconcile_report: dict | None = None
     if candidates:
-        results = _run_candidates(candidates, isolate=len(candidates) > 1 or managed, now=now, **context)
+        results = _run_candidates(candidates, isolate=managed, now=now, **context)
     if managed:
         # Order: committed tails first, then one bounded controller step, then the new child's
         # own first tick. The controller never calls a provider or reads a credential.
@@ -519,6 +528,9 @@ def _tick_command(
         result = results[0]
         return _emit(result, 0 if result.get("terminal") in _IDLE_OK_TICK_TERMINALS else 2)
     ok = all(item.get("terminal") in _IDLE_OK_TICK_TERMINALS for item in results)
+    reconcile_terminal = str((reconcile_report or {}).get("terminal") or "")
+    if reconcile_terminal in _RECONCILE_FAILURE_TERMINALS or reconcile_terminal.startswith("RECONCILE_BLOCKED_MANAGED_GRANT"):
+        ok = False  # a failed controller step must be visible to exit-code wrappers too
     return _emit(
         {
             "terminal": "TICK_COMPLETE" if ok else "TICK_PARTIAL",
@@ -671,7 +683,14 @@ def _collection_command(
                 0,
             )
     except ManagedCollectionError as exc:
-        return _emit({"terminal": str(exc), "next_action": "INSPECT_COLLECTION_STATUS"}, 2)
+        hints = {
+            "MANAGED_PROPOSAL_MISMATCH": "RERUN_COLLECTION_PLAN_AND_USE_ITS_PROPOSAL_SHA256",
+            "BLOCKED_AUTHORITY": "COPY_EXACT_OWNER_PHRASE_FROM_COLLECTION_PLAN",
+            "MANAGED_REVISION_CONFLICT": "READ_COLLECTION_STATUS_AND_USE_ITS_REVISION",
+            "ROLLBACK_NOT_RESTRICTIVE_PHRASE_REQUIRED": "RERUN_ROLLBACK_WITH_THE_EXACT_PHRASE_OF_THE_NEW_REVISION",
+        }
+        return _emit({"terminal": str(exc), "reason": str(exc),
+                      "next_action": hints.get(str(exc), "INSPECT_COLLECTION_STATUS")}, 2)
     return _emit({"terminal": "COMMAND_UNKNOWN"}, 2)
 
 

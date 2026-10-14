@@ -633,6 +633,47 @@ class ManagedRollbackTests(ManagedBase):
         self.assertEqual(again["terminal"], "ROLLBACK_NOT_RESTRICTIVE_PHRASE_REQUIRED", again)
 
 
+class ManagedRollbackAuthorityTests(ManagedBase):
+    def test_rollback_never_widens_validity_or_resources_without_the_phrase(self) -> None:
+        sc = self.sc
+        wide = mc.render_utc(D3 + timedelta(days=30))
+        narrow = mc.render_utc(D3)
+        self.commission_profile("--validity", "UNTIL_DATE", "--intake-until", wide)
+        tightened = sc.apply(D0 + timedelta(hours=2), "--validity", "UNTIL_DATE", "--intake-until", narrow)
+        self.assertEqual(tightened["revision"], 2, tightened)
+        # Same numeric limits, but revision 1 would extend the approved end date again.
+        denied = sc.cmd(D0 + timedelta(hours=3), "collection-rollback", "--expected-revision", "2", "--to-revision", "1")
+        self.assertEqual(denied["terminal"], "ROLLBACK_NOT_RESTRICTIVE_PHRASE_REQUIRED", denied)
+        self.assertEqual(sql(sc.ops_path, "SELECT COUNT(*) FROM managed_profiles")[0][0], 2)
+
+
+class ManagedClockTests(ManagedBase):
+    def test_clock_going_backwards_cannot_create_or_backdate_anything(self) -> None:
+        sc = self.sc
+        self.commission_profile()
+        sc.backup(D1 - timedelta(hours=1))
+        sc.tick(D1 + timedelta(seconds=30))
+        before = (sc.children(), sql(sc.ops_path, "SELECT COUNT(*) FROM authority_receipts")[0][0],
+                  sql(sc.ops_path, "SELECT COUNT(*) FROM registered_schedules")[0][0])
+        for at in (D1 + timedelta(seconds=1), D1 - timedelta(hours=2), D0 + timedelta(hours=1)):
+            result = sc.cmd(at, "collection-reconcile", "--once")
+            self.assertNotEqual(result["terminal"], "RECONCILE_CHILD_ACTIVATED", result)
+        after = (sc.children(), sql(sc.ops_path, "SELECT COUNT(*) FROM authority_receipts")[0][0],
+                 sql(sc.ops_path, "SELECT COUNT(*) FROM registered_schedules")[0][0])
+        self.assertEqual(before, after)
+
+
+class ManagedExitCodeTests(ManagedBase):
+    def test_failed_controller_step_is_visible_in_the_tick_exit_code(self) -> None:
+        sc = self.sc
+        self.commission_profile()
+        sc.backup(D1 - timedelta(hours=1))
+        with patch.object(mc, "_plan_child", side_effect=RuntimeError("SIMULATED_BUG")):
+            result = sc.tick(D1 + timedelta(seconds=5))
+        self.assertEqual(result["managed"]["terminal"], "RECONCILE_UNEXPECTED_ERROR", result)
+        self.assertEqual((result["terminal"], result["_exit_code"]), ("TICK_PARTIAL", 2), result)
+
+
 class ManagedResourceTests(ManagedBase):
     def body_and_store(self):
         store = ObservationScheduleStore(self.sc.ops_path)

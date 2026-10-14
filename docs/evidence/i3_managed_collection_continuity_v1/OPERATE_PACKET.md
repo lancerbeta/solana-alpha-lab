@@ -62,6 +62,11 @@ fallback. Inspect before asking for the phrase:
 - `validity.mode=UNTIL_REVOKED` is a **new** standing-grant semantic, not an extension of
   the A/B grants; the owner sees it in the phrase text.
 
+Show the owner, next to the phrase, the values the phrase only binds through its hash:
+`bootstrap_not_before`, `hard_bytes`/`target_bytes`, `backup_max_age_seconds`, the protected
+bridge and the template schedule hash (all printed in `profile` by `collection-plan`). The
+owner approves numbers, not a hash.
+
 Resource inputs that must be decided in the same gate: the target acceptance (none by
 default: the controller then blocks new intake at TARGET 40 GiB and never forges PASS),
 the backup receipt maximum age (default 30 h) and the measured growth bytes/day (unknown
@@ -118,6 +123,21 @@ prove an alert. Managed incident codes reaching the watch: `MANAGED_INTAKE_BLOCK
 Only after B's outcome is confirmed `ACTIVE` then closed and the first managed child holds
 the day: the one-shot `factory-i3-b-activate.service/.timer` may be removed. It is an
 idempotent replay source until then. This is not a Git change.
+
+## Stop, resume and rollback (commands)
+
+```text
+observation_schedule.py collection-stop-intake --expected-revision R    # new intake only; tails continue
+observation_schedule.py collection-rollback --to-revision N --expected-revision R [--phrase "<exact>"]
+observation_schedule.py collection-plan/apply ...                       # resume = a new approved revision
+```
+
+`--expected-revision` is mandatory (read `collection-status`). A rollback needs no phrase only
+when nothing it restores is wider than the current revision (limits, end date, routes, hard/
+target bytes, backup age, acceptance); otherwise the exact phrase of the new revision.
+`collection-record-backup` makes the OPERATE agent the attester: read the checkpoint time, hash
+and coverage from the existing backup owner's verified output; any 64-hex value would be
+accepted by the code.
 
 ## Stop conditions
 
