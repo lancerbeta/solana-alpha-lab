@@ -331,6 +331,11 @@
       "sha256": "b6435599a06a6e108ce100dc8f9076f2fdebc174c0e98a4175b2645c50954298"
     },
     {
+      "artifact": "independent-observer-v2.json",
+      "bytes": 1921,
+      "sha256": "952ef0bd6033b3c70b9724ea26ba77a01369b18919b7c03091889d439f2939e6"
+    },
+    {
       "artifact": "host-footprint.json",
       "bytes": 917,
       "sha256": "316928f7dbf5d5815e78f35c1fbce505b6038b722f0732faa1c53daeb691fd1f"

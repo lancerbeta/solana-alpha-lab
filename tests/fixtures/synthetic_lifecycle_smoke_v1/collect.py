@@ -84,7 +84,7 @@ def main():
         runs.append(run)
     for path in sorted((retained/'sls-v1-world-a3/native-world').glob('*-context.json')):
         pins.append({'artifact':path.relative_to(retained).as_posix(),'sha256':sha(path),'bytes':path.stat().st_size})
-    for name in ('independent-observer.json','host-footprint.json','docker-footprint.json'):
+    for name in ('independent-observer.json','independent-observer-v2.json','host-footprint.json','docker-footprint.json'):
         path=retained/name;pins.append({'artifact':name,'sha256':sha(path),'bytes':path.stat().st_size})
     terminals=[x for x in ledger if x['kind']=='TEST_TERMINAL']
     passed={x['test_id'] for x in terminals if x['status']=='PASS'}
@@ -97,7 +97,7 @@ def main():
     coverage[-1]['sub_obligations']=[{'boundary':'FRESH_WAL_AND_HUMAN_CLI','status':'PASS','reached':True,'oracle_exercised':True,'consumer_accepted':True},
         {'boundary':'TRADING_FEEDBACK_TO_FRESH_FORGE_MISSION','status':'UNKNOWN','reached':False,'oracle_exercised':False,'consumer_accepted':False},
         {'boundary':'BROWSER_UI_OPTIONAL','status':'UNKNOWN','reached':False,'oracle_exercised':False,'consumer_accepted':False}]
-    observer=read(retained/'independent-observer.json')
+    observer=read(retained/'independent-observer-v2.json')
     assert observer['status']=='PASS' and observer['canaries']['segment_aggregation']=='PASS'
     original=read(retained/'sls-v1-prepare-a2/frozen-denominator.json')
     assert [x['scenario_id'] for x in coverage]==original['scenarios']

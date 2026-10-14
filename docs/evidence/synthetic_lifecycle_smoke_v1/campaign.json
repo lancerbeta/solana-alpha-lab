@@ -809,8 +809,10 @@
   ],
   "independent_numeric_observer": {
     "canaries": {
+      "connected_full_control": "PASS",
       "empty_denominator": "PASS",
       "failed_attempt": "PASS",
+      "missing_full_boundary_or_oracle_metadata": "PASS",
       "numeric_corruption": "PASS",
       "segment_aggregation": "PASS",
       "unvisited_boundary": "PASS"

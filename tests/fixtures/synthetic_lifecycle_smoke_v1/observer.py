@@ -14,6 +14,11 @@ def combine(records):
         return 'SEGMENT_ONLY_LONG_PATH_BLOCKED'
     if len({x.get('lineage_id') for x in records})!=1 or any(not x.get('lineage_id') for x in records):
         return 'NOT_PROVED'
+    if any(not isinstance(x.get(key),str) or not x[key].strip()
+           for x in records for key in ('left_boundary','right_boundary')):
+        return 'NOT_PROVED'
+    if any(x.get('oracle_exercised') is not True or x.get('consumer_accepted') is not True for x in records):
+        return 'NOT_PROVED'
     if any(left.get('right_boundary')!=right.get('left_boundary') for left,right in zip(records,records[1:])):
         return 'NOT_PROVED'
     return 'FULL_PRODUCT_PATH'
@@ -70,9 +75,16 @@ def main():
     assert combine([{'status':'PASS','reached':False,'fidelity':'FULL_PRODUCT_PATH'}])=='NOT_PROVED'
     assert combine([{'status':'PASS','reached':True,'fidelity':'SEGMENT_PRODUCT_PATH','bridge_id':'BR-01'}]*2)=='SEGMENT_ONLY_LONG_PATH_BLOCKED'
     assert combine([{'status':'FAIL','reached':True}])=='NOT_PROVED'
+    full={'status':'PASS','reached':True,'fidelity':'FULL_PRODUCT_PATH','lineage_id':'control',
+        'left_boundary':'A','right_boundary':'B','oracle_exercised':True,'consumer_accepted':True}
+    assert combine([full,dict(full,left_boundary='B',right_boundary='C')])=='FULL_PRODUCT_PATH'
+    for key in ('left_boundary','right_boundary','oracle_exercised','consumer_accepted'):
+        missing=copy.deepcopy(full);missing.pop(key)
+        assert combine([missing])=='NOT_PROVED'
     receipt={'status':'PASS','observer':'INDEPENDENT_DECIMAL_ARITHMETIC_NO_PRODUCT_IMPORT',
         'new_main_calls':0,'source_pins':pins,'results':results,
-        'canaries':{'numeric_corruption':'PASS','empty_denominator':'PASS','unvisited_boundary':'PASS','segment_aggregation':'PASS','failed_attempt':'PASS'}}
+        'canaries':{'numeric_corruption':'PASS','empty_denominator':'PASS','unvisited_boundary':'PASS','segment_aggregation':'PASS',
+            'failed_attempt':'PASS','missing_full_boundary_or_oracle_metadata':'PASS','connected_full_control':'PASS'}}
     a.out.parent.mkdir(parents=True,exist_ok=True);a.out.write_text(json.dumps(receipt,indent=2)+'\n')
     print(json.dumps(receipt))
 
