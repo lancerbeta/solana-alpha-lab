@@ -185,13 +185,13 @@ def _frozen_hfic_replay_lineage(
     parameters = spec.get("parameters") or {}
     session_id = parameters.get("hfic_replay_session_id")
     native_alias = str(spec.get("hypothesis_version", "")).startswith("HYP-HFIC-CAND-")
-    is_reuse = (spec.get("schema_version") == "1.3"
+    is_reuse = (spec.get("schema_version") in {"1.3", "1.4"}
                 and (spec.get("observation_request") or {}).get("collection_mode") == "REUSE_ONLY")
     if session_id is None and not (native_alias and is_reuse):
         return None
     if (
         not isinstance(session_id, str)
-        or spec.get("schema_version") != "1.3"
+        or spec.get("schema_version") not in {"1.3", "1.4"}
         or spec.get("capability_id") != "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
         or (spec.get("observation_request") or {}).get("collection_mode") != "REUSE_ONLY"
     ):

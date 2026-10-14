@@ -3526,6 +3526,22 @@ def _project_episode_members(
     return members, cohort_membership, seen, duplicate_count, integrity_conflicts, episode_mints
 
 
+def project_episode_decision_prefix(census, observations, body, binding, *, universe_policy, scope):
+    """Shared native prefix selection; never calls the target evaluator."""
+    require_episode_binding_rows(binding)
+    _bind_scope_to_body(scope, body, census)
+    members, _cohorts, _seen, _duplicates, conflicts, _mints = _project_episode_members(
+        census, observations, body, binding, universe_policy=universe_policy, prefix_only=True, scope=scope)
+    if conflicts:
+        raise GroundedDiscoveryError("EPISODE_ADMISSION_IDENTITY_CONFLICT")
+    return members
+
+
+def require_episode_scope(resolved, body, census):
+    """The same frozen scope check for discovery and metadata readiness."""
+    _bind_scope_to_body(resolved, body, census)
+
+
 def _bind_scope_to_body(resolved: Any, body: Mapping[str, Any], census: Sequence[Mapping[str, Any]]) -> None:
     """The applied masks must be the frozen rule, over exactly the admitted episodes."""
 
@@ -4899,6 +4915,10 @@ def bind_frozen_fixed_time_inputs(
                 raise GroundedDiscoveryError("FROZEN_INPUT_SCHEDULE_MISMATCH")
         partitions.append((str(item.get("cohort_id")), census_path, obs_path))
         binding_cohorts.append(dict(item))
+    if spec.get("schema_version") == "1.4":
+        from solana_alpha_lab.factory.episode_required_outcomes import verify_frozen_episode_sources
+
+        verify_frozen_episode_sources(data_root, binding_cohorts)
     return public, pre, partitions, binding_cohorts
 
 

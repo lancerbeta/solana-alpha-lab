@@ -1,0 +1,8 @@
+{
+  "base": "dbe491595c7122735a418e67341be5cad9dbf45e",
+  "whole_spec_xy_control": "VALID",
+  "native_error_code": "EXPERIMENT_SPEC_SCHEMA_INVALID",
+  "instance_path": "required_outcomes/0/point_id",
+  "validator": "pattern",
+  "validator_value": "^[XY][0-9]{1,7}$"
+}

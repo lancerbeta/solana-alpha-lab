@@ -25874,7 +25874,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/experiment_spec.py', repository_path: src/solana_alpha_lab/factory/experiment_spec.py}
-  integrity: {kind: sha256, sha256: 6bff053c5d458f6e33929cec67bb88ce9a13bf9979d59364ab6eb425ccc29cac}
+  integrity: {kind: sha256, sha256: 2666e9f45cdcbf32b0bc2cb3333407c9ca6bdc05700e5719f8cc75bd907f9a98}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
@@ -32052,7 +32052,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lane_classifier.py', repository_path: src/solana_alpha_lab/factory/lane_classifier.py}
-  integrity: {kind: sha256, sha256: c310bc8e6aef354de17fb844f9bff0398e74e3589ee82bc299d95a6a055379f4}
+  integrity: {kind: sha256, sha256: cbc6c1e407aa95dc8907c8e314bb84b39faf5bbadf2b9385f8294cccf0298671}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32390,7 +32390,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: c566a2a01ebca53acb79ab81f037ba991049e9b7cc05ebaff08d64467d7bbfa5}
+  integrity: {kind: sha256, sha256: f5ff42a9610034d233fc7c0cddfc84fff9d09c07078425c783885970acdbe70f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -38031,7 +38031,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: af898471e64d5beecdb4e6f56caeca7d7cde0ec14fd5e7559634c7b241f0c383}
+  integrity: {kind: sha256, sha256: 315a116c11e81bc597f4dcfa17f92ae37d6294e7f0ef48c389b6e766f13beed8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
