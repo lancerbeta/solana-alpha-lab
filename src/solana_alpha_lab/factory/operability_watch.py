@@ -54,6 +54,7 @@ COLLECTOR_SNAPSHOT_PACKET_FIELDS = (
     "campaign_successor_activation_id",
     "campaign_successor_required",
     "campaign_successor_owner_action",
+    "managed_collection_incidents",
 )
 COLLECTOR_SNAPSHOT_FILE_MAX_BYTES = 65536
 WATCH_REQUIRED_TIMERS = (
@@ -87,7 +88,36 @@ INCIDENT_GRACE_SECONDS = {
     "WORKBENCH_SERVICE_DOWN": 0,
     "ALERTING_UNAVAILABLE": 0,
     "CAMPAIGN_SUCCESSOR_REQUIRED": 0,
+    "MANAGED_INTAKE_BLOCKED": 0,
+    "MANAGED_INTAKE_OWNER_MISSING": 0,
+    "MANAGED_GRANT_INVALID": 0,
+    "MANAGED_INTAKE_HELD": 1800,
+    "MANAGED_CHILD_STEP_FAILED": 900,
+    "MANAGED_RECONCILE_ERROR": 900,
 }
+_MANAGED_INCIDENT_CODES = {
+    "STORAGE_BLOCKED": "MANAGED_INTAKE_BLOCKED",
+    "INTAKE_HELD": "MANAGED_INTAKE_HELD",
+    "INTAKE_OWNER_MISSING": "MANAGED_INTAKE_OWNER_MISSING",
+    "GRANT_INVALID": "MANAGED_GRANT_INVALID",
+    "CHILD_STEP_FAILED": "MANAGED_CHILD_STEP_FAILED",
+    "RECONCILE_UNEXPECTED_ERROR": "MANAGED_RECONCILE_ERROR",
+}
+
+
+def _managed_incident_detail(item: Mapping[str, Any]) -> str:
+    """What stopped, what is preserved, what the system does next, what the owner must do."""
+
+    reasons = item.get("reasons")
+    cause = ",".join(str(r) for r in reasons) if isinstance(reasons, list) and reasons else str(
+        item.get("reason") or "UNKNOWN"
+    )
+    return (
+        f"Новые admissions остановлены ({cause}); scope={item.get('scope') or 'NEW_INTAKE'}; "
+        "уже принятые эпизоды продолжают наблюдаться под выданным child-authority; "
+        f"автоматически: {item.get('automatic_action') or 'повтор на следующем tick'}; "
+        "от владельца: ничего, пока причина не относится к бюджету, ресурсу или праву."
+    )
 OWNER_ATTENTION_CODES = frozenset({"CAMPAIGN_SUCCESSOR_REQUIRED"})
 
 
@@ -294,6 +324,13 @@ def classify_incidents(
                 f"continuity_activation={packet.get('campaign_continuity_activation_id')} "
                 f"owner_action={packet.get('campaign_successor_owner_action')})."
             )
+    for item in packet.get("managed_collection_incidents") or []:
+        if not isinstance(item, Mapping):
+            continue
+        prefix = str(item.get("incident_key") or "").split(":", 1)[0]
+        code = _MANAGED_INCIDENT_CODES.get(prefix)
+        if code is not None:
+            found[code] = _managed_incident_detail(item)
     units = unit_status or {}
     for unit in WATCH_REQUIRED_TIMERS:
         status = units.get(unit)

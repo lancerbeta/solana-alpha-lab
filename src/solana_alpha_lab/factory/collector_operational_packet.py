@@ -99,6 +99,29 @@ HEALTH_CLASSES = (
 )
 
 
+def _managed_continuation_state(
+    store: ObservationScheduleStore, activation: Mapping[str, Any]
+) -> str | None:
+    """MANAGED_* when this activation is a child of a managed grant; else None."""
+
+    payload = activation.get("payload")
+    if isinstance(payload, str):
+        try:
+            payload = json.loads(payload)
+        except ValueError:
+            return None
+    binding = payload.get("managed_collection") if isinstance(payload, Mapping) else None
+    if not isinstance(binding, Mapping):
+        return None
+    reader = getattr(store, "managed_control", None)
+    control = reader(str(binding.get("collection_lineage_id") or "")) if callable(reader) else None
+    if control is None:
+        return None
+    return (
+        "MANAGED_CONTINUATION" if str(control.get("desired_state")) == "RUN" else "MANAGED_INTAKE_STOPPED"
+    )
+
+
 def assess_campaign_successor_continuity(
     store: ObservationScheduleStore,
     *,
@@ -129,6 +152,15 @@ def assess_campaign_successor_continuity(
     if activation_state not in {"ACTIVE", "DRAINING"}:
         return {
             **empty,
+            "stops_admitting_at": str(activation.get("stops_admitting_at") or UNKNOWN),
+        }
+    managed_state = _managed_continuation_state(store, activation)
+    if managed_state is not None:
+        # The controller owns the next UTC-day child; a missing child is a managed incident
+        # (INTAKE_OWNER_MISSING), not an owner-registered successor.
+        return {
+            **empty,
+            "campaign_successor_state": managed_state,
             "stops_admitting_at": str(activation.get("stops_admitting_at") or UNKNOWN),
         }
     stops_raw = activation.get("stops_admitting_at")
@@ -1411,6 +1443,14 @@ def build_collector_operational_packet(
             "campaign_successor_owner_action"
         )
         or UNKNOWN,
+        "managed_collection_incidents": [
+            {"incident_key": str(item["incident_key"]), **dict(item["payload"])}
+            for item in (
+                getattr(store, "managed_incidents")(open_only=True)
+                if callable(getattr(store, "managed_incidents", None))
+                else []
+            )
+        ],
         # COLLECTION
         "last_tick_at": base.get("last_tick_at") or UNKNOWN,
         "call_diagnostics_status": base.get("call_diagnostics_status") or UNKNOWN,

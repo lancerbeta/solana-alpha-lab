@@ -37,6 +37,14 @@ def episode_factory_storage_forecast(*, remaining_slots: int, prospective_slots:
 
 
 EPISODE_STORAGE_KIND = "EPISODE_PRODUCER_STORAGE_COMMISSIONING_V1"
+# Managed continuity: the controller derives a child envelope from an owner-approved
+# standing grant. It never claims factory_storage_gate=PASS; it records the managed
+# decision (including an accepted TARGET risk) that the V1 validator cannot express.
+EPISODE_STORAGE_KIND_V2_MANAGED = "EPISODE_PRODUCER_STORAGE_COMMISSIONING_V2_MANAGED"
+_V2_DECISIONS = {
+    "OK": "ALLOW",
+    "DEGRADED_TARGET": "ALLOW_WITH_ACCEPTED_TARGET_RISK",
+}
 
 
 class EpisodeStorageError(ValueError):
@@ -57,11 +65,13 @@ def validate_episode_storage_commissioning(envelope: object, *, data_root: Path,
         raise EpisodeStorageError("EPISODE_STORAGE_COMMISSIONING_REQUIRED")
     body = dict(envelope)
     sha = body.pop("envelope_sha256", None)
+    managed = body.get("kind") == EPISODE_STORAGE_KIND_V2_MANAGED
     expected_keys = {"kind", "schedule_sha256", "activation_id", "producer_root_identity",
-                     "factory_storage_gate", "verified_backup_sha256", "copy_rehearsal_sha256",
+                     "verified_backup_sha256", "copy_rehearsal_sha256",
                      "factory_storage_receipt_sha256", "volume_bindings_sha256", "operate_authority_ref",
                      "search_call_local_bytes_max", "nomination_call_local_bytes_max",
                      "slot_metadata_local_bytes_max", "fixed_local_reserve_bytes", "local_safety_bytes"}
+    expected_keys |= {"storage_decision"} if managed else {"factory_storage_gate"}
     try:
         actual_identity = producer_root_identity(data_root)
         actual_sha = canonical_sha256(body)
@@ -71,12 +81,24 @@ def validate_episode_storage_commissioning(envelope: object, *, data_root: Path,
     if (not isinstance(identity, dict) or set(identity) != {"device", "inode"}
             or any(type(value) is not int or value < 0 for value in identity.values())):
         raise EpisodeStorageError("EPISODE_STORAGE_BINDING_INVALID")
-    if (set(body) != expected_keys or body.get("kind") != EPISODE_STORAGE_KIND or actual_sha != sha
+    if (set(body) != expected_keys
+            or body.get("kind") not in {EPISODE_STORAGE_KIND, EPISODE_STORAGE_KIND_V2_MANAGED}
+            or actual_sha != sha
             or body.get("schedule_sha256") != schedule_sha256
             or body.get("activation_id") != activation_id
             or body.get("producer_root_identity") != actual_identity):
         raise EpisodeStorageError("EPISODE_STORAGE_BINDING_INVALID")
-    if body.get("factory_storage_gate") != "PASS":
+    if managed:
+        decision = body.get("storage_decision")
+        if (not isinstance(decision, Mapping)
+                or decision.get("hard_constraints") != "PASS"
+                or decision.get("physical_tail_reserve") != "PASS"
+                or _V2_DECISIONS.get(str(decision.get("storage_health"))) != decision.get("decision")
+                or not re.fullmatch(r"[0-9a-f]{64}", str(decision.get("grant_sha256") or ""))
+                or (decision.get("storage_health") == "DEGRADED_TARGET")
+                != isinstance(decision.get("target_acceptance"), Mapping)):
+            raise EpisodeStorageError("FACTORY_STORAGE_COMMISSIONING_REQUIRED")
+    elif body.get("factory_storage_gate") != "PASS":
         raise EpisodeStorageError("FACTORY_STORAGE_COMMISSIONING_REQUIRED")
     for key in ("verified_backup_sha256", "copy_rehearsal_sha256",
                 "factory_storage_receipt_sha256", "volume_bindings_sha256"):

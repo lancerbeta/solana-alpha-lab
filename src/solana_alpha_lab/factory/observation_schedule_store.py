@@ -444,6 +444,48 @@ class ObservationScheduleStore:
             );
             CREATE INDEX IF NOT EXISTS idx_account_budget_members_scope
                 ON account_budget_members(account_scope_id);
+            -- Managed collection continuity (default-off). Profile revisions are
+            -- immutable; the control row is the only mutable pointer (CAS). Child
+            -- rows hold one idempotent intent per (lineage, UTC admission day);
+            -- they never copy accounting or observation data.
+            CREATE TABLE IF NOT EXISTS managed_profiles (
+                collection_lineage_id TEXT NOT NULL,
+                revision INTEGER NOT NULL CHECK (revision >= 1),
+                profile_sha256 TEXT NOT NULL,
+                previous_revision INTEGER,
+                command_sha256 TEXT NOT NULL UNIQUE,
+                created_at TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                PRIMARY KEY (collection_lineage_id, revision)
+            );
+            CREATE TABLE IF NOT EXISTS managed_control (
+                collection_lineage_id TEXT PRIMARY KEY,
+                current_revision INTEGER NOT NULL,
+                desired_state TEXT NOT NULL,
+                intake_revoked_at TEXT,
+                updated_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS managed_children (
+                collection_lineage_id TEXT NOT NULL,
+                utc_day TEXT NOT NULL,
+                state TEXT NOT NULL,
+                profile_revision INTEGER NOT NULL,
+                schedule_sha256 TEXT NOT NULL,
+                activation_id TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                PRIMARY KEY (collection_lineage_id, utc_day)
+            );
+            CREATE TABLE IF NOT EXISTS managed_incidents (
+                incident_key TEXT PRIMARY KEY,
+                state TEXT NOT NULL,
+                opened_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                recovered_at TEXT,
+                notified_at TEXT,
+                payload_json TEXT NOT NULL
+            );
             """
         )
         self._ensure_column(
@@ -1150,6 +1192,268 @@ class ObservationScheduleStore:
                 json.dumps(dict(policy.get("payload") or {}), sort_keys=True),
             ),
         )
+
+    # ------------------------------------------------------------------
+    # Managed collection continuity. Read helpers tolerate a store created by
+    # an older build (tables absent) so read-only status never creates state.
+
+    _MANAGED_TABLES = ("managed_profiles", "managed_control", "managed_children", "managed_incidents")
+
+    def managed_tables_present(self) -> bool:
+        rows = self._conn.execute(
+            "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN (?, ?, ?, ?)",
+            self._MANAGED_TABLES,
+        ).fetchone()
+        return int(rows[0]) == len(self._MANAGED_TABLES)
+
+    def managed_lineages(self) -> list[str]:
+        if not self.managed_tables_present():
+            return []
+        return [str(r[0]) for r in self._conn.execute(
+            "SELECT collection_lineage_id FROM managed_control ORDER BY collection_lineage_id").fetchall()]
+
+    def managed_control(self, lineage: str) -> dict[str, Any] | None:
+        if not self.managed_tables_present():
+            return None
+        row = self._conn.execute(
+            "SELECT * FROM managed_control WHERE collection_lineage_id = ?", (lineage,)).fetchone()
+        return dict(row) if row is not None else None
+
+    def managed_profile(self, lineage: str, revision: int) -> dict[str, Any] | None:
+        if not self.managed_tables_present():
+            return None
+        row = self._conn.execute(
+            "SELECT * FROM managed_profiles WHERE collection_lineage_id = ? AND revision = ?",
+            (lineage, int(revision))).fetchone()
+        if row is None:
+            return None
+        payload = dict(row)
+        payload["payload"] = json.loads(payload.pop("payload_json"))
+        return payload
+
+    def managed_profile_by_command(self, command_sha256: str) -> dict[str, Any] | None:
+        if not self.managed_tables_present():
+            return None
+        row = self._conn.execute(
+            "SELECT collection_lineage_id, revision FROM managed_profiles WHERE command_sha256 = ?",
+            (command_sha256,)).fetchone()
+        return self.managed_profile(str(row[0]), int(row[1])) if row is not None else None
+
+    def managed_commit_profile(
+        self,
+        *,
+        lineage: str,
+        revision: int,
+        expected_revision: int,
+        profile_sha256: str,
+        command_sha256: str,
+        payload: Mapping[str, Any],
+        desired_state: str = "RUN",
+        clock: datetime | None = None,
+    ) -> str:
+        """Insert one immutable revision and move the control pointer by CAS."""
+
+        self._require_write_lease(clock)
+        now = _now(clock)
+        try:
+            self._conn.execute("BEGIN IMMEDIATE")
+            replay = self._conn.execute(
+                "SELECT collection_lineage_id, revision, profile_sha256 FROM managed_profiles "
+                "WHERE command_sha256 = ?", (command_sha256,)).fetchone()
+            if replay is not None:
+                self._conn.rollback()
+                if str(replay["profile_sha256"]) != profile_sha256:
+                    raise ObservationScheduleStoreError("MANAGED_COMMAND_IDENTITY_CONFLICT")
+                return "COMMIT_REPLAY"
+            control = self._conn.execute(
+                "SELECT current_revision FROM managed_control WHERE collection_lineage_id = ?",
+                (lineage,)).fetchone()
+            current = int(control["current_revision"]) if control is not None else 0
+            if current != int(expected_revision) or int(revision) != current + 1:
+                self._conn.rollback()
+                raise ObservationScheduleStoreError("MANAGED_REVISION_CONFLICT")
+            self._conn.execute(
+                "INSERT INTO managed_profiles(collection_lineage_id, revision, profile_sha256, "
+                "previous_revision, command_sha256, created_at, payload_json) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (lineage, int(revision), profile_sha256, current or None, command_sha256, now,
+                 json.dumps(dict(payload), sort_keys=True, ensure_ascii=False)))
+            self._conn.execute(
+                "INSERT INTO managed_control(collection_lineage_id, current_revision, desired_state, "
+                "intake_revoked_at, updated_at) VALUES (?, ?, ?, NULL, ?) "
+                "ON CONFLICT(collection_lineage_id) DO UPDATE SET current_revision = excluded.current_revision, "
+                "desired_state = excluded.desired_state, intake_revoked_at = NULL, updated_at = excluded.updated_at",
+                (lineage, int(revision), desired_state, now))
+            self._conn.commit()
+            return "COMMITTED"
+        except Exception:
+            if self._conn.in_transaction:
+                self._conn.rollback()
+            raise
+
+    def managed_set_desired(
+        self, lineage: str, *, expected_revision: int, desired_state: str,
+        intake_revoked_at: str | None, clock: datetime | None = None,
+    ) -> str:
+        self._require_write_lease(clock)
+        now = _now(clock)
+        try:
+            self._conn.execute("BEGIN IMMEDIATE")
+            row = self._conn.execute(
+                "SELECT current_revision, desired_state, intake_revoked_at FROM managed_control "
+                "WHERE collection_lineage_id = ?", (lineage,)).fetchone()
+            if row is None or int(row["current_revision"]) != int(expected_revision):
+                self._conn.rollback()
+                raise ObservationScheduleStoreError("MANAGED_REVISION_CONFLICT")
+            if str(row["desired_state"]) == desired_state:
+                self._conn.rollback()
+                return "DESIRED_REPLAY"
+            self._conn.execute(
+                "UPDATE managed_control SET desired_state = ?, intake_revoked_at = ?, updated_at = ? "
+                "WHERE collection_lineage_id = ?", (desired_state, intake_revoked_at, now, lineage))
+            self._conn.commit()
+            return "DESIRED_SET"
+        except Exception:
+            if self._conn.in_transaction:
+                self._conn.rollback()
+            raise
+
+    def managed_child(self, lineage: str, utc_day: str) -> dict[str, Any] | None:
+        if not self.managed_tables_present():
+            return None
+        row = self._conn.execute(
+            "SELECT * FROM managed_children WHERE collection_lineage_id = ? AND utc_day = ?",
+            (lineage, utc_day)).fetchone()
+        return self._managed_decode(row)
+
+    def managed_children(self, lineage: str) -> list[dict[str, Any]]:
+        if not self.managed_tables_present():
+            return []
+        return [self._managed_decode(r) for r in self._conn.execute(
+            "SELECT * FROM managed_children WHERE collection_lineage_id = ? ORDER BY utc_day",
+            (lineage,)).fetchall()]
+
+    @staticmethod
+    def _managed_decode(row: sqlite3.Row | None) -> dict[str, Any] | None:
+        if row is None:
+            return None
+        payload = dict(row)
+        payload["payload"] = json.loads(payload.pop("payload_json"))
+        return payload
+
+    def managed_upsert_child(
+        self, *, lineage: str, utc_day: str, state: str, profile_revision: int,
+        schedule_sha256: str, activation_id: str, payload: Mapping[str, Any],
+        clock: datetime | None = None,
+    ) -> dict[str, Any]:
+        """Create or advance the single day owner. Identity fields never change."""
+
+        self._require_write_lease(clock)
+        now = _now(clock)
+        try:
+            self._conn.execute("BEGIN IMMEDIATE")
+            row = self._conn.execute(
+                "SELECT * FROM managed_children WHERE collection_lineage_id = ? AND utc_day = ?",
+                (lineage, utc_day)).fetchone()
+            encoded = json.dumps(dict(payload), sort_keys=True, ensure_ascii=False)
+            if row is None:
+                self._conn.execute(
+                    "INSERT INTO managed_children(collection_lineage_id, utc_day, state, profile_revision, "
+                    "schedule_sha256, activation_id, created_at, updated_at, payload_json) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (lineage, utc_day, state, int(profile_revision), schedule_sha256, activation_id,
+                     now, now, encoded))
+            else:
+                if (str(row["schedule_sha256"]), str(row["activation_id"]), int(row["profile_revision"])) != (
+                        schedule_sha256, activation_id, int(profile_revision)):
+                    self._conn.rollback()
+                    raise ObservationScheduleStoreError("MANAGED_DAY_OWNER_CONFLICT")
+                self._conn.execute(
+                    "UPDATE managed_children SET state = ?, updated_at = ?, payload_json = ? "
+                    "WHERE collection_lineage_id = ? AND utc_day = ?", (state, now, encoded, lineage, utc_day))
+            self._conn.commit()
+        except Exception:
+            if self._conn.in_transaction:
+                self._conn.rollback()
+            raise
+        return self.managed_child(lineage, utc_day)  # type: ignore[return-value]
+
+    def managed_supersede_child(self, lineage: str, utc_day: str, *, clock: datetime | None = None) -> None:
+        """Drop a never-activated day intent so a newer one can own the day (audited)."""
+
+        self._require_write_lease(clock)
+        row = self._conn.execute(
+            "SELECT * FROM managed_children WHERE collection_lineage_id = ? AND utc_day = ?",
+            (lineage, utc_day)).fetchone()
+        if row is None:
+            return
+        if str(row["state"]) not in {"PLANNED", "REGISTERED", "AUTHORIZED_DERIVED", "CANCELLED",
+                                     "EXPIRED_BEFORE_ACTIVATION"}:
+            raise ObservationScheduleStoreError("MANAGED_DAY_OWNER_CONFLICT")
+        activation = self._conn.execute(
+            "SELECT 1 FROM schedule_activations WHERE schedule_sha256 = ? AND activation_id = ?",
+            (row["schedule_sha256"], row["activation_id"])).fetchone()
+        if activation is not None:
+            raise ObservationScheduleStoreError("MANAGED_DAY_OWNER_CONFLICT")
+        self._conn.execute(
+            "INSERT INTO runtime_events(kind, created_at, payload_json) VALUES (?, ?, ?)",
+            ("MANAGED_CHILD_SUPERSEDED", _now(clock), json.dumps({
+                "collection_lineage_id": lineage, "utc_day": utc_day, "state": str(row["state"]),
+                "schedule_sha256": str(row["schedule_sha256"]), "activation_id": str(row["activation_id"]),
+                "profile_revision": int(row["profile_revision"])}, sort_keys=True)))
+        self._conn.execute(
+            "DELETE FROM managed_children WHERE collection_lineage_id = ? AND utc_day = ?", (lineage, utc_day))
+        self._conn.commit()
+
+    def managed_incident(self, key: str) -> dict[str, Any] | None:
+        if not self.managed_tables_present():
+            return None
+        return self._managed_decode(self._conn.execute(
+            "SELECT * FROM managed_incidents WHERE incident_key = ?", (key,)).fetchone())
+
+    def managed_incidents(self, *, open_only: bool = False) -> list[dict[str, Any]]:
+        if not self.managed_tables_present():
+            return []
+        sql = "SELECT * FROM managed_incidents" + (" WHERE state = 'OPEN'" if open_only else "") + " ORDER BY incident_key"
+        return [self._managed_decode(r) for r in self._conn.execute(sql).fetchall()]
+
+    def managed_incident_open(self, key: str, payload: Mapping[str, Any], *, clock: datetime | None = None) -> str:
+        """Dedup by key: an open incident is only refreshed, never re-notified."""
+
+        self._require_write_lease(clock)
+        now = _now(clock)
+        encoded = json.dumps(dict(payload), sort_keys=True, ensure_ascii=False)
+        row = self._conn.execute(
+            "SELECT state, payload_json FROM managed_incidents WHERE incident_key = ?", (key,)).fetchone()
+        if row is not None and str(row["state"]) == "OPEN":
+            if str(row["payload_json"]) != encoded:
+                self._conn.execute(
+                    "UPDATE managed_incidents SET payload_json = ?, updated_at = ? WHERE incident_key = ?",
+                    (encoded, now, key))
+                self._conn.commit()
+            return "INCIDENT_OPEN_REPLAY"
+        self._conn.execute(
+            "INSERT INTO managed_incidents(incident_key, state, opened_at, updated_at, recovered_at, "
+            "notified_at, payload_json) VALUES (?, 'OPEN', ?, ?, NULL, NULL, ?) "
+            "ON CONFLICT(incident_key) DO UPDATE SET state = 'OPEN', opened_at = excluded.opened_at, "
+            "updated_at = excluded.updated_at, recovered_at = NULL, notified_at = NULL, "
+            "payload_json = excluded.payload_json", (key, now, now, encoded))
+        self._conn.commit()
+        return "INCIDENT_OPENED"
+
+    def managed_incident_recover(self, key: str, *, clock: datetime | None = None) -> str:
+        self._require_write_lease(clock)
+        now = _now(clock)
+        cursor = self._conn.execute(
+            "UPDATE managed_incidents SET state = 'RECOVERED', recovered_at = ?, updated_at = ?, "
+            "notified_at = NULL WHERE incident_key = ? AND state = 'OPEN'", (now, now, key))
+        self._conn.commit()
+        return "INCIDENT_RECOVERED" if cursor.rowcount == 1 else "INCIDENT_NOT_OPEN"
+
+    def managed_incident_mark_notified(self, key: str, *, clock: datetime | None = None) -> None:
+        self._require_write_lease(clock)
+        self._conn.execute(
+            "UPDATE managed_incidents SET notified_at = ? WHERE incident_key = ?", (_now(clock), key))
+        self._conn.commit()
 
     def transition_activation(
         self,

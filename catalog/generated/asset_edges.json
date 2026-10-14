@@ -12288,6 +12288,16 @@
       "target_asset_id": "CTRL-M1-EXECUTION-REALITY-CALIBRATION-001"
     },
     {
+      "source_asset_id": "MODULE-MANAGED-COLLECTION-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OBSERVATION-ACCOUNT-BUDGET-001"
+    },
+    {
+      "source_asset_id": "MODULE-MANAGED-COLLECTION-CONTINUITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001"
+    },
+    {
       "source_asset_id": "MODULE-MARKET-CONTEXT-001",
       "relation": "consumes",
       "target_asset_id": "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"

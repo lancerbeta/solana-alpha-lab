@@ -226,6 +226,55 @@ above is the specific step. `account-budget-revise` has no built-in ceiling:
 any new number, raise or lower, needs an exact owner OPERATE decision for those
 numbers, and a raise never grants a provider entitlement or widens a grant.
 
+## Managed collection continuity — OPERATE gate only
+
+After the owner approves one profile, the ordinary `tick --once` creates, authorizes
+and activates each UTC-day child itself and keeps the tails alive. No timer, JSON or
+phrase per child. Everything below prints one JSON line, never reads a credential
+and never calls a provider.
+
+```text
+observation_schedule.py collection-status [--measure-storage]      # read-only
+observation_schedule.py collection-plan   --template-schedule-sha256 <running schedule> \
+  --account-scope-id <ID> --storage-basis-activation-id <running activation> \
+  [--validity UNTIL_REVOKED|UNTIL_DATE --intake-until <UTC>] [--bootstrap-not-before <UTC>] \
+  [--protected-bridge-activation-id <B>] [--admissions-per-utc-day N ...]   # read-only
+observation_schedule.py collection-apply  <same args> --expected-proposal-sha256 <hash> --phrase "<exact phrase>"
+observation_schedule.py collection-record-backup --checkpoint-at <UTC> --artifact-sha256 <hex> --coverage <label>
+observation_schedule.py collection-reconcile --once
+observation_schedule.py collection-stop-intake --expected-revision R
+observation_schedule.py collection-rollback --to-revision N --expected-revision R [--phrase "..."]
+```
+
+`plan` and `status` open the store read-only (a missing store is `SOURCE_NOT_PRESENT`,
+never a new empty system). `plan` prints the proposal hash, the exact owner phrase
+only when nothing refuses it, the capacity geometry (lower bound, not a forecast) and
+the refusing axes. Set `--bootstrap-not-before` at or after the stop of every running
+same-family window (armed B): the controller never competes with a bridge and
+`plan` refuses `HANDOVER_BEFORE_PEER_STOPS` otherwise.
+
+| Terminal | Meaning | Next |
+| --- | --- | --- |
+| `MANAGED_PLAN_REFUSED` (`refusals[].axis`) | `HANDOVER_BEFORE_PEER_STOPS`, `SHARED_ACCOUNT_BUDGET_NOT_COMMISSIONED`, `PROVIDER_CALLS_PER_UTC_DAY`, `PACE_DISPATCH_WINDOW`, `MANAGED_ADAPTER_V1_ADMISSION_CEILING`, ... | fix the named axis; a refused plan has no phrase |
+| `MANAGED_PROPOSAL_MISMATCH` / `BLOCKED_AUTHORITY` | apply args differ from the plan, or the phrase is not exact | re-run plan, copy the phrase |
+| `MANAGED_REVISION_CONFLICT` | another revision landed | read status |
+| `RECONCILE_WAIT_BOOTSTRAP_NOT_BEFORE` / `RECONCILE_WAIT_PEER_ACTIVE` / `RECONCILE_WAIT_PEER_CLOSURE[_PROOF]` | the bridge or the previous day is still closing | none; the next tick continues |
+| `RECONCILE_CHILD_ACTIVATED` / `RECONCILE_INTAKE_OK` | the day owner is active | none |
+| `RECONCILE_BLOCKED_NEW_INTAKE` (`reasons`: `HARD_BYTES`, `PHYSICAL_TAIL_RESERVE`, `BACKUP_MISSING`, `BACKUP_STALE`, `BACKUP_INVALID`, `TARGET_EXCEEDED_UNACCEPTED`) | new intake stopped, tails continue | restore the resource or record a fresh backup receipt; recovers by itself |
+| `RECONCILE_DAY_OWNER_CLOSED` | the day owner closed before its window end (stop, abort, pause) | none; a new child starts at the next UTC boundary |
+| `RECONCILE_INTAKE_STOPPED` | intake was stopped by the owner | `collection-plan`/`apply` again to resume at the next lawful boundary |
+| `RECONCILE_VALIDITY_ENDED` | `UNTIL_DATE` reached; tails continue | owner decision for a new profile |
+| `RECONCILE_BLOCKED_MANAGED_GRANT_*` / `RECONCILE_CHILD_STEP_FAILED` / `RECONCILE_UNEXPECTED_ERROR` | grant integrity, a lifecycle step or a controller bug | status shows the incident; the saved intent is resumed by the next tick |
+| `RECONCILE_DEFERRED_WRITER_BUSY` | another writer holds the lease | none |
+
+`collection-rollback` creates a new revision with the settings of an earlier approved
+one and needs no phrase only when no limit is higher and validity is not extended;
+otherwise the exact phrase of that new revision is required. Existing children, debt
+and admitted episodes are untouched; the new numbers apply to the next child.
+`collection-record-backup` records what the backup owner verified; it does not
+authenticate remote content. Rolling a binary back below this build after managed
+debits exist is forbidden; use a forward fix.
+
 ## Not here
 
 No provider smoke, deploy, live activation, real science, retention/eviction or
