@@ -185,8 +185,80 @@ def verify_cold_archive(proof: Mapping[str, Any], *, deep: bool = True) -> None:
         raise ObservationScheduleRetentionError("COLD_ARCHIVE_PROOF_UNAVAILABLE") from exc
 
 
+def _validate_operation_mode(operation_mode: str | None) -> None:
+    if operation_mode is not None and operation_mode not in {"ISOLATED_REHEARSAL", "OPERATE"}:
+        raise ObservationScheduleRetentionError("EXACT_OPERATION_MODE_REQUIRED")
+
+
+def _effective_operation_mode(store: ObservationScheduleStore, operation_mode: str | None) -> str | None:
+    _validate_operation_mode(operation_mode)
+    commissioned = _control(store, "policy", {}).get("operation_mode")
+    _validate_operation_mode(commissioned)
+    if commissioned is not None and operation_mode is not None and commissioned != operation_mode:
+        raise ObservationScheduleRetentionError("OPERATION_MODE_MISMATCH")
+    return commissioned if commissioned is not None else operation_mode
+
+
+def _check_retirement_operation_mode(store: ObservationScheduleStore, retirement: Mapping[str, Any],
+                                     operation_mode: str | None) -> None:
+    if operation_mode is None:
+        return  # Preserve native callers of policies commissioned before mode binding.
+    if retirement.get("operation_mode") != operation_mode:
+        raise ObservationScheduleRetentionError("OPERATION_MODE_MISMATCH")
+    if operation_mode == "OPERATE":
+        proof = retirement.get("archive_proof", {})
+        if (proof.get("proof_class") not in {"INDEPENDENT_SINK_CONTENT_READBACK", "REMOTE_CHECKPOINT_RESTORE_VERIFIED"}
+                or (not retirement.get("automatic") and not retirement.get("operate_authority_sha256"))):
+            raise ObservationScheduleRetentionError("INDEPENDENT_COLD_OPERATE_PROOF_REQUIRED")
+        if _control(store, "checkpoint_archive") != proof:
+            raise ObservationScheduleRetentionError("REGISTERED_CHECKPOINT_OPERATE_PROOF_REQUIRED")
+
+
+def validate_retention_operation_mode(store: ObservationScheduleStore, *, operation_mode: str | None,
+                                      policy: Mapping[str, Any] | None = None,
+                                      retirement: Mapping[str, Any] | None = None,
+                                      plan: Mapping[str, Any] | None = None,
+                                      now: datetime | None = None,
+                                      commissioning: bool = False) -> str | None:
+    """Read-only authority check, repeated by native writers under their fence.
+
+    Mode belongs to the installed control wrapper, never to a rewritten signed
+    policy. A legacy wrapper without mode keeps its existing native semantics.
+    """
+    _validate_operation_mode(operation_mode)
+    mode = operation_mode if commissioning else _effective_operation_mode(store, operation_mode)
+    if retirement is not None:
+        _check_retirement_operation_mode(store, retirement, mode)
+    if mode is None:
+        return mode
+    if policy is not None and policy.get("enabled"):
+        for scope in policy.get("allowed_scopes", []):
+            row = store._conn.execute("SELECT payload_json FROM retirement_scopes WHERE schedule_sha256=? AND activation_id=?",
+                (scope["schedule_sha256"], scope["activation_id"])).fetchone()
+            if row is not None:
+                retired = json.loads(row[0])
+                if retired.get("automatic") or retired.get("archive_proof", {}).get("proof_class") == "REMOTE_CHECKPOINT_RESTORE_VERIFIED":
+                    current = _control(store, "checkpoint_archive")
+                    if current:
+                        retired = {**retired, "archive_proof": current}
+                _check_retirement_operation_mode(store, retired, mode)
+    if plan is not None:
+        if mode == "OPERATE":
+            for proof in plan.get("archive_registry", {}).values():
+                if proof.get("proof_class") not in {"INDEPENDENT_SINK_CONTENT_READBACK", "REMOTE_CHECKPOINT_RESTORE_VERIFIED"}:
+                    raise ObservationScheduleRetentionError("INDEPENDENT_COLD_OPERATE_PROOF_REQUIRED")
+                if _control(store, "checkpoint_archive") != proof:
+                    raise ObservationScheduleRetentionError("REGISTERED_CHECKPOINT_OPERATE_PROOF_REQUIRED")
+        for candidate in plan.get("candidates", []):
+            _, retirements = _protect(store, candidate["row"], candidate["table"], plan["policy"], now)
+            for retired in retirements:
+                _check_retirement_operation_mode(store, retired, mode)
+    return mode
+
+
 def install_retirement(store: ObservationScheduleStore, *, retirement: Mapping[str, Any],
-                       approved_sha256: str, now: datetime) -> dict[str, Any]:
+                       approved_sha256: str, now: datetime,
+                       operation_mode: str | None = None) -> dict[str, Any]:
     """Exact approved no-resume record; lifecycle and due states remain original."""
     document = dict(retirement)
     if _hash(document) != approved_sha256 or document.get("disallow_resume") is not True:
@@ -195,6 +267,7 @@ def install_retirement(store: ObservationScheduleStore, *, retirement: Mapping[s
     mode = document.get("operation_mode")
     if mode not in {"ISOLATED_REHEARSAL", "OPERATE"}:
         raise ObservationScheduleRetentionError("EXACT_OPERATION_MODE_REQUIRED")
+    validate_retention_operation_mode(store, operation_mode=operation_mode, retirement=document)
     if mode == "OPERATE" and (document["archive_proof"].get("proof_class") not in {"INDEPENDENT_SINK_CONTENT_READBACK", "REMOTE_CHECKPOINT_RESTORE_VERIFIED"} or not document.get("operate_authority_sha256")):
         raise ObservationScheduleRetentionError("INDEPENDENT_COLD_OPERATE_PROOF_REQUIRED")
     if mode == "OPERATE" and _control(store, "checkpoint_archive") != document["archive_proof"]:
@@ -208,6 +281,8 @@ def install_retirement(store: ObservationScheduleStore, *, retirement: Mapping[s
     try:
         store._conn.execute("BEGIN IMMEDIATE")
         store._require_write_lease(now, within_transaction=True)
+        validate_retention_operation_mode(store, operation_mode=operation_mode, retirement=document)
+        _check_retirement_operation_mode(store, document, mode)
         activation = store._conn.execute("SELECT state FROM schedule_activations WHERE schedule_sha256=? AND activation_id=?", scope).fetchone()
         if activation is None or activation[0] not in {"PAUSED_OPERATOR", "COMPLETE", "ABORTED_SAFETY", "BLOCKED_AUTHORITY", "BLOCKED_BUDGET"}:
             raise ObservationScheduleRetentionError("RETIREMENT_SCOPE_ACTIVE_OR_UNKNOWN")
@@ -425,11 +500,15 @@ def _reconcile_pending_refresh_policy(store: ObservationScheduleStore, *,
 
 
 def install_maintenance_policy(store: ObservationScheduleStore, *, policy: Mapping[str, Any],
-                               approved_sha256: str, now: datetime) -> dict[str, Any]:
+                               approved_sha256: str, now: datetime,
+                               operation_mode: str | None = None) -> dict[str, Any]:
     validate_policy(policy)
     _check_frozen_lower_bounds(store, policy)
     if policy_sha256(policy) != approved_sha256:
         raise ObservationScheduleRetentionError("POLICY_APPROVAL_MISMATCH")
+    previous = _control(store, "policy", {})
+    mode = operation_mode if operation_mode is not None else previous.get("operation_mode")
+    validate_retention_operation_mode(store, operation_mode=mode, policy=policy, commissioning=True)
     lease = store.acquire_lease("i2-maintenance-policy", clock=now)
     if lease is None:
         raise ObservationScheduleRetentionError("WRITER_BUSY")
@@ -437,12 +516,17 @@ def install_maintenance_policy(store: ObservationScheduleStore, *, policy: Mappi
         store._conn.execute("BEGIN IMMEDIATE")
         store._require_write_lease(now, within_transaction=True)
         previous = _control(store, "policy")
-        if previous and policy != previous["policy"] and int(policy["revision"]) <= int(previous["policy"]["revision"]):
+        mode = operation_mode if operation_mode is not None else (previous or {}).get("operation_mode")
+        validate_retention_operation_mode(store, operation_mode=mode, policy=policy, commissioning=True)
+        if previous and (policy != previous["policy"] or mode != previous.get("operation_mode")) and int(policy["revision"]) <= int(previous["policy"]["revision"]):
             raise ObservationScheduleRetentionError("POLICY_REVISION_NOT_MONOTONIC")
         _check_frozen_lower_bounds(store, policy)
         _supersede_stale_policy_plan(store, approved_policy_sha256=approved_sha256, now=now)
         _reconcile_pending_refresh_policy(store, policy=policy, approved_policy_sha256=approved_sha256, now=now)
-        _set_control(store, "policy", {"policy": dict(policy), "approved_policy_sha256": approved_sha256})
+        wrapper = {"policy": dict(policy), "approved_policy_sha256": approved_sha256}
+        if mode is not None:
+            wrapper["operation_mode"] = mode
+        _set_control(store, "policy", wrapper)
         # Explicit commissioning, never startup, owns these consumer indices.
         store._conn.execute("CREATE INDEX IF NOT EXISTS idx_due_retention_occurrence ON due_observations(call_occurrence_id)")
         store._conn.execute("CREATE INDEX IF NOT EXISTS idx_due_retention_request ON due_observations(request_sha256)")
@@ -1181,8 +1265,10 @@ def _metadata_page(store: ObservationScheduleStore, table: str, after: int, high
 
 
 def build_retirement_plan(store: ObservationScheduleStore, *, now: datetime, policy: Mapping[str, Any],
-                          after: Mapping[str, int] | None = None) -> dict[str, Any]:
+                          after: Mapping[str, int] | None = None,
+                          operation_mode: str | None = None) -> dict[str, Any]:
     validate_policy(policy)
+    mode = validate_retention_operation_mode(store, operation_mode=operation_mode, policy=policy)
     _check_frozen_lower_bounds(store, policy)
     if store._conn.execute("SELECT 1 FROM sqlite_master WHERE name='idx_admission_retention_witness'").fetchone() is None:
         raise ObservationScheduleRetentionError("RETENTION_OWNER_INDICES_UNCOMMISSIONED")
@@ -1241,6 +1327,8 @@ def build_retirement_plan(store: ObservationScheduleStore, *, now: datetime, pol
                 if not _payload_has_compactable_body(payload):
                     exclusions["ALREADY_COMPACT_OR_NO_BODY"] = exclusions.get("ALREADY_COMPACT_OR_NO_BODY", 0) + 1
                     continue
+                for retired in retirements:
+                    _check_retirement_operation_mode(store, retired, mode)
                 if any(token in payload for token in ("frozen_release_pin", "export_pin", "capture_pin", "member_chain_pin")):
                     exclusions["FROZEN_EXPORT_CAPTURE_PIN"] = exclusions.get("FROZEN_EXPORT_CAPTURE_PIN", 0) + 1
                     continue
@@ -1304,7 +1392,8 @@ def _archive_candidate_matches(candidate: Mapping[str, Any]) -> None:
 
 
 def apply_retirement_plan(store: ObservationScheduleStore, *, plan: Mapping[str, Any],
-                          approved_plan_sha256: str, now: datetime) -> dict[str, Any]:
+                          approved_plan_sha256: str, now: datetime,
+                          operation_mode: str | None = None) -> dict[str, Any]:
     document = dict(plan)
     plan_id = document.pop("plan_id", None)
     if plan_id != _hash(document) or plan_id != approved_plan_sha256 or document.get("schema") != PLAN_SCHEMA:
@@ -1317,6 +1406,7 @@ def apply_retirement_plan(store: ObservationScheduleStore, *, plan: Mapping[str,
     installed = _control(store, "policy")
     if not installed or installed["approved_policy_sha256"] != plan["policy_sha256"] or installed["policy"] != policy:
         raise ObservationScheduleRetentionError("PLAN_STALE_POLICY")
+    validate_retention_operation_mode(store, operation_mode=operation_mode, policy=policy, plan=plan, now=now)
     progress = store._conn.execute("SELECT next_candidate FROM retention_progress WHERE plan_id=?", (plan_id,)).fetchone()
     offset = int(progress[0]) if progress else 0
     if len(plan["candidates"]) > int(policy["max_rows"]) or sum(int(c["row"]["payload_bytes"]) + int(c.get("dependency_bytes", 0)) for c in plan["candidates"]) > int(policy["max_bytes"]):
@@ -1361,6 +1451,10 @@ def apply_retirement_plan(store: ObservationScheduleStore, *, plan: Mapping[str,
             store._conn.execute("BEGIN IMMEDIATE")
             try:
                 store._require_write_lease(now, within_transaction=True)
+                current_policy = _control(store, "policy")
+                if not current_policy or current_policy["approved_policy_sha256"] != plan["policy_sha256"] or current_policy["policy"] != policy:
+                    raise ObservationScheduleRetentionError("PLAN_STALE_POLICY")
+                mode = _effective_operation_mode(store, operation_mode)
                 rowid = candidate["row"]["source_rowid"]
                 # Recheck byte size before fetching a possibly enlarged payload.
                 current_size = store._conn.execute(f"SELECT length(CAST(payload_json AS BLOB)) FROM {table} WHERE rowid=?", (rowid,)).fetchone()
@@ -1375,6 +1469,8 @@ def apply_retirement_plan(store: ObservationScheduleStore, *, plan: Mapping[str,
                 reason, retirements = _protect(store, actual, table, policy, now)
                 if reason or [_hash(item) for item in retirements] != candidate["retirement_sha256"]:
                     raise ObservationScheduleRetentionError("PLAN_STALE_PROTECTED:" + (reason or "RETIREMENT_CHANGED"))
+                for retired in retirements:
+                    _check_retirement_operation_mode(store, retired, mode)
                 _archive_candidate_matches(candidate)
                 for retired in retirements:
                     if retired.get("automatic"):
@@ -1406,6 +1502,7 @@ def apply_retirement_plan(store: ObservationScheduleStore, *, plan: Mapping[str,
         store._conn.execute("BEGIN IMMEDIATE")
         try:
             store._require_write_lease(now, within_transaction=True)
+            validate_retention_operation_mode(store, operation_mode=operation_mode, policy=policy, plan=plan, now=now)
             for refused in plan.get("refusals", []):
                 table = refused["table"]
                 rowid = refused["row"]["source_rowid"]
@@ -1492,7 +1589,8 @@ def apply_retention(store: ObservationScheduleStore, *, now: datetime, raw_reten
 def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
                          policy: Mapping[str, Any] | None = None, pressure: Mapping[str, Any] | None = None,
                          checkpoint_active: bool = False,
-                         expected_context: dict[str, Any] | None = None) -> dict[str, Any]:
+                         expected_context: dict[str, Any] | None = None,
+                         operation_mode: str | None = None) -> dict[str, Any]:
     expected = checkpoint_maintenance_context(store) if expected_context is None else expected_context
     if not expected:
         expected.update(checkpoint_maintenance_context(store))
@@ -1500,6 +1598,8 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
     if conflict:
         return {"status": "YIELD", "reason": conflict}
     installed = _control(store, "policy")
+    mode = validate_retention_operation_mode(store, operation_mode=operation_mode,
+        policy=(installed or {}).get("policy"), plan=_control(store, "active_plan"), now=now)
     if not installed or not installed["policy"].get("enabled"):
         return {"status": "DISABLED", "reason": "MAINTENANCE_NOT_COMMISSIONED"}
     effective = installed["policy"]
@@ -1569,8 +1669,12 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
         return {"status":"FAILED", "reason":pending_refresh["reconciliation_reason"], **retention_status(store)}
     if plan is None:
         try:
-            plan = build_retirement_plan(store, now=now, policy=effective, after=state.get("next_cursor"))
+            plan = build_retirement_plan(store, now=now, policy=effective, after=state.get("next_cursor"), operation_mode=mode)
         except Exception as exc:
+            if isinstance(exc, ObservationScheduleRetentionError) and str(exc) in {
+                    "OPERATION_MODE_MISMATCH", "EXACT_OPERATION_MODE_REQUIRED",
+                    "INDEPENDENT_COLD_OPERATE_PROOF_REQUIRED", "REGISTERED_CHECKPOINT_OPERATE_PROOF_REQUIRED"}:
+                raise
             # Selection is bounded and read-only, but its refusal is an actual
             # maintenance incident too. Never leave the last-good READY signal
             # masquerading as the current attempt's outcome after restart.
@@ -1618,6 +1722,7 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
             if _control(store, "active_plan") is not None:
                 store._conn.rollback()
                 return {"status": "YIELD", "reason": "ACTIVE_PLAN_CHANGED"}
+            validate_retention_operation_mode(store, operation_mode=mode, policy=effective, plan=plan, now=now)
             _set_control(store, "active_plan", plan)
             _commit_checkpoint_context(store, expected)
         except Exception:
@@ -1635,7 +1740,7 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
         return None, current
 
     try:
-        result = apply_retirement_plan(store, plan=plan, approved_plan_sha256=plan["plan_id"], now=now)
+        result = apply_retirement_plan(store, plan=plan, approved_plan_sha256=plan["plan_id"], now=now, operation_mode=mode)
     except Exception as exc:
         reason = str(exc) if isinstance(exc, ObservationScheduleRetentionError) else "OPTIONAL_MAINTENANCE_FAILED"
         closure_deficit = reason in {"RAW_ARCHIVE_DEPENDENCY_NOT_VERIFIED", "COLD_ARCHIVE_CANDIDATE_MISMATCH", "RAW_BODY_DEPENDENCY_NOT_ARCHIVED"}
@@ -1895,8 +2000,13 @@ def apply_physical_reclaim(store: ObservationScheduleStore, *, plan: Mapping[str
                            approved_plan_sha256: str, data_root: Path, writers_quiesced: bool,
                            independent_recovery_proof: Mapping[str, Any], now: datetime,
                            checkpoint_active: bool = False, failpoint: str | None = None,
-                           backup_root: Path | None = None) -> dict[str, Any]:
+                           backup_root: Path | None = None,
+                           operation_mode: str | None = None) -> dict[str, Any]:
     from solana_alpha_lab.factory.remote_ops import backup_plane_lock
+    _validate_operation_mode(plan.get("operation_mode"))
+    _validate_operation_mode(operation_mode)
+    if operation_mode is not None and plan.get("operation_mode") != operation_mode:
+        raise ObservationScheduleRetentionError("OPERATION_MODE_MISMATCH")
     backup_root = backup_root or store.path.parent
     if _root_binding(backup_root) != plan.get("backup_root_binding"):
         raise ObservationScheduleRetentionError("RECLAIM_BACKUP_ROOT_BINDING_MISMATCH")
@@ -1948,6 +2058,7 @@ def _apply_physical_reclaim(store: ObservationScheduleStore, *, plan: Mapping[st
     attached = False
     closed = False
     intent = {"schema": "smial.observation-reclaim-intent.v1", "state": "ALLOCATING", "plan_id": plan_id,
+              "operation_mode": plan["operation_mode"],
               "fingerprint": plan["fingerprint"], "source": plan["source"],
               "data_root_binding": plan["data_root_binding"], "lease_token": lease,
               "before_bytes": path.stat().st_size}
@@ -2065,6 +2176,7 @@ def _initial_reclaim_intent_from_plan(path: Path, data_root: Path, plan: Mapping
         if lease is not None and lease[0] != "i2-physical-reclaim":
             raise ObservationScheduleRetentionError("WRITER_BUSY")
     return {"schema":"smial.observation-reclaim-intent.v1", "state":"ALLOCATING", "plan_id":plan_id,
+            "operation_mode":document["operation_mode"],
             "fingerprint":document["fingerprint"], "source":source,
             "data_root_binding":document["data_root_binding"], "lease_token":lease[1] if lease else "",
             "before_bytes":path.stat().st_size, "initial_recovery_from_approved_plan":True}
@@ -2072,7 +2184,9 @@ def _initial_reclaim_intent_from_plan(path: Path, data_root: Path, plan: Mapping
 
 def recover_physical_reclaim(path: Path, *, data_root: Path, action: str,
                              approved_plan_sha256: str,
-                             plan: Mapping[str, Any] | None = None) -> dict[str, Any]:
+                             plan: Mapping[str, Any] | None = None,
+                             operation_mode: str | None = None) -> dict[str, Any]:
+    _validate_operation_mode(operation_mode)
     compact, rollback, intent_path = _reclaim_paths(path)
     temporary = intent_path.with_suffix(intent_path.suffix + ".tmp")
     if intent_path.is_symlink() or temporary.is_symlink():
@@ -2114,6 +2228,25 @@ def recover_physical_reclaim(path: Path, *, data_root: Path, action: str,
         identity_matches = False
     if not identity_matches:
         raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_IDENTITY_MISMATCH")
+    recorded_mode = intent.get("operation_mode")
+    _validate_operation_mode(recorded_mode)
+    if plan is not None:
+        document = dict(plan)
+        plan_id = document.pop("plan_id", None)
+        if plan_id != approved_plan_sha256 or plan_id != _hash(document):
+            raise ObservationScheduleRetentionError("RECLAIM_APPROVAL_MISMATCH")
+        plan_mode = document.get("operation_mode")
+        _validate_operation_mode(plan_mode)
+        if plan_mode is None:
+            raise ObservationScheduleRetentionError("EXACT_OPERATION_MODE_REQUIRED")
+        if recorded_mode is not None and recorded_mode != plan_mode:
+            raise ObservationScheduleRetentionError("OPERATION_MODE_MISMATCH")
+        recorded_mode = plan_mode
+    if operation_mode is not None:
+        if recorded_mode is None:
+            raise ObservationScheduleRetentionError("RECLAIM_OPERATION_MODE_PLAN_REQUIRED")
+        if recorded_mode != operation_mode:
+            raise ObservationScheduleRetentionError("OPERATION_MODE_MISMATCH")
     if action not in {"rollback", "resume"}:
         raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_ACTION_INVALID")
     state = intent["state"]

@@ -17,6 +17,7 @@ from solana_alpha_lab.factory.observation_schedule_retention import (
     install_maintenance_policy, install_retirement, recover_physical_reclaim,
     register_checkpoint_retirement_archive,
     run_maintenance_step, retention_status,
+    validate_retention_operation_mode,
 )
 from solana_alpha_lab.factory.observation_schedule_runtime import load_runtime_config
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore, ObservationScheduleStoreError
@@ -73,11 +74,50 @@ def main(argv: list[str] | None = None) -> int:
         factory_root = Path(args.factory_root).resolve() if args.factory_root else (path.parent if args.store else ROOT)
         if args.command=='register-checkpoint-archive' and not path.is_file():
             raise ObservationScheduleRetentionError('SOURCE_NOT_PRESENT')
+        if args.command=='archive' and args.operation_mode!='ISOLATED_REHEARSAL':
+            raise ObservationScheduleRetentionError('ARCHIVE_ISOLATED_REHEARSAL_ONLY')
+        # Reject mode/proof disagreements before opening a writable native owner:
+        # even startup commissioning must not alter a denied source.
+        if args.command in {'retire','policy','apply','maintenance-step','reclaim-apply'}:
+            if args.command in {'retire','policy'} and (not args.input or not args.approved_sha256):
+                raise ObservationScheduleRetentionError('EXACT_APPROVED_INPUT_REQUIRED')
+            if args.command=='apply' and (not args.plan or not args.approved_sha256):
+                raise ObservationScheduleRetentionError('EXACT_APPROVED_PLAN_REQUIRED')
+            if args.command=='reclaim-apply' and (not args.plan or not args.input or not args.approved_sha256):
+                raise ObservationScheduleRetentionError('RECLAIM_PLAN_AND_RECOVERY_PROOF_REQUIRED')
+            probe=ObservationScheduleStore(path,readonly=True,immutable=False)
+            try:
+                if args.command=='retire':
+                    validate_retention_operation_mode(probe,operation_mode=args.operation_mode,retirement=_load(args.input))
+                elif args.command=='policy':
+                    validate_retention_operation_mode(probe,operation_mode=args.operation_mode,policy=_load(args.input),commissioning=True)
+                elif args.command=='reclaim-apply':
+                    plan=_load(args.plan)
+                    if plan.get('operation_mode')!=args.operation_mode:
+                        raise ObservationScheduleRetentionError('OPERATION_MODE_MISMATCH')
+                    if args.operation_mode=='OPERATE':
+                        proof=_load(args.input)
+                        if proof.get('proof_class')!='REMOTE_CHECKPOINT_RESTORE_VERIFIED':
+                            raise ObservationScheduleRetentionError('RECLAIM_INDEPENDENT_OPERATE_PROOF_REQUIRED')
+                        row=probe._conn.execute("SELECT payload_json FROM retention_control WHERE control_key='checkpoint_archive'").fetchone()
+                        if row is None or json.loads(row[0])!=proof:
+                            raise ObservationScheduleRetentionError('RECLAIM_REGISTERED_OPERATE_PROOF_REQUIRED')
+                else:
+                    row=probe._conn.execute("SELECT payload_json FROM retention_control WHERE control_key='policy'").fetchone()
+                    policy=json.loads(row[0])['policy'] if row else None
+                    if args.command=='apply':
+                        plan=_load(args.plan)
+                    else:
+                        row=probe._conn.execute("SELECT payload_json FROM retention_control WHERE control_key='active_plan'").fetchone()
+                        plan=json.loads(row[0]) if row else None
+                    validate_retention_operation_mode(probe,operation_mode=args.operation_mode,policy=policy,plan=plan,now=now)
+            finally:
+                probe.close()
         if args.command in {'reclaim-resume','reclaim-rollback'}:
             result = recover_physical_reclaim(path, data_root=data_root,
                 action='resume' if args.command == 'reclaim-resume' else 'rollback',
                 approved_plan_sha256=args.approved_sha256 or '',
-                plan=_load(args.plan) if args.plan else None)
+                plan=_load(args.plan) if args.plan else None,operation_mode=args.operation_mode)
         else:
             store = ObservationScheduleStore(path, readonly=readonly, immutable=False)
             if args.command in {'status','dry-run'}:
@@ -104,7 +144,7 @@ def main(argv: list[str] | None = None) -> int:
                     raise ObservationScheduleRetentionError('EXACT_APPROVED_INPUT_REQUIRED')
                 operation = install_retirement if args.command == 'retire' else install_maintenance_policy
                 keyword = {'retirement' if args.command == 'retire' else 'policy':_load(args.input)}
-                result = operation(store, **keyword, approved_sha256=args.approved_sha256, now=now)
+                result = operation(store, **keyword, approved_sha256=args.approved_sha256, now=now,operation_mode=args.operation_mode)
             elif args.command == 'plan':
                 if args.policy:
                     policy = _load(args.policy)
@@ -114,13 +154,13 @@ def main(argv: list[str] | None = None) -> int:
                         raise ObservationScheduleRetentionError('APPROVED_POLICY_REQUIRED')
                     policy = json.loads(row[0])['policy']
                 result = build_retirement_plan(store, now=now, policy=policy,
-                    after=json.loads(args.after) if args.after else None)
+                    after=json.loads(args.after) if args.after else None,operation_mode=args.operation_mode)
             elif args.command == 'apply':
                 if not args.plan or not args.approved_sha256:
                     raise ObservationScheduleRetentionError('EXACT_APPROVED_PLAN_REQUIRED')
-                result = apply_retirement_plan(store, plan=_load(args.plan), approved_plan_sha256=args.approved_sha256, now=now)
+                result = apply_retirement_plan(store, plan=_load(args.plan), approved_plan_sha256=args.approved_sha256, now=now,operation_mode=args.operation_mode)
             elif args.command == 'maintenance-step':
-                result = run_maintenance_step(store, now=now, pressure=_load(args.pressure_input) if args.pressure_input else None)
+                result = run_maintenance_step(store, now=now, pressure=_load(args.pressure_input) if args.pressure_input else None,operation_mode=args.operation_mode)
             elif args.command == 'reclaim-plan':
                 result = build_reclaim_plan(store, data_root=data_root, max_wall_seconds=args.max_wall_seconds,
                     backup_root=factory_root, operation_mode=args.operation_mode)
@@ -128,7 +168,7 @@ def main(argv: list[str] | None = None) -> int:
                 if not args.plan or not args.input or not args.approved_sha256:
                     raise ObservationScheduleRetentionError('RECLAIM_PLAN_AND_RECOVERY_PROOF_REQUIRED')
                 result = apply_physical_reclaim(store, plan=_load(args.plan), approved_plan_sha256=args.approved_sha256,
-                    data_root=data_root, writers_quiesced=args.writers_quiesced, independent_recovery_proof=_load(args.input), now=now, backup_root=factory_root)
+                    data_root=data_root, writers_quiesced=args.writers_quiesced, independent_recovery_proof=_load(args.input), now=now, backup_root=factory_root,operation_mode=args.operation_mode)
             else:
                 raise ObservationScheduleRetentionError('COMMAND_NOT_IMPLEMENTED')
         if args.output:

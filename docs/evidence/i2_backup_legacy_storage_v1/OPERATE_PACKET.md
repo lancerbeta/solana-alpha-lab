@@ -90,7 +90,8 @@ Native entry для bounded чтения:
 uv run --locked --managed-python python -B scripts/observation_schedule_retention.py status \
   --store "$EXACT_OPS_STORE" --max-rows 256 --max-bytes 8388608 --max-wall-seconds 1
 uv run --locked --managed-python python -B scripts/observation_schedule_retention.py plan \
-  --store "$EXACT_OPS_STORE" --policy "$PROPOSED_POLICY_JSON" --output "$NEW_PLAN_JSON"
+  --store "$EXACT_OPS_STORE" --operation-mode OPERATE \
+  --policy "$PROPOSED_POLICY_JSON" --output "$NEW_PLAN_JSON"
 ```
 
 Status/plan открывают существующий store read-only с WAL-aware чтением. Metadata
@@ -121,7 +122,7 @@ real data_root device/inode и следующий native writer. В production O
    Сохранить original provider/scientific states, clocks, occurrence IDs,
    membership/denominator, accounting и A/B/managed authority.
 2. Применять только exact archive-bound plan bounded chunks через `apply
-   --plan ... --approved-sha256 ... --i-understand-apply`. Candidate/dependency/
+   --operation-mode OPERATE --plan ... --approved-sha256 ... --i-understand-apply`. Candidate/dependency/
    policy drift даёт отказ и новое чтение; unrelated active writes не разрешают
    расширить scope. Durable progress продолжается после restart без двойного effect.
 3. До physical switch quiesce всех actual writers/publication owners, сохранив
@@ -171,6 +172,29 @@ uv run --locked --managed-python python -B scripts/observation_schedule_retentio
 owner хеширует каноническое содержимое **без поля `plan_id`**. Полный file SHA
 или digest документа вместе с `plan_id` не подставляются. `apply` дополнительно
 проверяет установленную approved policy/revision.
+
+`--operation-mode OPERATE` должен совпасть с approved retirement/reclaim
+document и authority применяемого плана. Rehearsal JSON и `LOCAL_REHEARSAL`
+proof не принимаются на OPERATE-пути; установка, plan, APPLY и ручной
+`maintenance-step` отказывают до mutation. При отказе получить настоящий
+independent proof и новый exact документ/plan с отдельным approval; флаг не
+повышает rehearsal authority и не переписывает signed JSON. Для production
+plan/APPLY/maintenance/reclaim/recovery передавать `OPERATE` явно. По умолчанию
+CLI работает в `ISOLATED_REHEARSAL`; это не разрешение на production action.
+`OPERATION_MODE_MISMATCH` означает несовпадение режимов; proof refusal
+сохраняет исходные body/authority. Не обходить отказ сменой флага.
+Установка policy сохраняет выбранный режим в native control wrapper, отдельно
+от approved policy JSON/hash. Обычный автоматический caller наследует этот
+режим и проверяет authority каждого выбранного retirement. Signed policy
+не получает новое поле и не меняет canonical digest.
+
+После отдельного exact plan approval native bounded APPLY:
+
+```sh
+uv run --locked --managed-python python -B scripts/observation_schedule_retention.py apply \
+  --store "$EXACT_OPS_STORE" --operation-mode OPERATE \
+  --plan "$NEW_PLAN_JSON" --approved-sha256 "$APPROVED_RETIREMENT_PLAN_SHA256" --i-understand-apply
+```
 
 Обязательный physical-path блок после разрешённого quiesce. `FINAL_CURRENT_PROOF_JSON`
 создан независимым restore **последнего current capture после остановки writers**;
@@ -229,6 +253,10 @@ DB и их sidecars по сохранённому cleanup manifest и завер
 старые DB не образуют бессрочный HOT-хвост. Повтор того же resume после interruption
 дозавершает cleanup идемпотентно. После rollback аналогичный terminal —
 `ROLLBACK_FINALIZED`. Unknown/changed staging не удаляется.
+Новый durable intent хранит тот же operation mode. Для исторического intent
+без mode нужен exact approved `--plan` той операции; неизвестный режим не
+выводится из выбранного флага. План сохраняется до завершения recovery.
+Без такого плана — `RECLAIM_OPERATION_MODE_PLAN_REQUIRED`.
 
 Следующий backup повторно проверяет тот же native reclaim guard перед selection,
 writer fences и SQLite capture. Unfinished intent, orphan staging либо чужой

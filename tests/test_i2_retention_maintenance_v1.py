@@ -119,6 +119,185 @@ class NativeFixture(unittest.TestCase):
         return owner.apply_retirement_plan(self.store,plan=plan,approved_plan_sha256=plan['plan_id'],now=NOW)
 
 
+class CLIOperationModeTests(NativeFixture):
+    def cli(self, command, *arguments, mode='OPERATE'):
+        return subprocess.run([sys.executable,'-B',str(ROOT/'scripts/observation_schedule_retention.py'),
+            command,'--store',str(self.path),'--now',render_utc(NOW),'--operation-mode',mode,
+            *map(str,arguments)],cwd=ROOT,capture_output=True,text=True,timeout=30)
+
+    def artifact(self, name, document):
+        path=self.base/name
+        path.write_text(json.dumps(document),encoding='utf-8')
+        return path
+
+    def test_operate_retire_rejects_signed_rehearsal_before_source_mutation(self):
+        add_call(self.store,rowid=313,size=4096)
+        proof=self.archive()
+        retirement={'schedule_sha256':'a'*64,'activation_id':'LEGACY','disallow_resume':True,
+            'operation_mode':'ISOLATED_REHEARSAL','archive_proof':proof,'retire_pending_due':True}
+        path=self.artifact('retire.json',retirement)
+        self.store.close()
+        before=self.path.read_bytes()
+        denied=self.cli('retire','--input',path,'--approved-sha256',owner.policy_sha256(retirement),
+            '--i-understand-apply')
+        self.assertEqual(denied.returncode,2,denied.stdout+denied.stderr)
+        self.assertIn('OPERATION_MODE_MISMATCH',denied.stderr)
+        self.assertEqual(self.path.read_bytes(),before)
+        self.store=ObservationScheduleStore(self.path)
+        self.assertIsNone(owner._scope_retirement(self.store,('a'*64,'LEGACY')))
+        self.assertIn('rows',self.store.call_payload('OCC-1'))
+
+    def test_operate_downstream_rejects_preexisting_rehearsal_without_effects(self):
+        add_call(self.store,rowid=313,size=4096)
+        document=self.commission(enabled=True)
+        plan=self.plan(document)
+        path=self.artifact('local-plan.json',plan)
+        pressure=self.artifact('pressure.json',SAFE)
+        self.store.close()
+        before=self.path.read_bytes()
+        for command,arguments in (
+                ('plan',('--output',self.base/'denied-plan.json')),
+                ('apply',('--plan',path,'--approved-sha256',plan['plan_id'],'--i-understand-apply')),
+                ('maintenance-step',('--pressure-input',pressure,'--i-understand-apply'))):
+            with self.subTest(command=command):
+                denied=self.cli(command,*arguments)
+                self.assertEqual(denied.returncode,2,denied.stdout+denied.stderr)
+                self.assertRegex(denied.stderr,'OPERATION_MODE_MISMATCH|INDEPENDENT_COLD_OPERATE_PROOF_REQUIRED')
+                self.assertEqual(self.path.read_bytes(),before)
+        self.assertFalse((self.base/'denied-plan.json').exists())
+        self.store=ObservationScheduleStore(self.path)
+        self.assertIn('rows',self.store.call_payload('OCC-1'))
+        self.assertEqual(self.store._conn.execute('SELECT count(*) FROM retention_progress').fetchone()[0],0)
+        self.assertIsNone(owner._control(self.store,'maintenance'))
+
+    def test_policy_and_operate_local_proof_refuse_before_writable_open(self):
+        add_call(self.store,rowid=313,size=4096)
+        document=self.commission(enabled=True)
+        proposed={**document,'revision':2}
+        policy_path=self.artifact('operate-policy.json',proposed)
+        local={**owner._scope_retirement(self.store,('a'*64,'LEGACY')),
+            'operation_mode':'OPERATE','operate_authority_sha256':'9'*64}
+        local_path=self.artifact('operate-local.json',local)
+        self.store.close(); before=self.path.read_bytes()
+        for command,path,digest,reason in (
+                ('policy',policy_path,owner.policy_sha256(proposed),'OPERATION_MODE_MISMATCH'),
+                ('retire',local_path,owner.policy_sha256(local),'INDEPENDENT_COLD_OPERATE_PROOF_REQUIRED')):
+            with self.subTest(command=command):
+                result=self.cli(command,'--input',path,'--approved-sha256',digest,'--i-understand-apply')
+                self.assertEqual(result.returncode,2,result.stdout+result.stderr)
+                self.assertIn(reason,result.stderr)
+                self.assertEqual(self.path.read_bytes(),before)
+        self.store=ObservationScheduleStore(self.path)
+
+    def registered_checkpoint(self):
+        from solana_alpha_lab.factory import offhost_backup as backup
+        document,_,remote_root=CheckpointRefreshPolicyRecoveryTests.pending_checkpoint(self)
+        config,_,transport=CheckpointRefreshPolicyRecoveryTests.native_refresh_transport(self,remote_root)
+        with patch.object(backup,'load_offhost_config',return_value=config):
+            result=backup.refresh_checkpoint_archive(self.hot,{},now=NOW,runner=transport)
+        self.assertEqual(result['status'],'REGISTERED',result)
+        return document,owner._control(self.store,'checkpoint_archive')
+
+    def test_true_operate_cli_retire_policy_plan_apply_with_registered_proof(self):
+        document,proof=self.registered_checkpoint()
+        retirement={'schedule_sha256':'a'*64,'activation_id':'LEGACY','disallow_resume':True,
+            'operation_mode':'OPERATE','archive_proof':proof,'operate_authority_sha256':'9'*64}
+        retired_path=self.artifact('operate-retirement.json',retirement)
+        revised={**document,'revision':2}
+        policy_path=self.artifact('operate-policy.json',revised)
+        original=[tuple(row) for row in self.store._conn.execute(
+            'SELECT rowid,created_at,updated_at,state FROM call_ledger ORDER BY rowid')]
+        self.store.close()
+        for command,path,digest in (('retire',retired_path,owner.policy_sha256(retirement)),
+                ('policy',policy_path,owner.policy_sha256(revised))):
+            result=self.cli(command,'--input',path,'--approved-sha256',digest,'--i-understand-apply')
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+        plan_path=self.base/'operate-plan.json'
+        result=self.cli('plan','--output',plan_path)
+        self.assertEqual(result.returncode,0,result.stderr)
+        plan=json.loads(plan_path.read_text())
+        self.assertEqual(len(plan['candidates']),2)
+        result=self.cli('apply','--plan',plan_path,'--approved-sha256',plan['plan_id'],'--i-understand-apply')
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(json.loads(result.stdout)['applied_call_compactions'],2)
+        self.store=ObservationScheduleStore(self.path)
+        self.assertEqual([tuple(row) for row in self.store._conn.execute(
+            'SELECT rowid,created_at,updated_at,state FROM call_ledger ORDER BY rowid')],original)
+        self.assertNotIn('rows',self.store.call_payload('FIRST'))
+        self.assertEqual(owner._control(self.store,'policy'),{'policy':revised,
+            'approved_policy_sha256':owner.policy_sha256(revised),'operation_mode':'OPERATE'})
+        # Native policy revisions inherit commissioned mode without altering
+        # the signed policy's shape or silently returning to legacy semantics.
+        next_policy={**revised,'revision':3}
+        owner.install_maintenance_policy(self.store,policy=next_policy,
+            approved_sha256=owner.policy_sha256(next_policy),now=NOW)
+        self.assertEqual(owner._control(self.store,'policy')['operation_mode'],'OPERATE')
+
+    def test_automatic_native_step_inherits_commissioned_operate_mode(self):
+        document,_=self.registered_checkpoint()
+        revised={**document,'revision':2}
+        policy_path=self.artifact('automatic-policy.json',revised)
+        self.store.close()
+        commissioned=self.cli('policy','--input',policy_path,'--approved-sha256',owner.policy_sha256(revised),
+            '--i-understand-apply')
+        self.assertEqual(commissioned.returncode,0,commissioned.stderr)
+        self.store=ObservationScheduleStore(self.path)
+        native_apply=owner.apply_retirement_plan
+        with patch.object(owner,'apply_retirement_plan',wraps=native_apply) as apply:
+            result=owner.run_maintenance_step(self.store,now=NOW,pressure=SAFE)
+        self.assertEqual(result['applied_call_compactions'],2,result)
+        self.assertEqual(apply.call_args.kwargs['operation_mode'],'OPERATE')
+        self.assertTrue(owner._scope_retirement(self.store,('a'*64,'LEGACY'))['automatic'])
+        self.assertNotIn('rows',self.store.call_payload('SECOND'))
+
+    def test_reclaim_flag_and_historical_recovery_require_exact_mode(self):
+        add_call(self.store,rowid=313,size=4096)
+        proof=self.archive()
+        plan=owner.build_reclaim_plan(self.store,data_root=self.hot)
+        plan_path=self.artifact('reclaim-plan.json',plan)
+        proof_path=self.artifact('proof.json',proof)
+        self.store.close(); before=self.path.read_bytes()
+        result=self.cli('reclaim-apply','--plan',plan_path,'--input',proof_path,
+            '--approved-sha256',plan['plan_id'],'--writers-quiesced','--i-understand-apply')
+        self.assertEqual(result.returncode,2,result.stdout+result.stderr)
+        self.assertIn('OPERATION_MODE_MISMATCH',result.stderr)
+        self.assertEqual(self.path.read_bytes(),before)
+        compact,rollback,intent_path=owner._reclaim_paths(self.path)
+        self.assertFalse(any(path.exists() for path in (compact,rollback,intent_path)))
+        self.store=ObservationScheduleStore(self.path)
+        # Native reopen may commission a missing historical schedule alias;
+        # reclaim must use final-current proof and plan after that owner write.
+        proof=owner.create_cold_archive(self.store,archive_path=self.base/'current.sqlite',
+            restored_path=self.base/'current-restored.sqlite',routine_roots=[self.hot])
+        plan=owner.build_reclaim_plan(self.store,data_root=self.hot)
+        plan_path.write_text(json.dumps(plan),encoding='utf-8')
+        owner.apply_physical_reclaim(self.store,plan=plan,approved_plan_sha256=plan['plan_id'],
+            data_root=self.hot,writers_quiesced=True,independent_recovery_proof=proof,now=NOW,
+            operation_mode='ISOLATED_REHEARSAL')
+        intent_before=intent_path.read_bytes(); source_before=self.path.read_bytes()
+        for command in ('reclaim-resume','reclaim-rollback'):
+            denied=self.cli(command,'--approved-sha256',plan['plan_id'],'--i-understand-apply')
+            self.assertEqual(denied.returncode,2,denied.stdout+denied.stderr)
+            self.assertIn('OPERATION_MODE_MISMATCH',denied.stderr)
+            self.assertEqual(intent_path.read_bytes(),intent_before)
+            self.assertEqual(self.path.read_bytes(),source_before)
+        intent=json.loads(intent_before); intent.pop('operation_mode')
+        owner._write_intent(intent_path,intent)
+        historical=intent_path.read_bytes()
+        denied=self.cli('reclaim-resume','--approved-sha256',plan['plan_id'],'--i-understand-apply',
+            mode='ISOLATED_REHEARSAL')
+        self.assertEqual(denied.returncode,2,denied.stdout+denied.stderr)
+        self.assertIn('RECLAIM_OPERATION_MODE_PLAN_REQUIRED',denied.stderr)
+        self.assertEqual(intent_path.read_bytes(),historical)
+        resumed=self.cli('reclaim-resume','--plan',plan_path,'--approved-sha256',plan['plan_id'],
+            '--i-understand-apply',mode='ISOLATED_REHEARSAL')
+        self.assertEqual(resumed.returncode,0,resumed.stdout+resumed.stderr)
+        self.assertEqual(json.loads(resumed.stdout)['status'],'RESUMED')
+        self.store=ObservationScheduleStore(self.path)
+        self.assertEqual(self.store._conn.execute('SELECT rowid FROM call_ledger').fetchone()[0],313)
+        self.assertIn('rows',self.store.call_payload('OCC-1'))
+
+
 class PolicyRevisionRecoveryTests(NativeFixture):
     def checkpoint_outer_interleave(self, conflict, *, phase='refresh', fail=True):
         from solana_alpha_lab.factory import offhost_backup as backup

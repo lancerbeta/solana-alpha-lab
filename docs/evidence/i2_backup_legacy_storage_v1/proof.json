@@ -1038,6 +1038,122 @@
       "factory_static": "PASS",
       "independent_oracle": "Real first native APPLY, separate peer store/approved policy/plan/outcome, reopened raw SQLite, actual registered reconstructed checkpoints/two cache generations, filesystem SHA/inode checks and operational packet/watch; transport callbacks only at deliberate concurrency/failure boundaries",
       "production_gate": "Same mandatory separately approved installed ordinary maintenance/caller and incident/recovery acceptance. No production mutation, new policy field, scientific authority or live capacity claim."
+    },
+    "explicit_cli_mode_authority_remediation": {
+      "observed_head": "05de45fd479ffb7e67545f04cf777c83f724b30a",
+      "prior_packet_fingerprint_sha256": "03e0f0608a9d921f0dd79fa32c6d6a1a2c5b4fe96da5d020b899e10946e5dc37",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "ARCHITECTURE_CRITIC": "PASS",
+        "OWNER_UX_CRITIC": "NOT_READY"
+      },
+      "before": {
+        "independent_owner_ux_probe": "Actual CLI retire --operation-mode OPERATE accepted exact approved ISOLATED_REHEARSAL document with real LOCAL_REHEARSAL proof. Subsequent actual plan/apply with explicit OPERATE returned COMPLETE/applied_call_compactions=1 without independent remote proof.",
+        "raw_sqlite_oracle": "ROWID313 retained; original rows body removed on disposable native store.",
+        "root_cause": "CLI selected mode was not bound to the approved retirement JSON or the downstream plan/APPLY authority."
+      },
+      "native_validation": {
+        "schema": "smial.i2-cli-mode-repair-validation.v1",
+        "result": "PASS",
+        "scope": "Isolated native CLI operation-mode and independent-proof authority repair; no production actions",
+        "owned_paths": [
+          "scripts/observation_schedule_retention.py",
+          "src/solana_alpha_lab/factory/observation_schedule_retention.py",
+          "tests/test_i2_retention_maintenance_v1.py"
+        ],
+        "before": {
+          "baseline_head_prefix": "05de",
+          "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.CLIOperationModeTests",
+          "tests": 2,
+          "failures": 5,
+          "errors": 0,
+          "wall_seconds": 1.487,
+          "native_facts": [
+            "Actual CLI retire --operation-mode OPERATE accepted signed ISOLATED_REHEARSAL retirement with LOCAL_REHEARSAL proof (exit 0)",
+            "Actual CLI plan --operation-mode OPERATE produced a LOCAL_REHEARSAL-backed plan and output artifact",
+            "Actual CLI apply --operation-mode OPERATE returned COMPLETE with applied_call_compactions=1, retaining ROWID 313 while removing its rows body",
+            "Actual CLI maintenance-step --operation-mode OPERATE returned COMPLETE for the rehearsal-owned policy"
+          ]
+        },
+        "after": {
+          "focused_command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.CLIOperationModeTests tests.test_i2_retention_maintenance_v1.NativeCutoverAndCLITests.test_full_real_cli_plan_apply_reclaim_and_next_writer",
+          "focused_tests": 7,
+          "focused_wall_seconds": 8.72,
+          "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1 tests.test_i2_pipeline_v1",
+          "targeted_tests": 59,
+          "targeted_wall_seconds": 77.987,
+          "failures": 0,
+          "errors": 0,
+          "skips": 0,
+          "denial_facts": {
+            "retire_signed_mode_mismatch": "exit 2 OPERATION_MODE_MISMATCH before writable owner; exact database bytes preserved; no retirement installed; ROWID 313 body retained",
+            "preexisting_rehearsal_plan_apply_maintenance": "all exit 2 before source mutation; exact database bytes preserved; no output plan, no progress, no maintenance outcome; body retained",
+            "policy_mode_disagreement": "exit 2 OPERATION_MODE_MISMATCH; exact database bytes preserved",
+            "operate_document_local_proof": "exit 2 INDEPENDENT_COLD_OPERATE_PROOF_REQUIRED; exact database bytes preserved",
+            "reclaim_signed_plan_disagreement": "exit 2 OPERATION_MODE_MISMATCH; no staging, rollback or intent; source bytes preserved",
+            "resume_rollback_disagreement": "both exit 2 OPERATION_MODE_MISMATCH; intent and source bytes preserved",
+            "historical_intent_without_mode": "exit 2 RECLAIM_OPERATION_MODE_PLAN_REQUIRED without exact plan; supplied original approved plan permits matching rehearsal resume"
+          },
+          "positive_facts": {
+            "true_operate": "Actual full checkpoint download, native independent restore and source registration produced REMOTE_CHECKPOINT_RESTORE_VERIFIED; CLI OPERATE retire/policy/plan/apply succeeded with 2 compactions; ROWIDs 11/29, created_at, updated_at and state preserved",
+            "signed_policy": "Policy JSON and approved policy hash unchanged by mode binding; operation_mode stored only in existing policy control wrapper",
+            "native_mode_inheritance": "Automatic native step without requested mode inherited commissioned OPERATE and performed 2 compactions with actual registered proof; native policy revision operation_mode=None preserved prior wrapper mode",
+            "legacy_no_wrapper": "Existing ordinary native automatic pipeline passed without adding wrapper mode; independent-proof automatic retirement remains compatible",
+            "existing_default_rehearsal": "Actual CLI plan/apply/reclaim/resume plus next native writer passed; ROWID 313 and sibling root inode preserved",
+            "reclaim_recovery": "Actual signed rehearsal cutover intent carried operation_mode; historical intent with field removed resumed only with exact original plan; ROWID 313 and body preserved"
+          },
+          "native_rehearsal_measurements": {
+            "before_bytes": 2494464,
+            "after_bytes": 397312,
+            "logical_body_before_bytes": 2097175,
+            "logical_body_after_bytes": 0,
+            "provenance_payload_after_bytes": 614,
+            "next_checkpoint_bytes": 12372,
+            "independent_checkpoint_retired_body_count": 0,
+            "next_native_writer": "PASS",
+            "rowid": 313,
+            "root_inode": "PRESERVED"
+          },
+          "ordinary_multi_batch_measurements": {
+            "remaining_bodies_after_cycles": [
+              3,
+              3,
+              2,
+              2,
+              1,
+              1,
+              0
+            ],
+            "cache_generations_after_cycles": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            "old_remote_proof_pins": "PRESERVED",
+            "old_local_cache": "RELEASED"
+          }
+        },
+        "native_boundary": [
+          "Optional operation_mode added compatibly to native retirement, policy, planning, apply, maintenance, physical reclaim and recovery APIs",
+          "CLI supplies requested mode; read-only CLI preflight precedes writable owner construction",
+          "Native retirement/policy writes and every compaction recheck mode/proof/current policy under the owning native lease and transaction",
+          "Automatic maintenance inherits commissioned wrapper mode; old no-wrapper native semantics remain",
+          "Mode switch of an existing policy wrapper requires a monotonic policy revision; implicit native None inherits previous mode",
+          "Signed reclaim plan and durable intent bind mode; legacy intent without mode requires exact original approved plan when CLI supplies a mode",
+          "Local archive creation accepts ISOLATED_REHEARSAL only"
+        ],
+        "limits": [
+          "No production deploy, upload, maintenance activation or destructive apply performed",
+          "No full gate, Git mutation, dependency or schema-version addition performed",
+          "No new live scientific or economic claim; protected scientific histories, counters and source clocks preserved by existing native checks"
+        ]
+      },
+      "authority": "Only isolated native stores. No deployment, live retirement/reclaim, policy enable or effective freshness/retention change."
     }
   },
   "main_integration": {

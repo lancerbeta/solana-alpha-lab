@@ -6,7 +6,7 @@
   },
   {
     "claim_id": "I2_EXACT_COLD_RETIRE_RECLAIM",
-    "claim": "Retirement removes exact archived eligible bodies while preserving denominator/provenance/control; explicit native rebuild preserves ROWID/sequence/root identity and next writer. Durable pre-allocation intent blocks reboot/reconnected writers until exact recovery finalizes owned rollback/staging cleanup.",
+    "claim": "Retirement removes exact archived eligible bodies while preserving denominator/provenance/control; explicit native rebuild preserves ROWID/sequence/root identity and next writer. Durable pre-allocation intent blocks reboot/reconnected writers until exact recovery finalizes owned rollback/staging cleanup. Explicit CLI operation mode agrees with the exact approved retirement and applied authority before mutation; rehearsal proof cannot authorize the OPERATE path.",
     "scope": "Exact approved scope/plan; default-off; quiesced final-current production authority separate."
   },
   {

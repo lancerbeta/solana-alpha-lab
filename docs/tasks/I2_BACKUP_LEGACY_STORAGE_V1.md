@@ -213,3 +213,10 @@ Use current native owners and finite metadata comparisons; preserve committed
 effects, pins, newer policy/plan/state/checkpoint identity and last-good truth.
 Re-run the native race oracle and ordinary pipeline, then re-freeze all four
 reviews and exact-head CI. Scope, review roles and production gates are unchanged.
+
+The independent owner-UX review additionally reproduced explicit CLI OPERATE
+accepting rehearsal retirement and subsequently compacting bodies without an
+independent proof. Bind requested mode to the exact approved retirement and
+downstream authority before mutation, including physical apply/recovery, in
+the existing native owners. Preserve canonical document hashes and the valid
+isolated rehearsal path; no new policy schema or production authority follows.

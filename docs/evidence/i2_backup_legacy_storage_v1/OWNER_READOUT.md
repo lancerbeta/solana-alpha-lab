@@ -268,3 +268,18 @@ static PASS. Наборы перекрываются с прежними; сум
 уникальных tests. Native многопакетный ordinary путь завершил bodies
 [3,3,2,2,1,1,0], одновременно retained cache generations=1. Production B/C
 и Linux/filesystem/cadence/pressure acceptance остаются обязательными pending.
+
+## Explicit CLI operation mode authority
+
+Независимый OWNER_UX review на `05de45fd` воспроизвёл authority bypass:
+explicit CLI `OPERATE` принимал rehearsal retirement, а следующий APPLY
+удалял body без independent remote proof. Raw SQL сохранил ROWID313 и подтвердил
+исчезновение original body. Режим теперь сверяется с точным approved документом
+и применяемой authority до mutation; rehearsal proof не становится OPERATE
+из-за выбора флага. Canonical approval digest не переписывается. Actual CLI
+отрицательные и положительные native проверки, scope и результаты записаны
+в proof.json. Один staged OPERATE packet описывает отказ и точный повтор.
+Положительный native refresh/register → OPERATE retire/policy/plan/APPLY
+выполнил 2 compactions с сохранением ROWID/source clocks. Семь focused checks
+прошли за 8.720s, включая существующий полный CLI rehearsal. Factory static PASS.
+Production B/C остаются обязательными pending.
