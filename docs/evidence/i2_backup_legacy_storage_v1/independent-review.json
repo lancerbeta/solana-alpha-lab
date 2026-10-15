@@ -4,8 +4,8 @@
   "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-CAPTURE-REPAIR",
   "as_of": "2026-10-15",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "4a02ea385c46697fbcc2a5911eb28eea576eb071374196863cd8231f14766e24",
+  "reviewed_inventory_sha256": "ca80bf06c9f0a5a1d3db4f22f8f09601d206aaaa273c27eeddccc48a26e44c44",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -15,37 +15,53 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING actual isolated follow-up P0/P1 review; no prior #407 approval rebound."
+        "Isolated read-only P0/P1 review PASS on content head06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c; no open P0/P1. Real SQLITE_FULL now yields sanitary trace, COPY_FAILED attempt and one CLI JSON with last-good unchanged.",
+        "Frozen membership preserved, exact native completed/legacy JSON validation precedes post-release read; missing member refuses. Frozen diff, thirteen files, source bindings and six artifact hashes matched. Final comparable native writer/publication errors0. Four required roles sufficient."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING actual isolated follow-up P0/P1 review; no prior #407 approval rebound."
+        "Isolated read-only P0/P1 review PASS on content head06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c; all nine source/artifact hashes matched; both P1 fixes backed by regressions and comparable exact restore/writer/publication proof.",
+        "Owner outcome retained: fresh standalone full/restore, verified-copy finite native retirement/reclaim rehearsal, one scoped resumable cleanup, compact baseline and one policy sustainable against eligible inflow. Production byte attribution/pause/throughput UNKNOWN; no upload/delete/APPLY authority inferred."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING actual isolated follow-up P0/P1 review; no prior #407 approval rebound."
+        "Isolated packet+diff-only P0/P1 review PASS; SEMANTIC_PREMISE=PASS on content head06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c; candidate/diff/contract/evidence hashes matched.",
+        "Membership, WAL view, mutable jobs and closure remain fenced; exact frozen receipt relatives validated before post-fence read, no recensus/skip. Native completed/legacy owner confirms existing bytes not rewritten. OPS/ResearchStore/source bytes remain truth, DuckDB derived. Inventory/checkpoint meanings and old scientific evidence unchanged; no new cross-task private imports/framework.",
+        "Local proof can pass while production I/O, larger closure or WAL pressure delays collector and violates due/PIT coverage. Runtime falsifiers remain missed mandatory observations, backup-caused lock failure or recovered rows/closure diverging from pinned capture; local PASS grants no runtime authority.",
+        "packet_fingerprint_sha256=47488c0c6f66879eeecf1ffcf0950e972b1be0ed924bddd90c3cc5be563724fd; independence=PACKET_INFORMATION_PATH; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING actual isolated follow-up P0/P1 review; no prior #407 approval rebound."
+        "Isolated read-only P0/P1 review PASS on content head06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c. Next owner gate exact merge phrase after CI/readiness. Fresh full and independent restore require separate Stage B authority; only after PACKAGING_LIVE_PROVEN prepare Stage C and one finite cleanup/policy scope.",
+        "Old delta-chain/no-new-full restriction explicitly superseded as proposal. Actual production sizes, throughput and full technical pause UNKNOWN. Repair is not I2 DONE. No heavy reruns or production writes by reviewer."
       ]
     }
   ],
-  "verdict": "NOT_READY",
+  "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "NO_REVIEW_MODEL_DIVERSITY_PROOF",
     "NO_PRODUCTION_OPERATION_OR_MERGE_AUTHORITY"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1 native post-fence SQLITE_FULL escaped the former fence exception handler: no typed JSON/trace and latest attempt falsely stayed successful. Real SQLite max_page_count=1 CLI/attempt/last-good/native-writer oracle now passes.",
+      "observed_head": "2bd02dcb563ab284b327a6e541fb7427f0239060",
+      "resolved_by_head": "06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c"
+    }
   ]
 }
