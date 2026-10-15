@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/list_a_confirming_producer_v1/factory-fit.json",
-    "sha256": "177384678aefdd2f7a204e35dd6d4703a8171e9a5bdf6704acc5ad1278508cb2",
+    "sha256": "4c5e86563f45a60f0265a5a9086d691f3f5ca84daf8b4198737ce84905db79a4",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -39,6 +39,8 @@
     "acceptance_evaluator_invocations": 8,
     "acceptance_scientific_charges": 6,
     "active_worktree_venv": 0,
+    "git_delivery_new_scientific_runs": 0,
+    "git_delivery_new_virtual_environments_created": 0,
     "named_scientific_charges": 7,
     "named_stores_deleted": 0,
     "new_dependencies": 0,
@@ -61,8 +63,8 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/list_a_confirming_producer_v1/independent-review.json",
-      "sha256": "06cd44aa4076c8dedaae9ca65018286538a83dd96bf87069e227fece1ce9d258",
-      "verdict": "PENDING"
+      "sha256": "990929cf73684a170838d5ccbd3220fca7b12c51b0bbc968092631e944fb90fb",
+      "verdict": "PASS"
     },
     "project_checks": [
       "PASS_ACTUAL_PRE_VALUES_RESERVATION",

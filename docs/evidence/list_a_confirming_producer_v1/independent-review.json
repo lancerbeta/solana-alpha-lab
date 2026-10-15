@@ -95,6 +95,22 @@
       "resolved_by_head": "b34ffd2dc481f18808530b22edfdc362efb92fb4",
       "role": "OWNER_UX_CRITIC",
       "severity": "MAJOR"
+    },
+    {
+      "finding": "Historical empty review .venv violation was not owner accepted; resolved FORWARD by exact owner decision plus NEW isolated review, initial violation and NOT_READY immutable.",
+      "observed_head": "c1c626f68a4a9abad2ab03cafd410c50dcd1e4b2",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "8daef7ba3374e2c22ee6854997544ae34f9e7fe7",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "BLOCKER"
+    },
+    {
+      "finding": "Historical empty review .venv violation was not owner accepted; resolved FORWARD by exact owner decision plus NEW isolated review, initial violation and NOT_READY immutable.",
+      "observed_head": "c1c626f68a4a9abad2ab03cafd410c50dcd1e4b2",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "8daef7ba3374e2c22ee6854997544ae34f9e7fe7",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "BLOCKER"
     }
   ],
   "required_roles": [
@@ -104,40 +120,70 @@
     "OWNER_UX_CRITIC"
   ],
   "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-INDEPENDENT-AFTER-OWNER-ACCEPTANCE",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "8fd38da474ccf57feac31f802f31a8c9e2b044dc6fb2bdd1e529af1fc71d6757",
+  "reviewed_inventory_sha256": "0dfdd1b76b8f3752658bf0de698b74fe217658bd4bb4513ea0c5e94d1154045e",
   "reviews": [
     {
       "findings": [
-        "PENDING_NEW_ISOLATED_REVIEW_AFTER_EXACT_OWNER_DECISION; earlier receipts preserved in review-history.json and frozen Git object."
+        "NEW isolated read-only review after exact owner decision, head=8daef7ba3374e2c22ee6854997544ae34f9e7fe7; 49/49 committed/worktree bindings independently reconstructed; native bindings/inventory/exact patch and current evidence refs checked. packet_fingerprint_sha256=3a0b8d28afab0f921524422f3d14c6d8893a07f0f053ffa4a757c8e09eb4c191; no tests/scientific studies/observation-value reads/mutations/new environments.",
+        "No proved actionable code/test/direct-consumer findings. 52 changed paths inside write set, clean worktree; native chain exact. Current22-path qualification,33 changed Catalog hashes and frozen core match.",
+        "Reviewed pre-values reservation, aliases/retained charge, recovery, typed atomic completion, cold dossier and promotion denial. Exact4-role set verified.",
+        "Initial GOAL/ARCHITECTURE NOT_READY preserved in frozen review Git object sha06cd44aa4076c8dedaae9ca65018286538a83dd96bf87069e227fece1ce9d258. Archive16files509868bytes/no distributions/active .venv absent/footprint counted. Historical non-use verified from retained receipts, not re-executed. New role PASS does not attest CI/readiness/merge or real authority."
       ],
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     {
       "findings": [
-        "PENDING_NEW_ISOLATED_REVIEW_AFTER_EXACT_OWNER_DECISION; earlier receipts preserved in review-history.json and frozen Git object."
+        "NEW isolated read-only review after exact owner decision, head=8daef7ba3374e2c22ee6854997544ae34f9e7fe7; 49/49 committed/worktree bindings independently reconstructed; native bindings/inventory/exact patch and current evidence refs checked. packet_fingerprint_sha256=3a0b8d28afab0f921524422f3d14c6d8893a07f0f053ffa4a757c8e09eb4c191; no tests/scientific studies/observation-value reads/mutations/new environments.",
+        "No material GOAL/DoD gaps in reviewed synthetic scope. Current19refs/22qualification match. Positive/null/insufficient and literal negative/zero/ambiguous/empty-replicate/no-reroll address frozen outcomes; reservation/OS faults/retained charges/cold zero-call/ordinary PAUSE/promotion denial substantiated by saved evidence and code.",
+        "Core/seeds/historical UNBOUND unchanged;7 named charges/early P0 UNKNOWN/2 legacy SKIP/nonclaims preserved. Owner conditions match retained receipts and actual archive16files509868bytes, active .venv absent, counted footprint. Only delivery metadata changed after owner checkpoint; initial NOT_READY remains frozen, not renamed. CI/readiness and all real/provider/deploy/merge authority separate."
       ],
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     {
       "findings": [
-        "PENDING_NEW_ISOLATED_REVIEW_AFTER_EXACT_OWNER_DECISION; earlier receipts preserved in review-history.json and frozen Git object."
+        "NEW isolated read-only review after exact owner decision, head=8daef7ba3374e2c22ee6854997544ae34f9e7fe7; 49/49 committed/worktree bindings independently reconstructed; native bindings/inventory/exact patch and current evidence refs checked. packet_fingerprint_sha256=3a0b8d28afab0f921524422f3d14c6d8893a07f0f053ffa4a757c8e09eb4c191; no tests/scientific studies/observation-value reads/mutations/new environments.",
+        "SEMANTIC_PREMISE PASS only for declared synthetic engineering scope. No blocking implementation/premise defect or authority widening. This NEW verdict does not alter old NOT_READY or grant merge authority. Native validate-launch oktrue,19refs/22qualification exact; final frozen head/worktree unchanged.",
+        "Accepted historical environment conditions verified:16files509868logicalbytes/no installed packages/no active .venv; historical product/science non-use corroborated by yaml import failure and original shared-runtime qualification, archive counted. Old review Git object exists as ancestor, sha06cd44aa4076c8dedaae9ca65018286538a83dd96bf87069e227fece1ce9d258. After owner checkpoint only delivery evidence/navigation/Catalog changed, no production/science/charges/contracts/thresholds.",
+        "SEMANTIC_1: Exact bootstrap can still have poor market coverage under nonstationarity; observed-target contrast need not represent unconditional population. Constant synthetic lattice does not test this; schema/report limits preserve it.",
+        "SEMANTIC_2: Empirical95percent coverage/alpha/causality/clean-host bootstrap/global untouched source would exceed evidence; packet does not claim them. Malicious authorized source-owner facts outside trusted boundary excluded.",
+        "SEMANTIC_3: No local-to-family/global widening: exact trial/binding terminal, distinct dossier studies; negative does not close hypothesis family.",
+        "SEMANTIC_4: UNKNOWN not negative/zero. require_covered refuses UNKNOWN/INVALID membership; unavailable history UNKNOWN, absent result charged checkpoint; decision D0 null coverage; unavailable numeric retains observed counts and INSUFFICIENT.",
+        "SEMANTIC_5: RUN_COMPLETED alone cannot yield PRESENT; synthetic/nonpositive cannot promote. REAL supported would still need all existing science guards.",
+        "SEMANTIC_6: Spec1.5 separate branch preserves1.0-1.4 and frozen config bytes. Historic main-refresh only append-only dependency notice, no transfer of PASS.",
+        "SEMANTIC_7: Lock is process exclusion, Catalog code identity, dossier projection; scientific truth remains immutable ResearchStore/referenced result, core frozen protocol.",
+        "SEMANTIC_8_FALSIFIERS: observation decode without committed reservation; second charge on overlapping acquisition; accept after revoke; D changes with targets; orphan/foreign carrier PRESENT; synthetic PROMOTE. Code and separate saved witnesses address these.",
+        "SEMANTIC_9: ACCEPTED/PRESENT could be overread but schema/contract/report explicitly limit to engineering/result availability, REAL remains UNBOUND; no material ambiguity found.",
+        "SEMANTIC_10: No minimal correction now. Preserve exact nonclaims/scope/historical violation during binding; registry ACCEPTED is neither science nor merge authority.",
+        "DESIGN18_1: Other sample/query/role refused by schema/source/exposure/protection/binding; current grant/revoke checked before reservation, values, resume and completion.",
+        "DESIGN18_2: Crash/code/name cannot return first allowance: budget core/native acquisition and overlap under lease; retained charge; stale qualification refuses old binding, cold history preserved.",
+        "DESIGN18_3: Native E1800 eligibility fixes D before E14400; missing target keeps admission and never becomes zero; exact95percent coverage/5percent gap predicates, no100percent gate.",
+        "DESIGN18_4: Unit PASS alone could hide weights/ranks; reviewed method pooled shared mint-times-block draws,two seeds,B4096,ranks102/3993; independent Fraction1/5,fixed draws,clock vectors provide separate oracles.",
+        "DESIGN18_5: Shape alone insufficient: cold requires schema/hash, committed binding/source/grant/reservation/run and all carriers in one completion transaction; orphan nonqualifying, synthetic/nonpositive nonpromotable.",
+        "Tests can pass while market coverage/unconditional scientific meaning remains unproved. Nonstationary dependence and observed-target selection remain limited nonclaims; source-owner truth is an explicit trust boundary.",
+        "Without DuckDB projection, truth remains research manifests/verified events Parquet and immutable binding/source/result bytes; iter_committed_records verifies partitions, projection rebuildable. Missing library does not mean empty history.",
+        "No new cross-owner private imports. Public confirmation_price_cell/confirmation_price_relative/publish_immutable_artifact/build_science_obligations used; old private hfic imports predate base. Blast radius Spec1.5 and named consumers, rollback/recovery preserve exposure/charges/results; containment/reparse checks and no network/provider/signing. Existing native owners/ResearchStore/stdlib RNG/OS lock suffice, no second database/platform.",
+        "Residual evidence insufficiency explicitly nonclaimed: market coverage, clean-host bootstrap, early P0 reader count, blind Actor/model diversity. PACKET_INFORMATION_PATH only; launch isolation PROCESS_OBLIGATION/model diversity UNPROVEN. Current peer verdicts/transcript not used.",
+        "fingerprint_material_domain=sorted-key compact JSON;UTF8;ensure_ascii=false;no terminal LF;keyset=candidate,evidence,non_claims,review,semantic_claims,task;bytes6553; native bindings/inventory have terminal LF.",
+        "fingerprint_material={\"candidate\":{\"base\":\"07c81a99f2d0f385df66de2e1a5254e224c6b3b3\",\"diff_sha256\":\"46ed8ab1e7d8f553e6dff69a5b21bb577bf239ee464ef6a99e9b0d5fd2be8c4f\",\"head\":\"8daef7ba3374e2c22ee6854997544ae34f9e7fe7\"},\"evidence\":[{\"logical_ref\":\"repo://docs/tasks/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1.md\",\"sha256_or_fingerprint\":\"9363d35ad925e33c18d2980f23fe40cdc27902f32accca40ce6529a8f23d46ac\"},{\"logical_ref\":\"repo://docs/design/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1_PRD_SSD.md\",\"sha256_or_fingerprint\":\"efca7842cc32e359baa4d550b02c89fb5c5c337a2369dea599fbbcee0ca2e5ca\"},{\"logical_ref\":\"repo://docs/contracts/list_a_chronological_confirmation_v1.md\",\"sha256_or_fingerprint\":\"186284a72d82cd8ef5620ec97b9528663ebdedae0e00a6123f6add15f6de0df1\"},{\"logical_ref\":\"repo://docs/contracts/list_a_confirming_execution_v1.md\",\"sha256_or_fingerprint\":\"99c595e4d63f087c5c9d05d9c30013ab84f5f8e6fb2dd905f4e3d370f4085ede\"},{\"logical_ref\":\"repo://configs/list_a_chronological_confirmation_v1.yaml\",\"sha256_or_fingerprint\":\"4bfd2c80526d617f664e047ffa38f802722c5ca96211aed06992506bbc29be12\"},{\"logical_ref\":\"repo://docs/reports/list_a_confirming_producer_v1/OWNER_REPORT.md\",\"sha256_or_fingerprint\":\"bbf02228d452feffadf6bc5b7215a4aa95d368e33ee0351b5dd8ef2abdea8a78\"},{\"logical_ref\":\"repo://docs/evidence/list_a_confirming_producer_v1/acceptance.json\",\"sha256_or_fingerprint\":\"6cc57d3eb15d7545c7d20279c258f0952154c77038716d493e50622a031f618d\"},{\"logical_ref\":\"repo://docs/evidence/list_a_confirming_producer_v1/process-readback.json\",\"sha256_or_fingerprint\":\"10a00a6344187a19f74d645ad8cfea998366a7dcbd52c3c937dc553e53b41a68\"},{\"logical_ref\":\"repo://docs/evidence/list_a_confirming_producer_v1/qualification.json\",\"sha256_or_fingerprint\":\"63ff5cd34f01860c9f1e11c6a9ef86b03b2b42e290bbef133e0753efb3e0516e\"},{\"logical_ref\":\"repo://docs/evidence/list_a_confirming_producer_v1/scientific-history.json\",\"sha256_or_fingerprint\":\"7f2cfbaa1eb7d4486c2a7579d28e33daaa37654e5ad88b65356d98f5d984e229\"},{\"logical_ref\":\"repo://docs/evidence/list_a_confirming_producer_v1/validation.json\",\"sha256_or_fingerprint\":\"0f218608e308e555e045db1630b87a8a62e0aab2b1baa624583b8567e7e89021\"},{\"logical_ref\":\"repo://docs/evidence/list_a_confirming_producer_v1/coverage.json\",\"sha256_or_fingerprint\":\"3725c096e074288e55a3b2949b068990d63795a4db764587e04d521d247e6f68\"},{\"logical_ref\":\"repo://docs/evidence/list_a_confirming_producer_v1/footprint.json\",\"sha256_or_fingerprint\":\"9f9c9c603a53795b2b0f2b034cc65a15e11e8b9e495f7bc65b848ad45f2f4f9c\"},{\"logical_ref\":\"repo://docs/evidence/list_a_confirming_producer_v1/footprint-final.json\",\"sha256_or_fingerprint\":\"88e038439cf53efad69d1e98870b40ceb1f179cd4690e62a57d9852f94b8546d\"},{\"logical_ref\":\"repo://docs/evidence/list_a_confirming_producer_v1/footprint-delivery.json\",\"sha256_or_fingerprint\":\"a49d76ee04fed23565efd22dbb57698250ca82c94924e5dfbe6453e36b77df56\"},{\"logical_ref\":\"repo://docs/evidence/list_a_confirming_producer_v1/footprint-review-final.json\",\"sha256_or_fingerprint\":\"936f8094f3021294460d0c64605025c8dc57fe5e3b5266fe7b9d271deaccbd1f\"},{\"logical_ref\":\"repo://docs/evidence/list_a_confirming_producer_v1/footprint-checkpoint.json\",\"sha256_or_fingerprint\":\"a2efeed5b5fab246527d819729b202f758ce45e6260e818d4e4ee841f60433c2\"},{\"logical_ref\":\"repo://docs/evidence/list_a_confirming_producer_v1/owner-decision.json\",\"sha256_or_fingerprint\":\"d3f5c026a4dcc81da3cda41c8e6a537f666a8c14413386bec494d27279339a48\"},{\"logical_ref\":\"repo://docs/evidence/list_a_confirming_producer_v1/review-history.json\",\"sha256_or_fingerprint\":\"2b9cb1ef48b651455c7a5fe14a2a5f46b6f8eed4f1c1866902a7c064ccad93aa\"}],\"non_claims\":[\"NO_REAL_SCIENTIFIC_ACCEPTANCE\",\"NO_ALPHA_CAUSAL_OR_EMPIRICAL_COVERAGE_GUARANTEE\",\"NO_STRATEGY_ACTIVATION_PAPER_DEPLOY_MONEY\",\"AGENT_BEHAVIOR_UNVERIFIED\",\"MODEL_DIVERSITY_UNPROVEN\",\"EARLY_P0_READER_COUNT_UNKNOWN\",\"NO_CLEAN_HOST_BOOTSTRAP_PROOF\"],\"review\":{\"architecture_owner\":\"ARCHITECTURE_CRITIC\",\"profile\":\"SEMANTIC_PREMISE\",\"risk_dimensions\":[\"SCIENTIFIC_ESTIMAND\",\"FALSIFIER_OR_ENDPOINT\",\"EVIDENCE_ADMISSIBILITY\",\"PIT_OR_AVAILABILITY_SEMANTICS\",\"RESEARCH_TRUTH_OWNERSHIP\",\"HYPOTHESIS_OR_FAMILY_CLOSURE\",\"PROMOTION_OR_SUPPRESSION_AUTHORITY\",\"UNKNOWN_VS_NEGATIVE_EVIDENCE\",\"EXECUTION_TRUTH_SEMANTICS\",\"DURABLE_SCIENCE_SCHEMA\",\"OWNER_AUTHORITY_SEMANTICS\",\"HARNESS_PREMISE_OR_MERGE_AUTHORITY\"]},\"semantic_claims\":[{\"claim\":\"Only exact native ingress/admission/frame/exposure and independent frozen/current protection admit a compatible source. No source-observation Parquet decoding by inspection/preparation/classification or confirming evaluation before committed reservation.\",\"claim_id\":\"NATIVE_SOURCE_AUTHORITY\",\"scope\":\"Version-isolated Spec1.5; authorized owned synthetic plane; authored source ingress is distinct; no claim against malicious authorized source-owner outside scope\"},{\"claim\":\"Kernel lock plus committed acquisition-overlap reservation prevents alias/concurrent new first looks; only original immutable trial can resume.\",\"claim_id\":\"ONE_ATTEMPT\",\"scope\":\"One canonical data plane with exact source authority; scientific charge survives faults/code changes\"},{\"claim\":\"Episode-weighted observed conditional A-C, shared crossed pooled labels, two B4096 seeded partitions, ranks102/3993 and all LOO retain accepted core.\",\"claim_id\":\"FROZEN_METHOD\",\"scope\":\"Technical synthetic positive/null/insufficient plus independent arithmetic/draw/clock vectors; no empirical coverage claim\"},{\"claim\":\"Only validated immutable result/passport/reservation/source/grant and all atomic carriers become PRESENT in ordinary dossier; synthetic/nonpositive do not permit PROMOTE.\",\"claim_id\":\"TYPED_CONSUMER\",\"scope\":\"Definition1.5 consumer; existing other science obligations preserved; no strategy/activation authority\"},{\"claim\":\"Actual OS faults/concurrency/cold readers and ordinary PAUSE substantiate bounded vertical. P0 interruption/charges and explicit skips/UNKNOWN remain.\",\"claim_id\":\"BOUNDED_VERIFICATION\",\"scope\":\"Six named acceptance studies; not FULL_PRODUCT_PATH to PAPER/alpha or verification of blind Actor\"},{\"claim\":\"Fingerprint is SHA256 of canonical JSON containing task,candidate,review,semantic_claims,non_claims,evidence. It binds PACKET_INFORMATION_PATH only and cannot attest launch isolation or reviewer identity.\",\"claim_id\":\"PACKET_FINGERPRINT_PROTOCOL\",\"scope\":\"Unchanged native Delivery Harness protocol declaration; no new scientific or merge authority\"}],\"task\":{\"task_contract_sha256\":\"9363d35ad925e33c18d2980f23fe40cdc27902f32accca40ce6529a8f23d46ac\",\"task_id\":\"LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1\"}}"
       ],
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     {
       "findings": [
-        "PENDING_NEW_ISOLATED_REVIEW_AFTER_EXACT_OWNER_DECISION; earlier receipts preserved in review-history.json and frozen Git object."
+        "NEW isolated read-only review after exact owner decision, head=8daef7ba3374e2c22ee6854997544ae34f9e7fe7; 49/49 committed/worktree bindings independently reconstructed; native bindings/inventory/exact patch and current evidence refs checked. packet_fingerprint_sha256=3a0b8d28afab0f921524422f3d14c6d8893a07f0f053ffa4a757c8e09eb4c191; no tests/scientific studies/observation-value reads/mutations/new environments.",
+        "No proved UX/operability gaps. register/prepare/authorize/revoke/classify/submit/status/show/resume, ordinary dossier and handback reviewed. Saved result/current authority/consumed trial distinguished; refusal retains original IDs/charge; unavailable history UNKNOWN; missing/conflicting result UNVERIFIABLE with consumed allowance preserved. Recovery/limits/fresh merge gate explicit.",
+        "Native canonical algorithms independently reconstructed after permitted protocol-source clarification;19refs/22qualification/49bindings match Git/worktree; exact patch match, clean frozen head. Archive16files509868bytes/no reparse or installed distributions/no active .venv; footprint retains new_venv:true. Initial NOT_READY immutable Git object/hash/index verified. Historical non-use verified from bound receipt without re-execution; no scientific/real/merge authority granted."
       ],
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     }
   ],
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
-  "verdict": "PENDING"
+  "verdict": "PASS"
 }
