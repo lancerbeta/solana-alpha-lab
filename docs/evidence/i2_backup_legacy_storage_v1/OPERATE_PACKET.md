@@ -419,3 +419,10 @@ incoming growth и HOT/COLD/checkpoint retention, реальные overlaps и f
 counts. Непокрытые I4 pins не считать удалёнными. Что не повторять: baseline
 sampling benchmark, I1 production import, C1/C2 research, ручные окна или daily
 owner approval.
+
+OPEN P2 / owner P0-P1-only follow-up: locked Python pathlib directory census
+может предварительно считать каталог целиком до count/deadline check и держать
+writer дольше budget. Refusal не принимает checkpoint и не удаляет cache;
+source/token/pins сохранены, writer освобождается после refusal. Lazy-scandir
+repair не включён. При commissioning проверить actual directory sizes/latency
+и collector gaps; mandatory B/C и exact authority сохранены.

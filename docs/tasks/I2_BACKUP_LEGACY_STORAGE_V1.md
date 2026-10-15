@@ -238,3 +238,11 @@ must yield with its existing durable partial-delete token, then resume through
 the ordinary caller without weakening owner/inode/CAS/pin checks. Verify actual
 stream/file operations with an independent SQLite writer. No new authority,
 scientific owner change or additional production scope follows.
+
+Owner follow-up limits further review blockers and repair cycles to P0/P1.
+The code-review P2 on eager pathlib directory census at 8b6351ae remains a
+documented limitation, not a new implementation cycle. Unfinished changes for
+that P2 are withdrawn. Preserve the completed shared-deadline/hash/cache fixes;
+finish all four isolated review roles, exact-head CI and machine readiness.
+This severity floor grants no merge or production authority and does not move
+mandatory runtime B/C requirements to non-goals.

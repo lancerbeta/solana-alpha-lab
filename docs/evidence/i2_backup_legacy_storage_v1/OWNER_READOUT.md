@@ -326,3 +326,16 @@ ACK; при исчерпании уступает writer, сохраняет dur
 Native red/green, next-call resume и direct-consumer results находятся в proof.
 Один уже начатый OS/native вызов и обязательный cleanup остаются non-preemptible;
 actual Linux latency/collector gaps — mandatory B/C, не подтверждённый результат.
+
+## Review severity floor and open P2
+
+Owner ограничил дальнейшую блокирующую критику P0/P1. На `8b6351ae` остаётся
+открытый P2: pathlib в locked Python предварительно читает каталог до внешнего
+count/deadline check. Native manifest/cache oracles при cap3/budget0.15s прочитали
+15/17 entries и отказали через0.6514/0.7328s; SQLite writer блокировался во время
+обхода и освобождался после отказа. Checkpoint не принят, cache не удалён,
+source/token/pins сохранены. Незавершённый lazy-scandir patch снят; исправление
+не заявляется. Cooperative budgets не гарантируют latency/count внутри этого
+native directory census. Это раскрытый остаток, mandatory runtime B/C остаются
+в scope. Финальные четыре роли проверяют P0/P1; exact CI/readiness и отдельная
+merge/OPERATE authority обязательны.

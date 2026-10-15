@@ -1688,6 +1688,40 @@
         ]
       },
       "limit": "Cooperative checks stop subsequent operations and preserve resumable state; one in-flight native/OS operation and necessary cleanup cannot be hard-preempted. Production B/C remains mandatory pending."
+    },
+    "owner_review_severity_floor": {
+      "owner_instruction": "p1,p0 критика только,затянули",
+      "blocking_severities": [
+        "P0",
+        "P1"
+      ],
+      "open_nonblocking_finding": {
+        "severity": "P2",
+        "observed_head": "8b6351ae64d84d30f1e2f42253ea79a9a41a8d24",
+        "owner": "CODE_REVIEWER",
+        "status": "OPEN_NOT_REPAIRED",
+        "finding": "Locked Python 3.13 pathlib iterdir/rglob materializes native directory entries before caller count/deadline checks. Source membership, partition manifest, recovery-control and cache pre-delete censuses share this limitation.",
+        "native_manifest_oracle": {
+          "entry_cap": 3,
+          "entries": 15,
+          "budget_seconds": 0.15,
+          "delay_per_entry_seconds": 0.04,
+          "new_reads_after_deadline": 11,
+          "refusal_wall_seconds": 0.6514
+        },
+        "native_cache_oracle": {
+          "entry_cap": 3,
+          "entries": 17,
+          "budget_seconds": 0.15,
+          "delay_per_entry_seconds": 0.04,
+          "new_reads_after_deadline": 13,
+          "refusal_wall_seconds": 0.7328
+        },
+        "independent_writer": "BLOCKED_DURING_SCAN_ADMITTED_AFTER_REFUSAL",
+        "safety_readback": "NO_ACCEPTED_CHECKPOINT; NO_CACHE_DELETION; SOURCE_CACHE_TOKEN_PINS_PRESERVED",
+        "disposition": "Unfinished lazy-scandir patch withdrawn; continue final review/CI/readiness under explicit owner P0/P1 blocking floor. No claim of repair or production latency acceptance."
+      },
+      "authority": "No merge or production authority; all four review roles and mandatory runtime B/C remain required."
     }
   },
   "main_integration": {
