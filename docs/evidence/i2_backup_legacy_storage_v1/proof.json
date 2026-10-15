@@ -598,6 +598,24 @@
           "tests.test_factory_offhost_backup"
         ],
         "scope": "final CAS repair; supersedes these earlier module runs, counts overlap"
+      },
+      "native_footprint_and_overlap_falsifiers": {
+        "result": "PASS",
+        "tests": 10,
+        "wall_seconds": 1.526,
+        "scope": "actual ordinary cold restore/register and approved root change/disable; pending/release/activeplan/overlap/deletion/8 unsafe refs"
+      },
+      "final_durable_cache_footprint_direct_consumers": {
+        "result": "PASS",
+        "tests": 54,
+        "wall_seconds": 4.179,
+        "modules": [
+          "tests.test_factory_operability_signal_calibration_v1",
+          "tests.test_factory_operability_memory_collision_repair_v1",
+          "tests.test_i2_storage_consumers_v1",
+          "tests.test_managed_collection_continuity_v1.ManagedFootprintTests"
+        ],
+        "scope": "prior49 health tests plus4 new consumer regressions and existing HARD_BYTES oracle; counts overlap"
       }
     },
     "production_mutations": false,
@@ -793,6 +811,48 @@
       "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.PolicyRevisionRecoveryTests -q",
       "independent_oracle": "real native APPLY then separate peer ObservationScheduleStore and native lease/approved policy installation; raw SQLite reopen and actual operational packet/watch compare peer plan/state/cursor and committed effects/pins",
       "production_gate": "same staged separately approved installed ordinary maintenance and incident/recovery acceptance; no production fault injection performed"
+    },
+    "durable_cache_footprint_remediation": {
+      "observed_head": "a7dc0bfabdc6e41e9dbc69b322cd21f7e1e2bbff",
+      "prior_packet_fingerprint_sha256": "44b992a6bd6ee24b99e64cef26be2065368b189702473483fc2408513fec3d76",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "ARCHITECTURE_CRITIC": "NOT_READY",
+        "OWNER_UX_CRITIC": "PASS"
+      },
+      "before": {
+        "native_path": "actual ordinary fake-remote restore and checkpoint archive registration, then exact approved cold_root revision cold to cold-v2",
+        "actual_old_cache_bytes_in_critic_fixture": 460998,
+        "durable_checkpoint_archive": "UNCHANGED",
+        "reported_maintenance_staging_bytes_before_after_revision": [
+          460998,
+          0
+        ],
+        "effect": "projected peak/HARD_BYTES input understated despite retained filesystem bytes"
+      },
+      "owning_fix": "existing footprint owner charges safe source-owned current/pending/release/active-plan cache locations as well as proposed placement; ancestor overlap and previously counted roots/files deduplicated, unresolved or unsafe references remain UNKNOWN",
+      "after": {
+        "registered_cache_after_approved_root_revision": "ACTUAL_RETAINED_FILESYSTEM_BYTES_STILL_COUNTED",
+        "native_worker_fixture_actual_bytes_before_after_revision_disable": [
+          461003,
+          461003,
+          461003
+        ],
+        "final_consumer_run_actual_bytes_before_after_revision_disable": [
+          460997,
+          460997,
+          460997
+        ],
+        "measurement_scope": "separate disposable native fixture; not the critic fixture or production",
+        "pending_and_release_cache": "COUNTED_REGARDLESS_CURRENT_POLICY_ROOT_OR_ENABLEMENT",
+        "overlap_with_each_other_RDP_sink_OPS_WAL": "NO_DOUBLE_COUNT",
+        "invalid_unresolvable_or_outside_factory_reference": "UNKNOWN_NOT_ZERO",
+        "source_policy_profile_grants_counters_clocks_cache_bytes": "UNCHANGED_BY_MEASUREMENT"
+      },
+      "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_storage_consumers_v1 -q",
+      "independent_oracle": "existing native pending-checkpoint fixture, actual ordinary restore/register and approved revision, raw filesystem file-size sum and durable SQL references; separate synthetic overlap and invalid-reference negative controls",
+      "production_gate": "actual filesystem/root topology and permitted retained cache locations under exact OPERATE; production sizing remains UNKNOWN"
     }
   }
 }

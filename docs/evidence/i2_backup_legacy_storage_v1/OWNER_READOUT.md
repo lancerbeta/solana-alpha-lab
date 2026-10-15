@@ -85,6 +85,15 @@ policy, exact active plan и pre-apply maintenance state. При расхожд�
 видеть peer failure. Проверены separate native peer store и обе finalization
 ветки, включая unchanged-policy/same-plan interleave.
 
+Footprint consumer после approved `cold` → `cold-v2` раньше показывал
+460998 → 0 bytes, хотя зарегистрированная cache оставалась на диске. Он теперь
+считает source-owned current/pending/release/active-plan references вместе с
+текущим placement, дедуплицируя пересечения с OPS/RDP/sink и другими cache.
+В финальном native fixture actual460997 bytes сохраняются в расчёте до/после revision
+и disable; source record/files не меняются. Невалидная, unsafe либо внешняя по
+отношению к factory ссылка сохраняет `UNKNOWN`, не превращается в zero footprint.
+Это isolated sizing oracle; production topology/runway по-прежнему не измерены.
+
 Owner UX также проверил actual команды единственного OPERATE packet: canonical
 JSON digest из existing owner принимается `retire`/`policy`, SHA pretty-file
 отказывается. Из документа запускаются обе read-only digest команды и exact

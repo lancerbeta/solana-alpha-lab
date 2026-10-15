@@ -615,13 +615,38 @@ def measure_whole_factory(
             if resolved in seen or any(resolved == item or item in resolved.parents for item in counted_roots):
                 return
             seen.add(resolved)
-            if not path.exists():
+            try:
+                file_stat = path.stat()
+            except FileNotFoundError:
                 return
             if path.is_symlink():
                 raise OSError("OWNED_STORAGE_SYMLINK")
-            size = _walk_bytes(path) if path.is_dir() else path.stat().st_size
-            if not isinstance(size, int):
-                raise OSError("OWNED_STORAGE_UNAVAILABLE")
+            size = file_stat.st_size
+            if path.is_dir():
+                # A cache ancestor can contain OPS, RDP, sink or sibling stores
+                # already measured in their own categories. Prune those exact
+                # roots rather than charging their bytes a second time.
+                def covered(candidate: Path) -> bool:
+                    return candidate in seen or any(candidate == item or item in candidate.parents for item in counted_roots)
+
+                def unavailable(error: OSError) -> None:
+                    raise error
+
+                size = 0
+                for current, dirs, files in os.walk(path, onerror=unavailable, followlinks=False):
+                    for name in list(dirs):
+                        child = Path(current) / name
+                        if covered(child.resolve()):
+                            dirs.remove(name)
+                        elif child.is_symlink() or not child.resolve().is_relative_to(resolved):
+                            raise OSError("OWNED_STORAGE_SYMLINK")
+                    for name in files:
+                        child = Path(current) / name
+                        if covered(child.resolve()):
+                            continue
+                        if child.is_symlink():
+                            raise OSError("OWNED_STORAGE_SYMLINK")
+                        size += child.stat().st_size
             additional[key] += size
             if path.is_dir():
                 counted_roots.append(resolved)
@@ -631,24 +656,54 @@ def measure_whole_factory(
                 other = Path(root) / str(relative)
                 for suffix in ("", "-wal", "-shm"):
                     charge(Path(str(other) + suffix), "other_store_bytes")
-        charge(Path(root) / "local/factory_v1/backup_snapshot_staging", "maintenance_staging_bytes")
+        maintenance_roots = [Path(root) / "local/factory_v1/backup_snapshot_staging"]
         # These are exclusively owned by the native I2 reclaim operation.
         for suffix in ("-new.sqlite", "-rollback.sqlite", ".intent.json"):
-            charge(sqlite_path.parent / ("." + sqlite_path.name + ".i2-reclaim" + suffix),
-                   "maintenance_staging_bytes")
+            maintenance_roots.append(sqlite_path.parent / ("." + sqlite_path.name + ".i2-reclaim" + suffix))
         if hasattr(store, "_conn") and store._conn.execute(
             "SELECT 1 FROM sqlite_master WHERE name='retention_control'"
         ).fetchone():
-            installed = store._conn.execute(
-                "SELECT payload_json FROM retention_control WHERE control_key='policy'"
-            ).fetchone()
-            if installed:
-                policy = json.loads(installed[0])["policy"]
-                cold_relative = (policy.get("archive_refresh") or {}).get("cold_root_relative")
-                if cold_relative:
-                    from solana_alpha_lab.factory.remote_ops import _safe_relative
+            from solana_alpha_lab.factory.remote_ops import _safe_relative
 
-                    charge(_safe_relative(Path(root), str(cold_relative)), "maintenance_staging_bytes")
+            factory_root = Path(root).resolve()
+
+            def cache_root(value: Any, *, relative: bool = False) -> None:
+                if not isinstance(value, str) or not value:
+                    raise ValueError("OWNED_CACHE_ROOT_INVALID")
+                path = Path(value)
+                if not relative:
+                    if not path.is_absolute():
+                        raise ValueError("OWNED_CACHE_ROOT_INVALID")
+                    # External isolated restores are permitted by their owner,
+                    # but this factory cannot safely census an arbitrary tree.
+                    value = path.relative_to(factory_root).as_posix()
+                path = _safe_relative(factory_root, value)
+                if path == factory_root or (path.exists() and not path.is_dir()):
+                    raise ValueError("OWNED_CACHE_ROOT_INVALID")
+                maintenance_roots.append(path)
+
+            controls = {key: json.loads(payload) for key, payload in store._conn.execute(
+                "SELECT control_key,payload_json FROM retention_control WHERE control_key IN "
+                "('policy','checkpoint_archive','checkpoint_archive_refresh_pending','checkpoint_archive_cache_release','active_plan')"
+            ).fetchall()}
+            if "policy" in controls:
+                policy = controls["policy"]["policy"]
+                refresh = policy.get("archive_refresh") or {}
+                if "cold_root_relative" in refresh:
+                    cache_root(refresh["cold_root_relative"], relative=True)
+            for key in ("checkpoint_archive", "checkpoint_archive_cache_release"):
+                if key in controls:
+                    cache_root(controls[key]["cache_root"])
+            if "checkpoint_archive_refresh_pending" in controls:
+                cache_root(controls["checkpoint_archive_refresh_pending"]["cold_root_relative"], relative=True)
+            if "active_plan" in controls:
+                for proof in controls["active_plan"].get("archive_registry", {}).values():
+                    if "cache_root" in proof or proof.get("proof_class") == "REMOTE_CHECKPOINT_RESTORE_VERIFIED":
+                        cache_root(proof["cache_root"])
+        # Policy and durable generations can overlap in either direction after
+        # a revision. Count ancestors first, then exact descendants only once.
+        for path in sorted(maintenance_roots, key=lambda item: len(item.resolve().parts)):
+            charge(path, "maintenance_staging_bytes")
     except Exception:  # noqa: BLE001 - configuration/read failures keep footprint UNKNOWN
         additional = {key: _UNKNOWN for key in additional}
     return {

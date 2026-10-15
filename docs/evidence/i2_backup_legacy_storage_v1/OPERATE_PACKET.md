@@ -20,7 +20,8 @@ bounds времени/IO/места. Сохранить состояния вс�
 - APPLIED profile/control/revision/revoke; managed children, shared account
   membership, daily/rolling/lifetime debits; никаких новых grants или ручных окон;
 - исходные DB/WAL/RDP и staging/sink на каждом filesystem, last-good checkpoint,
-  pending backup intent, foreign lock, actual due/rollover/B timing;
+  source-owned current/pending/release/active-plan cold cache references, pending
+  backup intent, foreign lock, actual due/rollover/B timing;
 - текущие installed unit hashes/cadence, effective freshness/retention и версия
   reader. Старый бинарник после managed child не является rollback-кандидатом.
 
@@ -283,6 +284,12 @@ Disable приостанавливает тот же target, enable продол
 revision; не удалять pending/pins вручную. Повреждение identity/source/pins даёт
 refusal. Same-second backup terminal failure также виден через existing watch;
 снять его может подтверждённый success того же checkpoint.
+
+Перед сменой/disable policy учитывать actual retained cold cache по durable
+current/pending/release/active-plan references, включая прежний root. Новый
+placement не освобождает old bytes. Пересечения с OPS/RDP/sink/cache считаются
+один раз; unsafe/внешняя/unresolvable ссылка даёт `UNKNOWN` и блокирует выдачу
+численного capacity допуска до разрешения topology, без ручного обнуления refs.
 
 Caller — existing daily/weekly offhost backup command после завершения checkpoint;
 native maintenance вновь берёт backup-plane lock до OPS fence и уступает due,
