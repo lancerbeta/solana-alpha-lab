@@ -1,6 +1,8 @@
 {
   "acceptance_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-SYNTHETIC-NATIVE",
-  "active_stop_conditions": [],
+  "active_stop_conditions": [
+    "STOP_INDEPENDENT_REVIEW_NOT_READY:P2_CATALOG_SOURCE_ROLE_URI_MISMATCH"
+  ],
   "as_of": "2026-10-15",
   "base_main": "b3fb9d8ecffbffda468dccabaa81ca3392da6f15",
   "capability_radar_now": "NONE",
@@ -9,8 +11,8 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/list_a_confirming_producer_v1/factory-fit.json",
-    "sha256": "bf2a95cdf84c0281db2077203142d3085cbf50f92ce9ba812cbad53aef0c99c7",
-    "verdict": "PENDING"
+    "sha256": "17a92944ec0100668b5aaa84bd471333fd9037611294e40ade0aebe0e21d182a",
+    "verdict": "NOT_READY"
   },
   "implementation_bindings": {
     "catalog/assets/core.yaml": "7d22cda919e1d505b7a265937c7d860f5b562d89f7d91e9b3f438a60db27b76b",
@@ -104,15 +106,15 @@
     "spend": 0,
     "strategy_activation_paper_writes": 0
   },
-  "state_change": "Exact separately owner-authorized P2 next_action patch applied; actual immutable-source classify+submit safe typedrefusal,0values/evaluator/reservations/charges/storewrites; charge1/otherreasons/null preserved.34 direct-consumerPASS; prior55compatibilityPASS andsevennamedcharges/results preserved. HistoricalNOT_READY immutable; fresh4reviews/bind/preflight/exactheadCI pending. No scientificrun/realdata/merge.",
+  "state_change": "Exactauthorized P2 recoverycopy closed; committednativeclassify+submit zero values/evaluator/reservation/charge/storewrites,34checksPASS; prior55compatibilityPASS/source-roleP1preserved. Fresh4reviews: codeNOT_READY solelyseparateCatalogsource-rolewronglogicalURI; goal/architecture/UXPASS. Readonlyresolve-asset confirmsURI/pathmismatch. OnecanonicalURIproposal1905509a remainsunapplied. Strictownerfailure_stop honored; no bind/preflight/push/freshCI/merge. Sevennamedcharges/results/coreunchanged.",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
   "validation": {
     "full_gate": "NOT_EXECUTED_PRE_PR; GUARDED_MERGE_SOLE_EXECUTOR; MERGE_NOT_AUTHORIZED",
-    "github_ci": "PR406_REMOTE3A_FAILURE;COMPATIBILITY_HEAD2B_CI_NOT_RUN_AFTER_NOT_READY",
+    "github_ci": "PR406_REMOTE3A_FAILURE;6C727_NOT_PUSHED_AFTER_FRESH_CODE_NOT_READY_STOP",
     "independent_review": {
       "path": "docs/evidence/list_a_confirming_producer_v1/independent-review.json",
-      "sha256": "37071badae2097df834f3bbd4b415be1061d4c18aee729653c65d0314eb80094",
-      "verdict": "PENDING"
+      "sha256": "42085c82b1b8d22345b63d4a06385c695229d8d40a64d74be63b749cbf21eada",
+      "verdict": "NOT_READY"
     },
     "project_checks": [
       "PASS_ACTUAL_PRE_VALUES_RESERVATION",
@@ -120,7 +122,10 @@
       "PASS_OS_CONCURRENCY_CRASH_COLD_REPLAY",
       "PASS_TYPED_ATOMIC_COMPLETION_DOSSIER_AND_PROMOTE_REFUSAL",
       "PASS_MEASURED_FORWARD_RESOURCE_ENVELOPE",
-      "PASS_CURRENT_NATIVE_SOURCE_ROLE_FALSIFIER_2B906_WITNESS_SHA256_2c4577a7a72106b40bc40855f7ce228c310446873ba94adad2e2a9d01ce552f1"
+      "PASS_CURRENT_NATIVE_SOURCE_ROLE_FALSIFIER_2B906_WITNESS_SHA256_2c4577a7a72106b40bc40855f7ce228c310446873ba94adad2e2a9d01ce552f1",
+      "PASS_COMMITTED_RECOVERY_NATIVE_WITNESS_SHA256_aa559e30492285bbe3c9a1141a8f9dd0bc190a8f9c21714e7194a7e718d8d594",
+      "CONFIRMED_CATALOG_WRONG_URI_RESOLVE_ASSET_PROBE_SHA256_7eb8364b2700fd982973081d0a3492ae340eeefe4a89b29b1c2d499e9311ca22",
+      "FOOTPRINT_CONTENT6C727_OWNED195.831MIB_CAPCHARGED236.696MIB_30STOPPED_NO_CLEANUP_SHARED_TOTALS_UNKNOWN"
     ],
     "targeted": "PASS_34_RECOVERY_DIRECT_CONSUMERS;PRIOR_55_COMPATIBILITY_PASS"
   }

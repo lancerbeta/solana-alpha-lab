@@ -137,6 +137,30 @@
       "resolved_by_head": "2b906c386262e4881dc932a704dc0314b356ddfd",
       "role": "ARCHITECTURE_CRITIC",
       "severity": "MAJOR"
+    },
+    {
+      "finding": "Source-role refusal misleading binding-recovery P2 resolved by exact separately authorizedcopy381fc5 andcommittednative classify/submit zero-value/charge/write witness plus34directconsumerPASS. Code independentlyfound separateCatalogURI P2; overallNOT_READY preserved.",
+      "observed_head": "2b906c386262e4881dc932a704dc0314b356ddfd",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "6c72738caa261175a1dee94aa66aa1e4ff197102",
+      "role": "CODE_REVIEWER",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "Source-role refusal misleading binding-recovery P2 resolved by exact separately authorizedcopy381fc5 andcommittednative classify/submit zero-value/charge/write witness plus34directconsumerPASS. Code independentlyfound separateCatalogURI P2; overallNOT_READY preserved.",
+      "observed_head": "2b906c386262e4881dc932a704dc0314b356ddfd",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "6c72738caa261175a1dee94aa66aa1e4ff197102",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "Source-role refusal misleading binding-recovery P2 resolved by exact separately authorizedcopy381fc5 andcommittednative classify/submit zero-value/charge/write witness plus34directconsumerPASS. Code independentlyfound separateCatalogURI P2; overallNOT_READY preserved.",
+      "observed_head": "2b906c386262e4881dc932a704dc0314b356ddfd",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "6c72738caa261175a1dee94aa66aa1e4ff197102",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
     }
   ],
   "required_roles": [
@@ -145,77 +169,70 @@
     "ARCHITECTURE_CRITIC",
     "OWNER_UX_CRITIC"
   ],
-  "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-RECOVERY-COPY-FRESH-REVIEW",
-  "reviewed_bindings_sha256": "da5cebe23db22ab74482671e2c2c3810f8203c449135a8991af0f14a21e6411e",
-  "reviewed_inventory_sha256": "e910f95a6a694f6783c660af931a52db0e6ea60792f207fad945e99668edd577",
+  "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-RECOVERY-REVIEW-CHECKPOINT",
+  "reviewed_bindings_sha256": "ef1ced1804737688687636e6cc50563e9c01113534154a27639f2155cfd93eba",
+  "reviewed_inventory_sha256": "6ff43415f1b502b362edde97b86da46cff86b16b888dd1c6196dfbe09c6f0e03",
   "reviews": [
     {
       "findings": [
-        "NEW actual independent read-only review on head2b906c386262e4881dc932a704dc0314b356ddfd/baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15; prior PASS and conditional proposal closure not transferred.",
-        "Native53bindings/21refs/22qualification paths and exact Git/worktree bytes independently matched. bindingsda5cebe23db22ab74482671e2c2c3810f8203c449135a8991af0f14a21e6411e; inventorye910f95a6a694f6783c660af931a52db0e6ea60792f207fad945e99668edd577; packetd9839c2abd3131b66573c9b26c4a1eb6e34e67ee1a9511fcc1f9e0051089e315; diff0f99ec397cd2b14b42f08b5f480ce0d711191bb5ce534b7ed0f51cc24cb9009f.",
-        "Exact approved patchf636abfa752ade121b45094c0e1069296fa01d9b772ee260684ed9aed4a94739 and all3pre/postimages match.276 assertion sites preserved:274 assert-method calls plus2 Python assert statements. Only the lawful accepted capability expectation changes; engineeringpin reflects isolatedSpec1.5dispatch whose removal restores exactbaseAST; fixture4schemas equals base selection.",
-        "Saved regression trace d3dc60e7a20ea664c45e0e0438c32994ce68dea007c719cb07fede7954e89c9d checked:55tests/1771.808seconds/OK. All3prior delivery compatibility blockers closed without skip/xfail/stubs/scientific-golden changes.",
-        "P1 source-role guard preserved. Same immutable exploratory/true files refuse register-source,prepare,authorize,classify; zero targetdecodings/reservations/charges. Native committed2b witness sha2c4577a7a72106b40bc40855f7ce228c310446873ba94adad2e2a9d01ce552f1; original raw receipts/sourcehashes unchanged.",
-        "Production and22qualification/core/historical science receipts unchanged since84fc5b4844a41fac76ad7da1eea241951a03d25c. Seven named charges/results preserved; no new scientific campaign/environment. Read-only review, no tests/CLI/sourcevalues/science/network/mutations. NewCI/bind/readiness and merge not attested.",
-        "P2_SOURCE_REFUSAL_RECOVERY_MISDIRECTS_BINDING: lane_classifier.py:395 returns CORRECT_EXACT_CONFIRMATION_BINDING for CONFIRMATORY_REUSE_FORBIDDEN at charge0. Correcting binding cannot make immutable exploratory provenance eligible. Stop confirmation of this source, preserve labels/history, separately admit a compatible source; keep guards/charge/method unchanged. Owner three-test extension excludes this production recovery repair; proposal381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba is not applied and conditional adequacy is not actual closure.",
-        "Actual CODE_REVIEWER NOT_READY solely for remaining P2; no compatibility or source-role repair finding remains."
+        "NEW actual isolated read-only review of candidate head6c72738caa261175a1dee94aa66aa1e4ff197102/baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15. Required4roles launched independently; prior or conditional verdicts not transferred. No tests/productCLI/sourcevalues/science/network/mutations/newenvironment by critics.",
+        "Independently verified53implementationbindings ef1ced1804737688687636e6cc50563e9c01113534154a27639f2155cfd93eba; inventory6ff43415f1b502b362edde97b86da46cff86b16b888dd1c6196dfbe09c6f0e03; packet_fingerprint_sha256=37ed13905f11dac8fb583dab8d8bac01853ec666ad236ae8395e7a96b76d2833; diff386964f38cd27d7894be90d1b0097523bcf59775e965b61dd484c727d950c963.",
+        "Exact separately authorized applied P2 patch381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba changes only next_action. Retained immutable-source native classify/submit refuse BLOCKED_BEFORE_RESERVE/CONFIRMATORY_REUSE_FORBIDDEN with STOP_THIS_SOURCE_KEEP_LABELS_HISTORY_REQUIRE_SEPARATE_SOURCE_AUTHORITY;17storefiles unchanged;0targetdecodings/evaluator/runner/reservations/charges/storecontentwrites. Cleancommitted witness aa559e30492285bbe3c9a1141a8f9dd0bc190a8f9c21714e7194a7e718d8d594. Four injected checkpoint/exception branches preservecharge1/otherreasons/UNKNOWNnull; unit-only, notnativeadmission/scienceproof.",
+        "Saved34recovery/classifier/source-role checks and55compatibility checks PASS. Compatibility retains276assertionsites=274assertmethodcalls+2Pythonassertstatements; approvedcapabilityexpectationonly, legacydispatchAST andfourbasefixtureschemas preserved. Sevennamedscientificcharges/results/core unchanged; historicalscience not requalified. Real sampleUNBOUND; freshCI/readiness/merge notattested.",
+        "P2_CATALOG_SOURCE_ROLE_URI_MISMATCH: catalog/assets/core.yaml:43115 EVID-LIST-A-CONFIRMING-SOURCE-ROLE-001 logical_uri points repo://docs/evidence/list_a_confirming_producer_v1/qualification.json while repository_path andhash belong source-role-provenance.json; generateddocs/PROJECT_MAP.md:555 repeatswrongURI. catalog_discovery.py:305-307 useslogicalURI forexactidentity; resolve-asset returnslocation. Consumerfollowingsource-roleproofgetswrongartifact; repository_pathhashvalidationdoesnotcatchit. Correctcanonical logical_uri to repo://docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json thennativegeneratedsync. No productcopyfinding. ActualCODE_REVIEWER NOT_READY; strictownerfailure_stop preventsfurtherdelivery."
       ],
       "role": "CODE_REVIEWER",
       "verdict": "NOT_READY"
     },
     {
       "findings": [
-        "NEW actual independent read-only review on head2b906c386262e4881dc932a704dc0314b356ddfd/baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15; prior PASS and conditional proposal closure not transferred.",
-        "Native53bindings/21refs/22qualification paths and exact Git/worktree bytes independently matched. bindingsda5cebe23db22ab74482671e2c2c3810f8203c449135a8991af0f14a21e6411e; inventorye910f95a6a694f6783c660af931a52db0e6ea60792f207fad945e99668edd577; packetd9839c2abd3131b66573c9b26c4a1eb6e34e67ee1a9511fcc1f9e0051089e315; diff0f99ec397cd2b14b42f08b5f480ce0d711191bb5ce534b7ed0f51cc24cb9009f.",
-        "Exact approved patchf636abfa752ade121b45094c0e1069296fa01d9b772ee260684ed9aed4a94739 and all3pre/postimages match.276 assertion sites preserved:274 assert-method calls plus2 Python assert statements. Only the lawful accepted capability expectation changes; engineeringpin reflects isolatedSpec1.5dispatch whose removal restores exactbaseAST; fixture4schemas equals base selection.",
-        "Saved regression trace d3dc60e7a20ea664c45e0e0438c32994ce68dea007c719cb07fede7954e89c9d checked:55tests/1771.808seconds/OK. All3prior delivery compatibility blockers closed without skip/xfail/stubs/scientific-golden changes.",
-        "P1 source-role guard preserved. Same immutable exploratory/true files refuse register-source,prepare,authorize,classify; zero targetdecodings/reservations/charges. Native committed2b witness sha2c4577a7a72106b40bc40855f7ce228c310446873ba94adad2e2a9d01ce552f1; original raw receipts/sourcehashes unchanged.",
-        "Production and22qualification/core/historical science receipts unchanged since84fc5b4844a41fac76ad7da1eea241951a03d25c. Seven named charges/results preserved; no new scientific campaign/environment. Read-only review, no tests/CLI/sourcevalues/science/network/mutations. NewCI/bind/readiness and merge not attested.",
-        "P2_SOURCE_REFUSAL_RECOVERY_MISDIRECTS_BINDING: lane_classifier.py:395 returns CORRECT_EXACT_CONFIRMATION_BINDING for CONFIRMATORY_REUSE_FORBIDDEN at charge0. Correcting binding cannot make immutable exploratory provenance eligible. Stop confirmation of this source, preserve labels/history, separately admit a compatible source; keep guards/charge/method unchanged. Owner three-test extension excludes this production recovery repair; proposal381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba is not applied and conditional adequacy is not actual closure.",
-        "Actual GOAL_DOD_CRITIC NOT_READY: accepted design§18 line743 requires correct CLI recovery; no waiver. PendingCI alone is not a finding."
+        "NEW actual isolated read-only review of candidate head6c72738caa261175a1dee94aa66aa1e4ff197102/baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15. Required4roles launched independently; prior or conditional verdicts not transferred. No tests/productCLI/sourcevalues/science/network/mutations/newenvironment by critics.",
+        "Independently verified53implementationbindings ef1ced1804737688687636e6cc50563e9c01113534154a27639f2155cfd93eba; inventory6ff43415f1b502b362edde97b86da46cff86b16b888dd1c6196dfbe09c6f0e03; packet_fingerprint_sha256=37ed13905f11dac8fb583dab8d8bac01853ec666ad236ae8395e7a96b76d2833; diff386964f38cd27d7894be90d1b0097523bcf59775e965b61dd484c727d950c963.",
+        "Exact separately authorized applied P2 patch381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba changes only next_action. Retained immutable-source native classify/submit refuse BLOCKED_BEFORE_RESERVE/CONFIRMATORY_REUSE_FORBIDDEN with STOP_THIS_SOURCE_KEEP_LABELS_HISTORY_REQUIRE_SEPARATE_SOURCE_AUTHORITY;17storefiles unchanged;0targetdecodings/evaluator/runner/reservations/charges/storecontentwrites. Cleancommitted witness aa559e30492285bbe3c9a1141a8f9dd0bc190a8f9c21714e7194a7e718d8d594. Four injected checkpoint/exception branches preservecharge1/otherreasons/UNKNOWNnull; unit-only, notnativeadmission/scienceproof.",
+        "Saved34recovery/classifier/source-role checks and55compatibility checks PASS. Compatibility retains276assertionsites=274assertmethodcalls+2Pythonassertstatements; approvedcapabilityexpectationonly, legacydispatchAST andfourbasefixtureschemas preserved. Sevennamedscientificcharges/results/core unchanged; historicalscience not requalified. Real sampleUNBOUND; freshCI/readiness/merge notattested.",
+        "Actual GOAL_DOD_CRITIC PASS; findings=[]; no provedcontract/DoD18gap within declaredboundedscope. No peerverdicts read."
       ],
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     {
       "findings": [
-        "NEW actual independent read-only review on head2b906c386262e4881dc932a704dc0314b356ddfd/baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15; prior PASS and conditional proposal closure not transferred.",
-        "Native53bindings/21refs/22qualification paths and exact Git/worktree bytes independently matched. bindingsda5cebe23db22ab74482671e2c2c3810f8203c449135a8991af0f14a21e6411e; inventorye910f95a6a694f6783c660af931a52db0e6ea60792f207fad945e99668edd577; packetd9839c2abd3131b66573c9b26c4a1eb6e34e67ee1a9511fcc1f9e0051089e315; diff0f99ec397cd2b14b42f08b5f480ce0d711191bb5ce534b7ed0f51cc24cb9009f.",
-        "Exact approved patchf636abfa752ade121b45094c0e1069296fa01d9b772ee260684ed9aed4a94739 and all3pre/postimages match.276 assertion sites preserved:274 assert-method calls plus2 Python assert statements. Only the lawful accepted capability expectation changes; engineeringpin reflects isolatedSpec1.5dispatch whose removal restores exactbaseAST; fixture4schemas equals base selection.",
-        "Saved regression trace d3dc60e7a20ea664c45e0e0438c32994ce68dea007c719cb07fede7954e89c9d checked:55tests/1771.808seconds/OK. All3prior delivery compatibility blockers closed without skip/xfail/stubs/scientific-golden changes.",
-        "P1 source-role guard preserved. Same immutable exploratory/true files refuse register-source,prepare,authorize,classify; zero targetdecodings/reservations/charges. Native committed2b witness sha2c4577a7a72106b40bc40855f7ce228c310446873ba94adad2e2a9d01ce552f1; original raw receipts/sourcehashes unchanged.",
-        "Production and22qualification/core/historical science receipts unchanged since84fc5b4844a41fac76ad7da1eea241951a03d25c. Seven named charges/results preserved; no new scientific campaign/environment. Read-only review, no tests/CLI/sourcevalues/science/network/mutations. NewCI/bind/readiness and merge not attested.",
-        "Actual ARCHITECTURE_CRITIC PASS / SEMANTIC_PREMISE PASS in declared compatibilityscope. ExistingP2 is implementation/recoveryUX, not an authority bypass; overallDoD/delivery not closed. Nonblocking wording:276 assertion sites comprise274calls+2statements, rather than276methodcalls.",
-        "SEMANTIC1: False original owner labels and invalid dependence/missingness assumptions can pass synthetic checks; guard does not attest malicious rewritten originalmetadata or marketcoverage.",
-        "SEMANTIC2: Literal276calls wording is imprecise. Packet does not claim realconfirmation/alpha/blindActor/fullCI.",
-        "SEMANTIC3: No local-to-family/global widening; negative terminal scoped frozenboundary andpurpose-specific intervals; scientificcontract159 deniesfamilyclosure.",
-        "SEMANTIC4: Missing/invalidprovenance denies; unavailablehistory charge null; emptydecisiongroup coverageNone; numeric refusal preservesobservedcounts/INSUFFICIENT.",
-        "SEMANTIC5: RUN_COMPLETED insufficient; typed reader requires source/binding/grant/reservation/result/allcarriers; PRESENT notsyntheticpromotionauthority.",
-        "SEMANTIC6: ClosedSpec1.5 isolated; legacycapsAST equalbase afteronly1.5branch removal; historicalscience not rebound.",
-        "SEMANTIC7: Lock owns exclusion, hashes compatibility; committedResearchStoreowns charge/result, dossier derived.",
-        "SEMANTIC8: Exploratorytrue bytes admittedviaenvelope, targetdecodebeforecharge, secondaliaslook orforgedPRESENT wouldfalsify. Retainednativebefore/afterandobservation-only/missing/nonbooleanchecks coverboundedpremise.",
-        "SEMANTIC9: Ignoringnonclaimscouldoverread; reportpreservesP2/historicalqualification/no freshCI/no merge. CompatibilityPASSnotnewsciencequalification.",
-        "SEMANTIC10: No mandatorysemanticcorrection in reviewedcompatibilityscope. Separatelyauthorized recoverycopy shouldstop thissource/keeplabels/history; no rebind/relabel workaround.",
-        "DESIGN18: Closeddefinition/currentchecksretain query/source/revoke; committedreservation/acquisitionoverlap retainsonefirstlook; E1800maskindependenttargetmissingness; pooled sharedcrossedweights/ranks102and3993/LOOfrozen; typedreaderrequiressourceownedproof.",
-        "Researchvalidityriskdespitetests: complete-caseselection, nominalclocksubstitution, independentA/Cdraws, dishonest exposuremetadata. Nativeowners/publicfacades/ResearchStore/OSlock simplerthannewservice. WithoutDuckDBtruthis committedmanifestJSON+verifiedeventParquet+immutable source/binding/result+Git protocol. Rollbackkeepscharge; orphan notcompletion. PACKET_INFORMATION_PATHonly, PROCESS_OBLIGATION, MODEL_DIVERSITY_UNPROVEN."
+        "NEW actual isolated read-only review of candidate head6c72738caa261175a1dee94aa66aa1e4ff197102/baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15. Required4roles launched independently; prior or conditional verdicts not transferred. No tests/productCLI/sourcevalues/science/network/mutations/newenvironment by critics.",
+        "Independently verified53implementationbindings ef1ced1804737688687636e6cc50563e9c01113534154a27639f2155cfd93eba; inventory6ff43415f1b502b362edde97b86da46cff86b16b888dd1c6196dfbe09c6f0e03; packet_fingerprint_sha256=37ed13905f11dac8fb583dab8d8bac01853ec666ad236ae8395e7a96b76d2833; diff386964f38cd27d7894be90d1b0097523bcf59775e965b61dd484c727d950c963.",
+        "Exact separately authorized applied P2 patch381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba changes only next_action. Retained immutable-source native classify/submit refuse BLOCKED_BEFORE_RESERVE/CONFIRMATORY_REUSE_FORBIDDEN with STOP_THIS_SOURCE_KEEP_LABELS_HISTORY_REQUIRE_SEPARATE_SOURCE_AUTHORITY;17storefiles unchanged;0targetdecodings/evaluator/runner/reservations/charges/storecontentwrites. Cleancommitted witness aa559e30492285bbe3c9a1141a8f9dd0bc190a8f9c21714e7194a7e718d8d594. Four injected checkpoint/exception branches preservecharge1/otherreasons/UNKNOWNnull; unit-only, notnativeadmission/scienceproof.",
+        "Saved34recovery/classifier/source-role checks and55compatibility checks PASS. Compatibility retains276assertionsites=274assertmethodcalls+2Pythonassertstatements; approvedcapabilityexpectationonly, legacydispatchAST andfourbasefixtureschemas preserved. Sevennamedscientificcharges/results/core unchanged; historicalscience not requalified. Real sampleUNBOUND; freshCI/readiness/merge notattested.",
+        "ActualARCHITECTURE_CRITIC PASS / SEMANTIC_PREMISE PASS in frozen scope; no blocking implementation/premise defect orauthoritywidening found. This scopedPASS doesnotoverride independentCODE_REVIEWERfinding orgrantdelivery/merge.",
+        "SEMANTIC1: Exactbootstrap/syntheticpositivecannotprove untouchedrealexposure, marketdependence, empiricalcoverage oralpha; contract154/resultlimits preservebounds.",
+        "SEMANTIC2: No frozenclaim strongerthanevidence within scope. Newguard doesnotrequalifyhistoricalscience oracceptREAL.",
+        "SEMANTIC3: Exacttrial/binding/source scope, studiesseparate; nofamily/globalclosure.",
+        "SEMANTIC4: Unknowncharge staysnull/BLOCKED_RESERVATION_UNKNOWN; unavailabledossierUNKNOWN; missingtargetsmissing; emptydecisiongroup nullcoverage.",
+        "SEMANTIC5: RUN_COMPLETEDinsufficient; typedresult/binding/grant/source/reservation/allcarrierssingletransaction required; PRESENTavailabilitynotpromotionauthority.",
+        "SEMANTIC6: ClosedSpec1.5dispatchisolated; legacy1.0-1.4schemasunchanged; historicalcontractcontinuationlinkretainsREALUNBOUND.",
+        "SEMANTIC7: OSlock exclusiononly; committedreservationownscharge, frozencontract/coreownsmethod, nativeownersclock/price, dossierderived.",
+        "SEMANTIC8: Exploratorysourceadmission/valuebeforecharge/secondoverlapcharge/targetchangingD/orphanPRESENTwouldfalsify; exactguardsandretainedwitness coverboundedpremise.",
+        "SEMANTIC9: Futureconsumermustnotreinterpret syntheticashistoricalnewqualificationorREALacceptance.",
+        "SEMANTIC10: No mandatorysemanticcorrection withinfrozencandidate; neverwidensynthetic/compatibility/recoveryscope.",
+        "DESIGN18: Exacthashes/freshbinding/grant/source-role before reserve/values/completion; overlapunderlease retainedcharge/noaliasreset; decisionDpretargetwithmissingnotzero; pooledsharedcrossedweights/B4096/indices1023993/allLOO/fixedFractiondraworacles; lineage/allcarriers andsynthetic/nonpositivePROMOTEdenial.",
+        "TruthwithoutDuckDB: verifiedResearchStoreParquet/manifest-lastJSON plusimmutablebinding/source/result. Publicfacades owner-native; no newcross-taskprivateimports. Researchvaliditymaystillfail despite tests underfalseoriginalsourceownerlabels, invalidrealdependence/missingnessassumptions oroverclaimedsyntheticcoverage. Rollbackpreservesallreservations/attempts/results/charges.",
+        "PACKET_INFORMATION_PATH verified; launchisolationPROCESS_OBLIGATION, modeldiversityUNPROVEN. REAL/earlyP0reader/cleanhost/freshCI remainUNKNOWN/nonclaims."
       ],
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS"
     },
     {
       "findings": [
-        "NEW actual independent read-only review on head2b906c386262e4881dc932a704dc0314b356ddfd/baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15; prior PASS and conditional proposal closure not transferred.",
-        "Native53bindings/21refs/22qualification paths and exact Git/worktree bytes independently matched. bindingsda5cebe23db22ab74482671e2c2c3810f8203c449135a8991af0f14a21e6411e; inventorye910f95a6a694f6783c660af931a52db0e6ea60792f207fad945e99668edd577; packetd9839c2abd3131b66573c9b26c4a1eb6e34e67ee1a9511fcc1f9e0051089e315; diff0f99ec397cd2b14b42f08b5f480ce0d711191bb5ce534b7ed0f51cc24cb9009f.",
-        "P2_SOURCE_REFUSAL_RECOVERY_MISDIRECTS_BINDING: lane_classifier.py:395 returns CORRECT_EXACT_CONFIRMATION_BINDING for CONFIRMATORY_REUSE_FORBIDDEN at charge0. Correcting binding cannot make immutable exploratory provenance eligible. Stop confirmation of this source, preserve labels/history, separately admit a compatible source; keep guards/charge/method unchanged. Owner three-test extension excludes this production recovery repair; proposal381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba is not applied and conditional adequacy is not actual closure.",
-        "Actual OWNER_UX_CRITIC NOT_READY; same current native witness verifies wrongnext_action at0/0/0. No other provedUX gap; conditional proposal review is not canonicalPASS.",
-        "Production and22qualification/core/historical science receipts unchanged since84fc5b4844a41fac76ad7da1eea241951a03d25c. Seven named charges/results preserved; no new scientific campaign/environment. Read-only review, no tests/CLI/sourcevalues/science/network/mutations. NewCI/bind/readiness and merge not attested."
+        "NEW actual isolated read-only review of candidate head6c72738caa261175a1dee94aa66aa1e4ff197102/baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15. Required4roles launched independently; prior or conditional verdicts not transferred. No tests/productCLI/sourcevalues/science/network/mutations/newenvironment by critics.",
+        "Independently verified53implementationbindings ef1ced1804737688687636e6cc50563e9c01113534154a27639f2155cfd93eba; inventory6ff43415f1b502b362edde97b86da46cff86b16b888dd1c6196dfbe09c6f0e03; packet_fingerprint_sha256=37ed13905f11dac8fb583dab8d8bac01853ec666ad236ae8395e7a96b76d2833; diff386964f38cd27d7894be90d1b0097523bcf59775e965b61dd484c727d950c963.",
+        "Exact separately authorized applied P2 patch381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba changes only next_action. Retained immutable-source native classify/submit refuse BLOCKED_BEFORE_RESERVE/CONFIRMATORY_REUSE_FORBIDDEN with STOP_THIS_SOURCE_KEEP_LABELS_HISTORY_REQUIRE_SEPARATE_SOURCE_AUTHORITY;17storefiles unchanged;0targetdecodings/evaluator/runner/reservations/charges/storecontentwrites. Cleancommitted witness aa559e30492285bbe3c9a1141a8f9dd0bc190a8f9c21714e7194a7e718d8d594. Four injected checkpoint/exception branches preservecharge1/otherreasons/UNKNOWNnull; unit-only, notnativeadmission/scienceproof.",
+        "Saved34recovery/classifier/source-role checks and55compatibility checks PASS. Compatibility retains276assertionsites=274assertmethodcalls+2Pythonassertstatements; approvedcapabilityexpectationonly, legacydispatchAST andfourbasefixtureschemas preserved. Sevennamedscientificcharges/results/core unchanged; historicalscience not requalified. Real sampleUNBOUND; freshCI/readiness/merge notattested.",
+        "Actual OWNER_UX_CRITIC PASS; findings=[]; nativeCLI/status/recovery/dossier/REPRODUCE/design18 checked. P2safeNEXTclosed; charged/UNKNOWNrecoverypreserved. ScopedUXPASSnotfullCI/sciencequalification/merge. Nopeerverdictsread."
       ],
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     }
   ],
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
-  "verdict": "PENDING"
+  "verdict": "NOT_READY"
 }
