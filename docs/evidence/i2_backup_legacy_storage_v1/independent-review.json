@@ -4,19 +4,66 @@
   "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-FINAL",
   "as_of": "2026-10-15",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "aca6fec57e40feca206f3b242551062435b0bdfc4ee9e2bc1d2adf01a55a205c",
+  "reviewed_inventory_sha256": "8309e0b533df7c8bd199a338632ea4ef14ddff3b4a59e79decab90f81338d629",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
     "ARCHITECTURE_CRITIC",
     "OWNER_UX_CRITIC"
   ],
-  "reviews": [],
-  "verdict": "PENDING",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated final delta review PASS on 0e933d76d750600d1c41b37950d775c4fa4bc19e; 37/37 bindings independently checked. Seven targeted tests PASS in 7.967s: publication PIT race, unfenced SQLite, deadline, multi-batch restart/cache release, retained remote/raw pins and forged cold registration. Earlier confirmed sidecar replay, native partition closure, A-B-A weekly chain, fabricated prune proof, corrupt existing chain state, two scan starvation paths, crash capture leak and cold source-to-object linkage are closed. No open P0/P1/P2; production OPERATE remains separate."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated final review PASS on 0e933d76d750600d1c41b37950d775c4fa4bc19e; exact inventory checked. Previous multi-batch falsifier independently passes: remaining bodies 3,3,2,2,1,1,0; cache generations remain 1 and HOT raw/remote pins survive. Stage A covers the complete software I2 outcome, including retirement/reclaim and ordinary maintenance. Metrics and 7/30/180 scenario distinguish measured isolated values from production UNKNOWN; mandatory live B/C remain pending. No uncovered P1/P2."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SEMANTIC_PREMISE=PASS; packet_fingerprint_sha256=939c1ef4344e8e643339cab7e888e4520b9273a8abac7901f7276db342b791f4; frozen 0e933d76d750600d1c41b37950d775c4fa4bc19e. Refreshed packet/diff/task/evidence hashes match. Five independent targeted tests PASS in 4.992s. Provisional SQL admission now precedes fences and authoritative membership is inside; late native MANIFEST/MARKER recovery preserves original Oct5 identity and availability on Oct7. Dependency-based cache release preserves exact consumers and remote pins. What can still pass isolated tests and fail research validity: uncommissioned/mismatched production writers/caller, missing live PIT/availability readback or treating COMPLETE as scientific validity. Production B/C, runway UNKNOWN and source-owned scientific pins remain mandatory. Truth stays OPS, immutable ResearchEvents/manifests and pinned ZIP/raw objects; DuckDB is rebuildable. PACKET_INFORMATION_PATH only; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated final delta PASS on 0e933d76d750600d1c41b37950d775c4fa4bc19e; 37/37 bindings match. Explicit OPERATE/factory-root/data-root, public registered-cold adapter, final-current proof, successful-path read-only verification then reclaim-resume, interruption matrix and requested status budget narrowing are present. No daily IDs/manual backup registration or operator dead end added by PIT/cache delta. Readout and one staged OPERATE packet preserve mandatory live B/C and separate authority."
+      ]
+    }
+  ],
+  "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "NO_REVIEW_MODEL_DIVERSITY_PROOF",
     "NO_PRODUCTION_OPERATION_OR_MERGE_AUTHORITY"
+  ],
+  "remediation_history": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1: membership-before-fence omitted a native publication job and replay changed manifest identity/PIT availability. Closed by provisional SQL admission, authoritative bounded census under all fences and unfenced-SQL refusal; native MANIFEST/MARKER race regressions preserve exact source clocks/IDs.",
+      "observed_head": "8a38a12a363b812f73a9f5ec5417aea75c7ee7a6",
+      "resolved_by_head": "0e933d76d750600d1c41b37950d775c4fa4bc19e"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P2: three raw batches of one scope could stall between old-cache release and required refresh. Closed by dependency-based exact consumer and pin checks; ordinary restart regression completes all three bodies with generation count1 and preserves remote/raw evidence.",
+      "observed_head": "8a38a12a363b812f73a9f5ec5417aea75c7ee7a6",
+      "resolved_by_head": "0e933d76d750600d1c41b37950d775c4fa4bc19e"
+    }
   ]
 }

@@ -14,7 +14,45 @@
     "reason": "Git is the working context and evidence owner; no cloud export requested."
   },
   "capability_radar_now": "NONE: existing owners, Git/gh, locked Python/SQLite/zipfile suffice; no new dependency/service/connector/timer.",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "69c7087d14a4f42595fe3869031260b511c86ba2502b0b6cc19868ba3b2b2e06",
+    "catalog/assets/lifecycle.yaml": "95d1870f76d3ee95271bde513663e51a9baafdd4f18c073d436137fd45b578a7",
+    "catalog/catalog_manifest.yaml": "5d91bb9b9f955066a010eb703663e09c9f05716f1099222d0ed25a0565722772",
+    "catalog/generated/asset_edges.json": "a87dc469f90709c62ba8dde9fb1e432547c2431bfb5a518b3d1130c3b53cb4d8",
+    "catalog/schemas/factory_remote_operations_v1_1.schema.json": "c556379b9c81a013f011627f132cbe143d670754d3bf8dbe6cbb7bfe2d181670",
+    "configs/factory_remote_operations_v1_1.yaml": "025c17193d46ce2ae5cb14041686e28098c18c8c251d88eac4a0d596659c9730",
+    "docs/PROJECT_MAP.md": "c2aaddbfa7811d3340c886112ef6d15ab3179fdcef4caf45cb41c07cfa67eb54",
+    "docs/contracts/system_operability_surface_v2.md": "1bb4a151a06bce8cca61dc4cb61de39ab01e825ff8037ab2ed18426b73951bd3",
+    "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md": "05510a06f6c05175033daf9d2fb7bb7e715a93ef64431fdadff7307c1e450aed",
+    "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md": "afe197860c9a42d8a94aa36be87cc063be28378eae618142bb9b47e252100793",
+    "docs/evidence/i2_backup_legacy_storage_v1/proof.json": "fdb68fc9f541016a5e7c83b51860cd65dea94730a80bfb0257d0fbef69f7d016",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-claims.json": "d4a2de2f96910194e105e8d3fb6af90ca66fb309fa9fb7c324f3ba7cb87267a8",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-classification.json": "8255d225d052453ef06351f3151f0e7cc327b0e3236fb82a632a5230c2155bdc",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-evidence.json": "ebf84f6a43d4251b1dbfc6ea0a499c7f638d6e9c9af7e52b8d19eebd0fa703fb",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-non-claims.json": "fa67cec4ec6666f81580be0fd9d415f2ed65ee0055311210880303183398032a",
+    "docs/evidence/i2_backup_legacy_storage_v1/source-contract.md": "3d5c4d4bb6c991db03625747eda40b20b4fbfe1396fabfc8cd7d539146ba40bf",
+    "docs/operator/FACTORY_REMOTE_HOST.md": "1b65d1ca03814ac0c8cc2eae2ff51a4a87b910b09a6106bb2145dad69eabdb34",
+    "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "6bdd6e4350cf1f08292e029d845a12ce242ed0dd46a1b05d1eb1be5a456d0052",
+    "docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md": "d6c495fa2e9d60224a385850920de5bc2a1237fedea83883c40e8e94a455229f",
+    "scripts/factory_offhost_backup_copy.py": "28553789c4a6b4d3465d87a5ed014c13054fd7671f01c41314a68548a0e9bd78",
+    "scripts/observation_schedule_retention.py": "5d990d092db67f7d4ad69261e691228f696c13120c753745c4e948af2e01d3a2",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "07ff560d09254d422e8d5456d758cc4b3c14b3f5f5e54f5cb0a44e22f622f2ef",
+    "src/solana_alpha_lab/factory/managed_collection.py": "d171c32918f72eae3056b5eb3ada8be2a230a9e32161ad7c8c47b69612df31f3",
+    "src/solana_alpha_lab/factory/observation_schedule_retention.py": "08b191775a354ad5a7ca136f5d10303424e3a5ab7fcc009199a3f45430f94a58",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "1605aafa0ae433ea8bdbe76c6d37eae1cc02fc1be325ed2ef94b4d1ca81c797b",
+    "src/solana_alpha_lab/factory/offhost_backup.py": "4ea15f280d342a0d51b682254c923ff5a2d9d95a1635adfc0ce0d1625bca914f",
+    "src/solana_alpha_lab/factory/operability_watch.py": "fa0f11fc3f716b16cbc1385d86ac8f5b5e2d89eab8ccae8c4d650fd09596d73b",
+    "src/solana_alpha_lab/factory/remote_ops.py": "eb4978504d15a90faafc8bbf2f62336c512aa236fa6f223abb52a89eaff08fbb",
+    "tests/test_collector_operability_retention_and_owner_pulse.py": "cedf1fa81515355fac236e17ccd39f56ef77bf8fd1abe8d43a7bcc5a2a2eb876",
+    "tests/test_factory_offhost_backup.py": "248fab05ad4cb8affbf38fd8fe02cb0b13bcc8540328dfaab072021cc1dec0df",
+    "tests/test_factory_remote_operations.py": "5187377cce26bb5d17d10ba8222496fe94d5a51de01da656a6875e415e52be4c",
+    "tests/test_i2_backup_legacy_storage_v1.py": "592cedce0d307fcdb46ac3c5a6262ea01b1243b9e165447bbf5b5f454132e08a",
+    "tests/test_i2_offhost_checkpoint_v1.py": "642d36d0374d236d986bbbf0573e8e617149f56ec65f671ad6a21433316887d4",
+    "tests/test_i2_pipeline_v1.py": "266f27d61211552711a9cc98c0c6fd4e02cc91ab463ed5ded769c2e7f8cd8e14",
+    "tests/test_i2_retention_maintenance_v1.py": "7fcfc2a7505a3de70f63acb76bc4e40504e7b7954aa0eb2430144b13afbab52c",
+    "tests/test_i2_storage_consumers_v1.py": "5a869362fb7731a32bc251e8abc28911d3b77fbcacf5f73ab363f60387d7e5f5",
+    "tests/test_managed_collection_continuity_v1.py": "abaf8bb101e58a0800ea829d2797334c035cf5fe86f6198af86bb4b9dc90602c"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -25,15 +63,15 @@
   },
   "factory_fit": {
     "path": "docs/evidence/i2_backup_legacy_storage_v1/factory-fit.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-    "verdict": "PENDING"
+    "sha256": "6ccfb181a10091016c7b93ae092c9b3eb996e1692c8c147f20cadd2e205291e0",
+    "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_178_DIRECT_CONSUMER_TESTS_PLUS_96_INTEGRATED_AND_FINAL_45_CHANGED_PATH_TESTS_WITH_NATIVE_PUBLICATION_AND_MULTI_BATCH_FALSIFIERS",
     "independent_review": {
       "path": "docs/evidence/i2_backup_legacy_storage_v1/independent-review.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "verdict": "PENDING"
+      "sha256": "82f176771543e629c8061ba47411b3fcd8a5ccdd27a138002e8f2fd6436c8f64",
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
