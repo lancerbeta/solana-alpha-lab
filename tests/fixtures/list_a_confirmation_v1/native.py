@@ -22,7 +22,8 @@ def stamp(value):
     return value.isoformat().replace("+00:00", "Z")
 
 
-def ingress(root: Path, store, case: str = "POSITIVE", *, missing_a: int = 0, source_id="SYNTH-LIST-A-V1", origin_label=None):
+def ingress(root: Path, store, case: str = "POSITIVE", *, missing_a: int = 0, source_id="SYNTH-LIST-A-V1", origin_label=None,
+            t0_shift_seconds: int = 0, data_cutoff: str | None = None, interval_end_exclusive: str | None = None):
     schedule = yaml.safe_load((root / "configs/opportunity_episodes_jupiter_core_v1.yaml").read_text(encoding="utf-8"))
     schedule = copy.deepcopy(schedule)
     schedule["activation"] = {"starts_at": "2026-11-02T00:00:00Z", "stops_admitting_at": "2027-01-04T00:00:00Z"}
@@ -37,7 +38,7 @@ def ingress(root: Path, store, case: str = "POSITIVE", *, missing_a: int = 0, so
     missing_left = missing_a
     for day in range(32):
         for slot in range(8):
-            t0 = datetime(2026, 11, 2, 0, 15, tzinfo=UTC) + timedelta(days=day * 2, minutes=slot * 15)
+            t0 = datetime(2026, 11, 2, 0, 15, tzinfo=UTC) + timedelta(days=day * 2, minutes=slot * 15, seconds=t0_shift_seconds)
             group = "A" if slot < 4 else "C"
             label = f"D{day:02d}S{slot}"
             if day == 4 and slot == 0:
@@ -84,7 +85,7 @@ def ingress(root: Path, store, case: str = "POSITIVE", *, missing_a: int = 0, so
                 window = resolve_point(sb, t0, point)
                 request = window.request_not_before
                 price = "9" if point == "E14400" and group == "A" and case != "NULL" else "8"
-                state = "MISSING_TYPED" if (point == "E14400" and missing) or (
+                state = "MISSING_TYPED" if (point == "E14400" and (missing or case == "MISSING_ALL_TARGETS")) or (
                     point == "E1800" and group == "A" and case == "EMPTY_DECISION_A") else "OBSERVED"
                 observations.append({"episode_id": native_id, "mint": mint, "cohort_id": row["cohort_id"], "release_id": row["release_id"],
                     "evidence_role": "UNTOUCHED_FORWARD_HOLDOUT", "confirmatory_reuse_forbidden": False,
@@ -102,8 +103,8 @@ def ingress(root: Path, store, case: str = "POSITIVE", *, missing_a: int = 0, so
     sample = write_native_confirmation_sample(root=root, store=store, source_id=source_id, lineage_id=source_id,
         namespace=source_id, census=census, observations=observations, schedule=schedule, frames=frames,
         admission_documents=admissions, protection_documents=[assignment],
-        interval_start="2026-11-02T00:00:00Z", interval_end_exclusive="2027-01-04T00:00:00Z",
-        information_start="2026-11-02T00:00:00Z", data_cutoff=NOW.isoformat(), exposure=exposure, domain="SYNTHETIC")
+        interval_start="2026-11-02T00:00:00Z", interval_end_exclusive=interval_end_exclusive or "2027-01-04T00:00:00Z",
+        information_start="2026-11-02T00:00:00Z", data_cutoff=data_cutoff or NOW.isoformat(), exposure=exposure, domain="SYNTHETIC")
     proposal = register_source_authority(sample, root=root, store=store)
     register_source_authority(sample, root=root, store=store, owner_phrase=proposal["owner_phrase"])
     return sample, oracle

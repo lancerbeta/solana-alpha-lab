@@ -204,6 +204,8 @@ def evaluate_native(context: dict, *, store, phase=None) -> tuple[dict, dict]:
         for point in ("E1800", "E14400"):
             if point == "E14400" and not population[-1]["decision_eligible"]:
                 break
+            window = clocks[point]
+            require(window.availability_deadline <= utc(sample.data_cutoff), "TARGET_NOT_MATURE_AT_CUTOFF")
             # The immutable committed reservation was proved before entering this
             # decoder loop; no append/deletion or lock release occurs in it.
             source_rows = pq.read_table(path, columns=VALUE_COLUMNS, filters=[
@@ -214,8 +216,6 @@ def evaluate_native(context: dict, *, store, phase=None) -> tuple[dict, dict]:
             unique_rows = {digest(r): r for r in source_rows}
             require(len(unique_rows) <= 1, "OBSERVATION_CELL_CONFLICT")
             source_rows = list(unique_rows.values())
-            window = clocks[point]
-            require(window.availability_deadline <= utc(sample.data_cutoff), "TARGET_NOT_MATURE_AT_CUTOFF")
             cell = confirmation_price_cell(source_rows, cohort=row["cohort_id"], release=row["release_id"],
                     episode_id=row["episode_id"], point=point, window=window)
             typed_missing = {"MISSING_TYPED", "CENSORED", "CENSORED_LATE", "DISAPPEARED"}

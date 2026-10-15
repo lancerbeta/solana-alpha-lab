@@ -100,9 +100,11 @@ def main(argv=None) -> int:
             except (ValueError, OSError, KeyError, TypeError, RuntimeError):
                 pass  # Unavailable committed metadata stays UNKNOWN/null.
         charged_cold = args.command in {"status", "show"} and checkpoint.get("scientific_charge") == 1
-        print(json.dumps({**checkpoint, "status": "UNVERIFIABLE" if charged_cold else "REFUSED",
+        immature = getattr(exc, "code", None) == "TARGET_NOT_MATURE_AT_CUTOFF" and checkpoint.get("scientific_charge") != 1
+        print(json.dumps({**checkpoint, "status": "UNVERIFIABLE" if charged_cold else "BOUND_CONTRACT_NOT_READY" if immature else "REFUSED",
                           "reason_codes": [getattr(exc, "code", "CONFIRMATION_INPUT_OR_RUNTIME_INVALID")],
                           "next_action": "VERIFY_SAVED_ARTIFACT_KEEP_CONSUMED_ALLOWANCE" if charged_cold else
+                                         "WAIT_FOR_MATURITY_THEN_SEPARATELY_REBIND_EXACT_SAMPLE" if immature else
                                          "VERIFY_EXACT_INPUT_AND_SAVED_CHECKPOINT"}))
         return 2
 

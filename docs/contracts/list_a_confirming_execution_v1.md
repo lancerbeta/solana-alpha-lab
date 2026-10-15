@@ -95,5 +95,16 @@ symlink/junction и foreign observation identities запрещены. Cold stat
 именно этого grant. Отзыв доступен и после current incompatibility/expiry, не
 возвращает allowance и не скрывает сохранённый результат; exact repeat идемпотентен.
 
+Calendar maturity проверяется по metadata всех native admissions до observation
+value decoding, evaluator и scientific reservation. Авторитетный clock owner —
+`opportunity_episodes.resolve_point`: E14400 availability deadline включает grid
+rounding и grace и должен быть <= frozen sample data_cutoff. Незрелый sample
+получает `BOUND_CONTRACT_NOT_READY / TARGET_NOT_MATURE_AT_CUTOFF`; NEXT —
+`WAIT_FOR_MATURITY_THEN_SEPARATELY_REBIND_EXACT_SAMPLE`. Ни cutoff, ни границы
+sample автоматически не меняются. Проверка не читает target missingness или
+статистики. Зрелые `MISSING_TYPED` остаются в полном decision denominator и
+поступают в evaluator/coverage. Уже consumed charge и UNKNOWN не превращаются
+в новый unspent trial при отказе текущего binding.
+
 Acceptance, ресурсы и воспроизведение: `docs/reports/list_a_confirming_producer_v1/`.
 Никакой StrategyVersion/activation/provider call/deploy этим producer не создаётся.

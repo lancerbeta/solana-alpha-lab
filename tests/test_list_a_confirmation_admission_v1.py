@@ -28,7 +28,7 @@ from scripts import list_a_confirmation as cli
 class SourceRoleProvenanceTests(unittest.TestCase):
     """Independent oracle: stored source labels dominate a new outer envelope."""
 
-    def source(self, store, poison):
+    def source(self, store, poison, **source_options):
         from tests.fixtures.list_a_confirmation_v1 import native
         captured = {}
         def writer(**kwargs):
@@ -40,7 +40,7 @@ class SourceRoleProvenanceTests(unittest.TestCase):
         # Construction is not authority: exercise the real CLI below.
         with patch.object(native, "write_native_confirmation_sample", writer), patch.object(
                 native, "register_source_authority", return_value={"owner_phrase": "FIXTURE_NO_AUTHORITY"}):
-            native.ingress(ROOT, store)
+            native.ingress(ROOT, store, **source_options)
         return captured
 
     def test_original_role_and_forbidden_survive_repackaging_before_values(self):
@@ -101,6 +101,85 @@ class SourceRoleProvenanceTests(unittest.TestCase):
                 metadata = source_metadata(sample.model_copy(update={"domain":domain}), root=ROOT, data_root=store.root)
                 self.assertEqual(len(metadata["census"]), 256)
             self.assertFalse(any(r["kind"] == "RUN_STARTED" for r in records(store)))
+
+
+class CalendarMaturityTests(unittest.TestCase):
+    def test_native_grid_and_grace_maturity_before_source_authority_or_values(self):
+        from solana_alpha_lab.factory.list_a_confirmation_inputs import write_native_confirmation_sample
+        with tempfile.TemporaryDirectory(prefix="list-a-maturity-unit-") as tmp:
+            store = ResearchStore(Path(tmp)/"plane")
+            payload = SourceRoleProvenanceTests().source(store, lambda _: None, t0_shift_seconds=1,
+                interval_end_exclusive="2027-01-03T02:01:00Z", data_cutoff="2027-01-03T06:09:59Z")
+            # Literal independent clock oracle: 02:00:01 +4h ->06:05 grid +5min grace.
+            self.assertEqual(payload["census"][-1]["t0"], "2027-01-03T02:00:01Z")
+            original_read = pq.read_table
+            def metadata_only(path, *args, **kwargs):
+                self.assertNotEqual(Path(path).name, "observations.parquet")
+                return original_read(path, *args, **kwargs)
+            with patch.object(pq, "read_table", metadata_only), patch(
+                    "solana_alpha_lab.factory.list_a_confirmation.evaluate_native", side_effect=AssertionError("EVALUATOR")):
+                with self.assertRaisesRegex(ConfirmationError, "TARGET_NOT_MATURE_AT_CUTOFF"):
+                    write_native_confirmation_sample(root=ROOT, store=store, **payload)
+            self.assertFalse(any(r["payload"].get("type") in {"SOURCE_AUTHORITY", "CONFIRMATION_RESERVATION"}
+                                 or r["kind"] == "RUN_STARTED" for r in records(store)))
+            source_input = store.root/"immature-input.json"
+            source_input.write_bytes(finite_bytes(payload))
+            out = io.StringIO()
+            with patch.object(pq, "read_table", metadata_only), contextlib.redirect_stdout(out):
+                rc = cli.main(["register-source", "--data-root", str(store.root), "--source-input", str(source_input),
+                               "--as-of", NOW.isoformat()])
+            self.assertEqual(rc, 2)
+            response = json.loads(out.getvalue())
+            self.assertEqual(response["status"], "BOUND_CONTRACT_NOT_READY")
+            self.assertEqual(response["reason_codes"], ["TARGET_NOT_MATURE_AT_CUTOFF"])
+            self.assertEqual(response["next_action"], "WAIT_FOR_MATURITY_THEN_SEPARATELY_REBIND_EXACT_SAMPLE")
+            # Equality is mature. New source identity; no in-place boundary/cutoff rewrite.
+            mature = dict(payload, source_id="SYNTH-MATURE-EQUALITY", data_cutoff="2027-01-03T06:10:00Z")
+            with patch.object(pq, "read_table", metadata_only):
+                self.assertTrue(write_native_confirmation_sample(root=ROOT, store=store, **mature).endswith("sample.json"))
+
+    def test_mature_typed_missing_reaches_coverage_evaluator_with_full_denominator(self):
+        from solana_alpha_lab.factory.list_a_confirmation_method import CORE_SHA
+        with tempfile.TemporaryDirectory(prefix="list-a-maturity-unit-") as tmp:
+            store = ResearchStore(Path(tmp)/"plane")
+            spec, prepared, _ = bound(store, case="MISSING_ALL_TARGETS", t0_shift_seconds=1,
+                interval_end_exclusive="2027-01-03T02:01:00Z", data_cutoff="2027-01-03T06:10:00Z")
+            reader = ValueReader(store)
+            with patch.object(pq, "read_table", reader.read):
+                response = execute_capability(spec, root=ROOT, capture_hooks={"execution_context":{
+                    "binding_id":prepared["binding_id"], "data_root":store.root, "now":NOW}})
+            self.assertEqual(response["protocol_terminal"], "INSUFFICIENT")
+            result = response["result"]
+            self.assertEqual(result["binding"]["protocol_core_sha256"], CORE_SHA)
+            self.assertEqual(result["population"]["decision_denominators"], {"A":128,"C":128})
+            self.assertEqual(result["population"]["observed"], 0)
+            self.assertEqual(result["population"]["typed_missing_counts"], {"A:MISSING_TYPED":128,"C:MISSING_TYPED":128})
+            self.assertTrue(reader.reads)
+            self.assertEqual(sum(r["kind"]=="RESEARCH_ARTIFACT" and r["payload"].get("type")=="CONFIRMATION_RESERVATION"
+                                 for r in records(store)), 1)
+
+    def test_maturity_refusal_preserves_consumed_and_unknown_checkpoints(self):
+        from solana_alpha_lab.factory import list_a_confirmation as engine
+        from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
+        from solana_alpha_lab.factory.list_a_confirmation_inputs import DEFINITION
+        from solana_alpha_lab.factory.lane_classifier import classify_lane
+        spec = load_experiment_spec(ROOT, DEFINITION)
+        with tempfile.TemporaryDirectory(prefix="list-a-maturity-unit-") as tmp:
+            store = ResearchStore(Path(tmp)/"plane")
+            for charge, terminal, action in (
+                (0, "BOUND_CONTRACT_NOT_READY", "WAIT_FOR_MATURITY_THEN_SEPARATELY_REBIND_EXACT_SAMPLE"),
+                (1, "BLOCKED_AFTER_RESERVE", "VERIFY_SAVED_CHECKPOINT_KEEP_CONSUMED_ALLOWANCE"),
+                (None, "BLOCKED_RESERVATION_UNKNOWN", "CORRECT_EXACT_CONFIRMATION_BINDING")):
+                checkpoint = {"scientific_charge":charge,"trial_id":None,"run_id":None,
+                              "run_key_sha256":None,"execution_binding_sha256":None,"domain":None}
+                # Explicit unit branch oracle; native zero-charge admission is proved separately.
+                with self.subTest(charge=charge), patch.object(engine, "bound_confirmation_checkpoint", return_value=checkpoint), patch.object(
+                        engine, "current_context", side_effect=ConfirmationError("TARGET_NOT_MATURE_AT_CUTOFF")):
+                    lane = classify_lane({"experiment_spec":spec,"execution_binding_id":"0"*64},
+                                         root=ROOT,data_root=store.root,as_of=NOW)
+                self.assertEqual(lane.terminal, terminal)
+                self.assertEqual(lane.next_action, action)
+                self.assertIs(lane.confirmation_checkpoint["scientific_charge"], charge)
 
 
 class AdmissionTests(unittest.TestCase):

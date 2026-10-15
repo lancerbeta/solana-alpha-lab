@@ -30,8 +30,8 @@ from scripts import list_a_confirmation as cli
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def bound(store, *, case="POSITIVE", missing_a=0, source_id="SYNTH-LIST-A-V1", origin_label=None):
-    sample, oracle = ingress(ROOT, store, case, missing_a=missing_a, source_id=source_id, origin_label=origin_label)
+def bound(store, *, case="POSITIVE", missing_a=0, source_id="SYNTH-LIST-A-V1", origin_label=None, **source_options):
+    sample, oracle = ingress(ROOT, store, case, missing_a=missing_a, source_id=source_id, origin_label=origin_label, **source_options)
     spec = load_experiment_spec(ROOT, DEFINITION)
     prepared = prepare_confirmation(spec, sample, root=ROOT, store=store, now=NOW)
     if prepared["status"] == "ALREADY_RESERVED":

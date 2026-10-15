@@ -1,0 +1,35 @@
+{
+  "F01": {
+    "status": "PENDING_NATIVE_DAILY_SCHEDULE_FALSIFIER_AND_BOUNDED_REPAIR"
+  },
+  "F02": {
+    "after": "NATIVE_REGISTER_PREPARE_AUTHORIZE_CLASSIFY_SUBMIT_TYPED_MATURITY_REFUSAL_ZERO_VALUES_EVALUATOR_RESERVATIONS_CHARGES_WRITES",
+    "after_oracle": {
+      "path": "local/list_a_confirming_producer_v1/attempts/f02-after-1/receipt.json",
+      "sha256": "61cc99da6458408ff91b495fd636b5f90268e2062037e028b176a67f8d1a3126"
+    },
+    "before": "LATE_REFUSAL_AFTER_ONE_RESERVATION_ONE_CHARGE_AND_44_TARGET_DECODES",
+    "before_oracle": {
+      "path": "local/list_a_confirming_producer_v1/attempts/f02-before-2/oracle-correction.json",
+      "sha256": "98e880a980bfae127925042cc08811028c4d052f6d9b04bf29b34fc884d3d84d"
+    },
+    "counter_correction": "Original raw receipt counted two event carriers; durable RESEARCH_ARTIFACT oracle establishes one reservation/charge. Raw receipt retained.",
+    "grid_grace_and_mature_missing_tests": "PENDING",
+    "unspent_before": {
+      "path": "local/list_a_confirming_producer_v1/attempts/f02-before-3/receipt.json",
+      "sha256": "b33329ee9fcb09b15d89236bd1b7e53c8a82082ff9b92bb864500e5518b77ff3"
+    }
+  },
+  "current_verdict": "IMPLEMENTING_F02_THEN_F01_FRESH_REVIEW_CI_PENDING",
+  "historical_ready_head": "72151e2a011ce8a5899bebfdaa18cf23a4801039",
+  "merge_authority": false,
+  "owner_direction": {
+    "path": "docs/evidence/list_a_confirming_producer_v1/semantic-integration-owner-direction.md",
+    "sha256": "17bd953b4878db426c483bc9130d55660432a42c13f957d6f1b9d06fa0c5f48d"
+  },
+  "real_source_integration": "UNVERIFIED",
+  "schema": "smial.list-a-semantic-integration-audit",
+  "schema_version": "1.0",
+  "scientific_history": "SEVEN_HISTORICAL_CHARGES_AND_RESULTS_IMMUTABLE",
+  "separate_disposable_test_charge_count": 1
+}

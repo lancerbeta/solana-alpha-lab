@@ -388,13 +388,16 @@ def classify_lane(
                 confirmation_checkpoint=checkpoint)
         except (ConfirmationError, ResearchStoreError, ValueError, OSError, KeyError) as exc:
             charge = checkpoint["scientific_charge"]
+            immature = getattr(exc, "code", None) == "TARGET_NOT_MATURE_AT_CUTOFF" and charge == 0
             return ConfirmationLaneDecision(Lane.DENY,
-                "BLOCKED_AFTER_RESERVE" if charge == 1 else "BLOCKED_BEFORE_RESERVE" if charge == 0 else "BLOCKED_RESERVATION_UNKNOWN",
+                "BLOCKED_AFTER_RESERVE" if charge == 1 else "BOUND_CONTRACT_NOT_READY" if immature else
+                    "BLOCKED_BEFORE_RESERVE" if charge == 0 else "BLOCKED_RESERVATION_UNKNOWN",
                 reason_codes=(getattr(exc, "code", "CONFIRMATION_BINDING_INVALID"),),
                 run_key_sha256=checkpoint["run_key_sha256"], prior_run_id=checkpoint["run_id"],
                 next_action="VERIFY_SAVED_CHECKPOINT_KEEP_CONSUMED_ALLOWANCE" if charge == 1 else
                     "STOP_THIS_SOURCE_KEEP_LABELS_HISTORY_REQUIRE_SEPARATE_SOURCE_AUTHORITY"
-                    if getattr(exc, "code", None) == "CONFIRMATORY_REUSE_FORBIDDEN" else "CORRECT_EXACT_CONFIRMATION_BINDING",
+                    if getattr(exc, "code", None) == "CONFIRMATORY_REUSE_FORBIDDEN" else
+                    "WAIT_FOR_MATURITY_THEN_SEPARATELY_REBIND_EXACT_SAMPLE" if immature else "CORRECT_EXACT_CONFIRMATION_BINDING",
                 confirmation_checkpoint=checkpoint)
     spec = _validate_spec(submission, root=root, as_of=as_of)
     if spec is None:

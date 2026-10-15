@@ -274,6 +274,10 @@ def source_metadata(sample: Sample, *, root: Path, data_root: Path) -> dict:
                     for c in frame.get("candidates", [])), "NATIVE_ADMISSION_NOT_PASS")
         require(utc(schedule["activation"]["starts_at"]) <= t0 < utc(schedule["activation"]["stops_admitting_at"]),
                 "NATIVE_ACTIVATION_INTERVAL_MISMATCH")
+        # Calendar maturity belongs to the authoritative metadata admission gate.
+        # It is independent of target values, presence, missingness and statistics.
+        require(resolve_point(schedule_binding, t0, "E14400").availability_deadline <= utc(sample.data_cutoff),
+                "TARGET_NOT_MATURE_AT_CUTOFF")
         if key in unique:
             require(unique[key] == row, "DUPLICATE_EPISODE_CONFLICT")
         unique[key] = row

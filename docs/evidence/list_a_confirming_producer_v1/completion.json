@@ -10,7 +10,7 @@
   "factory_fit": {
     "path": "docs/evidence/list_a_confirming_producer_v1/factory-fit.json",
     "sha256": "2884df0129ec5f5afec998b4757db993f1592b920bdd28f622bf09264500ac46",
-    "verdict": "PASS"
+    "verdict": "NOT_READY"
   },
   "implementation_bindings": {
     "catalog/assets/core.yaml": "f8498871b610df2259e47327a6a69fc047d16de7fdc6e2e591e356f5934c34e5",
@@ -109,7 +109,7 @@
     "spend": 0,
     "strategy_activation_paper_writes": 0
   },
-  "state_change": "Implementation/source-role/recovery/Catalog complete within unchanged scientific outcome; task L2 now projects existing3deliveryreceipts after retained CI1green/readiness1DENY. All4fresh actual reviews PASS on0632/b89553bindings incl SEMANTIC_PREMISE. Diagnostic A/B and3context regressions PASS; no policy/gate/runtime/test/science change. Native bind/committed-grounding/preflight/newexact-headCI/readiness remain separate. Sevencharges/results/history immutable. No mergeauthority.",
+  "state_change": "Owner-authorized F02 then F01 semantic/integration continuation in progress. Fresh independent review, binding, CI and readiness pending; historical 72151 ready verdict does not apply. No merge authority.",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
   "validation": {
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
@@ -117,7 +117,7 @@
     "independent_review": {
       "path": "docs/evidence/list_a_confirming_producer_v1/independent-review.json",
       "sha256": "3d480dcf1651bca1656afec9c18c4e62ce5961d3f5d6aca97d569f4aa208c3ad",
-      "verdict": "PASS"
+      "verdict": "NOT_READY"
     },
     "project_checks": [
       "PASS_ACTUAL_PRE_VALUES_RESERVATION",
@@ -136,6 +136,6 @@
       "PASS_NATIVE_UNCOMMITTED_PROJECTION_AB_AND_3_REGRESSIONS;CI1GREEN_READINESS1DENY_RETAINED;NEW_CI_PENDING",
       "PASS_FRESH_FOUR_ROLE_REVIEW_BINDINGS_b895fb33bece2bb31887066ab6eb349f583d57e7569b4288ec2e2e4375d46339"
     ],
-    "targeted": "PASS_26_CATALOG;PRIOR_34_RECOVERY_AND_55_COMPATIBILITY;CURRENT_NATIVE_ZERO_VALUE_CHARGE_WRITE_WITNESS"
+    "targeted": "PENDING_F02_GRID_GRACE_MATURE_MISSING_AND_F01_NATIVE_DAILY_SET"
   }
 }

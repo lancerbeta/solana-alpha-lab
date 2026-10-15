@@ -160,3 +160,18 @@ resource boundary and honest UNKNOWN remain. No new named scientific campaign,
 real-data/provider/grant/credential/spend/deploy or merge authority is implied.
 Stop at a material boundary or exact merge gate. No write-set addition needed
 for the current Catalog URI repair: all actual paths are already covered.
+
+Owner targeted semantic/integration continuation 2026-10-15, review anchor
+72151e2a011ce8a5899bebfdaa18cf23a4801039: same task and PR406. Repair F02
+calendar maturity first, using native resolve_point before reservation/values;
+then F01 version-compatible multi-daily-schedule source binding, original
+admission/schedule/activation identities and complete population preserved.
+Disposable synthetic TEST executions are separate from seven frozen named
+scientific charges; retain every attempt and failure. Outcome-local schemas,
+source mapping, direct consumers and exact write-set additions are authorized.
+No scientific core/estimand/30-30/95-5/bootstrap/seeds/4096/verdict changes,
+source-role laundering, real authority/provider/deploy/dependencies or merge.
+Stop only for material scientific/trust/outcome/resource boundary, or after
+fresh independent review/bind/preflight/exact-head CI/native readiness for a
+new exact owner merge phrase. Explicit SPLIT is permitted only on a proved
+disproportionate F01 integration boundary, never by documentation-only closure.

@@ -1,3 +1,5 @@
+Текущий checkpoint: F02 metadata-only maturity repair; F01 native daily source-set integration далее. Новый кандидат ещё не reviewed/CI-green/merge-ready. Исторические результаты ниже сохраняются; readiness head72151 не переносится на изменённый код. Семь historical charges/results неизменны.
+
 # List A confirming producer: owner handback
 
 Текущий delivery checkpoint: CI1 наd975 полностьюPASS, но native readiness1 корректноDENY — вtaskL2 не включена DELIVERY_EVIDENCE. Добавлена только обязательная projection трёх уже существующих receipts. Native A/B-preview false→true и3regressionsPASS. Product/tests/gates/science/семьcharges неизменны; freshreview/rebind/новыйexactCI/readiness ещёpending. Исторические checkpoints ниже относятся ксвоимheads.
