@@ -1,0 +1,1750 @@
+{
+  "schema": "smial.i2-backup-legacy-storage-proof.v1",
+  "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
+  "as_of": "2026-10-15",
+  "scope": "ISOLATED_NATIVE_COUNTERPARTS_WITH_SYNTHETIC_TRANSPORT_NO_PRODUCTION",
+  "source_original_sha256": "a63241c261748dca5a271d0e3f99b7c22400fa72d786c934b6bf68e2989c6b80",
+  "source_git_projection_sha256": "3d5c4d4bb6c991db03625747eda40b20b4fbfe1396fabfc8cd7d539146ba40bf",
+  "baseline_reported_not_live": {
+    "ops_db_bytes": 5165555712,
+    "freelist_pages": 122880,
+    "page_bytes": 4096,
+    "stored_checkpoint_approx_bytes": 5225000000,
+    "entries_reported": 7932,
+    "upload_minutes_range": [
+      60,
+      110
+    ],
+    "sample_48MiB_ratio": 6.04,
+    "whole_checkpoint_production_ratio": "UNKNOWN"
+  },
+  "same_capture_compression": {
+    "stored_bytes": 2188785,
+    "deflated_bytes": 18760,
+    "logical_bytes": 2187281,
+    "ratio": 116.67297441364606,
+    "method": 8,
+    "level": 1,
+    "stage_bytes": 2187501,
+    "stage_files": 3,
+    "stage_plus_zip_bytes": 2206261,
+    "capture_pack_localverify_wall_seconds_observed_range": [
+      0.0664,
+      0.07794
+    ],
+    "cpu_seconds_observed_range": [
+      0.03125,
+      0.078125
+    ],
+    "independent_raw_restore": "PASS_BOTH_METHODS",
+    "production_claim": false
+  },
+  "retire_reclaim": {
+    "db_file_before_bytes": 2494464,
+    "db_file_after_bytes": 397312,
+    "wal_closed_before_after_bytes": [
+      0,
+      0
+    ],
+    "retired_decoded_body_before_bytes": 2097175,
+    "retired_decoded_body_after_bytes": 0,
+    "call_payload_before_bytes": 2097376,
+    "surviving_provenance_after_bytes": 614,
+    "cli_chain_wall_seconds_observed": 1.619,
+    "implicit_call_rowid": 313,
+    "episode_admission_rowids": [
+      7,
+      19
+    ],
+    "runtime_sequence_before_after": [
+      88,
+      89
+    ],
+    "native_next_writer": "PASS",
+    "data_root_inode": "PRESERVED",
+    "hot_files_before_after_retained_rollback_intent": [
+      1,
+      3
+    ],
+    "crash_rollback_phases": [
+      "PREPARED",
+      "ORIGINAL_MOVED",
+      "SWITCHED"
+    ],
+    "rollback_after_new_writes": "DENY",
+    "actual_volume_allocation": "UNKNOWN_PRODUCTION_NOT_RUN",
+    "next_compact_full_archive_bytes_observed": 12302,
+    "next_full_raw_sql_oracle": "PASS_RETIRED_BODY_KEYS_ZERO_NATIVE_SUCCESSOR_PRESENT",
+    "final_current_causal_proof": "REQUIRED_AFTER_LOGICAL_APPLY_OLD_PROOF_DENY",
+    "next_compact_full_archive_bytes_observed_range": [
+      12293,
+      12309
+    ],
+    "next_full_checkpoint_wall_seconds_observed": 0.046,
+    "cold_registration": "ONE_TIME_VERIFIED_OBJECT_RECONSTRUCTION_AND_CAUSAL_SQL_COMPARISON",
+    "hot_files_before_after_finalized": [
+      1,
+      2
+    ],
+    "after_follow_up_cli_wall_seconds": 1.817,
+    "after_follow_up_next_full_bytes": 12356,
+    "after_follow_up_next_full_raw_sql_retired_body_count": 0,
+    "rollback_cleanup": "EXACT_RESUME_FINALIZES_OWNED_BYTES_AND_LEAVES_SMALL_TERMINAL_RECEIPT"
+  },
+  "fresh_process_resource_measurements": [
+    {
+      "scope": "ISOLATED_SYNTHETIC_WINDOWS",
+      "phase": "capture_pack_restore",
+      "returncode": 0,
+      "wall_seconds": 0.5983772999898065,
+      "owned_tree_sampled_peak_file_bytes": 8822740,
+      "owned_tree_sampled_peak_file_count": 10,
+      "sample_seconds": 0.002,
+      "output_sha256": "0c577de80aa59d373a2992ff64177fa21e46da54b2c28f094688b4b282112ecf",
+      "actual_python_process_peak_working_set_bytes": [
+        43970560
+      ],
+      "rss_semantics": "individual process peak; launcher excluded; peaks not summed; no Linux/production claim"
+    },
+    {
+      "scope": "ISOLATED_SYNTHETIC_WINDOWS",
+      "phase": "retire_reclaim_native_cli",
+      "returncode": 0,
+      "wall_seconds": 2.217701700006728,
+      "owned_tree_sampled_peak_file_bytes": 12555872,
+      "owned_tree_sampled_peak_file_count": 15,
+      "sample_seconds": 0.002,
+      "output_sha256": "512430d664ad3487f1fb956cd01bf06924a68657d653b4d9488a6929df7daa9e",
+      "actual_python_process_peak_working_set_bytes": [
+        46256128,
+        39936000,
+        39784448,
+        48979968,
+        39211008,
+        43962368
+      ],
+      "rss_semantics": "individual process peak; launcher excluded; peaks not summed; no Linux/production claim"
+    }
+  ],
+  "measurement_reproduce": [
+    "I2_PRINT_BENCHMARK=1 uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1.I2BackupLegacyStorageTests.test_whole_same_snapshot_deflate_reduction -q",
+    "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.NativeCutoverAndCLITests.test_full_real_cli_plan_apply_reclaim_and_next_writer -q"
+  ],
+  "external_resource_measurement_method": "fresh Python processes; Windows GetProcessMemoryInfo(GetCurrentProcess) at exit for actual Python children; scoped temporary tree sampled every 2ms; sampled peak is lower bound, per-process RSS is not concurrent aggregate",
+  "growth_planning_scenario": {
+    "scope": "ISOLATED_SYNTHETIC_7_EQUAL_NATIVE_INPUTS",
+    "assumption": "one 100000-character authored decoded field per modeled day; no production growth inference",
+    "db_file_bytes_at_0_to_7_inputs": [
+      352256,
+      450560,
+      557056,
+      659456,
+      761856,
+      864256,
+      966656,
+      1069056
+    ],
+    "payload_before_bytes": 701568,
+    "payload_after_provenance_bytes": 4284,
+    "retired_logical_body_bytes_removed": 697284,
+    "applied_call_compactions": 7,
+    "incoming_payload_bytes_per_input": 100224.0,
+    "surviving_payload_bytes_per_input": 612.0,
+    "db_growth_per_input_bytes": 102400.0,
+    "modeled_inputs_7_30_180": [
+      {
+        "days": 7,
+        "incoming_payload_bytes": 701568,
+        "retained_original_cold_payload_lower_bound_bytes": 701568,
+        "retained_provenance_payload_bytes": 4284
+      },
+      {
+        "days": 30,
+        "incoming_payload_bytes": 3006720,
+        "retained_original_cold_payload_lower_bound_bytes": 3006720,
+        "retained_provenance_payload_bytes": 18360
+      },
+      {
+        "days": 180,
+        "incoming_payload_bytes": 18040320,
+        "retained_original_cold_payload_lower_bound_bytes": 18040320,
+        "retained_provenance_payload_bytes": 110160
+      }
+    ]
+  },
+  "ordinary_pipeline": {
+    "test": "tests.test_i2_pipeline_v1",
+    "policy_installed_before_future_children": true,
+    "future_children_n": 2,
+    "native_terminal_states": [
+      "COMPLETE",
+      "TAIL_COMPLETE"
+    ],
+    "mutable_only_backup": true,
+    "hot90_source_verified_raw_day_archive": true,
+    "independent_content_restore": "FAKE_REMOTE_BYTE_TRANSPORT",
+    "manual_child_bindings": 0,
+    "manual_checkpoint_registration": 0,
+    "restart_between_ordinary_calls": true,
+    "preserved_tables": [
+      "managed_profiles",
+      "managed_control",
+      "managed_children",
+      "accounting_counters",
+      "lifetime_counters",
+      "account_budget_members"
+    ],
+    "production_installed_caller": "LIVE_PENDING_INSTALL",
+    "multi_batch_rehearsal": {
+      "max_rows": 1,
+      "remaining_bodies_after_ordinary_cycles": [
+        3,
+        3,
+        2,
+        2,
+        1,
+        1,
+        0
+      ],
+      "cache_generations_after_cycles": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "reopen_between_cycles": true,
+      "old_remote_proof_pins": "PRESERVED",
+      "old_local_cache": "RELEASED",
+      "hot_raw_files_preserved": 3
+    }
+  },
+  "falsifiers": [
+    "post-inventory writer/path mutation cannot change captured bytes or membership",
+    "SQLite sidecar injection fails; after-manifest/after-marker restore rebuilds native panel without source",
+    "missing/reordered delta or wrong actual inventory refuses; restore marker follows last raw step",
+    "unknown upload/restart resumes exact pending ZIP/checkpoint; A-to-B-to-A weekly restore returns A",
+    "fabricated or changed durable prune proof refuses; raw oracle reruns before deletefile",
+    "active/tail/UNKNOWN/round/outbox/export/raw-frozen pin prevents retirement",
+    "candidate/dependency drift refuses; chunk restart never doubles effects or changes source clocks",
+    "protected prefix and future terminal eligibility eventually discovered after restart",
+    "oversize metadata refusal advances other work and remains FAILED instead of false READY",
+    "two fresh-process capture deaths recover known-dead staging; active/unknown preserved",
+    "schema rejects freshness30h/RPO24h; completed old snapshot never becomes fresh",
+    "existing malformed chain file refuses bootstrap before capture/network",
+    "cold registration rejects swapped standalone SQLite even if UUID and caller inventory are rebound",
+    "reclaim refuses older proof after any causal native event/counter/admission",
+    "native publication between provisional census and writer fence preserves exact Oct5 manifests and availability during Oct7 recovery",
+    "one COMPLETE scope with three raw batches and max_rows1 completes across ordinary restart cycles without cache-generation growth"
+  ],
+  "review_remediations": [
+    "WAL sidecar replay",
+    "missing publication partition manifests",
+    "weekly base-return obsolete deltas",
+    "fabricated prune proof",
+    "archive discovery prefix starvation",
+    "oversize starvation/false health",
+    "crash capture staging leak",
+    "OPERATE root/mode and normal reclaim-resume commands",
+    "public remote-restore-to-cold-record CLI adapter",
+    "read-only requested budget narrowing",
+    "strict corrupt-existing chain state vs absent bootstrap",
+    "cold source-to-verified-object reconstruction binding",
+    "final-current causal recovery fingerprint",
+    "authoritative membership under all writer fences preserves publication PIT identity",
+    "dependency-based old-cache release removes multi-batch refresh cycle",
+    "actual base producer full to new daily delta final closure",
+    "ordinary caller bounded busy retry and weekly/daily coalescing",
+    "reboot-safe reclaim guard and exact final cleanup",
+    "approved policy revision stale-plan reconciliation with effect hashes"
+  ],
+  "validation": {
+    "final_targeted_regression": {
+      "result": "PASS",
+      "tests": 45,
+      "wall_seconds": 32.691,
+      "modules": [
+        "tests.test_i2_backup_legacy_storage_v1",
+        "tests.test_i2_retention_maintenance_v1",
+        "tests.test_i2_pipeline_v1"
+      ],
+      "worker_direct_snapshot_and_legacy_consumers": "53_PASS_12.891s",
+      "worker_native_and_direct_offhost_consumers": "28_PASS_24.694s"
+    },
+    "github_ci": "ENFORCED_EXACT_HEAD",
+    "local_full_gate": "NOT_RUN_PRE_PR_BY_POLICY",
+    "prior_direct_consumer_regression": {
+      "tests": 178,
+      "skipped": 1,
+      "wall_seconds": 341.603,
+      "result": "PASS"
+    },
+    "static_contracts": "PASS",
+    "credential_scan_self_test": "PASS",
+    "credential_scan_repository": "PASS",
+    "previous_final_96_tests": {
+      "result": "PASS",
+      "tests": 96,
+      "skipped": 1,
+      "wall_seconds": 40.193,
+      "modules": [
+        "tests.test_i2_backup_legacy_storage_v1",
+        "tests.test_i2_offhost_checkpoint_v1",
+        "tests.test_factory_offhost_backup",
+        "tests.test_i2_retention_maintenance_v1",
+        "tests.test_i2_storage_consumers_v1",
+        "tests.test_i2_pipeline_v1"
+      ],
+      "subsequent_test_only_strengthening": "PASS_4_FORGED_COLD_CASES_NEW_CALL_COUNTER_ADMISSION_SAME_ROWCOUNT_BODY_0.864s"
+    },
+    "ci_fixture_repair": {
+      "failed_run": 38707216385,
+      "failed_head": "b8ed4be809652714065b0db6c54fe454a8129ec7",
+      "cause": "five numeric-runway assertions used disposable roots without factory topology configuration; new consumer correctly returned UNKNOWN",
+      "single_variable_probe": "PASS_ADD_ONLY_CONFIG_AND_SCHEMA_TO_ONE_FAILING_FIXTURE",
+      "fix": "seed existing config/schema in positive fixtures; preserve missing-config UNKNOWN and add real-filesystem negative control",
+      "production_code_changed": false,
+      "targeted_modules": [
+        "tests.test_factory_operability_signal_calibration_v1",
+        "tests.test_factory_operability_memory_collision_repair_v1",
+        "tests.test_i2_storage_consumers_v1"
+      ],
+      "result": "PASS",
+      "tests": 49,
+      "wall_seconds": 1.942,
+      "remaining_first_run_jobs": "ALL_OTHER_SHARDS_SUCCESS_NO_FURTHER_FAILURES",
+      "failed_run_url": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/38707216385"
+    }
+  },
+  "runtime_mandatory_pending": [
+    "exact deployment",
+    "ordinary live upload and independent restore",
+    "exact archive/retirement APPLY",
+    "final-current quiesced physical reclaim and native next writer",
+    "compact full baseline and separately authorized reachability prune",
+    "approved policy install and ordinary maintenance after restart",
+    "protected A/B/profile/counters/C1/C2 readback",
+    "watch TEST incident/recovery delivery",
+    "measured production runway and source/I4 disposition"
+  ],
+  "non_claims": [
+    "NO_PRODUCTION_RATIO_OR_94_PERCENT_RECLAIM",
+    "NO_MONTHS_RUNWAY_SUPPORTED",
+    "NO_SCIENTIFIC_ALPHA_OR_CASHFLOW_VERDICT",
+    "NO_CANONICAL_DONE",
+    "NO_MERGE_OR_OPERATE_AUTHORITY_FROM_EVIDENCE"
+  ],
+  "review_follow_up": {
+    "reviewed_head": "b8ed4be809652714065b0db6c54fe454a8129ec7",
+    "original_attachment_sha256": "778ca30b1be380455720fd4f7f80afb4bce77a0b0df0a2b7eeb14f093ebb91b3",
+    "git_projection_sha256": "11601856ef885191fcbeb1687e70e8717a84557d7541b98f970718d2c4080b93",
+    "P1-1": {
+      "producer_base": "b3fb9d8ecffbffda468dccabaa81ca3392da6f15",
+      "producer_blob_sha256": {
+        "remote_ops": "ee06a3eb46c20fefacf405a8ba9b9a66fbc31eb0dc90422f352d98ca99a13fea",
+        "offhost_backup": "43e18bec23e1d0093211ba7f19f6863b7fef010bbec70865279a2b0303a3dc30",
+        "observation_schedule_store": "3a2cdb874f943b07197116cb1ceab7d263945b8fe14beadc766f7fd773862791",
+        "observation_schedule_lifecycle": "872d75fc4b7c7c43169024e12bcd86c5443e943d1b648cf5fa4113551162be28"
+      },
+      "before": {
+        "native_states": [
+          "ACTIVE",
+          "DRAINING"
+        ],
+        "actual_historical_full": true,
+        "i2_retention_schema_absent": true,
+        "error_code": "RESEARCH_STORE_NOT_PRESENT",
+        "trace": [
+          "control:start"
+        ],
+        "markers": 0
+      },
+      "owning_fix": "defer semantic recovery control only for internal raw links; final chain retains control verification and marker-last",
+      "after": {
+        "ordinary_new_daily": "DAILY_DELTA_VERIFIED",
+        "original_base_reused": true,
+        "trace": [
+          "delta:start",
+          "delta:raw-verified",
+          "control:start",
+          "control:verified",
+          "marker:last"
+        ],
+        "raw_sql_tables": 31,
+        "ROWID_and_native_rows": "EXACT",
+        "file_inventory_members_ACTIVE_DRAINING": [
+          9,
+          11
+        ],
+        "full_event_objects_and_original_clocks": "EXACT",
+        "standalone_incomplete": "DENY",
+        "final_missing_transition_descriptor": "DENY",
+        "negative_markers": 0
+      },
+      "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1 -q",
+      "independent_oracle": "fresh-process standard checkpoint restore from separately copied remote object bytes after source hidden; raw SQL rows and file SHA inventory; I2_PRINT_LEGACY_ORACLE=1 exposes full synthetic readback",
+      "production_gate": "actual legacy chain plus first new daily independently restored after exact OPERATE deployment"
+    },
+    "P1-2": {
+      "before": {
+        "ordinary_cli": "DEFERRED",
+        "exit_code": 0,
+        "checkpoint_after_lease_release": "ABSENT_WITHOUT_MANUAL_SECOND_COMMAND"
+      },
+      "owning_fix": "existing scheduled caller retries only WRITER_BUSY; exact completed checkpoint coalescing under existing lock; two bounded per-mode incident receipts",
+      "busy_budget_seconds": 7200,
+      "backoff_seconds": 30,
+      "bound_basis": "weekly00:30/daily00:45 UTC overlap and existing measured full upload60-110min; RPO24h and timers unchanged",
+      "after": {
+        "native_lease_release": "AUTOMATIC_SUCCESS_SAME_CALLER_PROCESS",
+        "backup_lock_release": "AUTOMATIC_SUCCESS_SAME_PENDING_SHA_AND_BYTES_NO_CAPTURE",
+        "weekly_daily_overlap": {
+          "captures": 1,
+          "ZIPs": 1,
+          "checkpoints": 1,
+          "daily": "COALESCED_VERIFIED_CP_ZIP_BYTES_AND_DURABLE_POINTER"
+        },
+        "long_busy": {
+          "exit_code": 2,
+          "terminal": "COPY_FAILED",
+          "failure_code": "OFFHOST_BUSY_RETRY_EXHAUSTED",
+          "last_good": "UNCHANGED",
+          "resume": "EXACT_ARGV_PENDING_RELATIVE_AND_SHA"
+        },
+        "active_owner_completion_after_exhaustion": "INCIDENT_RESOLVED_WITHOUT_LAST_GOOD_OVERWRITE",
+        "stale_future_corrupt_coalesce": "DENY",
+        "110_minute_wait": "WITHIN_120_MINUTE_BUSY_ONLY_BUDGET"
+      },
+      "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_offhost_checkpoint_v1 -q",
+      "independent_oracle": "real CLI subprocesses, native lease and backup lock, filesystem transport objects, durable pointer/receipt and same pending hashes; wall release native, 110min modeled by monotonic clock",
+      "production_gate": "actual installed units/drop-in timeout/cadence and ordinary live cycle; no always-CURRENT/RPO claim"
+    },
+    "P1-3": {
+      "before": {
+        "NEW_BEFORE_INTENT": "WRITER_BUSY_AFTER_NATIVE_OPEN",
+        "RENAME_BEFORE_INTENT": "ORDINARY_WRITER_EXIT0_CREATED_EMPTY_MAIN",
+        "ORIGINAL_MOVED": "ORDINARY_WRITER_EXIT0_CREATED_EMPTY_MAIN",
+        "SWITCHED": "WRITER_BUSY_AFTER_NATIVE_OPEN",
+        "resume": "ROLLBACK_DB_RETAINED"
+      },
+      "owning_fix": "durable ALLOCATING before allocation, native constructor/reconnect/write guards, existing-source mode=rw, exact inode-based recovery and idempotent accepted cleanup; POSIX parent fsync",
+      "after": {
+        "four_process_death_windows": "ACTUAL_COLLECTOR_CLI_REFUSES_RECLAIM_RECOVERY_REQUIRED_BEFORE_MUTATION",
+        "hot_file_sizes_SHA": "UNCHANGED",
+        "missing_main": "STAYS_ABSENT",
+        "source_uuid": "SAME",
+        "rowid": 317,
+        "lifetime_provider_calls": 19,
+        "lifetime_canonical_bytes": 271,
+        "already_open_writers_after_TTL": "REFUSE",
+        "open_guard_rename_race": "NO_EMPTY_SQLITE",
+        "resume_prepared_and_rename_windows": "PASS",
+        "interrupted_cleanup_resume": "IDEMPOTENT_EXACT_DISPOSITION",
+        "terminal": "FINALIZED",
+        "terminal_receipt_bytes_observed": 2265,
+        "staging_exists": false,
+        "rollback_exists": false,
+        "byte_disposition": {
+          "rollback_bytes_released": 389120,
+          "staging_bytes_released": 0
+        },
+        "disposition_scope": "isolated original356352+SHM32768; not production allocated volume",
+        "next_native_writer": "PASS",
+        "rollback_after_resume_or_new_writes": "DENY",
+        "next_exact_reclaim": "PASS"
+      },
+      "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.ReclaimRestartSafetyTests -q",
+      "independent_oracle": "separate process os._exit73, actual observation_schedule.py tick --once before recovery, raw SQLite UUID/ROWID/counter and scoped filesystem SHA/size readbacks",
+      "production_gate": "exact approved quiesced OPERATE and Linux/filesystem identity/readback at real volume; no VPS fault injection or hardware power-loss proof"
+    },
+    "P1-4": {
+      "before": {
+        "process_death": "SECOND_CANDIDATE_OS_EXIT73_AFTER_FIRST_TRANSACTION_COMMIT",
+        "rowids": [
+          11,
+          29,
+          53
+        ],
+        "next_candidate": 1,
+        "candidates": 3,
+        "historical_owner": "b8ed4be809652714065b0db6c54fe454a8129ec7",
+        "ordinary_runs": [
+          "FAILED",
+          "FAILED",
+          "FAILED",
+          "FAILED"
+        ],
+        "last_reason": "PLAN_STALE_POLICY",
+        "active_plan": "SAME"
+      },
+      "owning_fix": "atomic policy install supersedes obsolete bounded intent only after source/candidate/cold/effect checks; preserves progress, restarts bounded selection; ordinary caller reconciles previous-binary state; lease-admitted policy recheck and durable effect hashes",
+      "after": {
+        "progress": "SUPERSEDED_POLICY_NEXT_CANDIDATE1_PRESERVED",
+        "narrowed_scope": "SECOND_ELIGIBLE_COMPACTED_EXCLUDED_REMAINS_HOT",
+        "old_effect_provenance": "BYTE_IDENTICAL",
+        "ROWIDs_and_source_clocks": "UNCHANGED",
+        "cold_archive_sha_and_retirement_references": "PRESERVED",
+        "disable_enable": "NO_OLD_REMAINDER_THEN_AUTOMATIC_CONTINUE",
+        "old_binary_installed_revision": "AUTOMATIC_RECONCILE_FRESH_ORDINARY_CALLER",
+        "changed_candidate_or_effect": "REJECT_NEW_POLICY_AND_ORDINARY_CALLER_FAILED_SAME_INTENT",
+        "small_body_provenance_growth": "BOUNDED_METADATA_READBACK_ACCEPTS_VALID_EFFECT"
+      },
+      "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.PolicyRevisionRecoveryTests -q",
+      "independent_oracle": "raw mode=ro SQL rowids/payloads/clocks/progress, original cold file SHA, pinned historical owner BEFORE, current fresh-process run_checkpoint_maintenance AFTER; only Linux pressure inputs supplied on Windows",
+      "production_gate": "separately approved actual policy revisions and installed ordinary maintenance cycle; no effective policy changed here"
+    },
+    "validation": {
+      "snapshot_and_direct_consumers": {
+        "result": "PASS",
+        "tests": 56,
+        "wall_seconds": 16.69
+      },
+      "offhost_and_direct_consumer": {
+        "result": "PASS",
+        "tests": 59,
+        "skipped": 1,
+        "wall_seconds": 25.009,
+        "after_final_race_guard": "3_TARGETED_PASS_7.918s"
+      },
+      "maintenance_and_pipeline_frozen": {
+        "result": "PASS",
+        "tests": 33,
+        "wall_seconds": 42.047
+      },
+      "store_and_collector_consumers": {
+        "result": "PASS",
+        "tests": 23,
+        "wall_seconds": 1.373
+      },
+      "policy_revision_fresh_caller": {
+        "result": "PASS",
+        "tests": 5,
+        "wall_seconds": 10.744
+      },
+      "overlap": "counts overlap; do not sum",
+      "local_full_gate": "NOT_RUN_PRE_PR_BY_POLICY",
+      "health_topology_direct_consumers": {
+        "result": "PASS",
+        "tests": 49,
+        "wall_seconds": 2.03
+      },
+      "factory_static": "PASS",
+      "reclaim_backup_seam": {
+        "result": "PASS",
+        "tests": 6,
+        "wall_seconds": 1.199
+      },
+      "shared_guard_and_store": {
+        "result": "PASS",
+        "tests": 27,
+        "wall_seconds": 9.26
+      },
+      "snapshot_final_with_direct_consumers": {
+        "result": "PASS",
+        "tests": 62,
+        "wall_seconds": 17.584
+      },
+      "initial_temp_and_torn_write": {
+        "result": "PASS",
+        "tests": 2,
+        "wall_seconds": 4.907
+      },
+      "combined_owner_pipeline_before_last_root_import": {
+        "result": "PASS",
+        "tests": 100,
+        "skipped": 1,
+        "wall_seconds": 80.271,
+        "scope": "before last root recovery import; final retention run supersedes that module"
+      },
+      "final_retention_owner": {
+        "result": "PASS",
+        "tests": 39,
+        "wall_seconds": 43.38
+      },
+      "final_planner_failure_direct_consumers": {
+        "result": "PASS",
+        "tests": 68,
+        "skipped": 1,
+        "wall_seconds": 60.954,
+        "modules": [
+          "tests.test_i2_retention_maintenance_v1",
+          "tests.test_i2_pipeline_v1",
+          "tests.test_factory_offhost_backup"
+        ],
+        "scope": "final native planner-health repair and direct callers; counts overlap previous suites"
+      },
+      "dedicated_planner_failure_falsifiers": {
+        "result": "PASS",
+        "tests": 4,
+        "wall_seconds": 2.139
+      },
+      "dedicated_post_apply_authority_falsifiers": {
+        "result": "PASS",
+        "tests": 3,
+        "wall_seconds": 1.949,
+        "before": "3 tests with 8 matrix failures; unchanged-state control already passed",
+        "scope": "actual native APPLY then separate peer writes; success/failure x new policy/new plan/new state/foreign lease; unchanged owner metadata control"
+      },
+      "final_post_apply_cas_direct_consumers": {
+        "result": "PASS",
+        "tests": 71,
+        "skipped": 1,
+        "wall_seconds": 62.346,
+        "modules": [
+          "tests.test_i2_retention_maintenance_v1",
+          "tests.test_i2_pipeline_v1",
+          "tests.test_factory_offhost_backup"
+        ],
+        "scope": "final CAS repair; supersedes these earlier module runs, counts overlap"
+      },
+      "native_footprint_and_overlap_falsifiers": {
+        "result": "PASS",
+        "tests": 10,
+        "wall_seconds": 1.526,
+        "scope": "actual ordinary cold restore/register and approved root change/disable; pending/release/activeplan/overlap/deletion/8 unsafe refs"
+      },
+      "final_durable_cache_footprint_direct_consumers": {
+        "result": "PASS",
+        "tests": 54,
+        "wall_seconds": 4.179,
+        "modules": [
+          "tests.test_factory_operability_signal_calibration_v1",
+          "tests.test_factory_operability_memory_collision_repair_v1",
+          "tests.test_i2_storage_consumers_v1",
+          "tests.test_managed_collection_continuity_v1.ManagedFootprintTests"
+        ],
+        "scope": "prior49 health tests plus4 new consumer regressions and existing HARD_BYTES oracle; counts overlap"
+      }
+    },
+    "production_mutations": false,
+    "new_PR_or_platform": false,
+    "backup_reclaim_compatibility": {
+      "before": {
+        "real_finalized_nested_recursive_full_restore": "PASS_THEN_NATIVE_WRITER_RECLAIM_RECOVERY_REQUIRED",
+        "unfinished_switched_after_lease_expiry": "SNAPSHOT_AND_DIRECT_SQLITE_BACKUP_INCORRECTLY_SUCCEEDED"
+      },
+      "owning_fix": "shared read-only native guard before selection/existence, before/after writer fences and SQLite API; exclude only verified terminal local-inode receipt from portable payload",
+      "after": {
+        "actual_reclaim_apply_resume": "FINALIZED_NO_SYNTHETIC_INTENT",
+        "nested_full_and_sibling_mutable_restore": "RAW_SQL_ROWID_SEQUENCE_EXACT_NEW_INODE",
+        "standard_reconciliation_and_next_native_writer": "EVENT89_AFTER_OLD77_SEQUENCE88",
+        "unfinished_switched": "DENY_ZERO_SQLITE_CAPTURE",
+        "rename_gap": "DENY_MAIN_ABSENT_BEFORE_AND_AFTER_CAPTURE0_ZIP0_INTENT_BYTES_UNCHANGED",
+        "direct_sqlite_api": "DENY_TARGET_ABSENT",
+        "wrong_terminal_inode": "DENY_BEFORE_CAPTURE",
+        "trace": [
+          "native:FINALIZED",
+          "terminal-binding:verified",
+          "backup:PASS",
+          "restore:raw-PASS",
+          "new-inode:verified",
+          "native:open",
+          "recovery-gap:0",
+          "marker:resolved",
+          "writer:event-89"
+        ]
+      },
+      "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1 -q",
+      "independent_oracle": "actual native reclaim and fresh target inode; raw SQLite rows/ROWIDs/sequence and filesystem absence/hash readbacks; standard marker reconciliation then native event write",
+      "production_gate": "ordinary backup after finalized native reclaim, independent restore/reconciliation and next writer in separately authorized staged acceptance"
+    },
+    "independent_review_remediation": {
+      "observed_head": "3eb796f297862572e3441bb7a707bb1820d8435d",
+      "prior_packet_fingerprint_sha256": "e30f89cd0324108ed4c03286a159deb676e3d5535d36acc18ec89a4068f20ac3",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "NOT_READY",
+        "GOAL_DOD_CRITIC": "NOT_READY",
+        "ARCHITECTURE_CRITIC": "NOT_READY"
+      },
+      "initial_reclaim_temp": {
+        "before": "child exit73 after first temp fsync before atomic publication; native writer REFUSE, exact resume/rollback FileNotFoundError",
+        "owning_fix": "validate initial ALLOCATING temp against approved plan/root/source inode/native fingerprint, publish before ordinary rollback; optional existing CLI --plan reconstructs torn first JSON only from self-hashed exact plan with no staged DB and matching native source/lease",
+        "after": {
+          "actual_collector": "RECLAIM_RECOVERY_REQUIRED_BEFORE_ANY_FILE_MUTATION",
+          "first_and_after_previous_terminal": "EXACT_CLI_ROLLBACK_THEN_NEXT_NATIVE_WRITER_PASS",
+          "torn_first_JSON": "EXACT_CLI_ROLLBACK_WITH_APPROVED_PLAN",
+          "missing_plan_for_torn_JSON": "RECLAIM_INITIAL_PLAN_REQUIRED",
+          "wrong_approval": "DENY",
+          "premature_resume": "DENY",
+          "source_uuid_ROWID317_debits19_271": "EXACT",
+          "temp_after_cleanup": "ABSENT",
+          "terminal": "ROLLBACK_FINALIZED"
+        },
+        "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.ReclaimRestartSafetyTests -q",
+        "independent_oracle": "separate child death at fsynced and partial first write; actual collector CLI, exact recovery CLI, raw mode=ro SQLite fingerprint/ROWID/counter and main/WAL/intent hashes; read-only recovery may regenerate SHM cache",
+        "production_gate": "Linux actual source/filesystem staged exact recovery; hardware power-loss not established"
+      },
+      "same_second_exhaustion": {
+        "before": "primary IN_PROGRESS observed_at=T hides scheduler COPY_FAILED failed_at=T; failure_code absent and MUTABLE_BACKUP_FAILED absent",
+        "owning_fix": "terminal precedence at equal timestamp while retaining exact same-checkpoint successful-owner resolution",
+        "after": {
+          "selected": "COPY_FAILED",
+          "incident": "MUTABLE_BACKUP_FAILED",
+          "unrelated_same_second_success": "DOES_NOT_HIDE_FAILURE",
+          "same_checkpoint_owner_success": "RESOLVES"
+        },
+        "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_offhost_checkpoint_v1.I2OffhostCheckpointTests.test_same_second_exhaustion_wins_in_progress_and_reaches_incident_classifier -q",
+        "independent_oracle": "direct disposable receipt JSON with identical timestamps plus actual read_offhost_attempt and classify_incidents; no timing/sleep oracle",
+        "production_gate": "actual scheduled exhaustion/incident/recovery delivery remains staged"
+      },
+      "pending_refresh_policy": {
+        "before": {
+          "ordinary_cycles": 4,
+          "maintenance": "COMPLETE_READY",
+          "refresh": "DISABLED_ARCHIVE_REFRESH_PENDING_POLICY_CHANGED",
+          "HOT_bodies": [
+            2,
+            2,
+            2,
+            2
+          ],
+          "registered_archive": "ABSENT"
+        },
+        "owning_fix": "native approved-install and previous-binary ordinary path reconcile bounded exact pending metadata/source/pins to current policy, preserve target identity, suspend disabled policy, expose incompatible authority as BLOCKED_POLICY/FAILED without new cache or old wider apply",
+        "after": {
+          "ordinary_fresh_process_HOT_bodies": [
+            2,
+            1,
+            0,
+            0
+          ],
+          "max_rows": 1,
+          "first_refresh": "REGISTERED_CHECKPOINT_COLD_PIN_REGISTERED",
+          "same_checkpoint_sha256_observed": "3bec5dda5c34a7dd1723bb94e4d17294684096dfae47670cff5b7419dd0aad50",
+          "pin_count": 2,
+          "before_after_pin_canonical_sha256_observed": "b8e8a1031a9db80dc487cd4ae571083001f85380ecd1d7bceae55c6202709bf4",
+          "hash_scope": "this disposable fixture only; not production pins",
+          "ROWIDs_clocks_remote_bytes": "UNCHANGED",
+          "pending_after_success": "CLEARED",
+          "disable_enable_new_scope": "OLD_BODIES_PRESERVED_NEW_SELECTION_ONLY",
+          "incompatible_max_objects1": "TWO_ORDINARY_FAILED_ARCHIVE_REFRESH_PENDING_BUDGET_EXCEEDED_NO_ALLOCATION_OR_BODY_EFFECTS",
+          "identity_source_pin_conflicts": "REFUSAL_PREVIOUS_POLICY_UNCHANGED"
+        },
+        "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.CheckpointRefreshPolicyRecoveryTests -q",
+        "independent_oracle": "actual checkpoint+native pending under old approved policy, separately reopened ordinary caller, filesystem fake-remote exact bytes, raw SQLite body/ROWID/clock/provenance and canonical pin hash; no network",
+        "production_gate": "separately approved actual revision and installed ordinary cold refresh/maintenance cycle"
+      }
+    },
+    "final_independent_remediation": {
+      "observed_head": "394092f28a50619446bc80ff874ca8ee8c2d8c93",
+      "prior_packet_fingerprint_sha256": "5c7411127572e3d46caef6e7fc550fd914d7bfec13b9760b3e29c51a6864f414",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "NOT_READY",
+        "ARCHITECTURE_CRITIC": "NOT_READY",
+        "OWNER_UX_CRITIC": "NOT_READY"
+      },
+      "planner_failure_health": {
+        "before": {
+          "native_source": "archived COMPLETED occurrence with due link and closed episode round source",
+          "approved_max_rows": 1,
+          "planner": "CALL_OWNER_SCOPE_BUDGET_REFUSED",
+          "durable_maintenance": "READY_COMPLETE",
+          "watch_incident": "ABSENT",
+          "backup_CLI": "optional transient FAILED output while backup exit0"
+        },
+        "owning_fix": "catch native selection failure in maintenance owner, acquire lease and recheck current approved policy/active plan, persist sanitized typed FAILED merging fresh durable state; transient busy or changed authority yields",
+        "after": {
+          "ordinary_fresh_process_reason": "CALL_OWNER_SCOPE_BUDGET_REFUSED",
+          "durable_maintenance": "FAILED_CALL_OWNER_SCOPE_BUDGET_REFUSED",
+          "watch_incident": "MAINTENANCE_FAILED",
+          "prior_committed_effect_ROWID11": "UNCHANGED",
+          "target_ROWID317_body_clocks": "UNCHANGED_ON_REFUSAL",
+          "last_good_last_success_cursors_pins_cold_bytes": "PRESERVED",
+          "approved_revision_max_rows2": "TARGET_RETIRED_READY",
+          "active_plan_revalidation_failure": "PRIOR_EFFECT_AND_EXACT_INTENT_PRESERVED",
+          "busy_lease_or_concurrent_policy_plan": "YIELD_NO_FRESH_STATE_OVERWRITE",
+          "unexpected_exception": "OPTIONAL_MAINTENANCE_FAILED_WITHOUT_RAW_EXCEPTION"
+        },
+        "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.PolicyRevisionRecoveryTests -q",
+        "independent_oracle": "actual ordinary checkpoint-maintenance child process, reopened raw SQLite, real collector operational packet and classify_incidents; protected row/body/ROWID/clocks/cold files/pins compared before and after",
+        "production_gate": "installed ordinary caller and actual watch incident/recovery delivery under separately approved OPERATE"
+      },
+      "operator_canonical_approval": {
+        "before": "OPERATE named approved SHA256 but omitted canonical JSON digest derivation and exact retire/policy install argv; pretty file SHA denied",
+        "first_recipe_probe": "standalone python -c could not import src owner; repaired explicit repository-root src path before documentation acceptance",
+        "owning_fix": "document read-only existing-owner policy_sha256 commands from repository root, entire UTF8 canonical JSON for retire/policy, exact --input argv; distinguish plan_id excluding itself for retirement/reclaim plan approval",
+        "after": {
+          "digest_commands": 2,
+          "digest_matches_independent_hashlib_JSON_with_unicode": true,
+          "retire_pretty_SHA": "EXIT2_RETIREMENT_APPROVAL_MISMATCH",
+          "retire_canonical_SHA": "EXIT0_RETIRED_DISALLOW_RESUME",
+          "policy_pretty_SHA": "EXIT2_POLICY_APPROVAL_MISMATCH",
+          "policy_canonical_SHA": "EXIT0_POLICY_INSTALLED",
+          "raw_SQL_installed_documents": "EXACT",
+          "both_plan_ids": "INDEPENDENT_HASH_EXCLUDING_PLAN_ID_MATCHES"
+        },
+        "reproduce": "execute documented digest plus retire/policy command argv on disposable tests.test_i2_retention_maintenance_v1.NativeFixture only",
+        "independent_oracle": "OWNER_UX critic extracted actual documented argv, checked independent hashlib/json canonicalization including Cyrillic and Omega, and reopened raw SQL; no production or tracked edits",
+        "production_gate": "runtime exact input artifacts, canonical digests and separate approved retirement/policy scopes; computing hash grants no authority"
+      }
+    },
+    "post_apply_authority_remediation": {
+      "observed_head": "feb749c849cde3f321a7fd0ba117b9bd1bb9a1bc",
+      "prior_packet_fingerprint_sha256": "1c212fd591dbbe30c74c295020ba5b343013ae531ca55dd47548364af72c75fd",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "ARCHITECTURE_CRITIC": "NOT_READY",
+        "OWNER_UX_CRITIC": "PASS"
+      },
+      "before": {
+        "native_interleave": "real old-policy APPLY completes, separate native peer installs approved revision2 and exact new plan with durable FAILED, old caller resumes cursor finalization",
+        "policy_revision": 2,
+        "new_active_plan": "INCORRECTLY_DELETED",
+        "new_health": "INCORRECTLY_OVERWRITTEN_FAILED_TO_READY_COMPLETE",
+        "cursor": "INCORRECTLY_REPLACED_ZERO_WITH_OLD11",
+        "same_policy_new_plan_and_same_plan_new_failed_state": "ALSO_REPRODUCED"
+      },
+      "owning_fix": "post-APPLY success and exception paths acquire native lease and BEGIN IMMEDIATE, compare current approved policy/exact active plan/pre-apply maintenance snapshot, merge only current unchanged state and delete only owned unchanged plan; changed authority/state or busy yields",
+      "after": {
+        "new_approved_policy": "YIELD_POLICY_CHANGED",
+        "same_policy_new_plan": "YIELD_ACTIVE_PLAN_CHANGED",
+        "same_exact_policy_plan_new_failed_state": "YIELD_MAINTENANCE_STATE_CHANGED",
+        "foreign_lease": "YIELD_WRITER_BUSY",
+        "success_and_exception_finalization": "NEWER_STATE_AND_EXACT_PLAN_PRESERVED",
+        "actual_prior_APPLY_effects_progress_ROWIDs_clocks_cold_pins": "PRESERVED",
+        "fresh_operational_packet_watch": "NEWER_MAINTENANCE_FAILED_REMAINS_VISIBLE"
+      },
+      "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.PolicyRevisionRecoveryTests -q",
+      "independent_oracle": "real native APPLY then separate peer ObservationScheduleStore and native lease/approved policy installation; raw SQLite reopen and actual operational packet/watch compare peer plan/state/cursor and committed effects/pins",
+      "production_gate": "same staged separately approved installed ordinary maintenance and incident/recovery acceptance; no production fault injection performed"
+    },
+    "durable_cache_footprint_remediation": {
+      "observed_head": "a7dc0bfabdc6e41e9dbc69b322cd21f7e1e2bbff",
+      "prior_packet_fingerprint_sha256": "44b992a6bd6ee24b99e64cef26be2065368b189702473483fc2408513fec3d76",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "ARCHITECTURE_CRITIC": "NOT_READY",
+        "OWNER_UX_CRITIC": "PASS"
+      },
+      "before": {
+        "native_path": "actual ordinary fake-remote restore and checkpoint archive registration, then exact approved cold_root revision cold to cold-v2",
+        "actual_old_cache_bytes_in_critic_fixture": 460998,
+        "durable_checkpoint_archive": "UNCHANGED",
+        "reported_maintenance_staging_bytes_before_after_revision": [
+          460998,
+          0
+        ],
+        "effect": "projected peak/HARD_BYTES input understated despite retained filesystem bytes"
+      },
+      "owning_fix": "existing footprint owner charges safe source-owned current/pending/release/active-plan cache locations as well as proposed placement; ancestor overlap and previously counted roots/files deduplicated, unresolved or unsafe references remain UNKNOWN",
+      "after": {
+        "registered_cache_after_approved_root_revision": "ACTUAL_RETAINED_FILESYSTEM_BYTES_STILL_COUNTED",
+        "native_worker_fixture_actual_bytes_before_after_revision_disable": [
+          461003,
+          461003,
+          461003
+        ],
+        "final_consumer_run_actual_bytes_before_after_revision_disable": [
+          460997,
+          460997,
+          460997
+        ],
+        "measurement_scope": "separate disposable native fixture; not the critic fixture or production",
+        "pending_and_release_cache": "COUNTED_REGARDLESS_CURRENT_POLICY_ROOT_OR_ENABLEMENT",
+        "overlap_with_each_other_RDP_sink_OPS_WAL": "NO_DOUBLE_COUNT",
+        "invalid_unresolvable_or_outside_factory_reference": "UNKNOWN_NOT_ZERO",
+        "source_policy_profile_grants_counters_clocks_cache_bytes": "UNCHANGED_BY_MEASUREMENT"
+      },
+      "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_storage_consumers_v1 -q",
+      "independent_oracle": "existing native pending-checkpoint fixture, actual ordinary restore/register and approved revision, raw filesystem file-size sum and durable SQL references; separate synthetic overlap and invalid-reference negative controls",
+      "production_gate": "actual filesystem/root topology and permitted retained cache locations under exact OPERATE; production sizing remains UNKNOWN"
+    },
+    "checkpoint_pipeline_authority_remediation": {
+      "observed_head": "5238677b5360db7c6fff28ff34b246e59fe8e98d",
+      "prior_packet_fingerprint_sha256": "eb79af4455c2490cec6ecfc86e8e973c92c35e12898d926c9c62416bae46b740",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "ARCHITECTURE_CRITIC": "NOT_READY"
+      },
+      "before": {
+        "native_first_apply": "FIRST body compacted and progress committed before separate native peer",
+        "peer_authority": "approved revision2 and FAILED/PEER_PLAN_REVALIDATION_FAILED at 12:00:01Z",
+        "late_old_refresh_exception": "overwrote newer failure with ARCHIVE_REFRESH_FAILED at 12:00:00Z",
+        "first_red_matrix": "2 test methods,10 native interleavings:9 failures and1 initial release uncaught exception;1.306s",
+        "adjacent_partial_cache_delete": "missing intent/archive/index stranded existing release token on ordinary retry"
+      },
+      "owning_fix": "One bounded in-memory native context across maintenance, refresh intent, independently reconstructed registration, cache release and terminal outcome. Exact source incarnation and policy/plan/maintenance/pending/current/release bytes compare under native lease and BEGIN IMMEDIATE; token advances only from own pre-commit snapshot. Network holds no OPS lease. Typed transient and peer conflicts yield before any stale outcome write.",
+      "partial_cache_recovery": "Existing release token durably records verified root inode, checkpoint and owner-intent SHA before deletion. Each phase rechecks exact context and active consumers. Only that committed token permits expected missing proof files; foreign inode or mutated surviving owner intent refuses. Pinned remote objects remain retained; ordinary checkpoint retry completes interrupted local cleanup.",
+      "cache_budget": "Pre-delete census uses installed policy.max_wall_seconds and existing16384entry scan bound; exhaustion yields CACHE_RELEASE_BUDGET before deletion. Two native phases are separately bounded; individual OS deletion syscalls cannot be hard wall-preempted.",
+      "native_validation": {
+        "schema": "smial.i2-checkpoint-maintenance-pipeline-repair-validation.v1",
+        "observed_base_head": "8a62062d21b01a2a5b663675fdb1248a5c474066",
+        "original_architecture_finding_head": "5238677b5360db7c6fff28ff34b246e59fe8e98d",
+        "scope": "Existing native maintenance, checkpoint refresh/registration and cache release owners only; no production activity, dependency, policy/schema migration or scientific change.",
+        "before": {
+          "outer_race": "Actual first APPLY compacts FIRST at ROWID11. Separate native peer changes authority/outcome at 12:00:01. Old checkpoint failure records ARCHIVE_REFRESH_FAILED at 12:00:00 over the newer truth.",
+          "new_native_oracle_tests": 2,
+          "interleavings": 10,
+          "failures": 9,
+          "errors": 1,
+          "wall_seconds": 1.306,
+          "release_error": "Initial release exception escaped before the old try boundary.",
+          "historical_partial_delete": {
+            "command": "uv run --locked --managed-python python -B local/i2_review/pipeline-partial-before.py",
+            "producer": "Actual two native independently verified cache generations, historical release function extracted from exact pre-repair commit.",
+            "interruption": "Owner intent removed before controlled failure; native release token and remaining cache preserved.",
+            "ordinary_retry": "FileNotFoundError_OWNER_INTENT_MISSING",
+            "durable_deletion_started": false,
+            "artifact": "local/i2_review/pipeline-partial-before.json"
+          }
+        },
+        "repair": {
+          "authority_context": [
+            "source UUID and database/root inode",
+            "exact policy",
+            "exact active plan",
+            "pending checkpoint",
+            "current archive",
+            "cache release token",
+            "archive refresh timestamp",
+            "maintenance outcome"
+          ],
+          "context_semantics": "One bounded SQLite control-row snapshot; native lease + BEGIN IMMEDIATE compare before mutation; advance from owned bytes before commit releases transaction. Never capture a replacement authority after failure. Context remains internal, absent from receipts.",
+          "covered_phases": [
+            "initial and subsequent maintenance",
+            "pre-network refresh intent",
+            "post-reconstruction registration",
+            "cache preparation/deletion/acknowledgement",
+            "terminal failure outcome",
+            "no-op finish"
+          ],
+          "peer_change": "Typed YIELD preserves all newer control bytes, effects/progress, pins, clocks and last-good outcome.",
+          "transient": "Native WRITER_BUSY remains YIELD even after peer releases its lease before outer catch. Reclaim/source reconnection refusals are typed YIELD.",
+          "unchanged_failure": "Actual release/refresh failure persists FAILED ARCHIVE_REFRESH_FAILED; fresh-store packet/watch reports MAINTENANCE_FAILED; ordinary subsequent attempt progresses and clears incident through native success.",
+          "remote_locking": "Actual native transport oracle acquires/releases an independent collector OPS lease during every network call. No OPS lease spans remote verification.",
+          "cache_partial_delete_recovery": "Existing release token durably gains exact checkpoint/root-inode/owner-intent-hash deletion_started before any filesystem deletion. Second short native fence rechecks authority and consumers; exact interrupted deletion can resume after owner-intent/archive/index removal. Still-present changed intent or replacement root inode refuses. Remote pins remain intact.",
+          "cache_budget": "Existing BACKUP_PARTITION_SCAN_MAX_FILES=16384 conservative census and installed max_wall_seconds; budget refusal occurs before deleting any cache file or committing deletion_started. Wrapper maps CACHE_RELEASE_BUDGET to YIELD. Individual filesystem syscalls/rmtree cannot be hard wall-preempted.",
+          "schema": "No SQLite schema change; bounded metadata added inside existing source-owned release token."
+        },
+        "after_native_oracles": {
+          "outer_interleavings": 10,
+          "outer_conflicts": [
+            "POLICY_CHANGED",
+            "ACTIVE_PLAN_CHANGED",
+            "MAINTENANCE_STATE_CHANGED",
+            "PENDING_CHECKPOINT_CHANGED",
+            "CHECKPOINT_ARCHIVE_CHANGED",
+            "CACHE_RELEASE_CHANGED",
+            "SOURCE_CHANGED",
+            "WRITER_BUSY"
+          ],
+          "outer_boundary_extras": [
+            "initial release fails after peer revision",
+            "successful late refresh cannot bless peer revision"
+          ],
+          "unchanged_failure_phases": [
+            "release",
+            "refresh"
+          ],
+          "registration_conflicts_after_actual_remote_reconstruction": [
+            "POLICY_CHANGED",
+            "ACTIVE_PLAN_CHANGED",
+            "PENDING_CHECKPOINT_CHANGED"
+          ],
+          "cache_oracles": [
+            "stale peer plan prevents deletion",
+            "entries and wall budget preserve every file and release token",
+            "controlled partial owner-intent removal then fresh-store restart",
+            "controlled archive/index removal",
+            "changed still-present owner intent refuses",
+            "foreign replacement inode preserves foreign file",
+            "peer lease unavailable between native release decision and deletion",
+            "ordinary checkpoint retry completes cleanup without remote transport",
+            "remote pins unchanged"
+          ],
+          "preserved": [
+            "committed FIRST compaction",
+            "SECOND body while newer peer owns outcome",
+            "ROWIDs11/29 and source created/updated clocks",
+            "owner metadata and cursor",
+            "cold pins",
+            "newer peer FAILED@12:00:01",
+            "fresh-store packet/watch MAINTENANCE_FAILED"
+          ]
+        },
+        "validation": {
+          "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1 tests.test_i2_pipeline_v1 tests.test_factory_offhost_backup",
+          "result": "PASS",
+          "tests": 77,
+          "skipped": 1,
+          "wall_seconds": 77.561,
+          "new_test_methods": [
+            "PolicyRevisionRecoveryTests.test_checkpoint_late_failure_preserves_peer_authority_and_health",
+            "PolicyRevisionRecoveryTests.test_checkpoint_release_failure_and_successful_refresh_cannot_bless_peer_state",
+            "PolicyRevisionRecoveryTests.test_checkpoint_unchanged_failure_is_durable_and_ordinary_retry_progresses",
+            "PolicyRevisionRecoveryTests.test_checkpoint_busy_phase_stays_yield_after_peer_releases_lease",
+            "CheckpointRefreshPolicyRecoveryTests.test_registration_checks_native_context_after_remote_reconstruction",
+            "CheckpointRefreshPolicyRecoveryTests.test_cache_release_context_and_consumer_decision_share_native_fence"
+          ],
+          "existing_multi_batch_native_rehearsal": {
+            "remaining_bodies_after_ordinary_cycles": [
+              3,
+              3,
+              2,
+              2,
+              1,
+              1,
+              0
+            ],
+            "cache_generations_after_cycles": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            "max_rows": 1,
+            "remote_pins": "PRESERVED"
+          },
+          "existing_cli_reclaim_native_rehearsal": {
+            "before_bytes": 2494464,
+            "after_bytes": 397312,
+            "rowid": 313,
+            "root_inode": "PRESERVED",
+            "next_native_writer": "PASS",
+            "retired_body_before_bytes": 2097175,
+            "retired_body_after_bytes": 0,
+            "next_full_checkpoint_bytes": 12371,
+            "independently_restored_retired_body_count": 0,
+            "cli_chain_wall_seconds": 1.739,
+            "cli_child_peak_rss_bytes": "UNKNOWN"
+          }
+        },
+        "tracked_files": [
+          "src/solana_alpha_lab/factory/observation_schedule_retention.py",
+          "src/solana_alpha_lab/factory/offhost_backup.py",
+          "tests/test_i2_retention_maintenance_v1.py"
+        ],
+        "tracked_mutations": "STOPPED_AFTER_FINAL_GREEN"
+      },
+      "direct_health_consumers": {
+        "result": "PASS",
+        "tests": 54,
+        "wall_seconds": 4.37,
+        "native_actual_cache_before_after_root_revision_bytes": [
+          460999,
+          460999
+        ],
+        "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_factory_operability_signal_calibration_v1 tests.test_factory_operability_memory_collision_repair_v1 tests.test_i2_storage_consumers_v1 tests.test_managed_collection_continuity_v1.ManagedFootprintTests -q"
+      },
+      "factory_static": "PASS",
+      "independent_oracle": "Real first native APPLY, separate peer store/approved policy/plan/outcome, reopened raw SQLite, actual registered reconstructed checkpoints/two cache generations, filesystem SHA/inode checks and operational packet/watch; transport callbacks only at deliberate concurrency/failure boundaries",
+      "production_gate": "Same mandatory separately approved installed ordinary maintenance/caller and incident/recovery acceptance. No production mutation, new policy field, scientific authority or live capacity claim."
+    },
+    "explicit_cli_mode_authority_remediation": {
+      "observed_head": "05de45fd479ffb7e67545f04cf777c83f724b30a",
+      "prior_packet_fingerprint_sha256": "03e0f0608a9d921f0dd79fa32c6d6a1a2c5b4fe96da5d020b899e10946e5dc37",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "ARCHITECTURE_CRITIC": "PASS",
+        "OWNER_UX_CRITIC": "NOT_READY"
+      },
+      "before": {
+        "independent_owner_ux_probe": "Actual CLI retire --operation-mode OPERATE accepted exact approved ISOLATED_REHEARSAL document with real LOCAL_REHEARSAL proof. Subsequent actual plan/apply with explicit OPERATE returned COMPLETE/applied_call_compactions=1 without independent remote proof.",
+        "raw_sqlite_oracle": "ROWID313 retained; original rows body removed on disposable native store.",
+        "root_cause": "CLI selected mode was not bound to the approved retirement JSON or the downstream plan/APPLY authority."
+      },
+      "native_validation": {
+        "schema": "smial.i2-cli-mode-repair-validation.v1",
+        "result": "PASS",
+        "scope": "Isolated native CLI operation-mode and independent-proof authority repair; no production actions",
+        "owned_paths": [
+          "scripts/observation_schedule_retention.py",
+          "src/solana_alpha_lab/factory/observation_schedule_retention.py",
+          "tests/test_i2_retention_maintenance_v1.py"
+        ],
+        "before": {
+          "baseline_head_prefix": "05de",
+          "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.CLIOperationModeTests",
+          "tests": 2,
+          "failures": 5,
+          "errors": 0,
+          "wall_seconds": 1.487,
+          "native_facts": [
+            "Actual CLI retire --operation-mode OPERATE accepted signed ISOLATED_REHEARSAL retirement with LOCAL_REHEARSAL proof (exit 0)",
+            "Actual CLI plan --operation-mode OPERATE produced a LOCAL_REHEARSAL-backed plan and output artifact",
+            "Actual CLI apply --operation-mode OPERATE returned COMPLETE with applied_call_compactions=1, retaining ROWID 313 while removing its rows body",
+            "Actual CLI maintenance-step --operation-mode OPERATE returned COMPLETE for the rehearsal-owned policy"
+          ]
+        },
+        "after": {
+          "focused_command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.CLIOperationModeTests tests.test_i2_retention_maintenance_v1.NativeCutoverAndCLITests.test_full_real_cli_plan_apply_reclaim_and_next_writer",
+          "focused_tests": 7,
+          "focused_wall_seconds": 8.72,
+          "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1 tests.test_i2_pipeline_v1",
+          "targeted_tests": 59,
+          "targeted_wall_seconds": 77.987,
+          "failures": 0,
+          "errors": 0,
+          "skips": 0,
+          "denial_facts": {
+            "retire_signed_mode_mismatch": "exit 2 OPERATION_MODE_MISMATCH before writable owner; exact database bytes preserved; no retirement installed; ROWID 313 body retained",
+            "preexisting_rehearsal_plan_apply_maintenance": "all exit 2 before source mutation; exact database bytes preserved; no output plan, no progress, no maintenance outcome; body retained",
+            "policy_mode_disagreement": "exit 2 OPERATION_MODE_MISMATCH; exact database bytes preserved",
+            "operate_document_local_proof": "exit 2 INDEPENDENT_COLD_OPERATE_PROOF_REQUIRED; exact database bytes preserved",
+            "reclaim_signed_plan_disagreement": "exit 2 OPERATION_MODE_MISMATCH; no staging, rollback or intent; source bytes preserved",
+            "resume_rollback_disagreement": "both exit 2 OPERATION_MODE_MISMATCH; intent and source bytes preserved",
+            "historical_intent_without_mode": "exit 2 RECLAIM_OPERATION_MODE_PLAN_REQUIRED without exact plan; supplied original approved plan permits matching rehearsal resume"
+          },
+          "positive_facts": {
+            "true_operate": "Actual full checkpoint download, native independent restore and source registration produced REMOTE_CHECKPOINT_RESTORE_VERIFIED; CLI OPERATE retire/policy/plan/apply succeeded with 2 compactions; ROWIDs 11/29, created_at, updated_at and state preserved",
+            "signed_policy": "Policy JSON and approved policy hash unchanged by mode binding; operation_mode stored only in existing policy control wrapper",
+            "native_mode_inheritance": "Automatic native step without requested mode inherited commissioned OPERATE and performed 2 compactions with actual registered proof; native policy revision operation_mode=None preserved prior wrapper mode",
+            "legacy_no_wrapper": "Existing ordinary native automatic pipeline passed without adding wrapper mode; independent-proof automatic retirement remains compatible",
+            "existing_default_rehearsal": "Actual CLI plan/apply/reclaim/resume plus next native writer passed; ROWID 313 and sibling root inode preserved",
+            "reclaim_recovery": "Actual signed rehearsal cutover intent carried operation_mode; historical intent with field removed resumed only with exact original plan; ROWID 313 and body preserved"
+          },
+          "native_rehearsal_measurements": {
+            "before_bytes": 2494464,
+            "after_bytes": 397312,
+            "logical_body_before_bytes": 2097175,
+            "logical_body_after_bytes": 0,
+            "provenance_payload_after_bytes": 614,
+            "next_checkpoint_bytes": 12372,
+            "independent_checkpoint_retired_body_count": 0,
+            "next_native_writer": "PASS",
+            "rowid": 313,
+            "root_inode": "PRESERVED"
+          },
+          "ordinary_multi_batch_measurements": {
+            "remaining_bodies_after_cycles": [
+              3,
+              3,
+              2,
+              2,
+              1,
+              1,
+              0
+            ],
+            "cache_generations_after_cycles": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            "old_remote_proof_pins": "PRESERVED",
+            "old_local_cache": "RELEASED"
+          }
+        },
+        "native_boundary": [
+          "Optional operation_mode added compatibly to native retirement, policy, planning, apply, maintenance, physical reclaim and recovery APIs",
+          "CLI supplies requested mode; read-only CLI preflight precedes writable owner construction",
+          "Native retirement/policy writes and every compaction recheck mode/proof/current policy under the owning native lease and transaction",
+          "Automatic maintenance inherits commissioned wrapper mode; old no-wrapper native semantics remain",
+          "Mode switch of an existing policy wrapper requires a monotonic policy revision; implicit native None inherits previous mode",
+          "Signed reclaim plan and durable intent bind mode; legacy intent without mode requires exact original approved plan when CLI supplies a mode",
+          "Local archive creation accepts ISOLATED_REHEARSAL only"
+        ],
+        "limits": [
+          "No production deploy, upload, maintenance activation or destructive apply performed",
+          "No full gate, Git mutation, dependency or schema-version addition performed",
+          "No new live scientific or economic claim; protected scientific histories, counters and source clocks preserved by existing native checks"
+        ]
+      },
+      "authority": "Only isolated native stores. No deployment, live retirement/reclaim, policy enable or effective freshness/retention change.",
+      "automatic_rehearsal_followup": {
+        "observed_head": "a2aaed60de2235caa53e285ba9dfb3d6870a463f",
+        "prior_packet_fingerprint_sha256": "439d386679c2842b1c72a157c6dea58a20f2841dc872829860be36106840adf0",
+        "role": "CODE_REVIEWER",
+        "prior_verdict": "NOT_READY",
+        "priority": "P2",
+        "before": {
+          "tests": 1,
+          "failures": 1,
+          "wall_seconds": 1.467,
+          "native_trace": "Actual CLI successfully commissions ISOLATED_REHEARSAL automatic policy with independently restored registered REMOTE checkpoint; next same-mode maintenance-step exits2 OPERATION_MODE_MISMATCH and leaves FIRST/SECOND HOT."
+        },
+        "owning_fix": "Existing automatic retirement reads commissioned policy wrapper mode; legacy no-mode wrapper retains OPERATE. Canonical signed policy and independent proof unchanged.",
+        "after": {
+          "focused_command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.CLIOperationModeTests tests.test_i2_retention_maintenance_v1.NativeCutoverAndCLITests.test_full_real_cli_plan_apply_reclaim_and_next_writer -q",
+          "focused_tests": 8,
+          "focused_wall_seconds": 10.004,
+          "failures": 0,
+          "skips": 0,
+          "actual_rehearsal_cli": "Accepted policy then same-mode maintenance-step succeeds with2 compactions; raw SQL ROWIDs11/29/clocks/state preserved, original body removed, exact registered proof and signed policy unchanged; synthetic retirement is ISOLATED_REHEARSAL.",
+          "production_mode_compatibility": "Actual registered OPERATE path and all mode/proof denial cases still PASS; inherited automatic OPERATE remains PASS.",
+          "legacy_pipeline_command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_pipeline_v1.ManagedMaintenancePipelineTests.test_generated_children_use_one_policy_and_ordinary_caller_after_restart -q",
+          "legacy_pipeline_tests": 1,
+          "legacy_pipeline_wall_seconds": 11.17,
+          "legacy_pipeline_result": "PASS",
+          "factory_static": "PASS",
+          "full_cli_rehearsal": {
+            "before_db_bytes": 2494464,
+            "after_db_bytes": 397312,
+            "before_body_bytes": 2097175,
+            "after_body_bytes": 0,
+            "retained_provenance_payload_bytes": 614,
+            "rowid": 313,
+            "source_root_inode": "PRESERVED",
+            "next_native_writer": "PASS",
+            "next_checkpoint_retired_body_count": 0,
+            "next_checkpoint_bytes": 12373,
+            "cli_chain_wall_seconds": 1.768,
+            "actual_parent_test_interpreter_peak_rss_bytes": 85016576,
+            "cli_child_peak_rss_bytes": "UNKNOWN"
+          }
+        }
+      }
+    },
+    "capture_control_deadline_remediation": {
+      "observed_head": "b3c12e3aa2d12c12cc3fa9afa1d1971ed14f9824",
+      "prior_packet_fingerprint_sha256": "42170c22d39f626935d00c684856fa24cca3bed37ebf31ae573ceaeaaac13e94",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "OWNER_UX_CRITIC": "PASS",
+        "ARCHITECTURE_CRITIC": "NOT_READY"
+      },
+      "before": {
+        "independent_oracle": "Existing native real-control-event fixture; real ResearchStore manifest parser with controlled60ms delay; shared fence budget0.10s; separate live SQLite BEGIN IMMEDIATE probe before each manifest read.",
+        "manifest_read_elapsed_before_seconds": [
+          0.001,
+          0.07,
+          0.137,
+          0.209,
+          0.271,
+          0.332,
+          0.41,
+          0.472,
+          0.533
+        ],
+        "separate_writer_blocked_each_read": true,
+        "dependency_elapsed_seconds": 0.608,
+        "terminal": "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED only after closure returns",
+        "meaning": "Additional sequential work continued after the capture budget, delaying collector availability; this was not one unpreemptible syscall."
+      },
+      "native_validation": {
+        "schema": "smial.i2-capture-closure-deadline-validation.v1",
+        "result": "PASS",
+        "base_head": "b3c12e3aa2d12c12cc3fa9afa1d1971ed14f9824",
+        "source_frozen": true,
+        "owned_paths_sha256": {
+          "src/solana_alpha_lab/factory/remote_ops.py": "89e44282accc162e920392c68fba4eef10d04e923ae38e8e4f5e5361122ad741",
+          "tests/test_i2_backup_legacy_storage_v1.py": "b9a1c97e01a8e1d2fd1aa6c5caae817bd8d27bfe76cc4dd371bd583b648530e8"
+        },
+        "before": {
+          "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1.I2BackupLegacyStorageTests.test_recovery_closure_checks_deadline_before_next_native_manifest_read",
+          "tests_run": 1,
+          "failures": 1,
+          "wall_seconds": 1.179,
+          "capture_budget_seconds": 0.1,
+          "injected_native_manifest_read_seconds": 0.06,
+          "native_manifest_reads": 9,
+          "manifest_read_starts_seconds": [
+            0.0168348,
+            0.0855308,
+            0.1527745,
+            0.224817,
+            0.2867323,
+            0.3487677,
+            0.4259146,
+            0.4872959,
+            0.5485737
+          ],
+          "independent_writer_blocked_during_reads": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "typed_refusal": "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED",
+          "refusal_wall_seconds": 0.635,
+          "finding": "Closure continued native manifest reads and blocked the SQLite writer after the original shared fence deadline"
+        },
+        "after": {
+          "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1 tests.test_factory_offhost_backup tests.test_factory_remote_operations tests.test_mutable_backup_zip64_repair_v1",
+          "tests_run": 84,
+          "passed": 83,
+          "skipped": 1,
+          "skip_reason": "Existing symlink proof requires POSIX",
+          "failures": 0,
+          "errors": 0,
+          "wall_seconds": 23.361,
+          "dependency_closure_oracle": {
+            "native_manifest_reads": 2,
+            "manifest_read_starts_seconds": [
+              0.0167868,
+              0.0860068
+            ],
+            "reads_started_after_deadline": 0,
+            "independent_writer_blocked_during_reads": [
+              true,
+              true
+            ],
+            "typed_refusal": "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED",
+            "refusal_wall_seconds": 0.165
+          },
+          "native_control_lookup_oracle": {
+            "native_manifest_reads": 1,
+            "manifest_read_starts_seconds": [
+              0.0456371
+            ],
+            "reads_started_after_deadline": 0,
+            "independent_writer_blocked_during_reads": [
+              true
+            ],
+            "typed_refusal": "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED",
+            "refusal_wall_seconds": 0.127
+          },
+          "refusal_readback": {
+            "source_business_rows_and_rowids": "UNCHANGED",
+            "independent_writer_after_refusal": "ADMITTED",
+            "backup_zip": "ABSENT",
+            "publication_marker": "ABSENT",
+            "owned_capture_staging": "ABSENT"
+          },
+          "finite_materialization_oracles": [
+            "Flat manifest census counts unmatched directory entries and refuses before any native manifest parse",
+            "Root control traversal counts unmatched directories before filtering the SQLite basename",
+            "Physical partition-size budget refuses before the unchanged native partition verifier",
+            "Actual Parquet row count exceeding the budget refuses even when signed manifest row_count remains small",
+            "Compressed Parquet uncompressed-column budget refuses before the unchanged native table materialization",
+            "Actual recursive SQLite VM query interruption under writer fence retains BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED, then admits independent writer"
+          ],
+          "fast_normal_path": {
+            "native_active_schedule_control_restore": "PASS",
+            "recovery_control": {
+              "transitions": 1,
+              "authorities": 1
+            },
+            "historical_full_delta_restore": "PASS",
+            "open_publication_partition_recovery": "PASS",
+            "zip64_and_offhost_direct_consumers": "PASS"
+          },
+          "factory_static": {
+            "reported_by": "root",
+            "command": "uv run --locked --managed-python python -B scripts/validate_factory_static.py",
+            "result": "PASS",
+            "wall_seconds": 0.958
+          },
+          "additional_direct_consumer": {
+            "reported_by": "root",
+            "module": "tests.test_observation_schedule_remote_ops",
+            "tests_run": 9,
+            "passed": 9,
+            "skipped": 0,
+            "result": "PASS",
+            "wall_seconds": 0.582
+          }
+        },
+        "implementation": [
+          "One ephemeral context carries the original monotonic fence deadline through dependency closure and native control verification",
+          "Deadline checks run before and after native manifest, partition and identity lookups; guarded enumeration avoids unbounded sorted filtered glob collections",
+          "Per-instance ResearchStore adapter reuses unchanged native parsers, hash checks, duplicate checks and scientific verification; no ResearchStore source edits",
+          "Existing 65536 path/material/row, 16384 manifest/partition and 32MiB cumulative metadata/materialization limits bound closure work",
+          "Actual Parquet metadata is checked for rows, rowgroup/column enumeration and uncompressed column bytes before native table materialization",
+          "Raw-reference traversal is iterative and bounded; mutable capture checks between stream chunks; captured SQL queries use a deadline progress handler",
+          "Existing publication partition budget refusal remains typed compatibly; elapsed shared deadline always has the capture-fence budget refusal"
+        ],
+        "limits": [
+          "Injected 60ms native manifest latency and 100ms budget are isolated test inputs, not measured production timing",
+          "Cooperative checks do not hard-preempt an individual filesystem, SQLite or Parquet native call; the in-flight call and cleanup can exceed the deadline",
+          "Repeated native lookups consume the shared finite budget and may refuse honestly; live capacity and B/C acceptance remain UNKNOWN",
+          "No production deployment, upload, compaction, reclaim or maintenance activation; no full gate or Git mutations"
+        ]
+      },
+      "scientific_semantics": "Exact OPS control/publication/authority causal closure still required; native scientific parsers/verifiers unchanged; absent/corrupt closure refuses without accepted marker.",
+      "limit": "Cooperative monotonic deadline stops subsequent work; individual in-flight OS/native calls cannot be hard-preempted. Installed filesystem latency and live collector gaps remain mandatory B/C acceptance."
+    },
+    "writer_lease_io_loop_remediation": {
+      "observed_head": "481360b63c74d0127a5515ca4c1e4c0a100a5932",
+      "prior_packet_fingerprint_sha256": "41d678b53ffb475d00ca133a4f3cfee6c5f8ebe406512e85405dc7c3b88e437c",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "NOT_READY",
+        "ARCHITECTURE_CRITIC": "NOT_READY",
+        "GOAL_DOD_CRITIC": "NOT_READY"
+      },
+      "before": {
+        "independent_architecture_hash_oracle": {
+          "sqlite_bytes": 6291456,
+          "budget_seconds": 0.1,
+          "delay_per_read_seconds": 0.06,
+          "read_starts_seconds": [
+            0.055,
+            0.118,
+            0.182,
+            0.244,
+            0.306,
+            0.369,
+            0.432,
+            0.493
+          ],
+          "new_reads_after_deadline": 7,
+          "independent_writer_blocked_each_read": true,
+          "refusal_wall_seconds": 0.561
+        },
+        "independent_goal_hash_oracle": {
+          "sqlite_bytes": 8388608,
+          "budget_seconds": 0.1,
+          "delay_per_read_seconds": 0.03,
+          "read_count": 10,
+          "new_reads_after_deadline": 8,
+          "independent_writer_blocked_each_read": true,
+          "refusal_wall_seconds": 0.391
+        },
+        "independent_code_cache_oracle": {
+          "native_verified_cache_generations": 2,
+          "approved_budget_seconds": 0.15,
+          "delay_per_unlink_seconds": 0.04,
+          "delete_starts_seconds": [
+            0.024,
+            0.069,
+            0.11,
+            0.151,
+            0.193,
+            0.235,
+            0.276,
+            0.318
+          ],
+          "independent_writer_blocked_each_delete": true,
+          "result": "RELEASED",
+          "wall_seconds": 0.384
+        },
+        "meaning": "Python loops issued subsequent native reads/deletions after the budget while retaining writer leases; single-call non-preemption did not cover this behavior."
+      },
+      "native_capture_hash_validation": {
+        "schema": "smial.i2-capture-hash-deadline-followup.v1",
+        "result": "PASS",
+        "base_head": "481360b63c74d0127a5515ca4c1e4c0a100a5932",
+        "source_frozen": true,
+        "owned_paths_sha256": {
+          "src/solana_alpha_lab/factory/remote_ops.py": "95f7b5f1e15cd4484f5174e7f61fe7303ffeb3b8e29428529adee445b9944cd9",
+          "src/solana_alpha_lab/factory/offhost_backup.py": "68d9f333264590a5c2d97ba6b404ac98891d64ad6855e51a956526cc9993fe8a",
+          "tests/test_i2_backup_legacy_storage_v1.py": "28b519aa0b29c559525a5be7f0caa7ef202f0093512bbb4443b5f27fdd18275e",
+          "tests/test_i2_retention_maintenance_v1.py": "03dbd8254d619cbbdc89e75722e43096449a591244c0d22ed00f6c0abcf3e498"
+        },
+        "previous_top_level_record": "Historical completed capture-closure repair; previous base and hashes retained unchanged.",
+        "change": "Existing _sha256_file checks the existing shared capture deadline immediately before and after every native read, including EOF. Outside capture both checks are no-ops.",
+        "before": {
+          "native_command": "uv run --locked --managed-python python -B local/i2_review/architecture_capture_hash_deadline_probe.py",
+          "native_sqlite_payload_bytes": 6291456,
+          "budget_seconds": 0.1,
+          "injected_read_seconds": 0.06,
+          "read_starts_seconds": [
+            0.056629,
+            0.119303,
+            0.182085,
+            0.244482,
+            0.30737,
+            0.370273,
+            0.43337,
+            0.49453
+          ],
+          "reads": 8,
+          "reads_started_after_deadline": 7,
+          "independent_writer_blocked_each_read": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "terminal": "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED",
+          "refusal_wall_seconds": 0.562589,
+          "writer_after_refusal": "ADMITTED",
+          "accepted_backup_zip_count": 0,
+          "regression": {
+            "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1.I2BackupLegacyStorageTests.test_staged_sqlite_hash_checks_shared_deadline_before_each_chunk",
+            "tests_run": 1,
+            "failures": 1,
+            "errors": 0,
+            "wall_seconds": 0.164,
+            "controlled_read_starts_seconds": [
+              0,
+              0.06,
+              0.12,
+              0.18,
+              0.24,
+              0.3,
+              0.36,
+              0.42
+            ]
+          }
+        },
+        "after": {
+          "native_command": "uv run --locked --managed-python python -B local/i2_review/architecture_capture_hash_deadline_probe.py",
+          "budget_seconds": 0.1,
+          "injected_read_seconds": 0.06,
+          "read_starts_seconds": [
+            0.059319
+          ],
+          "reads": 1,
+          "reads_started_after_deadline": 0,
+          "independent_writer_blocked_each_read": [
+            true
+          ],
+          "terminal": "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED",
+          "refusal_wall_seconds": 0.126961,
+          "writer_after_refusal": "ADMITTED",
+          "accepted_backup_zip_count": 0,
+          "controlled_regression": {
+            "read_starts_seconds": [
+              0,
+              0.06
+            ],
+            "writer_blocked_each_read": [
+              true,
+              true
+            ],
+            "source_sqlite_bytes": "UNCHANGED",
+            "owned_capture_staging": "ABSENT",
+            "backup_zip": "ABSENT",
+            "ordinary_hash_outside_capture": "PASS"
+          },
+          "targeted_suite": {
+            "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1 tests.test_i2_retention_maintenance_v1 tests.test_i2_pipeline_v1 tests.test_i2_offhost_checkpoint_v1 tests.test_factory_offhost_backup tests.test_factory_remote_operations tests.test_mutable_backup_zip64_repair_v1",
+            "tests_run": 182,
+            "passed": 181,
+            "skipped": 1,
+            "skip_reason": "Existing POSIX-only symlink proof",
+            "failures": 0,
+            "errors": 0,
+            "wall_seconds": 117.763,
+            "source_binding": "remote_ops and its backup regression were final; suite process loaded offhost before final relocation of original start marker to function entry. The last clock-only delta is covered by final cache regressions, actual slow-delete oracle and final FACTORY_STATIC below."
+          },
+          "factory_static": {
+            "result": "PASS",
+            "wall_seconds": 0.964,
+            "executor": "root",
+            "source_binding": "final stable owned bytes"
+          }
+        },
+        "limits": [
+          "One in-flight native read and transaction rollback/cleanup cannot be interrupted at a hard wall time; no later read or ordinary hash work starts after cooperative deadline detection.",
+          "Injected native I/O timings are isolated fault evidence, not production timing or live B/C capacity proof.",
+          "No new policy, schema, dependency, production mutation or scientific parser owner change."
+        ]
+      },
+      "native_cache_release_validation": {
+        "schema": "smial.i2-cache-release-deadline-validation.v1",
+        "result": "PASS",
+        "base_head": "481360b63c74d0127a5515ca4c1e4c0a100a5932",
+        "source_frozen": true,
+        "owned_paths_sha256": {
+          "src/solana_alpha_lab/factory/remote_ops.py": "95f7b5f1e15cd4484f5174e7f61fe7303ffeb3b8e29428529adee445b9944cd9",
+          "src/solana_alpha_lab/factory/offhost_backup.py": "68d9f333264590a5c2d97ba6b404ac98891d64ad6855e51a956526cc9993fe8a",
+          "tests/test_i2_backup_legacy_storage_v1.py": "28b519aa0b29c559525a5be7f0caa7ef202f0093512bbb4443b5f27fdd18275e",
+          "tests/test_i2_retention_maintenance_v1.py": "03dbd8254d619cbbdc89e75722e43096449a591244c0d22ed00f6c0abcf3e498"
+        },
+        "change": "Existing source-owned deletion token and native backup-plane -> OPS fence now use one original call-entry deadline across prepare, census, partial deletion and ACK. A finite 16384-entry no-follow census precedes a postorder plan; each unlink/rmdir rechecks deadline, root inode, reparse/symlink and ancestor guards. CACHE_RELEASE_BUDGET rolls back ACK and yields through ordinary checkpoint maintenance.",
+        "before": {
+          "command": "uv run --locked --managed-python python -B local/i2_review/repro_cache_release_deadline.py",
+          "oracle": "actual two independently restored and registered cold checkpoint generations",
+          "approved_policy_revision": 2,
+          "budget_seconds": 0.15,
+          "injected_native_unlink_seconds": 0.04,
+          "delete_starts_seconds": [
+            0.024,
+            0.069,
+            0.111,
+            0.153,
+            0.194,
+            0.235,
+            0.277,
+            0.318
+          ],
+          "deletions_started_after_deadline": 5,
+          "independent_writer_blocked_each_delete": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "terminal": "RELEASED",
+          "wall_seconds": 0.367,
+          "released_local_bytes": 460999,
+          "target_exists": false,
+          "regression": {
+            "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.CheckpointRefreshPolicyRecoveryTests.test_cache_release_deadline_spans_prepare_and_each_native_delete_then_resumes",
+            "tests_run": 1,
+            "failures": 1,
+            "errors": 0,
+            "wall_seconds": 1.277,
+            "observed_terminal": "COMPLETE instead of YIELD"
+          }
+        },
+        "after": {
+          "command": "uv run --locked --managed-python python -B local/i2_review/repro_cache_release_deadline.py",
+          "oracle": "same actual two cold generations with actual delayed native os.unlink and independent SQLite writer",
+          "approved_policy_revision": 2,
+          "budget_seconds": 0.15,
+          "injected_native_unlink_seconds": 0.04,
+          "delete_starts_seconds": [
+            0.027,
+            0.072,
+            0.114
+          ],
+          "deletions_started_after_deadline": 0,
+          "independent_writer_blocked_each_delete": [
+            true,
+            true,
+            true
+          ],
+          "terminal": "YIELD",
+          "reason": "CACHE_RELEASE_BUDGET",
+          "wall_seconds": 0.163,
+          "target_exists_after_yield": true,
+          "remaining_files_after_yield": 5,
+          "durable_existing_deletion_token_preserved": true,
+          "writer_after_yield": "ADMITTED",
+          "ordinary_native_resume": "RELEASED",
+          "target_exists_after_resume": false,
+          "release_token_after_resume": null,
+          "source_raw_rows_body_and_rowids": "UNCHANGED",
+          "remote_pins": "UNCHANGED"
+        },
+        "final_controlled_native_regressions": {
+          "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.CheckpointRefreshPolicyRecoveryTests.test_cache_release_deadline_spans_prepare_and_each_native_delete_then_resumes tests.test_i2_retention_maintenance_v1.CheckpointRefreshPolicyRecoveryTests.test_cache_release_context_and_consumer_decision_share_native_fence",
+          "tests_run": 2,
+          "passed": 2,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "wall_seconds": 2.585,
+          "phase_budget_seconds": 0.15,
+          "prepare_seconds": 0.1,
+          "native_delete_seconds": 0.04,
+          "native_unlink_starts_seconds": [
+            0.1,
+            0.14
+          ],
+          "writer_blocked_each_delete": [
+            true,
+            true
+          ],
+          "first_terminal": "YIELD:CACHE_RELEASE_BUDGET",
+          "fresh_source_reopen_token": "PRESERVED",
+          "remaining_file_bytes": "EXACT",
+          "source_call_rows_body_rowids_and_row_clocks": "UNCHANGED",
+          "remote_pins": "UNCHANGED",
+          "ordinary_retry_after_cadence": "RELEASED",
+          "last_rmdir_crossed_budget": "YIELD before ACK; target absent, token preserved",
+          "expired_missing_target_decision": "CACHE_RELEASE_BUDGET before ACK; token preserved",
+          "next_ordinary_missing_target_resume": "RELEASED; token acknowledged",
+          "existing_owner_guards": [
+            "stale exact context refuses",
+            "pre-delete census budget refuses with zero filesystem deletion",
+            "removed owner intent resumes only with prior native deletion token",
+            "still-present modified owner intent refuses",
+            "partial archive/index removal resumes",
+            "replacement root inode refuses",
+            "active consumer decision shares native write fence"
+          ]
+        },
+        "targeted_suite": {
+          "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1 tests.test_i2_retention_maintenance_v1 tests.test_i2_pipeline_v1 tests.test_i2_offhost_checkpoint_v1 tests.test_factory_offhost_backup tests.test_factory_remote_operations tests.test_mutable_backup_zip64_repair_v1",
+          "tests_run": 182,
+          "passed": 181,
+          "skipped": 1,
+          "skip_reason": "Existing POSIX-only symlink proof",
+          "failures": 0,
+          "errors": 0,
+          "wall_seconds": 117.763,
+          "source_binding": "remote_ops and its backup regression were final; suite process loaded offhost before final relocation of original start marker to function entry. The last clock-only delta is covered by final cache regressions, actual slow-delete oracle and final FACTORY_STATIC below."
+        },
+        "factory_static": {
+          "result": "PASS",
+          "wall_seconds": 0.964,
+          "executor": "root",
+          "source_binding": "final stable owned bytes"
+        },
+        "api_and_authority": {
+          "public_signature": "UNCHANGED",
+          "durable_schema": "UNCHANGED; reuse existing deletion_started",
+          "policy": "UNCHANGED; honor installed exact max_wall_seconds",
+          "automatic_pipeline": "typed CACHE_RELEASE_BUDGET becomes YIELD; ordinary next eligible call resumes",
+          "remote_pins": "PRESERVED",
+          "scientific_owner_and_history": "UNCHANGED"
+        },
+        "limits": [
+          "One in-flight filesystem syscall, metadata verification call, commit and rollback cleanup cannot be interrupted at a hard wall time; the next destructive operation does not start after budget detection.",
+          "The isolated injected delay measures cooperative interruption and resumability, not production timing. Live B/C capacity remains UNKNOWN.",
+          "released_local_bytes remains the bytes removed in the successful current call, rather than a new persisted cumulative counter across interrupted calls.",
+          "No production deployment, upload, compaction/reclaim or maintenance activation was performed."
+        ]
+      },
+      "limit": "Cooperative checks stop subsequent operations and preserve resumable state; one in-flight native/OS operation and necessary cleanup cannot be hard-preempted. Production B/C remains mandatory pending."
+    },
+    "owner_review_severity_floor": {
+      "owner_instruction": "p1,p0 критика только,затянули",
+      "blocking_severities": [
+        "P0",
+        "P1"
+      ],
+      "open_nonblocking_finding": {
+        "severity": "P2",
+        "observed_head": "8b6351ae64d84d30f1e2f42253ea79a9a41a8d24",
+        "owner": "CODE_REVIEWER",
+        "status": "OPEN_NOT_REPAIRED",
+        "finding": "Locked Python 3.13 pathlib iterdir/rglob materializes native directory entries before caller count/deadline checks. Source membership, partition manifest, recovery-control and cache pre-delete censuses share this limitation.",
+        "native_manifest_oracle": {
+          "entry_cap": 3,
+          "entries": 15,
+          "budget_seconds": 0.15,
+          "delay_per_entry_seconds": 0.04,
+          "new_reads_after_deadline": 11,
+          "refusal_wall_seconds": 0.6514
+        },
+        "native_cache_oracle": {
+          "entry_cap": 3,
+          "entries": 17,
+          "budget_seconds": 0.15,
+          "delay_per_entry_seconds": 0.04,
+          "new_reads_after_deadline": 13,
+          "refusal_wall_seconds": 0.7328
+        },
+        "independent_writer": "BLOCKED_DURING_SCAN_ADMITTED_AFTER_REFUSAL",
+        "safety_readback": "NO_ACCEPTED_CHECKPOINT; NO_CACHE_DELETION; SOURCE_CACHE_TOKEN_PINS_PRESERVED",
+        "disposition": "Unfinished lazy-scandir patch withdrawn; continue final review/CI/readiness under explicit owner P0/P1 blocking floor. No claim of repair or production latency acceptance."
+      },
+      "authority": "No merge or production authority; all four review roles and mandatory runtime B/C remain required."
+    }
+  },
+  "main_integration": {
+    "owner_direction": "Check changed main before PR delivery; changed main confirmed by owner",
+    "prior_base": "b3fb9d8ecffbffda468dccabaa81ca3392da6f15",
+    "new_frozen_base": "3ff9df44331d8063274132c3da7022e46d859d92",
+    "ordinary_merge_commit": "8a62062d21b01a2a5b663675fdb1248a5c474066",
+    "upstream_pr": 406,
+    "upstream_changed_paths": 59,
+    "unchanged_upstream_nonaggregate_blobs": 54,
+    "preserved_upstream_inventory_sha256": "0dfa4166845c66adeb6476727e7dbd89135812a8d70c3f87e1bce7482066d9cc",
+    "shared_aggregate_resolution": "Both append-only asset sets preserved; 3 source Catalog conflicts resolved; native harness_sync regenerated hashes/counts/navigation; no generated hand edits",
+    "authority_and_harness_changes_from_upstream": "NONE_IN_EXACT_AUTHORITY_PATHS",
+    "legacy_producer_historical_anchor": "b3fb9d8ecffbffda468dccabaa81ca3392da6f15",
+    "new_dependencies_profile_grants_or_scientific_semantic_changes_by_I2": "NONE",
+    "live_main_transport_and_api": "BOTH_MATCH_NEW_FROZEN_BASE",
+    "review_ci_disposition": "All final role reviews, evidence and exact-head CI must bind updated candidate; prior results remain historical",
+    "targeted_snapshot_chain_direct_consumer_validation": {
+      "result": "PASS",
+      "tests": 62,
+      "wall_seconds": 17.435,
+      "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1 tests.test_observation_schedule_remote_ops tests.test_mutable_backup_zip64_repair_v1 tests.test_factory_remote_operations -q"
+    },
+    "reproduce": "git diff --name-only b3fb9d8ecffbffda468dccabaa81ca3392da6f15 3ff9df44331d8063274132c3da7022e46d859d92; compare each nonaggregate Git blob to 8a62062d21b01a2a5b663675fdb1248a5c474066; native harness_sync owns shared aggregates"
+  }
+}

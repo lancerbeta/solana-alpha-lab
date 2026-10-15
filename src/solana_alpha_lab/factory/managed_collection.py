@@ -564,7 +564,8 @@ def _walk_bytes(path: Path) -> Any:
 
 
 def measure_whole_factory(
-    *, store: ObservationScheduleStore, data_root: Path, root: Path, environ: Mapping[str, str] | None = None
+    *, store: ObservationScheduleStore, data_root: Path, root: Path, environ: Mapping[str, str] | None = None,
+    rdp_inventory: tuple[Any, Any, Any, Any] | None = None,
 ) -> dict[str, Any]:
     """Non-overlapping resident and transient bytes of the whole same-volume factory.
 
@@ -581,7 +582,7 @@ def measure_whole_factory(
 
     sqlite_path = Path(store.path)
     sqlite_bytes = _file_bytes(sqlite_path) + _file_bytes(Path(str(sqlite_path) + "-wal"))
-    total, _open_count, open_bytes, _science = _rdp_inventory_bytes(Path(data_root))
+    total, _open_count, open_bytes, _science = rdp_inventory or _rdp_inventory_bytes(Path(data_root))
     resident = resident_rdp_bytes(total, open_bytes)
     nested = False
     try:
@@ -591,6 +592,7 @@ def measure_whole_factory(
     if isinstance(resident, int) and nested:
         resident = max(0, resident - sqlite_bytes)
     sink_bytes: Any = _UNKNOWN
+    sink: Path | None = None
     try:
         sink = resolve_backup_sink(Path(root), load_config(Path(root)), environ if environ is not None else os.environ)
         # A sink that does not exist holds nothing; one that exists but cannot be read completely is
@@ -598,12 +600,119 @@ def measure_whole_factory(
         sink_bytes = _walk_bytes(sink) if sink.exists() else 0
     except Exception:  # noqa: BLE001 - an unresolvable sink is UNKNOWN, never zero
         sink_bytes = _UNKNOWN
+    # Capture and reclaim work live outside RDP. Charge them while they exist,
+    # including failed-run artifacts, rather than assuming independent maxima.
+    additional: dict[str, Any] = {"other_store_bytes": 0, "maintenance_staging_bytes": 0}
+    try:
+        loaded = load_config(Path(root))
+        counted_roots = [Path(data_root).resolve()]
+        if sink is not None:
+            counted_roots.append(sink.resolve())
+        seen = {sqlite_path.resolve(), Path(str(sqlite_path) + "-wal").resolve()}
+
+        def charge(path: Path, key: str) -> None:
+            resolved = path.resolve()
+            if resolved in seen or any(resolved == item or item in resolved.parents for item in counted_roots):
+                return
+            seen.add(resolved)
+            try:
+                file_stat = path.stat()
+            except FileNotFoundError:
+                return
+            if path.is_symlink():
+                raise OSError("OWNED_STORAGE_SYMLINK")
+            size = file_stat.st_size
+            if path.is_dir():
+                # A cache ancestor can contain OPS, RDP, sink or sibling stores
+                # already measured in their own categories. Prune those exact
+                # roots rather than charging their bytes a second time.
+                def covered(candidate: Path) -> bool:
+                    return candidate in seen or any(candidate == item or item in candidate.parents for item in counted_roots)
+
+                def unavailable(error: OSError) -> None:
+                    raise error
+
+                size = 0
+                for current, dirs, files in os.walk(path, onerror=unavailable, followlinks=False):
+                    for name in list(dirs):
+                        child = Path(current) / name
+                        if covered(child.resolve()):
+                            dirs.remove(name)
+                        elif child.is_symlink() or not child.resolve().is_relative_to(resolved):
+                            raise OSError("OWNED_STORAGE_SYMLINK")
+                    for name in files:
+                        child = Path(current) / name
+                        if covered(child.resolve()):
+                            continue
+                        if child.is_symlink():
+                            raise OSError("OWNED_STORAGE_SYMLINK")
+                        size += child.stat().st_size
+            additional[key] += size
+            if path.is_dir():
+                counted_roots.append(resolved)
+
+        for name, relative in sorted((loaded.get("stores") or {}).items()):
+            if name.endswith("_relative") and str(relative).endswith(".sqlite"):
+                other = Path(root) / str(relative)
+                for suffix in ("", "-wal", "-shm"):
+                    charge(Path(str(other) + suffix), "other_store_bytes")
+        maintenance_roots = [Path(root) / "local/factory_v1/backup_snapshot_staging"]
+        # These are exclusively owned by the native I2 reclaim operation.
+        for suffix in ("-new.sqlite", "-rollback.sqlite", ".intent.json"):
+            maintenance_roots.append(sqlite_path.parent / ("." + sqlite_path.name + ".i2-reclaim" + suffix))
+        if hasattr(store, "_conn") and store._conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE name='retention_control'"
+        ).fetchone():
+            from solana_alpha_lab.factory.remote_ops import _safe_relative
+
+            factory_root = Path(root).resolve()
+
+            def cache_root(value: Any, *, relative: bool = False) -> None:
+                if not isinstance(value, str) or not value:
+                    raise ValueError("OWNED_CACHE_ROOT_INVALID")
+                path = Path(value)
+                if not relative:
+                    if not path.is_absolute():
+                        raise ValueError("OWNED_CACHE_ROOT_INVALID")
+                    # External isolated restores are permitted by their owner,
+                    # but this factory cannot safely census an arbitrary tree.
+                    value = path.relative_to(factory_root).as_posix()
+                path = _safe_relative(factory_root, value)
+                if path == factory_root or (path.exists() and not path.is_dir()):
+                    raise ValueError("OWNED_CACHE_ROOT_INVALID")
+                maintenance_roots.append(path)
+
+            controls = {key: json.loads(payload) for key, payload in store._conn.execute(
+                "SELECT control_key,payload_json FROM retention_control WHERE control_key IN "
+                "('policy','checkpoint_archive','checkpoint_archive_refresh_pending','checkpoint_archive_cache_release','active_plan')"
+            ).fetchall()}
+            if "policy" in controls:
+                policy = controls["policy"]["policy"]
+                refresh = policy.get("archive_refresh") or {}
+                if "cold_root_relative" in refresh:
+                    cache_root(refresh["cold_root_relative"], relative=True)
+            for key in ("checkpoint_archive", "checkpoint_archive_cache_release"):
+                if key in controls:
+                    cache_root(controls[key]["cache_root"])
+            if "checkpoint_archive_refresh_pending" in controls:
+                cache_root(controls["checkpoint_archive_refresh_pending"]["cold_root_relative"], relative=True)
+            if "active_plan" in controls:
+                for proof in controls["active_plan"].get("archive_registry", {}).values():
+                    if "cache_root" in proof or proof.get("proof_class") == "REMOTE_CHECKPOINT_RESTORE_VERIFIED":
+                        cache_root(proof["cache_root"])
+        # Policy and durable generations can overlap in either direction after
+        # a revision. Count ancestors first, then exact descendants only once.
+        for path in sorted(maintenance_roots, key=lambda item: len(item.resolve().parts)):
+            charge(path, "maintenance_staging_bytes")
+    except Exception:  # noqa: BLE001 - configuration/read failures keep footprint UNKNOWN
+        additional = {key: _UNKNOWN for key in additional}
     return {
         "sqlite_bytes": sqlite_bytes,
         "resident_rdp_bytes": resident if isinstance(resident, int) else _UNKNOWN,
         "backup_sink_bytes": sink_bytes,
         "staging_bytes": int(open_bytes) if isinstance(open_bytes, int) else _UNKNOWN,
         "ops_nested_in_rdp": nested,
+        **additional,
     }
 
 
@@ -628,10 +737,13 @@ def read_verified_backup(
             snapshot = offhost_health_snapshot(Path(root), now=now)
             if not snapshot.get("configured"):
                 return {"state": "UNCONFIGURED", "source": source}
-            checkpoint = snapshot.get("offhost_last_verified_at")
+            checkpoint = snapshot.get("offhost_snapshot_data_as_of") or snapshot.get("offhost_last_verified_at")
             artifact = snapshot.get("offhost_last_sha256")
             owner_state = str(snapshot.get("offhost_backup_state") or "")
             coverage = "OFFHOST_VERIFIED_CHECKPOINT"
+            owner_max_age = snapshot.get("offhost_current_max_age_seconds")
+            if isinstance(owner_max_age, int) and not isinstance(owner_max_age, bool):
+                max_age = min(max_age, owner_max_age)
         else:
             sink = resolve_backup_sink(Path(root), load_config(Path(root)), environ if environ is not None else os.environ)
             newest = _backup_newest(sink)
@@ -654,6 +766,7 @@ def read_verified_backup(
         state = "FRESH" if 0 <= age <= max_age else "STALE"
     return {
         "state": state, "source": source, "age_seconds": int(age), "max_age_seconds": max_age,
+        "profile_max_age_seconds": int(policy["backup_max_age_seconds"]),
         "artifact_sha256": artifact, "checkpoint_at": render_utc(parse_utc(str(checkpoint))), "coverage": coverage,
     }
 
@@ -724,14 +837,15 @@ def managed_storage_decision(
     target = int(policy["target_bytes"])
     required = int(reserve["required_free_bytes"])
     parts = [measured.get(key) for key in ("sqlite_bytes", "resident_rdp_bytes", "backup_sink_bytes", "staging_bytes")]
-    known = all(isinstance(item, int) for item in parts)
+    parts += [measured.get(key, 0) for key in ("other_store_bytes", "maintenance_staging_bytes")]
+    known = all(isinstance(item, int) and not isinstance(item, bool) and item >= 0 for item in parts)
     growth = policy.get("measured_growth_bytes_per_day")
     horizon_bytes = int(growth) * HORIZON_DAYS if growth else 0
     prospective_peak = (
         int(reserve["committed_drain_reserve_bytes"]) + int(reserve["prospective_reserve_bytes"])
         + int(reserve["future_nomination_reserve_bytes"])
     )
-    resident_total = sum(parts) - (parts[3] if known else 0) if known else None
+    resident_total = sum(parts) - parts[3] - parts[5] if known else None
     projected = (sum(parts) + horizon_bytes + prospective_peak) if known else None
     if not known:
         reasons.append("FOOTPRINT_UNKNOWN")

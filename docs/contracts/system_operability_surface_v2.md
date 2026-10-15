@@ -3,6 +3,15 @@
 Owner-facing `/system` composition over existing Factory machine sources.
 Does not own collector truth, backup/durability, incidents, deploy, or Visual OS.
 
+I2 direct-consumer projection retains that ownership. The collector packet
+exposes backup snapshot data-as-of, effective freshness revision/max-age,
+last-good and last-attempt separately, plus the existing native maintenance
+status. Whole-factory storage charges configured sibling SQLite/WAL/SHM,
+owned capture/reclaim/cold-cache staging and the backup sink without counting
+nested RDP bytes twice. Missing growth or unreadable storage stays UNKNOWN.
+These projections grant no retirement, physical reclaim or policy authority;
+resume is `docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md` and its staged OPERATE packet.
+
 Catalog document: `DOC-SYSTEM-OPERABILITY-SURFACE-001`
 Semantic route: `SEM-REMOTE-OPS-RECOVERY` (reused; no `SEM-SYSTEM`)
 Canonical binding remains `ACTIVE-FACTORY-REMOTE-OPERATIONS`

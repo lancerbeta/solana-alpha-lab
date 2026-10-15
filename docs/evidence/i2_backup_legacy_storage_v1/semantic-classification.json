@@ -1,0 +1,30 @@
+{
+  "authority_granted": false,
+  "matched_paths": [
+    "catalog/schemas/factory_remote_operations_v1_1.schema.json",
+    "docs/contracts/system_operability_surface_v2.md",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py",
+    "src/solana_alpha_lab/factory/managed_collection.py",
+    "src/solana_alpha_lab/factory/observation_schedule_retention.py",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py",
+    "src/solana_alpha_lab/factory/offhost_backup.py",
+    "src/solana_alpha_lab/factory/operability_watch.py",
+    "src/solana_alpha_lab/factory/remote_ops.py"
+  ],
+  "profile": "SEMANTIC_PREMISE",
+  "reason": "PATH_PREFIX",
+  "risk_dimensions": [
+    "SCIENTIFIC_ESTIMAND",
+    "FALSIFIER_OR_ENDPOINT",
+    "EVIDENCE_ADMISSIBILITY",
+    "PIT_OR_AVAILABILITY_SEMANTICS",
+    "RESEARCH_TRUTH_OWNERSHIP",
+    "HYPOTHESIS_OR_FAMILY_CLOSURE",
+    "PROMOTION_OR_SUPPRESSION_AUTHORITY",
+    "UNKNOWN_VS_NEGATIVE_EVIDENCE",
+    "EXECUTION_TRUTH_SEMANTICS",
+    "DURABLE_SCIENCE_SCHEMA",
+    "OWNER_AUTHORITY_SEMANTICS",
+    "HARNESS_PREMISE_OR_MERGE_AUTHORITY"
+  ]
+}

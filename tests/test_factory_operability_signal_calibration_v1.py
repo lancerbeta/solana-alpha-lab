@@ -100,6 +100,13 @@ def _write_history(
     sqlite_bytes: int,
     rdp_bytes: int,
 ) -> None:
+    # Numeric whole-factory runway needs a known topology. These isolated
+    # fixtures contain OPS/RDP only; configured optional stores/sink are absent.
+    for relative in ("configs/factory_remote_operations_v1.yaml",
+                     "catalog/schemas/factory_remote_operations.schema.json"):
+        target = root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((ROOT / relative).read_bytes())
     hist = root / STORAGE_HISTORY_RELATIVE
     hist.parent.mkdir(parents=True, exist_ok=True)
     hist.write_text(

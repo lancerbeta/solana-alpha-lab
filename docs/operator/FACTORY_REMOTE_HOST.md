@@ -145,3 +145,55 @@ SSH/scp/пакеты/systemd/nftables/fail2ban/doctor/backup/fault injection
 - печатать или коммитить секреты
 - абсолютные пути дома оператора в Git
 - называть это operational-ready / alpha / DONE
+
+## I2 backup / retirement / reclaim
+
+Точный resume — `docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md`; staged внедрение и
+destructive APPLY — `docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md`.
+Этот раздел не продлевает historical Atom 3 standing authority на I2.
+Без отдельного exact OPERATE запрещены deploy/upload, live retirement/reclaim,
+remote deletion, включение maintenance и изменение effective policy.
+
+Backup использует один immutable capture для inventory и ZIP, DEFLATE level 1
+и ZIP64. В mutable-only режиме capture также замыкает native authority/state
+events и open publication dependencies. Captured SQLite sidecars не пакуются.
+Reader принимает legacy STORED full вместе с новыми DEFLATE deltas; проверяет
+actual extracted inventory каждого шага, затем final inventory, затем ставит
+unresolved restore marker. Восстановленный collector требует reconciliation.
+Для actual legacy mutable-only full без authority/state ResearchEvents final
+control closure проверяется после новой delta, не раньше. Неполный standalone
+full или final missing event отказывается без marker; old bytes не переписываются.
+
+Offhost caller сохраняет immutable pending operation: после unknown upload
+следующий запуск продолжает те же bytes и checkpoint. Last-good и failed attempt
+показываются отдельно. CURRENT считается от snapshot data-as-of, а не от конца
+upload; baseline revision 1 остаётся 24h. Revision 2 требует совместных 30h
+CURRENT и RPO, но не редактирует APPLIED profile. Unknown/живой lock не снимать.
+Штатный caller сам повторяет busy до120min с шагом30s; weekly/daily overlap
+принимает один проверенный новый checkpoint без второго capture/upload.
+Исчерпание — exit2/COPY_FAILED/OFFHOST_BUSY_RETRY_EXHAUSTED с exact resume,
+last-good сохраняется. Actual unit/drop-in timeouts проверяются при OPERATE;
+retry не продлевает RPO и freshness. Два bounded scheduler incident receipts
+находятся рядом с существующим receipt.
+`BACKUP_SNAPSHOT_STAGING_RECOVERY_REQUIRED` означает сохранённый staging с
+неподтверждённым владельцем: inspect exact owner/bytes в отдельном recovery scope,
+не удалять каталог вслепую. Known-dead owned capture восстанавливает обычный caller.
+
+`factory_offhost_backup_copy.py --mode verify-remote-restore` скачивает exact
+checkpoint closure в новый явно выделенный isolated root. Remote pruning
+сначала связывает retained checkpoint graph и durable restore-proof artifacts
+в plan hash; отдельный apply повторяет raw reconstruction/SQLite oracle и
+remote identity. Удаление требует dedicated explicit permission. Для prune
+учитывать дополнительную временную raw copy внутри owned `.prune-verify`.
+
+Reclaim пишет durable ALLOCATING intent до new DB; ordinary native writable
+opens/ticks и уже открытые writers отказывают при unfinished recovery до записи
+или bootstrap исчезнувшего main. Exact `reclaim-resume`/`reclaim-rollback`
+выполняются по staged OPERATE. После durable resume decision rollback запрещён;
+повтор resume заканчивает owned cleanup и оставляет небольшой FINALIZED receipt,
+удаляя точные rollback/staging bytes. Не удалять intent/staging вручную.
+Первый fsynced intent.tmp штатно принимает exact rollback. Для torn first JSON
+передать сохранённый approved `--plan` с теми же roots/hash; отсутствие plan даёт
+`RECLAIM_INITIAL_PLAN_REQUIRED`. Проверяются original inode/native fingerprint,
+отсутствие stages и точный plan self-hash. Backup отказывает при unfinished
+reclaim; проверенная terminal inode-bound квитанция в portable payload не входит.

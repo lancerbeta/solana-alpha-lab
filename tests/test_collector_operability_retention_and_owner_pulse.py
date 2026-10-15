@@ -37,6 +37,7 @@ from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
 )
 from solana_alpha_lab.factory.observation_schedule_retention import (  # noqa: E402
     COMPACTION_MARKER,
+    ObservationScheduleRetentionError,
     apply_retention,
 )
 from solana_alpha_lab.factory.observation_schedule_store import (  # noqa: E402
@@ -304,21 +305,22 @@ class CollectorOperabilityRetentionPulseTests(unittest.TestCase):
                 store, now=NOW, raw_retention_days=31, dry_run=True
             )
             self.assertEqual(status["mode"], "dry-run")
-            self.assertGreaterEqual(status["eligible_call_compactions"], 1)
-            self.assertIn("OCC-OLD", status["eligible_call_ids"])
+            # Age is insufficient: this call belongs to an active scientific
+            # scope, with no explicit archive-backed retirement/no-resume proof.
+            self.assertEqual(status["eligible_call_compactions"], 0)
+            self.assertNotIn("OCC-OLD", status["eligible_call_ids"])
             self.assertNotIn("OCC-RECENT", status["eligible_call_ids"])
             self.assertNotIn("OCC-FLY", status["eligible_call_ids"])
 
-            applied = apply_retention(
-                store, now=NOW, raw_retention_days=31, dry_run=False
-            )
-            self.assertEqual(applied["mode"], "apply")
-            self.assertGreaterEqual(applied["applied_call_compactions"], 1)
+            with self.assertRaisesRegex(
+                ObservationScheduleRetentionError, "EXACT_ARCHIVE_BOUND_PLAN_REQUIRED"
+            ):
+                apply_retention(store, now=NOW, raw_retention_days=31, dry_run=False)
 
             old_payload = store.call_payload("OCC-OLD")
             assert old_payload is not None
-            self.assertEqual(old_payload.get("raw_payload_retention"), COMPACTION_MARKER)
-            self.assertNotIn("rows", old_payload)
+            self.assertNotEqual(old_payload.get("raw_payload_retention"), COMPACTION_MARKER)
+            self.assertIn("rows", old_payload)
             self.assertEqual(old_payload.get("response_sha256"), "e" * 64)
             self.assertEqual(store.call_state("OCC-OLD"), "COMPLETED")
             # Compaction must not rewrite updated_at into the 24h window.
@@ -350,9 +352,9 @@ class CollectorOperabilityRetentionPulseTests(unittest.TestCase):
             self.assertEqual(_sha_tree(rdp), rdp_before)
             self.assertEqual(_sha_file(release_manifest), release_before)
 
-            # Idempotent second apply.
+            # A repeated preview cannot alter protected science or clocks.
             again = apply_retention(
-                store, now=NOW, raw_retention_days=31, dry_run=False
+                store, now=NOW, raw_retention_days=31, dry_run=True
             )
             self.assertEqual(again["applied_call_compactions"], 0)
 

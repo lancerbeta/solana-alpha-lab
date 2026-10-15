@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import sqlite3
 import subprocess
 import sys
@@ -28,6 +29,7 @@ from solana_alpha_lab.factory.remote_ops import (
     emit_health_alert,
     format_alert,
     load_config,
+    logical_inventory_sha256,
     package_backup,
     package_delta_backup,
     project_health,
@@ -522,12 +524,17 @@ class FactoryRemoteOperationsTests(unittest.TestCase):
                 root,
                 base_manifest={
                     "entries": base_entries,
-                    "inventory_sha256": "0" * 64,
+                    "inventory_sha256": logical_inventory_sha256(base_entries),
                 },
                 current_entries=scanned["entries"],
                 sink=sink,
                 snapshot=snapshot,
             )
+            restored = Path(root.parent) / "delta-restore"
+            for item in base_entries:
+                target = restored / item["path"]
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(snapshot.staged_path(item["path"]), target)
         self.assertEqual(packed["terminal"], "DELTA_PACKAGED")
         with zipfile.ZipFile(sink / packed["bundle"]) as archive:
             self.assertEqual(archive.read(relative), payload)
@@ -535,7 +542,6 @@ class FactoryRemoteOperationsTests(unittest.TestCase):
         changed = next(item for item in manifest["changed"] if item["path"] == relative)
         self.assertEqual(changed["sha256"], hashlib.sha256(payload).hexdigest())
         self.assertEqual(manifest["result_inventory_sha256"], scanned["inventory_sha256"])
-        restored = Path(root.parent) / "delta-restore"
         apply_delta_bundle(sink / packed["bundle"], restored)
         self.assertEqual((restored / relative).read_bytes(), payload)
 

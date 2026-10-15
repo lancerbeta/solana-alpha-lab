@@ -264,6 +264,13 @@ class SemanticsPreservedTests(unittest.TestCase):
             rdp = root / "observation_rdp"
             expected = _seed_rdp(rdp)
             store = ObservationScheduleStore(root / "ops.sqlite")
+            # State the topology instead of treating unavailable configuration
+            # as zero bytes. Optional configured stores/sink do not exist here.
+            for relative in ("configs/factory_remote_operations_v1.yaml",
+                             "catalog/schemas/factory_remote_operations.schema.json"):
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes((ROOT / relative).read_bytes())
             hist = root / STORAGE_HISTORY_RELATIVE
             hist.parent.mkdir(parents=True, exist_ok=True)
             sqlite_now = int(Path(store.path).stat().st_size)

@@ -685,3 +685,53 @@ does not authorize reprepare: confirmed lookup reconciliation uses the existing
 separate OPERATE commissioning prerequisites/fences; missing evidence or an
 unresolved cause requires a repair gate. Do not bypass the proof gate or copy a
 prepared lookup to production.
+
+## I2 bounded maintenance
+
+Native owner — `observation_schedule_retention.py`, CLI —
+`scripts/observation_schedule_retention.py`. Exact task/readout/rollout находятся
+в `docs/evidence/i2_backup_legacy_storage_v1/`. Без commissioned policy maintenance
+выключена. Одобренный hash фиксирует scopes или managed lineages, terminal
+predicate, реальные frozen minimum ages, source/cold closure, rows/bytes/wall,
+cadence и pressure/due guards. Future managed children не требуют новых IDs.
+
+Обычный existing daily/weekly offhost caller после verified checkpoint запускает
+maintenance, вновь беря backup-plane lock перед OPS fence. Independent remote
+restore и source-verified HOT90 raw day archives дают exact cold proof. Один
+completed cache и один pending admission ограничивают local overlap; remote
+scientific pins сохраняются до отдельного source/I4 disposition. Нет нового
+timer, daily agent или ежедневного `record-backup`. Daily physical reclaim
+не включается: это отдельная quiesced операция из staged OPERATE packet.
+
+`status`/`plan` открывают existing SQLite read-only и учитывают WAL. `apply`
+проверяет approved plan/candidate/dependencies и сохраняет cursor с каждым chunk.
+Active/tail/UNKNOWN, незакрытые publication/export/raw dependencies защищены.
+Возраст сам по себе не даёт retirement. Oversized body остаётся protected с
+durable refusal; bounded cursor продолжает другие записи, health не рисует READY.
+FAILED создаёт incident через existing watch; disabled policy молчит, yields
+по cadence/pressure/due не являются failure. Backup success не скрывает failure
+maintenance или последней попытки upload.
+
+При approved policy revision существующий active plan проходит bounded identity/
+candidate/cold/effect checks и помечается SUPERSEDED_POLICY; только неприменённый
+остаток отменяется. Выполненные effects, ROWIDs, clocks, provenance и cold pins
+сохраняются; новая policy получает свежую bounded selection. Disable/enable и
+stale intent предыдущего бинарника продолжаются через обычный caller. Настоящий
+candidate/integrity conflict остаётся FAILED/refusal и не вызывает автоматический
+replan. Ни SQL-редактирование, ни ежедневный owner action для обычной смены
+approved policy не требуются.
+
+Pending cold refresh также reconciles approved revision: exact checkpoint и pins
+сохраняются, допустимый target получает новую policy binding и проходит обычный
+restore/register. Disable приостанавливает target; после enable действует новая
+selection/scope. Несовместимый cold root/refresh budget виден как BLOCKED_POLICY/
+FAILED и требует точной допустимой revision; false COMPLETE и новая cache
+generation не создаются. Повреждённые identity/source/pins остаются отказом.
+
+Backup contention автоматически повторяется существующим caller ≤120min/30s;
+weekly/daily overlap объединяется по verified bytes и durable pointer. Exhausted
+wait даёт COPY_FAILED/OFFHOST_BUSY_RETRY_EXHAUSTED в bounded scheduler receipt,
+точный pending/resume и existing watch incident; last-good остаётся прежним.
+Успех active backup owner снимает incident. Timers/RPO24h не меняются.
+При одинаковой секунде timestamps terminal failure имеет приоритет над
+IN_PROGRESS; success снимает такой incident только для того же checkpoint.
