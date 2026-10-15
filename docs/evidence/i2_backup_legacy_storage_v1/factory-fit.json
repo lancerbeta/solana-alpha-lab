@@ -4,8 +4,8 @@
   "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-RECOVERY-CLOSURE-FIT",
   "as_of": "2026-10-16",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "412c4eb2684386886c8a30f8f8caef3977fa41a65e61fd5f52dd711b643c2f74",
-  "reviewed_inventory_sha256": "2f1e779e486266a573094f424da041abd18633d33e219e18f3f12555cc822319",
+  "reviewed_bindings_sha256": "db1bb3d364520fa1b1e6bf56449aaca3a8524770aca5701a769519c6dc7f9663",
+  "reviewed_inventory_sha256": "bc3aecdad8a5f32ddd9059e4b49f8c4069b829e6749bc3d2c2ac0d9053a588bf",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

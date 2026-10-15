@@ -15,16 +15,16 @@
   },
   "capability_radar_now": "NONE: existing owners, Git/gh, locked Python/SQLite/zipfile suffice; no new dependency/service/connector/timer.",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "d4519d16ed4c81a93f844110930d4b495a6c956c07753e18f7aab24e87c1ecde",
-    "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md": "83ca808924babc9a8a473d9d3b153337901d48eb2190030aa1989346482c0835",
-    "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md": "6271be173cb77ba80e02a332cee4d6149817583e0606636c6e7a7eeeab23db02",
-    "docs/evidence/i2_backup_legacy_storage_v1/capture-repair-proof.json": "be9e3e2b8690d40dee2d2de53beb7252c32ffbaf19e372adc1ce1a4ec223f480",
-    "docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md": "7bfcc9a06cb241793456d9f4cd6625dd3af3de6e4211ee1544584e22eb8f4907",
-    "src/solana_alpha_lab/factory/offhost_backup.py": "3769b77f4e18e7923eaca3eb2d7643f60984a83676cb47ab74765c5ac29871fa",
-    "src/solana_alpha_lab/factory/remote_ops.py": "d4bc29f89992ebd53cbc91c3c27f106fc3f138a255be0fe4ea6b47b2953d1fd5",
-    "tests/i2_capture_rehearsal.py": "0955f11b1fe4e3d4f3b73d6c8e7619fb5e9f39d741ae4a71f658c64090fed2b5",
-    "tests/test_i2_backup_legacy_storage_v1.py": "c12afaf8a670730938932d409b1587f6db9e0ff388eb1bf52901ac36ac454466",
-    "tests/test_i2_offhost_checkpoint_v1.py": "bcc09560fc088fe701acf668cdf8645455da6297d129af8f795e3e42af4ce06b"
+    "catalog/assets/core.yaml": "db4dfc05d0427eb1b7d3e1ee968fe0d20670b4492e15daf2cdae32522dbb28e5",
+    "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md": "38c91789fe0c26a86c8f808bb0d6ffbfbe477f3171100f98dec6ac179267529c",
+    "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md": "972e98571aa861bc104b9dd2f41fc28b4cd1f00504867e64c7a7db9d3c337476",
+    "docs/evidence/i2_backup_legacy_storage_v1/recovery-closure-proof.json": "e7a29a839ae70dfd8bd2d32253b678e8b7a21fbf7c1457261dbee55f1751101f",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-claims.json": "852b9f2640a1658ab7ebfb44b513efebea7d693b211365f8205c7ed9e9caa31c",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-classification.json": "3994f6fda65dee6952a8009b258ce6d6ff98544aad52a03501a6db9876b38f83",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-evidence.json": "632d38fbe4e38edade1e494641b3ddf109db86167a74b3853be959d126deba3e",
+    "docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md": "1c480ef660d138394623b56696e69eae7c164d8007ad2edf8cd2013cb68859d0",
+    "src/solana_alpha_lab/factory/remote_ops.py": "393a237ce274d57b02fe5a295ad248494deaaf070027cd908992854c18e912ff",
+    "tests/test_i2_backup_legacy_storage_v1.py": "51750d481534649008c76e1b62b0ad0f2333e076d6c5aadd8ddd2fe9dd0978c6"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -36,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/i2_backup_legacy_storage_v1/factory-fit.json",
-    "sha256": "7e18be386deef3f158171d0a1a85015aff7c16c9f04065e39b6c691beb834d34",
+    "sha256": "b498f13426768ca874422fd5e7dcc3e7c11b053b41abce8c9b5f2891e6ebaeb4",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_Ran 45 tests in 733.338s_NATIVE_NAMESPACE_16670_TO_100000_SAME_SELECTED_CLOSURE_INDEPENDENT_RESTORE_TYPED_REFUSALS_INTERRUPTED_RETRY; PLUS4_FINAL_POINTER_NAMESPACE_CONSUMER_SEAMS; separate measured/final source hashes in recovery-closure-proof.json",
     "independent_review": {
       "path": "docs/evidence/i2_backup_legacy_storage_v1/independent-review.json",
-      "sha256": "90b629facbe6f9a9ae5f2f466b4d83893b35213a68723bf071035153a92d07ea",
+      "sha256": "9e16c1625be6978cac88b28c12d340fe1ca23af112750816e60633bbfb71f36f",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
