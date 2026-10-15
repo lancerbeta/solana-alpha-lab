@@ -63,6 +63,12 @@ class LaneDecision:
     episode_outcome_binding: dict[str, Any] | None = None
 
 
+@dataclass(frozen=True, slots=True)
+class ConfirmationLaneDecision(LaneDecision):
+    """Spec 1.5 readout extension; legacy decision serialization is unchanged."""
+    confirmation_checkpoint: dict[str, Any] | None = None
+
+
 def _decision(
     lane: Lane,
     terminal: str,
@@ -347,6 +353,52 @@ def classify_lane(
 ) -> LaneDecision:
     """Return one deterministic lane decision without executing a capability."""
 
+    candidate = submission.get("experiment_spec")
+    if isinstance(candidate, Mapping) and candidate.get("schema_version") == "1.5":
+        from solana_alpha_lab.factory.experiment_spec import validate_experiment_document
+        from solana_alpha_lab.factory.list_a_confirmation import (
+            bound_confirmation_checkpoint, current_context, committed, read_confirmation, run_identity,
+        )
+        from solana_alpha_lab.factory.list_a_confirmation_inputs import ConfirmationError
+        checkpoint = {"scientific_charge": None, "trial_id": None, "run_id": None,
+                      "run_key_sha256": None, "execution_binding_sha256": None, "domain": None}
+        try:
+            store = ResearchStore(data_root, create_if_missing=False)
+            binding_id = str(submission.get("execution_binding_id") or "")
+            checkpoint = bound_confirmation_checkpoint(store, binding_id)
+            validate_experiment_document(candidate, root=root)
+            descriptor = _load_capabilities(root, registry_relative=CAPABILITY_REGISTRY_V2_RELATIVE).get(candidate["capability_id"])
+            if not descriptor or descriptor["status"] != "ACCEPTED":
+                return ConfirmationLaneDecision(Lane.CHANGE_LANE, "CHANGE_LANE_CAPABILITY_GAP",
+                    reason_codes=("CAPABILITY_NOT_ACCEPTED",), run_key_sha256=checkpoint["run_key_sha256"],
+                    prior_run_id=checkpoint["run_id"], next_action="READ_SAVED_CHECKPOINT_AND_REVIEW_CAPABILITY",
+                    confirmation_checkpoint=checkpoint)
+            context = current_context(dict(candidate), binding_id, root=root, store=store, now=as_of)
+            reservation = committed(store, context["reservation_id"])
+            identity = reservation["payload"] if reservation else run_identity(context, root)
+            terminal = "FAST_LANE_READY"
+            if reservation:
+                saved = read_confirmation(store, trial_id=context["trial_id"], root=root)
+                terminal = "REPLAY_AVAILABLE" if saved["status"] == "COMPLETED" else "RESUME_REQUIRED"
+                if saved["status"] == "INVALID_AFTER_RESERVE":
+                    raise ConfirmationError("TRIAL_INVALID_NO_RESUME")
+            return ConfirmationLaneDecision(Lane.FAST_LANE, terminal, reason_codes=(), run_key_sha256=identity["run_key_sha256"],
+                prior_run_id=identity["run_id"] if reservation else None,
+                next_action="READ_SAVED_RESULT" if terminal == "REPLAY_AVAILABLE" else "SUBMIT_EXACT_BINDING",
+                confirmation_checkpoint=checkpoint)
+        except (ConfirmationError, ResearchStoreError, ValueError, OSError, KeyError) as exc:
+            charge = checkpoint["scientific_charge"]
+            immature = getattr(exc, "code", None) == "TARGET_NOT_MATURE_AT_CUTOFF" and charge == 0
+            return ConfirmationLaneDecision(Lane.DENY,
+                "BLOCKED_AFTER_RESERVE" if charge == 1 else "BOUND_CONTRACT_NOT_READY" if immature else
+                    "BLOCKED_BEFORE_RESERVE" if charge == 0 else "BLOCKED_RESERVATION_UNKNOWN",
+                reason_codes=(getattr(exc, "code", "CONFIRMATION_BINDING_INVALID"),),
+                run_key_sha256=checkpoint["run_key_sha256"], prior_run_id=checkpoint["run_id"],
+                next_action="VERIFY_SAVED_CHECKPOINT_KEEP_CONSUMED_ALLOWANCE" if charge == 1 else
+                    "STOP_THIS_SOURCE_KEEP_LABELS_HISTORY_REQUIRE_SEPARATE_SOURCE_AUTHORITY"
+                    if getattr(exc, "code", None) == "CONFIRMATORY_REUSE_FORBIDDEN" else
+                    "WAIT_FOR_MATURITY_THEN_SEPARATELY_REBIND_EXACT_SAMPLE" if immature else "CORRECT_EXACT_CONFIRMATION_BINDING",
+                confirmation_checkpoint=checkpoint)
     spec = _validate_spec(submission, root=root, as_of=as_of)
     if spec is None:
         return _decision(

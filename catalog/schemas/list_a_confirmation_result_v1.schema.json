@@ -1,0 +1,1220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "List A authoritative result V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "identity",
+    "population",
+    "method",
+    "binding",
+    "lineage",
+    "limits"
+  ],
+  "properties": {
+    "schema": {
+      "const": "smial.list-a-confirmation-result"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "experiment_id",
+        "hypothesis_version_id",
+        "experiment_spec_sha256",
+        "protocol_core_sha256",
+        "execution_binding_sha256",
+        "source_set_sha256",
+        "source_id",
+        "trial_id",
+        "run_id",
+        "run_key_sha256",
+        "domain"
+      ],
+      "properties": {
+        "experiment_id": {
+          "const": "EXP-LIST-A-CHRONOLOGICAL-CONFIRMATION-V1"
+        },
+        "hypothesis_version_id": {
+          "const": "HYP-LIST-A-CONDITIONAL-EPISODE-CONTRAST-V1"
+        },
+        "experiment_spec_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "protocol_core_sha256": {
+          "const": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252"
+        },
+        "execution_binding_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "source_set_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "source_id": {
+          "type": "string"
+        },
+        "trial_id": {
+          "type": "string",
+          "pattern": "^LA-TRIAL-[0-9A-F]{64}$"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "run_key_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "domain": {
+          "enum": [
+            "SYNTHETIC",
+            "REAL"
+          ]
+        }
+      }
+    },
+    "population": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "admitted",
+        "scope_known",
+        "decision_denominators",
+        "decision_mask_sha256",
+        "observed",
+        "typed_missing_counts",
+        "repeated_mints",
+        "membership",
+        "observed_mask_sha256"
+      ],
+      "properties": {
+        "admitted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scope_known": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "decision_denominators": {
+          "$ref": "#/$defs/groups"
+        },
+        "decision_mask_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "observed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "typed_missing_counts": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[AC]:(MISSING_TYPED|CENSORED|CENSORED_LATE|DISAPPEARED|ABSENT)$"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "repeated_mints": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "membership": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "episode_id",
+              "mint",
+              "group",
+              "decision_eligible",
+              "decision_nominal_due",
+              "blocks"
+            ],
+            "properties": {
+              "episode_id": {
+                "type": "string"
+              },
+              "mint": {
+                "type": "string"
+              },
+              "group": {
+                "enum": [
+                  "A",
+                  "C"
+                ]
+              },
+              "decision_eligible": {
+                "type": "boolean"
+              },
+              "decision_nominal_due": {
+                "type": "string"
+              },
+              "blocks": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "86400",
+                  "172800"
+                ],
+                "properties": {
+                  "86400": {
+                    "type": "integer"
+                  },
+                  "172800": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "observed_mask_sha256": {
+          "$ref": "#/$defs/hash"
+        }
+      }
+    },
+    "method": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_core_sha256",
+        "replicates_per_partition",
+        "support",
+        "coverage",
+        "pooled_mints",
+        "pooled_blocks",
+        "means",
+        "contrast",
+        "partitions",
+        "leave_one",
+        "reason_codes",
+        "terminal",
+        "numeric_order",
+        "quantile_indices",
+        "observed_mask_sha256"
+      ],
+      "properties": {
+        "protocol_core_sha256": {
+          "const": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252"
+        },
+        "replicates_per_partition": {
+          "const": 4096
+        },
+        "support": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "A",
+            "C"
+          ],
+          "properties": {
+            "A": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "observed",
+                "decision_denominator",
+                "mints",
+                "blocks"
+              ],
+              "properties": {
+                "observed": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "decision_denominator": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "mints": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "blocks": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "86400",
+                    "172800"
+                  ],
+                  "properties": {
+                    "86400": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "172800": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            },
+            "C": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "observed",
+                "decision_denominator",
+                "mints",
+                "blocks"
+              ],
+              "properties": {
+                "observed": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "decision_denominator": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "mints": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "blocks": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "86400",
+                    "172800"
+                  ],
+                  "properties": {
+                    "86400": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "172800": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "A",
+            "C"
+          ],
+          "properties": {
+            "A": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "C": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "pooled_mints": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pooled_blocks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "86400",
+            "172800"
+          ],
+          "properties": {
+            "86400": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "172800": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "means": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "A",
+                "C"
+              ],
+              "properties": {
+                "A": {
+                  "type": "number"
+                },
+                "C": {
+                  "type": "number"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "contrast": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "partitions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "86400": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "seed",
+                "valid_replicates",
+                "invalid_replicates",
+                "replicate_digest_sha256",
+                "interval"
+              ],
+              "properties": {
+                "seed": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "valid_replicates": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "invalid_replicates": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "replicate_digest_sha256": {
+                  "$ref": "#/$defs/hash"
+                },
+                "interval": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number"
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            "172800": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "seed",
+                "valid_replicates",
+                "invalid_replicates",
+                "replicate_digest_sha256",
+                "interval"
+              ],
+              "properties": {
+                "seed": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "valid_replicates": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "invalid_replicates": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "replicate_digest_sha256": {
+                  "$ref": "#/$defs/hash"
+                },
+                "interval": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number"
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "leave_one": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "count",
+                "valid_count",
+                "min",
+                "max",
+                "digest_sha256",
+                "min_labels",
+                "max_labels"
+              ],
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "valid_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "min": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "max": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "digest_sha256": {
+                  "$ref": "#/$defs/hash"
+                },
+                "min_labels": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "axis",
+                          "label",
+                          "contrast"
+                        ],
+                        "properties": {
+                          "axis": {
+                            "const": "MINT"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "contrast": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "axis",
+                          "partition",
+                          "label",
+                          "contrast"
+                        ],
+                        "properties": {
+                          "axis": {
+                            "const": "BLOCK"
+                          },
+                          "partition": {
+                            "enum": [
+                              86400,
+                              172800
+                            ]
+                          },
+                          "label": {
+                            "type": "integer"
+                          },
+                          "contrast": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "max_labels": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "axis",
+                          "label",
+                          "contrast"
+                        ],
+                        "properties": {
+                          "axis": {
+                            "const": "MINT"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "contrast": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "axis",
+                          "partition",
+                          "label",
+                          "contrast"
+                        ],
+                        "properties": {
+                          "axis": {
+                            "const": "BLOCK"
+                          },
+                          "partition": {
+                            "enum": [
+                              86400,
+                              172800
+                            ]
+                          },
+                          "label": {
+                            "type": "integer"
+                          },
+                          "contrast": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "terminal": {
+          "enum": [
+            "INSUFFICIENT",
+            "ASSOCIATION_SUPPORTED_CONDITIONAL",
+            "ASSOCIATION_NOT_SUPPORTED_AT_FROZEN_BOUNDARY",
+            "INCONCLUSIVE_DEPENDENCE_OR_CONCENTRATION"
+          ]
+        },
+        "numeric_order": {
+          "const": "CANONICAL_EPISODE_ID_MATH_FSUM"
+        },
+        "quantile_indices": {
+          "const": [
+            102,
+            3993
+          ]
+        },
+        "observed_mask_sha256": {
+          "$ref": "#/$defs/hash"
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "experiment_id",
+        "hypothesis_version_id",
+        "sample_ref",
+        "source_id",
+        "namespace",
+        "role",
+        "interval_start",
+        "interval_end_exclusive",
+        "data_cutoff",
+        "source_authority_id",
+        "lineage_id",
+        "experiment_spec_sha256",
+        "protocol_core_sha256",
+        "sample_sha256",
+        "source_set_sha256",
+        "scope_applied_sha256",
+        "census_semantic_sha256",
+        "exposure_sha256",
+        "frozen_protection_sha256",
+        "current_protection_sha256",
+        "study_budget_sha256",
+        "acquisition_identity_sha256",
+        "type",
+        "domain",
+        "query",
+        "source_hashes",
+        "potential_support",
+        "chronology",
+        "max_scientific_attempts",
+        "adaptive_allowance",
+        "acquisition_keys",
+        "qualification"
+      ],
+      "properties": {
+        "experiment_id": {
+          "type": "string"
+        },
+        "hypothesis_version_id": {
+          "type": "string"
+        },
+        "sample_ref": {
+          "type": "string"
+        },
+        "source_id": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "role": {
+          "const": "UNTOUCHED_FORWARD_HOLDOUT"
+        },
+        "interval_start": {
+          "type": "string"
+        },
+        "interval_end_exclusive": {
+          "type": "string"
+        },
+        "data_cutoff": {
+          "type": "string"
+        },
+        "source_authority_id": {
+          "type": "string"
+        },
+        "lineage_id": {
+          "type": "string"
+        },
+        "experiment_spec_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "protocol_core_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "sample_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "source_set_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "scope_applied_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "census_semantic_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "exposure_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "frozen_protection_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "current_protection_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "study_budget_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "acquisition_identity_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "type": {
+          "const": "EXECUTION_BINDING"
+        },
+        "domain": {
+          "enum": [
+            "SYNTHETIC",
+            "REAL"
+          ]
+        },
+        "query": {
+          "const": {
+            "adaptation_of": null,
+            "budget_allocation": "COMPOUND_FIRST",
+            "query_id": "QUERY-LIST-A-CONFIRMATION-V1",
+            "schema": "smial.hfic-temporal-query",
+            "schema_version": "1.2",
+            "scientific_body": {
+              "anchor_kind": "NOMINATION_T0",
+              "contrast": "MATCHED_VS_ELIGIBLE_COMPLEMENT",
+              "cost_profile": null,
+              "decision_point": "E1800",
+              "diagnostic_slices": [],
+              "entry_model": {
+                "assumed_latency_seconds": 0,
+                "kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT"
+              },
+              "evaluation": {
+                "ablations": "DROP_ONE_CONDITION",
+                "baseline": "SAME_DECISION_ELIGIBLE",
+                "calendar_block": "UTC_DAY_OF_DECISION"
+              },
+              "features": [],
+              "hypothesis_kind": "LIST_CONTRAST",
+              "list_condition": {
+                "clauses": [
+                  {
+                    "all_of": [
+                      "JUPITER:toporganicscore:5m"
+                    ],
+                    "any_of": [],
+                    "count": null,
+                    "none_of": []
+                  }
+                ],
+                "definition_refs": {
+                  "JUPITER:toporganicscore:5m": "8a35ad6835c5cd2a6c7fe772002f3c2a4d616d53479297130f88f25e978b48c0"
+                },
+                "required_observed_lists": [
+                  "JUPITER:toporganicscore:5m"
+                ],
+                "schema": "smial.list-selector",
+                "schema_version": "1.0"
+              },
+              "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1",
+              "population": "OPPORTUNITY_EPISODES",
+              "predicates": [],
+              "research_scope": {
+                "anchor_kind": "NOMINATION_T0",
+                "coverage_policy": "REQUIRE_KNOWN_REFERENCED",
+                "definition_refs": {},
+                "evidence_selection": {
+                  "kind": "EXPLICIT_VERIFIED_RELEASE_SET"
+                },
+                "membership_time_basis": "EPISODE_T0",
+                "population": "OPPORTUNITY_EPISODES",
+                "schema": "smial.research-scope",
+                "schema_version": "2.0",
+                "universe_selector": {
+                  "clauses": [
+                    {
+                      "all_of": [],
+                      "any_of": [],
+                      "count": null,
+                      "none_of": []
+                    }
+                  ],
+                  "required_observed_lists": [],
+                  "schema": "smial.list-selector",
+                  "schema_version": "1.0"
+                }
+              },
+              "target": {
+                "exit_point": "E14400",
+                "field_id": "FIELD-USD-PRICE-001",
+                "kind": "PRICE_RELATIVE_PROXY",
+                "reference_point": "E1800"
+              },
+              "time_contract": {
+                "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+                "time_feature_clock": "FIRST_RELIABLE_AVAILABLE_AT"
+              }
+            },
+            "search_tier": "COMPOUND_SCREEN",
+            "spec_sha256": "c34ecb1f6d432d320d589427cb7054fe2cc5370c6c0d4c6860ba3e569d683d8e"
+          }
+        },
+        "source_hashes": {
+          "type": "object",
+          "minProperties": 6,
+          "additionalProperties": {
+            "$ref": "#/$defs/hash"
+          }
+        },
+        "potential_support": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "A",
+            "C"
+          ],
+          "properties": {
+            "A": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "mints",
+                "blocks"
+              ],
+              "properties": {
+                "mints": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "blocks": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "86400",
+                    "172800"
+                  ],
+                  "properties": {
+                    "86400": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "172800": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            },
+            "C": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "mints",
+                "blocks"
+              ],
+              "properties": {
+                "mints": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "blocks": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "86400",
+                    "172800"
+                  ],
+                  "properties": {
+                    "86400": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "172800": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "chronology": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "information_start",
+            "exposure_boundary",
+            "purged_episode_ids",
+            "rule"
+          ],
+          "properties": {
+            "information_start": {
+              "type": "string"
+            },
+            "exposure_boundary": {
+              "type": "string"
+            },
+            "purged_episode_ids": {
+              "const": []
+            },
+            "rule": {
+              "const": "INFORMATION_START_STRICT_AFTER_BOUNDARY"
+            }
+          }
+        },
+        "max_scientific_attempts": {
+          "const": 1
+        },
+        "adaptive_allowance": {
+          "const": 0
+        },
+        "acquisition_keys": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/hash"
+          }
+        },
+        "qualification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "runtime",
+            "closure"
+          ],
+          "properties": {
+            "runtime": {
+              "const": {
+                "implementation": "CPython",
+                "version": "3.13.14",
+                "mant_dig": 53,
+                "serialization": "FINITE_JSON_SHORTEST_ROUNDTRIP",
+                "core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+                "replicates": 4096,
+                "seeds": {
+                  "86400": 2055296707731192101,
+                  "172800": 3449030900544075880
+                }
+              }
+            },
+            "closure": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "src/solana_alpha_lab/factory/list_a_confirmation.py",
+                "src/solana_alpha_lab/factory/list_a_confirmation_inputs.py",
+                "src/solana_alpha_lab/factory/list_a_confirmation_method.py",
+                "src/solana_alpha_lab/factory/opportunity_episodes.py",
+                "src/solana_alpha_lab/factory/hfic_research_scope.py",
+                "src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
+                "src/solana_alpha_lab/factory/research_store.py",
+                "src/solana_alpha_lab/factory/run_passport.py",
+                "src/solana_alpha_lab/factory/experiment_spec.py",
+                "src/solana_alpha_lab/factory/lane_classifier.py",
+                "src/solana_alpha_lab/factory/capabilities.py",
+                "src/solana_alpha_lab/factory/document_runner.py",
+                "src/solana_alpha_lab/factory/data_resolver.py",
+                "src/solana_alpha_lab/factory/experiment_evidence.py",
+                "src/solana_alpha_lab/factory/research_workbench.py",
+                "catalog/schemas/experiment_spec_v1_5.schema.json",
+                "catalog/schemas/list_a_confirmation_input_v1.schema.json",
+                "catalog/schemas/list_a_confirmation_result_v1.schema.json",
+                "configs/experiment_specs/list_a_chronological_confirmation_v1.yaml",
+                "configs/list_a_chronological_confirmation_v1.yaml",
+                "configs/experiment_capability_registry_v2.yaml",
+                "uv.lock"
+              ],
+              "properties": {
+                "src/solana_alpha_lab/factory/list_a_confirmation.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/list_a_confirmation_inputs.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/list_a_confirmation_method.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/opportunity_episodes.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/hfic_research_scope.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/research_store.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/run_passport.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/experiment_spec.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/lane_classifier.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/capabilities.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/document_runner.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/data_resolver.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/experiment_evidence.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "src/solana_alpha_lab/factory/research_workbench.py": {
+                  "$ref": "#/$defs/hash"
+                },
+                "catalog/schemas/experiment_spec_v1_5.schema.json": {
+                  "$ref": "#/$defs/hash"
+                },
+                "catalog/schemas/list_a_confirmation_input_v1.schema.json": {
+                  "$ref": "#/$defs/hash"
+                },
+                "catalog/schemas/list_a_confirmation_result_v1.schema.json": {
+                  "$ref": "#/$defs/hash"
+                },
+                "configs/experiment_specs/list_a_chronological_confirmation_v1.yaml": {
+                  "$ref": "#/$defs/hash"
+                },
+                "configs/list_a_chronological_confirmation_v1.yaml": {
+                  "$ref": "#/$defs/hash"
+                },
+                "configs/experiment_capability_registry_v2.yaml": {
+                  "$ref": "#/$defs/hash"
+                },
+                "uv.lock": {
+                  "$ref": "#/$defs/hash"
+                }
+              }
+            }
+          }
+        },
+        "source_input_version": {
+          "const": "1.1"
+        },
+        "schedule_owners": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "schedule_rel",
+              "schedule_sha256",
+              "activation_id"
+            ],
+            "properties": {
+              "schedule_rel": {
+                "type": "string",
+                "minLength": 1
+              },
+              "schedule_sha256": {
+                "$ref": "#/$defs/hash"
+              },
+              "activation_id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "source_input_version"
+            ]
+          },
+          "then": {
+            "required": [
+              "schedule_owners"
+            ]
+          },
+          "else": {
+            "properties": {
+              "source_hashes": {
+                "maxProperties": 6
+              }
+            },
+            "not": {
+              "required": [
+                "schedule_owners"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reservation_id",
+        "grant_id",
+        "attempt_id"
+      ],
+      "properties": {
+        "reservation_id": {
+          "type": "string"
+        },
+        "grant_id": {
+          "type": "string"
+        },
+        "attempt_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        }
+      }
+    },
+    "limits": {
+      "const": [
+        "CONDITIONAL_ON_OBSERVED_TARGETS",
+        "PREDICTIVE_OBSERVATIONAL",
+        "NO_CAUSAL_CLAIM",
+        "NO_EMPIRICAL_COVERAGE_GUARANTEE",
+        "NO_STRATEGY_ACTIVATION_AUTHORITY"
+      ]
+    }
+  },
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "groups": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "A",
+        "C"
+      ],
+      "properties": {
+        "A": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "C": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

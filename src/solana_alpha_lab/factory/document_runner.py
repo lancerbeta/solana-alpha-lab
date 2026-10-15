@@ -246,6 +246,13 @@ class DocumentRunner(ExperimentRunner):
         """Execute a classified Fast Lane document without mutating Git."""
 
         lane = run_context.lane_decision
+        if spec.get("schema_version") == "1.5":
+            hooks = dict(capture_hooks or {})
+            execution = dict(hooks.get("execution_context") or {})
+            execution["data_root"] = run_context.data_root
+            hooks["execution_context"] = execution
+            return execute_capability(spec, root=self.root, authority_phrase=authority_phrase,
+                                      capture_hooks=hooks)
         if spec.get("schema_version") == "1.4":
             from solana_alpha_lab.factory.lane_classifier import classify_lane
 

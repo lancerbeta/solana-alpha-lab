@@ -1,0 +1,40 @@
+{
+  "acceptance_charges": 6,
+  "acceptance_evaluator_invocations": 8,
+  "adaptive_allowance": 0,
+  "all_named_stores_and_attempts_retained": true,
+  "cash_spend": 0,
+  "named_charges": 7,
+  "named_completed_trials": 6,
+  "older_campaigns": "UNCHANGED",
+  "p0": {
+    "p0-positive": {
+      "charges": 0,
+      "terminal": "TIMESTAMP_INVALID"
+    },
+    "p0-positive-attempt2": {
+      "binding_sha256": "49a9cdbe5b9d366ca7730851e7aa0af6b45f23e149722417f7f978980219d099",
+      "charges": 1,
+      "exact_observation_decoder_calls": "UNKNOWN_NO_ACTUAL_COUNTER_CAPTURED",
+      "failure": "FRACTION_JSON_SERIALIZATION",
+      "observed_evaluator_invocations_lower_bound": 1,
+      "resume": "REFUSE_STALE_BINDING; RETAIN_ORIGINAL_STORE_AND_CHARGE",
+      "run_key_sha256": "638957c6f2b974a1c19d908dd0f49cb2a5541fa9c305eddb40c41b1c79ad61f2",
+      "technical_attempt_id": "a1f01295a0ab4ca18321801c9fc76130",
+      "terminal": "INTERRUPTED",
+      "trial_id": "LA-TRIAL-C345B70D8309EF44F1963AA205B0BAB07B5988C0B11A62D7E6CAEB0D2E2E6929",
+      "values_may_have_been_exposed": true
+    }
+  },
+  "pre_reserve_failures": [
+    "WINDOWS_SANDBOX_HARDLINK_PERMISSION",
+    "LOWERCASE_STABLE_ID"
+  ],
+  "provider_calls": 0,
+  "real_executions": 0,
+  "real_grants": 0,
+  "real_values_read": 0,
+  "schema": "smial.list-a-confirmation-scientific-history",
+  "schema_version": "1.0",
+  "scope": "NAMED_ACCEPTANCE_AND_P0_ONLY; UNIT_AND_CI_TRIALS_SEPARATE_DISPOSABLE_TEST_SCOPE"
+}

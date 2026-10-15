@@ -91,6 +91,7 @@ class DiscoveryEvidenceReleaseBridgeTests(unittest.TestCase):
                 "CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001",
                 "CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001",
                 "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+                "CAP-LIST-A-CHRONOLOGICAL-CONFIRMATION-001",
                 "CAP-OBSERVATION-SCHEDULE-COMPILE-BIND-001",
             ],
         )

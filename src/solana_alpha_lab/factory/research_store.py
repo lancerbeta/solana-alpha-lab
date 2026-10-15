@@ -1111,6 +1111,12 @@ def _publish_immutable(path: Path, data: bytes) -> _PublishDisposition:
                 raise ResearchStoreError("TEMPORARY_CLEANUP_FAILED") from exc
 
 
+def publish_immutable_artifact(data_root: Path, relative: str, raw: bytes) -> None:
+    """Publish path-contained immutable bytes through the store's atomic owner."""
+    root = _validated_data_root(data_root, create=False)
+    _publish_immutable(_target_path(root, relative, create_parents=True), raw)
+
+
 def _validated_data_root(data_root: Path, *, create: bool = True) -> Path:
     if not isinstance(data_root, Path):
         raise ResearchStoreError("DATA_ROOT_MUST_BE_PATH")
@@ -1210,6 +1216,11 @@ def _assert_stable_id_lineage(
 
 class ResearchStore:
     """One-writer immutable research log rooted outside Git."""
+
+    @property
+    def root(self) -> Path:
+        """Resolved data-plane root, for source-owned immutable artifacts."""
+        return self._root
 
     def __init__(
         self,

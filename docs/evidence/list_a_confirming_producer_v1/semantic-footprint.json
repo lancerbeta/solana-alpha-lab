@@ -1,0 +1,52 @@
+{
+  "as_of": "2026-10-15",
+  "cap_charged_bytes": 261831184,
+  "cap_charged_mib": 249.702,
+  "cleanup": false,
+  "conservative_common_git_objects_reserve": {
+    "allocated_bytes": 48219104,
+    "dedup": "NTFS_DEVICE_FILE_ID",
+    "files": 930,
+    "logical_bytes": 46509387
+  },
+  "forward_hard_cap_bytes": 1073741824,
+  "head": "d7dbb3d790c3441de8687ab88b7a78c31232537a",
+  "historical_empty_environment_retained": true,
+  "historical_scientific_receipts_exact_bytes_unchanged": true,
+  "host": {
+    "owned_checkout": {
+      "allocated_bytes": 92964000,
+      "dedup": "NTFS_DEVICE_FILE_ID",
+      "files": 4931,
+      "logical_bytes": 83139613
+    },
+    "owned_git_worktree_metadata": {
+      "allocated_bytes": 618888,
+      "dedup": "NTFS_DEVICE_FILE_ID",
+      "files": 8,
+      "logical_bytes": 614121
+    },
+    "owned_host_runtime": {
+      "allocated_bytes": 720904,
+      "dedup": "NTFS_DEVICE_FILE_ID",
+      "files": 22,
+      "logical_bytes": 674624
+    }
+  },
+  "named_charges_unchanged": 7,
+  "new_environments": 0,
+  "owned_allocated_bytes": 213612080,
+  "owned_container_size_rw_bytes": 364544,
+  "owned_mib": 203.716,
+  "schema": "smial.list-a-recovery-delivery-readback",
+  "separately_unmeasured": [
+    "SHARED_DOCKER_VHDX_PHYSICAL_GROWTH",
+    "DAEMON_LOG_DIRECTORY_METADATA",
+    "PREEXISTING_SHARED_RUNTIME_CACHE_TOTAL"
+  ],
+  "stopped_owned_containers": 30,
+  "volume_allocation_bytes": 118943744,
+  "volume_measurement": "PRESERVED_UNCHANGED_ALLOCATION_SNAPSHOT_NO_NEW_CONTAINER_OR_VOLUME_WRITES",
+  "within_hard_cap": true,
+  "worktree_clean": true
+}

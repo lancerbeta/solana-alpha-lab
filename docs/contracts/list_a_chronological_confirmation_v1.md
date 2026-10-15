@@ -10,6 +10,11 @@ configuration: configs/list_a_chronological_confirmation_v1.yaml
 
 # List A: научный контракт первой заранее определённой проверки
 
+Implementation continuation: `docs/contracts/list_a_confirming_execution_v1.md`
+описывает отдельный native producer/Spec 1.5. Исторические поля и научный core этого
+freeze не перепривязаны; real sample по-прежнему UNBOUND. Synthetic engineering
+доказательства continuation не являются реальной подтверждающей проверкой.
+
 Принятый смысл и метод материализованы. Полный data-bound freeze **не готов**:
 локально найден только `REL-20261007T000000Z-20261008T000000Z`, опубликованный
 как `EXPLORATORY_REUSE` с `confirmatory_reuse_forbidden=true`. Metadata даёт

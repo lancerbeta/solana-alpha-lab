@@ -708,6 +708,15 @@ def _build_obligations(
     return matrix
 
 
+def build_science_obligations(
+    spec: Mapping[str, Any], *, entity: Mapping[str, Any], direct: Sequence[Mapping[str, Any]],
+    records: Sequence[Any] | None, records_status: str, root: Path | None = None,
+) -> list[dict[str, Any]]:
+    """Public facade for version-specific consumers of ordinary science guards."""
+    return _build_obligations(spec, entity=entity, direct=direct, records=records,
+                              records_status=records_status, root=root)
+
+
 def science_guard(obligations: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     blocked = [
         item["code"]
@@ -803,6 +812,7 @@ def compose_experiment_dossier(
     records: Sequence[Any] | None,
     records_status: str,
     write_capability: Mapping[str, Any] | None = None,
+    research_store=None,
 ) -> dict[str, Any]:
     if locator.native_kind != "EXPERIMENT_SPEC":
         raise ResearchWorkbenchError("DOSSIER_KIND_REJECTED")
@@ -820,6 +830,10 @@ def compose_experiment_dossier(
     source_ref = entity.get("source_ref") if isinstance(entity.get("source_ref"), dict) else {}
     relative = str(source_ref.get("value") or "")
     spec = load_experiment_spec(root, relative) if relative else {}
+    if spec.get("schema_version") == "1.5":
+        from solana_alpha_lab.factory.list_a_confirmation import compose_confirmation_dossier
+        return compose_confirmation_dossier(spec=spec, locator=locator, root=root, store=research_store,
+            store_records=tuple(records or ()), records_status=records_status, write_capability=write_capability)
     spec_digest = spec_sha256(root, relative) if relative else None
     hypothesis_version_id = _text(spec.get("hypothesis_version"))
     store_records = tuple(records or ())
