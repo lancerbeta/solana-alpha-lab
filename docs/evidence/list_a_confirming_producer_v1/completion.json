@@ -1,7 +1,8 @@
 {
   "acceptance_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-SYNTHETIC-NATIVE",
   "active_stop_conditions": [
-    "STOP_EXACT_TASK_WRITE_SET: THREE_LEGACY_TEST_FIXTURE_PATHS_OUTSIDE_MANAGED_WRITE_SET"
+    "STOP_INDEPENDENT_REVIEW_NOT_READY: THREE_DELIVERY_FIXTURES_OUTSIDE_MANAGED_WRITE_SET",
+    "STOP_INDEPENDENT_REVIEW_NOT_READY: P2_SOURCE_REFUSAL_RECOVERY_MISDIRECTS_BINDING"
   ],
   "as_of": "2026-10-15",
   "base_main": "b3fb9d8ecffbffda468dccabaa81ca3392da6f15",
@@ -11,8 +12,8 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/list_a_confirming_producer_v1/factory-fit.json",
-    "sha256": "55d394a7158f3215207f107af3945ef99179cf6c702cc74a2512233e25f4c472",
-    "verdict": "PASS"
+    "sha256": "46eb839894bd197b40b2baab55214fa5d5f0738627758312476bf572a5c40b69",
+    "verdict": "NOT_READY"
   },
   "implementation_bindings": {
     "catalog/assets/core.yaml": "7d22cda919e1d505b7a265937c7d860f5b562d89f7d91e9b3f438a60db27b76b",
@@ -106,15 +107,15 @@
     "spend": 0,
     "strategy_activation_paper_writes": 0
   },
-  "state_change": "IMPLEMENTED_AND_VERIFIED_IN_SYNTHETIC_SCOPE: version-isolated Spec1.5 native confirmer, accepted method, pre-values reservation, single evaluator, source-owned typed completion and ordinary dossier; real sample UNBOUND.",
+  "state_change": "TARGETED_SOURCE_ROLE_P1_FIXED_AND_VERIFIED_IN_SYNTHETIC_TEST_SCOPE; allfour fresh independent critics NOT_READY for three legacy delivery fixture blockers and P2 source-refusal recovery copy. Stop per owner condition; no evidence-rebind/preflight/push/freshCI or merge. Historical scientific results/seven charges unchanged.",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
   "validation": {
-    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "full_gate": "NOT_EXECUTED_PRE_PR; GUARDED_MERGE_SOLE_EXECUTOR; MERGE_NOT_AUTHORIZED",
     "github_ci": "PR406_ORIGINAL_HEAD_FAILURE; REPAIR_HEAD_NOT_PUSHED",
     "independent_review": {
       "path": "docs/evidence/list_a_confirming_producer_v1/independent-review.json",
-      "sha256": "58a078faa9fee496e9e42b39dc06b4a8d3c2296305539137da87fd0c7e9075ca",
-      "verdict": "PENDING"
+      "sha256": "641be0dd7347d62987f2c6d074f6a9801878373c6cbe8f257f7de75cd85db5e6",
+      "verdict": "NOT_READY"
     },
     "project_checks": [
       "PASS_ACTUAL_PRE_VALUES_RESERVATION",
