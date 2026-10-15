@@ -92,7 +92,8 @@
     "acceptance_evaluator_invocations": 8,
     "acceptance_scientific_charges": 6,
     "active_worktree_venv": 0,
-    "git_delivery_new_scientific_runs": 0,
+    "git_delivery_new_named_scientific_runs": 0,
+    "git_delivery_new_scientific_runs": 3,
     "git_delivery_new_virtual_environments_created": 0,
     "named_scientific_charges": 7,
     "named_stores_deleted": 0,
@@ -106,10 +107,12 @@
     "real_data_reads": 0,
     "real_executions": 0,
     "real_grants": 0,
+    "semantic_historical_scientific_charges_modified": 0,
+    "semantic_retained_TEST_charges": 3,
     "spend": 0,
     "strategy_activation_paper_writes": 0
   },
-  "state_change": "Owner-authorized F02 then F01 semantic/integration continuation in progress. Fresh independent review, binding, CI and readiness pending; historical 72151 ready verdict does not apply. No merge authority.",
+  "state_change": "F02 and F01 implementation complete, native synthetic verified: rounded maturity before reservation/values; compatible original daily owners through numeric result/cold dossier; exact typed versioned result source set. Seven historical charges/results/core unchanged. Three separately authorized retained engineering TEST charges and all failures/corrections preserved. Fresh four-role review/evidence binding/exact-head CI/readiness pending; no merge authority.",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
   "validation": {
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
@@ -134,8 +137,11 @@
       "PASS_FRESH_FOUR_ROLE_REVIEW_BINDINGS_b89271b07dc146d5e4fda147c1191966f9d0df8b5563f082be0322d675f3c98a",
       "PASS_CURRENT9CE_OWNED_RESOURCE_BOUNDARY_OWNED195.973MIB_CAPCHARGED238.081MIB;30STOPPED;SCIENCEUNCHANGED;SHARED_PHYSICAL_TOTALS_UNKNOWN",
       "PASS_NATIVE_UNCOMMITTED_PROJECTION_AB_AND_3_REGRESSIONS;CI1GREEN_READINESS1DENY_RETAINED;NEW_CI_PENDING",
-      "PASS_FRESH_FOUR_ROLE_REVIEW_BINDINGS_b895fb33bece2bb31887066ab6eb349f583d57e7569b4288ec2e2e4375d46339"
+      "PASS_FRESH_FOUR_ROLE_REVIEW_BINDINGS_b895fb33bece2bb31887066ab6eb349f583d57e7569b4288ec2e2e4375d46339",
+      "PASS_F02_NATIVE_METADATA_MATURITY_ZERO_VALUES_RESERVATIONS_CHARGES",
+      "PASS_F01_ORIGINAL32_DAILY_OWNERS_256_POPULATION_NUMERIC_AND_COLD",
+      "PASS_F01_TYPED_RESULT_LEGACY6_OR_VERSIONED_EXACT5_PLUS_N"
     ],
-    "targeted": "PENDING_F02_GRID_GRACE_MATURE_MISSING_AND_F01_NATIVE_DAILY_SET"
+    "targeted": "PASS_F01_NATIVE_DAILY_SET_NUMERIC_COLD_OWNERSHIP_ALIAS;F02_ZERO_VALUE_CHARGE_WITNESS_GRID_GRACE_MISSING;7_RESULT_MATURITY;3_COMPAT;PRIOR67_OF68_WITH_RETAINED_FIXED_RESULT_SCHEMA_ERROR"
   }
 }

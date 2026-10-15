@@ -417,6 +417,39 @@
   "production_bytes_unchanged_since_native_acceptance": false,
   "schema": "smial.list-a-confirmation-validation",
   "schema_version": "1.0",
+  "semantic_integration_continuation_20261015": {
+    "after_result_repair_7": {
+      "status": "PASS",
+      "trace": {
+        "path": "local/list_a_confirming_producer_v1/attempts/semantic-result-regressions-2.log",
+        "sha256": "52ddd2d3869e5213a083d4edd70d4c6d259181b051c669a2ad4def3ac965659f"
+      }
+    },
+    "compatibility_3": {
+      "status": "PASS",
+      "trace": {
+        "path": "local/list_a_confirming_producer_v1/attempts/semantic-compatibility-3.log",
+        "sha256": "e24c15c8c9619de3e64a29e6f78ce8af7f53067611ff621f9274ecad12c65256"
+      }
+    },
+    "direct_68_first": {
+      "status": "67_PASS_1_ERROR_F01_RESULT_SCHEMA",
+      "trace": {
+        "path": "local/list_a_confirming_producer_v1/attempts/semantic-direct-regressions-1.log",
+        "sha256": "51af4a8b8a40de249704370fcbfbb7e92b61b0ef2905709bcc5c9a0d6627de2f"
+      }
+    },
+    "exact_head_CI": "PENDING_CURRENT_CANDIDATE",
+    "fresh_4_role_review": "PENDING_CURRENT_CONTENT",
+    "resource_checkpoint": {
+      "path": "docs/evidence/list_a_confirming_producer_v1/semantic-footprint.json",
+      "sha256": "0cf9aaaca28d0d87cbc8e1d265ac2ef964d40b48c02c19dfd92da3c9ceb48e52"
+    },
+    "source_role_native": {
+      "path": "local/list_a_confirming_producer_v1/attempts/recovery-copy-semantic-2c3f/receipt.json",
+      "sha256": "6f080559b4885e9e1ae5371c70dbe54b14d4e47d82ea26f06a47c736561be4ff"
+    }
+  },
   "source_refusal_recovery": {
     "approved_patch_sha256": "381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba",
     "as_of": "2026-10-15",

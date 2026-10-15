@@ -235,3 +235,57 @@ Expected location.logical_uri is repo://docs/evidence/list_a_confirming_producer
 Task context_requirements.l2_roles must include DELIVERY_EVIDENCE, in addition to the existing ARCHITECTURE_DECISIONS. The three exact_role_paths are completion.json, independent-review.json and factory-fit.json. After final binding/commit, generate context with native delivery_harness.py context --contract docs/tasks/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1.md --task-id LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1 --route DIRECT_CODEX_DELIVERY --write-receipt --format json. Confirm exactly3selected DELIVERY_EVIDENCE references, not DEFERRED_ON_DEMAND. Use its native local_receipt for merge-readiness after exact-head CI.
 
 Before/after uncommitted native bound_delivery_evidence preview false->true is a diagnostic only; it is not final context/readiness/CI authority. Original CI38698541162 success onD975 and readiness1 DENY remain in the audit. Never hand-edit a native context receipt or use LIVE_PR_HEAD for product diff. Re-run normal evidence binding/preflight/newexactCI/readiness on the changed contract.
+
+
+## F02/F01 targeted continuation (PR406 review anchor72151)
+
+Use the existing locked CPython3.13.14 environment; no install/new venv/container.
+The retained seven named studies must not run again. These commands create only
+ordinary disposable synthetic TEST stores under the test cleanup policy:
+
+```text
+python -B -m unittest tests.test_list_a_confirmation_admission_v1.CalendarMaturityTests tests.test_list_a_confirmation_admission_v1.DailyScheduleAdmissionTests tests.test_list_a_confirmation_vertical_v1 -v
+```
+
+Expected9 PASS. Native daily fixture is
+`tests/fixtures/list_a_confirmation_v1/native.py:ingress(..., daily_schedules=True)`.
+It derives32daily child documents exactly like managed child planning: same frozen
+template, native validator, per-day activation, original native SHA and ACT-SHA ID.
+It never rewrites generated admissions to a virtual extended schedule. Independent
+`daily_ownership_oracle` in test_list_a_confirmation_vertical_v1.py uses file hashes,
+literal UTC dates and joins, without production membership/clock helpers.
+
+CLI source-input supports `schedules:[{document:<original frozen child>,activation_id:<original>}]`
+instead of `schedule`; sample1.1 stores canonical schedule_set refs and all source hashes.
+Input schema is reproducibly generated with Pydantic TypeAdapter(Sample | MultiScheduleSample).json_schema(by_alias=True).
+Legacy input1.0 stays accepted with exactly its previous canonical document fields.
+Typed result1.0 adds optional source_input_version1.1/schedule_owners for new inputs;
+legacy source hash cardinality remains6; version1.1 requires exactly the5common files
+plus its canonical distinct owners. Frozen method/Spec1.5 are unchanged.
+
+F01 before witness: feed the daily fixture's original admissions/frames against only
+its first original daily schedule through write_native_confirmation_sample; expect
+NATIVE_ADMISSION_SOURCE_CLOCK_CONFLICT before values/reservation. Do not repair the
+fixture by rewriting SHA/activation or extending the daily activation window.
+Negative cases and mature/immature metadata rules are in DailyScheduleAdmissionTests.
+
+Retained native sequence is recorded in semantic-integration.json#F01: original
+immutable source files from f01-before-1 were reused; register-source preview/exact
+SYNTHETIC authority, prepare, exact SYNTHETIC authorize, classify, submit, typed cold
+reader and ordinary dossier. Separate engineering TEST2 plane retains TEST1 charge
+and reuses immutable files; it does not claim a new untouched scientific look.
+After run, alias prepare must return ALREADY_RESERVED/charge1/original trial.
+
+F02 uses native resolve_point E14400 including rounding/grace. For last literal
+T0=2027-01-03T02:00:01Z, deadline=06:10:00Z;06:09:59 refuses, equality admits.
+Mature MISSING_TYPED target rows reach evaluator with D128/128 and observed0.
+No target values, missingness/statistics or preview at metadata preflight.
+Current retained unspent before-source supports register/prepare/authorize/classify/
+submit all refusing with0values/evaluator/reservation/charge/storewrites.
+
+All failures remain: original late refusal/counter correction, first F01 max6
+result-schema failure, fixture isolation corrections and Windows process-chain
+correction. Cold independent-process proof binds launched Popen PID to the cold
+PID or its immediate parent (Windows environment launch may insert a wrapper),
+requires cold PID != caller and result digest equality;0Parquet/evaluator/writes.
+Do not rerun a charged failed attempt to make its history PASS.

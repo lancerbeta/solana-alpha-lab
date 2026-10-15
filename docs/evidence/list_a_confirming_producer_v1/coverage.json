@@ -121,6 +121,21 @@
       "evidence": "CI1 onD975 PASS; readiness1 correctlyDENY becauseDELIVERY_EVIDENCE deferred. TaskL2 nowrequires existingexact3paths; nativeuncommittedAB false→true and3regressionsPASS. No gate/source/sciencechange. Fresh4review/rebind/CI2/readiness2 pending.",
       "requirement": "Readiness context contains exact delivery evidence",
       "status": "PASS_NATIVE_AB_PREVIEW_AND_3_REGRESSIONS;NEW_EXACT_HEAD_CI_PENDING"
+    },
+    {
+      "evidence": "semantic-integration.json#F02: retained original unspent source, five native refusals; zero values/evaluator/reservations/charges/writes; grid+grace equality and mature missing full denominator",
+      "requirement": "F02 metadata-only native calendar maturity",
+      "status": "PASS"
+    },
+    {
+      "evidence": "semantic-integration.json#F01:32originalowners/256admissions/D128+128/mints127+128/32blocks each partition; exact ownership/population oracle; native alias consumption retained; typed negatives; no virtual schedule",
+      "requirement": "F01 original daily source identities through numeric result and cold dossier",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Legacy exact6-file guard retained; input1.1 original owners and exact5+N source paths; cold PRESENT/no values/no evaluator/no writes; synthetic promotion denied",
+      "requirement": "F01 typed result source-set compatibility",
+      "status": "PASS"
     }
   ],
   "schema": "smial.list-a-confirmation-coverage",

@@ -1,11 +1,67 @@
 {
   "F01": {
-    "status": "PENDING_NATIVE_DAILY_SCHEDULE_FALSIFIER_AND_BOUNDED_REPAIR"
+    "admissions": 256,
+    "after_cold_process_oracle": {
+      "path": "local/list_a_confirming_producer_v1/attempts/f01-vertical-2/oracle-correction.json",
+      "sha256": "b7f630301dc1ac96191bc7d751ecd544845f6748c2f47f71ca9f0d78b165fee8"
+    },
+    "after_hot": {
+      "path": "local/list_a_confirming_producer_v1/attempts/f01-vertical-2/hot.json",
+      "sha256": "d2480f874be29534ae9c641d27aff7d9655fd2fbfb1e538c04bd71b70eb4a8a5"
+    },
+    "before_oracle": {
+      "path": "local/list_a_confirming_producer_v1/attempts/f01-before-1/receipt.json",
+      "sha256": "adaacd993932ce0f50bd91ae8f8f97a68b06fb0aad9f3335eea478ebb64bd6bd"
+    },
+    "before_reason": "NATIVE_ADMISSION_SOURCE_CLOCK_CONFLICT",
+    "cold_result_binding": "Legacy exactly6 source files preserved; version1.1 binds canonical original owners and exact5+N paths",
+    "contrast": 0.125,
+    "contributing_blocks_per_group": {
+      "172800": 32,
+      "86400": 32
+    },
+    "contributing_mints": {
+      "A": 127,
+      "C": 128
+    },
+    "daily_original_owners": 32,
+    "denominator": {
+      "A": 128,
+      "C": 128
+    },
+    "failed_numeric_TEST_submit": {
+      "path": "local/list_a_confirming_producer_v1/attempts/f01-vertical-1/5-submit.json",
+      "sha256": "0133df4c5a76061418bec162bc33df5c5464f1ce5f8f0a4f4988aef89d3905ff"
+    },
+    "method_core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252",
+    "negative_cases": [
+      "FOREIGN_SCHEDULE",
+      "INCOMPATIBLE_FAMILY",
+      "CONFLICTING_DUPLICATE",
+      "SAME_UTC_COHORT_TWO_OWNERS",
+      "FOREIGN_ACTIVATION",
+      "EXPLORATORY_SOURCE_ROLE"
+    ],
+    "no_scientific_semantic_change": true,
+    "no_virtual_aggregate_schedule": true,
+    "operational_boundary": "Same frozen child template except activation/SHA; one owner per UTC cohort, partial initial-day intake remains legal",
+    "original_immutable_files_unchanged": true,
+    "ownership_oracle": {
+      "path": "local/list_a_confirming_producer_v1/attempts/f01-vertical-2/population-ownership-oracle.json",
+      "sha256": "b42470b3688e8c93dd14d2efb0325b5f99248ad02bcb4c461b34279c0c8910ce"
+    },
+    "replicates_per_partition": 4096,
+    "result_sha256": "7ffb464eea3c8f0bceac6cfd35e17d73fb48f7cc1af55110a44c38ee04d6bb7a",
+    "source_alias": "ALREADY_RESERVED_CHARGE1_ORIGINAL_TRIAL_ZERO_ADDITIONAL_VALUES_OR_RESERVATIONS",
+    "source_input_versions": "1.0 legacy unchanged canonical shape; 1.1 original daily schedule set",
+    "split": false,
+    "status": "FIXED_NATIVE_DAILY_BINDING_AND_TYPED_COLD_CONSUMER",
+    "terminal": "ASSOCIATION_SUPPORTED_CONDITIONAL"
   },
   "F02": {
     "after": "NATIVE_REGISTER_PREPARE_AUTHORIZE_CLASSIFY_SUBMIT_TYPED_MATURITY_REFUSAL_ZERO_VALUES_EVALUATOR_RESERVATIONS_CHARGES_WRITES",
     "after_oracle": {
-      "path": "local/list_a_confirming_producer_v1/attempts/f02-after-1/receipt.json",
+      "path": "local/list_a_confirming_producer_v1/attempts/f02-after-2/receipt.json",
       "sha256": "61cc99da6458408ff91b495fd636b5f90268e2062037e028b176a67f8d1a3126"
     },
     "before": "LATE_REFUSAL_AFTER_ONE_RESERVATION_ONE_CHARGE_AND_44_TARGET_DECODES",
@@ -14,22 +70,72 @@
       "sha256": "98e880a980bfae127925042cc08811028c4d052f6d9b04bf29b34fc884d3d84d"
     },
     "counter_correction": "Original raw receipt counted two event carriers; durable RESEARCH_ARTIFACT oracle establishes one reservation/charge. Raw receipt retained.",
-    "grid_grace_and_mature_missing_tests": "PENDING",
+    "grid_grace_and_mature_missing_tests": "PASS_NATIVE_ROUNDED_061000_EQUALITY_MATURE_060959_REFUSED;MATURE_MISSING_TYPED_D128_128_OBSERVED0",
+    "legacy_consumed_unknown": "PASS_CHARGE1_AND_NULL_CHECKPOINT_PRESERVED",
     "unspent_before": {
       "path": "local/list_a_confirming_producer_v1/attempts/f02-before-3/receipt.json",
       "sha256": "b33329ee9fcb09b15d89236bd1b7e53c8a82082ff9b92bb864500e5518b77ff3"
     }
   },
-  "current_verdict": "IMPLEMENTING_F02_THEN_F01_FRESH_REVIEW_CI_PENDING",
+  "REAL_source_availability": "UNKNOWN_NO_REAL_GRANT_CONSUMPTION_OR_PROVIDER_PROBE",
+  "current_verdict": "IMPLEMENTATION_COMPLETE_SYNTHETIC_NATIVE_VERIFIED_FRESH_REVIEW_CI_PENDING",
   "historical_ready_head": "72151e2a011ce8a5899bebfdaa18cf23a4801039",
+  "implementation_head": "d7dbb3d790c3441de8687ab88b7a78c31232537a",
   "merge_authority": false,
   "owner_direction": {
     "path": "docs/evidence/list_a_confirming_producer_v1/semantic-integration-owner-direction.md",
     "sha256": "17bd953b4878db426c483bc9130d55660432a42c13f957d6f1b9d06fa0c5f48d"
   },
   "real_source_integration": "UNVERIFIED",
+  "retained_TEST_breakdown": {
+    "F01_completed_vertical": 1,
+    "F01_result_schema_failure": 1,
+    "F02_late_refusal_before_repair": 1
+  },
+  "retained_failures_and_corrections": [
+    "F02 initial sandbox publication failure; no authority/reservation/charge",
+    "F02 raw counter counted two event carriers; retained correction establishes one durable reservation/charge",
+    "F02 grid test initially reused immutable ingress path with reordered Parquet columns; isolated CLI plane fixes fixture, not oracle",
+    "F01 negative fixture initially shared mutable nested document; deepcopy fixes fixture isolation",
+    "F01 first numeric TEST refused at closed max6 result schema after one charge; original store/charge retained",
+    "F01 second hot/cold succeeded; extra immediate-parent assertion failed on Windows launch; read-only process-chain correction retained"
+  ],
   "schema": "smial.list-a-semantic-integration-audit",
   "schema_version": "1.0",
-  "scientific_history": "SEVEN_HISTORICAL_CHARGES_AND_RESULTS_IMMUTABLE",
-  "separate_disposable_test_charge_count": 1
+  "scientific_history": "SEVEN_HISTORICAL_CHARGES_RESULTS_ATTEMPTS_CORE_IMMUTABLE",
+  "separate_disposable_test_charge_count": 3,
+  "unit_test_temporary_stores": "Separate ordinary tests with automatic cleanup; not the retained campaign or three retained TEST attempts",
+  "verification": {
+    "after_result_repair_7": {
+      "status": "PASS",
+      "trace": {
+        "path": "local/list_a_confirming_producer_v1/attempts/semantic-result-regressions-2.log",
+        "sha256": "52ddd2d3869e5213a083d4edd70d4c6d259181b051c669a2ad4def3ac965659f"
+      }
+    },
+    "compatibility_3": {
+      "status": "PASS",
+      "trace": {
+        "path": "local/list_a_confirming_producer_v1/attempts/semantic-compatibility-3.log",
+        "sha256": "e24c15c8c9619de3e64a29e6f78ce8af7f53067611ff621f9274ecad12c65256"
+      }
+    },
+    "direct_68_first": {
+      "status": "67_PASS_1_ERROR_F01_RESULT_SCHEMA",
+      "trace": {
+        "path": "local/list_a_confirming_producer_v1/attempts/semantic-direct-regressions-1.log",
+        "sha256": "51af4a8b8a40de249704370fcbfbb7e92b61b0ef2905709bcc5c9a0d6627de2f"
+      }
+    },
+    "exact_head_CI": "PENDING_CURRENT_CANDIDATE",
+    "fresh_4_role_review": "PENDING_CURRENT_CONTENT",
+    "resource_checkpoint": {
+      "path": "docs/evidence/list_a_confirming_producer_v1/semantic-footprint.json",
+      "sha256": "0cf9aaaca28d0d87cbc8e1d265ac2ef964d40b48c02c19dfd92da3c9ceb48e52"
+    },
+    "source_role_native": {
+      "path": "local/list_a_confirming_producer_v1/attempts/recovery-copy-semantic-2c3f/receipt.json",
+      "sha256": "6f080559b4885e9e1ae5371c70dbe54b14d4e47d82ea26f06a47c736561be4ff"
+    }
+  }
 }
