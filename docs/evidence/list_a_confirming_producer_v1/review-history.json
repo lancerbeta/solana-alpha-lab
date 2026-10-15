@@ -1,0 +1,116 @@
+{
+  "as_of": "2026-10-15",
+  "historical_snapshot": {
+    "git_object": "871682f5ff23fadb053647db146479444b58c073:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+    "git_object_sha256": "06cd44aa4076c8dedaae9ca65018286538a83dd96bf87069e227fece1ce9d258",
+    "reason": "Unaccepted historical no-new-environment deviation; actual NOT_READY preserved, not retroactively changed.",
+    "reviewed_candidate_head": "c1c626f68a4a9abad2ab03cafd410c50dcd1e4b2",
+    "roles": {
+      "ARCHITECTURE_CRITIC": "NOT_READY",
+      "CODE_REVIEWER": "PASS",
+      "GOAL_DOD_CRITIC": "NOT_READY",
+      "OWNER_UX_CRITIC": "PASS"
+    },
+    "verdict": "PENDING"
+  },
+  "history_policy": "Original Git object and all remediation history remain immutable; current review is a separate later assessment.",
+  "later_snapshots": [
+    {
+      "git_object": "1dfe9ab1d8b8caadd546788db0ce4de199f0997c:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+      "git_object_sha256": "990929cf73684a170838d5ccbd3220fca7b12c51b0bbc968092631e944fb90fb",
+      "reason": "Actual independent post-owner review preserved before forward-only main integration; not automatically transferred to a new candidate.",
+      "reviewed_candidate_head": "8daef7ba3374e2c22ee6854997544ae34f9e7fe7",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "PASS",
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "OWNER_UX_CRITIC": "PASS"
+      },
+      "verdict": "PASS"
+    },
+    {
+      "git_object": "3a1c5c79066364492ef8d8e93cef7614b190a72c:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+      "git_object_sha256": "58a078faa9fee496e9e42b39dc06b4a8d3c2296305539137da87fd0c7e9075ca",
+      "reason": "Actual main-integration review preserved; subsequent owner-targeted falsifier proved an uncovered P1 source-role laundering gap. No transfer to repair candidate.",
+      "reviewed_candidate_head": "ed33f2fc4f3b081ce12d612a76fb72abefeeb325",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "PASS",
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "OWNER_UX_CRITIC": "PASS"
+      },
+      "verdict": "PASS"
+    },
+    {
+      "git_object": "84fc5b4844a41fac76ad7da1eea241951a03d25c:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+      "git_object_sha256": "641be0dd7347d62987f2c6d074f6a9801878373c6cbe8f257f7de75cd85db5e6",
+      "reason": "Actual source-role P1 repair passed; three then-unapproved legacy compatibility paths and P2 recovery copy prevented delivery. New three-test authority does not retroactively alter NOT_READY or authorize recovery production repair.",
+      "reviewed_candidate_head": "822a848a758e501727d26fb7b2eec489d8264dfd",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "NOT_READY",
+        "CODE_REVIEWER": "NOT_READY",
+        "GOAL_DOD_CRITIC": "NOT_READY",
+        "OWNER_UX_CRITIC": "NOT_READY"
+      },
+      "verdict": "NOT_READY"
+    },
+    {
+      "git_object": "7de44a91080fc12ed2ef5e179fb1247ef26540ca:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+      "git_object_sha256": "7ab5e7c8618dd76975b0fc735a84709d1bad89c5c391488601f520bdc25699e9",
+      "reason": "Actual compatibility review closedthreelegacyblockers; code/goal/UX NOT_READY solely recoveryP2, architecturePASS. Later separate exact P2 grant does not retroactively alter verdicts.",
+      "reviewed_candidate_head": "2b906c386262e4881dc932a704dc0314b356ddfd",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "PASS",
+        "CODE_REVIEWER": "NOT_READY",
+        "GOAL_DOD_CRITIC": "NOT_READY",
+        "OWNER_UX_CRITIC": "NOT_READY"
+      },
+      "verdict": "NOT_READY"
+    },
+    {
+      "git_object": "86ef8bd045fd5a44edf0148f12f25d6eda1b81b8:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+      "git_object_sha256": "42085c82b1b8d22345b63d4a06385c695229d8d40a64d74be63b749cbf21eada",
+      "reason": "Actual recovery-copy review: codeNOT_READY solelywrongCatalogURI, other3PASS. New goal-based autonomy permits engineering repair/review, never retroactive verdict conversion.",
+      "reviewed_candidate_head": "6c72738caa261175a1dee94aa66aa1e4ff197102",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "PASS",
+        "CODE_REVIEWER": "NOT_READY",
+        "GOAL_DOD_CRITIC": "PASS",
+        "OWNER_UX_CRITIC": "PASS"
+      },
+      "verdict": "NOT_READY"
+    },
+    {
+      "git_object": "d9751d30f616b2d55a70cf711e2649c2e490f40d:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+      "git_object_sha256": "451965eb14f734b9ae5a4f0b8093dd6d065b8e246c164b0b36184191323ddb24",
+      "reason": "Actualall4PASSandCI1green onD975 retained; native readiness1 DENY uncoveredmissingDELIVERY_EVIDENCEL2 projection. No pastverdictconversion orCItransfer to changedcontract.",
+      "reviewed_candidate_head": "9ce5ee6a4873b172b48b0824080f571f62d4891c",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "PASS",
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "OWNER_UX_CRITIC": "PASS"
+      },
+      "verdict": "PASS"
+    }
+  ],
+  "next_review": "FRESH_FOUR_ROLE_AFTER_SEMANTIC_REVIEW_FOLLOWUP",
+  "schema": "smial.list-a-confirmation-review-history",
+  "schema_version": "1.0",
+  "semantic_review_rounds": [
+    {
+      "finding_refs": "repo://docs/evidence/list_a_confirming_producer_v1/semantic-integration.json#review_followup",
+      "head": "7e16f3435a98f7bc31fc2ffe4adb8d75ec49ef67",
+      "packet_sha256": "d9084b8d7399fdacd2cbe6dfc815331970264415b1ff1181932be81d41acb307",
+      "reason": "Actual independent review findings preserved; later repairs require new four-role review, not retroactive conversion.",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "PASS",
+        "CODE_REVIEWER": "NOT_READY",
+        "GOAL_DOD_CRITIC": "NOT_READY",
+        "OWNER_UX_CRITIC": "NOT_READY"
+      },
+      "verdict": "NOT_READY"
+    }
+  ],
+  "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1"
+}

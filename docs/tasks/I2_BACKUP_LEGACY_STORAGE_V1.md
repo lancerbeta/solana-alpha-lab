@@ -1,6 +1,6 @@
 ---
 task_id: I2_BACKUP_LEGACY_STORAGE_V1
-task_version: '1.2'
+task_version: '1.3'
 status: IN_PROGRESS
 as_of: '2026-10-15'
 owner: GOAL_OWNER
@@ -8,9 +8,9 @@ allowed_routes: [DIRECT_CODEX_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: b3fb9d8ecffbffda468dccabaa81ca3392da6f15
+  expected_base: 3ff9df44331d8063274132c3da7022e46d859d92
   expected_upstream: origin/main
-  expected_upstream_oid: b3fb9d8ecffbffda468dccabaa81ca3392da6f15
+  expected_upstream_oid: 3ff9df44331d8063274132c3da7022e46d859d92
   expected_branch: codex/i2-backup-legacy-storage-v1
   dirty_mode: ALLOW_REPORTED
 objective: Implement the complete I2 backup, legacy retirement, physical reclaim and bounded maintenance capability on existing owners; prove it on isolated stores, deliver reviewed exact-head CI and machine merge-readiness, and prepare one staged OPERATE packet without production mutations.
@@ -200,3 +200,16 @@ effective freshness/retention change follows from this EXECUTE.
 FACTORY_FIT_REVIEW: FULL_REVIEW. PRODUCT_HORIZON_RADAR NOW: NONE (I2 is
 the elected capability). WATCH: I4 source/cold lifecycle only if surviving
 scientific pins or RDP growth dominate measured 180d runway.
+
+## Main integration and checkpoint-pipeline replan
+
+The owner reported a changed main. Integrate PR #406 by ordinary forward merge,
+freeze its exact main `3ff9df44331d8063274132c3da7022e46d859d92` as the new delivery base,
+and preserve its scientific contracts, source, history and evidence bytes.
+Historical legacy-producer pins remain bound to their original b3fb9d8 commit.
+The independent outer refresh-outcome race requires one bounded repair across
+checkpoint maintenance, refresh/register/release and final outcome authority.
+Use current native owners and finite metadata comparisons; preserve committed
+effects, pins, newer policy/plan/state/checkpoint identity and last-good truth.
+Re-run the native race oracle and ordinary pipeline, then re-freeze all four
+reviews and exact-head CI. Scope, review roles and production gates are unchanged.

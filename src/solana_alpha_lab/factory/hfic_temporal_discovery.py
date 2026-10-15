@@ -1040,6 +1040,23 @@ def episode_decision_price(
                  point_due_at=decision_due_at)
 
 
+def confirmation_price_cell(rows, *, cohort, release, episode_id, point, window):
+    """Native snapshot price and clocks for the accepted confirmation consumer.
+
+    This arithmetic facade grants no reading or protection authority. The caller
+    must have committed its reservation before decoding these source rows.
+    """
+    return _cell({(cohort, release, episode_id, point, PRICE): rows},
+        (cohort, release, episode_id, point, PRICE), window.availability_deadline,
+        snapshot_policy=OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
+        point_due_at=window.request_not_before, exact_numeric=True)
+
+
+def confirmation_price_relative(exit_value, decision_value):
+    """Preserve the native exact-source ratio owner and binary64 output."""
+    return float(_episode_return_ratio(exit_value, decision_value))
+
+
 def evaluate_episode_prefix(
     body: Mapping[str, Any], *, grouped: Mapping[Any, Sequence[Mapping[str, Any]]],
     cohort: str, episode_id: str, t0: datetime, decision_deadline: datetime,

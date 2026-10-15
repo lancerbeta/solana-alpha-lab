@@ -1,0 +1,397 @@
+{
+  "as_of": "2026-10-15",
+  "committed_repair_head": "4a0a83f49bd0a0de451f8787f57836960cc90f9e",
+  "compatibility_delivery_20261015": {
+    "acceptance_scientific_payload_unchanged": true,
+    "as_of": "2026-10-15",
+    "cheap_regression": {
+      "status": "PASS",
+      "tests": 3,
+      "trace_sha256": "bfd1010ba686d1058b3d1b1458beaba84ab2ce831ab0f72dd44d8908ea0c73bd"
+    },
+    "evidence_rebind": "PENDING",
+    "fresh_exact_head_ci": "NOT_RUN_NOT_PUSHED",
+    "fresh_independent_review": "PENDING",
+    "historical_scientific_receipts_exact_bytes_unchanged": true,
+    "legacy_dispatch_oracle": {
+      "legacy_capabilities_ast_identical_after_removing_only_spec1_5_dispatch": true,
+      "new_dispatch_guard": "spec.get('schema_version') == '1.5'",
+      "scientific_golden_values_changed": false
+    },
+    "merge_authority": false,
+    "named_charges_unchanged": 7,
+    "named_scientific_campaigns_replayed": 0,
+    "new_environments": 0,
+    "oracle_audit": {
+      "audits": [
+        {
+          "after_sha256": "61b14f8d46171544b918d8b7788c47d337ec180d16ed1d403982807cb064afda",
+          "assertion_count_unchanged": 64,
+          "before_sha256": "7c525abea77ff80f4633d802fb00b521525a275eb58e7ef4a4c9335ca79b71d3",
+          "changed_expected_list_assertions": 0,
+          "path": "tests/test_factory_ordinary_market_hypothesis.py"
+        },
+        {
+          "after_sha256": "cd441847b3667f084bd5007be2de674f2e878b9425af74c3c4977e697c4f9844",
+          "assertion_count_unchanged": 36,
+          "before_sha256": "b775d46d795ac08d1177462930ff6cbad383476af2d421e59ebdfe7764b5a532",
+          "changed_expected_list_assertions": 1,
+          "path": "tests/test_discovery_evidence_release_bridge.py"
+        },
+        {
+          "after_sha256": "e18b2de3cf5af85979162441e324f074c372c24c23c9837dfc1cba50964f629c",
+          "assertion_count_unchanged": 176,
+          "before_sha256": "14cf984d3e042949f6b0b62249460525c1961292d7a0cd38501cf86e25d00711",
+          "changed_expected_list_assertions": 0,
+          "path": "tests/test_harness_sync.py"
+        }
+      ],
+      "base_schema_selection_preserved": [
+        "catalog/schemas/catalog_manifest.schema.json",
+        "catalog/schemas/asset_catalog.schema.json",
+        "catalog/schemas/query_recipe.schema.json",
+        "catalog/schemas/lifecycle_registry.schema.json"
+      ],
+      "head_before": "84fc5b4844a41fac76ad7da1eea241951a03d25c",
+      "new_skip_xfail_stubs": false,
+      "patch_sha256": "f636abfa752ade121b45094c0e1069296fa01d9b772ee260684ed9aed4a94739",
+      "production_paths_modified": [],
+      "scientific_oracles_modified": false,
+      "scope": "OWNER_AUTHORIZED_EXACT_THREE_TEST_COMPATIBILITY"
+    },
+    "owner_authorization_ref": "repo://docs/evidence/list_a_confirming_producer_v1/owner-decision.json#compatibility_extension",
+    "patch_sha256": "f636abfa752ade121b45094c0e1069296fa01d9b772ee260684ed9aed4a94739",
+    "preserved_native_falsifier": "Original same-source four-transition before/after receipts retained verbatim; production path unchanged; three durable role regressions repeated PASS",
+    "producer_qualification_closure_unchanged": true,
+    "production_paths_modified": [],
+    "recovery_production_change_authorized": false,
+    "shadow_pin_preview": {
+      "changed_paths": 56,
+      "passed_full_preflight": false,
+      "reasons": [],
+      "scope": "STATIC_SHADOW_PIN_PREVIEW_USING_CURRENT_WORKTREE_BYTES_NOT_PREFLIGHT_OR_MERGE_GATE"
+    },
+    "source_role_guard_sha256": "2d5c1f1545578f8149d590680bdce4e4e103f61974c0b83cc32952d727eadf53",
+    "targeted_regression": {
+      "elapsed_seconds": 1771.808,
+      "scope": "ordinary hypothesis13,discovery release bridge5,harness_sync34,source-role provenance3; disposable unit fixtures only",
+      "skip_xfail_stubs_added": 0,
+      "status": "PASS",
+      "tests": 55,
+      "trace_sha256": "d3dc60e7a20ea664c45e0e0438c32994ce68dea007c719cb07fede7954e89c9d"
+    },
+    "unresolved_finding": "P2_SOURCE_REFUSAL_RECOVERY_MISDIRECTS_BINDING"
+  },
+  "current_repair_qualification": {
+    "changed_paths": [
+      "src/solana_alpha_lab/factory/list_a_confirmation_inputs.py"
+    ],
+    "closure": {
+      "catalog/schemas/experiment_spec_v1_5.schema.json": "ee696d1d29e009abb354c87c0a225836783ab5e317c35ae304ddfd57362bcd57",
+      "catalog/schemas/list_a_confirmation_input_v1.schema.json": "b32d6fa347b9970f971e9a559a86983a3f5761cd70fe38f1b73549bc027d35a0",
+      "catalog/schemas/list_a_confirmation_result_v1.schema.json": "3080d2ed200050802f7c83e5d4aec77e329aac478c68a38c38dde212e456e350",
+      "configs/experiment_capability_registry_v2.yaml": "b6173a99298eac12bec314decafb80a272c13235bdaa9226f63782ed1351db3f",
+      "configs/experiment_specs/list_a_chronological_confirmation_v1.yaml": "789118443839aba34a1a979c611ed4a37b0c675cb5f3b0bb8aebd2b21b44341b",
+      "configs/list_a_chronological_confirmation_v1.yaml": "4bfd2c80526d617f664e047ffa38f802722c5ca96211aed06992506bbc29be12",
+      "src/solana_alpha_lab/factory/capabilities.py": "3b6f0c00cec42fcc60ebbb56f3d56c9ceadf0c6c65e1a9ae545b79176c391065",
+      "src/solana_alpha_lab/factory/data_resolver.py": "f29d1abbdda524cfb900c250ccd2971510b5f099d1d4099c38f213746afcfa1c",
+      "src/solana_alpha_lab/factory/document_runner.py": "e6bef62f301b159d916e01e09cb83b8b6931caf76dafb3e0d4dc29a96a36fd9d",
+      "src/solana_alpha_lab/factory/experiment_evidence.py": "19ae7be1a60fd11913463adf140deef3023779d1fc968554629b6ffab24582b2",
+      "src/solana_alpha_lab/factory/experiment_spec.py": "e0536158c67f008894854c698a702f58057993a6ea2a1ea97c2e48e378a308a4",
+      "src/solana_alpha_lab/factory/hfic_research_scope.py": "2a12d90b78e256fec8450d0128deb176f962c844954cd5814d298e57b28d4b7a",
+      "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "f5b38fa0da3766f8d19424b379bcea0ca92ecb90fb94b34d04c827f734c51c22",
+      "src/solana_alpha_lab/factory/lane_classifier.py": "5cbb79ba8a2635d84d8daa27feca5aadf2cefdc524d815d1a31ac42435ef6168",
+      "src/solana_alpha_lab/factory/list_a_confirmation.py": "7965d68892e3666cd6e9aa5af266f11f094a2ae65429b1d67bc640dfd2b6473c",
+      "src/solana_alpha_lab/factory/list_a_confirmation_inputs.py": "2d5c1f1545578f8149d590680bdce4e4e103f61974c0b83cc32952d727eadf53",
+      "src/solana_alpha_lab/factory/list_a_confirmation_method.py": "9f08291dd6d251b0030b121488a709ab8a502ca9a6c2e5b3b8a63201495cb9f5",
+      "src/solana_alpha_lab/factory/opportunity_episodes.py": "3565d1dff50b3b4be630ec1ee737c81e4259b247dde702c2327f976cfae837cc",
+      "src/solana_alpha_lab/factory/research_store.py": "c4c102b35c683eadfc06f8bbd92d6b4b23c53ec6dbf491b36fb02a8f5caa42d9",
+      "src/solana_alpha_lab/factory/research_workbench.py": "acc9cb3b07e920b41187d300b33beda7e27987a9efaf09f212139227e836aeca",
+      "src/solana_alpha_lab/factory/run_passport.py": "50cdc6d938c0a28f01734140938c026a6203ab69b775940fd2dc2cf37070e5a5",
+      "uv.lock": "3b75cc1c5a2c0c83560beaf1a57c4543b885e0909c75db6d1939e90d09eefedb"
+    },
+    "head": "4a0a83f49bd0a0de451f8787f57836960cc90f9e",
+    "historical_qualification_rebound": false,
+    "named_results_revalidated_or_recomputed": false
+  },
+  "delivery_projection_repair_20261015": {
+    "as_of": "2026-10-15",
+    "defect": "Task exact paths named deliveryevidence but l2_roles omitted DELIVERY_EVIDENCE; context deferred all3 so native factoryfitgrounding correctlydenied",
+    "first_exact_head_CI": {
+      "conclusion": "success",
+      "head": "d9751d30f616b2d55a70cf711e2649c2e490f40d",
+      "run_id": 38698541162,
+      "url": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/38698541162"
+    },
+    "first_native_readiness": {
+      "raw_utf8": "{\r\n  \"decision\": \"DENY\",\r\n  \"identity_mode\": \"TASK_CONTEXT_RECEIPT\",\r\n  \"merge_checks\": {\r\n    \"branch_preserved\": true,\r\n    \"ci_exact_head_pass\": true,\r\n    \"context_receipt_bound\": true,\r\n    \"context_receipt_sha256\": \"463eec8aa653d6d4c01034e9df63b6d090c2e7f4dc5f29a665e626b152e92ebd\",\r\n    \"context_route\": \"DIRECT_CODEX_DELIVERY\",\r\n    \"exact_pr_head_bound\": true,\r\n    \"factory_fit_pass\": false,\r\n    \"full_gate_pass\": true,\r\n    \"mergeable\": true,\r\n    \"no_unresolved_reviews\": true,\r\n    \"observed_head_sha\": \"d9751d30f616b2d55a70cf711e2649c2e490f40d\",\r\n    \"observed_tree_sha\": \"7b078398f7cfbe6de95ae9e6df7b6caa1bac582a\",\r\n    \"pr_number\": 406,\r\n    \"required_tests_pass\": true,\r\n    \"secret_scan_pass\": true,\r\n    \"settings_unchanged\": true,\r\n    \"standard_merge\": true,\r\n    \"write_set_pass\": true\r\n  },\r\n  \"merge_submitted\": false,\r\n  \"owner_phrase\": null,\r\n  \"ready_for_owner_phrase\": false,\r\n  \"reasons\": [\r\n    \"MERGE_CHECK_FAILED:factory_fit_pass\"\r\n  ],\r\n  \"schema\": \"smial.merge-readiness\",\r\n  \"schema_version\": \"1.0\"\r\n}\r\n",
+      "sha256": "0ee26790597b0628120398b88b7e0374633364c1cce84cdd31ec84d7ae023472"
+    },
+    "fresh_reviews_rebind_exact_head_CI_readiness": "PENDING",
+    "merge_authority": false,
+    "named_charges_unchanged": 7,
+    "native_ab_preview": {
+      "raw_utf8": "{\n  \"actual_readiness1\": \"DENY_factory_fit_pass_FALSE; original retained\",\n  \"after_context_sha256\": \"5e94416b5bdb6a9851e5e7f1843f366b4f6301b53053312eb9647aa17be3f8ec\",\n  \"as_of\": \"2026-10-15\",\n  \"before_context_sha256\": \"463eec8aa653d6d4c01034e9df63b6d090c2e7f4dc5f29a665e626b152e92ebd\",\n  \"head_before\": \"d9751d30f616b2d55a70cf711e2649c2e490f40d\",\n  \"native_after\": {\n    \"active_stop_conditions\": [],\n    \"factory_fit_pass\": true,\n    \"triggers\": {\n      \"auth_or_access_recovery\": false,\n      \"external_material_action\": false,\n      \"material_owner_decision\": false,\n      \"unresolved_safety_or_truth_conflict\": false,\n      \"user_only_activation\": false\n    }\n  },\n  \"native_before\": {\n    \"active_stop_conditions\": [\n      \"DELIVERY_EVIDENCE_NOT_GROUNDED\"\n    ],\n    \"factory_fit_pass\": false,\n    \"triggers\": {\n      \"auth_or_access_recovery\": false,\n      \"external_material_action\": false,\n      \"material_owner_decision\": false,\n      \"unresolved_safety_or_truth_conflict\": true,\n      \"user_only_activation\": false\n    }\n  },\n  \"new_environments\": 0,\n  \"new_scientific_runs\": 0,\n  \"only_contract_delta\": \"Require existing exact3 DELIVERY_EVIDENCE paths in L2; no new permissions/role-set/base-policy/science change\",\n  \"prior_exact_head_CI\": \"38698541162_SUCCESS_ON_D9751D30\",\n  \"schema\": \"smial.list-a-delivery-projection-preview\",\n  \"scientific_changes\": 0,\n  \"scope\": \"UNCOMMITTED_TASK_CONTEXT_AB_PREVIEW_NOT_READINESS_NOT_NEW_CI\",\n  \"selected_after\": [\n    \"docs/evidence/list_a_confirming_producer_v1/completion.json\",\n    \"docs/evidence/list_a_confirming_producer_v1/factory-fit.json\",\n    \"docs/evidence/list_a_confirming_producer_v1/independent-review.json\"\n  ],\n  \"selected_before\": []\n}\n",
+      "scope": "UNCOMMITTED_TASK_CONTEXT_AB_PREVIEW_NOT_READINESS_NOT_NEW_CI",
+      "sha256": "7aa999bcd000ef56c877f578fc9f632ce75851a48e581ebda0f6088c399a310a"
+    },
+    "new_environments": 0,
+    "new_gate_or_scientific_semantics": false,
+    "new_named_scientific_runs": 0,
+    "owner_microapproval_required": false,
+    "parent_head": "d9751d30f616b2d55a70cf711e2649c2e490f40d",
+    "production_or_test_code_changed": false,
+    "regression": {
+      "elapsed_seconds": 6.825,
+      "scope": "Existing evidencequorum/cloudconstants, providerL2notloadedbydefault, equivalentCursor/Codexcontext",
+      "status": "PASS",
+      "tests": 3,
+      "trace_sha256": "5a84e054e14bf9e58b8b9b59eb8967baecb5c4609d9f30f6645a58704496a152"
+    },
+    "repair": "Require existing exact3 DELIVERY_EVIDENCE paths inL2; taskmetadata only, no gate orrole-set/authority/science change"
+  },
+  "engineering_attempts": [
+    {
+      "attempt": "before",
+      "reason_code": "ATOMIC_NO_CLOBBER_PUBLICATION_FAILED",
+      "scope": "Sandbox NTFS hard-link publication denied; empty scratch retained; legitimate ordinary unsandboxed retry",
+      "status": "ENVIRONMENT_FAILURE_BEFORE_PATH"
+    },
+    {
+      "attempt": "source-role-first-unit",
+      "errors": 6,
+      "methods": 3,
+      "reason": "Fixture attempted repaired registration before expected CLI assertion; native input capture and closed Parquet handles corrected",
+      "status": "FIXTURE_FAILURE_RETAINED"
+    },
+    {
+      "attempt": "source-role-targeted-2",
+      "elapsed_seconds": 1.516,
+      "methods": 3,
+      "status": "PASS",
+      "trace_sha256": "489a5603e99a2f5abef2b1c8377d60d49f1c3c71b5d55c528eb40ddeb1a83385"
+    },
+    {
+      "attempt": "source-role-direct-consumers-1",
+      "checks": 66,
+      "elapsed_seconds": 234.387,
+      "scope": "admission20,vertical3,classifier31,evidence-decision12; disposable unit TEST stores, original named campaign not replayed",
+      "status": "PASS",
+      "trace_sha256": "5aae60a4bf0ef8bd538fca7da5588e2596cef2c874bf888e7bff6d36243a3a23"
+    }
+  ],
+  "finding": "P1_SOURCE_ROLE_LAUNDERING",
+  "footprint_checkpoint": {
+    "as_of": "2026-10-15",
+    "cap_charged_mib": 232.035,
+    "common_git_reserve": {
+      "allocated_bytes": 41089808,
+      "dedup": "NTFS_DEVICE_FILE_ID",
+      "files": 542,
+      "logical_bytes": 40144602
+    },
+    "conservative_cap_charged_bytes": 243306848,
+    "containers": 30,
+    "deleted_scientific_stores": 0,
+    "hard_cap_bytes": 1073741824,
+    "host": {
+      "owned_checkout": {
+        "allocated_bytes": 81573064,
+        "dedup": "NTFS_DEVICE_FILE_ID",
+        "files": 4552,
+        "logical_bytes": 72468143
+      },
+      "owned_git_worktree_metadata": {
+        "allocated_bytes": 614784,
+        "dedup": "NTFS_DEVICE_FILE_ID",
+        "files": 8,
+        "logical_bytes": 610012
+      },
+      "owned_host_runtime": {
+        "allocated_bytes": 720904,
+        "dedup": "NTFS_DEVICE_FILE_ID",
+        "files": 22,
+        "logical_bytes": 674624
+      }
+    },
+    "new_environments_containers_images": 0,
+    "owned_allocated_bytes": 202217040,
+    "owned_mib": 192.849,
+    "running": 0,
+    "scope": "NTFS regular-file AllocationSize deduplicated by file identity, preserved Linux volume allocation, current Docker SizeRw and full shared Git object reserve; before final review/delivery commits",
+    "size_rw_bytes": 364544,
+    "unmeasured": [
+      "SHARED_DOCKER_VHDX_PHYSICAL_GROWTH",
+      "DAEMON_LOG_DIRECTORY_METADATA_ALLOCATION",
+      "PREEXISTING_SHARED_RUNTIME_CACHE_TOTAL"
+    ],
+    "volume_allocation_bytes": 118943744,
+    "volume_measurement": "UNCHANGED_PRESERVED_SNAPSHOT: no volume write or new container since footprint-checkpoint; Docker containers read back only",
+    "within_hard_cap": true
+  },
+  "fresh_evidence_rebind": "PENDING",
+  "fresh_exact_head_ci": "NOT_RUN_NOT_PUSHED",
+  "fresh_preflight": "PENDING",
+  "fresh_review": "PENDING",
+  "goal_autonomy_catalog_uri_20261015": {
+    "applied_patch_sha256": "1905509a6739b08083ba296c55b77e7dec88cd75b4a3c45de14f395328208e5d",
+    "as_of": "2026-10-15",
+    "asset_id": "EVID-LIST-A-CONFIRMING-SOURCE-ROLE-001",
+    "catalog_regression": {
+      "checks": 26,
+      "elapsed_seconds": 9.9,
+      "module": "tests.test_catalog_canonical_binding_discovery",
+      "new_environments": 0,
+      "new_scientific_runs": 0,
+      "status": "PASS",
+      "trace_sha256": "02a0d2e5eb3159228986c16ea4ffac7890fe845517e8863e3c3ec4a59cb1cfe9"
+    },
+    "correct_logical_uri": "repo://docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json",
+    "exact_uri_identity_match": {
+      "asset_id": "EVID-LIST-A-CONFIRMING-SOURCE-ROLE-001",
+      "matched_by": [
+        {
+          "component": "EXACT_LOGICAL_URI",
+          "value": "repo://docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json"
+        }
+      ],
+      "score": 98000
+    },
+    "fresh_reviews_binding_ci": "PENDING",
+    "historical_NOT_READY_preserved": true,
+    "independent_oracle": "Logical URI equals repo://repository_path and targets the evidence whose bytes match integrity; exact-URI ranked discovery returns this asset with EXACT_LOGICAL_URI identity.",
+    "merge_authority": false,
+    "named_charges_unchanged": 7,
+    "new_containers": 0,
+    "new_environments": 0,
+    "new_named_scientific_runs": 0,
+    "old_logical_uri": "repo://docs/evidence/list_a_confirming_producer_v1/qualification.json",
+    "ordinary_resolve_receipt": {
+      "raw_utf8": "{\r\n  \"access\": {\r\n    \"method\": \"file\",\r\n    \"mode\": \"read_only\",\r\n    \"network_required\": false,\r\n    \"secrets_required\": false\r\n  },\r\n  \"as_of\": \"2026-10-14\",\r\n  \"asset_id\": \"EVID-LIST-A-CONFIRMING-SOURCE-ROLE-001\",\r\n  \"asset_type\": \"control_document\",\r\n  \"classification\": {\r\n    \"contains_raw_data\": false,\r\n    \"contains_secrets\": false,\r\n    \"sensitivity\": \"INTERNAL_NON_SECRET\"\r\n  },\r\n  \"consumers\": [\r\n    \"FACTORY-001\",\r\n    \"GOAL-OWNER\"\r\n  ],\r\n  \"evidence\": [],\r\n  \"integrity\": {\r\n    \"kind\": \"sha256\",\r\n    \"sha256\": \"5db74b502126ff1f7c7186d3637fcf6b3067d534dfdccbd8224f592c22e8df19\"\r\n  },\r\n  \"location\": {\r\n    \"kind\": \"git_path\",\r\n    \"logical_uri\": \"repo://docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json\",\r\n    \"repository_path\": \"docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json\"\r\n  },\r\n  \"origin\": \"REPOSITORY\",\r\n  \"purpose\": \"Retain the P1 role-laundering witness, same-source typed refusal, independent metadata oracle, zero preflight target decodes and bounded delivery blockers\",\r\n  \"record_version\": \"1.0\",\r\n  \"relations\": [\r\n    {\r\n      \"relation_type\": \"governed_by\",\r\n      \"target_asset_id\": \"CTRL-LIST-A-CONFIRMING-EXECUTION-001\"\r\n    }\r\n  ],\r\n  \"search_terms\": [\r\n    \"LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1\",\r\n    \"List A confirmation\",\r\n    \"Spec 1.5\",\r\n    \"native confirming\",\r\n    \"SYNTHETIC\",\r\n    \"UNBOUND real sample\"\r\n  ],\r\n  \"status\": \"VALIDATED_ACTIVE\",\r\n  \"truth_owner\": \"LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1\"\r\n}\r\n",
+      "sha256": "5468fd64394b9f7319a0c2899cb708b778a076bb6bf76c5e24520a4a99c5b989"
+    },
+    "owner_ref": "repo://docs/evidence/list_a_confirming_producer_v1/owner-decision.json#goal_based_delivery_mandate",
+    "parent_head": "86ef8bd045fd5a44edf0148f12f25d6eda1b81b8",
+    "production_runtime_changed": false,
+    "scientific_receipts_unchanged": true
+  },
+  "independent_oracle": "Original exploratory role and forbidden=true dominate external untouched role/false; same retained immutable source bytes refuse on every ordinary metadata entry point",
+  "merge_phrase_requested": false,
+  "named_campaign_charges_unchanged": 7,
+  "new_containers": 0,
+  "new_dependencies": 0,
+  "new_environments": 0,
+  "new_named_scientific_attempts": 0,
+  "non_claims": [
+    "NO_REAL_REGISTRATION_GRANT_OR_TARGET_READ",
+    "NO_GUARANTEE_AGAINST_MALICIOUS_SOURCE_OWNER_REWRITING_ORIGINAL_METADATA",
+    "NO_REQUALIFICATION_OF_HISTORICAL_SCIENCE",
+    "NO_FRESH_FULL_CI_PASS",
+    "NO_MERGE_AUTHORITY"
+  ],
+  "owner_checkpoint_head": "3a1c5c79066364492ef8d8e93cef7614b190a72c",
+  "prior_exact_head_ci": {
+    "conclusion": "FAILURE",
+    "failed_shards": [
+      0,
+      3,
+      5
+    ],
+    "head": "3a1c5c79066364492ef8d8e93cef7614b190a72c",
+    "outside_managed_write_set_blockers": [
+      {
+        "minimal_change": "Document allowed capability registration drift with an explicit current engineering pin; do not relabel historical scientific proof",
+        "path": "tests/test_factory_ordinary_market_hypothesis.py",
+        "reason": "Current capabilities.py legitimately includes the accepted Spec1.5 producer; test retains pre-producer hash",
+        "test": "test_factory_core_python_unchanged"
+      },
+      {
+        "minimal_change": "Include the accepted addition while preserving all registry-superset and ambiguous-state assertions",
+        "path": "tests/test_discovery_evidence_release_bridge.py",
+        "reason": "Exact additions list omits CAP-LIST-A-CHRONOLOGICAL-CONFIRMATION-001",
+        "test": "test_schedule_preserves_excluded_ambiguous_state"
+      },
+      {
+        "minimal_change": "Select the four explicit existing fixture schema paths, preserving fail-closed checks",
+        "path": "tests/test_harness_sync.py",
+        "reason": "Positional first-four schema selection includes new Spec1.5 schema but fixture copies the four original Catalog schemas",
+        "test": "SyncFixtureTests.setUp and dependent classes"
+      }
+    ],
+    "raw_failure_log_sha256": "a112482af9feaf13dbe1c87b6a78bc89441ac07504d0911e9be093c7be42e1ad",
+    "run_id": 38663657983,
+    "within_scope_metadata_blocker": "SOURCE_DISPOSITION_REQUIRED corrected separately without changing scientific payload"
+  },
+  "receipts": {
+    "after-committed-1": {
+      "execution_state": "COMMITTED_RUNTIME",
+      "raw_utf8": "{\n  \"attempt_label\": \"after-committed-1\",\n  \"attempts\": [\n    {\n      \"command\": \"register-source\",\n      \"response\": {\n        \"next_action\": \"VERIFY_EXACT_INPUT_AND_SAVED_CHECKPOINT\",\n        \"reason_codes\": [\n          \"CONFIRMATORY_REUSE_FORBIDDEN\"\n        ],\n        \"scientific_charge\": null,\n        \"status\": \"REFUSED\"\n      },\n      \"returncode\": 2\n    },\n    {\n      \"command\": \"prepare\",\n      \"response\": {\n        \"next_action\": \"VERIFY_EXACT_INPUT_AND_SAVED_CHECKPOINT\",\n        \"reason_codes\": [\n          \"CONFIRMATORY_REUSE_FORBIDDEN\"\n        ],\n        \"scientific_charge\": null,\n        \"status\": \"REFUSED\"\n      },\n      \"returncode\": 2\n    },\n    {\n      \"command\": \"authorize\",\n      \"response\": {\n        \"domain\": null,\n        \"execution_binding_sha256\": \"268c1fcc847872b070d720ecad301abb60296153c5d7ac7d182891fed1b5c66b\",\n        \"next_action\": \"VERIFY_EXACT_INPUT_AND_SAVED_CHECKPOINT\",\n        \"reason_codes\": [\n          \"CONFIRMATORY_REUSE_FORBIDDEN\"\n        ],\n        \"run_id\": null,\n        \"run_key_sha256\": null,\n        \"scientific_charge\": 0,\n        \"status\": \"REFUSED\",\n        \"trial_id\": null\n      },\n      \"returncode\": 2\n    },\n    {\n      \"command\": \"classify\",\n      \"response\": {\n        \"confirmation_checkpoint\": {\n          \"domain\": null,\n          \"execution_binding_sha256\": \"268c1fcc847872b070d720ecad301abb60296153c5d7ac7d182891fed1b5c66b\",\n          \"run_id\": null,\n          \"run_key_sha256\": null,\n          \"scientific_charge\": 0,\n          \"trial_id\": null\n        },\n        \"episode_outcome_binding\": null,\n        \"lane\": \"DENY\",\n        \"next_action\": \"CORRECT_EXACT_CONFIRMATION_BINDING\",\n        \"prior_run_id\": null,\n        \"reason_codes\": [\n          \"CONFIRMATORY_REUSE_FORBIDDEN\"\n        ],\n        \"run_key_sha256\": null,\n        \"terminal\": \"BLOCKED_BEFORE_RESERVE\"\n      },\n      \"returncode\": 0\n    }\n  ],\n  \"campaign_charges_modified\": 0,\n  \"domain\": \"SYNTHETIC\",\n  \"head\": \"4a0a83f49bd0a0de451f8787f57836960cc90f9e\",\n  \"immutable_source_reused_from_attempt\": \"before-native-1\",\n  \"independent_oracle\": \"Retained source EXPLORATORY_REUSE/forbidden=true must dominate new external untouched role, paths and hashes\",\n  \"new_environment\": false,\n  \"observation_metadata_reads\": [],\n  \"outer_exposure_forbidden\": false,\n  \"outer_sample_role\": \"UNTOUCHED_FORWARD_HOLDOUT\",\n  \"runtime_source_sha256\": \"2d5c1f1545578f8149d590680bdce4e4e103f61974c0b83cc32952d727eadf53\",\n  \"schema\": \"smial.list-a-source-role-falsifier\",\n  \"schema_version\": \"1.0\",\n  \"scientific_charges\": 0,\n  \"scientific_reservations\": 0,\n  \"source_metadata\": {\n    \"census_rel\": {\n      \"confirmatory_reuse_forbidden\": true,\n      \"metadata_role\": \"EXPLORATORY_REUSE\",\n      \"rows\": 256,\n      \"sha256\": \"795d0a07aad247288346fb54ca625a8ca069e0430900609e652439ac3ecb0655\"\n    },\n    \"observations_rel\": {\n      \"confirmatory_reuse_forbidden\": true,\n      \"metadata_role\": \"EXPLORATORY_REUSE\",\n      \"rows\": 512,\n      \"sha256\": \"6bfa08cd940d6aa668f465a117bedb9ec0dc6aabea556a41a4d6a2c705a7a678\"\n    }\n  },\n  \"store_purpose\": \"DISPOSABLE_TEST_NOT_SCIENTIFIC_CAMPAIGN\",\n  \"store_retained\": true,\n  \"target_value_decodings\": 0,\n  \"verdict\": \"PASS_TYPED_SOURCE_ROLE_REFUSAL\",\n  \"worktree_clean\": true\n}\n",
+      "sha256": "8128807586453b641622ebe0009e4c198c7d54d6e6814e1cbafec3b004195710"
+    },
+    "after-native-1": {
+      "execution_state": "UNCOMMITTED_PROBE_NOT_GIT_HEAD_PROOF",
+      "raw_utf8": "{\n  \"attempt_label\": \"after-native-1\",\n  \"attempts\": [\n    {\n      \"command\": \"register-source\",\n      \"response\": {\n        \"next_action\": \"VERIFY_EXACT_INPUT_AND_SAVED_CHECKPOINT\",\n        \"reason_codes\": [\n          \"CONFIRMATORY_REUSE_FORBIDDEN\"\n        ],\n        \"scientific_charge\": null,\n        \"status\": \"REFUSED\"\n      },\n      \"returncode\": 2\n    },\n    {\n      \"command\": \"prepare\",\n      \"response\": {\n        \"next_action\": \"VERIFY_EXACT_INPUT_AND_SAVED_CHECKPOINT\",\n        \"reason_codes\": [\n          \"CONFIRMATORY_REUSE_FORBIDDEN\"\n        ],\n        \"scientific_charge\": null,\n        \"status\": \"REFUSED\"\n      },\n      \"returncode\": 2\n    },\n    {\n      \"command\": \"authorize\",\n      \"response\": {\n        \"domain\": null,\n        \"execution_binding_sha256\": \"268c1fcc847872b070d720ecad301abb60296153c5d7ac7d182891fed1b5c66b\",\n        \"next_action\": \"VERIFY_EXACT_INPUT_AND_SAVED_CHECKPOINT\",\n        \"reason_codes\": [\n          \"CONFIRMATORY_REUSE_FORBIDDEN\"\n        ],\n        \"run_id\": null,\n        \"run_key_sha256\": null,\n        \"scientific_charge\": 0,\n        \"status\": \"REFUSED\",\n        \"trial_id\": null\n      },\n      \"returncode\": 2\n    },\n    {\n      \"command\": \"classify\",\n      \"response\": {\n        \"confirmation_checkpoint\": {\n          \"domain\": null,\n          \"execution_binding_sha256\": \"268c1fcc847872b070d720ecad301abb60296153c5d7ac7d182891fed1b5c66b\",\n          \"run_id\": null,\n          \"run_key_sha256\": null,\n          \"scientific_charge\": 0,\n          \"trial_id\": null\n        },\n        \"episode_outcome_binding\": null,\n        \"lane\": \"DENY\",\n        \"next_action\": \"CORRECT_EXACT_CONFIRMATION_BINDING\",\n        \"prior_run_id\": null,\n        \"reason_codes\": [\n          \"CONFIRMATORY_REUSE_FORBIDDEN\"\n        ],\n        \"run_key_sha256\": null,\n        \"terminal\": \"BLOCKED_BEFORE_RESERVE\"\n      },\n      \"returncode\": 0\n    }\n  ],\n  \"campaign_charges_modified\": 0,\n  \"domain\": \"SYNTHETIC\",\n  \"head\": \"3a1c5c79066364492ef8d8e93cef7614b190a72c\",\n  \"immutable_source_reused_from_attempt\": \"before-native-1\",\n  \"independent_oracle\": \"Retained source EXPLORATORY_REUSE/forbidden=true must dominate new external untouched role, paths and hashes\",\n  \"new_environment\": false,\n  \"observation_metadata_reads\": [],\n  \"outer_exposure_forbidden\": false,\n  \"outer_sample_role\": \"UNTOUCHED_FORWARD_HOLDOUT\",\n  \"schema\": \"smial.list-a-source-role-falsifier\",\n  \"schema_version\": \"1.0\",\n  \"scientific_charges\": 0,\n  \"scientific_reservations\": 0,\n  \"source_metadata\": {\n    \"census_rel\": {\n      \"confirmatory_reuse_forbidden\": true,\n      \"metadata_role\": \"EXPLORATORY_REUSE\",\n      \"rows\": 256,\n      \"sha256\": \"795d0a07aad247288346fb54ca625a8ca069e0430900609e652439ac3ecb0655\"\n    },\n    \"observations_rel\": {\n      \"confirmatory_reuse_forbidden\": true,\n      \"metadata_role\": \"EXPLORATORY_REUSE\",\n      \"rows\": 512,\n      \"sha256\": \"6bfa08cd940d6aa668f465a117bedb9ec0dc6aabea556a41a4d6a2c705a7a678\"\n    }\n  },\n  \"store_purpose\": \"DISPOSABLE_TEST_NOT_SCIENTIFIC_CAMPAIGN\",\n  \"store_retained\": true,\n  \"target_value_decodings\": 0,\n  \"verdict\": \"PASS_TYPED_SOURCE_ROLE_REFUSAL\"\n}\n",
+      "sha256": "1823cb984305579139d63f508a5d72b4421428bcfbedd5f3ce76d3a068a1f93c"
+    },
+    "before-native-1": {
+      "execution_state": "COMMITTED_RUNTIME",
+      "raw_utf8": "{\n  \"attempt_label\": \"before-native-1\",\n  \"attempts\": [\n    {\n      \"command\": \"register-source\",\n      \"response\": {\n        \"owner_phrase\": \"REGISTER SYNTHETIC LIST A SOURCE 380d2044de1c2f79c3dfafa979e26b58d60e2c93ea292127aeb8e6c40a7bdc5d\",\n        \"request_sha256\": \"380d2044de1c2f79c3dfafa979e26b58d60e2c93ea292127aeb8e6c40a7bdc5d\",\n        \"sample_ref\": \"confirmation/sources/SYNTH-ROLE-FALSIFIER-BEFORE-NATIVE-1/sample.json\",\n        \"scientific_charge\": 0,\n        \"status\": \"SOURCE_PREPARED\"\n      },\n      \"returncode\": 0\n    },\n    {\n      \"command\": \"register-source\",\n      \"response\": {\n        \"request_sha256\": \"380d2044de1c2f79c3dfafa979e26b58d60e2c93ea292127aeb8e6c40a7bdc5d\",\n        \"sample_ref\": \"confirmation/sources/SYNTH-ROLE-FALSIFIER-BEFORE-NATIVE-1/sample.json\",\n        \"scientific_charge\": 0,\n        \"source_authority_id\": \"LA-SOURCE-e6b1b1a7c18b7d7e0e352e941f72d097bd00c632afd7a1cdd422b5bcfa4a02e8\",\n        \"status\": \"SOURCE_REGISTERED\"\n      },\n      \"returncode\": 0\n    },\n    {\n      \"command\": \"prepare\",\n      \"response\": {\n        \"binding_id\": \"268c1fcc847872b070d720ecad301abb60296153c5d7ac7d182891fed1b5c66b\",\n        \"execution_binding_sha256\": \"268c1fcc847872b070d720ecad301abb60296153c5d7ac7d182891fed1b5c66b\",\n        \"next_action\": \"AUTHORIZE_EXACT_SYNTHETIC_REQUEST\",\n        \"request_sha256\": \"262cdd04abd2a26aedfdbca466d560ae4b882cda34e3ca939fa6e2ff2a671c32\",\n        \"scientific_charge\": 0,\n        \"status\": \"PREPARED\"\n      },\n      \"returncode\": 0\n    },\n    {\n      \"command\": \"authorize\",\n      \"response\": {\n        \"grant_id\": \"LA-GRANT-b24b655aacbb1c5fdc6d8441bbc9bf8d4f0ddd846c2bb7edb8b96cb1340a5392\",\n        \"request_sha256\": \"262cdd04abd2a26aedfdbca466d560ae4b882cda34e3ca939fa6e2ff2a671c32\",\n        \"scientific_charge\": 0,\n        \"status\": \"AUTHORIZED\"\n      },\n      \"returncode\": 0\n    },\n    {\n      \"command\": \"classify\",\n      \"response\": {\n        \"confirmation_checkpoint\": {\n          \"domain\": null,\n          \"execution_binding_sha256\": \"268c1fcc847872b070d720ecad301abb60296153c5d7ac7d182891fed1b5c66b\",\n          \"run_id\": null,\n          \"run_key_sha256\": null,\n          \"scientific_charge\": 0,\n          \"trial_id\": null\n        },\n        \"episode_outcome_binding\": null,\n        \"lane\": \"FAST_LANE\",\n        \"next_action\": \"SUBMIT_EXACT_BINDING\",\n        \"prior_run_id\": null,\n        \"reason_codes\": [],\n        \"run_key_sha256\": \"07f9fb0de026f50efd2abbac29796fcfdaf658c6ad211edaaf7a7699f5da6d68\",\n        \"terminal\": \"FAST_LANE_READY\"\n      },\n      \"returncode\": 0\n    }\n  ],\n  \"campaign_charges_modified\": 0,\n  \"domain\": \"SYNTHETIC\",\n  \"head\": \"3a1c5c79066364492ef8d8e93cef7614b190a72c\",\n  \"independent_oracle\": \"Retained source EXPLORATORY_REUSE/forbidden=true must dominate new external untouched role, paths and hashes\",\n  \"new_environment\": false,\n  \"observation_metadata_reads\": [],\n  \"outer_exposure_forbidden\": false,\n  \"outer_sample_role\": \"UNTOUCHED_FORWARD_HOLDOUT\",\n  \"schema\": \"smial.list-a-source-role-falsifier\",\n  \"schema_version\": \"1.0\",\n  \"scientific_charges\": 0,\n  \"scientific_reservations\": 0,\n  \"source_metadata\": {\n    \"census_rel\": {\n      \"confirmatory_reuse_forbidden\": true,\n      \"metadata_role\": \"EXPLORATORY_REUSE\",\n      \"rows\": 256,\n      \"sha256\": \"795d0a07aad247288346fb54ca625a8ca069e0430900609e652439ac3ecb0655\"\n    },\n    \"observations_rel\": {\n      \"confirmatory_reuse_forbidden\": true,\n      \"metadata_role\": \"EXPLORATORY_REUSE\",\n      \"rows\": 512,\n      \"sha256\": \"6bfa08cd940d6aa668f465a117bedb9ec0dc6aabea556a41a4d6a2c705a7a678\"\n    }\n  },\n  \"store_purpose\": \"DISPOSABLE_TEST_NOT_SCIENTIFIC_CAMPAIGN\",\n  \"store_retained\": true,\n  \"target_value_decodings\": 0,\n  \"verdict\": \"FAIL_SOURCE_ROLE_LAUNDERING_ACCEPTED\"\n}\n",
+      "sha256": "2fdda5deb3c94b17968a00099c612d87f97160bf368f58e4a0f17541df74e9d5"
+    }
+  },
+  "recovery_copy_20261015": {
+    "approved_patch_sha256": "381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba",
+    "as_of": "2026-10-15",
+    "direct_consumers": {
+      "elapsed_seconds": 6.825,
+      "scope": "31 legacy classifier and3 source-role provenance unit tests; shared existing runtime",
+      "status": "PASS",
+      "tests": 34,
+      "trace_sha256": "f02c77fa6338e71887f0ecc568671cf8ca82a78639300bfad69bd201dd150628"
+    },
+    "fresh_review": "PENDING",
+    "historical_science_requalified": false,
+    "historical_scientific_receipts_exact_bytes_unchanged": true,
+    "merge_authority": false,
+    "named_charges_unchanged": 7,
+    "new_containers": 0,
+    "new_environments": 0,
+    "new_named_scientific_runs": 0,
+    "only_product_path": "src/solana_alpha_lab/factory/lane_classifier.py",
+    "owner_authorization_ref": "repo://docs/evidence/list_a_confirming_producer_v1/owner-decision.json#source_refusal_recovery_extension",
+    "parent_head": "7de44a91080fc12ed2ef5e179fb1247ef26540ca",
+    "rebind_and_exact_head_ci": "PENDING",
+    "receipt": {
+      "execution_state": "UNCOMMITTED_PROBE_EXACT_RUNTIME_HASH_NOT_COMMITTED_HEAD_PROOF",
+      "raw_utf8": "{\n  \"attempts\": [\n    {\n      \"command\": \"classify\",\n      \"response\": {\n        \"confirmation_checkpoint\": {\n          \"domain\": null,\n          \"execution_binding_sha256\": \"268c1fcc847872b070d720ecad301abb60296153c5d7ac7d182891fed1b5c66b\",\n          \"run_id\": null,\n          \"run_key_sha256\": null,\n          \"scientific_charge\": 0,\n          \"trial_id\": null\n        },\n        \"episode_outcome_binding\": null,\n        \"lane\": \"DENY\",\n        \"next_action\": \"STOP_THIS_SOURCE_KEEP_LABELS_HISTORY_REQUIRE_SEPARATE_SOURCE_AUTHORITY\",\n        \"prior_run_id\": null,\n        \"reason_codes\": [\n          \"CONFIRMATORY_REUSE_FORBIDDEN\"\n        ],\n        \"run_key_sha256\": null,\n        \"terminal\": \"BLOCKED_BEFORE_RESERVE\"\n      },\n      \"returncode\": 0\n    },\n    {\n      \"command\": \"submit\",\n      \"response\": {\n        \"domain\": null,\n        \"execution_binding_sha256\": \"268c1fcc847872b070d720ecad301abb60296153c5d7ac7d182891fed1b5c66b\",\n        \"next_action\": \"STOP_THIS_SOURCE_KEEP_LABELS_HISTORY_REQUIRE_SEPARATE_SOURCE_AUTHORITY\",\n        \"reason_codes\": [\n          \"CONFIRMATORY_REUSE_FORBIDDEN\"\n        ],\n        \"run_id\": null,\n        \"run_key_sha256\": null,\n        \"scientific_charge\": 0,\n        \"status\": \"BLOCKED_BEFORE_RESERVE\",\n        \"trial_id\": null\n      },\n      \"returncode\": 0\n    }\n  ],\n  \"branch_unit_oracle\": [\n    {\n      \"injected_charge\": 1,\n      \"injected_reason\": \"CONFIRMATORY_REUSE_FORBIDDEN\",\n      \"response\": {\n        \"confirmation_checkpoint\": {\n          \"domain\": null,\n          \"execution_binding_sha256\": null,\n          \"run_id\": null,\n          \"run_key_sha256\": null,\n          \"scientific_charge\": 1,\n          \"trial_id\": null\n        },\n        \"episode_outcome_binding\": null,\n        \"lane\": \"DENY\",\n        \"next_action\": \"VERIFY_SAVED_CHECKPOINT_KEEP_CONSUMED_ALLOWANCE\",\n        \"prior_run_id\": null,\n        \"reason_codes\": [\n          \"CONFIRMATORY_REUSE_FORBIDDEN\"\n        ],\n        \"run_key_sha256\": null,\n        \"terminal\": \"BLOCKED_AFTER_RESERVE\"\n      }\n    },\n    {\n      \"injected_charge\": 0,\n      \"injected_reason\": \"SOURCE_ROLE_PROVENANCE_INVALID\",\n      \"response\": {\n        \"confirmation_checkpoint\": {\n          \"domain\": null,\n          \"execution_binding_sha256\": null,\n          \"run_id\": null,\n          \"run_key_sha256\": null,\n          \"scientific_charge\": 0,\n          \"trial_id\": null\n        },\n        \"episode_outcome_binding\": null,\n        \"lane\": \"DENY\",\n        \"next_action\": \"CORRECT_EXACT_CONFIRMATION_BINDING\",\n        \"prior_run_id\": null,\n        \"reason_codes\": [\n          \"SOURCE_ROLE_PROVENANCE_INVALID\"\n        ],\n        \"run_key_sha256\": null,\n        \"terminal\": \"BLOCKED_BEFORE_RESERVE\"\n      }\n    },\n    {\n      \"injected_charge\": null,\n      \"injected_reason\": \"SOURCE_ROLE_PROVENANCE_INVALID\",\n      \"response\": {\n        \"confirmation_checkpoint\": {\n          \"domain\": null,\n          \"execution_binding_sha256\": null,\n          \"run_id\": null,\n          \"run_key_sha256\": null,\n          \"scientific_charge\": null,\n          \"trial_id\": null\n        },\n        \"episode_outcome_binding\": null,\n        \"lane\": \"DENY\",\n        \"next_action\": \"CORRECT_EXACT_CONFIRMATION_BINDING\",\n        \"prior_run_id\": null,\n        \"reason_codes\": [\n          \"SOURCE_ROLE_PROVENANCE_INVALID\"\n        ],\n        \"run_key_sha256\": null,\n        \"terminal\": \"BLOCKED_RESERVATION_UNKNOWN\"\n      }\n    },\n    {\n      \"injected_charge\": null,\n      \"injected_reason\": \"CONFIRMATORY_REUSE_FORBIDDEN\",\n      \"response\": {\n        \"confirmation_checkpoint\": {\n          \"domain\": null,\n          \"execution_binding_sha256\": null,\n          \"run_id\": null,\n          \"run_key_sha256\": null,\n          \"scientific_charge\": null,\n          \"trial_id\": null\n        },\n        \"episode_outcome_binding\": null,\n        \"lane\": \"DENY\",\n        \"next_action\": \"STOP_THIS_SOURCE_KEEP_LABELS_HISTORY_REQUIRE_SEPARATE_SOURCE_AUTHORITY\",\n        \"prior_run_id\": null,\n        \"reason_codes\": [\n          \"CONFIRMATORY_REUSE_FORBIDDEN\"\n        ],\n        \"run_key_sha256\": null,\n        \"terminal\": \"BLOCKED_RESERVATION_UNKNOWN\"\n      }\n    }\n  ],\n  \"campaign_charges_modified\": 0,\n  \"evaluator_entries\": 0,\n  \"head\": \"7de44a91080fc12ed2ef5e179fb1247ef26540ca\",\n  \"metadata_reads\": [\n    {\n      \"api\": \"iter_batches\",\n      \"columns\": [\n        \"evidence_role\",\n        \"confirmatory_reuse_forbidden\"\n      ]\n    },\n    {\n      \"api\": \"iter_batches\",\n      \"columns\": [\n        \"evidence_role\",\n        \"confirmatory_reuse_forbidden\"\n      ]\n    }\n  ],\n  \"named_campaign_runs\": 0,\n  \"outer_exposure_forbidden\": false,\n  \"outer_sample_role\": \"UNTOUCHED_FORWARD_HOLDOUT\",\n  \"reused_source_attempt\": \"before-native-1\",\n  \"runner_entries\": 0,\n  \"runtime_lane_classifier_sha256\": \"d4ddf8627995c6eca630b8e7acfb098579518ad1f20931019c7e057b0bd29654\",\n  \"schema\": \"smial.list-a-recovery-copy-witness\",\n  \"schema_version\": \"1.0\",\n  \"scientific_charges\": 0,\n  \"scientific_reservations\": 0,\n  \"scope\": \"DISPOSABLE_SYNTHETIC_TEST_NOT_SCIENTIFIC_CAMPAIGN\",\n  \"source_guard_sha256\": \"2d5c1f1545578f8149d590680bdce4e4e103f61974c0b83cc32952d727eadf53\",\n  \"source_metadata\": {\n    \"census_rel\": {\n      \"confirmatory_reuse_forbidden\": true,\n      \"metadata_role\": \"EXPLORATORY_REUSE\",\n      \"rows\": 256,\n      \"sha256\": \"795d0a07aad247288346fb54ca625a8ca069e0430900609e652439ac3ecb0655\"\n    },\n    \"observations_rel\": {\n      \"confirmatory_reuse_forbidden\": true,\n      \"metadata_role\": \"EXPLORATORY_REUSE\",\n      \"rows\": 512,\n      \"sha256\": \"6bfa08cd940d6aa668f465a117bedb9ec0dc6aabea556a41a4d6a2c705a7a678\"\n    }\n  },\n  \"store_content_writes\": 0,\n  \"store_files\": 17,\n  \"store_inventory_sha256_after\": \"187eeafaea1d071cb80da710d10ea0990444f1a4e06603b7a3c6fa5ff4cbb40a\",\n  \"store_inventory_sha256_before\": \"187eeafaea1d071cb80da710d10ea0990444f1a4e06603b7a3c6fa5ff4cbb40a\",\n  \"target_value_decodings\": 0,\n  \"verdict\": \"PASS_TYPED_REFUSAL_SAFE_RECOVERY_AND_PRESERVED_CHECKPOINTS\",\n  \"worktree_clean\": false\n}\n",
+      "sha256": "679f1c48b9ed1e16fb944168fdb4fa272de51ea28e0d0cae287269a8f970cf5e"
+    },
+    "runtime_sha256": "d4ddf8627995c6eca630b8e7acfb098579518ad1f20931019c7e057b0bd29654",
+    "source_guard_sha256": "2d5c1f1545578f8149d590680bdce4e4e103f61974c0b83cc32952d727eadf53"
+  },
+  "repair_verdict": "PASS_TARGETED_SYNTHETIC_SOURCE_ROLE_BOUNDARY",
+  "root_cause": "Authoritative source row evidence_role/confirmatory_reuse_forbidden metadata omitted from pre-values validation; exterior Sample/exposure alone was insufficient",
+  "schema": "smial.list-a-source-role-provenance-audit",
+  "schema_version": "1.0",
+  "scientific_charges": 0,
+  "scientific_invariants": {
+    "acceptance_change_only": "Add project_sources_disposition.kind=NO_CHANGE; original scientific JSON payload exact-equal",
+    "core_file_sha256": "4bfd2c80526d617f664e047ffa38f802722c5ca96211aed06992506bbc29be12",
+    "historical_acceptance_before_delivery_metadata_sha256": "6cc57d3eb15d7545c7d20279c258f0952154c77038716d493e50622a031f618d",
+    "method_or_thresholds_or_estimand_changed": false,
+    "protocol_core_sha256": "3b62c8ccdc797c8f378aef831c2b5cad45bdc1e9c336ba94417bf54ccbd7e252"
+  },
+  "scientific_reservations": 0,
+  "source_parquet_columns_decoded": [
+    "evidence_role",
+    "confirmatory_reuse_forbidden"
+  ],
+  "target_value_decodings": 0,
+  "within_scope_delivery_metadata_regression": {
+    "checks": 1,
+    "elapsed_seconds": 0.204,
+    "scientific_payload_unchanged": true,
+    "test": "test_changed_acceptance_receipts_declare_source_disposition",
+    "verdict": "PASS"
+  }
+}

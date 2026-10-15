@@ -1,0 +1,276 @@
+{
+  "as_of": "2026-10-15",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_REAL_SCIENTIFIC_ACCEPTANCE",
+    "HISTORICAL_ENVIRONMENT_VIOLATION_PRESERVED_OWNER_ACCEPTED",
+    "NO_MERGE_AUTHORITY",
+    "NO_FRESH_FULL_CI_PASS",
+    "NO_REQUALIFICATION_OF_HISTORICAL_SCIENCE_ON_NEW_SOURCE_GUARD"
+  ],
+  "remediation_history": [
+    {
+      "finding": "Consumed charge hidden by denied submit",
+      "observed_head": "fe6ee0ff79451f6b14ad7dc03280e230960f834a",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "44227e5101d6e5edfde195bbd8bceaee9fba4d80",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Native numeric refusal falsely resumable",
+      "observed_head": "fe6ee0ff79451f6b14ad7dc03280e230960f834a",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "44227e5101d6e5edfde195bbd8bceaee9fba4d80",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Denied classify/submit falsely before reserve with charge0",
+      "observed_head": "fe6ee0ff79451f6b14ad7dc03280e230960f834a",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "44227e5101d6e5edfde195bbd8bceaee9fba4d80",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Unavailable/unverifiable history falsely NO_RUN/NO_DECISION",
+      "observed_head": "fe6ee0ff79451f6b14ad7dc03280e230960f834a",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "44227e5101d6e5edfde195bbd8bceaee9fba4d80",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Missing ordinary exact owner revoke path",
+      "observed_head": "44227e5101d6e5edfde195bbd8bceaee9fba4d80",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "dbc77d49ef5437287635f23a9bd71e7e5cbbec87",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Repeated prepare/authorize falsely unspent and new execution NEXT",
+      "observed_head": "44227e5101d6e5edfde195bbd8bceaee9fba4d80",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "dbc77d49ef5437287635f23a9bd71e7e5cbbec87",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Prepared-before-reserve alias and early capability refusal hide original consumed checkpoint",
+      "observed_head": "f4d3b510e51604ce881fc257390ffbeadc0a2db0",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "bbd12a38e55db23fdbbe59796a21f11cf275dbdf",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Native numeric insufficiency incorrectly mapped INVALID against frozen contract",
+      "observed_head": "f4d3b510e51604ce881fc257390ffbeadc0a2db0",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "bbd12a38e55db23fdbbe59796a21f11cf275dbdf",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Required ambiguous numeric terminal lacked explicit independent pure-method oracle",
+      "observed_head": "e5919ddf0352e9f70b947d2c504b063d46ea9fec",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "798822159d2c593e353501866b76b8903f7aa53c",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Resource coverage falsely claimed no new environment after retained incident",
+      "observed_head": "798822159d2c593e353501866b76b8903f7aa53c",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "54502e4ab8a2cbbe58322493a9ff73d3f95fa0b4",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Cold status/show lost known consumed charge/identity on missing or conflicting result",
+      "observed_head": "54502e4ab8a2cbbe58322493a9ff73d3f95fa0b4",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "b34ffd2dc481f18808530b22edfdc362efb92fb4",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Historical empty review .venv violation was not owner accepted; resolved FORWARD by exact owner decision plus NEW isolated review, initial violation and NOT_READY immutable.",
+      "observed_head": "c1c626f68a4a9abad2ab03cafd410c50dcd1e4b2",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "8daef7ba3374e2c22ee6854997544ae34f9e7fe7",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "BLOCKER"
+    },
+    {
+      "finding": "Historical empty review .venv violation was not owner accepted; resolved FORWARD by exact owner decision plus NEW isolated review, initial violation and NOT_READY immutable.",
+      "observed_head": "c1c626f68a4a9abad2ab03cafd410c50dcd1e4b2",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "8daef7ba3374e2c22ee6854997544ae34f9e7fe7",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "BLOCKER"
+    },
+    {
+      "finding": "Three legacy compatibility blockers resolved by exact owner-authorized fixture/pin/expectation patch and55targetedPASS; recoveryP2 remains separately open.",
+      "observed_head": "822a848a758e501727d26fb7b2eec489d8264dfd",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "2b906c386262e4881dc932a704dc0314b356ddfd",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Three legacy compatibility blockers resolved by exact owner-authorized fixture/pin/expectation patch and55targetedPASS; recoveryP2 remains separately open.",
+      "observed_head": "822a848a758e501727d26fb7b2eec489d8264dfd",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "2b906c386262e4881dc932a704dc0314b356ddfd",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Three legacy compatibility blockers resolved by exact owner-authorized fixture/pin/expectation patch and55targetedPASS; recoveryP2 remains separately open.",
+      "observed_head": "822a848a758e501727d26fb7b2eec489d8264dfd",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "2b906c386262e4881dc932a704dc0314b356ddfd",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Source-role refusal misleading binding-recovery P2 resolved by exact separately authorizedcopy381fc5 andcommittednative classify/submit zero-value/charge/write witness plus34directconsumerPASS. Code independentlyfound separateCatalogURI P2; overallNOT_READY preserved.",
+      "observed_head": "2b906c386262e4881dc932a704dc0314b356ddfd",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "6c72738caa261175a1dee94aa66aa1e4ff197102",
+      "role": "CODE_REVIEWER",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "Source-role refusal misleading binding-recovery P2 resolved by exact separately authorizedcopy381fc5 andcommittednative classify/submit zero-value/charge/write witness plus34directconsumerPASS. Code independentlyfound separateCatalogURI P2; overallNOT_READY preserved.",
+      "observed_head": "2b906c386262e4881dc932a704dc0314b356ddfd",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "6c72738caa261175a1dee94aa66aa1e4ff197102",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "Source-role refusal misleading binding-recovery P2 resolved by exact separately authorizedcopy381fc5 andcommittednative classify/submit zero-value/charge/write witness plus34directconsumerPASS. Code independentlyfound separateCatalogURI P2; overallNOT_READY preserved.",
+      "observed_head": "2b906c386262e4881dc932a704dc0314b356ddfd",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "6c72738caa261175a1dee94aa66aa1e4ff197102",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "Source-role CataloglogicalURI/pathmismatch resolved bycorrectcanonicalURI/nativegeneratednavigation andnativeresolve/exactURIoracle/26CatalogPASS; freshactualCODEPASS, no scientificruntimechange.",
+      "observed_head": "6c72738caa261175a1dee94aa66aa1e4ff197102",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "9ce5ee6a4873b172b48b0824080f571f62d4891c",
+      "role": "CODE_REVIEWER",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "Relocated unchanged input1.1 sample consumed attempt before cold source-path refusal; shared register/inspect/cold closure now refuses pre-values/reservation",
+      "observed_head": "7e16f3435a98f7bc31fc2ffe4adb8d75ec49ef67",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "eb5e86d667a45b3ee4a12e7480dd3b634b951ff6",
+      "role": "CODE_REVIEWER",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "Owner direction path bound historical CRLF bytes; current LF ref corrected and raw CRLF preserved separately",
+      "observed_head": "7e16f3435a98f7bc31fc2ffe4adb8d75ec49ef67",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "eb5e86d667a45b3ee4a12e7480dd3b634b951ff6",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "CLI maturity null/read-failure falsely unspent; now UNKNOWN blocks new authority, consumed allowance retained, zero proven",
+      "observed_head": "7e16f3435a98f7bc31fc2ffe4adb8d75ec49ef67",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "eb5e86d667a45b3ee4a12e7480dd3b634b951ff6",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "CLI projection omitted stored scientific limits; persisted limits now visible on public result and native cold status/show",
+      "observed_head": "7e16f3435a98f7bc31fc2ffe4adb8d75ec49ef67",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "eb5e86d667a45b3ee4a12e7480dd3b634b951ff6",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
+    }
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-SEMANTIC-INTEGRATION-FINAL",
+  "reviewed_bindings_sha256": "76c2ff86d042645225556761c48e7c91645f553b326b0cbdbe059ef43c69b233",
+  "reviewed_inventory_sha256": "abffb3d838fffc8badba768ad41966219f7c8f39a465c1e8025c2c8d6e8f1dba",
+  "reviews": [
+    {
+      "findings": [
+        "Fresh actual isolated read-only review of head1e29a23d5951c87b68d1f5434a62307610203389; baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15; all56 implementation hashes verified. Prior7e16 NOT_READY remains in semantic-integration.json#review_followup and review-history.json; no retrospective conversion.",
+        "reviewed_bindings_sha256=76c2ff86d042645225556761c48e7c91645f553b326b0cbdbe059ef43c69b233; reviewed_inventory_sha256=abffb3d838fffc8badba768ad41966219f7c8f39a465c1e8025c2c8d6e8f1dba; packet_fingerprint_sha256=4ebb48237abb9391c62517e0a9b1895dfe80518feedbc68871991988062a7e09",
+        "F01 original32 daily owners/256admissions/native clocks/fullD128+128/numeric0.125/B4096/coldPRESENT independent ownership oracle. F02 native rounded maturity before values/reservation; mature MISSING_TYPED retains denominator. Source-role laundering forbidden; original labels dominate outer envelope. Seven named charges/core/results immutable; retained engineeringTESTcharges3 separate; no new campaign/REAL/provider/env/dependency/deploy/merge.",
+        "16 direct-consumer PASS includes source-layout alias zero-value/evaluator/record refusal, CLI consumed/null/read-failure safety, actual cold status/show persistedlimits, legacy replay/source-role. Current committed native F02 fiveentrypoint/source-role readbacks values/evaluator/reservations/charges/writes0, originalstores unchanged. Read-only critics did not run tests/product CLI/network/writes/environments.",
+        "Synthetic scope only. REAL source availability/integration UNKNOWN; blindActor/modeldiversity/earlyP0decoder/cleanhost/sharedphysicaltotals unverified. Current content review does not establish exactCI/readiness/ownermergeauthority.",
+        "Actual isolated CODE_REVIEWER PASS; actionable findings none. Independently verified all56 implementation hashes and21 audit refs, retained16PASS log and native zero-value/charge witnesses.",
+        "Prior P2 source-path alias closed: shared exact source layout in registration, inspect and cold result refuses unchanged relocated sample before values/reservation; regression zero evaluator/read/records. CLI unknown/readfailure/consumed preserved and limits visible; LF/rawCRLF references exact. Legacy shape, method, overlap/crash/cold invariants unchanged."
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Fresh actual isolated read-only review of head1e29a23d5951c87b68d1f5434a62307610203389; baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15; all56 implementation hashes verified. Prior7e16 NOT_READY remains in semantic-integration.json#review_followup and review-history.json; no retrospective conversion.",
+        "reviewed_bindings_sha256=76c2ff86d042645225556761c48e7c91645f553b326b0cbdbe059ef43c69b233; reviewed_inventory_sha256=abffb3d838fffc8badba768ad41966219f7c8f39a465c1e8025c2c8d6e8f1dba; packet_fingerprint_sha256=4ebb48237abb9391c62517e0a9b1895dfe80518feedbc68871991988062a7e09",
+        "F01 original32 daily owners/256admissions/native clocks/fullD128+128/numeric0.125/B4096/coldPRESENT independent ownership oracle. F02 native rounded maturity before values/reservation; mature MISSING_TYPED retains denominator. Source-role laundering forbidden; original labels dominate outer envelope. Seven named charges/core/results immutable; retained engineeringTESTcharges3 separate; no new campaign/REAL/provider/env/dependency/deploy/merge.",
+        "16 direct-consumer PASS includes source-layout alias zero-value/evaluator/record refusal, CLI consumed/null/read-failure safety, actual cold status/show persistedlimits, legacy replay/source-role. Current committed native F02 fiveentrypoint/source-role readbacks values/evaluator/reservations/charges/writes0, originalstores unchanged. Read-only critics did not run tests/product CLI/network/writes/environments.",
+        "Synthetic scope only. REAL source availability/integration UNKNOWN; blindActor/modeldiversity/earlyP0decoder/cleanhost/sharedphysicaltotals unverified. Current content review does not establish exactCI/readiness/ownermergeauthority.",
+        "Actual isolated GOAL_DOD_CRITIC PASS; evidence-backed gaps none. Independently recomputed56 committed/worktree bindings,19packet evidence refs and21 semantic links; matches exact frozen candidate.",
+        "F01/F02 accepted outcome met within synthetic scope; original32 owners/fullpopulation, native maturity/maturemissing, sourcealias refusal, CLI zero/consumed/UNKNOWN and limits verified. Original CRLF request retained with separate locator, current LF hash correct. Seven historical charges/core/method immutable and retainedTESTcharges3. REAL integration UNKNOWN."
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Fresh actual isolated read-only review of head1e29a23d5951c87b68d1f5434a62307610203389; baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15; all56 implementation hashes verified. Prior7e16 NOT_READY remains in semantic-integration.json#review_followup and review-history.json; no retrospective conversion.",
+        "reviewed_bindings_sha256=76c2ff86d042645225556761c48e7c91645f553b326b0cbdbe059ef43c69b233; reviewed_inventory_sha256=abffb3d838fffc8badba768ad41966219f7c8f39a465c1e8025c2c8d6e8f1dba; packet_fingerprint_sha256=4ebb48237abb9391c62517e0a9b1895dfe80518feedbc68871991988062a7e09",
+        "F01 original32 daily owners/256admissions/native clocks/fullD128+128/numeric0.125/B4096/coldPRESENT independent ownership oracle. F02 native rounded maturity before values/reservation; mature MISSING_TYPED retains denominator. Source-role laundering forbidden; original labels dominate outer envelope. Seven named charges/core/results immutable; retained engineeringTESTcharges3 separate; no new campaign/REAL/provider/env/dependency/deploy/merge.",
+        "16 direct-consumer PASS includes source-layout alias zero-value/evaluator/record refusal, CLI consumed/null/read-failure safety, actual cold status/show persistedlimits, legacy replay/source-role. Current committed native F02 fiveentrypoint/source-role readbacks values/evaluator/reservations/charges/writes0, originalstores unchanged. Read-only critics did not run tests/product CLI/network/writes/environments.",
+        "Synthetic scope only. REAL source availability/integration UNKNOWN; blindActor/modeldiversity/earlyP0decoder/cleanhost/sharedphysicaltotals unverified. Current content review does not establish exactCI/readiness/ownermergeauthority.",
+        "Actual ARCHITECTURE_CRITIC PASS; SEMANTIC_PREMISE PASS. Frozen packet+diff only,56candidate bindings/19evidence refs/Git bytes verified. packet_fingerprint_sha256=4ebb48237abb9391c62517e0a9b1895dfe80518feedbc68871991988062a7e09. PACKET_INFORMATION_PATH only; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN; builder flags not live-launch attestation.",
+        "Each admission retains original scheduleSHA/activation/frame/UTCcohort/clocks; one compatible frozen template; no duplicate/cohort owner/foreignfamily. Independent raw file/date/join oracle binds full population. Native E14400 deadline <=frozen cutoff before target values/missingness/reservation; mature missing remains D128/128. No mandatory premise correction.",
+        "Source registration, exact execution grant, protection, reservation and result completion remain separate authority boundaries. Kernel lock and committed reservation/RUN_STARTED precede values, acquisition alias never restores allowance. Cold schema/hash/source/grant/reservation/atomic carriers required; orphan not PRESENT. PRESENT availability is not hypothesis acceptance; synthetic nonpromotable. UNKNOWN/null not zero, CLI unknown/consumed blocks new authority and keeps persistedlimits.",
+        "Compatibility keeps closed input1.1 and original1.0/sixfile result closure. Shared input/cold layout prevents charge-before-layout failure. No new foreign private API imports. WithoutDuckDB truth remains Git core/definition, immutable sources/result and ResearchStore committed partitions/manifests; ordinary dossier is derived view. Existing public owners/ResearchStore/kernel lock suffice; no new platform/dependency.",
+        "What can pass tests yet break research validity: inaccurate trusted exposure/source/availability, unseen prior data use, or real dependence/MNAR violating empirical bootstrap coverage. Synthetic conditional observational validation does not prove REAL availability/integration, alpha, causality or frequentist coverage. Premise falsifiers: foreigndaily owner accepted, immature deadline reserves, maturemissing removed fromD, alias resetsallowance, coldPRESENT without whole committedlineage; none found. Local negative terminal is exact protocol/question/boundary, no family closure/strategy authority."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Fresh actual isolated read-only review of head1e29a23d5951c87b68d1f5434a62307610203389; baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15; all56 implementation hashes verified. Prior7e16 NOT_READY remains in semantic-integration.json#review_followup and review-history.json; no retrospective conversion.",
+        "reviewed_bindings_sha256=76c2ff86d042645225556761c48e7c91645f553b326b0cbdbe059ef43c69b233; reviewed_inventory_sha256=abffb3d838fffc8badba768ad41966219f7c8f39a465c1e8025c2c8d6e8f1dba; packet_fingerprint_sha256=4ebb48237abb9391c62517e0a9b1895dfe80518feedbc68871991988062a7e09",
+        "F01 original32 daily owners/256admissions/native clocks/fullD128+128/numeric0.125/B4096/coldPRESENT independent ownership oracle. F02 native rounded maturity before values/reservation; mature MISSING_TYPED retains denominator. Source-role laundering forbidden; original labels dominate outer envelope. Seven named charges/core/results immutable; retained engineeringTESTcharges3 separate; no new campaign/REAL/provider/env/dependency/deploy/merge.",
+        "16 direct-consumer PASS includes source-layout alias zero-value/evaluator/record refusal, CLI consumed/null/read-failure safety, actual cold status/show persistedlimits, legacy replay/source-role. Current committed native F02 fiveentrypoint/source-role readbacks values/evaluator/reservations/charges/writes0, originalstores unchanged. Read-only critics did not run tests/product CLI/network/writes/environments.",
+        "Synthetic scope only. REAL source availability/integration UNKNOWN; blindActor/modeldiversity/earlyP0decoder/cleanhost/sharedphysicaltotals unverified. Current content review does not establish exactCI/readiness/ownermergeauthority.",
+        "Actual fresh isolated OWNER_UX_CRITIC PASS; confirmed operability gaps none on exact frozenhead/fingerprint.",
+        "Both prior P2 closed: UNKNOWN/read-failure cannot issue new execution authority, wait/rebind only knownzero; consumed stays visible. Public CLI preserves original persisted scientific limits. Review does not claim current CI/readiness/merge authority."
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
+  "verdict": "PASS"
+}

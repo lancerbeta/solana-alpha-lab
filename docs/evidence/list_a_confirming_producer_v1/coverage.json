@@ -1,0 +1,148 @@
+{
+  "coverage": [
+    {
+      "evidence": "Spec1.5 + registered capability + classifier/DocumentRunner + ordinary locator",
+      "requirement": "ordinary route/definition",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Six hash-bound native sources; source-owner ingress/admissions/frame nomination; exact source registration",
+      "requirement": "native input/source authority",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Actual reader counter + intentional forbidden-read canary; refusal before reserve charges zero",
+      "requirement": "preflight no outcomes",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Independent inventories; target availability tail; incomplete/unknown/DENY/revoke refused",
+      "requirement": "frozen/current purpose protection",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Strict purge equality refusal; CPython3.13.14; committed/working/Catalog assets; native off-grid clock oracle",
+      "requirement": "chronology/runtime",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Fraction 1/5, fixed nondegenerate draws, exact seeds/ranks, actual positive/null/insufficient bootstrap/LOO",
+      "requirement": "accepted numeric method",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Native oracle; repeated mint; exact future-only target/missingness counterfactual retains membership/D",
+      "requirement": "membership/estimand",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Committed reserve before decoder; overlap alias no reset; two real processes one evaluator/charge",
+      "requirement": "reservation/budget/concurrency",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Actual OS exits; same trial/charge; orphan not qualifying; response loss cold zero calls/writes",
+      "requirement": "crash/publication/replay",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Closed saved result/schema/identity/hash/all carriers one txn; foreign carrier conflict; ordinary PAUSE/REJECT/stale; PROMOTE blocked",
+      "requirement": "typed result and decisions",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Actual native foreign/conflicting/late observation decoder; durable invalid charge; after-values grant revoke prevents completion",
+      "requirement": "malformed observations/current revoke",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Classifier/decisions; episode1.4 14 PASS/2 SKIP",
+      "requirement": "legacy",
+      "status": "PASS_WITH_EXPLICIT_SKIPS"
+    },
+    {
+      "evidence": "Measured allocation under target/cap; named P0/OS attempts retained; no new images/dependencies. One accidental empty review environment created, reversibly archived with no installs/product/science use, accounted in footprint-review-final; active .venv absent",
+      "requirement": "resources/history",
+      "status": "PASS"
+    },
+    {
+      "evidence": "UNBOUND/0 real executions; no alpha/execution/StrategyVersion/activation/PAPER/blind Actor",
+      "requirement": "real sample/science/strategy/Actor",
+      "status": "NOT_CLAIMED"
+    },
+    {
+      "evidence": "Actual CLI charge/identity + zero new decoder/evaluator/writes; UNKNOWN history and visible charged reservation on result conflict; prepared-before-reserve acquisition alias and early capability refusal retain original checkpoint; actual status/show with only trial-id on missing/conflicting result retain validated consumed checkpoint",
+      "requirement": "denied readout and unavailable/unverifiable history",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Read-only preview, wrong phrase refusal, exact revoke before/after reserve, idempotent repeat; prepare/authorize/alias ALREADY_RESERVED charge1",
+      "requirement": "owner exact revoke and repeated metadata commands",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Registered positive-price native nonfinite/unrepresentable returns -> typed INSUFFICIENT, charge1, full observed counts, null numeric result, zero bootstrap draws; repeat and cold saved result no new look",
+      "requirement": "native numeric refusal",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Literal -1/8 and zero, concentrated point1/256 with LOOmin0/max1/248 and seeded intervals lower0 -> INCONCLUSIVE; actual pooled all-first-label draws -> 4096 invalid per partition, no reroll",
+      "requirement": "negative/zero/ambiguous and empty-bootstrap boundary predicates",
+      "status": "PASS"
+    },
+    {
+      "evidence": "source-role-provenance.json: prior P1 acceptance proved; same source bytes typed refusal after repair; observation-only late-row/missing/invalid provenance and legitimate compatible domain-independent metadata checks",
+      "requirement": "authoritative original source-role provenance",
+      "status": "PASS_TARGETED_SYNTHETIC"
+    },
+    {
+      "current_disposition": "Historical three-fixture blocker resolved by owner-authorized compatibility55PASS; fullCI still pending and P2 recovery unresolved",
+      "evidence": "Prior PR406 workflow38663657983 failed; three legacy test fixture compatibility paths require separate exact write-set authority; no passing CI transferred",
+      "observed_at_content_head": "822a848a758e501727d26fb7b2eec489d8264dfd",
+      "requirement": "fresh exact-head CI delivery",
+      "status": "BLOCKED_OUTSIDE_MANAGED_WRITE_SET"
+    },
+    {
+      "evidence": "55 PASS: all three changed legacy modules plus source-role provenance. Prior three outside-write-set blockers resolved by exact owner extension and minimal fixture/pin/expectation patch; historical entries retained. P2 recovery remains unresolved; no fresh fullCI PASS.",
+      "requirement": "Owner-authorized Spec1.5 legacy test compatibility",
+      "status": "PASS_TARGETED_REGRESSION"
+    },
+    {
+      "evidence": "Exact separately owner-authorized P2 patch381fc5. Same immutable exploratory source classify+submit BLOCKED_BEFORE_RESERVE / CONFIRMATORY_REUSE_FORBIDDEN / STOP_THIS_SOURCE_KEEP_LABELS_HISTORY_REQUIRE_SEPARATE_SOURCE_AUTHORITY. Target values/evaluator/reservations/charges/store content writes0;17files hash-identical. Unit branch oracle preservescharge1/otherreasons/null.34 direct-consumerPASS. Fresh independent review/binding/fullCI pending.",
+      "requirement": "Source-refusal owner recovery copy",
+      "status": "PASS_TARGETED_NATIVE_TEST"
+    },
+    {
+      "evidence": "goal_autonomy_catalog_uri_20261015: Catalog URI equals repository_path/source-role-provenance.json; native resolver and exact URI ranked discovery agree. Historical wrong URI and CODE_NOT_READY retained in Git86ef8bd; fresh review/bind/CI pending. All26Catalogschema/rankedsearch/resolver/livegoldqueriesPASS; no newtests/assertion changes orscientificruns.",
+      "requirement": "Correct discoverable source-role evidence URI",
+      "status": "PASS_NATIVE_RESOLVE_AND_EXACT_URI_ORACLE"
+    },
+    {
+      "evidence": "CI1 onD975 PASS; readiness1 correctlyDENY becauseDELIVERY_EVIDENCE deferred. TaskL2 nowrequires existingexact3paths; nativeuncommittedAB false→true and3regressionsPASS. No gate/source/sciencechange. Fresh4review/rebind/CI2/readiness2 pending.",
+      "requirement": "Readiness context contains exact delivery evidence",
+      "status": "PASS_NATIVE_AB_PREVIEW_AND_3_REGRESSIONS;NEW_EXACT_HEAD_CI_PENDING"
+    },
+    {
+      "evidence": "semantic-integration.json#F02: retained original unspent source, five native refusals; zero values/evaluator/reservations/charges/writes; grid+grace equality and mature missing full denominator",
+      "requirement": "F02 metadata-only native calendar maturity",
+      "status": "PASS"
+    },
+    {
+      "evidence": "semantic-integration.json#F01:32originalowners/256admissions/D128+128/mints127+128/32blocks each partition; exact ownership/population oracle; native alias consumption retained; typed negatives; no virtual schedule",
+      "requirement": "F01 original daily source identities through numeric result and cold dossier",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Legacy exact6-file guard retained; input1.1 original owners and exact5+N source paths; cold PRESENT/no values/no evaluator/no writes; synthetic promotion denied",
+      "requirement": "F01 typed result source-set compatibility",
+      "status": "PASS"
+    },
+    {
+      "evidence": "semantic-integration.json#review_followup; first7e16 code/goal/UX NOT_READY preserved; fresh four-role review on new fingerprint required",
+      "requirement": "Independent semantic review P2 closures: pre-reserve layout, UNKNOWN recovery, visible limits and exact owner hash",
+      "status": "PASS_16_DIRECT_CONSUMERS_AND_NATIVE_ZERO_VALUE_CHARGE_READBACKS"
+    }
+  ],
+  "schema": "smial.list-a-confirmation-coverage",
+  "schema_version": "1.0"
+}

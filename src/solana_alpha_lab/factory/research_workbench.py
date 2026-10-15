@@ -821,6 +821,7 @@ def build_research_detail(
             records=records,
             records_status=records_status,
             write_capability=write_capability,
+            research_store=research_store,
         )
         handoff = compose_science_to_strategy_handoff(
             root=root,
