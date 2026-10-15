@@ -1197,6 +1197,171 @@
           }
         }
       }
+    },
+    "capture_control_deadline_remediation": {
+      "observed_head": "b3c12e3aa2d12c12cc3fa9afa1d1971ed14f9824",
+      "prior_packet_fingerprint_sha256": "42170c22d39f626935d00c684856fa24cca3bed37ebf31ae573ceaeaaac13e94",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "OWNER_UX_CRITIC": "PASS",
+        "ARCHITECTURE_CRITIC": "NOT_READY"
+      },
+      "before": {
+        "independent_oracle": "Existing native real-control-event fixture; real ResearchStore manifest parser with controlled60ms delay; shared fence budget0.10s; separate live SQLite BEGIN IMMEDIATE probe before each manifest read.",
+        "manifest_read_elapsed_before_seconds": [
+          0.001,
+          0.07,
+          0.137,
+          0.209,
+          0.271,
+          0.332,
+          0.41,
+          0.472,
+          0.533
+        ],
+        "separate_writer_blocked_each_read": true,
+        "dependency_elapsed_seconds": 0.608,
+        "terminal": "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED only after closure returns",
+        "meaning": "Additional sequential work continued after the capture budget, delaying collector availability; this was not one unpreemptible syscall."
+      },
+      "native_validation": {
+        "schema": "smial.i2-capture-closure-deadline-validation.v1",
+        "result": "PASS",
+        "base_head": "b3c12e3aa2d12c12cc3fa9afa1d1971ed14f9824",
+        "source_frozen": true,
+        "owned_paths_sha256": {
+          "src/solana_alpha_lab/factory/remote_ops.py": "89e44282accc162e920392c68fba4eef10d04e923ae38e8e4f5e5361122ad741",
+          "tests/test_i2_backup_legacy_storage_v1.py": "b9a1c97e01a8e1d2fd1aa6c5caae817bd8d27bfe76cc4dd371bd583b648530e8"
+        },
+        "before": {
+          "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1.I2BackupLegacyStorageTests.test_recovery_closure_checks_deadline_before_next_native_manifest_read",
+          "tests_run": 1,
+          "failures": 1,
+          "wall_seconds": 1.179,
+          "capture_budget_seconds": 0.1,
+          "injected_native_manifest_read_seconds": 0.06,
+          "native_manifest_reads": 9,
+          "manifest_read_starts_seconds": [
+            0.0168348,
+            0.0855308,
+            0.1527745,
+            0.224817,
+            0.2867323,
+            0.3487677,
+            0.4259146,
+            0.4872959,
+            0.5485737
+          ],
+          "independent_writer_blocked_during_reads": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "typed_refusal": "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED",
+          "refusal_wall_seconds": 0.635,
+          "finding": "Closure continued native manifest reads and blocked the SQLite writer after the original shared fence deadline"
+        },
+        "after": {
+          "targeted_command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1 tests.test_factory_offhost_backup tests.test_factory_remote_operations tests.test_mutable_backup_zip64_repair_v1",
+          "tests_run": 84,
+          "passed": 83,
+          "skipped": 1,
+          "skip_reason": "Existing symlink proof requires POSIX",
+          "failures": 0,
+          "errors": 0,
+          "wall_seconds": 23.361,
+          "dependency_closure_oracle": {
+            "native_manifest_reads": 2,
+            "manifest_read_starts_seconds": [
+              0.0167868,
+              0.0860068
+            ],
+            "reads_started_after_deadline": 0,
+            "independent_writer_blocked_during_reads": [
+              true,
+              true
+            ],
+            "typed_refusal": "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED",
+            "refusal_wall_seconds": 0.165
+          },
+          "native_control_lookup_oracle": {
+            "native_manifest_reads": 1,
+            "manifest_read_starts_seconds": [
+              0.0456371
+            ],
+            "reads_started_after_deadline": 0,
+            "independent_writer_blocked_during_reads": [
+              true
+            ],
+            "typed_refusal": "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED",
+            "refusal_wall_seconds": 0.127
+          },
+          "refusal_readback": {
+            "source_business_rows_and_rowids": "UNCHANGED",
+            "independent_writer_after_refusal": "ADMITTED",
+            "backup_zip": "ABSENT",
+            "publication_marker": "ABSENT",
+            "owned_capture_staging": "ABSENT"
+          },
+          "finite_materialization_oracles": [
+            "Flat manifest census counts unmatched directory entries and refuses before any native manifest parse",
+            "Root control traversal counts unmatched directories before filtering the SQLite basename",
+            "Physical partition-size budget refuses before the unchanged native partition verifier",
+            "Actual Parquet row count exceeding the budget refuses even when signed manifest row_count remains small",
+            "Compressed Parquet uncompressed-column budget refuses before the unchanged native table materialization",
+            "Actual recursive SQLite VM query interruption under writer fence retains BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED, then admits independent writer"
+          ],
+          "fast_normal_path": {
+            "native_active_schedule_control_restore": "PASS",
+            "recovery_control": {
+              "transitions": 1,
+              "authorities": 1
+            },
+            "historical_full_delta_restore": "PASS",
+            "open_publication_partition_recovery": "PASS",
+            "zip64_and_offhost_direct_consumers": "PASS"
+          },
+          "factory_static": {
+            "reported_by": "root",
+            "command": "uv run --locked --managed-python python -B scripts/validate_factory_static.py",
+            "result": "PASS",
+            "wall_seconds": 0.958
+          },
+          "additional_direct_consumer": {
+            "reported_by": "root",
+            "module": "tests.test_observation_schedule_remote_ops",
+            "tests_run": 9,
+            "passed": 9,
+            "skipped": 0,
+            "result": "PASS",
+            "wall_seconds": 0.582
+          }
+        },
+        "implementation": [
+          "One ephemeral context carries the original monotonic fence deadline through dependency closure and native control verification",
+          "Deadline checks run before and after native manifest, partition and identity lookups; guarded enumeration avoids unbounded sorted filtered glob collections",
+          "Per-instance ResearchStore adapter reuses unchanged native parsers, hash checks, duplicate checks and scientific verification; no ResearchStore source edits",
+          "Existing 65536 path/material/row, 16384 manifest/partition and 32MiB cumulative metadata/materialization limits bound closure work",
+          "Actual Parquet metadata is checked for rows, rowgroup/column enumeration and uncompressed column bytes before native table materialization",
+          "Raw-reference traversal is iterative and bounded; mutable capture checks between stream chunks; captured SQL queries use a deadline progress handler",
+          "Existing publication partition budget refusal remains typed compatibly; elapsed shared deadline always has the capture-fence budget refusal"
+        ],
+        "limits": [
+          "Injected 60ms native manifest latency and 100ms budget are isolated test inputs, not measured production timing",
+          "Cooperative checks do not hard-preempt an individual filesystem, SQLite or Parquet native call; the in-flight call and cleanup can exceed the deadline",
+          "Repeated native lookups consume the shared finite budget and may refuse honestly; live capacity and B/C acceptance remain UNKNOWN",
+          "No production deployment, upload, compaction, reclaim or maintenance activation; no full gate or Git mutations"
+        ]
+      },
+      "scientific_semantics": "Exact OPS control/publication/authority causal closure still required; native scientific parsers/verifiers unchanged; absent/corrupt closure refuses without accepted marker.",
+      "limit": "Cooperative monotonic deadline stops subsequent work; individual in-flight OS/native calls cannot be hard-preempted. Installed filesystem latency and live collector gaps remain mandatory B/C acceptance."
     }
   },
   "main_integration": {

@@ -292,3 +292,20 @@ checks PASS/10.004s с обеими mode branches и полным CLI rehearsal.
 pipeline отдельно PASS/11.170s; factory static PASS. Raw SQL сохраняет ROWIDs,
 source clocks/state, exact proof и signed policy; принятую rehearsal policy
 следующий same-mode caller выполняет без повышения authority.
+
+## Capture/control deadline
+
+Свежий architecture review на `b3c12e3` обнаружил последовательные чтения
+research manifests внутри writer fences после deadline. Native lifecycle/parser
+с controlled60ms latency, budget0.10s: 9 reads, отдельный SQL writer заблокирован,
+refusal только через0.608s. Это реальный availability defect на медленном storage,
+хотя маленький byte-perfect fixture проходит.
+
+Backup owner теперь передаёт один monotonic budget через dependency/control
+enumeration, native parsing/verification/lookup, raw refs и SQL-обход. Конечные
+count/byte limits проверяются до полной materialization; исчерпание отказывает,
+освобождает fences и не принимает checkpoint/marker. Native scientific verifier,
+exact causal closure и old full/new delta semantics сохранены. Native negative
+writer/cleanup oracle и нормальные direct consumers записаны в proof.json.
+Один начатый OS/native вызов нельзя жёстко прервать: это cooperative deadline,
+а не hard real-time гарантия. Actual Linux latency/collector gaps — mandatory B/C.

@@ -472,13 +472,11 @@ print(json.dumps(remote.package_backup(root,config=config,sink_override=sink,pru
             dest_root=Path(self.temp.name)/"retry",expected_inventory_sha256=inventory["inventory_sha256"])
         self.assertEqual(result["raw_inventory_sha256"], inventory["inventory_sha256"])
 
-    def test_real_control_event_closure_survives_mutable_only_restore(self) -> None:
+    def _seed_real_control_activation(self) -> tuple[dict, dict]:
         from solana_alpha_lab.factory.observation_schedule import load_observation_schedule
         from solana_alpha_lab.factory.observation_schedule_lifecycle import (
             activate_schedule, authorize_schedule, prepare_schedule_authority)
         from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
-        from solana_alpha_lab.factory.research_store import ResearchStore
-
         self.config["backup"]["recursive_relative_paths"] = [f"{RDP}/datasets/publication_jobs"]
         (self.root/RDP/"datasets/publication_jobs").mkdir(parents=True)
         now = datetime(2026,9,1,0,10,tzinfo=UTC)
@@ -495,6 +493,161 @@ print(json.dumps(remote.package_backup(root,config=config,sink_override=sink,pru
             activation = store.get_activation(document["schedule_sha256"],"ACT-I2-RESTORE")
         finally:
             store.close()
+        return activation, authorized
+
+    def _assert_recovery_closure_deadline(self, phase: str) -> None:
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        self._seed_real_control_activation()
+        before = _raw_sql_readback(self.root/OPS)
+        read = ResearchStore._read_manifest
+        fences = remote._capture_writer_fences
+        clock = {}
+        reads, blocked = [], []
+
+        @contextmanager
+        def observed_fence(sources):
+            clock["start"] = time.monotonic()
+            with fences(sources):
+                yield
+
+        def delayed_native_read(store, path):
+            live = path.is_relative_to(self.root/RDP)
+            if live != (phase == "dependencies"):
+                return read(store,path)
+            reads.append(time.monotonic()-clock["start"])
+            with closing(sqlite3.connect(self.root/OPS,timeout=0)) as peer:
+                try:
+                    peer.execute("BEGIN IMMEDIATE")
+                except sqlite3.OperationalError:
+                    blocked.append(True)
+                else:
+                    blocked.append(False)
+                    peer.rollback()
+            time.sleep(0.06)
+            return read(store,path)
+
+        started = time.monotonic()
+        with patch.object(remote,"BACKUP_CAPTURE_FENCE_SECONDS",0.10), patch.object(
+                remote,"_capture_writer_fences",observed_fence), patch.object(
+                ResearchStore,"_read_manifest",delayed_native_read):
+            with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED"):
+                self.full()
+        elapsed = time.monotonic()-started
+        print("I2_CAPTURE_CLOSURE_DEADLINE "+json.dumps({"phase":phase,"budget_seconds":0.10,
+            "injected_native_read_seconds":0.06,"manifest_read_starts_seconds":reads,
+            "writer_blocked_during_reads":blocked,"refusal_wall_seconds":round(elapsed,3)}))
+        self.assertTrue(reads)
+        self.assertEqual(blocked,[True]*len(reads))
+        self.assertLessEqual(len(reads),2)
+        self.assertTrue(all(stamp < 0.10 for stamp in reads))
+        self.assertEqual(_raw_sql_readback(self.root/OPS),before)
+        with closing(sqlite3.connect(self.root/OPS,timeout=0)) as peer:
+            peer.execute("BEGIN IMMEDIATE")
+            peer.rollback()
+        self.assertFalse(self.sink.exists() and list(self.sink.glob("*.zip")))
+        staging = self.root/remote.BACKUP_SNAPSHOT_STAGING_RELATIVE
+        self.assertFalse(list(staging.glob("capture-*")))
+        self.assertFalse(list(self.root.rglob("*.published")))
+
+    def test_recovery_closure_checks_deadline_before_next_native_manifest_read(self) -> None:
+        self._assert_recovery_closure_deadline("dependencies")
+
+    def test_control_lookup_checks_deadline_inside_native_history(self) -> None:
+        self._assert_recovery_closure_deadline("control")
+
+    def test_recovery_manifest_census_refuses_before_materialized_native_reads(self) -> None:
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        self._seed_real_control_activation()
+        directory=self.root/RDP/"research/manifests/partitions"
+        for number in range(3):
+            (directory/f"unmatched-{number}.txt").write_text("unmatched",encoding="utf-8")
+        with patch.object(remote,"BACKUP_PARTITION_SCAN_MAX_FILES",3), patch.object(
+                ResearchStore,"_read_manifest",side_effect=AssertionError("native read after capped census")) as read:
+            with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_PUBLICATION_PARTITION_SCAN_BUDGET_EXCEEDED"):
+                self.full()
+        self.assertEqual(read.call_count,0)
+        self.assertFalse(self.sink.exists())
+
+    def test_recovery_partition_size_refuses_before_native_materialization(self) -> None:
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        self._seed_real_control_activation()
+        source = sorted((self.root/RDP/"research/manifests/partitions").glob("partition-*.json"))[0]
+        manifest = ResearchStore(self.root/RDP)._read_manifest(source)
+        partition = self.root/RDP/manifest.logical_location
+        maximum = source.stat().st_size + partition.stat().st_size - 1
+        with patch.object(remote,"BACKUP_PARTITION_SCAN_MAX_BYTES",maximum), patch.object(
+                ResearchStore,"_verify_partition",side_effect=AssertionError("oversized native materialization")) as verify:
+            with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_PUBLICATION_PARTITION_SCAN_BUDGET_EXCEEDED"):
+                self.full()
+        self.assertEqual(verify.call_count,0)
+        self.assertFalse(self.sink.exists())
+
+    def test_expired_capture_sql_interrupt_keeps_budget_refusal_and_releases_writer(self) -> None:
+        token = remote._CAPTURE_CLOSURE_BUDGET.set({
+            "deadline":time.monotonic()+0.02,"counts":{},"bytes":0})
+        try:
+            with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED"):
+                with remote._capture_writer_fences([(OPS,self.root/OPS,True)]):
+                    with closing(sqlite3.connect(":memory:")) as conn, remote._capture_sql_deadline(conn):
+                        conn.execute("WITH RECURSIVE n(x) AS (VALUES(0) UNION ALL SELECT x+1 FROM n WHERE x<100000000) SELECT SUM(x) FROM n").fetchone()
+        finally:
+            remote._CAPTURE_CLOSURE_BUDGET.reset(token)
+        with closing(sqlite3.connect(self.root/OPS,timeout=0)) as peer:
+            peer.execute("BEGIN IMMEDIATE")
+            peer.rollback()
+
+    def test_actual_parquet_rows_and_uncompressed_bytes_refuse_before_native_verifier(self) -> None:
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        self._seed_real_control_activation()
+        source = sorted((self.root/RDP/"research/manifests/partitions").glob("partition-*.json"))[0]
+        manifest = ResearchStore(self.root/RDP)._read_manifest(source)
+        path = self.root/RDP/manifest.logical_location
+        original = pq.read_table(path)
+        for kind in ("actual_rows", "uncompressed_bytes"):
+            with self.subTest(kind=kind):
+                if kind == "actual_rows":
+                    table = pa.concat_tables([original,original])
+                else:
+                    table = original.set_column(original.schema.get_field_index("payload_json"),
+                        "payload_json",pa.array(["x"*65536]))
+                pq.write_table(table,path,compression="zstd")
+                metadata = pq.ParquetFile(path).metadata
+                uncompressed = sum(metadata.row_group(i).column(j).total_uncompressed_size
+                    for i in range(metadata.num_row_groups) for j in range(metadata.num_columns))
+                maximum = path.stat().st_size + uncompressed - 1
+                token = remote._CAPTURE_CLOSURE_BUDGET.set({
+                    "deadline":time.monotonic()+5,"counts":{},"bytes":0})
+                try:
+                    with patch.object(remote,"BACKUP_SOURCE_SCAN_MAX_PATHS",1 if kind == "actual_rows" else 65536), patch.object(
+                            remote,"BACKUP_PARTITION_SCAN_MAX_BYTES",maximum), patch.object(
+                            ResearchStore,"_verify_partition",side_effect=AssertionError("unbounded native materialization")) as verify:
+                        expected = ("BACKUP_RECOVERY_DEPENDENCY_BUDGET_EXCEEDED" if kind == "actual_rows"
+                            else "BACKUP_PUBLICATION_PARTITION_SCAN_BUDGET_EXCEEDED")
+                        with self.assertRaisesRegex(remote.RemoteOpsError,expected):
+                            remote._capture_research_store(self.root/RDP)._verify_partition(manifest)
+                    self.assertEqual(verify.call_count,0)
+                finally:
+                    remote._CAPTURE_CLOSURE_BUDGET.reset(token)
+
+    def test_control_root_scan_charges_unmatched_directories(self) -> None:
+        isolated=Path(self.temp.name)/"unmatched-control-root"
+        isolated.mkdir()
+        for number in range(3):
+            (isolated/f"unmatched-{number}").mkdir()
+        token=remote._CAPTURE_CLOSURE_BUDGET.set({
+            "deadline":time.monotonic()+5,"counts":{},"bytes":0})
+        try:
+            with patch.object(remote,"BACKUP_SOURCE_SCAN_MAX_PATHS",2):
+                with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_RECOVERY_DEPENDENCY_BUDGET_EXCEEDED"):
+                    remote._verify_recovery_control(isolated)
+        finally:
+            remote._CAPTURE_CLOSURE_BUDGET.reset(token)
+
+    def test_real_control_event_closure_survives_mutable_only_restore(self) -> None:
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        activation,authorized = self._seed_real_control_activation()
         packed = self.full()
         self.assertNotIn(f"{RDP}/keep.json", {item["path"] for item in packed["entries"]})
         self.assertTrue(any("research/manifests/partitions/" in item["path"] for item in packed["entries"]))

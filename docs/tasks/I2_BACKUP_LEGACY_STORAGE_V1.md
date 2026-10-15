@@ -220,3 +220,13 @@ independent proof. Bind requested mode to the exact approved retirement and
 downstream authority before mutation, including physical apply/recovery, in
 the existing native owners. Preserve canonical document hashes and the valid
 isolated rehearsal path; no new policy schema or production authority follows.
+
+The independent architecture falsifier on b3c12e3 showed research/control
+dependency traversal continuing inside writer fences after their deadline.
+Thread one shared monotonic budget through existing capture/lookup owners,
+bound enumeration before materialization, and stop subsequent work on budget
+refusal. Reuse native scientific parsers/verifiers without changing their
+meaning. Prove refusal releases a separate ordinary SQLite writer, creates no
+accepted checkpoint/marker, and preserves normal/legacy full-delta closure.
+Single in-flight OS/native calls remain non-preemptible; state that limit and
+do not claim a hard real-time guarantee or production latency acceptance.

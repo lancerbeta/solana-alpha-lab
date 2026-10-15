@@ -52,6 +52,8 @@ BACKUP_CAPTURE_FENCE_SECONDS = 30.0
 BACKUP_SOURCE_SCAN_MAX_PATHS = 65536
 BACKUP_PARTITION_SCAN_MAX_FILES = 16384
 BACKUP_PARTITION_SCAN_MAX_BYTES = 32 * 1024 * 1024
+_CAPTURE_CLOSURE_BUDGET: ContextVar[dict[str, Any] | None] = ContextVar(
+    "backup_capture_closure_budget")
 PROTECTED_LIVE_NAMES = frozenset(
     {
         "observation_rdp",
@@ -949,6 +951,141 @@ class BackupPayloadSnapshot:
         return [(path, dict(item)) for path, item in sorted(self._captured.items())]
 
 
+def _capture_closure_step(kind: str | None = None, *, size: int = 0, count: int = 1) -> None:
+    """Charge closure work to the original writer-fence deadline and finite caps.
+
+    One native filesystem/Parquet call cannot be interrupted here. Check before
+    and after it, and refuse oversized materialization before native parsing.
+    """
+    budget = _CAPTURE_CLOSURE_BUDGET.get(None)
+    if budget is None:
+        return
+    if time.monotonic() > budget["deadline"]:
+        raise RemoteOpsError("BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED")
+    if kind is not None:
+        counts = budget["counts"]
+        counts[kind] = counts.get(kind, 0) + count
+        maximum = BACKUP_PARTITION_SCAN_MAX_FILES if kind in {"manifest_path", "manifest", "partition"} else BACKUP_SOURCE_SCAN_MAX_PATHS
+        budget["bytes"] += size
+        if counts[kind] > maximum or budget["bytes"] > BACKUP_PARTITION_SCAN_MAX_BYTES:
+            code = ("BACKUP_PUBLICATION_PARTITION_SCAN_BUDGET_EXCEEDED"
+                if kind in {"manifest_path", "manifest", "partition", "partition_bytes"}
+                else "BACKUP_RECOVERY_DEPENDENCY_BUDGET_EXCEEDED")
+            raise RemoteOpsError(code)
+
+
+def _capture_paths(paths: Iterator[Path], *, ordered: bool = False, kind: str = "path") -> Iterator[Path]:
+    """Bound enumeration before materializing a sorted path collection."""
+    iterator = iter(paths)
+    collected = []
+    while True:
+        _capture_closure_step()
+        try:
+            path = next(iterator)
+        except StopIteration:
+            break
+        _capture_closure_step(kind)
+        if ordered:
+            collected.append(path)
+        else:
+            yield path
+    if ordered:
+        for path in sorted(collected):
+            _capture_closure_step()
+            yield path
+
+
+def _capture_partition_paths(directory: Path) -> Iterator[Path]:
+    paths = directory.iterdir() if directory.is_dir() else iter(())
+    # Charge unmatched entries too: a filtered glob can traverse a large
+    # directory inside one next() before the caller gets a chance to refuse.
+    for path in _capture_paths(paths, ordered=True, kind="manifest_path"):
+        if path.match("partition-*.json"):
+            yield path
+
+
+def _capture_research_store(data_root: Path, *, create_if_missing: bool = True) -> Any:
+    """Bound the existing native reader; keep all scientific parsing/verifying native."""
+    from solana_alpha_lab.factory.research_store import ResearchStore, ResearchStoreError
+    if _CAPTURE_CLOSURE_BUDGET.get(None) is None:
+        return ResearchStore(data_root, create_if_missing=create_if_missing)
+
+    class CaptureResearchStore(ResearchStore):
+        def _manifest_files(self):
+            _capture_closure_step()
+            directory = self.root / "research/manifests/partitions"
+            if not directory.exists():
+                return ()
+            if directory.is_symlink() or not directory.is_dir():
+                raise ResearchStoreError("MANIFEST_DIRECTORY_UNSAFE")
+            return tuple(_capture_partition_paths(directory))
+
+        def _read_manifest(self, path):
+            _capture_closure_step()
+            _capture_closure_step("manifest", size=path.stat().st_size if path.is_file() else 0)
+            manifest = super()._read_manifest(path)
+            _capture_closure_step()
+            return manifest
+
+        def _verify_partition(self, manifest):
+            _capture_closure_step("record", count=int(manifest.row_count))
+            path = _safe_relative(self.root, manifest.logical_location)
+            _capture_closure_step("partition", size=path.stat().st_size if path.is_file() else 0)
+            if path.is_file():
+                # Actual Parquet metadata can disagree with the manifest or
+                # encode highly compressed columns. Bound it before native
+                # _verify_partition materializes the table, then let that
+                # unchanged verifier establish all scientific/hash semantics.
+                import pyarrow as pa
+                import pyarrow.parquet as pq
+                try:
+                    metadata = pq.ParquetFile(path).metadata
+                except (OSError, ValueError, pa.ArrowException) as exc:
+                    raise ResearchStoreError("COMMITTED_PARQUET_UNREADABLE") from exc
+                _capture_closure_step("actual_record", count=int(metadata.num_rows))
+                _capture_closure_step("material", count=int(metadata.num_row_groups)*int(metadata.num_columns))
+                for group in range(metadata.num_row_groups):
+                    for column in range(metadata.num_columns):
+                        _capture_closure_step()
+                        size = int(metadata.row_group(group).column(column).total_uncompressed_size)
+                        if size < 0:
+                            raise RemoteOpsError("BACKUP_RECOVERY_DEPENDENCY_BUDGET_EXCEEDED")
+                        _capture_closure_step("partition_bytes", size=size)
+            records = super()._verify_partition(manifest)
+            _capture_closure_step()
+            return records
+
+        def iter_committed_records(self):
+            for record in super().iter_committed_records():
+                _capture_closure_step("material")
+                yield record
+
+        def find_record(self, record_id):
+            _capture_closure_step("lookup")
+            record = super().find_record(record_id)
+            _capture_closure_step()
+            return record
+
+    _capture_closure_step()
+    return CaptureResearchStore(data_root, create_if_missing=create_if_missing)
+
+
+@contextmanager
+def _capture_sql_deadline(conn: sqlite3.Connection) -> Iterator[None]:
+    budget = _CAPTURE_CLOSURE_BUDGET.get(None)
+    if budget is not None:
+        conn.set_progress_handler(lambda: int(time.monotonic() > budget["deadline"]), 1000)
+    try:
+        yield
+    except sqlite3.OperationalError as exc:
+        if budget is not None and time.monotonic() > budget["deadline"]:
+            raise RemoteOpsError("BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED") from exc
+        raise
+    finally:
+        if budget is not None:
+            conn.set_progress_handler(None, 0)
+
+
 def _capture_mutable_file(live: Path, dest: Path) -> tuple[str, int] | None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     digest = hashlib.sha256()
@@ -956,6 +1093,7 @@ def _capture_mutable_file(live: Path, dest: Path) -> tuple[str, int] | None:
     try:
         with live.open("rb") as src, dest.open("wb") as out:
             while True:
+                _capture_closure_step()
                 chunk = src.read(BACKUP_STREAM_CHUNK)
                 if not chunk:
                     break
@@ -982,6 +1120,7 @@ def _capture_writer_fences(sources: Sequence[tuple[str, Path, bool]]) -> Iterato
     started = time.monotonic()
     try:
         for _relative, source, is_sqlite in sorted(sources):
+            _capture_closure_step()
             if not is_sqlite:
                 continue
             _check_backup_reclaim(source)
@@ -992,7 +1131,9 @@ def _capture_writer_fences(sources: Sequence[tuple[str, Path, bool]]) -> Iterato
             exists = conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='scheduler_leases'").fetchone()
             if exists and conn.execute("SELECT 1 FROM scheduler_leases WHERE expires_at > ? LIMIT 1", (_now(),)).fetchone():
                 raise RemoteOpsError("WRITER_BUSY")
+        _capture_closure_step()
         yield
+        _capture_closure_step()
         if time.monotonic() - started > BACKUP_CAPTURE_FENCE_SECONDS:
             raise RemoteOpsError("BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED")
     except sqlite3.OperationalError as exc:
@@ -1004,6 +1145,7 @@ def _capture_writer_fences(sources: Sequence[tuple[str, Path, bool]]) -> Iterato
 
 
 def _capture_source(captured: dict[str, dict[str, Any]], staging: Path, relative: str, source: Path, is_sqlite: bool, *, deadline: float | None = None) -> None:
+    _capture_closure_step()
     if relative == BACKUP_SNAPSHOT_OWNER_NAME:
         raise RemoteOpsError("BACKUP_SNAPSHOT_OWNER_PATH_RESERVED")
     if relative in captured:
@@ -1031,18 +1173,24 @@ def _recovery_data_root_relative(ops_relative: str) -> str:
 
 def _capture_recovery_raw_refs(root: Path, data_root: Path, staging: Path,
                                captured: dict[str, dict[str, Any]], value: Any) -> None:
-    if isinstance(value, dict):
-        for key, nested in value.items():
-            if key in {"raw_body_rel", "witness_raw_body_rel"} and nested:
-                source = _safe_relative(data_root, str(nested))
-                if not source.is_file():
-                    raise RemoteOpsError("BACKUP_RECOVERY_DEPENDENCY_MISSING")
-                _capture_source(captured, staging, source.relative_to(root).as_posix(), source, False)
-            else:
-                _capture_recovery_raw_refs(root, data_root, staging, captured, nested)
-    elif isinstance(value, list):
-        for nested in value:
-            _capture_recovery_raw_refs(root, data_root, staging, captured, nested)
+    pending = [value]
+    while pending:
+        _capture_closure_step("raw_ref")
+        current = pending.pop()
+        if isinstance(current, dict):
+            for key, nested in current.items():
+                _capture_closure_step("raw_ref")
+                if key in {"raw_body_rel", "witness_raw_body_rel"} and nested:
+                    source = _safe_relative(data_root, str(nested))
+                    if not source.is_file():
+                        raise RemoteOpsError("BACKUP_RECOVERY_DEPENDENCY_MISSING")
+                    _capture_source(captured, staging, source.relative_to(root).as_posix(), source, False)
+                else:
+                    pending.append(nested)
+        elif isinstance(current, list):
+            for nested in current:
+                _capture_closure_step("raw_ref")
+                pending.append(nested)
 
 
 def _capture_publication_partitions(root: Path, data_root: Path, staging: Path,
@@ -1057,6 +1205,7 @@ def _capture_publication_partitions(root: Path, data_root: Path, staging: Path,
     from solana_alpha_lab.storage.manifests import verify_dataset_manifest, verify_partition_manifest
 
     item = captured[(data_root / manifest_relative).relative_to(root).as_posix()]
+    _capture_closure_step()
     if int(item["bytes"]) > 2 * 1024 * 1024:
         raise RemoteOpsError("BACKUP_PUBLICATION_PARTITION_SCAN_BUDGET_EXCEEDED")
     try:
@@ -1064,14 +1213,17 @@ def _capture_publication_partitions(root: Path, data_root: Path, staging: Path,
         partitions_dir = _safe_relative(data_root, "datasets/manifests/partitions")
         matched: list[tuple[Path, Any]] = []
         scanned_bytes = 0
-        for count, source in enumerate(partitions_dir.glob("partition-*.json"), 1):
+        for count, source in enumerate(_capture_partition_paths(partitions_dir), 1):
+            _capture_closure_step()
             source = _safe_relative(data_root, source.relative_to(data_root).as_posix())
             size = source.stat().st_size
             scanned_bytes += size
             if (count > BACKUP_PARTITION_SCAN_MAX_FILES or size > 2 * 1024 * 1024
                     or scanned_bytes > BACKUP_PARTITION_SCAN_MAX_BYTES):
                 raise RemoteOpsError("BACKUP_PUBLICATION_PARTITION_SCAN_BUDGET_EXCEEDED")
+            _capture_closure_step("manifest", size=size)
             encoded = source.read_bytes()
+            _capture_closure_step()
             metadata = json.loads(encoded)
             if not isinstance(metadata, dict):
                 raise RemoteOpsError("BACKUP_PUBLICATION_PARTITION_INVALID")
@@ -1086,6 +1238,7 @@ def _capture_publication_partitions(root: Path, data_root: Path, staging: Path,
             raise RemoteOpsError("BACKUP_PUBLICATION_PARTITION_MISSING")
         verify_dataset_manifest(dataset, partitions=[partition for _source, partition in matched])
         for source, partition in matched:
+            _capture_closure_step()
             _capture_source(captured, staging, source.relative_to(root).as_posix(), source, False)
             artifact = _safe_relative(data_root, partition.logical_location)
             _capture_source(captured, staging, artifact.relative_to(root).as_posix(), artifact, False)
@@ -1119,6 +1272,7 @@ def _capture_recovery_dependencies(root: Path, staging: Path, captured: dict[str
                         if PurePosixPath(path).name == "observation_schedule_state.sqlite"}
     roots.update(ops_by_data_root)
     for data_relative in sorted(roots):
+        _capture_closure_step("material")
         data_root = _safe_relative(root, data_relative)
         open_contents = {PurePosixPath(path).stem for path in captured
                          if path.startswith(data_relative + "/datasets/publication_jobs/")
@@ -1129,9 +1283,9 @@ def _capture_recovery_dependencies(root: Path, staging: Path, captured: dict[str
         manifest_dir = _safe_relative(data_root, "research/manifests/partitions")
         if manifest_dir.is_dir():
             # The native owner verifies canonical manifests and partition hashes.
-            from solana_alpha_lab.factory.research_store import ResearchStore
-            research = ResearchStore(data_root)
-            for manifest_path in sorted(manifest_dir.glob("partition-*.json")):
+            research = _capture_research_store(data_root)
+            for manifest_path in _capture_partition_paths(manifest_dir):
+                _capture_closure_step()
                 manifest = research._read_manifest(manifest_path)
                 if (manifest.partition_id not in publication_transactions and not manifest.partition_id.startswith(
                         ("RESEARCH-TXN-OBS-SCHED-", "RESEARCH-TXN-OBS-AUTHZ-", "RESEARCH-TXN-OBS-TRANS-"))):
@@ -1147,6 +1301,7 @@ def _capture_recovery_dependencies(root: Path, staging: Path, captured: dict[str
                 and "/completed/" not in path and "/legacy_full/" not in path
                 and path.endswith(".json")]
         for _relative, item in jobs:
+            _capture_closure_step("material")
             if int(item["bytes"]) > 2 * 1024 * 1024:
                 raise RemoteOpsError("BACKUP_OPEN_JOB_DEPENDENCY_BUDGET_EXCEEDED")
             try:
@@ -1165,6 +1320,7 @@ def _capture_recovery_dependencies(root: Path, staging: Path, captured: dict[str
                 if stage in {"MARKER", "COMPLETE"}:
                     dependencies.append(f"datasets/manifests/{manifest_id}.published")
             for dependency in dependencies:
+                _capture_closure_step("material")
                 source = _safe_relative(data_root, dependency)
                 if not source.is_file():
                     if stage in {"ARTIFACTS", "RDP_OBSERVATION_BATCH", "RDP_MEMBER_BATCH", "MANIFEST", "MARKER", "COMPLETE"}:
@@ -1181,6 +1337,7 @@ def _capture_recovery_dependencies(root: Path, staging: Path, captured: dict[str
                         _capture_source(captured, staging, unit.relative_to(root).as_posix(), unit, False)
                         unit_payload = json.loads(captured[unit.relative_to(root).as_posix()]["staged"].read_text(encoding="utf-8"))
                         for publication in unit_payload.get("publications", []):
+                            _capture_closure_step("material")
                             artifact = _safe_relative(data_root, str(publication["rel"]))
                             _capture_source(captured, staging, artifact.relative_to(root).as_posix(), artifact, False)
                             if str(captured[artifact.relative_to(root).as_posix()]["sha256"]) != str(publication.get("sha256")):
@@ -1191,7 +1348,7 @@ def _capture_recovery_dependencies(root: Path, staging: Path, captured: dict[str
         ops_item = captured.get(ops_by_data_root.get(data_relative, ""))
         if ops_item and ops_item.get("kind") == "SQLITE_BACKUP_API":
             # Only unresolved recovery rows; never parse historical call bodies.
-            with closing(sqlite3.connect(ops_item["staged"].as_uri() + "?mode=ro&immutable=1", uri=True)) as conn:
+            with closing(sqlite3.connect(ops_item["staged"].as_uri() + "?mode=ro&immutable=1", uri=True)) as conn, _capture_sql_deadline(conn):
                 tables = {row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
                 for table, column, predicate in (
                     ("episode_outbox", "row_json", "1=1"),
@@ -1199,10 +1356,12 @@ def _capture_recovery_dependencies(root: Path, staging: Path, captured: dict[str
                     ("due_observations", "payload_json", "state NOT IN ('OBSERVED','CENSORED','COMPLETE','RETIRED')"),
                     ("call_ledger", "payload_json", "state IN ('STARTED','UNKNOWN')"),
                 ):
+                    _capture_closure_step()
                     if table not in tables:
                         continue
                     cursor = conn.execute(f"SELECT rowid,length(CAST({column} AS BLOB)) FROM {table} WHERE {predicate}")
                     for rowid, size in cursor:
+                        _capture_closure_step("material")
                         if int(size) > 2 * 1024 * 1024:
                             raise RemoteOpsError("BACKUP_RECOVERY_DEPENDENCY_BUDGET_EXCEEDED")
                         encoded = conn.execute(f"SELECT {column} FROM {table} WHERE rowid=?", (rowid,)).fetchone()[0]
@@ -1218,6 +1377,7 @@ def _verify_recovery_control_one(root: Path, ops_relative: str) -> dict[str, int
     boundary. Backup defers until its existing lifecycle owner repairs it; it
     cannot silently canonize ACTIVE or manufacture the missing event.
     """
+    _capture_closure_step()
     path = _safe_relative(root, ops_relative)
     if not path.is_file():
         return {"transitions": 0, "authorities": 0}
@@ -1225,18 +1385,18 @@ def _verify_recovery_control_one(root: Path, ops_relative: str) -> dict[str, int
         if handle.read(16) != b"SQLite format 3\x00":
             return {"transitions": 0, "authorities": 0}
     # This is an isolated SQLite backup with no WAL, never the live source.
-    with closing(sqlite3.connect(path.as_uri() + "?mode=ro&immutable=1", uri=True)) as conn:
+    with closing(sqlite3.connect(path.as_uri() + "?mode=ro&immutable=1", uri=True)) as conn, _capture_sql_deadline(conn):
         conn.row_factory = sqlite3.Row
         tables = {row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
         if "schedule_activations" not in tables:
             return {"transitions": 0, "authorities": 0}
         rows = conn.execute("SELECT * FROM schedule_activations WHERE state IN ('ACTIVE','DRAINING')")
         transitions, authorities = 0, set()
-        from solana_alpha_lab.factory.research_store import ResearchStore
         research = None
         for row in rows:
+            _capture_closure_step("material")
             if research is None:
-                research = ResearchStore(_safe_relative(root, _recovery_data_root_relative(ops_relative)), create_if_missing=False)
+                research = _capture_research_store(_safe_relative(root, _recovery_data_root_relative(ops_relative)), create_if_missing=False)
             item = dict(row)
             event_id = str(item.get("last_transition_event_id") or "")
             record = research.find_record(event_id) if event_id else None
@@ -1254,6 +1414,7 @@ def _verify_recovery_control_one(root: Path, ops_relative: str) -> dict[str, int
                 raise RemoteOpsError("BACKUP_RECOVERY_TRANSITION_EVENT_CONFLICT")
             transitions += 1
             receipt_sha = str(item.get("authority_receipt_sha256") or "")
+            _capture_closure_step()
             authority = conn.execute("SELECT payload_json FROM authority_receipts WHERE receipt_sha256=?", (receipt_sha,)).fetchone() if "authority_receipts" in tables else None
             event = research.find_record(f"OBS-AUTHZ-{receipt_sha[:16].upper()}") if receipt_sha else None
             if authority is None or event is None:
@@ -1266,7 +1427,10 @@ def _verify_recovery_control_one(root: Path, ops_relative: str) -> dict[str, int
 
 def _verify_recovery_control(root: Path) -> dict[str, int]:
     result = {"transitions": 0, "authorities": 0}
-    for path in sorted(root.rglob("observation_schedule_state.sqlite")):
+    for path in _capture_paths(root.rglob("*"), ordered=True):
+        if not path.match("observation_schedule_state.sqlite"):
+            continue
+        _capture_closure_step()
         counts = _verify_recovery_control_one(root, path.relative_to(root).as_posix())
         for key in result:
             result[key] += counts[key]
@@ -1357,20 +1521,24 @@ def backup_payload_snapshot(
                           if is_sqlite and sqlite_api]
     with _owned_snapshot_staging(root, parent) as staging:
         deadline = time.monotonic() + BACKUP_CAPTURE_FENCE_SECONDS
-        with _capture_writer_fences(provisional_sqlite):
-            # Freeze authoritative membership only after every admitted writer
-            # is fenced, with traversal charged to the same capture deadline.
-            sources = [(relative, path, is_sqlite and sqlite_api)
-                       for relative, path, is_sqlite in _backup_source_paths(
-                           root, loaded, deadline_monotonic=deadline)]
-            fenced_sqlite = {relative for relative, _path, _sqlite in provisional_sqlite}
-            if any(is_sqlite and relative not in fenced_sqlite for relative, _path, is_sqlite in sources):
-                raise RemoteOpsError("BACKUP_UNFENCED_SQLITE_DISCOVERED")
-            for relative, source, is_sqlite in sources:
-                if is_sqlite or _is_publication_job_path(relative):
-                    _capture_source(captured, staging, relative, source, is_sqlite, deadline=deadline)
-            _capture_recovery_dependencies(root, staging, captured)
-            _verify_recovery_control(staging)
+        token = _CAPTURE_CLOSURE_BUDGET.set({"deadline":deadline,"counts":{},"bytes":0})
+        try:
+            with _capture_writer_fences(provisional_sqlite):
+                # Freeze authoritative membership only after every admitted writer
+                # is fenced, with traversal charged to the same capture deadline.
+                sources = [(relative, path, is_sqlite and sqlite_api)
+                           for relative, path, is_sqlite in _backup_source_paths(
+                               root, loaded, deadline_monotonic=deadline)]
+                fenced_sqlite = {relative for relative, _path, _sqlite in provisional_sqlite}
+                if any(is_sqlite and relative not in fenced_sqlite for relative, _path, is_sqlite in sources):
+                    raise RemoteOpsError("BACKUP_UNFENCED_SQLITE_DISCOVERED")
+                for relative, source, is_sqlite in sources:
+                    if is_sqlite or _is_publication_job_path(relative):
+                        _capture_source(captured, staging, relative, source, is_sqlite, deadline=deadline)
+                _capture_recovery_dependencies(root, staging, captured)
+                _verify_recovery_control(staging)
+        finally:
+            _CAPTURE_CLOSURE_BUDGET.reset(token)
         for relative, source, is_sqlite in sources:
             _capture_source(captured, staging, relative, source, is_sqlite)
         yield BackupPayloadSnapshot(captured, captured_at=captured_at)

@@ -76,6 +76,16 @@ profile/revoke/counters/children/authority events, publication recovery и OPEN
 operational/paper obligations. Не запускать восстановленный stale collector до
 штатной reconciliation. Это разрешает принять только `PACKAGING_LIVE_PROVEN`.
 
+
+Capture использует общий monotonic writer-fence deadline, включая dependency/
+control manifests, native lookup, raw refs и SQL-обход; конечные count/byte limits
+проверяются до materialization. `BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED` и
+dependency scan budget refusal не дают accepted checkpoint/marker и освобождают
+writers. Проверить incident/last-good и повторить обычный caller в допустимом
+окне. Persistent refusal — material blocker с actual census/latency, не повод
+отбросить causal dependencies или молча поднять limits. Один уже начатый OS/native
+вызов не preemptible; Linux filesystem latency и collector gaps измерить при B/C.
+
 ## 2. Подготовка exact destructive APPLY
 
 На consistent изолированной копии уточнить известный benchmark: exact legacy
