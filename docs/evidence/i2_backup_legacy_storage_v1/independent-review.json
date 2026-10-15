@@ -4,8 +4,8 @@
   "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-CAPTURE-REPAIR",
   "as_of": "2026-10-15",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "4a02ea385c46697fbcc2a5911eb28eea576eb071374196863cd8231f14766e24",
-  "reviewed_inventory_sha256": "ca80bf06c9f0a5a1d3db4f22f8f09601d206aaaa273c27eeddccc48a26e44c44",
+  "reviewed_bindings_sha256": "412c4eb2684386886c8a30f8f8caef3977fa41a65e61fd5f52dd711b643c2f74",
+  "reviewed_inventory_sha256": "2f1e779e486266a573094f424da041abd18633d33e219e18f3f12555cc822319",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -17,34 +17,34 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only P0/P1 review PASS on content head06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c; no open P0/P1. Real SQLITE_FULL now yields sanitary trace, COPY_FAILED attempt and one CLI JSON with last-good unchanged.",
-        "Frozen membership preserved, exact native completed/legacy JSON validation precedes post-release read; missing member refuses. Frozen diff, thirteen files, source bindings and six artifact hashes matched. Final comparable native writer/publication errors0. Four required roles sufficient."
+        "Isolated read-only P0/P1 refresh PASS on frozen content head 362a5dc97686ef508ebd033d45a3989c92aed969; no open P0/P1. All three ContextVar get(None) calls preserve fallback and token reset; the security test is unchanged.",
+        "Frozen candidate and current source bindings matched. Comparable measurements remain bound separately to content head 06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c. No additional tests, production writes or runtime authority."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only P0/P1 review PASS on content head06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c; all nine source/artifact hashes matched; both P1 fixes backed by regressions and comparable exact restore/writer/publication proof.",
-        "Owner outcome retained: fresh standalone full/restore, verified-copy finite native retirement/reclaim rehearsal, one scoped resumable cleanup, compact baseline and one policy sustainable against eligible inflow. Production byte attribution/pause/throughput UNKNOWN; no upload/delete/APPLY authority inferred."
+        "Isolated read-only P0/P1 refresh PASS on frozen content head 362a5dc97686ef508ebd033d45a3989c92aed969; no new P0/P1 gaps. ContextVar fallback is equivalent; snapshot, budgets and recovery are unchanged. Current source hashes matched; measured-source provenance remains separate.",
+        "Owner outcome and authority boundaries remain: fresh standalone full/restore, verified-copy finite native retirement/reclaim rehearsal, one scoped resumable cleanup, compact baseline and sustainable policy. Production attribution, pause and throughput remain UNKNOWN."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Isolated packet+diff-only P0/P1 review PASS; SEMANTIC_PREMISE=PASS on content head06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c; candidate/diff/contract/evidence hashes matched.",
-        "Membership, WAL view, mutable jobs and closure remain fenced; exact frozen receipt relatives validated before post-fence read, no recensus/skip. Native completed/legacy owner confirms existing bytes not rewritten. OPS/ResearchStore/source bytes remain truth, DuckDB derived. Inventory/checkpoint meanings and old scientific evidence unchanged; no new cross-task private imports/framework.",
-        "Local proof can pass while production I/O, larger closure or WAL pressure delays collector and violates due/PIT coverage. Runtime falsifiers remain missed mandatory observations, backup-caused lock failure or recovered rows/closure diverging from pinned capture; local PASS grants no runtime authority.",
-        "packet_fingerprint_sha256=47488c0c6f66879eeecf1ffcf0950e972b1be0ed924bddd90c3cc5be563724fd; independence=PACKET_INFORMATION_PATH; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN."
+        "Isolated packet+diff-only P0/P1 review PASS; SEMANTIC_PREMISE=PASS on frozen content head 362a5dc97686ef508ebd033d45a3989c92aed969. Diff, contract and named evidence hashes matched. Equivalent constructor-default to get(None) change preserves all three reads and set/reset; snapshot, closure, budgets, ZIP and recovery unchanged.",
+        "Membership, WAL view and mutable closure remain consistent; native completed/legacy owner owns immutable bytes; missing or unsafe members refuse. OPS, native ResearchStore manifests/records and source/archive bytes remain truth, DuckDB derived. No new private cross-task imports or scientific authority.",
+        "Local proof can pass while production I/O, WAL pressure or larger closure delays collector and violates due/PIT coverage. Missed mandatory observations, backup-caused lock failure or restored closure divergence remain runtime falsifiers. No production acceptance or merge/OPERATE authority.",
+        "packet_fingerprint_sha256=2d46564fa9fe919ac060e4f72cff6a606bf48a10b33964cd9ec33037900e9aa4; independence=PACKET_INFORMATION_PATH; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN. Review read-only without test reruns."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only P0/P1 review PASS on content head06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c. Next owner gate exact merge phrase after CI/readiness. Fresh full and independent restore require separate Stage B authority; only after PACKAGING_LIVE_PROVEN prepare Stage C and one finite cleanup/policy scope.",
-        "Old delta-chain/no-new-full restriction explicitly superseded as proposal. Actual production sizes, throughput and full technical pause UNKNOWN. Repair is not I2 DONE. No heavy reruns or production writes by reviewer."
+        "Isolated read-only P0/P1 refresh PASS on frozen content head 362a5dc97686ef508ebd033d45a3989c92aed969; no P0/P1 owner-UX gaps. Readout explicitly states no scale rerun, while proof retains measured-source hashes and measured scale head 06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c.",
+        "Next owner action remains exact merge phrase after exact-head CI and native readiness. Runtime-pending/BLOCKED and separate Stage B/C authorization are preserved. No tests or writes by reviewer."
       ]
     }
   ],
