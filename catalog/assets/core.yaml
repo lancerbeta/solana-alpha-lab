@@ -29901,7 +29901,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/remote_ops.py', repository_path: src/solana_alpha_lab/factory/remote_ops.py}
-  integrity: {kind: sha256, sha256: ee06a3eb46c20fefacf405a8ba9b9a66fbc31eb0dc90422f352d98ca99a13fea}
+  integrity: {kind: sha256, sha256: cedf30829044b053c9f55c5210d2d3aa9d2890c1107b980b9886775d3e177b28}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -29949,7 +29949,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_remote_operations.py', repository_path: tests/test_factory_remote_operations.py}
-  integrity: {kind: sha256, sha256: e68e4f3b42732169423108eb97b9caabd1e570c80e4980f90e47f4006aaf835d}
+  integrity: {kind: sha256, sha256: 5187377cce26bb5d17d10ba8222496fe94d5a51de01da656a6875e415e52be4c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-001}
@@ -30016,7 +30016,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_REMOTE_HOST.md', repository_path: docs/operator/FACTORY_REMOTE_HOST.md}
-  integrity: {kind: sha256, sha256: 4020217fea69647cbd48bc63de0e3a73b913f8626435b996fc62bbbb6a2af985}
+  integrity: {kind: sha256, sha256: 1b65d1ca03814ac0c8cc2eae2ff51a4a87b910b09a6106bb2145dad69eabdb34}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -33144,7 +33144,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_remote_operations_v1_1.schema.json', repository_path: catalog/schemas/factory_remote_operations_v1_1.schema.json}
-  integrity: {kind: sha256, sha256: e859eed9cc2310ae645c4eb88872cd13f950352acfe93659a32fd15a55e42264}
+  integrity: {kind: sha256, sha256: c556379b9c81a013f011627f132cbe143d670754d3bf8dbe6cbb7bfe2d181670}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33213,7 +33213,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_remote_operations_v1_1.yaml', repository_path: configs/factory_remote_operations_v1_1.yaml}
-  integrity: {kind: sha256, sha256: 106c842e700ecbf63962bda2090fae03a4e7985c231e95c15364199087bf49eb}
+  integrity: {kind: sha256, sha256: 025c17193d46ce2ae5cb14041686e28098c18c8c251d88eac4a0d596659c9730}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -33673,7 +33673,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/managed_collection.py', repository_path: src/solana_alpha_lab/factory/managed_collection.py}
-  integrity: {kind: sha256, sha256: ad519f07837a9aa8fc52a529fb661699a1b4eac6cee199ba55e14decd1ba1f51}
+  integrity: {kind: sha256, sha256: d171c32918f72eae3056b5eb3ada8be2a230a9e32161ad7c8c47b69612df31f3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
@@ -34456,7 +34456,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: 3718719bd31b107b819556d6bce7409ef64e0dd85a1765e72addb989dc06c5dc}
+  integrity: {kind: sha256, sha256: 07ff560d09254d422e8d5456d758cc4b3c14b3f5f5e54f5cb0a44e22f622f2ef}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -34495,7 +34495,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_retention.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_retention.py}
-  integrity: {kind: sha256, sha256: 78a94b12c99a8849804872d246ff227b5785a5fc2aaa7d72cf7a4c1b4b0d1329}
+  integrity: {kind: sha256, sha256: 2df5fbb8b773689ed693383d0c61f069be154b4b1338e57410372caa0f573c02}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -34512,7 +34512,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_collector_operability_retention_and_owner_pulse.py', repository_path: tests/test_collector_operability_retention_and_owner_pulse.py}
-  integrity: {kind: sha256, sha256: 880680d82e26661cc428aff45b03c0ccecdc417e4b0306eb9e0b06cd3f358652}
+  integrity: {kind: sha256, sha256: cedf1fa81515355fac236e17ccd39f56ef77bf8fd1abe8d43a7bcc5a2a2eb876}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -36565,7 +36565,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_UNATTENDED_OPERABILITY.md', repository_path: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md}
-  integrity: {kind: sha256, sha256: 62f6bbbf11009a0f14afdd9ad82ff50b1e4850c4a85da11652756c879fa1689b}
+  integrity: {kind: sha256, sha256: 6bdd6e4350cf1f08292e029d845a12ce242ed0dd46a1b05d1eb1be5a456d0052}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -36790,7 +36790,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/system_operability_surface_v2.md', repository_path: docs/contracts/system_operability_surface_v2.md}
-  integrity: {kind: sha256, sha256: 0ba1436b05c8ed6cee8fa4f7106eac2c6023b0d293120a81ca1fffd01bab1be9}
+  integrity: {kind: sha256, sha256: 1bb4a151a06bce8cca61dc4cb61de39ab01e825ff8037ab2ed18426b73951bd3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SYSTEM-OPERABILITY-SURFACE-001}
@@ -42264,3 +42264,119 @@ records:
   evidence: []
   search_terms: [SMIAL_SCIENCE_LIFECYCLE_SMOKE_V1, native numeric, chronological confirmation, synthetic audit, SC06]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-I2-BACKUP-LEGACY-STORAGE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: 'Exact I2 software delivery contract: consistent full/delta backup, cold
+    retirement, ROWID-preserving reclaim and default-off bounded ordinary maintenance;
+    production OPERATE remains separate.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-15'
+  truth_owner: I2_BACKUP_LEGACY_STORAGE_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md
+    repository_path: docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md
+  integrity:
+    kind: sha256
+    sha256: d6c495fa2e9d60224a385850920de5bc2a1237fedea83883c40e8e94a455229f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations: []
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - I2
+  - BACKUP
+  - LEGACY
+  - RETIREMENT
+  - PHYSICAL_RECLAIM
+  - MAINTENANCE
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SPEC-I2-BACKUP-LEGACY-STORAGE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Owner-adopted single I2 PRD and SSD; complete outcome, protected A/B/profile/accounting/science
+    and staged operation authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-15'
+  truth_owner: I2_BACKUP_LEGACY_STORAGE_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/i2_backup_legacy_storage_v1/source-contract.md
+    repository_path: docs/evidence/i2_backup_legacy_storage_v1/source-contract.md
+  integrity:
+    kind: sha256
+    sha256: 3d5c4d4bb6c991db03625747eda40b20b4fbfe1396fabfc8cd7d539146ba40bf
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-I2-BACKUP-LEGACY-STORAGE-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - I2
+  - BACKUP
+  - LEGACY
+  - RETIREMENT
+  - PHYSICAL_RECLAIM
+  - MAINTENANCE
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-I2-BACKUP-LEGACY-STORAGE-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: 'One I2 owner readout: isolated evidence and metrics, preserved semantics,
+    default-off automation, recovery, honest runway UNKNOWN and staged OPERATE resume.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-15'
+  truth_owner: I2_BACKUP_LEGACY_STORAGE_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md
+    repository_path: docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md
+  integrity:
+    kind: sha256
+    sha256: 0cb3db3eac1e3cfb5f6f1c45a0ced4fe980c5326701992f03433900f1003bcbf
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-I2-BACKUP-LEGACY-STORAGE-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - I2
+  - BACKUP
+  - LEGACY
+  - RETIREMENT
+  - PHYSICAL_RECLAIM
+  - MAINTENANCE
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET

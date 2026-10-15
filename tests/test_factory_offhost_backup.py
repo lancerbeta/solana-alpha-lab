@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import sqlite3
 import sys
@@ -144,6 +145,13 @@ class FakeRcloneRunner:
             self.objects[remote] = len(data)
             self.payloads[remote] = data
             return type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        if sub == "hashsum":
+            remote = argv[-1]
+            data = self.payloads.get(remote)
+            if data is None:
+                return type("R", (), {"returncode": 1, "stdout": "", "stderr": "object not found"})()
+            digest = hashlib.md5(data, usedforsecurity=False).hexdigest()
+            return type("R", (), {"returncode": 0, "stdout": digest + "  " + Path(remote).name + "\n", "stderr": ""})()
         raise AssertionError(f"unexpected subcommand {sub}")
 
 
@@ -193,6 +201,7 @@ class FactoryOffhostBackupTests(unittest.TestCase):
         bundle = self._pack()
         remote = self.config.remote_object(bundle.name)
         self.runner.objects[remote] = bundle.stat().st_size
+        self.runner.payloads[remote] = bundle.read_bytes()
         receipt = copy_offhost_backup(
             self.root,
             config=self.config,
@@ -598,7 +607,7 @@ class FactoryOffhostBackupTests(unittest.TestCase):
         self.assertGreater(attempted, 0)
         self.assertEqual(ledger["offhost_backup_payload_bytes_30d"], attempted)
 
-    def test_weekly_fail_allows_daily_delta_from_previous_base(self) -> None:
+    def test_weekly_unknown_retries_exact_full_from_previous_base(self) -> None:
         wednesday = datetime(2026, 9, 2, 0, 45, tzinfo=UTC)
         (self.root / "local/factory_v1/observation_rdp/seed.bin").write_bytes(b"before")
         first = run_offhost_checkpoint(
@@ -612,15 +621,15 @@ class FactoryOffhostBackupTests(unittest.TestCase):
         (self.root / "local/factory_v1/observation_rdp/seed.bin").write_bytes(b"after-change")
         self.runner.fail_copy_count = 1
         sunday = datetime(2026, 9, 6, 0, 45, tzinfo=UTC)
-        daily = run_offhost_checkpoint(
-            self.root,
-            mode="daily",
-            config=self.config,
-            runner=self.runner,
-            now=sunday,
-        )
-        self.assertEqual(daily["terminal"], "DAILY_DELTA_VERIFIED")
-        self.assertEqual(daily["weekly_full_state"], "DEGRADED")
+        with self.assertRaises(OffhostBackupError):
+            run_offhost_checkpoint(self.root, mode="daily", config=self.config,
+                runner=self.runner, now=sunday)
+        # A failed weekly upload may already exist remotely. Changing to a new
+        # delta here would abandon the uncertain immutable operation.
+        self.assertEqual(read_offhost_receipt(self.root, self.config)["checkpoint_filename"], first["checkpoint_filename"])
+        daily = run_offhost_checkpoint(self.root, mode="daily", config=self.config,
+            runner=self.runner, now=sunday)
+        self.assertEqual(daily["terminal"], "WEEKLY_FULL_VERIFIED")
 
     def test_nonempty_rdp_incremental_restore_proof(self) -> None:
         rdp = self.root / "local/factory_v1/observation_rdp/live.bin"

@@ -42,6 +42,8 @@ COLLECTOR_SNAPSHOT_PACKET_FIELDS = (
     "immutable_archive_last_terminal",
     "immutable_archive_latest_verified_day",
     "offhost_backup_state",
+    "offhost_last_attempt_terminal",
+    "maintenance",
     "projected_97d_status",
     "provider_observations",
     "restore_marker_unresolved",
@@ -76,6 +78,7 @@ INCIDENT_GRACE_SECONDS = {
     "SQLITE_INTEGRITY_FAILED": 0,
     "MUTABLE_BACKUP_STALE": 86400,
     "MUTABLE_BACKUP_FAILED": 0,
+    "MAINTENANCE_FAILED": 0,
     "IMMUTABLE_ARCHIVE_STALE": 86400,
     "IMMUTABLE_ARCHIVE_UPLOAD_FAILED": 86400,
     "IMMUTABLE_ARCHIVE_HASH_MISMATCH": 0,
@@ -265,6 +268,19 @@ def classify_incidents(
         found["MUTABLE_BACKUP_STALE"] = "Mutable backup freshness degraded."
     if packet.get("restore_marker_unresolved") is True:
         found["MUTABLE_BACKUP_FAILED"] = "Restore marker unresolved."
+    if str(packet.get("offhost_last_attempt_terminal") or "") in {
+        "COPY_FAILED", "REMOTE_IDENTITY_CONFLICT", "SOURCE_INTEGRITY_FAILED", "FAILED"
+    }:
+        found["MUTABLE_BACKUP_FAILED"] = (
+            "Последняя попытка off-host backup не завершена; last-good сохранён и имеет собственный data-age. "
+            "Проверить точный pending operation и повторить тот же артефакт."
+        )
+    maintenance = packet.get("maintenance")
+    if isinstance(maintenance, Mapping) and maintenance.get("enabled") is not False and maintenance.get("state") == "FAILED":
+        found["MAINTENANCE_FAILED"] = (
+            "Ограниченное обслуживание остановлено; backup и protected sources сохранены. "
+            "Проверить retention status/plan, архив и cursor; не расширять scope очистки."
+        )
     if "IMMUTABLE_ARCHIVE_STALE" in classes:
         found["IMMUTABLE_ARCHIVE_STALE"] = "Closed-day archive backlog older than RPO."
     if str(packet.get("immutable_archive_last_terminal") or "") == "DRIVE_WRITE_FAILED":

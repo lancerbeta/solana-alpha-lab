@@ -486,7 +486,30 @@ class ObservationScheduleStore:
                 notified_at TEXT,
                 payload_json TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS retention_control (
+                control_key TEXT PRIMARY KEY,
+                payload_json TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS retirement_scopes (
+                schedule_sha256 TEXT NOT NULL,
+                activation_id TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                PRIMARY KEY (schedule_sha256, activation_id)
+            );
+            CREATE TABLE IF NOT EXISTS retention_progress (
+                plan_id TEXT PRIMARY KEY,
+                next_candidate INTEGER NOT NULL,
+                payload_json TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS retention_archive_pins (
+                object_name TEXT PRIMARY KEY,
+                archive_sha256 TEXT NOT NULL
+            );
             """
+        )
+        self._conn.execute(
+            "INSERT OR IGNORE INTO retention_control(control_key,payload_json) VALUES('source_identity',?)",
+            (json.dumps({"source_id": uuid4().hex}),),
         )
         self._ensure_column(
             "schedule_activations",
@@ -632,6 +655,17 @@ class ObservationScheduleStore:
         if getattr(self, "readonly", False):
             raise ObservationScheduleStoreError("SOURCE_READONLY")
 
+    def _require_not_retired(self, schedule_sha256: str, activation_id: str, state: str) -> None:
+        """A retired activation cannot be admitted/resumed through native writers."""
+        if state not in {"ACTIVE", "DRAINING"}:
+            return
+        retired = self._conn.execute(
+            "SELECT payload_json FROM retirement_scopes WHERE schedule_sha256=? AND activation_id=?",
+            (schedule_sha256, activation_id),
+        ).fetchone()
+        if retired is not None and json.loads(retired[0]).get("disallow_resume") is True:
+            raise ObservationScheduleStoreError("RETIRED_SCOPE_RESUME_DISALLOWED")
+
     def _require_write_lease(self, clock: datetime | None = None, *, within_transaction: bool = False) -> None:
         """Fence mutations after another process replaces or expires our lease.
 
@@ -773,6 +807,7 @@ class ObservationScheduleStore:
 
     def upsert_activation(self, row: Mapping[str, Any], *, clock: datetime | None = None) -> None:
         self._require_write_lease(clock)
+        self._require_not_retired(str(row["schedule_sha256"]), str(row["activation_id"]), str(row["state"]))
         now = _now(clock)
         payload = dict(row.get("payload") or {})
         if not payload and row.get("payload_json"):
@@ -1481,6 +1516,7 @@ class ObservationScheduleStore:
     ) -> dict[str, Any]:
         """Apply one append-only lifecycle transition under a SQLite lock."""
         self._require_write_lease(clock)
+        self._require_not_retired(schedule_sha256, activation_id, new_state)
         if new_state not in _ALLOWED_ACTIVATION_TRANSITIONS or new_state == "UNREGISTERED":
             raise ObservationScheduleStoreError("INVALID_STATE_TRANSITION")
         now = _now(clock)

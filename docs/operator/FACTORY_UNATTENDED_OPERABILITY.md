@@ -685,3 +685,29 @@ does not authorize reprepare: confirmed lookup reconciliation uses the existing
 separate OPERATE commissioning prerequisites/fences; missing evidence or an
 unresolved cause requires a repair gate. Do not bypass the proof gate or copy a
 prepared lookup to production.
+
+## I2 bounded maintenance
+
+Native owner — `observation_schedule_retention.py`, CLI —
+`scripts/observation_schedule_retention.py`. Exact task/readout/rollout находятся
+в `docs/evidence/i2_backup_legacy_storage_v1/`. Без commissioned policy maintenance
+выключена. Одобренный hash фиксирует scopes или managed lineages, terminal
+predicate, реальные frozen minimum ages, source/cold closure, rows/bytes/wall,
+cadence и pressure/due guards. Future managed children не требуют новых IDs.
+
+Обычный existing daily/weekly offhost caller после verified checkpoint запускает
+maintenance, вновь беря backup-plane lock перед OPS fence. Independent remote
+restore и source-verified HOT90 raw day archives дают exact cold proof. Один
+completed cache и один pending admission ограничивают local overlap; remote
+scientific pins сохраняются до отдельного source/I4 disposition. Нет нового
+timer, daily agent или ежедневного `record-backup`. Daily physical reclaim
+не включается: это отдельная quiesced операция из staged OPERATE packet.
+
+`status`/`plan` открывают existing SQLite read-only и учитывают WAL. `apply`
+проверяет approved plan/candidate/dependencies и сохраняет cursor с каждым chunk.
+Active/tail/UNKNOWN, незакрытые publication/export/raw dependencies защищены.
+Возраст сам по себе не даёт retirement. Oversized body остаётся protected с
+durable refusal; bounded cursor продолжает другие записи, health не рисует READY.
+FAILED создаёт incident через existing watch; disabled policy молчит, yields
+по cadence/pressure/due не являются failure. Backup success не скрывает failure
+maintenance или последней попытки upload.

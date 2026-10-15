@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-FIT",
+  "as_of": "2026-10-15",
+  "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PENDING",
+  "dimensions": {
+    "mission": "Complete I2 software stage: economical consistent backup, recoverable exact cold retirement/reclaim and ordinary bounded maintenance; no compression-only DONE.",
+    "flexibility_and_history": "Old STORED compatible; native scientific/account/profile/A/B/C1/C2 history preserved; append-only policy/retirement/pins, no fake missingness or clocks.",
+    "context_efficiency": "Existing owners and locked stdlib; independent falsifiers plus focused direct-consumer regression, no local pre-PR full gate.",
+    "research_truth": "Exact cold/source closure required; UNKNOWN ownership and source scientific pins protected; no alpha, estimand or promotion claim.",
+    "owner_operability": "One staged OPERATE packet; exact CLI adapter, final-current bindings, successful-path resume, typed failure and recovery; one policy/future children/no daily IDs.",
+    "execution_to_cashflow": "Storage/recovery capability only; no money, market call or trading claim.",
+    "monitoring_and_recovery": "Last-good vs attempt vs maintenance separate, data-age semantics, existing watch, durable pending/cursors and bounded staging recovery.",
+    "build_vs_buy": "ADOPT SQLite backup, zipfile, existing HOT90/archive/research/lifecycle/store; WRAP existing offhost caller. No service/dependency/connector.",
+    "security": "No credentials or production operations; explicit destructive grants; archive path/hash and independent restore oracle; default-off deletes/policy.",
+    "red_team": "Review found and closed sidecar replay, native closure omission, A-B-A chain corruption, fabricated prune proof, two starvation paths and crash staging leak; dedicated negative regressions."
+  },
+  "capability_radar": {
+    "now": "NONE: existing native owners suffice; next is exact merge gate, then separately bound staged OPERATE.",
+    "watch": "I4 source-owned cold/scientific pin disposition when measured RDP/cold growth dominates 180d runway; bounded lifecycle task only after evidence, not silent TTL."
+  },
+  "recovery": "Exact pending/cursor replay; reclaim rollback only before resume/new writes; preserve final-current rollback; forward repair after new writes.",
+  "limits": [
+    "NO_PRODUCTION_RATIO_OR_94_PERCENT_RECLAIM",
+    "NO_MONTHS_RUNWAY_SUPPORTED",
+    "NO_SCIENTIFIC_ALPHA_OR_CASHFLOW_VERDICT",
+    "NO_CANONICAL_DONE",
+    "NO_MERGE_OR_OPERATE_AUTHORITY_FROM_EVIDENCE"
+  ]
+}

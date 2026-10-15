@@ -1,0 +1,243 @@
+# I2 — staged OPERATE packet
+
+Статус: PREPARED, NOT_AUTHORIZED. Единственный execution contract:
+`docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md`; единый PRD/SSD — `source-contract.md`.
+Этот пакет поставляется вместе с reviewed code и completion binding. Конкретный
+producer SHA берётся из успешного guarded merge/post-merge receipt, а не из даты
+или имени ветки. Каждая runtime запись остаётся в operational plane.
+
+## 1. Первое разрешение: установка и доказательство обычного backup
+
+После merge сформировать exact OPERATE scope: target merged SHA, actual live SHA,
+host/root identity, разрешённые deploy/backup units, независимый sink и upper
+bounds времени/IO/места. Сохранить состояния всех участвующих services/timers;
+отдельно считать armed B и её activation timer. Установку проводить существующим
+`scripts/factory_live_release.py` по `docs/operator/FACTORY_REMOTE_HOST.md`.
+
+До install выполнить bounded metadata readback:
+
+- protected A/B: schedules, authority/storage envelopes, activation/tail state;
+- APPLIED profile/control/revision/revoke; managed children, shared account
+  membership, daily/rolling/lifetime debits; никаких новых grants или ручных окон;
+- исходные DB/WAL/RDP и staging/sink на каждом filesystem, last-good checkpoint,
+  pending backup intent, foreign lock, actual due/rollover/B timing;
+- текущие installed unit hashes/cadence, effective freshness/retention и версия
+  reader. Старый бинарник после managed child не является rollback-кандидатом.
+
+Если измеренная capture/reclaim щель пересекает due или фактическую B/rollover
+границу, перенести техническую операцию. Не останавливать business intake ради
+deploy и не менять frozen root/envelopes. При unresolved writers/backup дождаться
+штатного завершения либо вернуть конкретный blocker.
+
+Deploy сохраняет baseline policy revision 1: CURRENT data-age 86400s, RPO 24h;
+maintenance без approved policy выключена. Затем разрешённый обычный caller:
+
+```sh
+cd /opt/solana-alpha-lab
+uv run --locked --managed-python python -B scripts/factory_offhost_backup_copy.py --mode daily
+```
+
+При `DEFERRED` не снимать чужой lock. При failed/unknown upload следующий запуск
+продолжает тот же pending operation/ZIP; ручное удаление intent запрещено.
+Проверить реальные entry compression, logical inventory, snapshot/start/upload/
+verify clocks, actual attempted/verified upload bytes и last-good/attempt health.
+
+Первоначальная независимая приёмка использует точный скачанный checkpoint JSON
+и **новый** явно выделенный isolated root с учтённым filesystem peak:
+
+```sh
+uv run --locked --managed-python python -B scripts/factory_offhost_backup_copy.py \
+  --mode verify-remote-restore --checkpoint "$EXACT_CHECKPOINT_JSON" \
+  --isolated-root "$NEW_ISOLATED_RESTORE_ROOT"
+```
+
+Значения переменных — exact artifacts этой операции; отсутствие любого binding
+блокирует запуск. Проверить raw inventory до marker, final unresolved marker,
+profile/revoke/counters/children/authority events, publication recovery и OPEN
+operational/paper obligations. Не запускать восстановленный stale collector до
+штатной reconciliation. Это разрешает принять только `PACKAGING_LIVE_PROVEN`.
+
+## 2. Подготовка exact destructive APPLY
+
+На consistent изолированной копии уточнить известный benchmark: exact legacy
+scope и body bytes; retained membership/denominator/accounting/provenance;
+actual source-owned release/export/raw/member closure и exclusions. Unknown
+ownership остаётся protected. Оригинальные decoded JSON bytes сохраняются до
+изменения; это не исходный HTTP response.
+
+Native entry для bounded чтения:
+
+```sh
+uv run --locked --managed-python python -B scripts/observation_schedule_retention.py status \
+  --store "$EXACT_OPS_STORE" --max-rows 256 --max-bytes 8388608 --max-wall-seconds 1
+uv run --locked --managed-python python -B scripts/observation_schedule_retention.py plan \
+  --store "$EXACT_OPS_STORE" --policy "$PROPOSED_POLICY_JSON" --output "$NEW_PLAN_JSON"
+```
+
+Status/plan открывают существующий store read-only с WAL-aware чтением. Metadata
+commissioning, создание cold artifact и independent upload являются отдельными
+явно перечисленными разрешёнными действиями OPERATE scope. `archive` создаёт
+только LOCAL_REHEARSAL proof; оно не заменяет independent remote readback.
+
+Перед предложением APPLY пакет должен содержать exact source/schema/root
+identity, policy revision/hash, cutoff/high-watermarks/cursor, retirement hashes,
+candidate hashes/bytes и protected exclusions; source-owned closure; immutable
+cold locator/object hashes и независимый restore proof; retained checkpoint
+reference graph. Cold archive находится вне routine source selection и остаётся
+pinned до отдельного доказанного source/I4 disposition. Срок не выводится из
+возраста папки, факта download на ПК или маленького нового ZIP.
+
+Reclaim rehearsal на recent copy измеряет DB/WAL и filesystem bytes, wall/CPU/
+RSS/phase peak, все material key/ROWID/sequence/cursor fingerprints, неизменный
+real data_root device/inode и следующий native writer. В production OPS обычно
+является sibling observation_rdp; нельзя подменять frozen data_root его parent.
+Составить finite maintenance window и rollback boundary.
+
+## 3. Второе разрешение: exact retirement, reclaim и одна policy
+
+Одно согласованное решение может покрыть совместимые действия ниже, только если
+их exact hashes, scopes, targets, budgets и остановки уже связаны в runtime packet.
+
+1. Установить exact disallow-resume retirement и policy по их approved SHA256.
+   Сохранить original provider/scientific states, clocks, occurrence IDs,
+   membership/denominator, accounting и A/B/managed authority.
+2. Применять только exact archive-bound plan bounded chunks через `apply
+   --plan ... --approved-sha256 ... --i-understand-apply`. Candidate/dependency/
+   policy drift даёт отказ и новое чтение; unrelated active writes не разрешают
+   расширить scope. Durable progress продолжается после restart без двойного effect.
+3. До physical switch quiesce всех actual writers/publication owners, сохранив
+   prior timer/service states. Не использовать `collection-stop-intake` как
+   техническую остановку. Снять **final current** pre-maintenance recovery set
+   и rebind plan к фактическим новым counters/children/cursors.
+4. `reclaim-plan` связывает actual source и real data_root. `reclaim-apply`
+   требует exact plan hash, independent recovery proof, подтверждённый quiesce
+   и explicit apply flag. Rehearsal DB никогда не заменяет live DB. Native
+   rebuild сохраняет implicit ROWID, sequences, schema/indices и all row values.
+5. При interrupted switch использовать `reclaim-resume`/`reclaim-rollback` с
+   exact plan identity при остановленных writers. Возврат old DB допустим лишь
+   до resume/new writes. После новых admissions — forward repair/reconciliation.
+6. Проверить source/control/accounting/root bindings и восстановить прежние
+   services/timers. Подтвердить штатный tick → SEARCH → publication, source
+   clocks, calls/debits и coverage/gaps. Никакого backfill новыми market calls.
+7. Создать один новый компактный weekly/full baseline через existing caller,
+   независимо восстановить exact checkpoint и подтвердить: retired bodies
+   отсутствуют в logical routine payload, DB-file физически уменьшен.
+
+Обязательный physical-path блок после разрешённого quiesce. `FINAL_CURRENT_PROOF_JSON`
+создан независимым restore **последнего current capture после остановки writers**;
+старый rehearsal proof не допускается. Все roots берутся из проверенного live
+runtime/config, а не из defaults CLI. `APPROVED_RECLAIM_PLAN_SHA256` равен
+`plan_id` прочитанного exact plan и входит в отдельно утверждённый APPLY scope.
+
+Сначала получить native cold record из независимого remote restore — без
+ручного конструирования proof JSON. `FINAL_REMOTE_RESTORE_PROOF_JSON` — exact
+durable `.remote-restore-proof.json` нового final-current isolated cache:
+
+```sh
+uv run --locked --managed-python python -B scripts/observation_schedule_retention.py register-checkpoint-archive \
+  --store "$EXACT_OPS_STORE" --factory-root "$EXACT_FACTORY_ROOT" \
+  --isolated-root "$FINAL_CURRENT_ISOLATED_CACHE" --input "$FINAL_REMOTE_RESTORE_PROOF_JSON" \
+  --output "$FINAL_CURRENT_PROOF_JSON" --i-understand-apply
+```
+
+Команда повторно реконструирует verified objects во временный owned scratch,
+сравнивает actual SQLite contents с cold copy и регистрирует source-owned pin.
+Учесть ещё одну raw copy в phase peak этой отдельной операции. Подмена standalone
+SQLite при прежних ZIP/checkpoint и пересчёт собственного inventory отказываются.
+Отсутствующий source UUID или несовпадение current business rows/counters/
+admissions означает refusal и новый final-current checkpoint; старый до retirement
+или до последнего writer proof не подходит. Mechanical registration/restore-marker
+bytes не подменяют causal comparison. После этого строится exact reclaim plan:
+
+```sh
+uv run --locked --managed-python python -B scripts/observation_schedule_retention.py reclaim-plan \
+  --store "$EXACT_OPS_STORE" --operation-mode OPERATE \
+  --factory-root "$EXACT_FACTORY_ROOT" --data-root "$EXACT_FROZEN_DATA_ROOT" \
+  --max-wall-seconds 60 --output "$NEW_RECLAIM_PLAN_JSON"
+uv run --locked --managed-python python -B scripts/observation_schedule_retention.py reclaim-apply \
+  --store "$EXACT_OPS_STORE" --operation-mode OPERATE \
+  --factory-root "$EXACT_FACTORY_ROOT" --data-root "$EXACT_FROZEN_DATA_ROOT" \
+  --plan "$NEW_RECLAIM_PLAN_JSON" --input "$FINAL_CURRENT_PROOF_JSON" \
+  --approved-sha256 "$APPROVED_RECLAIM_PLAN_SHA256" --writers-quiesced --i-understand-apply
+```
+
+На обычном успехе `SWITCHED_AWAITING_NATIVE_READBACK` services всё ещё остановлены.
+Read-only native fingerprint, keys/ROWID/sequence/cursors, control/accounting и
+data_root identity должны совпасть с plan. Затем обязательный explicit переход:
+
+```sh
+uv run --locked --managed-python python -B scripts/observation_schedule_retention.py reclaim-resume \
+  --store "$EXACT_OPS_STORE" --operation-mode OPERATE \
+  --factory-root "$EXACT_FACTORY_ROOT" --data-root "$EXACT_FROZEN_DATA_ROOT" \
+  --approved-sha256 "$APPROVED_RECLAIM_PLAN_SHA256" --i-understand-apply
+```
+
+Только после успешного resume возвращаются prior services/timers и проверяется
+следующий native writer. До resume и любых новых записей rollback доступен тем же
+CLI `reclaim-rollback` с exact roots/hash и explicit apply flag. После новых
+записей rollback запрещён; forward repair/reconciliation, сохраняющий current.
+
+| Durable phase после interruption | Допустимый следующий шаг при quiesced writers |
+|---|---|
+| PREPARED | exact rollback; исходная БД остаётся current |
+| ORIGINAL_MOVED | exact rollback возвращает final-current original; не запускать writers |
+| SWITCHED | read-only invariants → resume либо exact rollback до новых записей |
+| resumed / есть новые записи | forward repair; old rollback не применять |
+
+Recurring policy разрешает конкретные legacy scopes и/или managed lineages,
+classes, terminal retirement conditions, реальные frozen minimum ages,
+source/cold proofs, max rows/bytes/wall/cadence, pressure/due/restore fences,
+retained restore points и pause/resume. Её hash/revision утверждаются один раз;
+будущие children проходят те же source-owned predicates автоматически. Нет
+ежедневного списка IDs, ручного агента или `record-backup`.
+
+Caller — existing daily/weekly offhost backup command после завершения checkpoint;
+native maintenance вновь берёт backup-plane lock до OPS fence и уступает due,
+foreign writer, restore, RAM/IO/CPU pressure. Ошибка optional maintenance
+сохраняет backup/last-good и источники, создаёт один incident через existing watch.
+Включение caller/policy требует installed readback; Git template не доказывает
+commissioning. Daily VACUUM не включать.
+
+## 4. Freshness decision внутри commissioning
+
+Рекомендуемый вариант после измерения package/upload/verify: policy revision 2,
+CURRENT **data-age 108000s (30h)**, RPO **30h**, existing daily cadence;
+DEGRADED upper bound остаётся 172800s. Допустимо лишь если измеренные 24h cadence
++ work + margin укладываются в 30h. Поля конфигурации должны согласованно
+измениться после exact approval; schema отвергает 30h freshness с RPO24h.
+APPLIED managed profile и его grant hash не редактируются. Его собственный
+max-age продолжает ограничивать effective threshold вместе с backup owner.
+
+При сохранении owner hard24h выбрать одну измеренную более частую cadence и
+посчитать дополнительный traffic/IO; расписание без approval не менять.
+IN_PROGRESS не омолаживает last-good и не даёт бесконечной grace. Failed/stalled,
+skipped day, reboot retry, future clock, weekly/daily overlap и UTC boundary
+проверяются отдельно. Длительности используют monotonic clock.
+
+## 5. Pruning и финальная приёмка
+
+Перед remote deletion использовать `factory_offhost_backup_copy.py --mode
+plan-prune` с bounded exact object inventory, retained checkpoints и source-owned
+cold/scientific/pending pins. Новая компактная delta старой full не отменяет
+зависимость от этой full. Удаление требует exact plan hash, независимого remote
+restore retained chains и dedicated `--authorize-remote-delete`; обычные callers
+остаются copy-only. Ни wildcard, ни `sync --delete` не применяются. Первый
+remote cleanup можно отложить лишь при доказанном runway; pins сохраняются.
+`--restore-proof-json` и для plan, и для apply указывает на durable
+`cache/.remote-restore-proof.json`, созданный actual independent restore.
+Его SHA256 входит в approved plan; подстановка JSON с `verified:true` не
+принимается. Apply заново реконструирует retained bytes и проверяет SQLite;
+дополнительная временная raw copy в `.prune-verify` входит в phase peak.
+
+Итог I2: один ordinary backup cycle и один ordinary bounded maintenance cycle
+после restart при работающем collector, сохранённые A/B/profile/counters/C1/C2,
+actual DB/WAL/volume reduction, no retired routine bodies, new last-good и
+verified restore, delivery incident/recovery через existing TEST path при
+изменённых watch consumers. Пока natural cycle не произошёл — точный
+`LIVE_PENDING_*`/`AWAITING_ROUTINE_BACKUP`, полного I2 DONE нет.
+
+Отбивка — один `OWNER_READOUT.md` по §14. Модель 7/30/180d использует измеренный
+incoming growth и HOT/COLD/checkpoint retention, реальные overlaps и file/inode
+counts. Непокрытые I4 pins не считать удалёнными. Что не повторять: baseline
+sampling benchmark, I1 production import, C1/C2 research, ручные окна или daily
+owner approval.

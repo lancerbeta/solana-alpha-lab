@@ -1,0 +1,268 @@
+{
+  "schema": "smial.i2-backup-legacy-storage-proof.v1",
+  "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
+  "as_of": "2026-10-15",
+  "scope": "ISOLATED_NATIVE_COUNTERPARTS_WITH_SYNTHETIC_TRANSPORT_NO_PRODUCTION",
+  "source_original_sha256": "a63241c261748dca5a271d0e3f99b7c22400fa72d786c934b6bf68e2989c6b80",
+  "source_git_projection_sha256": "3d5c4d4bb6c991db03625747eda40b20b4fbfe1396fabfc8cd7d539146ba40bf",
+  "baseline_reported_not_live": {
+    "ops_db_bytes": 5165555712,
+    "freelist_pages": 122880,
+    "page_bytes": 4096,
+    "stored_checkpoint_approx_bytes": 5225000000,
+    "entries_reported": 7932,
+    "upload_minutes_range": [
+      60,
+      110
+    ],
+    "sample_48MiB_ratio": 6.04,
+    "whole_checkpoint_production_ratio": "UNKNOWN"
+  },
+  "same_capture_compression": {
+    "stored_bytes": 2188785,
+    "deflated_bytes": 18760,
+    "logical_bytes": 2187281,
+    "ratio": 116.67297441364606,
+    "method": 8,
+    "level": 1,
+    "stage_bytes": 2187501,
+    "stage_files": 3,
+    "stage_plus_zip_bytes": 2206261,
+    "capture_pack_localverify_wall_seconds_observed_range": [
+      0.0664,
+      0.07794
+    ],
+    "cpu_seconds_observed_range": [
+      0.03125,
+      0.078125
+    ],
+    "independent_raw_restore": "PASS_BOTH_METHODS",
+    "production_claim": false
+  },
+  "retire_reclaim": {
+    "db_file_before_bytes": 2494464,
+    "db_file_after_bytes": 397312,
+    "wal_closed_before_after_bytes": [
+      0,
+      0
+    ],
+    "retired_decoded_body_before_bytes": 2097175,
+    "retired_decoded_body_after_bytes": 0,
+    "call_payload_before_bytes": 2097376,
+    "surviving_provenance_after_bytes": 614,
+    "cli_chain_wall_seconds_observed": 1.619,
+    "implicit_call_rowid": 313,
+    "episode_admission_rowids": [
+      7,
+      19
+    ],
+    "runtime_sequence_before_after": [
+      88,
+      89
+    ],
+    "native_next_writer": "PASS",
+    "data_root_inode": "PRESERVED",
+    "hot_files_before_after_retained_rollback_intent": [
+      1,
+      3
+    ],
+    "crash_rollback_phases": [
+      "PREPARED",
+      "ORIGINAL_MOVED",
+      "SWITCHED"
+    ],
+    "rollback_after_new_writes": "DENY",
+    "actual_volume_allocation": "UNKNOWN_PRODUCTION_NOT_RUN",
+    "next_compact_full_archive_bytes_observed": 12302,
+    "next_full_raw_sql_oracle": "PASS_RETIRED_BODY_KEYS_ZERO_NATIVE_SUCCESSOR_PRESENT",
+    "final_current_causal_proof": "REQUIRED_AFTER_LOGICAL_APPLY_OLD_PROOF_DENY",
+    "next_compact_full_archive_bytes_observed_range": [
+      12302,
+      12309
+    ],
+    "next_full_checkpoint_wall_seconds_observed": 0.046,
+    "cold_registration": "ONE_TIME_VERIFIED_OBJECT_RECONSTRUCTION_AND_CAUSAL_SQL_COMPARISON"
+  },
+  "fresh_process_resource_measurements": [
+    {
+      "scope": "ISOLATED_SYNTHETIC_WINDOWS",
+      "phase": "capture_pack_restore",
+      "returncode": 0,
+      "wall_seconds": 0.5983772999898065,
+      "owned_tree_sampled_peak_file_bytes": 8822740,
+      "owned_tree_sampled_peak_file_count": 10,
+      "sample_seconds": 0.002,
+      "output_sha256": "0c577de80aa59d373a2992ff64177fa21e46da54b2c28f094688b4b282112ecf",
+      "actual_python_process_peak_working_set_bytes": [
+        43970560
+      ],
+      "rss_semantics": "individual process peak; launcher excluded; peaks not summed; no Linux/production claim"
+    },
+    {
+      "scope": "ISOLATED_SYNTHETIC_WINDOWS",
+      "phase": "retire_reclaim_native_cli",
+      "returncode": 0,
+      "wall_seconds": 2.217701700006728,
+      "owned_tree_sampled_peak_file_bytes": 12555872,
+      "owned_tree_sampled_peak_file_count": 15,
+      "sample_seconds": 0.002,
+      "output_sha256": "512430d664ad3487f1fb956cd01bf06924a68657d653b4d9488a6929df7daa9e",
+      "actual_python_process_peak_working_set_bytes": [
+        46256128,
+        39936000,
+        39784448,
+        48979968,
+        39211008,
+        43962368
+      ],
+      "rss_semantics": "individual process peak; launcher excluded; peaks not summed; no Linux/production claim"
+    }
+  ],
+  "measurement_reproduce": [
+    "I2_PRINT_BENCHMARK=1 uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1.I2BackupLegacyStorageTests.test_whole_same_snapshot_deflate_reduction -q",
+    "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.NativeCutoverAndCLITests.test_full_real_cli_plan_apply_reclaim_and_next_writer -q"
+  ],
+  "external_resource_measurement_method": "fresh Python processes; Windows GetProcessMemoryInfo(GetCurrentProcess) at exit for actual Python children; scoped temporary tree sampled every 2ms; sampled peak is lower bound, per-process RSS is not concurrent aggregate",
+  "growth_planning_scenario": {
+    "scope": "ISOLATED_SYNTHETIC_7_EQUAL_NATIVE_INPUTS",
+    "assumption": "one 100000-character authored decoded field per modeled day; no production growth inference",
+    "db_file_bytes_at_0_to_7_inputs": [
+      352256,
+      450560,
+      557056,
+      659456,
+      761856,
+      864256,
+      966656,
+      1069056
+    ],
+    "payload_before_bytes": 701568,
+    "payload_after_provenance_bytes": 4284,
+    "retired_logical_body_bytes_removed": 697284,
+    "applied_call_compactions": 7,
+    "incoming_payload_bytes_per_input": 100224.0,
+    "surviving_payload_bytes_per_input": 612.0,
+    "db_growth_per_input_bytes": 102400.0,
+    "modeled_inputs_7_30_180": [
+      {
+        "days": 7,
+        "incoming_payload_bytes": 701568,
+        "retained_original_cold_payload_lower_bound_bytes": 701568,
+        "retained_provenance_payload_bytes": 4284
+      },
+      {
+        "days": 30,
+        "incoming_payload_bytes": 3006720,
+        "retained_original_cold_payload_lower_bound_bytes": 3006720,
+        "retained_provenance_payload_bytes": 18360
+      },
+      {
+        "days": 180,
+        "incoming_payload_bytes": 18040320,
+        "retained_original_cold_payload_lower_bound_bytes": 18040320,
+        "retained_provenance_payload_bytes": 110160
+      }
+    ]
+  },
+  "ordinary_pipeline": {
+    "test": "tests.test_i2_pipeline_v1",
+    "policy_installed_before_future_children": true,
+    "future_children_n": 2,
+    "native_terminal_states": [
+      "COMPLETE",
+      "TAIL_COMPLETE"
+    ],
+    "mutable_only_backup": true,
+    "hot90_source_verified_raw_day_archive": true,
+    "independent_content_restore": "FAKE_REMOTE_BYTE_TRANSPORT",
+    "manual_child_bindings": 0,
+    "manual_checkpoint_registration": 0,
+    "restart_between_ordinary_calls": true,
+    "preserved_tables": [
+      "managed_profiles",
+      "managed_control",
+      "managed_children",
+      "accounting_counters",
+      "lifetime_counters",
+      "account_budget_members"
+    ],
+    "production_installed_caller": "LIVE_PENDING_INSTALL"
+  },
+  "falsifiers": [
+    "post-inventory writer/path mutation cannot change captured bytes or membership",
+    "SQLite sidecar injection fails; after-manifest/after-marker restore rebuilds native panel without source",
+    "missing/reordered delta or wrong actual inventory refuses; restore marker follows last raw step",
+    "unknown upload/restart resumes exact pending ZIP/checkpoint; A-to-B-to-A weekly restore returns A",
+    "fabricated or changed durable prune proof refuses; raw oracle reruns before deletefile",
+    "active/tail/UNKNOWN/round/outbox/export/raw-frozen pin prevents retirement",
+    "candidate/dependency drift refuses; chunk restart never doubles effects or changes source clocks",
+    "protected prefix and future terminal eligibility eventually discovered after restart",
+    "oversize metadata refusal advances other work and remains FAILED instead of false READY",
+    "two fresh-process capture deaths recover known-dead staging; active/unknown preserved",
+    "schema rejects freshness30h/RPO24h; completed old snapshot never becomes fresh",
+    "existing malformed chain file refuses bootstrap before capture/network",
+    "cold registration rejects swapped standalone SQLite even if UUID and caller inventory are rebound",
+    "reclaim refuses older proof after any causal native event/counter/admission"
+  ],
+  "review_remediations": [
+    "WAL sidecar replay",
+    "missing publication partition manifests",
+    "weekly base-return obsolete deltas",
+    "fabricated prune proof",
+    "archive discovery prefix starvation",
+    "oversize starvation/false health",
+    "crash capture staging leak",
+    "OPERATE root/mode and normal reclaim-resume commands",
+    "public remote-restore-to-cold-record CLI adapter",
+    "read-only requested budget narrowing",
+    "strict corrupt-existing chain state vs absent bootstrap",
+    "cold source-to-verified-object reconstruction binding",
+    "final-current causal recovery fingerprint"
+  ],
+  "validation": {
+    "final_targeted_regression": {
+      "result": "PASS",
+      "tests": 96,
+      "skipped": 1,
+      "wall_seconds": 40.193,
+      "modules": [
+        "tests.test_i2_backup_legacy_storage_v1",
+        "tests.test_i2_offhost_checkpoint_v1",
+        "tests.test_factory_offhost_backup",
+        "tests.test_i2_retention_maintenance_v1",
+        "tests.test_i2_storage_consumers_v1",
+        "tests.test_i2_pipeline_v1"
+      ],
+      "subsequent_test_only_strengthening": "PASS_4_FORGED_COLD_CASES_NEW_CALL_COUNTER_ADMISSION_SAME_ROWCOUNT_BODY_0.864s"
+    },
+    "github_ci": "ENFORCED_EXACT_HEAD",
+    "local_full_gate": "NOT_RUN_PRE_PR_BY_POLICY",
+    "prior_direct_consumer_regression": {
+      "tests": 178,
+      "skipped": 1,
+      "wall_seconds": 341.603,
+      "result": "PASS"
+    },
+    "static_contracts": "PASS",
+    "credential_scan_self_test": "PASS",
+    "credential_scan_repository": "PASS"
+  },
+  "runtime_mandatory_pending": [
+    "exact deployment",
+    "ordinary live upload and independent restore",
+    "exact archive/retirement APPLY",
+    "final-current quiesced physical reclaim and native next writer",
+    "compact full baseline and separately authorized reachability prune",
+    "approved policy install and ordinary maintenance after restart",
+    "protected A/B/profile/counters/C1/C2 readback",
+    "watch TEST incident/recovery delivery",
+    "measured production runway and source/I4 disposition"
+  ],
+  "non_claims": [
+    "NO_PRODUCTION_RATIO_OR_94_PERCENT_RECLAIM",
+    "NO_MONTHS_RUNWAY_SUPPORTED",
+    "NO_SCIENTIFIC_ALPHA_OR_CASHFLOW_VERDICT",
+    "NO_CANONICAL_DONE",
+    "NO_MERGE_OR_OPERATE_AUTHORITY_FROM_EVIDENCE"
+  ]
+}

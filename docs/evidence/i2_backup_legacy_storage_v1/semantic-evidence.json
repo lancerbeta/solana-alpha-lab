@@ -1,0 +1,14 @@
+[
+  {
+    "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/proof.json",
+    "sha256_or_fingerprint": "48cde15b6d770b800a5ae29deede9347ff79c7f4267a33146cdb80fa79ad6fde"
+  },
+  {
+    "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md",
+    "sha256_or_fingerprint": "05510a06f6c05175033daf9d2fb7bb7e715a93ef64431fdadff7307c1e450aed"
+  },
+  {
+    "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md",
+    "sha256_or_fingerprint": "0cb3db3eac1e3cfb5f6f1c45a0ced4fe980c5326701992f03433900f1003bcbf"
+  }
+]

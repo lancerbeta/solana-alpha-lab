@@ -69,6 +69,7 @@ backup:
     rclone_config_absolute: /etc/solana-alpha-lab/rclone.conf
     rclone_bin: /usr/bin/rclone
     receipt_relative: local/factory_v1/offhost_backup_receipt.json
+    freshness_policy_revision: 1
     freshness_current_max_seconds: 86400
     freshness_degraded_max_seconds: 172800
     daily_delta: true

@@ -1535,6 +1535,11 @@ def build_collector_operational_packet(
         "backup_domain": backup_domain,
         "offhost_backup_state": offhost.get("offhost_backup_state"),
         "offhost_last_verified_at": offhost.get("offhost_last_verified_at"),
+        "offhost_snapshot_data_as_of": offhost.get("offhost_snapshot_data_as_of"),
+        "offhost_current_max_age_seconds": offhost.get("offhost_current_max_age_seconds"),
+        "offhost_freshness_policy_revision": offhost.get("offhost_freshness_policy_revision"),
+        "offhost_last_attempt_terminal": offhost.get("offhost_last_attempt_terminal"),
+        "offhost_clock_semantics": offhost.get("offhost_clock_semantics"),
         "offhost_backup_age_seconds": offhost.get("offhost_backup_age_seconds"),
         "offhost_last_filename": offhost.get("offhost_last_filename"),
         "offhost_last_sha256": offhost.get("offhost_last_sha256"),
@@ -1594,20 +1599,32 @@ def build_collector_operational_packet(
         if receipt:
             last_terminal = receipt.get("terminal")
     packet["immutable_archive_last_terminal"] = last_terminal
-    incremental = data_growth if isinstance(data_growth, int) and data_growth >= 0 else 0
-    current_bytes = 0
-    for item in (sqlite_bytes, resident_rdp):
-        if isinstance(item, int):
-            current_bytes += item
-    if isinstance(resident_rdp, int) and isinstance(open_job_bytes, int):
+    from solana_alpha_lab.factory.managed_collection import measure_whole_factory
+
+    topology = measure_whole_factory(
+        store=store, data_root=rdp, root=root, environ=env,
+        rdp_inventory=(rdp_bytes, open_job_count, open_job_bytes, rdp_science_bytes),
+    )
+    packet["factory_storage_topology"] = topology
+    try:
+        from solana_alpha_lab.factory.observation_schedule_retention import retention_status
+
+        packet["maintenance"] = retention_status(store)
+    except Exception:  # noqa: BLE001 - missing/broken policy never becomes successful maintenance
+        packet["maintenance"] = {"enabled": None, "state": "FAILED", "last_reason": "UNAVAILABLE"}
+    incremental = data_growth if isinstance(data_growth, int) and data_growth >= 0 else None
+    resident_parts = [topology.get(key) for key in
+                      ("sqlite_bytes", "resident_rdp_bytes", "other_store_bytes")]
+    transient_parts = [topology.get(key) for key in ("staging_bytes", "maintenance_staging_bytes")]
+    storage_known = all(isinstance(item, int) and not isinstance(item, bool)
+                        for item in resident_parts + transient_parts + [topology.get("backup_sink_bytes")])
+    if storage_known and incremental is not None:
         try:
             runway = project_storage_runway(
                 incremental_compressed_bytes_per_day=incremental,
-                current_same_volume_factory_bytes=current_bytes,
-                mutable_backup_peak_bytes=int(backup_sink_bytes)
-                if isinstance(backup_sink_bytes, int)
-                else 0,
-                staging_peak_bytes=open_job_bytes,
+                current_same_volume_factory_bytes=sum(resident_parts),
+                mutable_backup_peak_bytes=topology["backup_sink_bytes"],
+                staging_peak_bytes=sum(transient_parts),
                 retention_class="HOT90_RESIDENT",
             )
             packet["projected_97d_bytes"] = runway["projected_total_same_volume_bytes"]

@@ -7288,6 +7288,11 @@
       "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
+      "source_asset_id": "EVIDENCE-I2-BACKUP-LEGACY-STORAGE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-I2-BACKUP-LEGACY-STORAGE-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-RUNTIME-001"
@@ -17146,6 +17151,11 @@
       "source_asset_id": "SKILL-HYPOTHESIS-FORGE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "SPEC-I2-BACKUP-LEGACY-STORAGE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-I2-BACKUP-LEGACY-STORAGE-001"
     },
     {
       "source_asset_id": "STRAT-V-EARLY-LIQ-FLOOR-V1-001",

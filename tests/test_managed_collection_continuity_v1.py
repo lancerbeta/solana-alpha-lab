@@ -807,11 +807,16 @@ class ManagedFootprintTests(ManagedBase):
         return total
 
     def decide(self, body, store, footprint=None, free=100 * 1024 ** 3):
-        from solana_alpha_lab.factory.remote_ops import BACKUP_SINK_ENV
+        from solana_alpha_lab.factory.remote_ops import BACKUP_SINK_ENV, load_config
 
-        return mc.managed_storage_decision(
-            store=store, body=body, data_root=self.sc.data_root, root=ROOT_DIR, now=D1, free_bytes=free,
-            footprint=footprint, environ={BACKUP_SINK_ENV: str(self.sc.sink)})
+        # This fixture owns OPS/RDP/sink only; installed sibling store paths on
+        # the developer workstation belong to a different factory instance.
+        config = load_config(ROOT_DIR)
+        config["stores"] = {}
+        with patch("solana_alpha_lab.factory.remote_ops.load_config", return_value=config):
+            return mc.managed_storage_decision(
+                store=store, body=body, data_root=self.sc.data_root, root=ROOT_DIR, now=D1, free_bytes=free,
+                footprint=footprint, environ={BACKUP_SINK_ENV: str(self.sc.sink)})
 
     def test_sibling_ops_wal_backup_and_staging_move_target_and_hard_not_physical_reserve(self) -> None:
         sc = self.sc
