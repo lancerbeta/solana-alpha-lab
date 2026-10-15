@@ -121,7 +121,7 @@
     "ARCHITECTURE_CRITIC",
     "OWNER_UX_CRITIC"
   ],
-  "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-SOURCE-ROLE-CHECKPOINT",
+  "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-AFTER-THREE-TEST-COMPATIBILITY",
   "reviewed_bindings_sha256": "3a2d4944752482965b5c167d3b2d2b06188eb38e523c6be9bc63a07bee805b61",
   "reviewed_inventory_sha256": "89575887977c4e0dba1ebfaf1a09c19e4e440d49ccd37dded4c440b31e5b0953",
   "reviews": [
@@ -193,5 +193,5 @@
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
-  "verdict": "NOT_READY"
+  "verdict": "PENDING"
 }

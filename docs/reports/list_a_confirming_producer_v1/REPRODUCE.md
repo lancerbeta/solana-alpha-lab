@@ -180,3 +180,19 @@ binding тоже отказывает. Raw receipt UTF-8 и hashes находя�
 test compatibility paths вне managed_write_set перечислены в receipt. Новый full
 CI пока не заявлен. Historical qualification/results не переписываются для новой
 metadata границы; сохранённые charges остаются consumed. Merge phrase не запрашивать.
+
+
+## Owner-authorized three-test compatibility regression
+
+```text
+python -B -m unittest tests.test_factory_ordinary_market_hypothesis tests.test_discovery_evidence_release_bridge tests.test_harness_sync tests.test_list_a_confirmation_admission_v1.SourceRoleProvenanceTests -v
+```
+
+Existing shared locked runtime only; no install/new environment. Expected55 tests:
+13 ordinary-hypothesis,5 release bridge,34 harness_sync,3 source-role provenance.
+These are disposable unit fixtures, not a named scientific campaign or a replay
+of seven consumed charges. Original four-operation source-role CLI receipts remain
+in source-role-provenance.json; before/after source hashes/role flags are exact.
+Fixture schema set is the original base four paths, independent of manifest order.
+P2 recovery next-action is still a separately unresolved production finding;
+compatibility PASS does not assert independent-review/bindings/fullCI/merge PASS.

@@ -283,7 +283,12 @@ class SyncGoldenTests(unittest.TestCase):
                 "lifecycle_registries": real_manifest["root_resolver"][
                     "lifecycle_registries"
                 ],
-                "schemas": list(real_manifest["root_resolver"]["schemas"])[:4],
+                "schemas": [
+                    "catalog/schemas/catalog_manifest.schema.json",
+                    "catalog/schemas/asset_catalog.schema.json",
+                    "catalog/schemas/query_recipe.schema.json",
+                    "catalog/schemas/lifecycle_registry.schema.json",
+                ],
                 "commands": legacy_commands,
             },
             "policies": real_manifest["policies"],

@@ -96,9 +96,16 @@
       "status": "PASS_TARGETED_SYNTHETIC"
     },
     {
+      "current_disposition": "Historical three-fixture blocker resolved by owner-authorized compatibility55PASS; fullCI still pending and P2 recovery unresolved",
       "evidence": "Prior PR406 workflow38663657983 failed; three legacy test fixture compatibility paths require separate exact write-set authority; no passing CI transferred",
+      "observed_at_content_head": "822a848a758e501727d26fb7b2eec489d8264dfd",
       "requirement": "fresh exact-head CI delivery",
       "status": "BLOCKED_OUTSIDE_MANAGED_WRITE_SET"
+    },
+    {
+      "evidence": "55 PASS: all three changed legacy modules plus source-role provenance. Prior three outside-write-set blockers resolved by exact owner extension and minimal fixture/pin/expectation patch; historical entries retained. P2 recovery remains unresolved; no fresh fullCI PASS.",
+      "requirement": "Owner-authorized Spec1.5 legacy test compatibility",
+      "status": "PASS_TARGETED_REGRESSION"
     }
   ],
   "schema": "smial.list-a-confirmation-coverage",

@@ -11,6 +11,34 @@
   ],
   "as_of": "2026-10-15",
   "candidate_checkpoint_head": "871682f5ff23fadb053647db146479444b58c073",
+  "compatibility_extension": {
+    "approved_patch_sha256": "f636abfa752ade121b45094c0e1069296fa01d9b772ee260684ed9aed4a94739",
+    "as_of": "2026-10-15",
+    "checkpoint_head": "84fc5b4844a41fac76ad7da1eea241951a03d25c",
+    "conditions": [
+      "NO_ASSERTION_REMOVAL_OR_WEAKENING",
+      "NO_SKIP_XFAIL_STUBS",
+      "NO_SCIENTIFIC_GOLDEN_CHANGES",
+      "ONLY_LAWFUL_SPEC1_5_COMPATIBILITY",
+      "STOP_ORACLE_SEMANTIC_CHANGE",
+      "PRESERVE_SOURCE_ROLE_FALSIFIER",
+      "PRESERVE_SEVEN_CHARGES_AND_ALL_RESULTS"
+    ],
+    "forbidden": [
+      "NEW_SCIENTIFIC_CAMPAIGN",
+      "REAL_DATA",
+      "OTHER_PRODUCTION_CHANGES",
+      "MERGE"
+    ],
+    "oracle_meaning": "UNCHANGED; current engineering pin, exact accepted addition, base-identical fixture schema set",
+    "origin": "DIRECT_OWNER_MESSAGE",
+    "unresolved_existing_finding": "P2_SOURCE_REFUSAL_RECOVERY_MISDIRECTS_BINDING",
+    "write_set_additions": [
+      "tests/test_factory_ordinary_market_hypothesis.py",
+      "tests/test_discovery_evidence_release_bridge.py",
+      "tests/test_harness_sync.py"
+    ]
+  },
   "conditions": {
     "archive_preserved": true,
     "archive_ref": "local/list_a_confirming_producer_v1/attempts/accidental-review-environment",

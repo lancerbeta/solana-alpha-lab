@@ -1,8 +1,7 @@
 {
   "acceptance_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-SYNTHETIC-NATIVE",
   "active_stop_conditions": [
-    "STOP_INDEPENDENT_REVIEW_NOT_READY: THREE_DELIVERY_FIXTURES_OUTSIDE_MANAGED_WRITE_SET",
-    "STOP_INDEPENDENT_REVIEW_NOT_READY: P2_SOURCE_REFUSAL_RECOVERY_MISDIRECTS_BINDING"
+    "P2_SOURCE_REFUSAL_RECOVERY_UNRESOLVED_NO_OTHER_PRODUCTION_AUTHORITY"
   ],
   "as_of": "2026-10-15",
   "base_main": "b3fb9d8ecffbffda468dccabaa81ca3392da6f15",
@@ -107,15 +106,15 @@
     "spend": 0,
     "strategy_activation_paper_writes": 0
   },
-  "state_change": "TARGETED_SOURCE_ROLE_P1_FIXED_AND_VERIFIED_IN_SYNTHETIC_TEST_SCOPE; allfour fresh independent critics NOT_READY for three legacy delivery fixture blockers and P2 source-refusal recovery copy. Stop per owner condition; no evidence-rebind/preflight/push/freshCI or merge. Historical scientific results/seven charges unchanged.",
+  "state_change": "Owner-authorized exact three-test compatibility patch applied;55 targeted regression PASS including source-role provenance3. No production/core/charges/results change. Prior NOT_READY preserved in immutable Git snapshot; fresh review/bindings pending. P2 source-refusal recovery remains unauthorized and unresolved; no push/freshCI/merge claim.",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
   "validation": {
     "full_gate": "NOT_EXECUTED_PRE_PR; GUARDED_MERGE_SOLE_EXECUTOR; MERGE_NOT_AUTHORIZED",
     "github_ci": "PR406_ORIGINAL_HEAD_FAILURE; REPAIR_HEAD_NOT_PUSHED",
     "independent_review": {
       "path": "docs/evidence/list_a_confirming_producer_v1/independent-review.json",
-      "sha256": "641be0dd7347d62987f2c6d074f6a9801878373c6cbe8f257f7de75cd85db5e6",
-      "verdict": "NOT_READY"
+      "sha256": "3bba1c3b322b5a546afa02143d54582a513ee4dc7b6ca28b040399a36aec3c93",
+      "verdict": "PENDING"
     },
     "project_checks": [
       "PASS_ACTUAL_PRE_VALUES_RESERVATION",
@@ -124,6 +123,6 @@
       "PASS_TYPED_ATOMIC_COMPLETION_DOSSIER_AND_PROMOTE_REFUSAL",
       "PASS_MEASURED_FORWARD_RESOURCE_ENVELOPE"
     ],
-    "targeted": "PASS_SOURCE_ROLE_FALSIFIER_AND_66_DIRECT_CONSUMER_TESTS"
+    "targeted": "PASS_55_THREE_LEGACY_MODULES_AND_SOURCE_ROLE_PROVENANCE"
   }
 }

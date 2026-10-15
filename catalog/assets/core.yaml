@@ -27680,7 +27680,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 7c525abea77ff80f4633d802fb00b521525a275eb58e7ef4a4c9335ca79b71d3}
+  integrity: {kind: sha256, sha256: 61b14f8d46171544b918d8b7788c47d337ec180d16ed1d403982807cb064afda}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -33617,7 +33617,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_discovery_evidence_release_bridge.py', repository_path: tests/test_discovery_evidence_release_bridge.py}
-  integrity: {kind: sha256, sha256: b775d46d795ac08d1177462930ff6cbad383476af2d421e59ebdfe7764b5a532}
+  integrity: {kind: sha256, sha256: cd441847b3667f084bd5007be2de674f2e878b9425af74c3c4977e697c4f9844}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}
@@ -42887,7 +42887,7 @@ records:
     repository_path: docs/reports/list_a_confirming_producer_v1/OWNER_REPORT.md
   integrity:
     kind: sha256
-    sha256: 4fac0cc362b4175105b1d90ad15071d7343c935c27390c1d54102c78ff634745
+    sha256: 95a55a34cb7ddfcb93e0d4cd9e1a46b7e914d64fc8dc02d85badde3c5ae0aadf
   access:
     mode: read_only
     method: file
@@ -42926,7 +42926,7 @@ records:
     repository_path: docs/reports/list_a_confirming_producer_v1/REPRODUCE.md
   integrity:
     kind: sha256
-    sha256: bb1e78d23901bcb9fe85f9c7137c853addeedd5285b1fdfb9dcad467606638d7
+    sha256: 9084023a2da12b66fcc04c620bd673fc220714d976959a87f75fdbfa82275ca5
   access:
     mode: read_only
     method: file
@@ -43042,7 +43042,7 @@ records:
     repository_path: docs/evidence/list_a_confirming_producer_v1/owner-decision.json
   integrity:
     kind: sha256
-    sha256: d3f5c026a4dcc81da3cda41c8e6a537f666a8c14413386bec494d27279339a48
+    sha256: d831b56f220c44858d3588a7937a2e15ed79aaf612a97eaea1447598fad0283c
   access:
     mode: read_only
     method: file
@@ -43079,7 +43079,7 @@ records:
     repository_path: docs/evidence/list_a_confirming_producer_v1/review-history.json
   integrity:
     kind: sha256
-    sha256: e884bfb99008247ad750b42be3da4161b3aba43aaa049933580d2cd4da15a2c3
+    sha256: d86f1661c5d7ef41ec21b55a2d5a79aa6df3c872ade9ba32f1020241a3dcccb9
   access:
     mode: read_only
     method: file
@@ -43116,7 +43116,7 @@ records:
     repository_path: docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json
   integrity:
     kind: sha256
-    sha256: 3773aeb1e38d305525ab16e8ba99be8ef870af556c8aca5f9b056ee1efd4c5a3
+    sha256: d5fb308aa135f922c997c63fddc0076f90cfcc0522bf85087dda5c735febaf43
   access:
     mode: read_only
     method: file

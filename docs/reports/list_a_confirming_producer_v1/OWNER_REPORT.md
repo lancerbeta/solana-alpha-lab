@@ -1,5 +1,7 @@
 # List A confirming producer: owner handback
 
+Текущий compatibility checkpoint 15 октября: **55 targeted PASS**, включая source-role provenance; production/scientific bytes не изменены. P2 recovery-copy остаётся незакрытым и не разрешён текущим scope. Fresh review/bindings/fullCI отдельно; прежние NOT_READY и научные результаты ниже относятся к своим historical heads.
+
 **IMPLEMENTED_AND_VERIFIED_IN_SYNTHETIC_SCOPE.** Зарегистрирован native producer
 `CAP-LIST-A-CHRONOLOGICAL-CONFIRMATION-001`, отдельный ExperimentSpec 1.5 и обычный
 путь definition → prepare/grant → classifier → DocumentRunner → typed result →
@@ -166,3 +168,24 @@ Sample; намеренную подделку самих исходных source
 Docker physical growth сохраняют прежние UNKNOWN/nonclaims.
 
 Footprint targeted checkpoint: **192.849 MiB owned / 232.035 MiB conservative cap charge**, 30 stopped containers. Host allocation и SizeRw прочитаны заново; unchanged proof volume использует сохранённый allocation snapshot (новых volume writes/containers нет). Замер до финальных review/delivery commits. Shared Docker VHDX/log metadata остаются UNKNOWN. Новая source provenance boundary не переименовывает старые input labels: исторические шесть результатов сохранены, их повторная qualification на новой closure не заявлена.
+
+
+15 октября owner отдельно разрешил ровно три legacy test paths. Применён exact
+compatibility patch `f636abfa752ade121b45094c0e1069296fa01d9b772ee260684ed9aed4a94739`.
+Все 276 существующих assertion calls сохранены; единственное изменённое
+ожидаемое множество дополнено принятой capability. Новый engineering pin
+соответствует только законной Spec1.5 dispatch ветке, а четыре явных schema paths
+точно равны исходному base fixture set. Behavioral/negative/scientific assertions,
+legacy semantics и scientific goldens не ослаблялись; skip/xfail/stubs не добавлены.
+Все три изменённых модуля и три source-role tests: **55 PASS**, новых scientific
+campaigns/production изменений нет. Семь named charges и сохранённые результаты
+неизменны. Original native source-role before/after receipts и source hashes
+сохранены; текущие production bytes и 22-path qualification closure не менялись.
+
+**Незакрытая граница:** P2 recovery-copy после CONFIRMATORY_REUSE_FORBIDDEN всё ещё
+предлагает CORRECT_EXACT_CONFIRMATION_BINDING вместо остановки подтверждения
+данного exploratory-источника с сохранением labels/history. Последнее разрешение
+исключает другие production изменения и не принимает P2 как закрытый. Поэтому
+новый review/evidence binding/CI оцениваются отдельно; прежние NOT_READY сохранены
+в Git object84fc5b48. Merge authority отсутствует. Данные подробной regression и
+oracle audit — source-role-provenance.json#compatibility_delivery_20261015.

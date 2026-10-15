@@ -53,6 +53,9 @@ managed_write_set:
 - tests/test_list_a_confirmation_admission_v1.py
 - tests/test_list_a_confirmation_method_v1.py
 - tests/test_list_a_confirmation_vertical_v1.py
+- tests/test_factory_ordinary_market_hypothesis.py
+- tests/test_discovery_evidence_release_bridge.py
+- tests/test_harness_sync.py
 - catalog/assets/**
 - catalog/generated/**
 - docs/generated/**
@@ -123,3 +126,14 @@ accepted, repair only the authoritative native source-role boundary. Disposable
 synthetic TEST stores allowed; original campaign/seven charges immutable. Fresh
 targeted/direct-consumer tests, independent reviews, rebind/preflight/exact-head CI
 required. No merge phrase request until this targeted concern is closed.
+
+Owner compatibility extension 2026-10-15: exact additional write set is only
+tests/test_factory_ordinary_market_hypothesis.py,
+tests/test_discovery_evidence_release_bridge.py, tests/test_harness_sync.py.
+Apply the reviewed minimal fixture/pin/expectation compatibility patch for lawful
+Spec1.5 only. Preserve all behavioral/negative/scientific/legacy assertions;
+no skip/xfail/stubs or scientific golden changes. Stop and present exact diff
+if oracle meaning changes. Targeted regression includes source-role laundering;
+fresh review/bindings/exact-head CI required. Seven charges/results immutable;
+no new named scientific run, real data, other production changes or merge.
+Unresolved P2 source-refusal recovery copy remains outside this extension.

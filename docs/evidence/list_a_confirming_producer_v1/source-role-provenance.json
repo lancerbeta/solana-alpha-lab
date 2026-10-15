@@ -1,6 +1,87 @@
 {
   "as_of": "2026-10-15",
   "committed_repair_head": "4a0a83f49bd0a0de451f8787f57836960cc90f9e",
+  "compatibility_delivery_20261015": {
+    "acceptance_scientific_payload_unchanged": true,
+    "as_of": "2026-10-15",
+    "cheap_regression": {
+      "status": "PASS",
+      "tests": 3,
+      "trace_sha256": "bfd1010ba686d1058b3d1b1458beaba84ab2ce831ab0f72dd44d8908ea0c73bd"
+    },
+    "evidence_rebind": "PENDING",
+    "fresh_exact_head_ci": "NOT_RUN_NOT_PUSHED",
+    "fresh_independent_review": "PENDING",
+    "historical_scientific_receipts_exact_bytes_unchanged": true,
+    "legacy_dispatch_oracle": {
+      "legacy_capabilities_ast_identical_after_removing_only_spec1_5_dispatch": true,
+      "new_dispatch_guard": "spec.get('schema_version') == '1.5'",
+      "scientific_golden_values_changed": false
+    },
+    "merge_authority": false,
+    "named_charges_unchanged": 7,
+    "named_scientific_campaigns_replayed": 0,
+    "new_environments": 0,
+    "oracle_audit": {
+      "audits": [
+        {
+          "after_sha256": "61b14f8d46171544b918d8b7788c47d337ec180d16ed1d403982807cb064afda",
+          "assertion_count_unchanged": 64,
+          "before_sha256": "7c525abea77ff80f4633d802fb00b521525a275eb58e7ef4a4c9335ca79b71d3",
+          "changed_expected_list_assertions": 0,
+          "path": "tests/test_factory_ordinary_market_hypothesis.py"
+        },
+        {
+          "after_sha256": "cd441847b3667f084bd5007be2de674f2e878b9425af74c3c4977e697c4f9844",
+          "assertion_count_unchanged": 36,
+          "before_sha256": "b775d46d795ac08d1177462930ff6cbad383476af2d421e59ebdfe7764b5a532",
+          "changed_expected_list_assertions": 1,
+          "path": "tests/test_discovery_evidence_release_bridge.py"
+        },
+        {
+          "after_sha256": "e18b2de3cf5af85979162441e324f074c372c24c23c9837dfc1cba50964f629c",
+          "assertion_count_unchanged": 176,
+          "before_sha256": "14cf984d3e042949f6b0b62249460525c1961292d7a0cd38501cf86e25d00711",
+          "changed_expected_list_assertions": 0,
+          "path": "tests/test_harness_sync.py"
+        }
+      ],
+      "base_schema_selection_preserved": [
+        "catalog/schemas/catalog_manifest.schema.json",
+        "catalog/schemas/asset_catalog.schema.json",
+        "catalog/schemas/query_recipe.schema.json",
+        "catalog/schemas/lifecycle_registry.schema.json"
+      ],
+      "head_before": "84fc5b4844a41fac76ad7da1eea241951a03d25c",
+      "new_skip_xfail_stubs": false,
+      "patch_sha256": "f636abfa752ade121b45094c0e1069296fa01d9b772ee260684ed9aed4a94739",
+      "production_paths_modified": [],
+      "scientific_oracles_modified": false,
+      "scope": "OWNER_AUTHORIZED_EXACT_THREE_TEST_COMPATIBILITY"
+    },
+    "owner_authorization_ref": "repo://docs/evidence/list_a_confirming_producer_v1/owner-decision.json#compatibility_extension",
+    "patch_sha256": "f636abfa752ade121b45094c0e1069296fa01d9b772ee260684ed9aed4a94739",
+    "preserved_native_falsifier": "Original same-source four-transition before/after receipts retained verbatim; production path unchanged; three durable role regressions repeated PASS",
+    "producer_qualification_closure_unchanged": true,
+    "production_paths_modified": [],
+    "recovery_production_change_authorized": false,
+    "shadow_pin_preview": {
+      "changed_paths": 56,
+      "passed_full_preflight": false,
+      "reasons": [],
+      "scope": "STATIC_SHADOW_PIN_PREVIEW_USING_CURRENT_WORKTREE_BYTES_NOT_PREFLIGHT_OR_MERGE_GATE"
+    },
+    "source_role_guard_sha256": "2d5c1f1545578f8149d590680bdce4e4e103f61974c0b83cc32952d727eadf53",
+    "targeted_regression": {
+      "elapsed_seconds": 1771.808,
+      "scope": "ordinary hypothesis13,discovery release bridge5,harness_sync34,source-role provenance3; disposable unit fixtures only",
+      "skip_xfail_stubs_added": 0,
+      "status": "PASS",
+      "tests": 55,
+      "trace_sha256": "d3dc60e7a20ea664c45e0e0438c32994ce68dea007c719cb07fede7954e89c9d"
+    },
+    "unresolved_finding": "P2_SOURCE_REFUSAL_RECOVERY_MISDIRECTS_BINDING"
+  },
   "current_repair_qualification": {
     "changed_paths": [
       "src/solana_alpha_lab/factory/list_a_confirmation_inputs.py"

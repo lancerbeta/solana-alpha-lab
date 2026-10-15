@@ -40,9 +40,22 @@
         "OWNER_UX_CRITIC": "PASS"
       },
       "verdict": "PASS"
+    },
+    {
+      "git_object": "84fc5b4844a41fac76ad7da1eea241951a03d25c:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+      "git_object_sha256": "641be0dd7347d62987f2c6d074f6a9801878373c6cbe8f257f7de75cd85db5e6",
+      "reason": "Actual source-role P1 repair passed; three then-unapproved legacy compatibility paths and P2 recovery copy prevented delivery. New three-test authority does not retroactively alter NOT_READY or authorize recovery production repair.",
+      "reviewed_candidate_head": "822a848a758e501727d26fb7b2eec489d8264dfd",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "NOT_READY",
+        "CODE_REVIEWER": "NOT_READY",
+        "GOAL_DOD_CRITIC": "NOT_READY",
+        "OWNER_UX_CRITIC": "NOT_READY"
+      },
+      "verdict": "NOT_READY"
     }
   ],
-  "next_review": "NEW_ISOLATED_REVIEW_REQUIRED_AFTER_TARGETED_SOURCE_ROLE_REPAIR",
+  "next_review": "NEW_ISOLATED_REVIEW_AFTER_AUTHORIZED_THREE_TEST_COMPATIBILITY; P2_RECOVERY_UNRESOLVED",
   "schema": "smial.list-a-confirmation-review-history",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1"
