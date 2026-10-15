@@ -1,6 +1,8 @@
 {
   "acceptance_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-SYNTHETIC-NATIVE",
-  "active_stop_conditions": [],
+  "active_stop_conditions": [
+    "OWNER_REQUESTED_PAUSE_BEFORE_PR_PENDING_MAIN_CHANGE"
+  ],
   "as_of": "2026-10-15",
   "base_main": "07c81a99f2d0f385df66de2e1a5254e224c6b3b3",
   "capability_radar_now": "NONE",
