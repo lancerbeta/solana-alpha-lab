@@ -27,9 +27,22 @@
         "OWNER_UX_CRITIC": "PASS"
       },
       "verdict": "PASS"
+    },
+    {
+      "git_object": "3a1c5c79066364492ef8d8e93cef7614b190a72c:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+      "git_object_sha256": "58a078faa9fee496e9e42b39dc06b4a8d3c2296305539137da87fd0c7e9075ca",
+      "reason": "Actual main-integration review preserved; subsequent owner-targeted falsifier proved an uncovered P1 source-role laundering gap. No transfer to repair candidate.",
+      "reviewed_candidate_head": "ed33f2fc4f3b081ce12d612a76fb72abefeeb325",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "PASS",
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "OWNER_UX_CRITIC": "PASS"
+      },
+      "verdict": "PASS"
     }
   ],
-  "next_review": "NEW_ISOLATED_REVIEW_REQUIRED_AFTER_MAIN_INTEGRATION",
+  "next_review": "NEW_ISOLATED_REVIEW_REQUIRED_AFTER_TARGETED_SOURCE_ROLE_REPAIR",
   "schema": "smial.list-a-confirmation-review-history",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1"

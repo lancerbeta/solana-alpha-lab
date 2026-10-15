@@ -112,7 +112,7 @@
     "independent_review": {
       "path": "docs/evidence/list_a_confirming_producer_v1/independent-review.json",
       "sha256": "58a078faa9fee496e9e42b39dc06b4a8d3c2296305539137da87fd0c7e9075ca",
-      "verdict": "PASS"
+      "verdict": "PENDING"
     },
     "project_checks": [
       "PASS_ACTUAL_PRE_VALUES_RESERVATION",

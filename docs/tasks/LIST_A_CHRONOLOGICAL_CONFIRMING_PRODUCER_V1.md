@@ -116,3 +116,10 @@ new provider/route pivot or cap breach. Git task transport is the policy excepti
 to network=false. Factory Fit FULL_REVIEW; horizon NOW=this vertical, WATCH=real
 upstream provisioning. Any historical pin notice is append-only and names the
 original frozen commit/hash; it does not requalify historical science.
+
+Owner targeted checkpoint 2026-10-15 on PR406/head3a1c5c79066364492ef8d8e93cef7614b190a72c:
+prove source-role provenance refusal before observation values/reservation; if
+accepted, repair only the authoritative native source-role boundary. Disposable
+synthetic TEST stores allowed; original campaign/seven charges immutable. Fresh
+targeted/direct-consumer tests, independent reviews, rebind/preflight/exact-head CI
+required. No merge phrase request until this targeted concern is closed.

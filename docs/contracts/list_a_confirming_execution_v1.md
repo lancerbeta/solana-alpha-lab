@@ -39,6 +39,16 @@ native protection проверяются независимо на полном 
 Только совместимый untouched holdout допускает exact-purpose consumption;
 DENY, revoke, unknown scope и incomplete inventory блокируют его.
 
+Source role проверяется в исходных hash-bound census и observations по metadata
+колонкам `evidence_role` и `confirmatory_reuse_forbidden`. На каждом row нужны
+`UNTOUCHED_FORWARD_HOLDOUT` и boolean false. EXPLORATORY_REUSE/true дают typed
+`CONFIRMATORY_REUSE_FORBIDDEN`; отсутствующая provenance —
+`SOURCE_ROLE_PROVENANCE_UNBOUND`. Новые Sample paths/hashes и внешний exposure
+не повышают исходную роль. Чтение ограничено двумя metadata колонками до source
+registration, prepare и current authorization; target/state не декодируются.
+Native ingress сохраняет исходные labels; consumer не дописывает untouched
+из внешней роли. Проверка одна для SYNTHETIC и REAL, без blanket REAL refusal.
+
 Одна атомарная ResearchStore transaction записывает reservation + RUN_STARTED
 до первого observation decoder. OS lock действует всё вычисление; TTL takeover
 отсутствует. Reservation сохраняет charge 1 после crash. Current authority

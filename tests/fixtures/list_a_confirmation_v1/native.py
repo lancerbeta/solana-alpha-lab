@@ -70,6 +70,7 @@ def ingress(root: Path, store, case: str = "POSITIVE", *, missing_a: int = 0, so
                 round_id_value=receipt["round_id"])
             admissions.append(admission)
             row = {"episode_id": native_id, "mint": mint, "t0": stamp(t0), "cohort_id": admission["cohort_id"],
+                   "evidence_role": "UNTOUCHED_FORWARD_HOLDOUT", "confirmatory_reuse_forbidden": False,
                    "release_id": "RELEASE-" + source_id, "round_id": receipt["round_id"], "frame_sha256": receipt["frame_sha256"],
                    "admission_request_started_at": stamp(t0 - timedelta(seconds=1)),
                    "admission_response_received_at": stamp(t0), "admission_first_reliable_available_at": stamp(t0)}
@@ -86,6 +87,7 @@ def ingress(root: Path, store, case: str = "POSITIVE", *, missing_a: int = 0, so
                 state = "MISSING_TYPED" if (point == "E14400" and missing) or (
                     point == "E1800" and group == "A" and case == "EMPTY_DECISION_A") else "OBSERVED"
                 observations.append({"episode_id": native_id, "mint": mint, "cohort_id": row["cohort_id"], "release_id": row["release_id"],
+                    "evidence_role": "UNTOUCHED_FORWARD_HOLDOUT", "confirmatory_reuse_forbidden": False,
                     "point_id": point, "field_id": "FIELD-USD-PRICE-001", "state": state,
                     "typed_value": price if state == "OBSERVED" else None,
                     "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1", "source_price_event_time": "UNKNOWN",

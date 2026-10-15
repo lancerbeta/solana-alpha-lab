@@ -25,6 +25,84 @@ from tests.fixtures.list_a_confirmation_v1.native import NOW
 from scripts import list_a_confirmation as cli
 
 
+class SourceRoleProvenanceTests(unittest.TestCase):
+    """Independent oracle: stored source labels dominate a new outer envelope."""
+
+    def source(self, store, poison):
+        from tests.fixtures.list_a_confirmation_v1 import native
+        captured = {}
+        def writer(**kwargs):
+            kwargs = copy.deepcopy(kwargs)
+            poison(kwargs)
+            self.assertFalse(kwargs["exposure"]["confirmatory_reuse_forbidden"])
+            captured.update({k:v for k,v in kwargs.items() if k not in {"root", "store"}})
+            return "FIXTURE_NOT_YET_PUBLISHED"
+        # Construction is not authority: exercise the real CLI below.
+        with patch.object(native, "write_native_confirmation_sample", writer), patch.object(
+                native, "register_source_authority", return_value={"owner_phrase": "FIXTURE_NO_AUTHORITY"}):
+            native.ingress(ROOT, store)
+        return captured
+
+    def test_original_role_and_forbidden_survive_repackaging_before_values(self):
+        original_batches = pq.ParquetFile.iter_batches
+        def metadata_only(parquet, *args, **kwargs):
+            self.assertTrue(set(kwargs.get("columns", [])) <= {"evidence_role", "confirmatory_reuse_forbidden"})
+            return original_batches(parquet, *args, **kwargs)
+        for tables in (("census",), ("observations",), ("census", "observations")):
+            with self.subTest(tables=tables), tempfile.TemporaryDirectory(prefix="list-a-role-unit-") as tmp:
+                store = ResearchStore(Path(tmp)/"plane")
+                def poison(kwargs):
+                    for table in tables:
+                        # Last row prevents a first-row-only provenance check.
+                        kwargs[table][-1].update(evidence_role="EXPLORATORY_REUSE", confirmatory_reuse_forbidden=True)
+                payload = self.source(store, poison)
+                source_input = store.root/"native-input.json"
+                source_input.write_bytes(finite_bytes(payload))
+                out = io.StringIO()
+                with patch.object(pq.ParquetFile, "iter_batches", metadata_only), contextlib.redirect_stdout(out):
+                    rc = cli.main(["register-source", "--data-root", str(store.root), "--source-input", str(source_input),
+                                   "--as-of", NOW.isoformat()])
+                self.assertEqual(rc, 2)
+                self.assertEqual(json.loads(out.getvalue())["reason_codes"], ["CONFIRMATORY_REUSE_FORBIDDEN"])
+                self.assertFalse(any(r["payload"].get("type") in {"SOURCE_AUTHORITY", "CONFIRMATION_GRANT", "CONFIRMATION_RESERVATION"}
+                                     or r["kind"] == "RUN_STARTED" for r in records(store)))
+
+    def test_absent_unknown_or_nonboolean_provenance_fails_closed(self):
+        cases = (({}, "SOURCE_ROLE_PROVENANCE_UNBOUND"),
+                 ({"evidence_role": None, "confirmatory_reuse_forbidden": False}, "SOURCE_ROLE_PROVENANCE_INVALID"),
+                 ({"evidence_role": "UNTOUCHED_FORWARD_HOLDOUT", "confirmatory_reuse_forbidden": "false"}, "SOURCE_ROLE_PROVENANCE_INVALID"))
+        for labels, code in cases:
+            with self.subTest(labels=labels), tempfile.TemporaryDirectory(prefix="list-a-role-unit-") as tmp:
+                store = ResearchStore(Path(tmp)/"plane")
+                def poison(kwargs):
+                    for row in kwargs["observations"]:
+                        row.pop("evidence_role")
+                        row.pop("confirmatory_reuse_forbidden")
+                        row.update(labels)
+                payload = self.source(store, poison)
+                source_input = store.root/"native-input.json"
+                source_input.write_bytes(finite_bytes(payload))
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    rc = cli.main(["register-source", "--data-root", str(store.root), "--source-input", str(source_input),
+                                   "--as-of", NOW.isoformat()])
+                self.assertEqual(rc, 2)
+                self.assertEqual(json.loads(out.getvalue())["reason_codes"], [code])
+                self.assertFalse(any(r["kind"] == "RUN_STARTED" for r in records(store)))
+
+    def test_compatible_source_metadata_is_domain_independent(self):
+        from solana_alpha_lab.factory.list_a_confirmation_inputs import Sample, source_metadata, write_native_confirmation_sample
+        with tempfile.TemporaryDirectory(prefix="list-a-role-unit-") as tmp:
+            store = ResearchStore(Path(tmp)/"plane")
+            sample_ref = write_native_confirmation_sample(root=ROOT,store=store,**self.source(store, lambda _: None))
+            sample = Sample.model_validate(json.loads((store.root/sample_ref).read_bytes()))
+            # Both calls read the same synthetic TEST metadata; no REAL registration/grant/values.
+            for domain in ("SYNTHETIC", "REAL"):
+                metadata = source_metadata(sample.model_copy(update={"domain":domain}), root=ROOT, data_root=store.root)
+                self.assertEqual(len(metadata["census"]), 256)
+            self.assertFalse(any(r["kind"] == "RUN_STARTED" for r in records(store)))
+
+
 class AdmissionTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix="list-a-unit-")

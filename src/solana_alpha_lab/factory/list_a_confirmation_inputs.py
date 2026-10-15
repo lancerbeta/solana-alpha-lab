@@ -41,6 +41,7 @@ DEFINITION = "configs/experiment_specs/list_a_chronological_confirmation_v1.yaml
 LIST_A = "JUPITER:toporganicscore:5m"
 SOURCE_COLUMNS = ["episode_id", "mint", "t0", "cohort_id", "release_id", "round_id", "frame_sha256",
                   "admission_request_started_at", "admission_response_received_at", "admission_first_reliable_available_at"]
+SOURCE_ROLE_COLUMNS = ["evidence_role", "confirmatory_reuse_forbidden"]
 ADMISSION_COLUMNS = {"entity_id", "episode_id", "mint", "population", "population_contract", "anchor_kind",
     "collection_kind", "collection_lineage_id", "schedule_sha256", "activation_id", "cycle_start", "ticket_priority",
     "t0", "cohort_id", "membership_state", "witness_point_id", "witness_source_id", "witness_rank", "witness_object_sha256",
@@ -208,6 +209,18 @@ def source_metadata(sample: Sample, *, root: Path, data_root: Path) -> dict:
     require(set(sample.source_hashes) == expected_paths, "SOURCE_SET_INCOMPLETE")
     for relative, sha in sample.source_hashes.items():
         require(file_sha(safe_path(data_root, relative)) == sha, "SOURCE_HASH_MISMATCH")
+    # Source-owned role columns survive repackaging; external Sample/exposure
+    # assertions cannot turn an exploratory release into an untouched source.
+    # Read only provenance columns, never observation states or target values.
+    for relative in (sample.census_rel, sample.observations_rel):
+        with pq.ParquetFile(safe_path(data_root, relative)) as parquet:
+            require(set(SOURCE_ROLE_COLUMNS) <= set(parquet.schema_arrow.names), "SOURCE_ROLE_PROVENANCE_UNBOUND")
+            for batch in parquet.iter_batches(columns=SOURCE_ROLE_COLUMNS):
+                for row in batch.to_pylist():
+                    require(row["evidence_role"] in {"UNTOUCHED_FORWARD_HOLDOUT", "EXPLORATORY_REUSE"} and
+                            isinstance(row["confirmatory_reuse_forbidden"], bool), "SOURCE_ROLE_PROVENANCE_INVALID")
+                    require(row["evidence_role"] == "UNTOUCHED_FORWARD_HOLDOUT" and
+                            row["confirmatory_reuse_forbidden"] is False, "CONFIRMATORY_REUSE_FORBIDDEN")
     schedule = validate_episode_schedule(load_json(safe_path(data_root, sample.schedule_rel)), root=root)
     assignment_documents = load_json(safe_path(data_root, sample.protection_rel))["assignments"]
     inventory = inventory_from_documents(assignment_documents)
