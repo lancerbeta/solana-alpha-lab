@@ -106,6 +106,32 @@ repair or one concrete temporary recovery path and its required authority.
 Unproven scale is BLOCKED, never a ready patch. The complete original I2 and
 Stage C outcome remain required after PACKAGING_LIVE_PROVEN.
 
+Owner outcome clarification: this capture repair enables one-time removal of
+unnecessary legacy from HOT and future routine backups, then automatic bounded
+working-set maintenance. Do not extend it into a storage redesign or repeat
+scale tests without a material finding. The follow-up P1 native SQLite failure
+boundary is such a finding; no further test cycle follows without new evidence.
+The proposed next OPERATE scope prefers one fresh compressed standalone
+full/checkpoint and independent restore, verified-copy retirement/reclaim
+rehearsal, then an approved finite resumable cleanup and compact full baseline.
+Old archives/checkpoints/pins remain intact until exact authority and proof.
+Previous no-new-full/delta-chain scope is superseded as a proposal, not a grant
+for uploads. Use existing #407 owners; no separate cleanup PR by default.
+On one actual consistent copy, attribute legacy bodies, mandatory compact
+history/accounting, active collector/recovery/science closure and large residuals
+with concrete consumers/limits. Preserve all activations' shared accounting,
+grants/revocations, source identity, ROWIDs/cursors, A/B/managed, new episodes and
+C1/C2. No wholesale table deletion or global date filter. Complete finite legacy
+backlog in one authorized scope of bounded resumable chunks, then measure one
+recurring policy's sustainable throughput against eligible inflow. Any technical
+pause must include final-current recovery checks, rebuild, invariants and trigger
+restoration/next native tick, with explicit due obligations. Preserve RUN/grants
+and observation coverage. Native gate refusal yields one precise blocker and
+supported path, never automatic gate weakening/new PR. Acceptance needs actual
+DB/backup before-after, legacy HOT bytes removed, justified residue, routine
+restore/next collector tick, maintenance cost and preliminary runway. No fixed
+95-percent deletion target; synthetic scale is not production byte attribution.
+
 Owner EXECUTE accepts the single PRD/SSD imported without semantic changes as
 `docs/evidence/i2_backup_legacy_storage_v1/source-contract.md`. Its section 15
 is the execution instruction; section 14 defines handback. The task is a Git

@@ -70,9 +70,12 @@ class RemoteOpsError(ValueError):
 
 
 @contextmanager
-def _capture_phase(name: str, *, size: int = 0, count: int = 0) -> Iterator[dict[str, Any]]:
+def _capture_phase(name: str, *, size: int = 0, count: int = 0,
+                   source: str | None = None) -> Iterator[dict[str, Any]]:
     trace = _CAPTURE_TRACE.get()
     phase: dict[str, Any] = {"elapsed_seconds": 0.0, "bytes": size, "count": count}
+    if source is not None:
+        phase["source"] = source
     started = time.monotonic()
     try:
         yield phase
@@ -828,6 +831,7 @@ def _backup_source_paths(
     loaded: Mapping[str, Any],
     *,
     deadline_monotonic: float | None = None,
+    defer_completed_validation: bool = False,
 ) -> list[tuple[str, Path, bool]]:
     result: list[tuple[str, Path, bool]] = []
     seen: set[str] = set()
@@ -869,7 +873,11 @@ def _backup_source_paths(
                     or "/projections/research_memory.duckdb" in normalized
                     or normalized.endswith("/locks/research-writer.lock")):
                 continue  # native rebuildable lookup/projection/lease is not canonical data
-            source = _safe_relative(root, normalized)
+            # Freeze every member now, but postpone repeated parent-resolution
+            # of write-once receipts until after the writer fence. No bytes are
+            # read from these paths before the same frozen relative is validated.
+            if not (defer_completed_validation and _immutable_publication_receipt(normalized)):
+                source = _safe_relative(root, normalized)
             if not _admit_backup_reclaim_source(source):
                 continue
             if normalized not in seen:
@@ -928,6 +936,13 @@ def _reject_restored_sqlite_sidecars(root: Path, entries: Sequence[Mapping[str, 
 def _is_publication_job_path(relative: str) -> bool:
     normalized = str(relative).replace("\\", "/")
     return "/datasets/publication_jobs/" in f"/{normalized}"
+
+
+def _immutable_publication_receipt(relative: str) -> bool:
+    path = PurePosixPath(relative)
+    return (path.suffix == ".json" and not path.name.startswith(".")
+            and any(f"/datasets/publication_jobs/{kind}/" in f"/{relative}"
+                    for kind in ("completed", "legacy_full")))
 
 
 def _publication_job_roots(root: Path, loaded: Mapping[str, Any]) -> list[str]:
@@ -1194,12 +1209,12 @@ def _capture_source(captured: dict[str, dict[str, Any]], staging: Path, relative
     staged = staging / relative
     staged.parent.mkdir(parents=True, exist_ok=True)
     if is_sqlite:
-        with _capture_phase("sqlite_copy_fenced", size=source.stat().st_size, count=1):
+        with _capture_phase("sqlite_copy_fenced", size=source.stat().st_size, count=1, source=relative):
             consistent_sqlite_backup(source, staged, deadline_monotonic=deadline)
         size = staged.stat().st_size
         digest = None
         if hash_sqlite:
-            with _capture_phase("captured_sqlite_sha256", size=size, count=1):
+            with _capture_phase("captured_sqlite_sha256", size=size, count=1, source=relative):
                 digest = _sha256_file(staged)
     else:
         copied = _capture_mutable_file(source, staged)
@@ -1565,12 +1580,15 @@ def backup_payload_snapshot(
             trace["capture_elapsed_seconds"] = round(time.monotonic() - started, 6)
             snapshot.capture_trace = trace
             yield snapshot
-    except RemoteOpsError as exc:
+    except (RemoteOpsError, sqlite3.Error) as exc:
+        error = RemoteOpsError("BACKUP_CAPTURE_SQLITE_ERROR") if isinstance(exc, sqlite3.Error) else exc
         trace["failure_phase"] = trace["failure_phase"] or (
             "post_capture_consumer" if "capture_elapsed_seconds" in trace else
             "writer_fence_admission" if str(exc) == "WRITER_BUSY" else "capture_guard")
-        exc.capture_trace = trace
-        raise
+        error.capture_trace = trace
+        if error is exc:
+            raise
+        raise error from exc
     finally:
         trace["lifecycle_wall_seconds"] = round(time.monotonic() - started, 6)
         _CAPTURE_TRACE.reset(token)
@@ -1605,7 +1623,8 @@ def _backup_payload_snapshot(root: Path, loaded: Mapping[str, Any], *,
                 with _capture_phase("enumeration_fenced") as phase:
                     sources = [(relative, path, is_sqlite and sqlite_api)
                                for relative, path, is_sqlite in _backup_source_paths(
-                                   root, loaded, deadline_monotonic=deadline)]
+                                   root, loaded, deadline_monotonic=deadline,
+                                   defer_completed_validation=True)]
                     phase["count"] = len(sources)
                 fenced_sqlite = {relative for relative, _path, _sqlite in provisional_sqlite}
                 if any(is_sqlite and relative not in fenced_sqlite for relative, _path, is_sqlite in sources):
@@ -1629,8 +1648,7 @@ def _backup_payload_snapshot(root: Path, loaded: Mapping[str, Any], *,
                     # The native completed owner is write-once; legacy_full
                     # preserves exact bytes. Their fixed membership is copied
                     # after release. Open/flat jobs can change and stay fenced.
-                    elif (_is_publication_job_path(relative)
-                          and "/completed/" not in relative and "/legacy_full/" not in relative):
+                    elif _is_publication_job_path(relative) and not _immutable_publication_receipt(relative):
                         _capture_source(captured, staging, relative, source, False, deadline=deadline)
                 # Jobs and mutable member-layout/unit pointers must be frozen
                 # with OPS. Dependency discovery queries the same pinned view;
@@ -1650,7 +1668,7 @@ def _backup_payload_snapshot(root: Path, loaded: Mapping[str, Any], *,
             for relative, source, is_sqlite in sources:
                 if relative in sqlite_readers:
                     staged = staging/relative
-                    with _capture_phase("sqlite_copy_online", size=source.stat().st_size, count=1):
+                    with _capture_phase("sqlite_copy_online", size=source.stat().st_size, count=1, source=relative):
                         consistent_sqlite_backup(source, staged, snapshot_connection=sqlite_readers[relative],
                             deadline_monotonic=copy_deadline, budget_error="BACKUP_CAPTURE_TOTAL_BUDGET_EXCEEDED")
                     # End WAL retention before SHA or other file copies.
@@ -1658,12 +1676,16 @@ def _backup_payload_snapshot(root: Path, loaded: Mapping[str, Any], *,
                     sqlite_readers[relative].close()
                 if is_sqlite:
                     staged = captured[relative]["staged"]
-                    with _capture_phase("captured_sqlite_sha256", size=staged.stat().st_size, count=1):
+                    with _capture_phase("captured_sqlite_sha256", size=staged.stat().st_size, count=1, source=relative):
                         captured[relative].update(sha256=_sha256_file(staged), bytes=staged.stat().st_size)
             with _capture_phase("control_verification"):
                 _verify_recovery_control(staging)
             with _capture_phase("remaining_files") as phase:
                 for relative, source, is_sqlite in sources:
+                    if _immutable_publication_receipt(relative):
+                        source = _safe_relative(root, relative)
+                        if not _admit_backup_reclaim_source(source) or not source.is_file():
+                            raise RemoteOpsError("BACKUP_SOURCE_CHANGED_DURING_CAPTURE")
                     _capture_source(captured, staging, relative, source, is_sqlite)
                 phase["count"] = len(captured)
                 phase["bytes"] = sum(item["bytes"] for item in captured.values())

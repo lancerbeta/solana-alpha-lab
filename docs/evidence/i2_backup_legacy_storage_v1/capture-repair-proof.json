@@ -110,88 +110,90 @@
     ]
   },
   "after": {
-    "db_bytes": 5559480320,
-    "capture_seconds": 85.48099459998775,
-    "packaging_seconds": 64.59783000001335,
-    "backup_ready_seconds": 150.09286209999118,
-    "restore_seconds": 126.40550660001463,
-    "capture_cleanup_wall_seconds": 278.41471740001,
-    "inventory_sha256": "c2645a99f48003771572b2f8c67e805d61e34baa03afc0ee2911900ab23a6ad3",
-    "snapshot_db_sha256": "2af6de0c5d0e80af8dc0964bf264ccf79141deaa5a5a91162a680d09fa5fbbba",
-    "snapshot_native_events": 2377,
-    "entries": 8229,
-    "peak_staging_bytes": 5568714263,
+    "db_bytes": 5559824384,
+    "capture_seconds": 81.51395809999667,
+    "packaging_seconds": 66.31357169998228,
+    "backup_ready_seconds": 147.84246449999046,
+    "restore_seconds": 118.19492680000258,
+    "capture_cleanup_wall_seconds": 267.62035879999166,
+    "inventory_sha256": "2a65635775b96e42052ee83931a575a292229f5801fabe0bb7b31b4c30dae0d3",
+    "snapshot_db_sha256": "aefca9a3c6fae7a53de5e69199d8a68439e84a666c98e085e7bd024c1ae0eb40",
+    "snapshot_native_events": 6022,
+    "entries": 8241,
+    "peak_staging_bytes": 5569070903,
     "peak_wal_bytes": 4124152,
-    "min_free_bytes": 240072724480,
+    "min_free_bytes": 233539768320,
     "staging_remaining": 0
   },
   "capture_trace": {
-    "capture_elapsed_seconds": 84.920808,
+    "capture_elapsed_seconds": 80.969914,
     "failure_phase": null,
-    "lifecycle_wall_seconds": 277.854503,
+    "lifecycle_wall_seconds": 267.076293,
     "phases": [
       {
         "bytes": 0,
         "count": 1,
-        "elapsed_seconds": 5.022173,
+        "elapsed_seconds": 4.939705,
         "phase": "enumeration_provisional"
       },
       {
         "bytes": 0,
-        "count": 8223,
-        "elapsed_seconds": 5.155435,
+        "count": 8235,
+        "elapsed_seconds": 0.502837,
         "phase": "enumeration_fenced"
       },
       {
         "bytes": 43197,
         "count": 7,
-        "elapsed_seconds": 0.116537,
+        "elapsed_seconds": 0.87243,
         "phase": "recovery_dependencies"
       },
       {
-        "bytes": 5559480320,
+        "bytes": 5559824384,
         "count": 1,
-        "elapsed_seconds": 14.220848,
-        "phase": "sqlite_copy_online"
+        "elapsed_seconds": 13.084665,
+        "phase": "sqlite_copy_online",
+        "source": "local/factory_v1/observation_rdp/observation_schedule_state.sqlite"
       },
       {
-        "bytes": 5559480320,
+        "bytes": 5559824384,
         "count": 1,
-        "elapsed_seconds": 8.982603,
-        "phase": "captured_sqlite_sha256"
+        "elapsed_seconds": 8.492186,
+        "phase": "captured_sqlite_sha256",
+        "source": "local/factory_v1/observation_rdp/observation_schedule_state.sqlite"
       },
       {
         "bytes": 0,
         "count": 0,
-        "elapsed_seconds": 0.048404,
+        "elapsed_seconds": 0.043787,
         "phase": "control_verification"
       },
       {
-        "bytes": 5568714043,
-        "count": 8229,
-        "elapsed_seconds": 51.342252,
+        "bytes": 5569070683,
+        "count": 8241,
+        "elapsed_seconds": 52.986303,
         "phase": "remaining_files"
       },
       {
         "bytes": 0,
         "count": 1,
-        "elapsed_seconds": 1.907839,
+        "elapsed_seconds": 1.575072,
         "phase": "cleanup"
       }
     ],
-    "writer_fence_hold_seconds": 5.275858,
-    "writer_fence_wait_seconds": 0.005512
+    "writer_fence_hold_seconds": 1.399311,
+    "writer_fence_wait_seconds": 0.005046
   },
   "writer": {
     "write": {
-      "successful": 2202,
+      "successful": 2009,
       "failures": 0,
-      "max_seconds": 5.295555300021078
+      "max_seconds": 1.4180049000133295
     },
     "publication_tick": {
-      "successful": 276,
+      "successful": 252,
       "failures": 0,
-      "max_seconds": 0.9139786000014283
+      "max_seconds": 1.7338305000157561
     },
     "publications": 7
   },
@@ -202,7 +204,7 @@
     },
     "fresh_process": true,
     "producer_reads": "FORBIDDEN_VERIFIED",
-    "raw_inventory_sha256": "c2645a99f48003771572b2f8c67e805d61e34baa03afc0ee2911900ab23a6ad3"
+    "raw_inventory_sha256": "2a65635775b96e42052ee83931a575a292229f5801fabe0bb7b31b4c30dae0d3"
   },
   "interrupted_capture": {
     "actual_capture_pid": 49380,
@@ -215,11 +217,13 @@
     "orphan_count_before_native_restart": 1,
     "partial_copy_bytes_at_kill": 19165184,
     "staging_remaining": 0,
-    "writer_commit_after_kill_seconds": 0.007814899989170954
+    "writer_commit_after_kill_seconds": 0.007814899989170954,
+    "tested_content_head": "2bd02dcb563ab284b327a6e541fb7427f0239060",
+    "subsequent_change": "SQL exception/trace attribution and completed path validation placement do not change actual-process exit or owned-staging recovery; native interruption not redundantly rerun."
   },
   "zip": {
-    "bytes": 63892952,
-    "sha256": "322708e3a1fa0eb282b1676b0512bbd082f3f24da1d9ae0b98370acc772e71e2",
+    "bytes": 63974768,
+    "sha256": "ffca1a03a2a89cf3d90d5abe8765d194dbcfad3524bcfeeda84bac86f4e75fac",
     "method": "DEFLATE_LEVEL_1_ZIP64",
     "source": "SYNTHETIC_SCALE_PROOF_NOT_PRODUCTION_RATIO"
   },
@@ -237,29 +241,29 @@
   ],
   "regressions": {
     "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1 tests.test_i2_offhost_checkpoint_v1 tests.test_mutable_backup_zip64_repair_v1",
-    "count": 78,
-    "seconds": 36.914,
+    "count": 80,
+    "seconds": 37.4,
     "outcome": "PASS",
-    "output_sha256": "c3ba3a045fb1d2c2310d9c05d054261cdbb064d2f2e7095e7a6d3bf26f4becb5",
+    "output_sha256": "cf9a5bdebab1d1813654f1e948fe70498e35b9509f4fa240ff3d4eb1f2ad9818",
     "diagnostic_regression": "expected busy retry must retain one JSON output; trace is persisted in existing pending/receipt, no warning output"
   },
   "reproduce": [
     "uv run --locked --managed-python python -B tests/i2_capture_rehearsal.py build",
     "uv run --locked --managed-python python -B tests/i2_capture_rehearsal.py ledger-before --baseline",
     "uv run --locked --managed-python python -B tests/i2_capture_rehearsal.py production-metadata",
-    "uv run --locked --managed-python python -B tests/i2_capture_rehearsal.py ledger-final --package",
+    "uv run --locked --managed-python python -B tests/i2_capture_rehearsal.py ledger-final-v2 --package",
     "uv run --locked --managed-python python -B tests/i2_capture_rehearsal.py interrupt"
   ],
   "artifacts_sha256": {
     "ledger-before.json": "bd3b2c2c91fe07b7adfbaec1bf7934e5a29a12217bccd5793d9da940f5cece35",
-    "ledger-final.json": "c27c02ee1559e9d525448d3672b6d2a97b987385858667b2f7fc58c66ac64bd2",
-    "ledger-final.writer.json": "755b45016cf472d9ecd0c8c24407df64198faa1ce47a3e0c0701ec15ccf92ec5",
-    "ledger-final.restore.json": "ee543909060d3ee57a60e437e6fd763ce591ef3786fa2810960f84d4d20fbf37",
+    "ledger-final-v2.json": "776bb05c233515341c46df3a9157589eab5d30b429a201c33337ce4e059c5956",
+    "ledger-final-v2.writer.json": "e64c0edc1a6603c98d64a2f8e84f6549c83061c3ae57f41b72616917dcee2fbd",
+    "ledger-final-v2.restore.json": "508a9f0e391de7ce56deaeb7008068bdb3d55d2a080143a9833026795cf65def",
     "interrupt.json": "1deaec92ccc27c4cda5c3c76dca0ccc160b74f4d4d49bd8c2521aa605d804ab3",
     "production-source-shape.json": "91a8d1423f1983b89d8c0221131972d2b2aefc8f37d7d676e3eff19f9e22ad45"
   },
   "source_bindings": {
-    "src/solana_alpha_lab/factory/remote_ops.py": "0b164f155b46ddeac3ac1973474c8cf59f13cc7dcb686dccba5723363dbe9712",
+    "src/solana_alpha_lab/factory/remote_ops.py": "481239077eb54b90964e35ea2a1ab7c088ec075c2745f5b6beb873c4211d7ea8",
     "src/solana_alpha_lab/factory/offhost_backup.py": "3769b77f4e18e7923eaca3eb2d7643f60984a83676cb47ab74765c5ac29871fa",
     "tests/i2_capture_rehearsal.py": "0955f11b1fe4e3d4f3b73d6c8e7619fb5e9f39d741ae4a71f658c64090fed2b5"
   },
@@ -267,8 +271,27 @@
     "LOCAL_WINDOWS_ISOLATED_SCALE_NOT_PRODUCTION_LATENCY_SLA",
     "NO_LIVE_OFFHOST_UPLOAD_OR_STAGE_B_ACCEPTANCE",
     "NO_STAGE_C_APPLY_OR_POLICY_ENABLE",
-    "Original isolated interruption used 8120 small padding files; final full profile meets/exceeds current production completed metadata count and bytes.",
+    "Hard-interruption proof used 8120 metadata padding files on frozen content head 2bd02dcb563ab284b327a6e541fb7427f0239060; subsequent diagnostic attribution and typed SQLite-error repair do not change hard-exit/owned-restart path. Final complete scale profile meets/exceeds current production metadata.",
     "Individual native/OS calls are cooperative and cannot be preempted; historical pathlib eager census P2 remains disclosed."
   ],
-  "verdict": "ISOLATED_SCALE_PROVEN_RUNTIME_PENDING"
+  "verdict": "ISOLATED_SCALE_PROVEN_RUNTIME_PENDING",
+  "review_remediation": [
+    {
+      "severity": "P1",
+      "finding": "Post-fence native SQLITE_FULL escaped typed capture boundary, leaving latest attempt falsely successful.",
+      "repair": "Normalize sqlite3.Error to sanitary BACKUP_CAPTURE_SQLITE_ERROR with phase trace; real native destination max_page_count=1 proves one CLI JSON, COPY_FAILED attempt, unchanged last-good, no pending/staging and released native writer.",
+      "oracle": "tests.test_i2_offhost_checkpoint_v1.I2OffhostCheckpointTests.test_native_post_fence_sqlite_full_records_failure_and_one_cli_json"
+    },
+    {
+      "severity": "P1",
+      "finding": "Subsequent comparable run measured fence5.703160s, enum4.846548s, dependencies0.853143s; one native write failed after5.707475s. Existing restore target also caused RESTORE_TARGET_EXISTS. No ready patch from this result.",
+      "repair": "Freeze all membership under fence; defer only exact native completed/legacy_full JSON path validation to before any post-fence bytes read. Preserve same relative, reject missing/unsafe, scan/reclaim caps unchanged. New isolated restore target. No timeout increase.",
+      "failed_artifacts_sha256": {
+        "ledger-final.json": "52ac7c8a7d39e2f15bfac40d5adaf66e3e33ac55d5a23236cd2a40ae21318a55",
+        "ledger-final.writer.json": "f73990a6dd644ccf8bfe158d89480a9a1a7f8c0804cb1bbd34723c619b210c3f",
+        "ledger-final.log": "f3617482826d639d1d3bed1f8fe130c664dbd5b70d1c6d8fa7258cd61cc02049"
+      },
+      "oracle": "tests.test_i2_backup_legacy_storage_v1.I2BackupLegacyStorageTests.test_deferred_receipt_revalidates_frozen_membership_after_release; final comparable native writer profile"
+    }
+  ]
 }

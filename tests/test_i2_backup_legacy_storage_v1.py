@@ -170,6 +170,24 @@ class I2BackupLegacyStorageTests(unittest.TestCase):
                 self.assertIsNone(snapshot.capture_trace["failure_phase"])
         self.assertEqual(calls, [True])
 
+    def test_deferred_receipt_revalidates_frozen_membership_after_release(self) -> None:
+        directory = self.root / RDP / "datasets/publication_jobs/completed"
+        directory.mkdir(parents=True)
+        receipt = directory / "frozen.json"
+        receipt.write_text('{"stage":"COMPLETE"}')
+        original = remote._capture_writer_fences
+        @contextmanager
+        def after_release(sources):
+            with original(sources):
+                yield
+            receipt.unlink()
+            (directory / "later.json").write_text('{"stage":"COMPLETE"}')
+        with patch.object(remote, "_capture_writer_fences", after_release):
+            with self.assertRaisesRegex(remote.RemoteOpsError, "BACKUP_SOURCE_CHANGED_DURING_CAPTURE"):
+                with remote.backup_payload_snapshot(self.root, self.config):
+                    self.fail("missing frozen member must not be skipped or replaced by new census")
+        self.assertEqual(list((self.root / remote.BACKUP_SNAPSHOT_STAGING_RELATIVE).glob("capture-*")), [])
+
     def test_nested_native_open_wal_cannot_override_captured_main_after_restore(self) -> None:
         from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 

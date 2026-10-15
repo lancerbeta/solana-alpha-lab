@@ -11,14 +11,14 @@
   "dimensions": {
     "mission": "Ordinary independent recoverability with bounded collector disruption and no daily manual step.",
     "flexibility_and_history": "Complete original I2 and Stage C remain required; no scientific history or former acceptance re-audit.",
-    "context_efficiency": "One same-contract replan, existing native owners, one opt-in scale fixture and 78 direct regressions. No local full gate before PR.",
+    "context_efficiency": "One same-contract replan, same native owners, 80 direct regressions; scale rerun only for concrete P1 failure boundary and measured writer error. No local full gate before PR.",
     "research_truth": "WAL views pinned while all admitted writers fenced; mutable jobs/member pointers and causal files frozen together. Native ResearchStore semantic validation and one inventory/ZIP use captured bytes; integrity/freshness and all dependencies retained.",
-    "owner_operability": "One current task and OPERATE packet, existing ordinary scheduled caller, phase trace in pending/receipt, preserved last-good and native owned-staging recovery. No production mutation or third blind retry.",
+    "owner_operability": "One current task and OPERATE packet, existing ordinary scheduled caller, phase trace in pending/receipt, preserved last-good and native owned-staging recovery. No production mutation or third blind retry. Updated owner OPERATE proposal prefers standalone fresh compressed full/restore, one finite retirement/reclaim, compact baseline and one sustainable recurring policy; no authority inferred.",
     "execution_to_cashflow": "Backup recoverability only; no trading, alpha or cashflow acceptance.",
     "monitoring_and_recovery": "Existing fence30s and monitoring stall1800s treated separately; finite closure caps retained; measured temp/WAL/free and native writer/publications on local comparable fixture. Production latency acceptance remains separate. Actual-process OS_EXIT_73 during >=5.3 GB page copy, native writer commit and next capture without manual state fix; verified prior bundle hash unchanged. Initial Windows launcher-kill experiment excluded, not hidden.",
     "build_vs_buy": "ADOPT existing SQLite Online Backup API/read transactions (SQLite backup.html and isolation.html), WRAP existing native capture/offhost owner. Reuse registry/ADR-002 checked; no dependency/service/framework.",
     "security": "No credentials, raw production payloads, deployment, live capture, remote upload/delete or policy changes; metadata-only production probe.",
-    "red_team": "Before/after native copy/hash/metadata fence costs; writer commits after view pinning, fresh-process producer-read-denied restore; actual-process hard death, native cleanup and restart; busy-retry remains one JSON document."
+    "red_team": "Before/after native copy/hash/metadata fence costs; writer commits after view pinning, fresh-process producer-read-denied restore; actual-process hard death, native cleanup and restart; busy-retry remains one JSON document. Real SQLITE_FULL tests failed attempt/one CLI JSON/last-good; missing frozen deferred receipt refuses rather than new census or skip. Comparable writer failure is recorded and repaired in the same patch."
   },
   "capability_radar": {
     "now": "NONE: finish exact-head gates, then exact merged Stage B authorization. Stage C remains required after PACKAGING_LIVE_PROVEN.",

@@ -70,7 +70,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_78_CAPTURE_OFFHOST_LEGACY_CHAIN_REGRESSIONS_PLUS_5_56GB_NATIVE_WRITER_PUBLICATION_INDEPENDENT_RESTORE_AND_HARD_INTERRUPTION; see capture-repair-proof.json",
+    "targeted": "PASS_80_CAPTURE_OFFHOST_LEGACY_CHAIN_REGRESSIONS_PLUS_5_56GB_NATIVE_WRITER_PUBLICATION_INDEPENDENT_RESTORE_AND_HARD_INTERRUPTION; see capture-repair-proof.json",
     "independent_review": {
       "path": "docs/evidence/i2_backup_legacy_storage_v1/independent-review.json",
       "sha256": "80f13c214de8111e42b226004485bafcb1707ed8afb01605ab4d0aec9197c17d",

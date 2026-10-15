@@ -15,8 +15,12 @@ Frozen schedule/availability не менять, business stop-intake не исп
 
 Разрешаемые записи: exact release существующим installer, восстановление прежних
 triggers, owned snapshot staging/ZIP/pending/attempt/checkpoint/chain через ordinary
-caller. Один обычный daily delta к прежнему full + prefix deltas; новых full ради
-процедуры нет. Upload только новой delta и checkpoint в прежний commissioned remote.
+caller. По новому owner scope предпочтителен один свежий самостоятельный сжатый
+weekly/full checkpoint существующим caller и upload его ZIP/checkpoint в прежний
+commissioned remote. Independent restore должен обходиться этой self-contained
+closure. Прежняя25.7GB цепь не является обязательным путём; старые объекты/pins
+не переписываются и не удаляются. Новый full/upload требует новой exact подписи;
+старое ограничение «без нового full» не переносится на новый scope.
 Native capacity/reader checks; independent restore <=32 GB closure /8 objects /3h,
 MemoryMax1GB CPUQuota100% Nice10 IOWeight10 без изменения collector resources.
 Native writer fence30s прежний; total capture использует existing stall1800s;
@@ -24,7 +28,7 @@ transport timeout10800s, busy retry7200s/30s, owner operator deadline18000s пр
 
 Runtime acceptance: actual phase trace с fence wait/hold отдельно от service wall;
 ноль backup-caused collector lock failures и пропущенных обязательных due;
-DEFLATE8, один inventory/ZIP set, exact ordinary delta chain, independent restore
+DEFLATE8, один inventory/ZIP set, exact self-contained full/checkpoint, independent restore
 с control closure и source clocks, A/B/profile envelopes сохранены, shared counters
 монотонны, last-good обновлён только после независимого remote verification.
 Записать фактические bytes/time/WAL/temp/free/collector impact. Изолированный
@@ -41,6 +45,41 @@ RPO/retention changes. A/B/managed grants/science и ручные C/D не ме�
 Stage C из verified copy: exact retirement/reclaim rehearsal и одну recurring policy.
 Destructive APPLY и policy enable требуют одного отдельно согласованного scope;
 не выполнять на сломанном backup или в конфликте с due/activation/rollover.
+
+Stage C готовится на этой одной актуальной verified consistent copy через native
+owners #407, без отдельного cleanup PR по умолчанию. Read-only dry-run/plan и
+изолированный rehearsal дают компактную разбивку bytes: eligible legacy bodies;
+обязательная компактная history/accounting; новый collector и active recovery/
+science dependencies; крупные остатки вне native path. Для каждого крупного
+остатка назвать конкретного consumer или точное ограничение; UNKNOWN удержать
+явно. Shared accounting всех activations, grants/revocations, source identity,
+ROWIDs/cursors, A/B/managed, новые episodes и C1/C2 closure сохраняются. Не удалять
+целые таблицы и не применять один общий date cut.
+
+Одно следующее destructive решение связывает exact конечный срез и native
+archive-bound plans, resumable chunks с пределами rows/bytes/wall и общий finite
+drain budget, physical reclaim и последующий компактный full/independent restore,
+а также одну recurring policy. Per-chunk approval и ежедневный список IDs не нужны.
+Не выдавать маленький ZIP за logical retirement. Указать actual legacy bytes out
+of HOT, DB-file и routine backup до/после, retained residue с consumers, source
+identities, следующий native collector tick, maintenance cost/throughput и runway.
+У recurring policy измерить eligible inflow и устойчивый service rate: запаса
+должно хватать на поступление, а разовый backlog закрывается отдельно конечным
+прогоном в этом scope. Fixed95% target не устанавливается.
+
+Если reclaim требует pause, до APPLY измерить полную цепь quiesce → final-current
+recovery capture/restore checks → rebuild/switch/invariants → native recovery →
+возврат triggers/next tick с запасом; перечислить затронутые due/observation
+obligations. Не считать лишь rename, не менять RUN/grants и не разрешать потери
+наблюдений. При несовместимом окне или native refusal — один blocker: exact gate,
+защищаемая identity/dependency, удержанные bytes и минимальный supported путь.
+Не ослаблять gate и не открывать новый PR автоматически. До runtime copy все
+production размеры категорий, throughput и полная pause duration — UNKNOWN.
+
+Нижний master сохраняет native command/hash/recovery контракты. Его прежние
+Stage B no-new-full/delta-chain ограничения заменены этим owner уточнением;
+предложение30h freshness/RPO из истории остаётся неавторизованным. Effective
+freshness/retention, RUN, grants и frozen schedule не входят в новый scope.
 
 Дальше — сохранённый master OPERATE packet; этот header определяет актуальную
 Stage B capture repair boundary, прежние Stage C обязательства остаются в силе.
