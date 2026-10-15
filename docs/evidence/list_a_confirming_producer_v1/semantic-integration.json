@@ -106,7 +106,21 @@
     "F01 second hot/cold succeeded; extra immediate-parent assertion failed on Windows launch; read-only process-chain correction retained"
   ],
   "review_followup": {
-    "cold_limits_and_direct_consumers": "PENDING_COMMITTED_IMPLEMENTATION_CHECK",
+    "cold_limits_and_direct_consumers": {
+      "status": "PASS_16",
+      "trace": {
+        "path": "local/list_a_confirming_producer_v1/attempts/semantic-review-direct-consumers-2.log",
+        "sha256": "43eb411099a4e9c65d7d07e56b4d9fb62b8bbbbde3d45771c788eba2b3ab1ced"
+      }
+    },
+    "current_native_F02": {
+      "path": "local/list_a_confirming_producer_v1/attempts/f02-after-3/receipt.json",
+      "sha256": "a3dd7ca8601fc456d6b15cc9d03446eabcf095b1c2b3874a8d3924fe08db9faf"
+    },
+    "current_native_source_role": {
+      "path": "local/list_a_confirming_producer_v1/attempts/recovery-copy-semantic-eb5e/receipt.json",
+      "sha256": "0690d72b6cbae6634dfe62004237b9187563f1975b7c4ecd49e2097ccd53aeac"
+    },
     "earlier_verdicts_preserved": true,
     "findings": [
       {
@@ -135,6 +149,7 @@
       }
     ],
     "fresh_review": "PENDING_NEW_CONTENT_FINGERPRINT",
+    "implementation_head": "eb5e86d667a45b3ee4a12e7480dd3b634b951ff6",
     "metadata_regressions": {
       "status": "PASS_2",
       "trace": {
@@ -144,6 +159,10 @@
     },
     "new_persistent_TEST_charges": 0,
     "packet_sha256": "d9084b8d7399fdacd2cbe6dfc815331970264415b1ff1181932be81d41acb307",
+    "resource_checkpoint": {
+      "path": "local/list_a_confirming_producer_v1/attempts/recovery-delivery-readback-eb5e86d667a45b3ee4a12e7480dd3b634b951ff6.json",
+      "sha256": "23cff3fd3638d768c9f9a413a1d715e3730f01da5c9e5a8e4134ca10bf27c42a"
+    },
     "reviewed_head": "7e16f3435a98f7bc31fc2ffe4adb8d75ec49ef67",
     "roles": {
       "ARCHITECTURE_CRITIC": "PASS",
@@ -184,6 +203,13 @@
     "resource_checkpoint": {
       "path": "docs/evidence/list_a_confirming_producer_v1/semantic-footprint.json",
       "sha256": "0cf9aaaca28d0d87cbc8e1d265ac2ef964d40b48c02c19dfd92da3c9ceb48e52"
+    },
+    "review_followup_16": {
+      "status": "PASS",
+      "trace": {
+        "path": "local/list_a_confirming_producer_v1/attempts/semantic-review-direct-consumers-2.log",
+        "sha256": "43eb411099a4e9c65d7d07e56b4d9fb62b8bbbbde3d45771c788eba2b3ab1ced"
+      }
     },
     "source_role_native": {
       "path": "local/list_a_confirming_producer_v1/attempts/recovery-copy-semantic-2c3f/receipt.json",

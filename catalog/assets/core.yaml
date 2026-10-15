@@ -42887,7 +42887,7 @@ records:
     repository_path: docs/reports/list_a_confirming_producer_v1/OWNER_REPORT.md
   integrity:
     kind: sha256
-    sha256: 3c8c939305bdacaa0a0c3293eaa643e4482dc49846462433fab66990f8fe9e1f
+    sha256: 77fb35c9b83dbffe7989d6d666a016a8d30c2e67c55e84573d28c486f86bc0b1
   access:
     mode: read_only
     method: file

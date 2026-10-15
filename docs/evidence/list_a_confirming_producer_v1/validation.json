@@ -450,6 +450,26 @@
       "sha256": "6f080559b4885e9e1ae5371c70dbe54b14d4e47d82ea26f06a47c736561be4ff"
     }
   },
+  "semantic_review_followup": {
+    "direct_consumers": "PASS_16",
+    "exact_head_CI": "PENDING_NEW_HEAD",
+    "fresh_review": "PENDING_NEW_FINGERPRINT",
+    "implementation_head": "eb5e86d667a45b3ee4a12e7480dd3b634b951ff6",
+    "native_F02": {
+      "path": "local/list_a_confirming_producer_v1/attempts/f02-after-3/receipt.json",
+      "sha256": "a3dd7ca8601fc456d6b15cc9d03446eabcf095b1c2b3874a8d3924fe08db9faf"
+    },
+    "native_source_role": {
+      "path": "local/list_a_confirming_producer_v1/attempts/recovery-copy-semantic-eb5e/receipt.json",
+      "sha256": "0690d72b6cbae6634dfe62004237b9187563f1975b7c4ecd49e2097ccd53aeac"
+    },
+    "new_retained_TEST_charges": 0,
+    "seven_historical_charges_unchanged": true,
+    "trace": {
+      "path": "local/list_a_confirming_producer_v1/attempts/semantic-review-direct-consumers-2.log",
+      "sha256": "43eb411099a4e9c65d7d07e56b4d9fb62b8bbbbde3d45771c788eba2b3ab1ced"
+    }
+  },
   "source_refusal_recovery": {
     "approved_patch_sha256": "381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba",
     "as_of": "2026-10-15",

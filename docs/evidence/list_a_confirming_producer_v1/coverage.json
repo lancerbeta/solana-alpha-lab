@@ -136,6 +136,11 @@
       "evidence": "Legacy exact6-file guard retained; input1.1 original owners and exact5+N source paths; cold PRESENT/no values/no evaluator/no writes; synthetic promotion denied",
       "requirement": "F01 typed result source-set compatibility",
       "status": "PASS"
+    },
+    {
+      "evidence": "semantic-integration.json#review_followup; first7e16 code/goal/UX NOT_READY preserved; fresh four-role review on new fingerprint required",
+      "requirement": "Independent semantic review P2 closures: pre-reserve layout, UNKNOWN recovery, visible limits and exact owner hash",
+      "status": "PASS_16_DIRECT_CONSUMERS_AND_NATIVE_ZERO_VALUE_CHARGE_READBACKS"
     }
   ],
   "schema": "smial.list-a-confirmation-coverage",

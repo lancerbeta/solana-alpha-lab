@@ -1,7 +1,8 @@
 # PR #406 — targeted semantic/integration repair
 
 F01 и F02 исправлены на native synthetic product path. Implementation завершён;
-свежие независимые review, exact-head CI и merge-readiness ещё предстоят.
+на момент content freeze свежие review, exact-head CI и merge-readiness ещё предстоят.
+Их окончательные результаты фиксируются отдельными exact-head delivery receipts.
 Исторический green/ready head72151 не переносится на этот кандидат. Merge не разрешён.
 
 | Finding | До | После | Independent evidence |
@@ -21,8 +22,10 @@ fragmented same-day cohorts запрещены. Virtual aggregate schedule не 
 Закрыты точечные P2: relocated sample отказывает по общему input/cold layout
 до values/reservation; CLI сохраняет UNKNOWN расхода и показывает исходные
 scientific limits. Hash owner direction связан с текущими LF bytes; raw CRLF
-сохранён отдельно. Два metadata regression PASS; fresh review и cold limits
-regression ещё требуются. Первые verdicts сохранены, не переименованы в PASS.
+сохранён отдельно. Два metadata regression PASS; затем16 direct-consumer PASS,
+включая настоящий cold status/show с limits, source-role и legacy charge recovery.
+Повторные native F02/source-role readbacks дают ноль values/reservations/charges/writes;
+fresh review по новому fingerprint требуется. Первые verdicts сохранены, не переименованы в PASS.
 
 Сохранены все попытки: F02 late-refusal TEST charge1, F01 result-schema failure
 charge1, F01 completed engineering TEST charge1. Это отдельные disposable TEST
@@ -44,7 +47,7 @@ causality, empirical bootstrap coverage, net execution или StrategyVersion.
 Blind Actor/model diversity/earlyP0 decoder count/clean-host bootstrap и полные
 shared infrastructure totals сохраняют прежние UNKNOWN.
 
-Footprint checkpoint d7db:203.716MiB owned;249.702MiB с консервативным reserve всех
+Footprint checkpoint eb5e:204.624MiB owned;252.151MiB с консервативным reserve всех
 общих Git objects, hard cap1024MiB.30owned containers остановлены, owned`.venv`
 отсутствует; прежний пустой review-env archive сохранён. Ничего не удалялось.
 Docker volume allocation взята из неизменённого snapshot; shared VHDX/logs/runtime
@@ -52,5 +55,5 @@ cache physical totals отдельно UNKNOWN. Финальный delivery read
 
 Основной evidence: `docs/evidence/list_a_confirming_producer_v1/semantic-integration.json`.
 Воспроизведение: `REPRODUCE.md`. Новых зависимостей/сервисов/сред нет.
-Осталась обычная Git delivery до fresh exact-head CI/native readiness; затем одна
+Git delivery заканчивается fresh exact-head CI/native readiness; затем нужна одна
 новая exact owner phrase. NOW product repair: NONE, если fresh review не найдёт дефект.
