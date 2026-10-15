@@ -14,6 +14,37 @@ Observed 15.10.2026: изолированные synthetic native stores, product
 maintenance default-off. Frozen A/B, APPLIED profile, grants/shared debits,
 C1/C2 и научные bytes production в этой работе не изменялись.
 
+## Review follow-up #407
+
+Owner review `PATCH_BEFORE_MERGE` принят отдельным дополнением к исходному
+контракту (`review-follow-up.md`, original SHA256
+`778ca30b1be380455720fd4f7f80afb4bce77a0b0df0a2b7eeb14f093ebb91b3`).
+Каждый P1 сначала воспроизведён на native disposable stores; подробные команды,
+trace и raw readback bindings — `proof.json / review_follow_up`. Новый PR,
+production fault injection и повторный аудит I1/I3 не потребовались.
+
+| Finding | Конкретное ДО | Owning repair и независимое ПОСЛЕ |
+|---|---|---|
+| P1-1 legacy full → new delta | Native ACTIVE/DRAINING и actual full/chain из Git producer `b3fb9d8…`: fresh restore падал `RESEARCH_STORE_NOT_PRESENT` до delta | Raw-link checks сохранены; delta → raw verify → final control verify → marker. Raw SQL31 таблиц/ROWID, 9/11 файлов и исходные events/clocks совпали. Standalone incomplete/final missing event — DENY, marker0 |
+| P1-2 DEFERRED | Обычный CLI при native lease: exit0/DEFERRED, после release checkpoint не возникал | Тот же caller автоматически retry busy ≤120min, шаг30s; release завершает checkpoint без второй команды. Backup-lock retry сохраняет exact pending; weekly/daily дают один capture/ZIP/checkpoint. Exhaustion exit2 с incident и exact resume; last-good сохраняется, active owner success снимает incident |
+| P1-3 reboot до resume | Kill между rename/intent и ORIGINAL_MOVED: ordinary writer создавал пустой main; NEW/SWITCHED открывал store до WRITER_BUSY; rollback bytes оставались после resume | Intent до allocation, native writable guard; actual fresh collector tick и already-open writers отказывают до mutation, отсутствующий main остаётся absent. Exact resume/rollback сохраняет source UUID, ROWID317, debits19/271. Finalized resume удаляет owned rollback/staging, сохраняет small receipt; после новых writes old rollback запрещён |
+| P1-4 policy revision | После child process death на втором candidate progress1/3; approved narrower revision давала 4×FAILED/PLAN_STALE_POLICY с тем же intent | Atomically superseded intent, прежний progress/effect/provenance/cold сохранены; fresh ordinary caller продолжает под новой policy, excluded scope остаётся HOT. Disable/enable и previous-binary policy проходят; candidate/effect corruption остаётся отказом/FAILED |
+
+Production gate для всех четырёх остаётся staged: actual reader/units/drop-ins и
+cadence, native ordinary backup/maintenance, protected state и Linux filesystem
+readback в exact разрешённом OPERATE. Синтетические kill tests не являются
+fault injection на VPS или доказательством power-loss поведения конкретного диска.
+
+На пересечении P1-1/P1-3 воспроизведён дополнительный native дефект: full recursive
+backup переносил `FINALIZED` intent с исходным inode; restore проходил, следующий
+writer получал `RECLAIM_RECOVERY_REQUIRED`. Теперь backup использует общий native
+guard, отказывает до capture при unfinished reclaim и исключает только проверенную
+terminal inode-bound квитанцию. Actual nested full и sibling mutable restore
+сохраняют raw SQL/ROWID/sequence; после reconciliation новый writer создаёт event89
+после old77/sequence88. При rename gap main остаётся absent, capture calls0/ZIP0;
+чужой terminal inode также DENY. Production backup после finalized reclaim остаётся
+частью того же staged acceptance.
+
 ## Проверенный эффект и предел чисел
 
 | Величина | BEFORE → AFTER | Что именно измерено |
@@ -34,8 +65,10 @@ process peaks, не сумма одновременно работающих п�
 Plan→apply→reclaim→resume→next writer: около 1,6s wall. Sampled owned-tree peak
 capture/restore — 8 822 740 bytes / 10 files; retirement/CLI — 12 555 872 / 15.
 2ms sampling даёт observed lower bound, не строгий peak guarantee. Native reclaim
-сохраняет rollback+intent: 1→3 hot files до отдельного безопасного завершения
-recovery. Эти bytes не объявлены освобождёнными. Actual allocated volume/inodes
+в cutover временно сохраняет rollback+intent: 1→3 hot files; успешный exact resume
+теперь финализирует owned cleanup, оставляя DB+small receipt (1→2 hot files).
+Отдельный crash fixture подтвердил release389120 bytes original+SHM и отсутствие
+rollback/new; это не production volume reclaim. Actual allocated volume/inodes
 на production — `LIVE_PENDING_TOPOLOGY_AND_RECLAIM`; DB-file shrink доказан.
 
 Известный benchmark переиспользован: reported OPS 5 165 555 712 bytes,
@@ -52,11 +85,13 @@ freelist 122 880 pages, STORED около 5,225 GB и 60–110 минут upload
   Authoritative membership перечисляется внутри writer fences; предварительный
   проход служит только SQL admission. Publication, появившаяся до fence, сохраняет
   исходные manifest ID и availability при более позднем recovery.
-- Mixed STORED-full/DEFLATE-delta reconstruction проверяет actual extracted
+- Actual base-producer mutable-only full и новая DEFLATE-delta проверяют extracted
   membership/size/SHA каждого шага и final inventory; marker ставится последним.
   Missing/reordered delta, duplicates/path escape/sidecars/inventory mismatch
   отказывают. После restore native writer ждёт reconciliation.
-- Immutable pending backup переживает unknown upload/kill; повтор продолжает
+- Immutable pending backup переживает unknown upload/kill; обычный caller сам
+  повторяет transient busy в конечном окне и объединяет weekly/daily overlap;
+  exhaustion виден отдельным incident с exact resume. Повтор продолжает
   тот же ZIP/checkpoint. Pointer следует verified checkpoint; last-good отделён
   от failed attempt. A→B→A weekly сбрасывает obsolete deltas.
 - Retirement требует exact scope, запрета resume, source-owned cold/raw closure,
@@ -69,8 +104,10 @@ freelist 122 880 pages, STORED около 5,225 GB и 60–110 минут upload
   fresh independent proof после logical apply должен совпасть с final-current
   causal rows/counters/admissions; старый proof отказывается.
 - Native reclaim сохраняет all row values, implicit ROWID gaps, sequence88→89,
-  cursors и actual sibling/nested data_root identity. Три cutover crash phases
-  имеют rollback до resume/new writes; после новых writes только forward repair.
+  cursors и actual sibling/nested data_root identity. Durable pre-allocation guard
+  переживает reboot/rename windows, не даёт bootstrap/reset SQLite и блокирует
+  native writes до final recovery. Resume финализирует owned cleanup; после
+  durable resume decision и новых writes только forward repair.
 - Одна policy установлена до двух будущих managed children. Real public CLI/tick
   довёл их до COMPLETE/TAIL_COMPLETE; ordinary mutable-only backup, source-verified
   HOT90 raw archives и обычный caller после restart дали independent fake-remote

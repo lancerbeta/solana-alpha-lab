@@ -5,11 +5,13 @@ from __future__ import annotations
 import json
 import hashlib
 import io
-from contextlib import redirect_stdout
+from contextlib import closing, redirect_stdout
 import os
 import subprocess
 import sys
+import sqlite3
 import tempfile
+import time
 import unittest
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
@@ -39,8 +41,16 @@ class I2OffhostCheckpointTests(unittest.TestCase):
         self.clock = datetime(2026, 10, 14, 0, 45, tzinfo=UTC)
         self.source = self.root / "local/factory_v1/observation_rdp/source.bin"
         self.source.write_bytes(b"capture-one")
+        self.scheduled_processes = []
+        self.native_stores = []
 
     def tearDown(self) -> None:
+        for process in self.scheduled_processes:
+            if process.poll() is None:
+                process.kill()
+                process.wait(timeout=10)
+        for store in self.native_stores:
+            store.close()
         self.temporary.cleanup()
 
     def run_checkpoint(self, **kwargs):
@@ -248,6 +258,269 @@ print(json.dumps(receipt))
         self.assertEqual(receipt, {"terminal": "DEFERRED", "reason": "WRITER_BUSY"})
         self.assertEqual(self.runner.calls, [])
         self.assertFalse((self.root / self.config.pending_relative).exists())
+
+    def scheduled_process(self, remote: Path, *, mode: str = "daily", budget: float = 3,
+                          hold_upload: bool = False, forbid_capture: bool = False):
+        """Actual CLI main in another process; only transport and test time scale differ."""
+        remote.mkdir(exist_ok=True)
+        program = r'''
+import hashlib, json, shutil, subprocess, sys, time
+from dataclasses import replace
+from pathlib import Path
+from scripts import factory_offhost_backup_copy as cli
+from solana_alpha_lab.factory import offhost_backup as owner
+root, remote = Path(sys.argv[1]), Path(sys.argv[2])
+mode, budget, hold, forbid = sys.argv[3], float(sys.argv[4]), sys.argv[5]=='1', sys.argv[6]=='1'
+owner.SCHEDULED_BUSY_RETRY_BUDGET_SECONDS = budget
+owner.SCHEDULED_BUSY_RETRY_INTERVAL_SECONDS = .05
+load = owner.load_offhost_config
+owner.load_offhost_config = lambda root: replace(load(root), rclone_config_absolute=root/'rclone-fixture.conf')
+def event(kind, **values):
+    with (remote/(mode+'.events')).open('a', encoding='utf-8') as stream:
+        stream.write(json.dumps({'kind':kind, **values})+'\n')
+original = owner.run_offhost_checkpoint
+def checkpoint(*args, **kwargs):
+    result = original(*args, **kwargs)
+    event('attempt', terminal=result['terminal'])
+    return result
+owner.run_offhost_checkpoint = checkpoint
+capture = owner.backup_payload_snapshot
+def snapshot(*args, **kwargs):
+    event('capture')
+    if forbid:
+        raise AssertionError('scheduled retry recaptured immutable pending')
+    return capture(*args, **kwargs)
+owner.backup_payload_snapshot = snapshot
+def runner(argv):
+    command = argv[3]
+    target = remote/Path(argv[-1]).name
+    if command == 'copyto':
+        if hold and not (remote/'upload-held').exists():
+            (remote/'upload-held').write_text('held')
+            deadline = time.monotonic()+15
+            while not (remote/'release-upload').exists():
+                if time.monotonic()>deadline:
+                    raise AssertionError('fixture upload release not received')
+                time.sleep(.02)
+        shutil.copyfile(argv[-2],target)
+        event('copy', filename=target.name)
+        return subprocess.CompletedProcess(argv,0,'','')
+    if not target.is_file():
+        return subprocess.CompletedProcess(argv,1,'[]','object not found')
+    if command == 'lsjson':
+        return subprocess.CompletedProcess(argv,0,json.dumps([{'Path':target.name,'Size':target.stat().st_size}]),'')
+    if command == 'hashsum':
+        return subprocess.CompletedProcess(argv,0,hashlib.md5(target.read_bytes(),usedforsecurity=False).hexdigest()+'  '+target.name+'\n','')
+    raise AssertionError(command)
+owner.default_rclone_runner = runner
+cli._git_sha = lambda root: 'a'*40
+sys.argv = ['factory_offhost_backup_copy.py','--root',str(root),'--mode',mode]
+raise SystemExit(cli.main())
+'''
+        env = dict(os.environ)
+        repository = Path(__file__).resolve().parents[1]
+        env["PYTHONPATH"] = os.pathsep.join((str(repository), str(repository / "src")))
+        output = self.root / (mode + ".scheduled-output.txt")
+        stream = output.open("w", encoding="utf-8")
+        process = subprocess.Popen([sys.executable, "-B", "-c", program, str(self.root), str(remote),
+            mode, str(budget), str(int(hold_upload)), str(int(forbid_capture))],
+            stdout=stream, stderr=subprocess.STDOUT, env=env)
+        stream.close()
+        self.scheduled_processes.append(process)
+        return process, output
+
+    def wait_scheduled_event(self, remote: Path, *, mode: str = "daily", terminal: str = "DEFERRED"):
+        deadline = time.monotonic() + 10
+        path = remote / (mode + ".events")
+        while time.monotonic() < deadline:
+            events = [json.loads(line) for line in path.read_text().splitlines()] if path.exists() else []
+            if any(event.get("terminal") == terminal for event in events):
+                return events
+            time.sleep(.02)
+        self.fail("scheduled caller did not reach native contention")
+
+    def test_scheduled_caller_automatically_finishes_after_native_lease_release(self) -> None:
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        path = self.root / "local/factory_v1/observation_schedule_state.sqlite"
+        path.unlink()
+        store = ObservationScheduleStore(path)
+        self.native_stores.append(store)
+        token = store.acquire_lease("real-fixture-collector")
+        self.assertIsNotNone(token)
+        with closing(sqlite3.connect(path.as_uri()+"?mode=ro", uri=True)) as independent:
+            before = independent.execute("SELECT lease_token FROM scheduler_leases").fetchone()[0]
+        self.assertEqual(before, token)
+        remote = Path(self.temporary.name) / "scheduled-remote"
+        process, output = self.scheduled_process(remote)
+        self.wait_scheduled_event(remote)
+        time.sleep(.1)
+        store.release_lease(token)
+        code = process.wait(timeout=15)
+        result = json.loads(output.read_text(encoding="utf-8"))
+        self.assertEqual(code, 0, result)
+        self.assertIn(result["terminal"], owner.CHECKPOINT_TERMINALS)
+        with closing(sqlite3.connect(path.as_uri()+"?mode=ro", uri=True)) as independent:
+            self.assertEqual(independent.execute("SELECT COUNT(*) FROM scheduler_leases").fetchone()[0], 0)
+        receipt = json.loads((self.root / self.config.receipt_relative).read_text())
+        checkpoint = remote / receipt["checkpoint_filename"]
+        self.assertEqual(hashlib.sha256(checkpoint.read_bytes()).hexdigest(), receipt["checkpoint_sha256"])
+        self.assertFalse((self.root / self.config.pending_relative).exists())
+
+    def test_scheduled_backup_lock_retry_resumes_exact_pending_without_capture(self) -> None:
+        self.runner.fail_copy_count = 1
+        with self.assertRaises(owner.OffhostBackupError):
+            self.run_checkpoint()
+        pending_path = self.root / self.config.pending_relative
+        pending_bytes = pending_path.read_bytes()
+        operation = self.pending()
+        from solana_alpha_lab.factory.remote_ops import load_config_v1_1, resolve_backup_sink
+        sink = resolve_backup_sink(self.root, load_config_v1_1(self.root), {})
+        expected = {item["filename"]: (sink / item["filename"]).read_bytes()
+                    for item in [*operation["objects"], operation["checkpoint"]]}
+        remote = Path(self.temporary.name) / "locked-pending-remote"
+        with backup_plane_lock(self.root):
+            process, output = self.scheduled_process(remote, forbid_capture=True)
+            self.wait_scheduled_event(remote)
+            self.source.write_bytes(b"later source must not replace immutable pending")
+            time.sleep(.1)
+            self.assertEqual(pending_path.read_bytes(), pending_bytes)
+            self.assertFalse(any(remote.glob("RECOVERY_CHECKPOINT*")))
+        self.assertEqual(process.wait(timeout=15), 0, output.read_text())
+        result = json.loads(output.read_text())
+        self.assertEqual(result["checkpoint_filename"], operation["checkpoint"]["filename"])
+        self.assertEqual(result["snapshot_data_as_of"], operation["snapshot_data_as_of"])
+        self.assertEqual({name: (remote / name).read_bytes() for name in expected}, expected)
+        self.assertFalse(pending_path.exists())
+        events = [json.loads(line) for line in (remote / "daily.events").read_text().splitlines()]
+        self.assertFalse(any(event["kind"] == "capture" for event in events))
+
+    def wait_upload(self, remote: Path) -> None:
+        deadline = time.monotonic() + 10
+        while not (remote / "upload-held").exists() and time.monotonic() < deadline:
+            time.sleep(.02)
+        self.assertTrue((remote / "upload-held").exists(), "weekly never held real backup lock")
+
+    def test_weekly_daily_scheduled_overlap_coalesces_one_capture_and_publication(self) -> None:
+        remote = Path(self.temporary.name) / "overlap-remote"
+        weekly, weekly_output = self.scheduled_process(remote, mode="weekly", hold_upload=True)
+        self.wait_upload(remote)
+        pending = self.pending()
+        daily, daily_output = self.scheduled_process(remote)
+        self.wait_scheduled_event(remote)
+        (remote / "release-upload").write_text("release")
+        self.assertEqual(weekly.wait(timeout=15), 0, weekly_output.read_text())
+        self.assertEqual(daily.wait(timeout=15), 0, daily_output.read_text())
+        w = json.loads(weekly_output.read_text())
+        d = json.loads(daily_output.read_text())
+        self.assertTrue(d["scheduled_coalesced"])
+        self.assertEqual(d["checkpoint_filename"], w["checkpoint_filename"])
+        self.assertEqual(d["snapshot_data_as_of"], pending["snapshot_data_as_of"])
+        self.assertNotIn("maintenance", d)
+        self.assertEqual(len(list(remote.glob("RECOVERY_CHECKPOINT_*.json"))), 1)
+        self.assertEqual(len(list(remote.glob("BACKUP_*.zip"))), 1)
+        daily_events = [json.loads(line) for line in (remote / "daily.events").read_text().splitlines()]
+        self.assertFalse(any(event["kind"] in {"capture", "copy"} for event in daily_events))
+        receipt = json.loads((self.root / self.config.receipt_relative).read_text())
+        self.assertEqual(receipt["checkpoint_sha256"], hashlib.sha256(
+            (remote / w["checkpoint_filename"]).read_bytes()).hexdigest())
+        import zipfile
+        with zipfile.ZipFile(next(remote.glob("BACKUP_*.zip"))) as archive:
+            self.assertEqual(archive.read("local/factory_v1/observation_rdp/source.bin"), b"capture-one")
+
+    def test_exhausted_scheduled_wait_is_incident_then_active_owner_success_resolves_it(self) -> None:
+        first = self.run_checkpoint()
+        first_bytes = (self.root / self.config.receipt_relative).read_bytes()
+        self.source.write_bytes(b"weekly source state two")
+        remote = Path(self.temporary.name) / "exhausted-remote"
+        weekly, weekly_output = self.scheduled_process(remote, mode="weekly", hold_upload=True)
+        self.wait_upload(remote)
+        pending_bytes = (self.root / self.config.pending_relative).read_bytes()
+        pending = self.pending()
+        daily, daily_output = self.scheduled_process(remote, budget=.2)
+        self.wait_scheduled_event(remote)
+        self.assertEqual(daily.wait(timeout=10), 2, daily_output.read_text())
+        failure = json.loads(daily_output.read_text())
+        self.assertEqual(failure["terminal"], "COPY_FAILED")
+        self.assertEqual(failure["failure_code"], "OFFHOST_BUSY_RETRY_EXHAUSTED")
+        self.assertEqual(failure["resume"]["action"], "RETRY_SAME_PENDING_OPERATION")
+        self.assertEqual(failure["resume"]["argv"][-2:], ["--mode", "daily"])
+        self.assertEqual(failure["checkpoint_filename"], pending["checkpoint"]["filename"])
+        self.assertEqual(failure["resume"]["pending_operation_sha256"], hashlib.sha256(
+            owner._checkpoint_canonical(pending)).hexdigest())
+        self.assertEqual((self.root / self.config.receipt_relative).read_bytes(), first_bytes)
+        self.assertEqual((self.root / self.config.pending_relative).read_bytes(), pending_bytes)
+        self.assertEqual(owner.read_offhost_attempt(self.root, self.config)["failure_code"],
+            "OFFHOST_BUSY_RETRY_EXHAUSTED")
+        self.assertEqual(owner.read_offhost_receipt(self.root, self.config)["checkpoint_filename"],
+            first["checkpoint_filename"])
+        (remote / "release-upload").write_text("release")
+        self.assertEqual(weekly.wait(timeout=15), 0, weekly_output.read_text())
+        last = owner.read_offhost_attempt(self.root, self.config)
+        self.assertEqual(last["terminal"], "WEEKLY_FULL_VERIFIED")
+        self.assertEqual(last["checkpoint_filename"], pending["checkpoint"]["filename"])
+        self.assertFalse((self.root / self.config.pending_relative).exists())
+
+    def test_default_busy_budget_covers_110_minute_weekly_without_changing_24h_age(self) -> None:
+        # Real retry policy, virtual elapsed time; no tiny-store timing claim.
+        elapsed = [0.0]
+        def sleep(seconds):
+            elapsed[0] += seconds
+        def attempt(*args, **kwargs):
+            if elapsed[0] < 110 * 60:
+                return {"terminal": "DEFERRED", "reason": "WRITER_BUSY"}
+            return {"terminal": "WEEKLY_FULL_VERIFIED", "snapshot_data_as_of": "2026-10-14T00:30:00Z"}
+        with patch.object(owner, "run_offhost_checkpoint", side_effect=attempt):
+            result = owner.run_scheduled_offhost_checkpoint(self.root, mode="daily", config=self.config,
+                now=self.clock, monotonic_clock=lambda: elapsed[0], sleeper=sleep)
+        self.assertEqual(result["scheduled_retry"]["busy_wait_seconds"], 110 * 60)
+        self.assertEqual(result["scheduled_retry"]["busy_retry_budget_seconds"], 120 * 60)
+        self.assertEqual(self.config.freshness_current_max_seconds, 86400)
+        self.assertEqual(result["snapshot_data_as_of"], "2026-10-14T00:30:00Z")
+
+    def test_default_long_busy_exhausts_after_120_minutes_without_capture_or_last_good_change(self) -> None:
+        first = self.run_checkpoint()
+        before = (self.root / self.config.receipt_relative).read_bytes()
+        elapsed = [0.0]
+        def sleep(seconds):
+            elapsed[0] += seconds
+        with backup_plane_lock(self.root), patch.object(owner, "backup_payload_snapshot",
+                side_effect=AssertionError("busy capture")):
+            result = owner.run_scheduled_offhost_checkpoint(self.root, mode="daily", config=self.config,
+                runner=self.runner, monotonic_clock=lambda: elapsed[0], sleeper=sleep,
+                wall_clock=lambda: self.clock + timedelta(seconds=elapsed[0]))
+        self.assertEqual(result["failure_code"], "OFFHOST_BUSY_RETRY_EXHAUSTED")
+        self.assertEqual(result["busy_wait_seconds"], 120 * 60)
+        self.assertEqual(result["deferred_attempts"], 241)
+        self.assertEqual(result["resume"]["action"], "RETRY_SCHEDULED_CHECKPOINT")
+        self.assertIsNone(result["resume"]["pending_operation_sha256"])
+        self.assertEqual((self.root / self.config.receipt_relative).read_bytes(), before)
+        self.assertEqual(owner.read_offhost_receipt(self.root, self.config)["checkpoint_filename"],
+                         first["checkpoint_filename"])
+
+    def test_coalescing_refuses_stale_future_or_corrupt_published_bytes(self) -> None:
+        first = self.run_checkpoint()
+        for observed in (self.clock + timedelta(hours=25), self.clock - timedelta(seconds=1)):
+            with self.subTest(observed=observed), patch.object(owner, "backup_payload_snapshot",
+                    side_effect=AssertionError("ordinary capture required")):
+                with self.assertRaisesRegex(AssertionError, "ordinary capture required"):
+                    self.run_checkpoint(now=observed, scheduled_requested_at=self.clock - timedelta(minutes=1))
+        from solana_alpha_lab.factory.remote_ops import load_config_v1_1, resolve_backup_sink
+        sink = resolve_backup_sink(self.root, load_config_v1_1(self.root), {})
+        (sink / first["source_backup_filename"]).write_bytes(b"corrupt published full")
+        before = len(self.runner.calls)
+        with patch.object(owner, "backup_payload_snapshot", side_effect=AssertionError("recapture")):
+            with self.assertRaisesRegex(owner.OffhostBackupError, "OFFHOST_COALESCED_CHECKPOINT_INTEGRITY_FAILED"):
+                self.run_checkpoint(scheduled_requested_at=self.clock - timedelta(minutes=1))
+        self.assertEqual(len(self.runner.calls), before)
+
+    def test_exact_checkpoint_success_resolves_incident_persisted_after_commit(self) -> None:
+        receipt = self.run_checkpoint()
+        incident = {"terminal": "COPY_FAILED", "failure_code": "OFFHOST_BUSY_RETRY_EXHAUSTED",
+                    "failed_at": owner._stamp(self.clock + timedelta(seconds=2)),
+                    "checkpoint_filename": receipt["checkpoint_filename"]}
+        # Models incident IO delayed after its final lock-busy observation.
+        owner._atomic_write_json(owner._scheduled_incident_path(self.root, self.config, "daily"), incident)
+        self.assertEqual(owner.read_offhost_attempt(self.root, self.config)["terminal"], "WEEKLY_FULL_VERIFIED")
 
     def test_same_size_remote_corruption_is_not_accepted(self) -> None:
         self.runner.fail_copy_count = 1

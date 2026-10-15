@@ -367,6 +367,7 @@ def consistent_sqlite_backup(source: Path, dest: Path, *, deadline_monotonic: fl
     _reject_symlink_components(source)
     _reject_symlink_components(dest)
     source = source.resolve()
+    _check_backup_reclaim(source)
     if source.is_file() is False:
         raise RemoteOpsError("BACKUP_SOURCE_MISSING")
     dest.parent.mkdir(parents=True, exist_ok=True)
@@ -380,6 +381,7 @@ def consistent_sqlite_backup(source: Path, dest: Path, *, deadline_monotonic: fl
                 raise RemoteOpsError("BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED")
         conn.backup(replica, pages=256, progress=progress)
         replica.commit()
+        _check_backup_reclaim(source)
     finally:
         replica.close()
         conn.close()
@@ -817,6 +819,8 @@ def _backup_source_paths(
         scan_step()
         normalized = str(relative).replace("\\", "/")
         source = _safe_relative(root, normalized)
+        if not _admit_backup_reclaim_source(source):
+            continue
         if source.is_file() is False:
             raise RemoteOpsError(f"BACKUP_SOURCE_MISSING:{normalized}")
         if normalized not in seen:
@@ -838,6 +842,8 @@ def _backup_source_paths(
                     or normalized.endswith("/locks/research-writer.lock")):
                 continue  # native rebuildable lookup/projection/lease is not canonical data
             source = _safe_relative(root, normalized)
+            if not _admit_backup_reclaim_source(source):
+                continue
             if normalized not in seen:
                 result.append((normalized, source, normalized.endswith(".sqlite")))
                 seen.add(normalized)
@@ -846,6 +852,32 @@ def _backup_source_paths(
         result = [item for item in result
                   if (_sqlite_sidecar_main(item[0]) or "").casefold() not in api_mains]
     return result
+
+
+def _check_backup_reclaim(source: Path) -> dict[str, Any] | None:
+    from solana_alpha_lab.factory.observation_schedule_store import (
+        ObservationScheduleStoreError, assert_reclaim_write_allowed)
+
+    try:
+        return assert_reclaim_write_allowed(source)
+    except ObservationScheduleStoreError as exc:
+        raise RemoteOpsError("BACKUP_RECLAIM_RECOVERY_REQUIRED") from exc
+
+
+def _admit_backup_reclaim_source(source: Path) -> bool:
+    artifact = re.fullmatch(r"\.(.+\.sqlite)\.i2-reclaim(?:\.intent\.json(?:\.tmp)?"
+                            r"|-(?:new|rollback)\.sqlite(?:-(?:wal|shm|journal))?)", source.name)
+    if artifact:
+        main = source.with_name(artifact.group(1))
+        terminal = _check_backup_reclaim(main)
+        if terminal is None or source.name != f".{main.name}.i2-reclaim.intent.json":
+            raise RemoteOpsError("BACKUP_RECLAIM_RECOVERY_REQUIRED")
+        # This validated terminal receipt binds a local inode. It is technical
+        # recovery state for that host, not portable operational/scientific data.
+        return False
+    if source.name.casefold().endswith(".sqlite"):
+        _check_backup_reclaim(source)
+    return True
 
 
 def _sqlite_sidecar_main(relative: str) -> str | None:
@@ -952,9 +984,11 @@ def _capture_writer_fences(sources: Sequence[tuple[str, Path, bool]]) -> Iterato
         for _relative, source, is_sqlite in sorted(sources):
             if not is_sqlite:
                 continue
+            _check_backup_reclaim(source)
             conn = sqlite3.connect(source.as_uri() + "?mode=rw", uri=True, timeout=0)
             connections.append(conn)
             conn.execute("BEGIN IMMEDIATE")
+            _check_backup_reclaim(source)
             exists = conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='scheduler_leases'").fetchone()
             if exists and conn.execute("SELECT 1 FROM scheduler_leases WHERE expires_at > ? LIMIT 1", (_now(),)).fetchone():
                 raise RemoteOpsError("WRITER_BUSY")
@@ -1867,7 +1901,10 @@ def restore_backup_isolated(*, bundle: Path, dest_root: Path,
         raise RemoteOpsError("BACKUP_ARCHIVE_CORRUPT") from exc
     actual = _check_inventory(dest_root, inventory, baseline)
     integrity = _sqlite_restore_integrity(dest_root, list(entries.values()))
-    control = _verify_recovery_control(dest_root)
+    # A legacy mutable-only full can acquire its required ResearchEvents from
+    # later deltas. Its raw bytes remain verified here; semantic closure belongs
+    # to the final reconstruction. Standalone full restore still requires it.
+    control = None if _raw_only else _verify_recovery_control(dest_root)
     rdp = [item for item in entries.values() if str(item["path"]).startswith("local/factory_v1/observation_rdp/")]
     journals = [item for item in entries.values() if "/publication_jobs/" in str(item["path"]) or "/journals/" in str(item["path"])]
     for key, items in (("rdp_inventory", rdp), ("active_journal_inventory", journals)):

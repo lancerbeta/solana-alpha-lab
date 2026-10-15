@@ -1,17 +1,17 @@
 [
   {
     "claim_id": "I2_SINGLE_CAPTURE_RECOVERY",
-    "claim": "Inventory and full/delta archives share immutable captured bytes with causal native control/publication closure; final raw inventory precedes operational restore marker.",
+    "claim": "Inventory and full/delta archives share immutable captured bytes with causal native control/publication closure; final raw inventory precedes operational restore marker. Actual historical mutable-only full can receive first event closure in a new delta; standalone/final incomplete control refuses.",
     "scope": "Isolated native counterpart, old STORED/new DEFLATE readers; production pending."
   },
   {
     "claim_id": "I2_EXACT_COLD_RETIRE_RECLAIM",
-    "claim": "Retirement removes exact archived eligible bodies while preserving denominator/provenance/control; explicit native rebuild preserves ROWID/sequence/root identity and next writer.",
+    "claim": "Retirement removes exact archived eligible bodies while preserving denominator/provenance/control; explicit native rebuild preserves ROWID/sequence/root identity and next writer. Durable pre-allocation intent blocks reboot/reconnected writers until exact recovery finalizes owned rollback/staging cleanup.",
     "scope": "Exact approved scope/plan; default-off; quiesced final-current production authority separate."
   },
   {
     "claim_id": "I2_ORDINARY_BOUNDED_MAINTENANCE",
-    "claim": "One approved lineage/scopes policy lets the existing checkpoint caller discover future terminal children and process bounded work across restart without daily IDs or manual backup records.",
+    "claim": "One approved lineage/scopes policy lets the existing checkpoint caller discover future terminal children and process bounded work across restart without daily IDs or manual backup records. Existing scheduled caller bounds busy retry/coalesces overlap; approved policy revisions reconcile stale intents without erasing effects or candidate conflicts.",
     "scope": "Synthetic transport ordinary pipeline; installed production caller and normal cycles pending; scientific/cold pins survive."
   }
 ]

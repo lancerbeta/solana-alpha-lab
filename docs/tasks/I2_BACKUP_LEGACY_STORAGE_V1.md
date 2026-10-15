@@ -1,6 +1,6 @@
 ---
 task_id: I2_BACKUP_LEGACY_STORAGE_V1
-task_version: '1.1'
+task_version: '1.2'
 status: IN_PROGRESS
 as_of: '2026-10-15'
 owner: GOAL_OWNER
@@ -118,6 +118,38 @@ Tool Entry: existing delivery-harness, Git/gh, locked Python 3.13.14, stdlib
 SQLite/zipfile and existing native owners. New plugin/connector/MCP/automation,
 dependency, key or service: NONE. Reuse the existing I2 benchmark; its sample
 ratio is not a whole-checkpoint measurement. No provider or production write.
+
+## Owner review follow-up — same PR #407
+
+The owner review imported as `docs/evidence/i2_backup_legacy_storage_v1/review-follow-up.md`
+is an additional acceptance constraint, not a replacement for the original
+PRD/SSD. Original attachment SHA256:
+`778ca30b1be380455720fd4f7f80afb4bce77a0b0df0a2b7eeb14f093ebb91b3`.
+It reviewed `b8ed4be809652714065b0db6c54fe454a8129ec7` against the frozen base.
+All four findings must be reproduced on disposable native stores and either
+minimally repaired in existing owners or disproved by a concrete production-path
+trace and independent oracle before merge-readiness:
+
+- P1-1: actual base-producer mutable-only full plus new daily delta; defer final
+  recovery-control closure until the complete chain, retain every raw-link
+  integrity check and refuse an incomplete standalone or final reconstruction.
+- P1-2: ordinary scheduled caller automatically retries transient writer/backup
+  contention within a finite cadence/RPO-derived budget, preserves pending
+  bytes/identity, coalesces overlap and reports terminal exhaustion with exact
+  resume; no force-unlock, collector stop, new daemon or live timer/RPO change.
+- P1-3: fresh ordinary writable processes must refuse pending reclaim before
+  SQLite creation/mutation in every process-death/rename window; exact durable
+  recovery includes owned pre-intent staging, irreversible resume boundary and
+  explicit disposition of rollback/staging bytes after successful acceptance.
+- P1-4: installing an approved narrower policy revision or disable/enable
+  reconciles stale active plans without applying their remainder, losing prior
+  effects/provenance/cold pins, or hiding a genuine integrity/candidate conflict.
+
+Extend existing native fixtures only at these seams; report each exact BEFORE
+failure, owning repair, independent AFTER readback and remaining production gate.
+Then refresh task/OPERATE/evidence bindings, isolated reviews, exact-head CI and
+machine merge-readiness in #407. No merge phrase before all material findings
+are closed. Original production and protected-state authority limits still hold.
 
 ## Implementation and verification plan
 

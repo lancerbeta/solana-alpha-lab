@@ -259,6 +259,95 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
             raise ObservationScheduleRetentionError("ARCHIVE_REFRESH_BUDGET_INVALID")
 
 
+def _supersede_stale_policy_plan(store: ObservationScheduleStore, *,
+        approved_policy_sha256: str, now: datetime) -> bool:
+    """Retire an obsolete intent, never its effects or immutable cold pins.
+
+    Called inside the native lease and transaction. A new approval is not
+    permission to erase a changed candidate, corrupt archive or altered effect.
+    The old bounded plan is checked before its unapplied remainder is abandoned.
+    """
+    plan = _control(store, "active_plan")
+    if not plan or plan.get("policy_sha256") == approved_policy_sha256:
+        return False
+    document = {key: value for key, value in plan.items() if key != "plan_id"}
+    if (plan.get("schema") != PLAN_SCHEMA or plan.get("plan_id") != _hash(document)
+            or policy_sha256(plan["policy"]) != plan["policy_sha256"]):
+        raise ObservationScheduleRetentionError("PLAN_APPROVAL_OR_IDENTITY_MISMATCH")
+    if _source_identity(store) != plan["source"]:
+        raise ObservationScheduleRetentionError("PLAN_STALE_SOURCE_OR_SCHEMA")
+    old_policy = plan["policy"]
+    validate_policy(old_policy)
+    candidates = plan["candidates"]
+    if (len(candidates) > int(old_policy["max_rows"])
+            or sum(int(c["row"]["payload_bytes"]) + int(c.get("dependency_bytes", 0)) for c in candidates) > int(old_policy["max_bytes"])):
+        raise ObservationScheduleRetentionError("PLAN_BUDGET_EXCEEDED")
+    progress = store._conn.execute("SELECT next_candidate,payload_json FROM retention_progress WHERE plan_id=?", (plan["plan_id"],)).fetchone()
+    offset = int(progress[0]) if progress else 0
+    if not 0 <= offset <= len(candidates):
+        raise ObservationScheduleRetentionError("PLAN_STALE_CANDIDATE_AFTER_EFFECT")
+    started = time.monotonic()
+    proofs = plan.get("archive_registry", {})
+    for proof in proofs.values():
+        verify_cold_archive(proof, deep=False)
+    current_bytes = 0
+    # Provenance can exceed a tiny original body. Bound commissioning readback
+    # by frozen input + bounded intent/metadata, rather than rejecting a valid
+    # already-committed effect solely because it grew operational metadata.
+    current_read_budget = int(old_policy["max_bytes"]) + len(_json(plan).encode()) + len(candidates)*2048
+    for index, original in enumerate(candidates):
+        if time.monotonic() - started >= float(old_policy["max_wall_seconds"]):
+            raise ObservationScheduleRetentionError("POLICY_RECONCILIATION_BUDGET_EXCEEDED")
+        candidate = {**original, "archive_proofs": [proofs[p] if isinstance(p, str) else p for p in original["archive_proofs"]]}
+        table, rowid = candidate["table"], candidate["row"]["source_rowid"]
+        if table not in {"call_ledger", "poll_slots"}:
+            raise ObservationScheduleRetentionError("PLAN_TABLE_INVALID")
+        size = store._conn.execute(f"SELECT length(CAST(payload_json AS BLOB)) FROM {table} WHERE rowid=?", (rowid,)).fetchone()
+        current_bytes += int(size[0]) if size else 0
+        if size is None or current_bytes > current_read_budget:
+            raise ObservationScheduleRetentionError("PLAN_STALE_CANDIDATE")
+        row = dict(store._conn.execute(f"SELECT rowid AS source_rowid,* FROM {table} WHERE rowid=?", (rowid,)).fetchone())
+        if any(row[key] != value for key, value in candidate["row"].items() if key != "payload_bytes"):
+            raise ObservationScheduleRetentionError("PLAN_STALE_CANDIDATE")
+        if index >= offset:
+            if size[0] != candidate["row"]["payload_bytes"] or hashlib.sha256(row["payload_json"].encode()).hexdigest() != candidate["payload_sha256"]:
+                raise ObservationScheduleRetentionError("PLAN_STALE_CANDIDATE")
+        _archive_candidate_matches(candidate)
+        if index < offset:
+            actual = json.loads(row["payload_json"])
+            effect_hashes = json.loads(progress[1]).get("effect_hashes", {}) if progress else {}
+            effect = effect_hashes.get(f"{table}:{rowid}")
+            if effect and _hash({**row,"payload_bytes":size[0]}) != effect:
+                raise ObservationScheduleRetentionError("PLAN_STALE_CANDIDATE_AFTER_EFFECT")
+            reason, retirements = _protect(store, row, table, old_policy, now)
+            if reason or [_hash(item) for item in retirements] != candidate["retirement_sha256"]:
+                raise ObservationScheduleRetentionError("PLAN_STALE_CANDIDATE_AFTER_EFFECT")
+            proof = candidate["archive_proofs"][0]
+            with _sqlite_connection(Path(proof["archive_path"]).as_uri()+"?mode=ro&immutable=1", uri=True) as archived:
+                source = json.loads(archived.execute(f"SELECT payload_json FROM {table} WHERE rowid=?", (rowid,)).fetchone()[0])
+            expected = compact_payload(source, compacted_at=actual.get("raw_payload_compacted_at"),
+                archive_locator={"archive_sha256": proof["archive_sha256"], "source_rowid": rowid,
+                    "plan_id": plan["plan_id"], "archive_locator": retirements[0].get("archive_locator", "COLD_ARCHIVE_OPERATOR_INDEX")},
+                retire_entities=all(r.get("retire_entities") is True for r in retirements))
+            if table == "poll_slots":
+                expected["poll_slot_retention"] = COMPACTION_MARKER
+            if actual != expected:
+                raise ObservationScheduleRetentionError("PLAN_STALE_CANDIDATE_AFTER_EFFECT")
+    history = json.loads(progress[1]) if progress else {}
+    history.update(state="SUPERSEDED_POLICY", superseded_at=render_utc(now),
+        previous_policy_sha256=plan["policy_sha256"], approved_policy_sha256=approved_policy_sha256,
+        abandoned_candidates=len(candidates)-offset)
+    store._conn.execute("INSERT INTO retention_progress VALUES(?,?,?) ON CONFLICT(plan_id) DO UPDATE SET payload_json=excluded.payload_json",
+        (plan["plan_id"], offset, _json(history)))
+    store._conn.execute("DELETE FROM retention_control WHERE control_key='active_plan'")
+    state = _control(store, "maintenance", {})
+    state.update(state="YIELD", last_reason="POLICY_RECONCILED", active_plan_id=None,
+        superseded_plan_id=plan["plan_id"], next_cursor={"call_ledger":0, "poll_slots":0}, archive_discovery=[])
+    state.pop("last_run_at", None)
+    _set_control(store, "maintenance", state)
+    return True
+
+
 def install_maintenance_policy(store: ObservationScheduleStore, *, policy: Mapping[str, Any],
                                approved_sha256: str, now: datetime) -> dict[str, Any]:
     validate_policy(policy)
@@ -269,9 +358,13 @@ def install_maintenance_policy(store: ObservationScheduleStore, *, policy: Mappi
     if lease is None:
         raise ObservationScheduleRetentionError("WRITER_BUSY")
     try:
+        store._conn.execute("BEGIN IMMEDIATE")
+        store._require_write_lease(now, within_transaction=True)
         previous = _control(store, "policy")
         if previous and policy != previous["policy"] and int(policy["revision"]) <= int(previous["policy"]["revision"]):
             raise ObservationScheduleRetentionError("POLICY_REVISION_NOT_MONOTONIC")
+        _check_frozen_lower_bounds(store, policy)
+        _supersede_stale_policy_plan(store, approved_policy_sha256=approved_sha256, now=now)
         _set_control(store, "policy", {"policy": dict(policy), "approved_policy_sha256": approved_sha256})
         # Explicit commissioning, never startup, owns these consumer indices.
         store._conn.execute("CREATE INDEX IF NOT EXISTS idx_due_retention_occurrence ON due_observations(call_occurrence_id)")
@@ -282,6 +375,9 @@ def install_maintenance_policy(store: ObservationScheduleStore, *, policy: Mappi
             for kind, prefix in (("source", "$.sources"), ("recovery", "$.recovery_plan.frame_receipt.sources")):
                 store._conn.execute(f"CREATE INDEX IF NOT EXISTS idx_round_retention_{kind}_{number} ON episode_rounds(json_extract(frame_json,'{prefix}[{number}].call_occurrence_id'))")
         store._conn.commit()
+    except Exception:
+        store._conn.rollback()
+        raise
     finally:
         store.release_lease(lease)
     return {"status": "POLICY_INSTALLED", "enabled": policy["enabled"], "approved_policy_sha256": approved_sha256}
@@ -1047,15 +1143,27 @@ def apply_retirement_plan(store: ObservationScheduleStore, *, plan: Mapping[str,
         return {"status": "YIELD", "reason": "WRITER_BUSY", "plan_id": plan_id}
     calls = polls = count = size = 0
     try:
+        installed = _control(store, "policy")
+        if not installed or installed["approved_policy_sha256"] != plan["policy_sha256"] or installed["policy"] != policy:
+            raise ObservationScheduleRetentionError("PLAN_STALE_POLICY")
         # Read durable progress only under the lease: concurrent retries cannot
         # use an offset read before another admitted chunk committed.
-        progress = store._conn.execute("SELECT next_candidate FROM retention_progress WHERE plan_id=?", (plan_id,)).fetchone()
+        progress = store._conn.execute("SELECT next_candidate,payload_json FROM retention_progress WHERE plan_id=?", (plan_id,)).fetchone()
         offset = int(progress[0]) if progress else 0
+        effect_hashes = json.loads(progress[1]).get("effect_hashes", {}) if progress else {}
         for applied in plan["candidates"][:offset]:
             table = applied["table"]
             check = store._conn.execute(f"SELECT json_extract(payload_json,'$.raw_payload_retention'),json_extract(payload_json,'$.retirement_archive.plan_id') FROM {table} WHERE rowid=?", (applied["row"]["source_rowid"],)).fetchone()
             if check is None or check[0] != COMPACTION_MARKER or check[1] != plan_id:
                 raise ObservationScheduleRetentionError("PLAN_STALE_CANDIDATE_AFTER_EFFECT")
+            expected_effect = effect_hashes.get(f"{table}:{applied['row']['source_rowid']}")
+            if expected_effect:
+                metadata_size = store._conn.execute(f"SELECT length(CAST(payload_json AS BLOB)) FROM {table} WHERE rowid=?", (applied["row"]["source_rowid"],)).fetchone()[0]
+                if metadata_size > int(policy["max_bytes"]) + len(_json(plan).encode()) + 2048:
+                    raise ObservationScheduleRetentionError("PLAN_STALE_CANDIDATE_AFTER_EFFECT")
+                actual_effect = dict(store._conn.execute(f"SELECT rowid AS source_rowid,* FROM {table} WHERE rowid=?", (applied["row"]["source_rowid"],)).fetchone())
+                if _hash({**actual_effect,"payload_bytes":metadata_size}) != expected_effect:
+                    raise ObservationScheduleRetentionError("PLAN_STALE_CANDIDATE_AFTER_EFFECT")
         for index, candidate in enumerate(plan["candidates"][offset:], start=offset):
             candidate = {**candidate, "archive_proofs": [proofs[p] if isinstance(p, str) else p for p in candidate["archive_proofs"]]}
             if count >= int(policy["max_rows"]) or size + candidate["row"]["payload_bytes"] + int(candidate.get("dependency_bytes", 0)) > int(policy["max_bytes"]) or time.monotonic() - started >= float(policy["max_wall_seconds"]):
@@ -1094,9 +1202,11 @@ def apply_retirement_plan(store: ObservationScheduleStore, *, plan: Mapping[str,
                     retire_entities=all(r.get("retire_entities") is True for r in retirements))
                 if table == "poll_slots":
                     compacted["poll_slot_retention"] = COMPACTION_MARKER
-                store._conn.execute(f"UPDATE {table} SET payload_json=? WHERE rowid=?", (_json(compacted), rowid))
+                compacted_json = _json(compacted)
+                store._conn.execute(f"UPDATE {table} SET payload_json=? WHERE rowid=?", (compacted_json, rowid))
                 store._conn.execute("DELETE FROM retention_control WHERE control_key=?", (f"refusal:{table}:{rowid}",))
-                store._conn.execute("INSERT INTO retention_progress VALUES(?,?,?) ON CONFLICT(plan_id) DO UPDATE SET next_candidate=excluded.next_candidate,payload_json=excluded.payload_json", (plan_id, index + 1, _json({"next_cursor": plan["next_cursor"], "updated_at": render_utc(now)})))
+                effect_hashes[f"{table}:{rowid}"] = _hash({**actual,"payload_json":compacted_json,"payload_bytes":len(compacted_json.encode())})
+                store._conn.execute("INSERT INTO retention_progress VALUES(?,?,?) ON CONFLICT(plan_id) DO UPDATE SET next_candidate=excluded.next_candidate,payload_json=excluded.payload_json", (plan_id, index + 1, _json({"next_cursor": plan["next_cursor"], "updated_at": render_utc(now), "effect_hashes":effect_hashes})))
                 store._conn.commit()
                 count += 1
                 size += actual["payload_bytes"] + int(candidate.get("dependency_bytes", 0))
@@ -1217,6 +1327,35 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
     if reason:
         return {"status": "YIELD", "reason": reason, **retention_status(store)}
     plan = _control(store, "active_plan")
+    if plan and plan.get("policy_sha256") != installed["approved_policy_sha256"]:
+        # Upgrade recovery for a policy installed by a previous binary. The
+        # same strict check as commissioning runs once under the native fence;
+        # arbitrary candidate/integrity failures never trigger replanning.
+        lease = store.acquire_lease("i2-policy-plan-reconcile", clock=now)
+        if lease is None:
+            return {"status": "YIELD", "reason": "WRITER_BUSY"}
+        try:
+            store._conn.execute("BEGIN IMMEDIATE")
+            store._require_write_lease(now, within_transaction=True)
+            current = _control(store, "policy")
+            if current != installed:
+                store._conn.rollback()
+                return {"status": "YIELD", "reason": "POLICY_CHANGED"}
+            _supersede_stale_policy_plan(store, approved_policy_sha256=installed["approved_policy_sha256"], now=now)
+            store._conn.commit()
+            plan = _control(store, "active_plan")
+            state = _control(store, "maintenance", {})
+        except ObservationScheduleRetentionError as exc:
+            store._conn.rollback()
+            _set_control(store, "maintenance", {**state, "state":"FAILED", "last_reason":str(exc),
+                "last_run_at":render_utc(now), "active_plan_id":plan["plan_id"]})
+            store._conn.commit()
+            return {"status":"FAILED", "reason":str(exc), "plan_id":plan["plan_id"]}
+        except Exception:
+            store._conn.rollback()
+            raise
+        finally:
+            store.release_lease(lease)
     if plan is None:
         plan = build_retirement_plan(store, now=now, policy=effective, after=state.get("next_cursor"))
         lease = store.acquire_lease("i2-maintenance-plan", clock=now)
@@ -1436,6 +1575,34 @@ def _write_intent(path: Path, payload: Mapping[str, Any]) -> None:
         stream.flush()
         os.fsync(stream.fileno())
     os.replace(temporary, path)
+    _fsync_directory(path.parent)
+
+
+def _fsync_directory(path: Path) -> None:
+    # Windows does not expose POSIX directory fsync. File fsync + replace still
+    # applies there; on POSIX the directory entry must survive a power loss too.
+    if os.name != "nt":
+        descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+        try:
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+
+
+def _reclaim_replace(source: Path, target: Path) -> None:
+    os.replace(source, target)
+    _fsync_directory(target.parent)
+
+
+def _reclaim_unlink(path: Path) -> int:
+    if not path.exists():
+        return 0
+    if path.is_symlink() or not path.is_file():
+        raise ObservationScheduleRetentionError("RECLAIM_STAGING_BINDING_INVALID")
+    size = path.stat().st_size
+    path.unlink()
+    _fsync_directory(path.parent)
+    return size
 
 
 def apply_physical_reclaim(store: ObservationScheduleStore, *, plan: Mapping[str, Any],
@@ -1481,7 +1648,10 @@ def _apply_physical_reclaim(store: ObservationScheduleStore, *, plan: Mapping[st
         raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_SOURCE_MISMATCH")
     path = store.path
     compact, rollback, intent_path = _reclaim_paths(path)
-    if any(p.exists() for p in (compact, rollback, intent_path)):
+    # A small terminal receipt may be replaced by the next exact operation;
+    # unfinished stages always remain owned by recovery.
+    previous = json.loads(intent_path.read_text(encoding="utf-8")) if intent_path.exists() else None
+    if compact.exists() or rollback.exists() or (previous and previous.get("state") not in {"FINALIZED", "ROLLBACK_FINALIZED"}):
         raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_REQUIRED")
     if shutil.disk_usage(path.parent).free < int(plan["required_free_bytes"]):
         raise ObservationScheduleRetentionError("RECLAIM_CAPACITY_REFUSED")
@@ -1491,7 +1661,14 @@ def _apply_physical_reclaim(store: ObservationScheduleStore, *, plan: Mapping[st
         raise ObservationScheduleRetentionError("WRITER_BUSY")
     attached = False
     closed = False
+    intent = {"schema": "smial.observation-reclaim-intent.v1", "state": "ALLOCATING", "plan_id": plan_id,
+              "fingerprint": plan["fingerprint"], "source": plan["source"],
+              "data_root_binding": plan["data_root_binding"], "lease_token": lease,
+              "before_bytes": path.stat().st_size}
     try:
+        # Reboot guards must exist before ATTACH can allocate any new DB bytes.
+        store._reclaim_guard_token = lease
+        _write_intent(intent_path, intent)
         store._conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
         store._conn.execute("ATTACH DATABASE ? AS reclaimed", (str(compact),))
         attached = True
@@ -1534,9 +1711,9 @@ def _apply_physical_reclaim(store: ObservationScheduleStore, *, plan: Mapping[st
         with _sqlite_connection(compact) as verify:
             if verify.execute("PRAGMA integrity_check").fetchone()[0] != "ok" or native_identity_fingerprint(verify, deadline=started + float(plan["max_wall_seconds"])) != fingerprint:
                 raise ObservationScheduleRetentionError("RECLAIM_IDENTITY_MISMATCH")
-        intent = {"schema": "smial.observation-reclaim-intent.v1", "state": "PREPARED", "plan_id": plan_id,
-                  "fingerprint": fingerprint, "source": plan["source"], "data_root_binding": plan["data_root_binding"],
-                  "lease_token": lease, "before_bytes": path.stat().st_size, "after_bytes": compact.stat().st_size}
+        with compact.open("r+b") as durable_compact:
+            os.fsync(durable_compact.fileno())
+        intent.update(state="PREPARED", after_bytes=compact.stat().st_size, compact_binding=_root_binding(compact))
         _write_intent(intent_path, intent)
         if failpoint == "PREPARED":
             raise ObservationScheduleRetentionError("RECLAIM_INJECTED_CRASH")
@@ -1545,12 +1722,12 @@ def _apply_physical_reclaim(store: ObservationScheduleStore, *, plan: Mapping[st
         closed = True
         if any(Path(str(path) + suffix).exists() and Path(str(path) + suffix).stat().st_size for suffix in ("-wal",)):
             raise ObservationScheduleRetentionError("RECLAIM_WRITER_STILL_OPEN")
-        os.replace(path, rollback)
+        _reclaim_replace(path, rollback)
         intent["state"] = "ORIGINAL_MOVED"
         _write_intent(intent_path, intent)
         if failpoint == "ORIGINAL_MOVED":
             raise ObservationScheduleRetentionError("RECLAIM_INJECTED_CRASH")
-        os.replace(compact, path)
+        _reclaim_replace(compact, path)
         intent["state"] = "SWITCHED"
         _write_intent(intent_path, intent)
         if failpoint == "SWITCHED":
@@ -1565,10 +1742,17 @@ def _apply_physical_reclaim(store: ObservationScheduleStore, *, plan: Mapping[st
             if attached:
                 store._conn.execute("DETACH DATABASE reclaimed")
             store.release_lease(lease)
-        # Intent means recovery owns staging; before intent creation cleanup is
-        # bounded to the exact sibling file this invocation created.
-        if not intent_path.exists() and compact.exists():
-            compact.unlink()
+        # A handled allocation failure never renamed the source. A process death
+        # cannot execute this cleanup: its durable ALLOCATING intent owns retry.
+        if intent["state"] == "ALLOCATING" and not rollback.exists():
+            for suffix in ("", "-journal", "-wal", "-shm"):
+                _reclaim_unlink(Path(str(compact) + suffix))
+            _reclaim_unlink(intent_path.with_suffix(intent_path.suffix + ".tmp"))
+            if previous is None:
+                _reclaim_unlink(intent_path)
+            else:
+                _write_intent(intent_path, previous)
+        store._reclaim_guard_token = None
         raise
 
 
@@ -1576,37 +1760,110 @@ def recover_physical_reclaim(path: Path, *, data_root: Path, action: str,
                              approved_plan_sha256: str) -> dict[str, Any]:
     compact, rollback, intent_path = _reclaim_paths(path)
     intent = json.loads(intent_path.read_text(encoding="utf-8"))
-    if intent["plan_id"] != approved_plan_sha256 or _root_binding(data_root) != intent["data_root_binding"]:
+    if (intent.get("schema") != "smial.observation-reclaim-intent.v1"
+            or intent["plan_id"] != approved_plan_sha256
+            or _root_binding(data_root) != intent["data_root_binding"]
+            or _root_binding(path.parent) != intent["source"]["root_binding"]):
         raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_IDENTITY_MISMATCH")
     if action not in {"rollback", "resume"}:
         raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_ACTION_INVALID")
-    if intent["state"] == "RESUMED":
-        if action == "rollback":
-            raise ObservationScheduleRetentionError("RECLAIM_ROLLBACK_AFTER_RESUME_DENIED")
-        with _sqlite_connection(path) as connection:
-            connection.execute("DELETE FROM scheduler_leases WHERE lease_token=?", (intent["lease_token"],))
-        return {"status": "RESUMED", "idempotent": True}
-    # A crash may fall between either rename and its intent update.
-    switched = path.exists() and rollback.exists() and not compact.exists()
-    if path.exists():
-        with _sqlite_connection(path.as_uri() + "?mode=ro", uri=True) as current:
+    state = intent["state"]
+    if state in {"RESUMED", "FINALIZED"} and action == "rollback":
+        raise ObservationScheduleRetentionError("RECLAIM_ROLLBACK_AFTER_RESUME_DENIED")
+    if state in {"ROLLING_BACK", "ROLLED_BACK", "ROLLBACK_FINALIZED"} and action == "resume":
+        raise ObservationScheduleRetentionError("RECLAIM_RESUME_AFTER_ROLLBACK_DENIED")
+    if state in {"FINALIZED", "ROLLBACK_FINALIZED"}:
+        if not path.is_file() or _root_binding(path) != intent.get("final_db_binding"):
+            raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_IDENTITY_MISMATCH")
+        if any(item.exists() for item in (compact, rollback)):
+            raise ObservationScheduleRetentionError("RECLAIM_STAGING_BINDING_INVALID")
+        return {"status": "RESUMED" if state == "FINALIZED" else "ROLLED_BACK",
+                "plan_id": intent["plan_id"], "idempotent": True,
+                "rollback_allowed": False, "byte_disposition": intent["byte_disposition"]}
+    if state not in {"ALLOCATING", "PREPARED", "ORIGINAL_MOVED", "SWITCHED", "RESUMED", "ROLLING_BACK", "ROLLED_BACK"}:
+        raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_STATE_INVALID")
+
+    def verify(candidate: Path, expected_binding: Mapping[str, int] | None = None) -> None:
+        if candidate.is_symlink() or not candidate.is_file():
+            raise ObservationScheduleRetentionError("RECLAIM_FINAL_CURRENT_ROLLBACK_MISSING")
+        if expected_binding is not None and _root_binding(candidate) != expected_binding:
+            raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_IDENTITY_MISMATCH")
+        # Recovery is the only narrow writer bypass. Validation itself is ro,
+        # WAL-aware, and cannot create the missing native source.
+        with _sqlite_connection(candidate.as_uri() + "?mode=ro", uri=True) as current:
             if native_identity_fingerprint(current) != intent["fingerprint"]:
                 raise ObservationScheduleRetentionError("RECLAIM_NEW_WRITES_FORWARD_REPAIR_REQUIRED")
-    if action == "rollback":
-        if rollback.exists():
-            if path.exists():
-                os.replace(path, compact)
-            os.replace(rollback, path)
-        elif not path.exists():
-            raise ObservationScheduleRetentionError("RECLAIM_FINAL_CURRENT_ROLLBACK_MISSING")
-        intent["state"] = "ROLLED_BACK"
-        _write_intent(intent_path, intent)
-    elif not switched:
-        raise ObservationScheduleRetentionError("RECLAIM_SWITCH_INCOMPLETE")
+
+    # Infer each rename from actual inode identities too: the process can die
+    # before the corresponding durable state update.
+    if path.exists():
+        verify(path)
+    if rollback.exists():
+        verify(rollback, intent["source"]["db_binding"])
+    elif not path.exists():
+        raise ObservationScheduleRetentionError("RECLAIM_FINAL_CURRENT_ROLLBACK_MISSING")
+    if action == "resume":
+        if state != "RESUMED":
+            if compact.exists():
+                if state == "ALLOCATING":
+                    raise ObservationScheduleRetentionError("RECLAIM_SWITCH_INCOMPLETE_USE_ROLLBACK")
+                verify(compact, intent.get("compact_binding"))
+                if path.exists():
+                    if rollback.exists():
+                        raise ObservationScheduleRetentionError("RECLAIM_STAGING_BINDING_INVALID")
+                    verify(path, intent["source"]["db_binding"])
+                    _reclaim_replace(path, rollback)
+                    intent["state"] = "ORIGINAL_MOVED"
+                    _write_intent(intent_path, intent)
+                _reclaim_replace(compact, path)
+                intent["state"] = "SWITCHED"
+                _write_intent(intent_path, intent)
+            elif not (path.exists() and rollback.exists()):
+                raise ObservationScheduleRetentionError("RECLAIM_SWITCH_INCOMPLETE_USE_ROLLBACK")
+            verify(path, intent.get("compact_binding"))
+            intent["state"] = "RESUMED"
+            _write_intent(intent_path, intent)
     else:
-        intent["state"] = "RESUMED"
-        _write_intent(intent_path, intent)
-    # Release the exact persisted fence only after durable recovery decision.
-    with _sqlite_connection(path) as connection:
+        if state != "ROLLED_BACK":
+            intent["state"] = "ROLLING_BACK"
+            _write_intent(intent_path, intent)
+            if rollback.exists():
+                if path.exists():
+                    if compact.exists():
+                        raise ObservationScheduleRetentionError("RECLAIM_STAGING_BINDING_INVALID")
+                    _reclaim_replace(path, compact)
+                _reclaim_replace(rollback, path)
+            verify(path, intent["source"]["db_binding"])
+            intent["state"] = "ROLLED_BACK"
+            _write_intent(intent_path, intent)
+    # Durable acceptance forbids rollback before releasing the fence or any
+    # original bytes. Ordinary native writes stay blocked until final cleanup.
+    with _sqlite_connection(path.as_uri() + "?mode=rw", uri=True) as connection:
         connection.execute("DELETE FROM scheduler_leases WHERE lease_token=?", (intent["lease_token"],))
-    return {"status": intent["state"], "plan_id": intent["plan_id"], "rollback_allowed": False}
+    if "cleanup_files" not in intent:
+        disposition = {"rollback_bytes_released": 0, "staging_bytes_released": 0}
+        cleanup_files = []
+        for candidate, key in ((rollback, "rollback_bytes_released"), (compact, "staging_bytes_released")):
+            for suffix in ("", "-journal", "-wal", "-shm"):
+                item = Path(str(candidate) + suffix)
+                if item.exists():
+                    cleanup_files.append({"name": item.name, "binding": _archive_binding(item)})
+                    disposition[key] += item.stat().st_size
+        intent.update(cleanup_files=cleanup_files, byte_disposition=disposition)
+        _write_intent(intent_path, intent)
+    disposition = intent["byte_disposition"]
+    allowed_cleanup = {Path(str(candidate) + suffix).name for candidate in (compact, rollback)
+                       for suffix in ("", "-journal", "-wal", "-shm")}
+    for entry in intent["cleanup_files"]:
+        if entry["name"] not in allowed_cleanup:
+            raise ObservationScheduleRetentionError("RECLAIM_STAGING_BINDING_INVALID")
+        item = path.parent / entry["name"]
+        if item.exists() and _archive_binding(item) != entry["binding"]:
+            raise ObservationScheduleRetentionError("RECLAIM_STAGING_BINDING_INVALID")
+        _reclaim_unlink(item)
+    _reclaim_unlink(intent_path.with_suffix(intent_path.suffix + ".tmp"))
+    intent.update(state="FINALIZED" if action == "resume" else "ROLLBACK_FINALIZED",
+                  final_db_binding=_root_binding(path), byte_disposition=disposition)
+    _write_intent(intent_path, intent)
+    return {"status": "RESUMED" if action == "resume" else "ROLLED_BACK", "plan_id": intent["plan_id"],
+            "rollback_allowed": False, "byte_disposition": disposition}

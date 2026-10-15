@@ -92,12 +92,12 @@ def main() -> int:
         elif args.mode == "copy-newest":
             receipt = copy_offhost_backup(root, deploy_git_sha=_git_sha(root))
         else:
-            from solana_alpha_lab.factory.offhost_backup import run_offhost_checkpoint
+            from solana_alpha_lab.factory.offhost_backup import run_scheduled_offhost_checkpoint
 
-            receipt = run_offhost_checkpoint(
+            receipt = run_scheduled_offhost_checkpoint(
                 root, mode=args.mode, deploy_git_sha=_git_sha(root)
             )
-            if receipt.get("terminal") != "DEFERRED":
+            if receipt.get("terminal") not in {"DEFERRED", "COPY_FAILED"} and not receipt.get("scheduled_coalesced"):
                 # The checkpoint owner has released its backup-plane lock. The
                 # native policy is default-off; optional failure cannot discard
                 # the successful independent backup.
@@ -112,7 +112,7 @@ def main() -> int:
                         "status": "FAILED", "reason": "OPTIONAL_MAINTENANCE_FAILED"
                     }
         print(json.dumps(receipt, indent=2, sort_keys=True, default=str))
-        return 0
+        return 2 if receipt.get("terminal") in {"DEFERRED", "COPY_FAILED"} else 0
     except (OffhostBackupError, RemoteOpsError) as exc:
         print(
             json.dumps({"error": str(exc), "terminal": "COPY_FAILED"}, indent=2, sort_keys=True)

@@ -160,12 +160,21 @@ events и open publication dependencies. Captured SQLite sidecars не паку�
 Reader принимает legacy STORED full вместе с новыми DEFLATE deltas; проверяет
 actual extracted inventory каждого шага, затем final inventory, затем ставит
 unresolved restore marker. Восстановленный collector требует reconciliation.
+Для actual legacy mutable-only full без authority/state ResearchEvents final
+control closure проверяется после новой delta, не раньше. Неполный standalone
+full или final missing event отказывается без marker; old bytes не переписываются.
 
 Offhost caller сохраняет immutable pending operation: после unknown upload
 следующий запуск продолжает те же bytes и checkpoint. Last-good и failed attempt
 показываются отдельно. CURRENT считается от snapshot data-as-of, а не от конца
 upload; baseline revision 1 остаётся 24h. Revision 2 требует совместных 30h
 CURRENT и RPO, но не редактирует APPLIED profile. Unknown/живой lock не снимать.
+Штатный caller сам повторяет busy до120min с шагом30s; weekly/daily overlap
+принимает один проверенный новый checkpoint без второго capture/upload.
+Исчерпание — exit2/COPY_FAILED/OFFHOST_BUSY_RETRY_EXHAUSTED с exact resume,
+last-good сохраняется. Actual unit/drop-in timeouts проверяются при OPERATE;
+retry не продлевает RPO и freshness. Два bounded scheduler incident receipts
+находятся рядом с существующим receipt.
 `BACKUP_SNAPSHOT_STAGING_RECOVERY_REQUIRED` означает сохранённый staging с
 неподтверждённым владельцем: inspect exact owner/bytes в отдельном recovery scope,
 не удалять каталог вслепую. Known-dead owned capture восстанавливает обычный caller.
@@ -176,3 +185,10 @@ checkpoint closure в новый явно выделенный isolated root. Re
 в plan hash; отдельный apply повторяет raw reconstruction/SQLite oracle и
 remote identity. Удаление требует dedicated explicit permission. Для prune
 учитывать дополнительную временную raw copy внутри owned `.prune-verify`.
+
+Reclaim пишет durable ALLOCATING intent до new DB; ordinary native writable
+opens/ticks и уже открытые writers отказывают при unfinished recovery до записи
+или bootstrap исчезнувшего main. Exact `reclaim-resume`/`reclaim-rollback`
+выполняются по staged OPERATE. После durable resume decision rollback запрещён;
+повтор resume заканчивает owned cleanup и оставляет небольшой FINALIZED receipt,
+удаляя точные rollback/staging bytes. Не удалять intent/staging вручную.

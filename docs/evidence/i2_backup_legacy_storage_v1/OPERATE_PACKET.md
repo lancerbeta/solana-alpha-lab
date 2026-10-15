@@ -37,10 +37,28 @@ cd /opt/solana-alpha-lab
 uv run --locked --managed-python python -B scripts/factory_offhost_backup_copy.py --mode daily
 ```
 
-При `DEFERRED` не снимать чужой lock. При failed/unknown upload следующий запуск
-продолжает тот же pending operation/ZIP; ручное удаление intent запрещено.
+Штатный daily/weekly caller автоматически повторяет `WRITER_BUSY` с шагом 30s
+в пределах 120 минут ожидания. Это покрывает известный weekly upload до 110 минут
+при weekly00:30/daily00:45 UTC, сохраняя прежние timers, transport budget и
+RPO24h. Capture/upload время считаются отдельно; постоянный CURRENT не обещается.
+Ожидающий daily проверяет actual bytes нового завершённого weekly checkpoint и
+durable pointer и принимает его без второго capture/upload. Pending operation
+всегда продолжается с прежними identity/ZIP. Чужой lock не снимать.
+При исчерпании — exit2, `COPY_FAILED / OFFHOST_BUSY_RETRY_EXHAUSTED` и точный
+resume argv/pending SHA в одном из двух ограниченных scheduler receipts рядом
+с existing receipt. Last-good сохраняется; последующее завершение active owner
+снимает incident. До install проверить actual unit/drop-in timeout и cadence.
+При failed/unknown upload следующий запуск продолжает тот же pending
+operation/ZIP; ручное удаление intent запрещено.
 Проверить реальные entry compression, logical inventory, snapshot/start/upload/
 verify clocks, actual attempted/verified upload bytes и last-good/attempt health.
+
+Исторический mutable-only full от producer `b3fb9d8…` может не содержать control
+ResearchEvents. Новый reader проверяет hashes/membership каждого raw звена, но
+final control closure — после всех deltas. Upgrade сохраняет old bytes/hashes;
+обычный новый daily доставляет closure. Приёмка ниже обязана восстановить actual
+legacy full + новую delta. Неполный standalone full или final missing event
+получает отказ без marker; один STORED-repack нового I2 full это не доказывает.
 
 Первоначальная независимая приёмка использует точный скачанный checkpoint JSON
 и **новый** явно выделенный isolated root с учтённым filesystem peak:
@@ -115,7 +133,8 @@ real data_root device/inode и следующий native writer. В production O
    rebuild сохраняет implicit ROWID, sequences, schema/indices и all row values.
 5. При interrupted switch использовать `reclaim-resume`/`reclaim-rollback` с
    exact plan identity при остановленных writers. Возврат old DB допустим лишь
-   до resume/new writes. После новых admissions — forward repair/reconciliation.
+   до durable resume decision. После неё — forward recovery того же решения;
+   old rollback запрещён, даже если cleanup был прерван до возврата services.
 6. Проверить source/control/accounting/root bindings и восстановить прежние
    services/timers. Подтвердить штатный tick → SEARCH → publication, source
    clocks, calls/debits и coverage/gaps. Никакого backfill новыми market calls.
@@ -172,17 +191,40 @@ uv run --locked --managed-python python -B scripts/observation_schedule_retentio
   --approved-sha256 "$APPROVED_RECLAIM_PLAN_SHA256" --i-understand-apply
 ```
 
-Только после успешного resume возвращаются prior services/timers и проверяется
-следующий native writer. До resume и любых новых записей rollback доступен тем же
-CLI `reclaim-rollback` с exact roots/hash и explicit apply flag. После новых
-записей rollback запрещён; forward repair/reconciliation, сохраняющий current.
+`reclaim-resume` самостоятельно проверяет native fingerprint и file identities,
+durably фиксирует необратимое решение, удаляет только точные owned rollback/new
+DB и их sidecars по сохранённому cleanup manifest и завершает `FINALIZED`.
+Квитанция содержит actual byte disposition; небольшой terminal intent остаётся,
+старые DB не образуют бессрочный HOT-хвост. Повтор того же resume после interruption
+дозавершает cleanup идемпотентно. После rollback аналогичный terminal —
+`ROLLBACK_FINALIZED`. Unknown/changed staging не удаляется.
+
+Следующий backup повторно проверяет тот же native reclaim guard перед selection,
+writer fences и SQLite capture. Unfinished intent, orphan staging либо чужой
+terminal inode дают `BACKUP_RECLAIM_RECOVERY_REQUIRED` до capture/ZIP. Проверенная
+terminal квитанция привязана к inode этого host и в portable payload не входит;
+исключение не разрешает пропустить произвольный файл. В production acceptance
+после finalized reclaim включить ordinary backup → independent restore → native
+reconciliation → следующий writer с сохранением UUID/ROWID/sequence/counters.
+
+Durable `ALLOCATING` intent записывается до выделения new DB. Native writable
+entrypoints, включая reboot collector tick и уже открытые writers, проверяют
+reclaim guard до SQLite creation/mutation. При незавершённом switch они получают
+`RECLAIM_RECOVERY_REQUIRED`; исчезнувший existing source не bootstrap-ится.
+Это техническая блокировка до exact recovery, без изменения RUN/profile/grants.
+Только после successful finalized resume возвращаются prior services/timers и
+проверяется следующий native writer. До resume rollback доступен тем же CLI
+`reclaim-rollback` с exact roots/hash и explicit apply flag. После новых записей
+нельзя откатить old DB; forward repair сохраняет current.
 
 | Durable phase после interruption | Допустимый следующий шаг при quiesced writers |
 |---|---|
-| PREPARED | exact rollback; исходная БД остаётся current |
-| ORIGINAL_MOVED | exact rollback возвращает final-current original; не запускать writers |
-| SWITCHED | read-only invariants → resume либо exact rollback до новых записей |
-| resumed / есть новые записи | forward repair; old rollback не применять |
+| ALLOCATING / owned incomplete new | exact rollback; original current, unfinished new удаляется только после проверки ownership |
+| PREPARED | exact resume завершает switch либо exact rollback сохраняет original |
+| между rename и intent update / ORIGINAL_MOVED | exact recovery определяет phase по inode identities; resume либо rollback |
+| SWITCHED | read-only invariants → resume либо exact rollback |
+| RESUMED / cleanup interrupted | только тот же resume; native writers всё ещё заблокированы, cleanup дозавершается |
+| FINALIZED / есть новые записи | writers разрешены; old rollback запрещён, small receipt сохраняется |
 
 Recurring policy разрешает конкретные legacy scopes и/или managed lineages,
 classes, terminal retirement conditions, реальные frozen minimum ages,
@@ -190,6 +232,15 @@ source/cold proofs, max rows/bytes/wall/cadence, pressure/due/restore fences,
 retained restore points и pause/resume. Её hash/revision утверждаются один раз;
 будущие children проходят те же source-owned predicates автоматически. Нет
 ежедневного списка IDs, ручного агента или `record-backup`.
+
+Изменение policy требует нового approved SHA и монотонной revision. Install
+атомарно проверяет старый bounded intent, candidates, cold proofs и выполненные
+effects; сохраняет прежний progress как `SUPERSEDED_POLICY` и original provenance/
+ROWIDs/pins, отменяет только неприменённый остаток и перезапускает bounded scan по
+новой policy. Disable → enable не применяет старый remainder. Ordinary caller
+также восстанавливает stale plan, оставленный предыдущим бинарником. Настоящий
+candidate/archive/effect conflict остаётся FAILED/refusal; автоматического
+пересоздания вокруг него нет. Возраст, clocks и approvals не сбрасываются.
 
 Caller — existing daily/weekly offhost backup command после завершения checkpoint;
 native maintenance вновь берёт backup-plane lock до OPS fence и уступает due,

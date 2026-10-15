@@ -43,6 +43,11 @@ RECEIPT_SCHEMA = "smial.factory-offhost-backup-receipt"
 RECEIPT_SCHEMA_VERSION = "1.1"
 CHECKPOINT_SCHEMA = "smial.factory-offhost-recovery-checkpoint"
 CHECKPOINT_SCHEMA_VERSION = "1.0"
+# Weekly Sun 00:30 and daily 00:45 share a lock; the measured existing full
+# upload takes up to 110 min. Allow 120 min of contention, independently of
+# capture/upload time. This does not extend the approved 24 h data-age limit.
+SCHEDULED_BUSY_RETRY_BUDGET_SECONDS = 120 * 60
+SCHEDULED_BUSY_RETRY_INTERVAL_SECONDS = 30
 DEFAULT_RCLONE_BIN = "/usr/bin/rclone"
 OFFHOST_REMOTE = "GOOGLE_DRIVE"
 SUCCESS_TERMINALS = frozenset(
@@ -222,11 +227,44 @@ def _attempt_path(root: Path, config: OffhostConfig) -> Path:
 
 
 def read_offhost_attempt(root: Path, config: OffhostConfig) -> dict[str, Any] | None:
-    try:
-        payload = json.loads(_attempt_path(root, config).read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return None
-    return payload if isinstance(payload, dict) else None
+    # A caller can exhaust its wait while another process still owns the backup
+    # lock. Its per-mode incident must not race that owner's receipt temp file.
+    paths = [_attempt_path(root, config)] + [
+        _scheduled_incident_path(root, config, mode) for mode in ("daily", "weekly")
+    ]
+    selected = None
+    selected_at = datetime.min.replace(tzinfo=UTC)
+    primary = None
+    for path in paths:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(payload, dict):
+                continue
+            stamp = next((payload[key] for key in ("failed_at", "verified_at", "observed_at", "attempt_started_at")
+                          if payload.get(key)), "")
+            observed = datetime.fromisoformat(stamp.replace("Z", "+00:00")) if stamp else datetime.min.replace(tzinfo=UTC)
+            if observed.tzinfo is None:
+                continue
+        except (OSError, json.JSONDecodeError, TypeError, ValueError, AttributeError):
+            continue
+        # The backup owner's success wins a same-second tie, so a later commit
+        # resolves the incident even on the existing second-resolution clocks.
+        if selected is None or observed > selected_at:
+            selected, selected_at = payload, observed
+        if path == paths[0]:
+            primary = payload
+    if (primary and primary.get("terminal") in CHECKPOINT_TERMINALS and selected
+            and selected.get("failure_code") == "OFFHOST_BUSY_RETRY_EXHAUSTED"
+            and primary.get("checkpoint_filename")
+            and primary.get("checkpoint_filename") == selected.get("checkpoint_filename")):
+        # The active owner may commit between our final busy observation and
+        # incident persistence. Exact checkpoint completion resolves that race.
+        return primary
+    return selected
+
+
+def _scheduled_incident_path(root: Path, config: OffhostConfig, mode: str) -> Path:
+    return root / (config.receipt_relative + ".scheduler-" + mode + ".json")
 
 
 def read_offhost_receipt(root: Path, config: OffhostConfig) -> dict[str, Any] | None:
@@ -2084,6 +2122,50 @@ def _finish_checkpoint_operation(
     return receipt
 
 
+def _completed_scheduled_checkpoint(
+    *, root: Path, offhost: OffhostConfig, sink: Path, chain: Mapping[str, Any],
+    mode: str, requested_at: datetime, clock: datetime, previously_seen: str | None,
+) -> dict[str, Any] | None:
+    """Coalesce a newly completed scheduled point only under the backup lock."""
+    receipt = read_offhost_receipt(root, offhost)
+    if (not receipt or receipt.get("terminal") not in CHECKPOINT_TERMINALS
+            or receipt.get("clock_semantics") != "SNAPSHOT_DATA_AGE_V2"
+            or receipt.get("checkpoint_filename") == previously_seen
+            or {key: value for key, value in receipt.items()
+                if key not in {"schema", "schema_version", "offhost_remote"}} != chain.get("last_good_receipt")):
+        return None
+    try:
+        captured = datetime.fromisoformat(receipt["snapshot_data_as_of"].replace("Z", "+00:00"))
+        verified = datetime.fromisoformat(receipt["verified_at"].replace("Z", "+00:00"))
+        if captured.tzinfo is None or verified.tzinfo is None:
+            return None
+        age = (clock - captured).total_seconds()
+        if (captured.astimezone(UTC).date() != requested_at.astimezone(UTC).date()
+                or verified < requested_at.replace(microsecond=0) or verified > clock
+                or not 0 <= age <= offhost.freshness_current_max_seconds
+                or (mode == "weekly" and chain.get("last_weekly_date") != requested_at.date().isoformat())):
+            return None
+        checkpoint = chain["last_checkpoint"]
+        if (checkpoint["filename"] != receipt["checkpoint_filename"]
+                or checkpoint["sha256"] != receipt["checkpoint_sha256"]):
+            raise ValueError("pointer")
+        path = sink / _filename(checkpoint["filename"])
+        payload = validate_recovery_checkpoint(path)
+        if (path.is_symlink() or _sha256_file(path) != checkpoint["sha256"]
+                or payload["result_inventory_sha256"] != chain["tip_inventory_sha256"]
+                or payload["snapshot_data_as_of"] != receipt["snapshot_data_as_of"]):
+            raise ValueError("checkpoint")
+        for item in [payload["base_full"], *payload["ordered_deltas"]]:
+            artifact = sink / _filename(item["filename"])
+            if (not artifact.is_file() or artifact.is_symlink()
+                    or artifact.stat().st_size != int(item["bytes"])
+                    or _sha256_file(artifact) != item["sha256"]):
+                raise ValueError("artifact")
+    except (KeyError, TypeError, ValueError, OSError) as exc:
+        raise OffhostBackupError("OFFHOST_COALESCED_CHECKPOINT_INTEGRITY_FAILED") from exc
+    return {**receipt, "scheduled_coalesced": True}
+
+
 def run_offhost_checkpoint(
     root: Path, *, mode: str, deploy_git_sha: str | None = None,
     config: OffhostConfig | None = None, environ: Mapping[str, str] | None = None,
@@ -2091,6 +2173,8 @@ def run_offhost_checkpoint(
     wall_clock: Callable[[], datetime] | None = None,
     monotonic_clock: Callable[[], float] = time.monotonic,
     lock_timeout_seconds: float = 0.0,
+    scheduled_requested_at: datetime | None = None,
+    scheduled_previously_seen: str | None = None,
 ) -> dict[str, Any]:
     if mode not in {"daily", "weekly"}:
         raise OffhostBackupError("CHECKPOINT_MODE_INVALID")
@@ -2112,8 +2196,14 @@ def run_offhost_checkpoint(
     operation: Mapping[str, Any] | None = None
     try:
         with backup_plane_lock(root, timeout_seconds=lock_timeout_seconds):
-            read_chain_state(root, offhost)
+            chain = read_chain_state(root, offhost)
             operation = _read_pending(root, offhost)
+            if operation is None and scheduled_requested_at is not None:
+                completed = _completed_scheduled_checkpoint(root=root, offhost=offhost, sink=sink,
+                    chain=chain, mode=mode, requested_at=scheduled_requested_at, clock=clock,
+                    previously_seen=scheduled_previously_seen)
+                if completed is not None:
+                    return completed
             if operation is None:
                 operation = _prepare_checkpoint_operation(root=root, offhost=offhost,
                     loaded=loaded, env=env, sink=sink, mode=mode, clock=clock,
@@ -2147,6 +2237,82 @@ def run_offhost_checkpoint(
         })
         raise OffhostBackupError("OFFHOST_TRANSPORT_OUTCOME_UNKNOWN") from exc
 
+
+def run_scheduled_offhost_checkpoint(
+    root: Path, *, mode: str, deploy_git_sha: str | None = None,
+    config: OffhostConfig | None = None, environ: Mapping[str, str] | None = None,
+    runner: RcloneRunner | None = None, now: datetime | None = None,
+    wall_clock: Callable[[], datetime] | None = None,
+    monotonic_clock: Callable[[], float] = time.monotonic,
+    sleeper: Callable[[float], None] = time.sleep,
+    busy_retry_budget_seconds: float | None = None,
+    busy_retry_interval_seconds: float | None = None,
+) -> dict[str, Any]:
+    """Existing oneshot caller: retry contention, preserve exact pending bytes."""
+    if mode not in {"daily", "weekly"}:
+        raise OffhostBackupError("CHECKPOINT_MODE_INVALID")
+    budget = SCHEDULED_BUSY_RETRY_BUDGET_SECONDS if busy_retry_budget_seconds is None else busy_retry_budget_seconds
+    interval = SCHEDULED_BUSY_RETRY_INTERVAL_SECONDS if busy_retry_interval_seconds is None else busy_retry_interval_seconds
+    if not (0 < budget <= 120 * 60 and 0 < interval <= 30):
+        raise OffhostBackupError("OFFHOST_BUSY_RETRY_BUDGET_INVALID")
+    actual_clock = wall_clock or (lambda: now if now is not None else datetime.now(UTC))
+    requested_at = actual_clock().astimezone(UTC)
+    offhost = config if config is not None else load_offhost_config(root)
+    if offhost is None:
+        raise OffhostBackupError("OFFHOST_NOT_CONFIGURED")
+    previous = read_offhost_receipt(root, offhost) or {}
+    previously_seen = previous.get("checkpoint_filename")
+    started = monotonic_clock()
+    deferred = 0
+    waited = 0.0
+    while True:
+        attempt = monotonic_clock()
+        result = run_offhost_checkpoint(root, mode=mode, deploy_git_sha=deploy_git_sha,
+            config=offhost, environ=environ, runner=runner, wall_clock=actual_clock,
+            monotonic_clock=monotonic_clock, scheduled_requested_at=requested_at,
+            scheduled_previously_seen=previously_seen)
+        if result.get("terminal") != "DEFERRED" or result.get("reason") != "WRITER_BUSY":
+            return {**result, "scheduled_retry": {"deferred_attempts": deferred,
+                "busy_wait_seconds": waited, "busy_retry_budget_seconds": budget}}
+        deferred += 1
+        waited += max(0.0, monotonic_clock() - attempt)
+        remaining = budget - (monotonic_clock() - started)
+        if remaining <= 0:
+            break
+        before_sleep = monotonic_clock()
+        sleeper(min(interval, remaining))
+        waited += max(0.0, monotonic_clock() - before_sleep)
+    try:
+        operation = _read_pending(root, offhost)
+    except OffhostBackupError:
+        # The active owner can finish and unlink the intent between exists()
+        # and read_text(). Existing corrupt bytes remain a distinct refusal.
+        if _pending_path(root, offhost).exists():
+            raise
+        operation = None
+    failure = {
+        "schema": RECEIPT_SCHEMA, "schema_version": RECEIPT_SCHEMA_VERSION,
+        "terminal": "COPY_FAILED", "failure_code": "OFFHOST_BUSY_RETRY_EXHAUSTED",
+        "reason": "WRITER_BUSY", "failed_at": _stamp(actual_clock()),
+        "scheduled_requested_at": _stamp(requested_at), "mode": mode,
+        "deploy_git_sha": deploy_git_sha, "deferred_attempts": deferred,
+        "busy_wait_seconds": waited, "busy_retry_budget_seconds": budget,
+        "snapshot_data_as_of": operation.get("snapshot_data_as_of") if operation else None,
+        "checkpoint_filename": operation["checkpoint"]["filename"] if operation else None,
+        "resume": {
+            "working_directory": "SOURCE_ROOT",
+            "argv": ["uv", "run", "--locked", "--managed-python", "python", "-B",
+                     "scripts/factory_offhost_backup_copy.py", "--mode", mode],
+            "pending_relative": offhost.pending_relative if operation else None,
+            "pending_operation_sha256": hashlib.sha256(_checkpoint_canonical(operation)).hexdigest() if operation else None,
+            "action": "RETRY_SAME_PENDING_OPERATION" if operation else "RETRY_SCHEDULED_CHECKPOINT",
+        },
+    }
+    # No shared backup state or last-good is written while a different process
+    # owns the lock. Systemd serializes each existing per-mode oneshot unit.
+    _atomic_write_json(_scheduled_incident_path(root, offhost, mode), failure)
+    return failure
+
 __all__ = [
     "ALLOWED_RCLONE_SUBCOMMANDS",
     "FORBIDDEN_RCLONE_SUBCOMMANDS",
@@ -2178,6 +2344,7 @@ __all__ = [
     "restore_incremental_chain_isolated",
     "restore_from_recovery_checkpoint",
     "run_offhost_checkpoint",
+    "run_scheduled_offhost_checkpoint",
     "refresh_checkpoint_archive",
     "release_checkpoint_archive_cache",
     "run_checkpoint_maintenance",

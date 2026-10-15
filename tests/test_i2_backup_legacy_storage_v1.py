@@ -11,9 +11,11 @@ import subprocess
 import sys
 import tempfile
 import time
+import types
 import unittest
 import zipfile
 from contextlib import closing, contextmanager
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import patch
@@ -26,6 +28,28 @@ from solana_alpha_lab.factory import remote_ops as remote  # noqa: E402
 
 OPS = "local/factory_v1/observation_schedule_state.sqlite"
 RDP = "local/factory_v1/observation_rdp"
+LEGACY_PRODUCER_BASE = "b3fb9d8ecffbffda468dccabaa81ca3392da6f15"
+
+
+def _raw_sql_readback(path: Path, *, isolated: bool = False) -> dict:
+    """Independent row/ROWID oracle; the restore marker is the only decoration."""
+    uri = path.as_uri() + "?mode=ro" + ("&immutable=1" if isolated else "")
+    with closing(sqlite3.connect(uri, uri=True)) as conn:
+        tables = [row[0] for row in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name != 'restore_markers' ORDER BY name")]
+        result = {}
+        for table in tables:
+            quoted = '"' + table.replace('"', '""') + '"'
+            try:
+                rows = list(conn.execute(f"SELECT rowid,* FROM {quoted} ORDER BY rowid"))
+            except sqlite3.OperationalError:
+                rows = sorted(list(conn.execute(f"SELECT * FROM {quoted}")), key=repr)
+            result[table] = {"rows": len(rows), "sha256": hashlib.sha256(
+                json.dumps(rows, separators=(",", ":"), default=str).encode()).hexdigest()}
+        result["activation_rows"] = list(conn.execute(
+            "SELECT schedule_sha256,activation_id,state,last_transition_event_id,transition_sequence,"
+            "authority_receipt_sha256,payload_json FROM schedule_activations ORDER BY rowid"))
+        return json.loads(json.dumps(result))
 
 
 class I2BackupLegacyStorageTests(unittest.TestCase):
@@ -152,6 +176,128 @@ class I2BackupLegacyStorageTests(unittest.TestCase):
         with closing(sqlite3.connect(restored/nested)) as conn:
             self.assertEqual(list(conn.execute("SELECT kind FROM runtime_events ORDER BY event_id")),[("BEFORE_CAPTURE",)])
             self.assertEqual(conn.execute("SELECT resolved FROM restore_markers").fetchone(),(0,))
+
+    def _native_reclaim_backup_fixture(self, *, nested: bool, finalize: bool,
+                                       phase: str = "SWITCHED") -> tuple[Path, str, Path]:
+        from solana_alpha_lab.factory import observation_schedule_retention as retention
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+
+        relative = f"{RDP}/observation_schedule_state.sqlite" if nested else OPS
+        path = self.root/relative
+        # Reclaim deliberately accepts only the native operational schema.
+        (self.root/OPS).unlink()
+        self.config["backup"]["source_relative_paths"] = [relative]
+        if not nested:
+            self.config["backup"]["recursive_relative_paths"] = [f"{RDP}/datasets/publication_jobs"]
+            (self.root/RDP/"datasets/publication_jobs").mkdir(parents=True)
+        store = ObservationScheduleStore(path)
+        try:
+            store.record_event("BEFORE_RECLAIM", {"debit":17})
+            store._conn.execute("UPDATE runtime_events SET event_id=77")
+            store._conn.execute("UPDATE sqlite_sequence SET seq=88 WHERE name='runtime_events'")
+            store._conn.commit()
+            proof = retention.create_cold_archive(store,
+                archive_path=Path(self.temp.name)/"final-native.sqlite",
+                restored_path=Path(self.temp.name)/"final-native-verified.sqlite", routine_roots=[self.root])
+            plan = retention.build_reclaim_plan(store, data_root=self.root/RDP, backup_root=self.root)
+            arguments = dict(plan=plan, approved_plan_sha256=plan["plan_id"], data_root=self.root/RDP,
+                backup_root=self.root, writers_quiesced=True, independent_recovery_proof=proof,
+                now=datetime.now(UTC)-timedelta(minutes=5))
+            if phase == "ORIGINAL_MOVED":
+                with self.assertRaisesRegex(retention.ObservationScheduleRetentionError, "RECLAIM_INJECTED_CRASH"):
+                    retention.apply_physical_reclaim(store, **arguments, failpoint=phase)
+            else:
+                result = retention.apply_physical_reclaim(store, **arguments)
+                self.assertEqual(result["status"], "SWITCHED_AWAITING_NATIVE_READBACK")
+            if finalize:
+                retention.recover_physical_reclaim(path, data_root=self.root/RDP,
+                    action="resume", approved_plan_sha256=plan["plan_id"])
+        finally:
+            store.close()
+        intent = retention._reclaim_paths(path)[2]
+        self.assertEqual(json.loads(intent.read_text())["state"], "FINALIZED" if finalize else phase)
+        return path, relative, intent
+
+    def test_finalized_reclaim_nested_full_restore_allows_native_writer(self) -> None:
+        self._assert_finalized_reclaim_backup_restores(nested=True)
+
+    def test_finalized_reclaim_sibling_mutable_restore_allows_native_writer(self) -> None:
+        self._assert_finalized_reclaim_backup_restores(nested=False)
+
+    def _assert_finalized_reclaim_backup_restores(self, *, nested: bool) -> None:
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+
+        source, relative, intent = self._native_reclaim_backup_fixture(nested=nested, finalize=True)
+        expected = _raw_sql_readback(source)
+        self.assertEqual(json.loads(intent.read_text())["final_db_binding"]["inode"], source.stat().st_ino)
+        packed = self.full()
+        restored = Path(self.temp.name)/"finalized-reclaim-restored"
+        remote.restore_incremental_chain_isolated(full_bundle=self.sink/packed["bundle"], deltas=[],
+            dest_root=restored, expected_inventory_sha256=packed["inventory_sha256"])
+        self.assertNotEqual((restored/relative).stat().st_ino, source.stat().st_ino)
+        with closing(ObservationScheduleStore(restored/relative)) as writer:
+            self.assertEqual(_raw_sql_readback(restored/relative), expected)
+            self.assertTrue(writer.restore_marker_unresolved())
+            self.assertEqual(writer.mark_recovery_gap(cutoff=datetime.now(UTC)), 0)
+            writer.resolve_restore_marker()
+            self.assertFalse(writer.restore_marker_unresolved())
+            writer.record_event("AFTER_RESTORE", {"debit":18})
+            rows = list(writer._conn.execute("SELECT kind FROM runtime_events ORDER BY event_id"))
+            self.assertEqual([row[0] for row in rows], ["BEFORE_RECLAIM", "AFTER_RESTORE"])
+            self.assertEqual([row[0] for row in writer._conn.execute(
+                "SELECT event_id FROM runtime_events ORDER BY event_id")], [77,89])
+        self.assertFalse(any(".i2-reclaim" in item["path"] for item in packed["entries"]))
+        self.assertTrue(intent.exists())
+        if os.environ.get("I2_PRINT_RECLAIM_BACKUP_ORACLE"):
+            print(json.dumps({"layout":"nested/full" if nested else "sibling/mutable",
+                "trace":["native:FINALIZED","terminal-binding:verified","backup:PASS",
+                         "restore:raw-PASS","new-inode:verified","native:open",
+                         "recovery-gap:0","marker:resolved","writer:event-89"],
+                "inventory_sha256":packed["inventory_sha256"],
+                "source_receipt_preserved":intent.exists(),"receipt_in_backup":False,
+                "source_inode":source.stat().st_ino,"restored_inode":(restored/relative).stat().st_ino,
+                "rows_and_ROWIDs_preserved":True,"runtime_event_ids":[77,89]}, sort_keys=True))
+
+    def test_unfinished_native_reclaim_refuses_before_snapshot_sqlite_capture(self) -> None:
+        _source, _relative, intent = self._native_reclaim_backup_fixture(nested=True, finalize=False)
+        before = intent.read_bytes()
+        with patch.object(remote, "consistent_sqlite_backup", wraps=remote.consistent_sqlite_backup) as capture:
+            with self.assertRaisesRegex(remote.RemoteOpsError, "BACKUP_RECLAIM_RECOVERY_REQUIRED"):
+                self.full()
+            capture.assert_not_called()
+        self.assertEqual(intent.read_bytes(), before)
+        self.assertEqual(list(self.sink.glob("BACKUP_*.zip")), [])
+
+    def test_unfinished_native_reclaim_refuses_direct_sqlite_backup(self) -> None:
+        source, _relative, _intent = self._native_reclaim_backup_fixture(nested=False, finalize=False)
+        target = Path(self.temp.name)/"must-not-capture.sqlite"
+        with self.assertRaisesRegex(remote.RemoteOpsError, "BACKUP_RECLAIM_RECOVERY_REQUIRED"):
+            remote.consistent_sqlite_backup(source, target)
+        self.assertFalse(target.exists())
+
+    def test_native_reclaim_missing_main_rename_gap_refuses_before_capture(self) -> None:
+        source, _relative, intent = self._native_reclaim_backup_fixture(
+            nested=True, finalize=False, phase="ORIGINAL_MOVED")
+        before = intent.read_bytes()
+        self.assertFalse(source.exists())
+        with patch.object(remote, "consistent_sqlite_backup", wraps=remote.consistent_sqlite_backup) as capture:
+            with self.assertRaisesRegex(remote.RemoteOpsError, "BACKUP_RECLAIM_RECOVERY_REQUIRED"):
+                self.full()
+            capture.assert_not_called()
+        self.assertFalse(source.exists())
+        self.assertEqual(intent.read_bytes(), before)
+        self.assertEqual(list(self.sink.glob("BACKUP_*.zip")), [])
+
+    def test_reclaim_terminal_receipt_wrong_inode_is_not_silently_excluded(self) -> None:
+        _source, _relative, intent = self._native_reclaim_backup_fixture(nested=True, finalize=True)
+        stale = json.loads(intent.read_text())
+        stale["final_db_binding"]["inode"] += 1
+        intent.write_text(json.dumps(stale), encoding="utf-8")
+        with patch.object(remote, "consistent_sqlite_backup", wraps=remote.consistent_sqlite_backup) as capture:
+            with self.assertRaisesRegex(remote.RemoteOpsError, "BACKUP_RECLAIM_RECOVERY_REQUIRED"):
+                self.full()
+            capture.assert_not_called()
+        self.assertEqual(json.loads(intent.read_text()), stale)
 
     def test_old_api_backup_with_sqlite_sidecar_is_rejected_before_decoration(self) -> None:
         packed=self.full()
@@ -368,6 +514,229 @@ print(json.dumps(remote.package_backup(root,config=config,sink_override=sink,pru
                 path.unlink()
         with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_RECOVERY_TRANSITION_EVENT_MISSING"):
             self.full()
+
+    def _legacy_control_checkpoint(self, state: str) -> dict:
+        """Run the pinned, unmodified pre-I2 producer, then today's daily caller."""
+        from tests.test_factory_offhost_backup import FakeRcloneRunner, _seed_tree
+        from solana_alpha_lab.factory import offhost_backup as offhost
+        from solana_alpha_lab.factory.hot90_activation import write_hot90_runtime_state
+        from solana_alpha_lab.factory.observation_schedule import load_observation_schedule
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        # Native lifecycle, SQLite schema and packaging all come from the exact
+        # historical producer. No new retention tables/source UUID enter it.
+        modules = {}
+        producer_hashes = {}
+        for filename in ("observation_schedule_store", "observation_schedule_lifecycle",
+                         "remote_ops", "offhost_backup"):
+            relative = f"src/solana_alpha_lab/factory/{filename}.py"
+            source = subprocess.run(["git", "show", f"{LEGACY_PRODUCER_BASE}:{relative}"],
+                cwd=ROOT, check=True, capture_output=True).stdout
+            producer_hashes[filename] = hashlib.sha256(source).hexdigest()
+            name = f"_i2_legacy_{filename}_{id(self)}"
+            module = types.ModuleType(name)
+            module.__file__ = str(ROOT/relative)
+            sys.modules[name] = module
+            self.addCleanup(sys.modules.pop, name, None)
+            bindings = {f"solana_alpha_lab.factory.{key}": value for key, value in modules.items()}
+            with patch.dict(sys.modules, bindings):
+                exec(compile(source, f"{LEGACY_PRODUCER_BASE}:{relative}", "exec"), module.__dict__)
+            modules[filename] = module
+        lifecycle = modules["observation_schedule_lifecycle"]
+        _seed_tree(self.root)
+        for relative in ("configs/observation_schedule_runtime_v1.yaml",
+                         "catalog/schemas/observation_schedule_runtime_v1.schema.json"):
+            target = self.root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes((ROOT / relative).read_bytes())
+        (self.root/RDP/"datasets/publication_jobs").mkdir(parents=True)
+        write_hot90_runtime_state(self.root, {"activation_stage": "DURABILITY_CUTOVER",
+            "production_compaction_enabled": False, "production_eviction_enabled": False,
+            "drive_writes_enabled": True})
+        now = datetime(2026, 9, 1, 0, 10, tzinfo=UTC)
+        document = load_observation_schedule(ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml")
+        with closing(modules["observation_schedule_store"].ObservationScheduleStore(self.root/OPS)) as store:
+            prepared = lifecycle.prepare_schedule_authority(root=ROOT, data_root=self.root/RDP, store=store,
+                document=document, now=now, producer_git_sha="c"*40)
+            authorized = lifecycle.authorize_schedule(root=ROOT, data_root=self.root/RDP, store=store,
+                schedule_sha256=document["schedule_sha256"],
+                phrase=prepared["authority_request"]["exact_owner_phrase"], now=now, producer_git_sha="c"*40)
+            lifecycle.activate_schedule(data_root=self.root/RDP, store=store,
+                schedule_sha256=document["schedule_sha256"], activation_id="ACT-LEGACY-I2",
+                now=now, producer_git_sha="c"*40)
+            if state == "DRAINING":
+                drained = lifecycle.drain_expired_admission(data_root=self.root/RDP, store=store,
+                    schedule_sha256=document["schedule_sha256"], activation_id="ACT-LEGACY-I2",
+                    now=datetime(2026, 9, 2, 0, 1, tzinfo=UTC), producer_git_sha="c"*40)
+                self.assertEqual(drained["terminal"], "DRAINED")
+        expected_sql = _raw_sql_readback(self.root/OPS)
+        self.assertEqual(expected_sql["activation_rows"][0][2], state)
+        self.assertNotIn("retention_control", expected_sql)
+        event_ids = [expected_sql["activation_rows"][0][3],
+                     f"OBS-AUTHZ-{authorized['receipt_sha256'][:16].upper()}"]
+        research = ResearchStore(self.root/RDP, create_if_missing=False)
+        expected_events = {identity: research.find_record(identity).model_dump(mode="json")
+                           for identity in event_ids}
+
+        credentials = self.root/"fixture-rclone.conf"
+        credentials.write_text("[factory-gdrive]\ntype = drive\n", encoding="utf-8")
+        credentials.chmod(0o600)
+        runner = FakeRcloneRunner()
+        legacy = modules["offhost_backup"]
+        legacy_config = replace(legacy.load_offhost_config(self.root), rclone_config_absolute=credentials)
+        environment = {remote.BACKUP_SINK_ENV: str(self.sink)}
+        old_receipt = legacy.run_offhost_checkpoint(self.root, mode="daily", config=legacy_config,
+            environ=environment, runner=runner, now=datetime(2026, 9, 3, 0, 45, tzinfo=UTC))
+        legacy_chain = json.loads((self.root/legacy_config.chain_relative).read_text(encoding="utf-8"))
+        self.assertEqual(legacy_chain["ordered_deltas"], [])
+        base = legacy_chain["base_full"]
+        with zipfile.ZipFile(self.sink/base["filename"]) as archive:
+            old_manifest = json.loads(archive.read("BACKUP_MANIFEST.json"))
+            self.assertTrue(all(info.compress_type == zipfile.ZIP_STORED for info in archive.infolist()))
+            self.assertFalse(any("/research/" in item["path"] for item in old_manifest["entries"]))
+        self.assertEqual(len(old_manifest["entries"]), 3)
+        config = replace(offhost.load_offhost_config(self.root), rclone_config_absolute=credentials)
+        receipt = offhost.run_offhost_checkpoint(self.root, mode="daily", config=config,
+            environ=environment, runner=runner, now=datetime(2026, 9, 4, 0, 45, tzinfo=UTC))
+        self.assertEqual(receipt["terminal"], "DAILY_DELTA_VERIFIED")
+        chain = offhost.read_chain_state(self.root, config)
+        self.assertEqual(chain["base_full"], base)
+        self.assertEqual(len(chain["ordered_deltas"]), 1)
+        # This is a separate transport view containing only remotely committed bytes.
+        independent = Path(self.temp.name)/"independent-remote"
+        independent.mkdir()
+        for remote_name, payload in runner.payloads.items():
+            (independent/Path(remote_name).name).write_bytes(payload)
+        expected_files = [{key: item[key] for key in ("path", "sha256", "bytes")}
+                          for item in chain["tip_entries"]]
+        self.assertEqual(_raw_sql_readback(self.root/OPS), expected_sql)
+        self.root.rename(self.root.with_name("source-unavailable"))
+        return {"base": base, "legacy_receipt": old_receipt, "receipt": receipt,
+                "objects": independent, "chain": chain, "sql": expected_sql,
+                "events": expected_events, "files": expected_files, "producer_sha256": producer_hashes}
+
+    def test_actual_legacy_active_full_new_daily_delta_restores_final_control_closure(self) -> None:
+        self._assert_actual_legacy_checkpoint_restores("ACTIVE")
+
+    def test_actual_legacy_draining_full_new_daily_delta_restores_final_control_closure(self) -> None:
+        self._assert_actual_legacy_checkpoint_restores("DRAINING")
+
+    def test_actual_legacy_full_and_final_missing_control_event_refuse_without_marker(self) -> None:
+        from solana_alpha_lab.factory.research_store import ResearchStoreError
+
+        fixture = self._legacy_control_checkpoint("ACTIVE")
+        full = fixture["objects"]/fixture["base"]["filename"]
+        for label in ("standalone", "chain-without-closure"):
+            target = Path(self.temp.name)/label
+            with self.subTest(label=label), patch.object(remote, "_decorate_restore") as marker:
+                with self.assertRaisesRegex(ResearchStoreError, "RESEARCH_STORE_NOT_PRESENT"):
+                    if label == "standalone":
+                        remote.restore_backup_isolated(bundle=full, dest_root=target)
+                    else:
+                        remote.restore_incremental_chain_isolated(full_bundle=full, deltas=[], dest_root=target)
+                marker.assert_not_called()
+                with closing(sqlite3.connect((target/OPS).as_uri()+"?mode=ro&immutable=1", uri=True)) as conn:
+                    self.assertEqual(conn.execute("SELECT COUNT(*) FROM restore_markers").fetchone()[0], 0)
+
+        delta = fixture["objects"]/fixture["chain"]["ordered_deltas"][0]["filename"]
+        with zipfile.ZipFile(delta) as archive:
+            missing = next(name for name in archive.namelist()
+                if "/research/manifests/partitions/" in name and
+                json.loads(archive.read(name))["partition_id"].startswith("RESEARCH-TXN-OBS-TRANS-"))
+        # Preserve valid raw-link hashes/membership while omitting a required
+        # native event descriptor: byte integrity alone must not grant recovery.
+        expected = [item for item in fixture["files"] if item["path"] != missing]
+        inventory = hashlib.sha256(json.dumps(sorted(expected, key=lambda item:item["path"]),
+            separators=(",", ":"), sort_keys=True).encode()).hexdigest()
+        def omit_control(manifest):
+            manifest["changed"] = [item for item in manifest["changed"] if item["path"] != missing]
+            manifest["result_inventory_sha256"] = inventory
+        incomplete = self.rewrite(delta, manifest_change=omit_control, omit=(missing,))
+        target = Path(self.temp.name)/"final-missing-control"
+        with patch.object(remote, "apply_delta_bundle", wraps=remote.apply_delta_bundle) as apply:
+            with patch.object(remote, "_decorate_restore") as marker:
+                with self.assertRaisesRegex(remote.RemoteOpsError, "BACKUP_RECOVERY_TRANSITION_EVENT_MISSING"):
+                    remote.restore_incremental_chain_isolated(full_bundle=full, deltas=[incomplete],
+                        dest_root=target, expected_inventory_sha256=inventory)
+                marker.assert_not_called()
+            self.assertEqual(apply.call_count, 1)
+        actual = sorted([{"path":path.relative_to(target).as_posix(), "bytes":path.stat().st_size,
+            "sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for path in target.rglob("*")
+            if path.is_file()], key=lambda item:item["path"])
+        self.assertEqual(actual, sorted(expected, key=lambda item:item["path"]))
+        with closing(sqlite3.connect((target/OPS).as_uri()+"?mode=ro&immutable=1", uri=True)) as conn:
+            self.assertEqual(conn.execute("SELECT COUNT(*) FROM restore_markers").fetchone()[0], 0)
+
+    def _assert_actual_legacy_checkpoint_restores(self, state: str) -> None:
+        fixture = self._legacy_control_checkpoint(state)
+        destination = Path(self.temp.name)/"independent-restored"
+        program = r'''
+import hashlib, json, sqlite3, sys
+from contextlib import closing
+from pathlib import Path
+from tests.test_i2_backup_legacy_storage_v1 import _raw_sql_readback, OPS, RDP
+from solana_alpha_lab.factory import remote_ops as remote
+from solana_alpha_lab.factory.offhost_backup import restore_from_recovery_checkpoint
+from solana_alpha_lab.factory.research_store import ResearchStore
+objects, checkpoint, destination = Path(sys.argv[1]), sys.argv[2], Path(sys.argv[3])
+trace, raw = [], {}
+def files():
+    return sorted([{'path':p.relative_to(destination).as_posix(), 'bytes':p.stat().st_size,
+                    'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+                   for p in destination.rglob('*') if p.is_file()], key=lambda item:item['path'])
+apply, control, marker = remote.apply_delta_bundle, remote._verify_recovery_control, remote._decorate_restore
+def traced_apply(*args, **kwargs):
+    trace.append('delta:start')
+    value = apply(*args, **kwargs)
+    trace.append('delta:raw-verified')
+    return value
+def traced_control(*args, **kwargs):
+    trace.append('control:start')
+    value = control(*args, **kwargs)
+    trace.append('control:verified')
+    return value
+def traced_marker(*args, **kwargs):
+    raw['files'] = files()
+    raw['sql'] = _raw_sql_readback(destination/OPS, isolated=True)
+    trace.append('marker:last')
+    return marker(*args, **kwargs)
+remote.apply_delta_bundle, remote._verify_recovery_control, remote._decorate_restore = traced_apply, traced_control, traced_marker
+try:
+    restored = restore_from_recovery_checkpoint(checkpoint_path=objects/checkpoint,
+        objects_dir=objects, dest_root=destination)
+    research = ResearchStore(destination/RDP, create_if_missing=False)
+    events = {event.record_id:event.model_dump(mode='json') for event in research.iter_committed_records()}
+    with closing(sqlite3.connect(destination/OPS)) as conn:
+        markers = list(conn.execute('SELECT marker_id,resolved FROM restore_markers'))
+    print(json.dumps({'ok':True,'trace':trace,'raw':raw,'events':events,
+        'markers':markers,'sql_after':_raw_sql_readback(destination/OPS),
+        'inventory_sha256':restored['raw_inventory_sha256'], 'control':restored['recovery_control']}))
+except Exception as exc:
+    print(json.dumps({'ok':False,'trace':trace,'error':type(exc).__name__+':'+str(exc),
+                      'partial_files':files()}))
+'''
+        environment = dict(os.environ, PYTHONPATH=os.pathsep.join((str(ROOT/"src"), str(ROOT))))
+        result = subprocess.run([sys.executable, "-B", "-c", program, str(fixture["objects"]),
+            fixture["receipt"]["checkpoint_filename"], str(destination)],
+            cwd=ROOT, env=environment, capture_output=True, text=True, timeout=45)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        oracle = json.loads(result.stdout)
+        if os.environ.get("I2_PRINT_LEGACY_ORACLE"):
+            print(json.dumps({"state":state,"producer_base":LEGACY_PRODUCER_BASE,
+                "producer_sha256":fixture["producer_sha256"],"base":fixture["base"],
+                "legacy_terminal":fixture["legacy_receipt"]["terminal"],
+                "new_receipt":fixture["receipt"],"oracle":oracle}, sort_keys=True))
+        self.assertTrue(oracle["ok"], {"state":state,"oracle":oracle})
+        self.assertEqual(oracle["trace"], ["delta:start", "delta:raw-verified",
+            "control:start", "control:verified", "marker:last"])
+        self.assertEqual(oracle["raw"]["files"], sorted(fixture["files"], key=lambda item:item["path"]))
+        self.assertEqual(oracle["raw"]["sql"], fixture["sql"])
+        self.assertEqual(oracle["sql_after"], fixture["sql"])
+        self.assertEqual(oracle["inventory_sha256"], fixture["chain"]["tip_inventory_sha256"])
+        self.assertEqual(oracle["control"], {"transitions":1,"authorities":1})
+        self.assertEqual(oracle["markers"], [["UNRESOLVED",0]])
+        for event_id, payload in fixture["events"].items():
+            self.assertEqual(oracle["events"][event_id], payload)
 
     def test_open_publication_artifact_and_member_prefix_closure(self) -> None:
         self.config["backup"]["recursive_relative_paths"] = [f"{RDP}/datasets/publication_jobs"]

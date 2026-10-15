@@ -143,6 +143,37 @@ OPERABILITY_INDEX_SQL = (
 )
 
 
+def assert_reclaim_write_allowed(path: Path, *, owner_token: str | None = None) -> dict[str, Any] | None:
+    """Read only the native reclaim guard; never open or create a SQLite source.
+
+    Backup selection uses the same decision before traversing technical stages.
+    The returned terminal receipt is valid only for this current source inode.
+    """
+    prefix = path.parent / ("." + path.name + ".i2-reclaim")
+    intent_path = Path(str(prefix) + ".intent.json")
+    staging = (Path(str(prefix) + "-new.sqlite"), Path(str(prefix) + "-rollback.sqlite"))
+    if intent_path.exists():
+        try:
+            intent = json.loads(intent_path.read_text(encoding="utf-8"))
+            if (intent.get("schema") == "smial.observation-reclaim-intent.v1"
+                    and owner_token is not None and intent.get("lease_token") == owner_token):
+                return intent
+            terminal = (intent.get("schema") == "smial.observation-reclaim-intent.v1"
+                        and intent.get("state") in {"FINALIZED", "ROLLBACK_FINALIZED"})
+            stat = path.stat() if terminal else None
+            binding = {"device": stat.st_dev, "inode": stat.st_ino} if stat else None
+            if (terminal and intent.get("final_db_binding") == binding
+                    and not any(item.exists() for item in staging)
+                    and not intent_path.with_suffix(intent_path.suffix + ".tmp").exists()):
+                return intent
+        except (OSError, ValueError, TypeError, AttributeError):
+            pass
+        raise ObservationScheduleStoreError("RECLAIM_RECOVERY_REQUIRED")
+    if any(item.exists() for item in staging) or intent_path.with_suffix(intent_path.suffix + ".tmp").exists():
+        raise ObservationScheduleStoreError("RECLAIM_RECOVERY_REQUIRED")
+    return None
+
+
 class ObservationScheduleStore:
     def __init__(self, path: Path, *, readonly: bool = False, immutable: bool = True) -> None:
         if path.is_absolute() is False:
@@ -150,6 +181,7 @@ class ObservationScheduleStore:
         self.path = path
         self.readonly = readonly
         self._lease_token: str | None = None
+        self._reclaim_guard_token: str | None = None
         if readonly:
             if path.exists() and path.is_file() is False:
                 raise ObservationScheduleStoreError("SOURCE_INVALID")
@@ -168,6 +200,8 @@ class ObservationScheduleStore:
             except sqlite3.Error as exc:
                 raise ObservationScheduleStoreError("SOURCE_UNAVAILABLE") from exc
             return
+        self._source_existed_at_open = path.exists()
+        self._check_reclaim_guard()
         path.parent.mkdir(parents=True, exist_ok=True)
         try:
             self._connect()
@@ -178,7 +212,21 @@ class ObservationScheduleStore:
             raise
 
     def _connect(self) -> None:
-        self._conn = sqlite3.connect(self.path, check_same_thread=False)
+        native_source = (self._source_existed_at_open
+                         or getattr(self, "_connected_file_identity", None) is not None
+                         or self.path.exists())
+        self._check_reclaim_guard()
+        # An existing native source may disappear during an interrupted switch.
+        # mode=rw forbids sqlite from silently bootstrapping an empty replacement.
+        try:
+            if native_source:
+                self._conn = sqlite3.connect(self.path.as_uri() + "?mode=rw", uri=True, check_same_thread=False)
+            else:
+                self._conn = sqlite3.connect(self.path, check_same_thread=False)
+        except sqlite3.Error:
+            self._check_reclaim_guard()
+            raise
+        self._check_reclaim_guard()
         self._conn.row_factory = sqlite3.Row
         self._conn.execute("PRAGMA journal_mode=WAL")
         self._conn.execute("PRAGMA foreign_keys=ON")
@@ -548,6 +596,12 @@ class ObservationScheduleStore:
                 (schedule_digest, schedule_key, alias_digest, str(row["created_at"])),
             )
         self._conn.commit()
+        stat = self.path.stat()
+        self._connected_file_identity = (stat.st_dev, stat.st_ino)
+
+    def _check_reclaim_guard(self) -> None:
+        """A durable cutover decision gates ordinary native writes, including reboot."""
+        assert_reclaim_write_allowed(self.path, owner_token=self._reclaim_guard_token)
 
     def _migrate_call_ledger_to_occurrence_primary_key(self) -> None:
         """Migrate pre-occurrence ledgers without retaining request-global identity."""
@@ -654,6 +708,12 @@ class ObservationScheduleStore:
     def _require_writable(self) -> None:
         if getattr(self, "readonly", False):
             raise ObservationScheduleStoreError("SOURCE_READONLY")
+        self._check_reclaim_guard()
+        connected = getattr(self, "_connected_file_identity", None)
+        if connected is not None:
+            stat = self.path.stat()
+            if connected != (stat.st_dev, stat.st_ino):
+                raise ObservationScheduleStoreError("RECLAIM_CONNECTION_REOPEN_REQUIRED")
 
     def _require_not_retired(self, schedule_sha256: str, activation_id: str, state: str) -> None:
         """A retired activation cannot be admitted/resumed through native writers."""
@@ -797,6 +857,7 @@ class ObservationScheduleStore:
             self._conn.rollback()
 
     def release_lease(self, lease_token: str) -> None:
+        self._require_writable()
         cursor = self._conn.execute(
             "DELETE FROM scheduler_leases WHERE lease_id = ? AND lease_token = ?",
             (GLOBAL_LEASE_ID, lease_token),
@@ -3683,6 +3744,7 @@ class ObservationScheduleStore:
         payload: Mapping[str, Any],
         clock: datetime | None = None,
     ) -> None:
+        self._require_write_lease(clock)
         now = _now(clock)
         self._conn.execute(
             """

@@ -8,6 +8,8 @@ import sys
 import tempfile
 import time
 import unittest
+from contextlib import closing
+from contextlib import closing
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import patch
@@ -115,6 +117,191 @@ class NativeFixture(unittest.TestCase):
 
     def apply(self, plan):
         return owner.apply_retirement_plan(self.store,plan=plan,approved_plan_sha256=plan['plan_id'],now=NOW)
+
+
+class PolicyRevisionRecoveryTests(NativeFixture):
+    def ordinary_caller_process(self, now):
+        import yaml
+        for relative in ('configs/observation_schedule_runtime_v1.yaml',
+                         'catalog/schemas/observation_schedule_runtime_v1.schema.json'):
+            target = self.hot/relative
+            target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes((ROOT/relative).read_bytes())
+        runtime_path = self.hot/'configs/observation_schedule_runtime_v1.yaml'
+        runtime = yaml.safe_load(runtime_path.read_text(encoding='utf-8'))
+        runtime['ops_store_relative'] = 'ops.sqlite'
+        runtime_path.write_text(yaml.safe_dump(runtime),encoding='utf-8')
+        self.store.close()
+        # Only host pressure inputs are supplied on Windows. All store/caller,
+        # policy, cold files, candidate checks and effects are real owners.
+        child = '''import json,sys
+from pathlib import Path
+from unittest.mock import patch
+sys.path.insert(0,str(Path.cwd()/'src'))
+from solana_alpha_lab.factory.offhost_backup import run_checkpoint_maintenance
+from solana_alpha_lab.factory.observation_schedule import parse_utc
+from solana_alpha_lab.factory import observation_schedule_retention as owner
+original=Path.read_text
+def pressure(path,*args,**kwargs):
+ if path.as_posix()=='/proc/meminfo': return 'MemAvailable: 1048576 kB\\n'
+ if path.as_posix()=='/proc/pressure/io': return 'some avg10=0.00 avg60=0.00 avg300=0.00 total=0\\n'
+ return original(path,*args,**kwargs)
+with patch.object(owner.os,'getloadavg',return_value=(0,0,0),create=True),patch.object(Path,'read_text',pressure):
+ print(json.dumps(run_checkpoint_maintenance(Path(sys.argv[1]),{},now=parse_utc(sys.argv[2]))))
+'''
+        result = subprocess.run([sys.executable,'-B','-c',child,str(self.hot),render_utc(now)],
+            cwd=ROOT,capture_output=True,text=True,timeout=30)
+        self.store = ObservationScheduleStore(self.path)
+        self.assertEqual(result.returncode,0,result.stderr)
+        return json.loads(result.stdout)
+
+    def partial_native_plan(self, *, size=200, max_bytes=8*1024*1024):
+        add_scope(self.store, 'OTHER')
+        for occurrence, scope, rowid in [('FIRST','LEGACY',11),('SECOND','LEGACY',29),('EXCLUDED','OTHER',53)]:
+            add_call(self.store, occurrence, scope=scope, rowid=rowid, size=size)
+        proof = self.archive()
+        document = self.commission(proof=proof, enabled=True, allowed_classes=['call_ledger'], max_bytes=max_bytes)
+        other = {'schedule_sha256':'a'*64, 'activation_id':'OTHER', 'disallow_resume':True,
+            'operation_mode':'ISOLATED_REHEARSAL', 'archive_proof':proof, 'retire_pending_due':True}
+        owner.install_retirement(self.store, retirement=other,
+            approved_sha256=owner.policy_sha256(other), now=NOW)
+        document = {**document, 'revision':2, 'allowed_scopes':[
+            {'schedule_sha256':'a'*64,'activation_id':'LEGACY'},
+            {'schedule_sha256':'a'*64,'activation_id':'OTHER'}]}
+        owner.install_maintenance_policy(self.store, policy=document,
+            approved_sha256=owner.policy_sha256(document), now=NOW)
+        plan = self.plan(document)
+        self.assertEqual(len(plan['candidates']), 3)
+        owner._set_control(self.store, 'active_plan', plan)
+        self.store._conn.commit()
+        plan_path = self.base/'partial-plan.json'
+        plan_path.write_text(json.dumps(plan), encoding='utf-8')
+        self.store.close()
+        # Process death during candidate two leaves the first real transaction
+        # committed and the second uncommitted. No fabricated progress rows.
+        child = '''import json,os,sys
+from pathlib import Path
+from unittest.mock import patch
+sys.path.insert(0,str(Path.cwd()/'src'))
+from tests.test_i2_retention_maintenance_v1 import NOW
+from solana_alpha_lab.factory import observation_schedule_retention as owner
+from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+plan=json.loads(Path(sys.argv[2]).read_text()); store=ObservationScheduleStore(Path(sys.argv[1]))
+original=owner.compact_payload; calls=0
+def die_on_second(*args,**kwargs):
+ global calls
+ calls+=1
+ if calls==2: os._exit(73)
+ return original(*args,**kwargs)
+with patch.object(owner,'compact_payload',side_effect=die_on_second):
+ owner.apply_retirement_plan(store,plan=plan,approved_plan_sha256=plan['plan_id'],now=NOW)
+'''
+        result = subprocess.run([sys.executable,'-B','-c',child,str(self.path),str(plan_path)],
+            cwd=ROOT, capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 73, result.stderr)
+        self.store = ObservationScheduleStore(self.path)
+        with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+            rows = raw.execute('SELECT rowid,payload_json,created_at,updated_at FROM call_ledger ORDER BY rowid').fetchall()
+            progress = raw.execute('SELECT next_candidate FROM retention_progress WHERE plan_id=?',(plan['plan_id'],)).fetchone()[0]
+        self.assertEqual([row[0] for row in rows], [11,29,53])
+        self.assertEqual(progress, 1)
+        self.assertNotIn('rows', json.loads(rows[0][1]))
+        self.assertIn('rows', json.loads(rows[1][1]))
+        return document, plan, rows, proof
+
+    def test_narrower_approved_revision_reconciles_partial_plan_and_continues(self):
+        document, plan, before, proof = self.partial_native_plan()
+        archive_hash = hashlib.sha256(Path(proof['archive_path']).read_bytes()).hexdigest()
+        narrower = {**document,'revision':3,'max_rows':1,
+            'allowed_scopes':[{'schedule_sha256':'a'*64,'activation_id':'LEGACY'}]}
+        later = NOW+timedelta(minutes=5)
+        owner.install_maintenance_policy(self.store, policy=narrower,
+            approved_sha256=owner.policy_sha256(narrower), now=later)
+        results = []
+        for minute in (0,2,4,6):
+            results.append(self.ordinary_caller_process(later+timedelta(minutes=minute)))
+        with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+            after = raw.execute('SELECT rowid,payload_json,created_at,updated_at FROM call_ledger ORDER BY rowid').fetchall()
+            progress = raw.execute('SELECT next_candidate,payload_json FROM retention_progress WHERE plan_id=?',(plan['plan_id'],)).fetchone()
+        self.assertTrue(all(item['status'] in {'COMPLETE','PROGRESS'} for item in results),results)
+        self.assertEqual(after[0], before[0])  # Provenance/effect are never rewritten.
+        self.assertNotIn('rows',json.loads(after[1][1]))
+        self.assertIn('rows',json.loads(after[2][1]))  # Removed scope stays HOT.
+        self.assertEqual([(r[0],r[2],r[3]) for r in after],[(r[0],r[2],r[3]) for r in before])
+        self.assertEqual(progress[0],1)
+        self.assertEqual(json.loads(progress[1])['state'],'SUPERSEDED_POLICY')
+        self.assertEqual(hashlib.sha256(Path(proof['archive_path']).read_bytes()).hexdigest(),archive_hash)
+
+    def test_disable_enable_reconciles_without_applying_old_remainder(self):
+        document, plan, before, _ = self.partial_native_plan()
+        later = NOW+timedelta(minutes=5)
+        disabled = {**document,'revision':3,'enabled':False,'max_rows':1}
+        owner.install_maintenance_policy(self.store,policy=disabled,
+            approved_sha256=owner.policy_sha256(disabled),now=later)
+        self.assertEqual(owner.run_maintenance_step(self.store,now=later,pressure=SAFE)['status'],'DISABLED')
+        self.assertIsNone(owner._control(self.store,'active_plan'))
+        self.assertEqual(self.store._conn.execute('SELECT payload_json FROM call_ledger WHERE rowid=29').fetchone()[0],before[1][1])
+        enabled = {**disabled,'revision':4,'enabled':True}
+        owner.install_maintenance_policy(self.store,policy=enabled,
+            approved_sha256=owner.policy_sha256(enabled),now=later)
+        for minute in (0,2,4,6):
+            self.assertNotEqual(self.ordinary_caller_process(later+timedelta(minutes=minute))['status'],'FAILED')
+        self.assertTrue(all('rows' not in json.loads(row[0]) for row in self.store._conn.execute('SELECT payload_json FROM call_ledger')))
+
+    def test_ordinary_caller_repairs_policy_installed_by_previous_binary(self):
+        import types
+        document, plan, before, _ = self.partial_native_plan()
+        historical = types.ModuleType('i2_historical_policy_owner')
+        source = subprocess.check_output(['git','show',
+            'b8ed4be809652714065b0db6c54fe454a8129ec7:src/solana_alpha_lab/factory/observation_schedule_retention.py'],cwd=ROOT)
+        exec(compile(source,'<pinned-historical-policy-owner>','exec'),historical.__dict__)
+        revised = {**document,'revision':3,'max_rows':1}
+        later = NOW+timedelta(minutes=5)
+        historical.install_maintenance_policy(self.store,policy=revised,
+            approved_sha256=owner.policy_sha256(revised),now=later)
+        self.assertEqual(owner._control(self.store,'active_plan')['plan_id'],plan['plan_id'])
+        before_runs = [historical.run_maintenance_step(self.store,
+            now=later+timedelta(minutes=minute),pressure=SAFE) for minute in (0,2,4,6)]
+        self.assertEqual([item['status'] for item in before_runs],['FAILED']*4)
+        self.assertEqual({item['plan_id'] for item in before_runs},{plan['plan_id']})
+        self.assertEqual(owner._control(self.store,'maintenance')['last_reason'],'PLAN_STALE_POLICY')
+        for minute in (8,10,12,14):
+            self.assertNotEqual(self.ordinary_caller_process(later+timedelta(minutes=minute))['status'],'FAILED')
+        self.assertEqual(self.store._conn.execute('SELECT payload_json FROM call_ledger WHERE rowid=11').fetchone()[0],before[0][1])
+        self.assertTrue(all('rows' not in json.loads(row[0]) for row in self.store._conn.execute('SELECT payload_json FROM call_ledger')))
+
+    def test_policy_revision_does_not_hide_changed_candidate_or_effect(self):
+        for rowid in (11,29):
+            with self.subTest(rowid=rowid):
+                # A separate fixture is necessary: a rejected approval keeps
+                # the exact policy and active intent, including real conflicts.
+                fixture = PolicyRevisionRecoveryTests()
+                fixture.setUp()
+                try:
+                    document, plan, _, _ = fixture.partial_native_plan()
+                    fixture.store._conn.execute("UPDATE call_ledger SET payload_json=json_set(payload_json,'$.unexpected',1) WHERE rowid=?",(rowid,))
+                    fixture.store._conn.commit()
+                    revised = {**document,'revision':3,'max_rows':1}
+                    with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,'PLAN_STALE_CANDIDATE'):
+                        owner.install_maintenance_policy(fixture.store,policy=revised,
+                            approved_sha256=owner.policy_sha256(revised),now=NOW+timedelta(minutes=5))
+                    self.assertEqual(owner._control(fixture.store,'active_plan')['plan_id'],plan['plan_id'])
+                    self.assertEqual(owner._control(fixture.store,'policy')['policy'],document)
+                    failed = fixture.ordinary_caller_process(NOW+timedelta(minutes=5))
+                    self.assertEqual(failed['status'],'FAILED',failed)
+                    self.assertEqual(owner._control(fixture.store,'active_plan')['plan_id'],plan['plan_id'])
+                finally:
+                    fixture.tearDown()
+
+    def test_small_body_provenance_growth_does_not_block_policy_reconciliation(self):
+        document, _, before, _ = self.partial_native_plan(size=0,max_bytes=1000)
+        revised = {**document,'revision':3,'max_rows':1,'max_bytes':500}
+        later = NOW+timedelta(minutes=5)
+        owner.install_maintenance_policy(self.store,policy=revised,
+            approved_sha256=owner.policy_sha256(revised),now=later)
+        for minute in (0,2,4,6):
+            self.assertNotEqual(self.ordinary_caller_process(later+timedelta(minutes=minute))['status'],'FAILED')
+        self.assertEqual(self.store._conn.execute('SELECT payload_json FROM call_ledger WHERE rowid=11').fetchone()[0],before[0][1])
 
 
 class NativeRetentionTests(NativeFixture):
@@ -809,6 +996,215 @@ class NativeCutoverAndCLITests(NativeFixture):
             'rehearsal_process_peak_rss_bytes':_rehearsal_peak_rss_bytes(),
             'rss_scope':'ACTUAL_TEST_INTERPRETER_EXCLUDES_CLI_CHILDREN',
             'cli_child_peak_rss_bytes':'UNKNOWN'}))
+
+class ReclaimRestartSafetyTests(NativeFixture):
+    def test_open_guard_race_never_creates_a_disappeared_native_database(self):
+        check=ObservationScheduleStore._check_reclaim_guard
+        calls=0
+        interrupted=[]
+        def race(store):
+            nonlocal calls
+            check(store)
+            calls+=1
+            if calls==2:
+                # Actual reclaim moves the native source after the opening
+                # process passed its last pre-connect guard.
+                interrupted.append(self._killed_reclaim('ORIGINAL_MOVED'))
+        with patch.object(ObservationScheduleStore,'_check_reclaim_guard',race):
+            with self.assertRaisesRegex(ObservationScheduleStoreError,'RECLAIM_RECOVERY_REQUIRED'):
+                ObservationScheduleStore(self.path)
+        self.assertFalse(self.path.exists(),'mode=create re-created the disappeared native source')
+        owner.recover_physical_reclaim(self.path,data_root=self.hot,action='rollback',
+            approved_plan_sha256=interrupted[0]['plan_id'])
+        self.store=ObservationScheduleStore(self.path)
+
+    def _killed_reclaim(self, phase):
+        add_call(self.store, occurrence='PERSISTED', rowid=317, size=4096)
+        self.store.save_lifetime(schedule_sha256='a'*64, activation_id='LEGACY',
+            provider_calls=19, canonical_bytes=271, clock=NOW)
+        # Run native startup alias materialization before freezing the plan.
+        self.store.close()
+        self.store=ObservationScheduleStore(self.path)
+        proof=self.archive()
+        plan=owner.build_reclaim_plan(self.store,data_root=self.hot)
+        self.store.close()
+        script='''
+import json, os, sys
+from pathlib import Path
+from unittest.mock import patch
+sys.path.insert(0, str(Path.cwd() / 'src'))
+from solana_alpha_lab.factory import observation_schedule_retention as o
+from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+from solana_alpha_lab.factory.observation_schedule import parse_utc
+path, root, phase = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
+plan, proof = json.loads(sys.argv[4]), json.loads(sys.argv[5])
+write, replace = o._write_intent, o.os.replace
+def checkpoint(target, value):
+    if phase == 'NEW_BEFORE_INTENT' and value['state'] == 'PREPARED':
+        os._exit(73)
+    write(target, value)
+    if value['state'] == phase:
+        os._exit(73)
+def rename(source, target):
+    replace(source, target)
+    if phase == 'RENAME_BEFORE_INTENT' and Path(source) == path and Path(target) == o._reclaim_paths(path)[1]:
+        os._exit(73)
+store = ObservationScheduleStore(path)
+with patch.object(o, '_write_intent', checkpoint), patch.object(o.os, 'replace', rename):
+    o.apply_physical_reclaim(store, plan=plan, approved_plan_sha256=plan['plan_id'],
+        data_root=root, writers_quiesced=True, independent_recovery_proof=proof,
+        now=parse_utc(sys.argv[6]))
+'''
+        result=subprocess.run([sys.executable,'-B','-c',script,str(self.path),str(self.hot),phase,
+            json.dumps(plan),json.dumps(proof),render_utc(NOW)],capture_output=True,text=True,cwd=ROOT)
+        self.assertEqual(result.returncode,73,result.stderr)
+        return plan
+
+    def test_reboot_writer_refuses_all_reclaim_crash_windows_before_native_open(self):
+        # Each phase is a real child-process death, not exception cleanup.
+        for phase in ('NEW_BEFORE_INTENT','RENAME_BEFORE_INTENT','ORIGINAL_MOVED','SWITCHED'):
+            with self.subTest(phase=phase):
+                self.store.close()
+                runtime_root=self.hot/phase
+                runtime_root.mkdir()
+                self.path=runtime_root/'observation_schedule_state.sqlite'
+                self.store=ObservationScheduleStore(self.path)
+                add_scope(self.store)
+                # Distinct artifact names keep every killed process disposable.
+                with patch.object(self,'archive',lambda: owner.create_cold_archive(self.store,
+                        archive_path=self.base/(phase+'-archive.sqlite'),
+                        restored_path=self.base/(phase+'-restored.sqlite'),routine_roots=[self.hot])):
+                    plan=self._killed_reclaim(phase)
+                existed=self.path.exists()
+                files_before={p.name:[p.stat().st_size,hashlib.sha256(p.read_bytes()).hexdigest()]
+                    for p in runtime_root.iterdir() if p.is_file()}
+                # Actual enabled collector CLI binds its ordinary writable OPS
+                # source before any credential/provider materialization.
+                writer=subprocess.run([sys.executable,'-B',str(ROOT/'scripts/observation_schedule.py'),
+                    'tick','--once','--data-root',str(runtime_root)],
+                    capture_output=True,text=True,cwd=ROOT)
+                self.assertEqual(writer.returncode,2,writer.stdout+writer.stderr)
+                self.assertEqual(json.loads(writer.stdout)['terminal'],'RECLAIM_RECOVERY_REQUIRED')
+                self.assertEqual(self.path.exists(),existed,'ordinary open created the missing main database')
+                self.assertEqual({p.name:[p.stat().st_size,hashlib.sha256(p.read_bytes()).hexdigest()]
+                    for p in runtime_root.iterdir() if p.is_file()},files_before)
+                result=owner.recover_physical_reclaim(self.path,data_root=self.hot,action='rollback',
+                    approved_plan_sha256=plan['plan_id'])
+                self.assertEqual(result['status'],'ROLLED_BACK')
+                with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+                    self.assertEqual(owner.native_identity_fingerprint(raw),plan['fingerprint'])
+                    self.assertEqual(raw.execute('SELECT rowid FROM call_ledger').fetchone()[0],317)
+                    self.assertEqual(raw.execute('SELECT provider_calls,canonical_bytes FROM lifetime_counters').fetchone(),(19,271))
+                    self.assertEqual(json.loads(raw.execute("SELECT payload_json FROM retention_control WHERE control_key='source_identity'").fetchone()[0])['source_id'],plan['source']['source_id'])
+                    self.assertEqual(raw.execute("SELECT count(*) FROM runtime_events WHERE kind='REBOOT_WRITER'").fetchone()[0],0)
+                self.store=ObservationScheduleStore(self.path)
+
+    def test_allocating_guard_fences_already_open_native_writers_before_new_bytes(self):
+        existing=ObservationScheduleStore(self.path)
+        try:
+            plan=self._killed_reclaim('ALLOCATING')
+            self.assertFalse(owner._reclaim_paths(self.path)[0].exists())
+            later=NOW+timedelta(days=365)
+            operations=[lambda: existing.record_event('STALE',{},clock=later),
+                lambda: existing.acquire_lease('reboot-collector',clock=later),
+                lambda: existing.save_publication_job(content_sha256='b'*64,stage='NEW',payload={},clock=later),
+                lambda: existing.save_lifetime(schedule_sha256='a'*64,activation_id='LEGACY',provider_calls=0,canonical_bytes=0,clock=later),
+                existing._connect]
+            for operation in operations:
+                with self.assertRaisesRegex(ObservationScheduleStoreError,'RECLAIM_RECOVERY_REQUIRED'):
+                    operation()
+            existing.close()
+            result=owner.recover_physical_reclaim(self.path,data_root=self.hot,action='rollback',
+                approved_plan_sha256=plan['plan_id'])
+            self.assertEqual(result['byte_disposition']['staging_bytes_released'],0)
+            with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+                self.assertEqual(raw.execute('SELECT provider_calls,canonical_bytes FROM lifetime_counters').fetchone(),(19,271))
+        finally:
+            existing.close()
+
+    def test_exact_resume_completes_prepared_and_rename_crash_windows(self):
+        for phase in ('PREPARED','RENAME_BEFORE_INTENT','ORIGINAL_MOVED'):
+            with self.subTest(phase=phase):
+                self.store.close()
+                self.path=self.hot/(phase+'.sqlite')
+                self.store=ObservationScheduleStore(self.path)
+                add_scope(self.store)
+                with patch.object(self,'archive',lambda: owner.create_cold_archive(self.store,
+                        archive_path=self.base/(phase+'-archive.sqlite'),
+                        restored_path=self.base/(phase+'-restored.sqlite'),routine_roots=[self.hot])):
+                    plan=self._killed_reclaim(phase)
+                result=owner.recover_physical_reclaim(self.path,data_root=self.hot,action='resume',
+                    approved_plan_sha256=plan['plan_id'])
+                self.assertEqual(result['status'],'RESUMED')
+                self.assertFalse(owner._reclaim_paths(self.path)[1].exists())
+                with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+                    self.assertEqual(owner.native_identity_fingerprint(raw),plan['fingerprint'])
+                self.store=ObservationScheduleStore(self.path)
+
+    def test_cleanup_process_death_resumes_exact_disposition_then_allows_next_reclaim(self):
+        plan=self._killed_reclaim('SWITCHED')
+        compact,rollback,intent_path=owner._reclaim_paths(self.path)
+        rollback_size=rollback.stat().st_size
+        script='''
+import os, sys
+from pathlib import Path
+from unittest.mock import patch
+sys.path.insert(0, str(Path.cwd() / 'src'))
+from solana_alpha_lab.factory import observation_schedule_retention as o
+path=Path(sys.argv[1])
+remove=o._reclaim_unlink
+def killed_remove(candidate):
+    size=remove(candidate)
+    if candidate == o._reclaim_paths(path)[1]:
+        os._exit(74)
+    return size
+with patch.object(o, '_reclaim_unlink', killed_remove):
+    o.recover_physical_reclaim(path,data_root=Path(sys.argv[2]),action='resume',approved_plan_sha256=sys.argv[3])
+'''
+        killed=subprocess.run([sys.executable,'-B','-c',script,str(self.path),str(self.hot),plan['plan_id']],
+            capture_output=True,text=True,cwd=ROOT)
+        self.assertEqual(killed.returncode,74,killed.stderr)
+        self.assertFalse(rollback.exists())
+        pending=json.loads(intent_path.read_text())
+        self.assertEqual(pending['state'],'RESUMED')
+        self.assertEqual(next(row['binding']['size'] for row in pending['cleanup_files'] if row['name']==rollback.name),rollback_size)
+        with self.assertRaisesRegex(ObservationScheduleStoreError,'RECLAIM_RECOVERY_REQUIRED'):
+            ObservationScheduleStore(self.path)
+        with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,'ROLLBACK_AFTER_RESUME_DENIED'):
+            owner.recover_physical_reclaim(self.path,data_root=self.hot,action='rollback',approved_plan_sha256=plan['plan_id'])
+        resumed=owner.recover_physical_reclaim(self.path,data_root=self.hot,action='resume',approved_plan_sha256=plan['plan_id'])
+        self.assertEqual(resumed['byte_disposition']['rollback_bytes_released'],sum(row['binding']['size']
+            for row in pending['cleanup_files'] if row['name'].startswith(rollback.name)))
+        self.store=ObservationScheduleStore(self.path)
+        self.store.record_event('AFTER_FINALIZE',{},clock=NOW)
+        repeated=owner.recover_physical_reclaim(self.path,data_root=self.hot,action='resume',approved_plan_sha256=plan['plan_id'])
+        self.assertTrue(repeated['idempotent'])
+        proof=owner.create_cold_archive(self.store,archive_path=self.base/'second-original.sqlite',
+            restored_path=self.base/'second-restored.sqlite',routine_roots=[self.hot])
+        second=owner.build_reclaim_plan(self.store,data_root=self.hot)
+        owner.apply_physical_reclaim(self.store,plan=second,approved_plan_sha256=second['plan_id'],
+            data_root=self.hot,writers_quiesced=True,independent_recovery_proof=proof,now=NOW)
+        owner.recover_physical_reclaim(self.path,data_root=self.hot,action='resume',approved_plan_sha256=second['plan_id'])
+        self.store=ObservationScheduleStore(self.path)
+
+    def test_reclaim_resume_finalizes_owned_bytes_and_keeps_rollback_denied(self):
+        plan=self._killed_reclaim('SWITCHED')
+        result=owner.recover_physical_reclaim(self.path,data_root=self.hot,action='resume',
+            approved_plan_sha256=plan['plan_id'])
+        compact,rollback,intent_path=owner._reclaim_paths(self.path)
+        self.assertFalse(compact.exists())
+        self.assertFalse(rollback.exists(),'successful native acceptance retained the entire original HOT database')
+        self.assertEqual(result['status'],'RESUMED')
+        self.assertEqual(json.loads(intent_path.read_text())['state'],'FINALIZED')
+        print('I2_RECLAIM_FINALIZE '+json.dumps({'terminal':'FINALIZED','staging_exists':compact.exists(),
+            'rollback_exists':rollback.exists(),'terminal_receipt_bytes':intent_path.stat().st_size,
+            'byte_disposition':result['byte_disposition'],'db_bytes':self.path.stat().st_size,
+            'rowid':317,'lifetime_provider_calls':19,'lifetime_canonical_bytes':271}))
+        self.store=ObservationScheduleStore(self.path)
+        self.store.record_event('SUCCESSOR',{},clock=NOW)
+        with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,'ROLLBACK_AFTER_RESUME_DENIED'):
+            owner.recover_physical_reclaim(self.path,data_root=self.hot,action='rollback',
+                approved_plan_sha256=plan['plan_id'])
 
 if __name__ == '__main__':
     unittest.main()

@@ -711,3 +711,18 @@ durable refusal; bounded cursor продолжает другие записи, 
 FAILED создаёт incident через existing watch; disabled policy молчит, yields
 по cadence/pressure/due не являются failure. Backup success не скрывает failure
 maintenance или последней попытки upload.
+
+При approved policy revision существующий active plan проходит bounded identity/
+candidate/cold/effect checks и помечается SUPERSEDED_POLICY; только неприменённый
+остаток отменяется. Выполненные effects, ROWIDs, clocks, provenance и cold pins
+сохраняются; новая policy получает свежую bounded selection. Disable/enable и
+stale intent предыдущего бинарника продолжаются через обычный caller. Настоящий
+candidate/integrity conflict остаётся FAILED/refusal и не вызывает автоматический
+replan. Ни SQL-редактирование, ни ежедневный owner action для обычной смены
+approved policy не требуются.
+
+Backup contention автоматически повторяется существующим caller ≤120min/30s;
+weekly/daily overlap объединяется по verified bytes и durable pointer. Exhausted
+wait даёт COPY_FAILED/OFFHOST_BUSY_RETRY_EXHAUSTED в bounded scheduler receipt,
+точный pending/resume и existing watch incident; last-good остаётся прежним.
+Успех active backup owner снимает incident. Timers/RPO24h не меняются.
