@@ -4,8 +4,8 @@
   "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-CAPTURE-FIT",
   "as_of": "2026-10-15",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "e8fe9ea75d072cb95fd39489ffbbb6bdbd0a002a6db23edbd7ec52d7dbe22516",
-  "reviewed_inventory_sha256": "754affeeae59033973d2bb7022f497e8fdabf0a0900d493481f2a795c31c2e76",
+  "reviewed_bindings_sha256": "4a02ea385c46697fbcc2a5911eb28eea576eb071374196863cd8231f14766e24",
+  "reviewed_inventory_sha256": "ca80bf06c9f0a5a1d3db4f22f8f09601d206aaaa273c27eeddccc48a26e44c44",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
