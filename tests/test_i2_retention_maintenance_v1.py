@@ -391,6 +391,101 @@ class NativeRetentionTests(NativeFixture):
         self.assertEqual(wal_path.read_bytes(),wal_before)
 
 class AutomaticMaintenanceTests(unittest.TestCase):
+    def test_three_same_scope_raw_batches_finish_through_ordinary_caller_after_restart(self):
+        from contextlib import ExitStack, closing
+        from dataclasses import replace
+        import os
+        from tests.test_factory_offhost_backup import FakeRcloneRunner, _seed_tree
+        from solana_alpha_lab.factory import offhost_backup as backup, hot90_closed_day_loop as closed_day
+        from solana_alpha_lab.factory.hot90_activation import write_hot90_runtime_state
+        from solana_alpha_lab.factory.remote_ops import load_config_v1_1
+        with tempfile.TemporaryDirectory() as temporary, ExitStack() as cleanup:
+            base=Path(temporary); root=_seed_tree(base/'factory')
+            for relative in ('configs/observation_schedule_runtime_v1.yaml',
+                             'catalog/schemas/observation_schedule_runtime_v1.schema.json'):
+                target=root/relative; target.parent.mkdir(parents=True,exist_ok=True)
+                target.write_bytes((ROOT/relative).read_bytes())
+            loaded=load_config_v1_1(root)
+            for relative in loaded['backup']['mutable_only_recursive_relative_paths']:
+                (root/relative).mkdir(parents=True,exist_ok=True)
+            write_hot90_runtime_state(root,{'activation_stage':'DURABILITY_CUTOVER',
+                'production_compaction_enabled':False,'production_eviction_enabled':False,'drive_writes_enabled':True})
+            credentials=root/'rclone-fixture.conf'; credentials.write_text('[fixture]\ntype = drive\n',encoding='utf-8')
+            credentials.chmod(0o600)
+            config=replace(backup.load_offhost_config(root),rclone_config_absolute=credentials)
+            remote=FakeRcloneRunner()
+            def transport(argv):
+                sub=remote._subcommand(argv)
+                if sub=='copyto' and argv[-2] in remote.payloads:
+                    target=Path(argv[-1]); target.parent.mkdir(parents=True,exist_ok=True)
+                    target.write_bytes(remote.payloads[argv[-2]])
+                    return subprocess.CompletedProcess(argv,0,'','')
+                if sub=='copyto' and argv[-2].startswith(config.remote_prefix):
+                    return subprocess.CompletedProcess(argv,1,'','object absent')
+                if sub=='hashsum' and 'sha256' in argv:
+                    payload=remote.payloads.get(argv[-1])
+                    return subprocess.CompletedProcess(argv,1,'','object absent') if payload is None else subprocess.CompletedProcess(
+                        argv,0,hashlib.sha256(payload).hexdigest()+'  '+Path(argv[-1]).name+'\n','')
+                return remote(argv)
+            path=root/'local/factory_v1/observation_schedule_state.sqlite'
+            with owner._sqlite_connection(path) as fixture:
+                fixture.execute('DROP TABLE activations')
+            store=ObservationScheduleStore(path); cleanup.callback(store.close)
+            add_scope(store,'LEGACY','COMPLETE')
+            for number in range(3):
+                relative='datasets/raw_evidence/20260905/raw'+str(number)+'.json'
+                raw=root/'local/factory_v1/observation_rdp'/relative
+                raw.parent.mkdir(parents=True,exist_ok=True); raw.write_text(json.dumps({'source':number}),encoding='utf-8')
+                add_call(store,'C'+str(number),size=1000,raw=relative)
+            document=policy(enabled=True); document.update(max_rows=1,auto_retire_terminal=True,
+                archive_refresh={'enabled':True,'max_objects':128,'max_bytes':64*1024*1024,
+                    'max_wall_seconds':120,'cold_root_relative':'local/factory_v1/retirement_cold',
+                    'minimum_interval_seconds':60,'local_cache_retained':1})
+            owner.install_maintenance_policy(store,policy=document,approved_sha256=owner.policy_sha256(document),now=NOW)
+            store.close(); store=ObservationScheduleStore(path); cleanup.callback(store.close); store.close()
+            original_read_text=Path.read_text
+            def host_read_text(path,*args,**kwargs):
+                if path.as_posix()=='/proc/meminfo': return 'MemAvailable: 1048576 kB\n'
+                if path.as_posix()=='/proc/pressure/io': return 'some avg10=0.00 avg60=0.00 avg300=0.00 total=0\n'
+                return original_read_text(path,*args,**kwargs)
+            remaining=[]; outcomes=[]; cache_counts=[]
+            with patch.object(backup,'load_offhost_config',return_value=config), patch.object(
+                    closed_day,'load_offhost_config',return_value=config), patch.object(
+                    os,'getloadavg',return_value=(0,0,0),create=True), patch.object(Path,'read_text',new=host_read_text):
+                archived=closed_day.process_one_day(root,'20260905',now=NOW,rclone_runner=transport,allow_drive=True)
+                self.assertEqual(archived['terminal'],'REMOTE_CONTENT_SHA256_VERIFIED',archived)
+                for cycle in range(10):
+                    now=NOW+timedelta(days=cycle)
+                    receipt=backup.run_offhost_checkpoint(root,mode='daily',config=config,runner=transport,now=now)
+                    outcome=backup.run_checkpoint_maintenance(root,receipt,now=now,runner=transport)
+                    outcomes.append(outcome)
+                    with closing(ObservationScheduleStore(path,readonly=True,immutable=False)) as restarted:
+                        count=restarted._conn.execute("SELECT count(*) FROM call_ledger WHERE json_extract(payload_json,'$.raw_payload_retention') IS NULL").fetchone()[0]
+                        remaining.append(count)
+                        self.assertEqual(owner.retention_status(restarted)['approved_policy_sha256'],owner.policy_sha256(document))
+                        self.assertLessEqual((remaining[-2] if len(remaining)>1 else 3)-count,document['max_rows'])
+                    cache_root=root/document['archive_refresh']['cold_root_relative']
+                    caches=[item for item in cache_root.iterdir() if item.is_dir()] if cache_root.is_dir() else []
+                    cache_counts.append(len(caches))
+                    self.assertLessEqual(len(caches),2,(remaining,outcomes))
+                    if 'scanned_rows' in outcome:
+                        self.assertLessEqual(outcome['scanned_rows'],document['max_rows'])
+                        self.assertLessEqual(outcome['scanned_bytes'],document['max_bytes'])
+                    if count==0: break
+            self.assertEqual(remaining[-1],0,(remaining,outcomes))
+            self.assertEqual(cache_counts[-1],1)
+            with closing(ObservationScheduleStore(path,readonly=True,immutable=False)) as restarted:
+                retired=owner._scope_retirement(restarted,('a'*64,'LEGACY'))
+                self.assertIsNotNone(retired)
+                for filename in retired['archive_proof']['pin_objects']:
+                    self.assertIsNotNone(restarted._conn.execute('SELECT 1 FROM retention_archive_pins WHERE object_name=?',(filename,)).fetchone())
+                    self.assertIn(config.remote_object(filename),remote.payloads)
+                self.assertFalse(Path(retired['archive_proof']['cache_root']).exists())
+            self.assertEqual(len(list((root/'local/factory_v1/observation_rdp/datasets/raw_evidence/20260905').glob('*.json'))),3)
+            print('I2_MULTI_BATCH_REHEARSAL '+json.dumps({'remaining_bodies_after_ordinary_cycles':remaining,
+                'cache_generations_after_cycles':cache_counts,'max_rows':1,'old_remote_proof_pins':'PRESERVED',
+                'old_local_cache':'RELEASED','hot_raw_files':3}))
+
     def test_forged_restore_cache_cannot_register_rows_absent_from_remote_objects(self):
         from contextlib import ExitStack
         from dataclasses import replace
@@ -528,6 +623,7 @@ class AutomaticMaintenanceTests(unittest.TestCase):
                     registered=subprocess.run([*command,'--i-understand-apply'],capture_output=True,text=True)
                     self.assertEqual(registered.returncode,0,registered.stderr)
                     record=json.loads(record_path.read_text(encoding='utf-8'))
+                    first_record=record
                     self.assertEqual(record,owner._control(store,'checkpoint_archive'))
                     self.assertEqual(record['proof_class'],'REMOTE_CHECKPOINT_RESTORE_VERIFIED')
                     self.assertEqual(record['source_id'],owner._control(store,'source_identity')['source_id'])
@@ -544,6 +640,15 @@ class AutomaticMaintenanceTests(unittest.TestCase):
                             writers_quiesced=True,independent_recovery_proof=record,now=NOW)
                 else:
                     owner.register_checkpoint_retirement_archive(store,proof=proof,isolated_root=isolated,source_root=root,now=NOW+timedelta(days=day))
+                    current_record=owner._control(store,'checkpoint_archive')
+                    owner._set_control(store,'active_plan',{'archive_registry':{'old':first_record}})
+                    store._conn.commit()
+                    self.assertEqual(owner.checkpoint_archive_cache_releasable(store)['reason'],'CHECKPOINT_CACHE_ACTIVE_CONSUMER')
+                    owner._set_control(store,'active_plan',{'archive_registry':{'current':current_record}})
+                    store._conn.commit()
+                    self.assertEqual(owner.checkpoint_archive_cache_releasable(store)['status'],'RELEASABLE')
+                    store._conn.execute("DELETE FROM retention_control WHERE control_key='active_plan'")
+                    store._conn.commit()
                 store.close()
                 store=ObservationScheduleStore(path)
                 cleanup.callback(store.close)

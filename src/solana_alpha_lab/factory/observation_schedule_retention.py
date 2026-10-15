@@ -421,7 +421,7 @@ def register_checkpoint_retirement_archive(store: ObservationScheduleStore, *,
                 _set_control(store, "checkpoint_archive_cache_release", {
                     "checkpoint_sha256": previous["checkpoint_sha256"], "cache_root": previous["cache_root"],
                     "file_bindings": previous["file_bindings"], "archive_path": previous["archive_path"],
-                    "inventory_path": previous["inventory_path"]})
+                    "inventory_path": previous["inventory_path"], "pin_objects": previous["pin_objects"]})
             _set_control(store, "checkpoint_archive", record)
             # Retry rescan preserves effects and the former durable cursor.
             store._conn.execute("DELETE FROM retention_control WHERE control_key='active_plan'")
@@ -448,30 +448,27 @@ def checkpoint_archive_cache_releasable(store: ObservationScheduleStore, isolate
         return {"status": "NONE"}
     if isolated_root is not None and Path(token["cache_root"]).resolve() != isolated_root.resolve():
         raise ObservationScheduleRetentionError("CHECKPOINT_CACHE_RELEASE_IDENTITY_MISMATCH")
-    if _control(store, "active_plan") or _control(store, "checkpoint_archive_refresh_pending"):
+    plan = _control(store, "active_plan") or {}
+    for proof in plan.get("archive_registry", {}).values():
+        if (proof.get("cache_root") == token["cache_root"]
+                or proof.get("archive_path") == token["archive_path"]):
+            return {"status": "WAIT", "reason": "CHECKPOINT_CACHE_ACTIVE_CONSUMER"}
+    pending = _control(store, "checkpoint_archive_refresh_pending") or {}
+    if pending.get("checkpoint_sha256") == token["checkpoint_sha256"]:
         return {"status": "WAIT", "reason": "CHECKPOINT_CACHE_ACTIVE_CONSUMER"}
+    # Untouched bodies remain HOT. An absent raw dependency in both caches is
+    # not a consumer of the old cache: its pinned immutable day archive can be
+    # downloaded for the next bounded batch. Only exact consumers block release.
+    current = _control(store, "checkpoint_archive")
+    if not current or current.get("cache_root") == token["cache_root"]:
+        return {"status": "WAIT", "reason": "CHECKPOINT_CACHE_REPLACEMENT_MISSING"}
+    _verify_checkpoint_archive(current, deep=False)
+    pins = token.get("pin_objects") or []
+    if (not pins or len(pins) > 128 or any(store._conn.execute(
+            "SELECT 1 FROM retention_archive_pins WHERE object_name=?", (name,)).fetchone() is None for name in pins)):
+        return {"status": "WAIT", "reason": "CHECKPOINT_CACHE_REMOTE_PINS_REQUIRED"}
     if not Path(token["cache_root"]).exists():
         return {"status": "RELEASABLE", "token": token}  # Delete-before-ack recovery.
-    # Old retirement rows retain immutable remote locators/pins. Remaining body
-    # readers use the new verified archive, which still has their original JSON.
-    installed = _control(store, "policy", {})
-    policy = installed.get("policy", {})
-    current = _control(store, "checkpoint_archive")
-    if not current:
-        return {"status": "WAIT", "reason": "CHECKPOINT_CACHE_REPLACEMENT_MISSING"}
-    limit = int(policy.get("max_rows", 256))
-    bytes_left = int(policy.get("max_bytes", MAX_PLAN_BYTES))
-    rows = store._conn.execute("SELECT c.rowid,c.call_occurrence_id,length(CAST(c.payload_json AS BLOB)) FROM call_ledger c WHERE EXISTS (SELECT 1 FROM due_observations d JOIN retirement_scopes r ON r.schedule_sha256=d.schedule_sha256 AND r.activation_id=d.activation_id WHERE d.request_sha256=c.request_sha256) AND json_extract(c.payload_json,'$.raw_payload_retention') IS NULL ORDER BY c.rowid LIMIT ?", (limit + 1,))
-    for index, row in enumerate(rows):
-        if index >= limit or row[2] > bytes_left:
-            return {"status": "WAIT", "reason": "CHECKPOINT_CACHE_COVERAGE_BUDGET"}
-        bytes_left -= row[2]
-        payload = store._conn.execute("SELECT payload_json FROM call_ledger WHERE rowid=?", (row[0],)).fetchone()[0]
-        try:
-            _archive_candidate_matches({"table": "call_ledger", "row": {"source_rowid": row[0], "call_occurrence_id": row[1]},
-                "payload_sha256": hashlib.sha256(payload.encode()).hexdigest(), "archive_proofs": [current]})
-        except ObservationScheduleRetentionError:
-            return {"status": "WAIT", "reason": "CHECKPOINT_CACHE_REPLACEMENT_CLOSURE_MISSING"}
     if [_archive_binding(Path(token[key])) for key in ("archive_path", "inventory_path")] != token["file_bindings"]:
         raise ObservationScheduleRetentionError("CHECKPOINT_CACHE_RELEASE_BINDING_CHANGED")
     return {"status": "RELEASABLE", "token": token}
@@ -852,7 +849,7 @@ def _protect(store: ObservationScheduleStore, row: Mapping[str, Any], table: str
                            "archive_missing": True, "retire_pending_due": False}
         if not retired or retired.get("disallow_resume") is not True:
             return "EXPLICIT_RETIREMENT_REQUIRED", []
-        if retired.get("automatic"):
+        if retired.get("automatic") or (retired.get("archive_proof") or {}).get("proof_class") == "REMOTE_CHECKPOINT_RESTORE_VERIFIED":
             # Remote provenance stays immutable; current verified source closure
             # supplies any still-uncompacted rows after an old local cache exits.
             current_archive = _control(store, "checkpoint_archive")

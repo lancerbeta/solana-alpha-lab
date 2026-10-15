@@ -475,6 +475,102 @@ print(json.dumps(remote.package_backup(root,config=config,sink_override=sink,pru
     def test_after_marker_restore_repairs_and_rebuilds_native_panel_with_partition_manifests(self) -> None:
         self._publication_partition_recovery("AFTER_MARKER")
 
+    def test_native_after_manifest_between_membership_and_fence_preserves_exact_source(self) -> None:
+        self._publication_arrives_before_fence("AFTER_MANIFEST")
+
+    def test_native_after_marker_between_membership_and_fence_preserves_exact_source(self) -> None:
+        self._publication_arrives_before_fence("AFTER_MARKER")
+
+    def _publication_arrives_before_fence(self, fault: str) -> None:
+        from tests.test_opportunity_episodes_harness_v1 import EpisodeScenario,nominate,synth_mint,token_object
+        from solana_alpha_lab.factory.observation_panel_publisher import (
+            repair_open_publication_jobs,rebuild_observation_panel_from_rdp)
+        import pyarrow.parquet as pq
+
+        start=datetime(2026,10,5,tzinfo=UTC)
+        sc=EpisodeScenario(self.root/RDP,start=start,stops=start+timedelta(hours=1))
+        mint=synth_mint("I2-fence-race")
+        row=token_object(mint,price=1,liquidity=10000,holders=60)
+        nominate(sc.market,start,{"toporganicscore":[row],"toptraded":[],"toptrending":[]})
+        sc.market.series[mint]=lambda _now:row
+        jobs_root=sc.data_root/"datasets/publication_jobs"
+        jobs_root.mkdir(parents=True,exist_ok=True)
+        self.config["backup"]["source_relative_paths"]=[sc.ops_path.relative_to(self.root).as_posix()]
+        self.config["backup"]["recursive_relative_paths"]=[f"{RDP}/datasets/publication_jobs"]
+        original_fence=remote._capture_writer_fences
+        observed={}
+        @contextmanager
+        def publish_before_fence(sources):
+            self.assertEqual(list(jobs_root.rglob("*.json")),[])
+            crashed=sc.tick(start+timedelta(seconds=5),fault=fault)
+            self.assertNotEqual(crashed["_exit_code"],0)
+            job_path=next((jobs_root/"open").glob("*.json"))
+            job=json.loads(job_path.read_text(encoding="utf-8"))
+            manifest=sc.data_root/"datasets/manifests"/(job["dataset_manifest_id"]+".json")
+            observed.update(job=job,job_path=job_path.relative_to(self.root).as_posix(),
+                job_bytes=job_path.read_bytes(),manifest_bytes=manifest.read_bytes(),
+                observations=pq.read_table(sc.data_root/job["parquet_rel"]).to_pylist(),
+                members=pq.read_table(sc.data_root/job["member_rel"]).to_pylist())
+            with original_fence(sources):
+                yield
+        with patch.object(remote,"_capture_writer_fences",publish_before_fence):
+            with patch.object(remote,"consistent_sqlite_backup",wraps=remote.consistent_sqlite_backup) as capture:
+                packed=self.full()
+                self.assertEqual(capture.call_count,1)
+        self.assertIn(observed["job_path"],{item["path"] for item in packed["entries"]})
+        with zipfile.ZipFile(self.sink/packed["bundle"]) as archive:
+            self.assertEqual(archive.read(observed["job_path"]),observed["job_bytes"])
+        sc.data_root.rename(sc.data_root.with_name("race-source-unavailable"))
+        restored=Path(self.temp.name)/"race-restored"
+        remote.restore_incremental_chain_isolated(full_bundle=self.sink/packed["bundle"],deltas=[],
+            dest_root=restored,expected_inventory_sha256=packed["inventory_sha256"])
+        repaired=repair_open_publication_jobs(data_root=restored/RDP,root=ROOT,schedule=sc.schedule,
+            activation_id=sc.activation_id,now=start+timedelta(days=2),producer_git_sha="d"*40)
+        self.assertEqual(len(repaired),1)
+        job=observed["job"]
+        self.assertEqual(repaired[0]["dataset_manifest_id"],job["dataset_manifest_id"])
+        restored_manifest=restored/RDP/"datasets/manifests"/(job["dataset_manifest_id"]+".json")
+        self.assertEqual(restored_manifest.read_bytes(),observed["manifest_bytes"])
+        manifest=json.loads(restored_manifest.read_text(encoding="utf-8"))
+        self.assertEqual(manifest["first_reliable_available_at"],json.loads(observed["manifest_bytes"])["first_reliable_available_at"])
+        self.assertTrue(manifest["first_reliable_available_at"].startswith("2026-10-05"))
+        panel=rebuild_observation_panel_from_rdp(data_root=restored/RDP,schedule_sha256=sc.schedule["schedule_sha256"])
+        canonical=lambda rows:sorted(json.dumps(item,sort_keys=True,default=str) for item in rows)
+        self.assertEqual(canonical(panel["observations"]),canonical(observed["observations"]))
+        self.assertEqual(canonical(panel["members"]),canonical(observed["members"]))
+        self.assertEqual(panel["dataset_manifest_ids"],[job["dataset_manifest_id"]])
+
+    def test_new_sqlite_after_provisional_scan_is_not_captured_without_fence(self) -> None:
+        original_fence=remote._capture_writer_fences
+        @contextmanager
+        def introduce_sqlite(sources):
+            with closing(sqlite3.connect(self.root/RDP/"new-store.sqlite")) as conn:
+                conn.execute("CREATE TABLE new_state(id INTEGER PRIMARY KEY)")
+                conn.commit()
+            with original_fence(sources):
+                yield
+        with patch.object(remote,"_capture_writer_fences",introduce_sqlite):
+            with patch.object(remote,"consistent_sqlite_backup",wraps=remote.consistent_sqlite_backup) as capture:
+                with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_UNFENCED_SQLITE_DISCOVERED"):
+                    self.full()
+                self.assertEqual(capture.call_count,0)
+
+    def test_authoritative_membership_scan_uses_original_fence_deadline(self) -> None:
+        original_scan=remote._backup_source_paths
+        clock=[0.0]
+        scans=[0]
+        def slow_authoritative_scan(*args,**kwargs):
+            scans[0]+=1
+            if scans[0]==2:
+                clock[0]=2.0
+            return original_scan(*args,**kwargs)
+        with patch.object(remote.time,"monotonic",side_effect=lambda:clock[0]):
+            with patch.object(remote,"BACKUP_CAPTURE_FENCE_SECONDS",1.0):
+                with patch.object(remote,"_backup_source_paths",slow_authoritative_scan):
+                    with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED"):
+                        self.full()
+        self.assertEqual(scans[0],2)
+
     def _publication_partition_recovery(self, fault: str) -> None:
         from tests.test_opportunity_episodes_harness_v1 import EpisodeScenario,nominate,synth_mint,token_object
         from solana_alpha_lab.factory.observation_panel_publisher import (

@@ -77,7 +77,7 @@
     "next_full_raw_sql_oracle": "PASS_RETIRED_BODY_KEYS_ZERO_NATIVE_SUCCESSOR_PRESENT",
     "final_current_causal_proof": "REQUIRED_AFTER_LOGICAL_APPLY_OLD_PROOF_DENY",
     "next_compact_full_archive_bytes_observed_range": [
-      12302,
+      12293,
       12309
     ],
     "next_full_checkpoint_wall_seconds_observed": 0.046,
@@ -186,7 +186,32 @@
       "lifetime_counters",
       "account_budget_members"
     ],
-    "production_installed_caller": "LIVE_PENDING_INSTALL"
+    "production_installed_caller": "LIVE_PENDING_INSTALL",
+    "multi_batch_rehearsal": {
+      "max_rows": 1,
+      "remaining_bodies_after_ordinary_cycles": [
+        3,
+        3,
+        2,
+        2,
+        1,
+        1,
+        0
+      ],
+      "cache_generations_after_cycles": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "reopen_between_cycles": true,
+      "old_remote_proof_pins": "PRESERVED",
+      "old_local_cache": "RELEASED",
+      "hot_raw_files_preserved": 3
+    }
   },
   "falsifiers": [
     "post-inventory writer/path mutation cannot change captured bytes or membership",
@@ -202,7 +227,9 @@
     "schema rejects freshness30h/RPO24h; completed old snapshot never becomes fresh",
     "existing malformed chain file refuses bootstrap before capture/network",
     "cold registration rejects swapped standalone SQLite even if UUID and caller inventory are rebound",
-    "reclaim refuses older proof after any causal native event/counter/admission"
+    "reclaim refuses older proof after any causal native event/counter/admission",
+    "native publication between provisional census and writer fence preserves exact Oct5 manifests and availability during Oct7 recovery",
+    "one COMPLETE scope with three raw batches and max_rows1 completes across ordinary restart cycles without cache-generation growth"
   ],
   "review_remediations": [
     "WAL sidecar replay",
@@ -217,10 +244,35 @@
     "read-only requested budget narrowing",
     "strict corrupt-existing chain state vs absent bootstrap",
     "cold source-to-verified-object reconstruction binding",
-    "final-current causal recovery fingerprint"
+    "final-current causal recovery fingerprint",
+    "authoritative membership under all writer fences preserves publication PIT identity",
+    "dependency-based old-cache release removes multi-batch refresh cycle"
   ],
   "validation": {
     "final_targeted_regression": {
+      "result": "PASS",
+      "tests": 45,
+      "wall_seconds": 32.691,
+      "modules": [
+        "tests.test_i2_backup_legacy_storage_v1",
+        "tests.test_i2_retention_maintenance_v1",
+        "tests.test_i2_pipeline_v1"
+      ],
+      "worker_direct_snapshot_and_legacy_consumers": "53_PASS_12.891s",
+      "worker_native_and_direct_offhost_consumers": "28_PASS_24.694s"
+    },
+    "github_ci": "ENFORCED_EXACT_HEAD",
+    "local_full_gate": "NOT_RUN_PRE_PR_BY_POLICY",
+    "prior_direct_consumer_regression": {
+      "tests": 178,
+      "skipped": 1,
+      "wall_seconds": 341.603,
+      "result": "PASS"
+    },
+    "static_contracts": "PASS",
+    "credential_scan_self_test": "PASS",
+    "credential_scan_repository": "PASS",
+    "previous_final_96_tests": {
       "result": "PASS",
       "tests": 96,
       "skipped": 1,
@@ -234,18 +286,7 @@
         "tests.test_i2_pipeline_v1"
       ],
       "subsequent_test_only_strengthening": "PASS_4_FORGED_COLD_CASES_NEW_CALL_COUNTER_ADMISSION_SAME_ROWCOUNT_BODY_0.864s"
-    },
-    "github_ci": "ENFORCED_EXACT_HEAD",
-    "local_full_gate": "NOT_RUN_PRE_PR_BY_POLICY",
-    "prior_direct_consumer_regression": {
-      "tests": 178,
-      "skipped": 1,
-      "wall_seconds": 341.603,
-      "result": "PASS"
-    },
-    "static_contracts": "PASS",
-    "credential_scan_self_test": "PASS",
-    "credential_scan_repository": "PASS"
+    }
   },
   "runtime_mandatory_pending": [
     "exact deployment",

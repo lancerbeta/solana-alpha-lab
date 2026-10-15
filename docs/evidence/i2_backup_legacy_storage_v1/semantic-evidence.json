@@ -1,7 +1,7 @@
 [
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/proof.json",
-    "sha256_or_fingerprint": "48cde15b6d770b800a5ae29deede9347ff79c7f4267a33146cdb80fa79ad6fde"
+    "sha256_or_fingerprint": "fdb68fc9f541016a5e7c83b51860cd65dea94730a80bfb0257d0fbef69f7d016"
   },
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md",
@@ -9,6 +9,6 @@
   },
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md",
-    "sha256_or_fingerprint": "0cb3db3eac1e3cfb5f6f1c45a0ced4fe980c5326701992f03433900f1003bcbf"
+    "sha256_or_fingerprint": "afe197860c9a42d8a94aa36be87cc063be28378eae618142bb9b47e252100793"
   }
 ]

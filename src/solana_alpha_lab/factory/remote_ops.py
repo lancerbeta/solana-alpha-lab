@@ -49,6 +49,7 @@ BACKUP_SNAPSHOT_STAGING_RELATIVE = "local/factory_v1/backup_snapshot_staging"
 BACKUP_SNAPSHOT_OWNER_NAME = ".capture-owner.json"
 _HELD_BACKUP_LOCKS: ContextVar[frozenset[str]] = ContextVar("factory_backup_locks")
 BACKUP_CAPTURE_FENCE_SECONDS = 30.0
+BACKUP_SOURCE_SCAN_MAX_PATHS = 65536
 BACKUP_PARTITION_SCAN_MAX_FILES = 16384
 BACKUP_PARTITION_SCAN_MAX_BYTES = 32 * 1024 * 1024
 PROTECTED_LIVE_NAMES = frozenset(
@@ -795,11 +796,25 @@ def _assert_independent_sink(root: Path, loaded: Mapping[str, Any], sink: Path) 
 def _backup_source_paths(
     root: Path,
     loaded: Mapping[str, Any],
+    *,
+    deadline_monotonic: float | None = None,
 ) -> list[tuple[str, Path, bool]]:
     result: list[tuple[str, Path, bool]] = []
     seen: set[str] = set()
+    scanned_paths = 0
+
+    def scan_step() -> None:
+        nonlocal scanned_paths
+        if deadline_monotonic is not None and time.monotonic() > deadline_monotonic:
+            raise RemoteOpsError("BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED")
+        scanned_paths += 1
+        if scanned_paths > BACKUP_SOURCE_SCAN_MAX_PATHS:
+            raise RemoteOpsError("BACKUP_SOURCE_SCAN_BUDGET_EXCEEDED")
+
+    scan_step()
     sources, recursive = _effective_backup_lists(root, loaded)
     for relative in sources:
+        scan_step()
         normalized = str(relative).replace("\\", "/")
         source = _safe_relative(root, normalized)
         if source.is_file() is False:
@@ -808,11 +823,15 @@ def _backup_source_paths(
             result.append((normalized, source, normalized.endswith(".sqlite")))
             seen.add(normalized)
     for relative in recursive:
+        scan_step()
         normalized_root = str(relative).replace("\\", "/").rstrip("/")
         source_root = _safe_relative(root, normalized_root)
         if source_root.is_dir() is False:
             raise RemoteOpsError(f"BACKUP_SOURCE_MISSING:{normalized_root}")
-        for source in sorted(path for path in source_root.rglob("*") if path.is_file()):
+        for source in source_root.rglob("*"):
+            scan_step()
+            if not source.is_file():
+                continue
             normalized = source.relative_to(root).as_posix()
             if ("/research/write_lookup_v1/" in normalized
                     or "/projections/research_memory.duckdb" in normalized
@@ -1295,12 +1314,24 @@ def backup_payload_snapshot(
     parent = staging_parent or _safe_relative(root, BACKUP_SNAPSHOT_STAGING_RELATIVE)
     _reject_symlink_components(parent.absolute())
     parent.mkdir(parents=True, exist_ok=True)
-    # Membership is enumerated once, before any capture or caller-visible hook.
-    sources = [(relative, path, sqlite and str(loaded.get("schema_version")) == "1.1")
-               for relative, path, sqlite in _backup_source_paths(root, loaded)]
+    sqlite_api = str(loaded.get("schema_version")) == "1.1"
+    # This provisional census admits only the SQLite writer-fence set. It is
+    # never the checkpoint's file membership: a publication can commit before
+    # those fences are acquired.
+    provisional_sqlite = [(relative, path, True)
+                          for relative, path, is_sqlite in _backup_source_paths(root, loaded)
+                          if is_sqlite and sqlite_api]
     with _owned_snapshot_staging(root, parent) as staging:
-        with _capture_writer_fences(sources):
-            deadline = time.monotonic() + BACKUP_CAPTURE_FENCE_SECONDS
+        deadline = time.monotonic() + BACKUP_CAPTURE_FENCE_SECONDS
+        with _capture_writer_fences(provisional_sqlite):
+            # Freeze authoritative membership only after every admitted writer
+            # is fenced, with traversal charged to the same capture deadline.
+            sources = [(relative, path, is_sqlite and sqlite_api)
+                       for relative, path, is_sqlite in _backup_source_paths(
+                           root, loaded, deadline_monotonic=deadline)]
+            fenced_sqlite = {relative for relative, _path, _sqlite in provisional_sqlite}
+            if any(is_sqlite and relative not in fenced_sqlite for relative, _path, is_sqlite in sources):
+                raise RemoteOpsError("BACKUP_UNFENCED_SQLITE_DISCOVERED")
             for relative, source, is_sqlite in sources:
                 if is_sqlite or _is_publication_job_path(relative):
                     _capture_source(captured, staging, relative, source, is_sqlite, deadline=deadline)

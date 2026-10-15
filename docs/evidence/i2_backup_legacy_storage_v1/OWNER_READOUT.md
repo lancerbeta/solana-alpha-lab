@@ -49,6 +49,9 @@ freelist 122 880 pages, STORED около 5,225 GB и 60–110 минут upload
 - Один SQLite capture и frozen path membership идут в inventory и ZIP. Native
   authority/state events, open publication jobs и partition manifests входят
   в causal closure. WAL/SHM/journal не могут повторно наложить post-capture bytes.
+  Authoritative membership перечисляется внутри writer fences; предварительный
+  проход служит только SQL admission. Publication, появившаяся до fence, сохраняет
+  исходные manifest ID и availability при более позднем recovery.
 - Mixed STORED-full/DEFLATE-delta reconstruction проверяет actual extracted
   membership/size/SHA каждого шага и final inventory; marker ставится последним.
   Missing/reordered delta, duplicates/path escape/sidecars/inventory mismatch
