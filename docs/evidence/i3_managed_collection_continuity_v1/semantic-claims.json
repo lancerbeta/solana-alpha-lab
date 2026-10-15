@@ -1,0 +1,17 @@
+[
+  {
+    "claim_id": "I3_MANAGED_STANDING_GRANT",
+    "claim": "One owner-approved profile revision lets the ordinary tick derive child authority and activate one frozen one-UTC-day child per day, each required to equal the approved template; revoke or expiry stops new intake only.",
+    "scope": "Disposable stores, synthetic transport. Not a live grant; the profile is default-off until a separate OPERATE apply."
+  },
+  {
+    "claim_id": "I3_ONE_OWNER_PER_DAY_CRASH_SAFE",
+    "claim": "Each UTC day has at most one intake owner; a killed step resumes from the persisted intent and a missing ACTIVE ResearchEvent is repaired from the committed transition.",
+    "scope": "Existing lifecycle owners and ResearchStore; no change to activation identity, frozen schedules or accounting."
+  },
+  {
+    "claim_id": "I3_NO_FORGED_STORAGE_PASS",
+    "claim": "The managed storage decision records HARD, physical tail reserve, backup freshness, accepted TARGET risk and budget tail coverage independently and never emits factory_storage_gate=PASS.",
+    "scope": "Backup freshness is read from the existing backup owners; the footprint reuses the collector packet measurements; archive content and unrelated residents are not authenticated."
+  }
+]

@@ -834,6 +834,28 @@ def authorize_schedule(
         "approved_capability_ids": [APPROVED_CAPABILITY],
         "allowed_credential_class": "LOCAL_ENV_CREDENTIAL",
     }
+    return _commit_authority_receipt(
+        root=root,
+        data_root=data_root,
+        store=store,
+        receipt=receipt,
+        now=now,
+        producer_git_sha=producer_git_sha,
+    )
+
+
+def _commit_authority_receipt(
+    *,
+    root: Path,
+    data_root: Path,
+    store: ObservationScheduleStore,
+    receipt: dict[str, Any],
+    now: datetime,
+    producer_git_sha: str,
+) -> dict[str, Any]:
+    """Seal, validate, persist and publish one authority receipt (shared tail)."""
+
+    schedule_sha256 = str(receipt["schedule_sha256"])
     receipt["receipt_sha256"] = canonical_sha256(
         {key: value for key, value in receipt.items() if key != "receipt_sha256"}
     )
@@ -860,8 +882,130 @@ def authorize_schedule(
         "schedule_sha256": schedule_sha256,
         "receipt_sha256": receipt["receipt_sha256"],
         "authority_id": receipt["authority_id"],
-        "expires_at": expires,
+        "expires_at": receipt["expires_at"],
     }
+
+
+def ensure_authority_event(
+    *,
+    data_root: Path,
+    store: ObservationScheduleStore,
+    receipt_sha256: str,
+    now: datetime,
+    producer_git_sha: str,
+) -> bool:
+    """Append the immutable authority ResearchEvent of an already persisted receipt if absent.
+
+    Repairs a kill between ``persist_authority`` (SQL) and the event append. The event is the one
+    ``_commit_authority_receipt`` would have written (same id, same payload); it never creates or
+    changes a receipt. Returns True when an event was appended.
+    """
+
+    receipt = store.get_authority(receipt_sha256)
+    if receipt is None:
+        raise ObservationLifecycleError("AUTHORITY_MISSING")
+    event = _research_event(
+        record_id=f"OBS-AUTHZ-{receipt['receipt_sha256'][:16].upper()}",
+        record_kind=RecordKind.OBSERVATION_SCHEDULE_AUTHORITY,
+        entity_id=str(receipt["schedule_sha256"]),
+        payload=receipt,
+        now=now,
+        producer_git_sha=producer_git_sha,
+        run_id=None,
+        transaction_id=f"RESEARCH-TXN-OBS-AUTHZ-{receipt['receipt_sha256'][:12].upper()}",
+    )
+    if ResearchStore(data_root).find_record(event.record_id) is not None:
+        return False
+    _append_or_replay(data_root, event)
+    return True
+
+
+def authorize_schedule_from_standing_grant(
+    *,
+    root: Path,
+    data_root: Path,
+    store: ObservationScheduleStore,
+    schedule_sha256: str,
+    standing_grant_sha256: str,
+    standing_grant_revision: int,
+    now: datetime,
+    producer_git_sha: str,
+) -> dict[str, Any]:
+    """Derive child authority from an owner-approved standing grant.
+
+    No human phrase exists for the child; ``phrase_sha256`` binds the grant hash
+    and the exact child envelope instead. Issuance fits the grant (routes,
+    limits, validity, family) or the whole derivation is refused.
+    """
+
+    from solana_alpha_lab.factory.managed_collection import (
+        ManagedCollectionError,
+        derived_authority_basis_text,
+        require_child_within_standing_grant,
+    )
+
+    registered = store.get_registered_schedule(schedule_sha256)
+    if registered is None:
+        raise ObservationLifecycleError("SCHEDULE_NOT_REGISTERED")
+    document = registered["document"]
+    primitive_ids, routes = _used_provider_route_ids(root, document)
+    minimum_expiry = _minimum_expiry(document)
+    expires = render_utc(minimum_expiry)
+    policy = _authority_policy(
+        root=root, document=document, schedule_key=str(document["schedule_key"]), expires_at=expires
+    )
+    policy_digest = canonical_sha256(policy)
+    phrase = expected_authority_phrase(
+        schedule_sha256=schedule_sha256,
+        schedule_key=str(document["schedule_key"]),
+        activation_starts_at=str(document["activation"]["starts_at"]),
+        activation_stops_admitting_at=str(document["activation"]["stops_admitting_at"]),
+        provider_route_ids=routes,
+        expires_at=expires,
+        policy_digest=policy_digest,
+    )
+    receipt: dict[str, Any] = {
+        "schema": "smial.observation-schedule-authority",
+        "schema_version": "1.0",
+        "authority_id": f"AUTHZ-OBS-{schedule_sha256[:12].upper()}",
+        "schedule_sha256": schedule_sha256,
+        "schedule_key": document["schedule_key"],
+        "activation_starts_at": document["activation"]["starts_at"],
+        "activation_stops_admitting_at": document["activation"]["stops_admitting_at"],
+        "used_primitive_ids": primitive_ids,
+        "provider_route_ids": routes,
+        "provider_calls_per_utc_day_max": int(document["budgets"]["provider_calls_per_utc_day_max"]),
+        "provider_calls_lifetime_max": int(document["budgets"]["provider_calls_lifetime_max"]),
+        "modeled_provider_credits_per_utc_day_max": int(
+            document["budgets"]["modeled_provider_credits_per_utc_day_max"]
+        ),
+        "cash_usd_max": "0",
+        "retry": False,
+        "fallback": False,
+        "build_execute_wallet_signer_transaction": False,
+        "expires_at": expires,
+        "phrase_sha256": hashlib.sha256(
+            derived_authority_basis_text(standing_grant_sha256, phrase).encode("utf-8")
+        ).hexdigest(),
+        "minimum_expiry_at": expires,
+        "policy_digest": policy_digest,
+        "approved_capability_ids": [APPROVED_CAPABILITY],
+        "allowed_credential_class": "LOCAL_ENV_CREDENTIAL",
+        "authority_basis": "STANDING_GRANT",
+        "standing_grant_sha256": standing_grant_sha256,
+        "standing_grant_revision": int(standing_grant_revision),
+    }
+    try:
+        # Issue-time fit including revocation/validity (tick-time keeps tails alive).
+        require_child_within_standing_grant(
+            store, receipt=receipt, document=document, routes=routes, issuing_at=now
+        )
+    except ManagedCollectionError as exc:
+        raise ObservationLifecycleError(str(exc)) from exc
+    return _commit_authority_receipt(
+        root=root, data_root=data_root, store=store, receipt=receipt, now=now,
+        producer_git_sha=producer_git_sha,
+    )
 
 
 def _require_live_authority(
@@ -950,6 +1094,27 @@ def _require_live_authority(
         expires_at=str(receipt["expires_at"]),
         policy_digest=expected_policy_digest,
     )
+    basis_keys = ("authority_basis", "standing_grant_sha256", "standing_grant_revision")
+    if receipt.get("authority_basis") == "STANDING_GRANT":
+        # Derived child authority: no owner phrase exists for this schedule; the
+        # owner approved the parent profile and the child must fit inside it.
+        from solana_alpha_lab.factory.managed_collection import (
+            ManagedCollectionError,
+            derived_authority_basis_text,
+            require_child_within_standing_grant,
+        )
+
+        try:
+            require_child_within_standing_grant(
+                store, receipt=receipt, document=document, routes=expected_policy["provider_route_ids"]
+            )
+        except ManagedCollectionError as exc:
+            raise ObservationLifecycleError("AUTHORITY_MISMATCH") from exc
+        expected_phrase = derived_authority_basis_text(
+            str(receipt["standing_grant_sha256"]), expected_phrase
+        )
+    elif any(key in receipt for key in basis_keys):
+        raise ObservationLifecycleError("AUTHORITY_MISMATCH")
     if hashlib.sha256(expected_phrase.encode("utf-8")).hexdigest() != str(
         receipt.get("phrase_sha256")
     ):
@@ -1826,6 +1991,7 @@ def activate_schedule(
     now: datetime,
     producer_git_sha: str,
     storage_commissioning: Mapping[str, Any] | None = None,
+    managed_binding: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     registered = store.get_registered_schedule(schedule_sha256)
     if registered is None:
@@ -1895,12 +2061,16 @@ def activate_schedule(
                 if existing["state"] == "PAUSED_OPERATOR"
                 else "STATUS",
             }
+        repaired = _repair_activation_event(
+            data_root=data_root, existing=existing, now=now, producer_git_sha=producer_git_sha
+        )
         return {
             "terminal": "ACTIVATE_REPLAY",
             "activation_id": activation_id,
             "schedule_sha256": schedule_sha256,
             "state": existing["state"],
             "transition_event_id": existing.get("last_transition_event_id"),
+            **({"event_repaired": True} if repaired else {}),
         }
     transition = store.transition_activation(
         schedule_sha256=schedule_sha256,
@@ -1912,7 +2082,8 @@ def activate_schedule(
         stops_admitting_at=document["activation"]["stops_admitting_at"],
         schedule_key=str(document["schedule_key"]),
         payload={"receipt_sha256": receipt["receipt_sha256"],
-                 **({"storage_commissioning": storage_commissioning} if storage_commissioning is not None else {})},
+                 **({"storage_commissioning": storage_commissioning} if storage_commissioning is not None else {}),
+                 **({"managed_collection": dict(managed_binding)} if managed_binding is not None else {})},
         clock=now,
     )
     event = _research_event(
@@ -1946,6 +2117,58 @@ def activate_schedule(
         "state": "ACTIVE",
         "receipt_sha256": receipt["receipt_sha256"],
     }
+
+
+def _repair_activation_event(
+    *,
+    data_root: Path,
+    existing: Mapping[str, Any],
+    now: datetime,
+    producer_git_sha: str,
+) -> bool:
+    """Append the first ACTIVE ResearchEvent when a crash left only the OPS row.
+
+    The event is rebuilt from the committed transition (same identity, same
+    effective instant); a retry never invents a new activation instant.
+    """
+
+    payload = existing.get("payload")
+    if not isinstance(payload, Mapping) or str(existing.get("state")) != "ACTIVE":
+        return False
+    if (
+        str(payload.get("prior_state") or "") != "UNREGISTERED"
+        or str(payload.get("new_state") or "") != "ACTIVE"
+        or int(payload.get("transition_sequence") or 0) != 1
+    ):
+        return False
+    if activation_transition_research_event_proven(data_root, existing, now=now):
+        return False
+    event_id = str(existing.get("last_transition_event_id") or "")
+    storage = payload.get("storage_commissioning")
+    effective = parse_utc(str(payload["transition_effective_at"]))
+    event = _research_event(
+        record_id=event_id,
+        record_kind=RecordKind.OBSERVATION_SCHEDULE_STATE,
+        entity_id=str(existing["schedule_sha256"]),
+        payload={
+            "state_event_id": event_id,
+            "activation_id": str(existing["activation_id"]),
+            "state": "ACTIVE",
+            "schedule_sha256": str(existing["schedule_sha256"]),
+            "prior_state": "UNREGISTERED",
+            "transition_sequence": 1,
+            "authority_receipt_sha256": str(existing.get("authority_receipt_sha256") or ""),
+            **({"storage_commissioning_sha256": storage["envelope_sha256"]}
+               if isinstance(storage, Mapping) else {}),
+        },
+        now=max(now, effective),
+        effective_at=effective,
+        producer_git_sha=producer_git_sha,
+        run_id=str(existing["activation_id"]),
+        transaction_id=f"RESEARCH-TXN-{event_id.upper()}",
+    )
+    _append_or_replay(data_root, event)
+    return True
 
 
 def pause_schedule(

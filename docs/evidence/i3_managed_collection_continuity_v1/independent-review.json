@@ -1,0 +1,95 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "I3_MANAGED_COLLECTION_CONTINUITY_V1-FINAL",
+  "as_of": "2026-10-14",
+  "task_id": "I3_MANAGED_COLLECTION_CONTINUITY_V1",
+  "reviewed_bindings_sha256": "492d0e3cca7c9a7c648f563a19771d15398e2d1066282424286e514456b03a72",
+  "reviewed_inventory_sha256": "c2c070a0c094805a62ea05b702e6e6a97c6032b3b61df5756df1383b356f9c09",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only review chain da297ff4 -> a3f7da9c -> 8e69811a -> 11d9779254bb83f5ce9cd7e408bec80ad5489e3d (final PASS, 35 managed tests green). Findings closed in order: rollback widened authority (P1); controller failure invisible in exit code; hold incident first lineage only; owner follow-up seams (whole-factory footprint, owner-sourced backup, authority event repair, sticky stop) reviewed with no defect except an unreadable backup sink counted as 0 (P1, now UNKNOWN fail-closed) and backup_source missing from rollback wideness (P2, fixed). Declared residuals: unmanaged multi-candidate refusals are collected; lease is not renewed during the size walk (surfaces as RECONCILE_FAILED, exit 2); one managed lineage per store."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS on 11d9779254bb83f5ce9cd7e408bec80ad5489e3d after earlier NOT_READY (PRD 12.2 rows). Each owner P0 (whole-factory TARGET/HARD, owner-sourced backup, authority event repair, sticky revocation-safe rollback) has a before/after in proof.json, a named test and a mutation kill; the release seam test (four managed days across a weekly boundary, one failing child, production verify/import and Forge preflight) is substantive. Outcome stays CODE_READY_RUNTIME_PENDING; unproven items are declared in the task contract."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SEMANTIC_PREMISE=PASS; packet_fingerprint_sha256=2870c3922107c3a8dab15a7beb626e4ff78d85cc1b1546c17816dd8984775765 (delta re-review on 11d9779254bb83f5ce9cd7e408bec80ad5489e3d; earlier packets d3d4cfe6..., bd9037e8..., b8654d75...). PACKET_INFORMATION_PATH only; launch isolation is PROCESS_OBLIGATION; the reviewer environment lacked jsonschema so the fingerprint was read from the packet and recomputed by the coordinator with validate-launch. Named residuals: approval is integrity not provenance; HOLD rounds and mid-day windows leave no per-round event so nomination gaps are UNKNOWN and statistics must key on the child window; repaired authority event carries repair time; LOCAL_BUNDLE is not an off-host guarantee; controller-dead masking relies on generic alerts."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS on 11d9779254bb83f5ce9cd7e408bec80ad5489e3d after NOT_READY twice (packet hid bound values and lacked stop/rollback commands; then stale references to the removed backup-receipt step). No daily owner or agent step remains; refusal and incident text per reason; readout states residuals. Residual P2: managed incident codes do not page as owner-attention."
+      ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1: rollback widened validity, routes and resource policy without an owner phrase; closed by _not_wider covering limits, end date, routes, hard/target bytes, backup age, acceptance and family, used by rollback_profile and _approval_valid, with a test.",
+      "observed_head": "da297ff496fd3729f6110e23c2252a544dffa5a5",
+      "resolved_by_head": "a3f7da9c321828e5f015ef594994fa3846d829f7"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "PRD 12.2 rows (clock backwards, exit visibility, multi-boundary, scale, seal/import, old binary, Telegram outage) neither proven nor declared; closed with tests for clock and exit code and named limits for the rest.",
+      "observed_head": "da297ff496fd3729f6110e23c2252a544dffa5a5",
+      "resolved_by_head": "a3f7da9c321828e5f015ef594994fa3846d829f7"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1: OPERATE packet hid values bound only by the profile hash and lacked stop/rollback commands; closed in the packet with per-code incident next steps and refusal hints.",
+      "observed_head": "da297ff496fd3729f6110e23c2252a544dffa5a5",
+      "resolved_by_head": "a3f7da9c321828e5f015ef594994fa3846d829f7"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1: an existing but unreadable backup sink was counted as 0 bytes (under-counted whole-factory footprint); closed by _walk_bytes returning UNKNOWN and blocking with FOOTPRINT_UNKNOWN, with a test.",
+      "observed_head": "8e69811a7d8bd85cedb2d4dc54d640544693dfc7",
+      "resolved_by_head": "11d9779254bb83f5ce9cd7e408bec80ad5489e3d"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1: stale references to the removed backup-receipt step in the runbook row, the STORAGE_BLOCKED incident text and proof.json; closed with actionable backup-owner/footprint wording.",
+      "observed_head": "8e69811a7d8bd85cedb2d4dc54d640544693dfc7",
+      "resolved_by_head": "11d9779254bb83f5ce9cd7e408bec80ad5489e3d"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_REVIEW_MODEL_DIVERSITY_PROOF",
+    "NO_PRODUCTION_DEPLOY_OR_COMMISSIONING",
+    "NO_NEW_PIT_SCIENTIFIC_ALPHA_OR_CASHFLOW_VERDICT",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_REVIEW"
+  ]
+}
