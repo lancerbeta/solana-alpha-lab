@@ -1,9 +1,6 @@
 {
   "acceptance_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-SYNTHETIC-NATIVE",
-  "active_stop_conditions": [
-    "STOP_INDEPENDENT_REVIEW_NOT_READY:P2_SOURCE_REFUSAL_RECOVERY_UNRESOLVED",
-    "STRICT_OWNER_NO_OTHER_PRODUCTION_CHANGES:P2_COPY_NOT_AUTHORIZED"
-  ],
+  "active_stop_conditions": [],
   "as_of": "2026-10-15",
   "base_main": "b3fb9d8ecffbffda468dccabaa81ca3392da6f15",
   "capability_radar_now": "NONE",
@@ -12,8 +9,8 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/list_a_confirming_producer_v1/factory-fit.json",
-    "sha256": "874e7e51871035c7e8942ee3a4359e194d0733f0da69833123d4b3532b5c5adc",
-    "verdict": "NOT_READY"
+    "sha256": "bf2a95cdf84c0281db2077203142d3085cbf50f92ce9ba812cbad53aef0c99c7",
+    "verdict": "PENDING"
   },
   "implementation_bindings": {
     "catalog/assets/core.yaml": "7d22cda919e1d505b7a265937c7d860f5b562d89f7d91e9b3f438a60db27b76b",
@@ -107,15 +104,15 @@
     "spend": 0,
     "strategy_activation_paper_writes": 0
   },
-  "state_change": "Exact owner-authorized3test compatibility repaired;55PASS/preserved276assertions/legacyAST/basefixture. Originalsource-role P1 remainsclosed oncommitted2b906 immutable-source native4transition0values/reserve/charge. FresharchitecturePASS;code/goal/UX NOT_READY onlyP2recoverycopy. No productionchange inextension/science rerun/result/7charge change. Stop; no bind/preflight/push/freshCI/merge.",
+  "state_change": "Exact separately owner-authorized P2 next_action patch applied; actual immutable-source classify+submit safe typedrefusal,0values/evaluator/reservations/charges/storewrites; charge1/otherreasons/null preserved.34 direct-consumerPASS; prior55compatibilityPASS andsevennamedcharges/results preserved. HistoricalNOT_READY immutable; fresh4reviews/bind/preflight/exactheadCI pending. No scientificrun/realdata/merge.",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
   "validation": {
     "full_gate": "NOT_EXECUTED_PRE_PR; GUARDED_MERGE_SOLE_EXECUTOR; MERGE_NOT_AUTHORIZED",
     "github_ci": "PR406_REMOTE3A_FAILURE;COMPATIBILITY_HEAD2B_CI_NOT_RUN_AFTER_NOT_READY",
     "independent_review": {
       "path": "docs/evidence/list_a_confirming_producer_v1/independent-review.json",
-      "sha256": "7ab5e7c8618dd76975b0fc735a84709d1bad89c5c391488601f520bdc25699e9",
-      "verdict": "NOT_READY"
+      "sha256": "37071badae2097df834f3bbd4b415be1061d4c18aee729653c65d0314eb80094",
+      "verdict": "PENDING"
     },
     "project_checks": [
       "PASS_ACTUAL_PRE_VALUES_RESERVATION",
@@ -125,6 +122,6 @@
       "PASS_MEASURED_FORWARD_RESOURCE_ENVELOPE",
       "PASS_CURRENT_NATIVE_SOURCE_ROLE_FALSIFIER_2B906_WITNESS_SHA256_2c4577a7a72106b40bc40855f7ce228c310446873ba94adad2e2a9d01ce552f1"
     ],
-    "targeted": "PASS_55_THREE_LEGACY_MODULES_AND_SOURCE_ROLE_PROVENANCE"
+    "targeted": "PASS_34_RECOVERY_DIRECT_CONSUMERS;PRIOR_55_COMPATIBILITY_PASS"
   }
 }

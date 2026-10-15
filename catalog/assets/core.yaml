@@ -32052,7 +32052,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lane_classifier.py', repository_path: src/solana_alpha_lab/factory/lane_classifier.py}
-  integrity: {kind: sha256, sha256: 5cbb79ba8a2635d84d8daa27feca5aadf2cefdc524d815d1a31ac42435ef6168}
+  integrity: {kind: sha256, sha256: d4ddf8627995c6eca630b8e7acfb098579518ad1f20931019c7e057b0bd29654}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -42887,7 +42887,7 @@ records:
     repository_path: docs/reports/list_a_confirming_producer_v1/OWNER_REPORT.md
   integrity:
     kind: sha256
-    sha256: 95a55a34cb7ddfcb93e0d4cd9e1a46b7e914d64fc8dc02d85badde3c5ae0aadf
+    sha256: d33598a8317b44e520607317d3a46fffea3e8415eb24b9b765e60561f5a8bf34
   access:
     mode: read_only
     method: file
@@ -42926,7 +42926,7 @@ records:
     repository_path: docs/reports/list_a_confirming_producer_v1/REPRODUCE.md
   integrity:
     kind: sha256
-    sha256: 9084023a2da12b66fcc04c620bd673fc220714d976959a87f75fdbfa82275ca5
+    sha256: ae4d29e13e309e260855e677720378a3ac619ad167c6ce62d8afb6e8ccd476d6
   access:
     mode: read_only
     method: file
@@ -43042,7 +43042,7 @@ records:
     repository_path: docs/evidence/list_a_confirming_producer_v1/owner-decision.json
   integrity:
     kind: sha256
-    sha256: d831b56f220c44858d3588a7937a2e15ed79aaf612a97eaea1447598fad0283c
+    sha256: ad7ba748d542bba8dc721387b8905b4567640065946259500e778a0e5b701cff
   access:
     mode: read_only
     method: file
@@ -43079,7 +43079,7 @@ records:
     repository_path: docs/evidence/list_a_confirming_producer_v1/review-history.json
   integrity:
     kind: sha256
-    sha256: d86f1661c5d7ef41ec21b55a2d5a79aa6df3c872ade9ba32f1020241a3dcccb9
+    sha256: 1bdf2dbe63504847bc537dbe1fc010b32ebaebe65184a7c952e432f154c55d95
   access:
     mode: read_only
     method: file
@@ -43116,7 +43116,7 @@ records:
     repository_path: docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json
   integrity:
     kind: sha256
-    sha256: d5fb308aa135f922c997c63fddc0076f90cfcc0522bf85087dda5c735febaf43
+    sha256: 5db74b502126ff1f7c7186d3637fcf6b3067d534dfdccbd8224f592c22e8df19
   access:
     mode: read_only
     method: file

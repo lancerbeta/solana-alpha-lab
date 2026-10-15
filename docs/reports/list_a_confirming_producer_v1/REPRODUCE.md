@@ -196,3 +196,28 @@ in source-role-provenance.json; before/after source hashes/role flags are exact.
 Fixture schema set is the original base four paths, independent of manifest order.
 P2 recovery next-action is still a separately unresolved production finding;
 compatibility PASS does not assert independent-review/bindings/fullCI/merge PASS.
+
+
+## Separately authorized P2 recovery copy
+
+Apply only proposal SHA256381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba.
+Repeat ordinary classify then submit on the retained source-role-falsifier-before-native-1
+TEST plane and its existing binding with the fixture as-of clock
+(use native.NOW from tests/fixtures/list_a_confirmation_v1/native.py as authority).
+Expected reason CONFIRMATORY_REUSE_FORBIDDEN, terminal BLOCKED_BEFORE_RESERVE,
+next_action STOP_THIS_SOURCE_KEEP_LABELS_HISTORY_REQUIRE_SEPARATE_SOURCE_AUTHORITY.
+Do not regenerate a world or scientific run; original source hashes are in
+source-role-provenance.json#recovery_copy_20261015.receipt.raw_utf8. The retained
+local recovery_copy_witness.py uses explicit metadata-only decoder guards,
+fail-on-entry runner/evaluator spies and complete17-file store hash inventories.
+Separate injected checkpoint/exception branch oracle is unit-only: charge1 keeps
+VERIFY_SAVED_CHECKPOINT_KEEP_CONSUMED_ALLOWANCE; other reasons keep previous
+binding recovery; unknown charge remains null/BLOCKED_RESERVATION_UNKNOWN.
+
+```text
+python -B -m unittest tests.test_fast_lane_classifier tests.test_list_a_confirmation_admission_v1.SourceRoleProvenanceTests -v
+```
+
+Expected34 PASS on shared existing runtime; no new environment/install. Prior55
+compatibility checks need not repeat for a copy-only change. No campaign replay,
+requalification of saved science, REAL scope or merge authority follows.

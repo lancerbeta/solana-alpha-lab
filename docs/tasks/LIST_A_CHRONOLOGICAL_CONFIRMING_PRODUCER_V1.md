@@ -137,3 +137,11 @@ if oracle meaning changes. Targeted regression includes source-role laundering;
 fresh review/bindings/exact-head CI required. Seven charges/results immutable;
 no new named scientific run, real data, other production changes or merge.
 Unresolved P2 source-refusal recovery copy remains outside this extension.
+
+Owner separate P2 recovery extension 2026-10-15: exact patch SHA256
+381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba
+authorized for lane_classifier.py next_action only. Stop this exploratory source,
+keep labels/history, require separate source authority; preserve guards, terminals,
+charge1 and all other refusals. Narrow checks and ordinary Git delivery only;
+no new scientific runs, real data or merge. Prior extension limits remain scoped
+to their historical phase, not retroactively rewritten.

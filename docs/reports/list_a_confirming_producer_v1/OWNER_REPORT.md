@@ -1,5 +1,7 @@
 # List A confirming producer: owner handback
 
+Текущий P2 checkpoint: **разрешённый точный recovery-copy применён**, 34 narrow checks PASS. На прежнем exploratory TEST source classify и submit отказывают до reservation и направляют остановить этот source, сохранить labels/history и получить отдельную source authority. Targets/evaluator/reservations/charges/store writes: **0/0/0/0/0**; 17 файлов store неизменны. Prior55 compatibility checks и семь scientific charges/results сохранены. Fresh review/bindings/exact-head CI ещё не заявлены; merge не разрешён. Нижеследующие checkpoints сохраняют историю своих heads.
+
 Текущий compatibility checkpoint 15 октября: **55 targeted PASS**, включая source-role provenance; production/scientific bytes не изменены. P2 recovery-copy остаётся незакрытым и не разрешён текущим scope. Fresh review/bindings/fullCI отдельно; прежние NOT_READY и научные результаты ниже относятся к своим historical heads.
 
 **IMPLEMENTED_AND_VERIFIED_IN_SYNTHETIC_SCOPE.** Зарегистрирован native producer
@@ -189,3 +191,6 @@ campaigns/production изменений нет. Семь named charges и сох
 новый review/evidence binding/CI оцениваются отдельно; прежние NOT_READY сохранены
 в Git object84fc5b48. Merge authority отсутствует. Данные подробной regression и
 oracle audit — source-role-provenance.json#compatibility_delivery_20261015.
+
+
+Отдельное разрешение owner на P2 от15октября: patch381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba меняет только next_action в lane_classifier.py. Терминалы, причина отказа, charge1, UNKNOWN/null и прочие отказы сохранены четырьмя unit branch oracles. Native classify/submit не входят в runner/evaluator и не изменяют прежний TESTstore; scientificcampaign не перезапускалась. 34 direct-consumer tests PASS за6.825s. Новой qualification прежних scientific результатов нет. Уточнение подсчёта прежнего compatibility audit:276 assertion sites состоят из274 assert-method calls и2 Python assert statements; все сохранены. Предыдущие NOT_READY остаются в Git object7de44a91080fc12ed2ef5e179fb1247ef26540ca.

@@ -53,9 +53,22 @@
         "OWNER_UX_CRITIC": "NOT_READY"
       },
       "verdict": "NOT_READY"
+    },
+    {
+      "git_object": "7de44a91080fc12ed2ef5e179fb1247ef26540ca:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+      "git_object_sha256": "7ab5e7c8618dd76975b0fc735a84709d1bad89c5c391488601f520bdc25699e9",
+      "reason": "Actual compatibility review closedthreelegacyblockers; code/goal/UX NOT_READY solely recoveryP2, architecturePASS. Later separate exact P2 grant does not retroactively alter verdicts.",
+      "reviewed_candidate_head": "2b906c386262e4881dc932a704dc0314b356ddfd",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "PASS",
+        "CODE_REVIEWER": "NOT_READY",
+        "GOAL_DOD_CRITIC": "NOT_READY",
+        "OWNER_UX_CRITIC": "NOT_READY"
+      },
+      "verdict": "NOT_READY"
     }
   ],
-  "next_review": "NEW_ISOLATED_REVIEW_AFTER_AUTHORIZED_THREE_TEST_COMPATIBILITY; P2_RECOVERY_UNRESOLVED",
+  "next_review": "NEW_ISOLATED_REVIEW_AFTER_SEPARATELY_AUTHORIZED_P2_RECOVERY_COPY",
   "schema": "smial.list-a-confirmation-review-history",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1"

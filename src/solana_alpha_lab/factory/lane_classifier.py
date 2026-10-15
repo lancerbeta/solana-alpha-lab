@@ -392,7 +392,9 @@ def classify_lane(
                 "BLOCKED_AFTER_RESERVE" if charge == 1 else "BLOCKED_BEFORE_RESERVE" if charge == 0 else "BLOCKED_RESERVATION_UNKNOWN",
                 reason_codes=(getattr(exc, "code", "CONFIRMATION_BINDING_INVALID"),),
                 run_key_sha256=checkpoint["run_key_sha256"], prior_run_id=checkpoint["run_id"],
-                next_action="VERIFY_SAVED_CHECKPOINT_KEEP_CONSUMED_ALLOWANCE" if charge == 1 else "CORRECT_EXACT_CONFIRMATION_BINDING",
+                next_action="VERIFY_SAVED_CHECKPOINT_KEEP_CONSUMED_ALLOWANCE" if charge == 1 else
+                    "STOP_THIS_SOURCE_KEEP_LABELS_HISTORY_REQUIRE_SEPARATE_SOURCE_AUTHORITY"
+                    if getattr(exc, "code", None) == "CONFIRMATORY_REUSE_FORBIDDEN" else "CORRECT_EXACT_CONFIRMATION_BINDING",
                 confirmation_checkpoint=checkpoint)
     spec = _validate_spec(submission, root=root, as_of=as_of)
     if spec is None:

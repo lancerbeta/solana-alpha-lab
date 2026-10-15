@@ -77,5 +77,20 @@
   "owner": "GOAL_OWNER",
   "schema": "smial.list-a-confirmation-owner-delivery-decision",
   "schema_version": "1.0",
+  "source_refusal_recovery_extension": {
+    "approved_patch_sha256": "381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba",
+    "as_of": "2026-10-15",
+    "checkpoint_head": "7de44a91080fc12ed2ef5e179fb1247ef26540ca",
+    "exact_owner_text": "Разрешаю только этот P2 recovery-copy и проверки",
+    "forbidden": [
+      "NEW_SCIENTIFIC_RUN",
+      "REAL_DATA",
+      "MERGE",
+      "OTHER_PRODUCT_REPAIR"
+    ],
+    "only_product_path": "src/solana_alpha_lab/factory/lane_classifier.py",
+    "origin": "DIRECT_OWNER_REPLY_TO_EXACT_PATCH_QUESTION",
+    "scope": "Only next_action on CONFIRMATORY_REUSE_FORBIDDEN before reservation; preserve charged recovery, terminals, guards, scientific method and all other refusals. Narrow checks and ordinary Git delivery."
+  },
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1"
 }

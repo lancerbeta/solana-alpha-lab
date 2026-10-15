@@ -106,6 +106,11 @@
       "evidence": "55 PASS: all three changed legacy modules plus source-role provenance. Prior three outside-write-set blockers resolved by exact owner extension and minimal fixture/pin/expectation patch; historical entries retained. P2 recovery remains unresolved; no fresh fullCI PASS.",
       "requirement": "Owner-authorized Spec1.5 legacy test compatibility",
       "status": "PASS_TARGETED_REGRESSION"
+    },
+    {
+      "evidence": "Exact separately owner-authorized P2 patch381fc5. Same immutable exploratory source classify+submit BLOCKED_BEFORE_RESERVE / CONFIRMATORY_REUSE_FORBIDDEN / STOP_THIS_SOURCE_KEEP_LABELS_HISTORY_REQUIRE_SEPARATE_SOURCE_AUTHORITY. Target values/evaluator/reservations/charges/store content writes0;17files hash-identical. Unit branch oracle preservescharge1/otherreasons/null.34 direct-consumerPASS. Fresh independent review/binding/fullCI pending.",
+      "requirement": "Source-refusal owner recovery copy",
+      "status": "PASS_TARGETED_NATIVE_TEST"
     }
   ],
   "schema": "smial.list-a-confirmation-coverage",
