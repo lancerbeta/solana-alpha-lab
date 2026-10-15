@@ -1,11 +1,11 @@
 {
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
-  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-FINAL",
+  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-CAPTURE-REPAIR",
   "as_of": "2026-10-15",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "e8fe9ea75d072cb95fd39489ffbbb6bdbd0a002a6db23edbd7ec52d7dbe22516",
-  "reviewed_inventory_sha256": "754affeeae59033973d2bb7022f497e8fdabf0a0900d493481f2a795c31c2e76",
+  "reviewed_bindings_sha256": "412c4eb2684386886c8a30f8f8caef3977fa41a65e61fd5f52dd711b643c2f74",
+  "reviewed_inventory_sha256": "2f1e779e486266a573094f424da041abd18633d33e219e18f3f12555cc822319",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -17,28 +17,34 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Actual isolated final review PASS on 47bdb804bd896e9a04c0a6317a90e7894e51c446 under explicit owner P0/P1 blocking floor. All40 worktree hashes/frozen diff blob identities and canonical packet/inventory/bindings independently match; prior full-scope review, native hash/cache deadline and ordinary-resume results remain valid on unchanged source/tests. No openP0/P1. OPEN_NOT_REPAIRED P2 eager pathlib directory census remains disclosed at four owning seams; no lazy-scandir repair claimed. Mandatory runtimeB/C, scientific acceptance and merge/OPERATE authority remain separate. No repeated fullsuite, writes or production operations."
+        "Isolated read-only P0/P1 refresh PASS on frozen content head 362a5dc97686ef508ebd033d45a3989c92aed969; no open P0/P1. All three ContextVar get(None) calls preserve fallback and token reset; the security test is unchanged.",
+        "Frozen candidate and current source bindings matched. Comparable measurements remain bound separately to content head 06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c. No additional tests, production writes or runtime authority."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Actual isolated final GOAL/DoD review PASS on 47bdb804bd896e9a04c0a6317a90e7894e51c446 for explicit owner P0/P1 blocking scope. All40 exact bindings, canonical evidence chain/diff and complete docs delta independently checked. Four ownerP1 repairs, whole software StageA and handback14/15 remain covered;145 focused tests,3 affected regressions and independent hash/cache oracles retained on unchanged bytes without repeating suites. OPEN_NOT_REPAIRED P2 eager pathlib census is disclosed and nonblocking by owner floor. CODE_READY_RUNTIME_PENDING only after remaining delivery gates; fullI2 false, mandatoryB/C pending exactOPERATE; no new authority."
+        "Isolated read-only P0/P1 refresh PASS on frozen content head 362a5dc97686ef508ebd033d45a3989c92aed969; no new P0/P1 gaps. ContextVar fallback is equivalent; snapshot, budgets and recovery are unchanged. Current source hashes matched; measured-source provenance remains separate.",
+        "Owner outcome and authority boundaries remain: fresh standalone full/restore, verified-copy finite native retirement/reclaim rehearsal, one scoped resumable cleanup, compact baseline and sustainable policy. Production attribution, pause and throughput remain UNKNOWN."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "SEMANTIC_PREMISE=PASS; packet_fingerprint_sha256=3cf751604da3bac1e05983e022340235202011271a7b8f5515966865dbc07aa8; actual isolated final47bdb804bd896e9a04c0a6317a90e7894e51c446. All40 live/committed bindings, full-index canonicaldiff, inventory and launch checked; all7 docs/evidence/Catalog deltas reviewed. No openP0/P1 under owner floor.21 native falsifiers PASS32.652s retained on identical source/tests: capture/hash writer release, legacy closure/publication, policy races, mode, torn reclaim/cutover, ordinarypipeline and remote corruption/prune. OPEN_NOT_REPAIRED P2 pathlib eager census means strict count/latency cannot be claimed. Native ResearchStore/ResearchEvents/manifests and source/archived bytes retain truth; DuckDB remains derived. Tests can pass while production latency causes observation gaps and invalid PIT/live coverage; synthetic COMPLETE cannot establish research validity, alpha or scientific authority. Mandatory runtimeB/C remain pending. PACKET_INFORMATION_PATH only; launch isolation PROCESS_OBLIGATION, model diversity UNPROVEN; no merge/production authority."
+        "Isolated packet+diff-only P0/P1 review PASS; SEMANTIC_PREMISE=PASS on frozen content head 362a5dc97686ef508ebd033d45a3989c92aed969. Diff, contract and named evidence hashes matched. Equivalent constructor-default to get(None) change preserves all three reads and set/reset; snapshot, closure, budgets, ZIP and recovery unchanged.",
+        "Membership, WAL view and mutable closure remain consistent; native completed/legacy owner owns immutable bytes; missing or unsafe members refuse. OPS, native ResearchStore manifests/records and source/archive bytes remain truth, DuckDB derived. No new private cross-task imports or scientific authority.",
+        "Local proof can pass while production I/O, WAL pressure or larger closure delays collector and violates due/PIT coverage. Missed mandatory observations, backup-caused lock failure or restored closure divergence remain runtime falsifiers. No production acceptance or merge/OPERATE authority.",
+        "packet_fingerprint_sha256=2d46564fa9fe919ac060e4f72cff6a606bf48a10b33964cd9ec33037900e9aa4; independence=PACKET_INFORMATION_PATH; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN. Review read-only without test reruns."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Actual isolated final owner-UX PASS on47bdb804bd896e9a04c0a6317a90e7894e51c446; no newP0/P1. All40 exact worktree/committed bindings, canonical inventory/packet and clean frozenHEAD checked; previous full ownerUX scope retained. Native cache deadline spanning prepare and each deletion/ordinaryresume regression1PASS1.753s: deletes0.10/0.14 on budget0.15 then YIELD, raw rows/ROWID/pins/token retained, separate writer released, next ordinarycaller RELEASED without remote work. Single OPERATE gives last-good/refusal/retry, partialcleanup nextstep without manualtoken removal, exactmode/canonicaldigests/plan_id/roots/reclaimrecovery. OPENP2 eagerpathlib census disclosed, not repaired or production latencyPASS; onlyP0/P1 block by ownerfloor. Mandatory runtimeB/C/livecycles remain pending; no merge/production authority."
+        "Isolated read-only P0/P1 refresh PASS on frozen content head 362a5dc97686ef508ebd033d45a3989c92aed969; no P0/P1 owner-UX gaps. Readout explicitly states no scale rerun, while proof retains measured-source hashes and measured scale head 06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c.",
+        "Next owner action remains exact merge phrase after exact-head CI and native readiness. Runtime-pending/BLOCKED and separate Stage B/C authorization are preserved. No tests or writes by reviewer."
       ]
     }
   ],
@@ -50,140 +56,12 @@
   ],
   "remediation_history": [
     {
-      "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "finding": "P1: membership-before-fence omitted a native publication job and replay changed manifest identity/PIT availability. Closed by provisional SQL admission, authoritative bounded census under all fences and unfenced-SQL refusal; native MANIFEST/MARKER race regressions preserve exact source clocks/IDs.",
-      "observed_head": "8a38a12a363b812f73a9f5ec5417aea75c7ee7a6",
-      "resolved_by_head": "0e933d76d750600d1c41b37950d775c4fa4bc19e"
-    },
-    {
-      "role": "GOAL_DOD_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "finding": "P2: three raw batches of one scope could stall between old-cache release and required refresh. Closed by dependency-based exact consumer and pin checks; ordinary restart regression completes all three bodies with generation count1 and preserves remote/raw evidence.",
-      "observed_head": "8a38a12a363b812f73a9f5ec5417aea75c7ee7a6",
-      "resolved_by_head": "0e933d76d750600d1c41b37950d775c4fa4bc19e"
-    },
-    {
       "role": "CODE_REVIEWER",
       "prior_verdict": "NOT_READY",
       "severity": "MAJOR",
-      "observed_head": "3eb796f297862572e3441bb7a707bb1820d8435d",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "First durable/torn initial reclaim temp intent blocked writers but had no native recovery; exact approved-plan-bound rollback now handles first and subsequent operations. Approved policy change also stranded old pending cold refresh; native bounded rebind preserves exact checkpoint/pins and ordinary progress, incompatible limits remain visible FAILED."
-    },
-    {
-      "role": "GOAL_DOD_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "observed_head": "3eb796f297862572e3441bb7a707bb1820d8435d",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "Owned pre-intent staging could strand the operator before final intent publication. Actual child kill, collector refusal, exact CLI recovery and raw UUID/ROWID/debit readbacks now cover complete and torn first temp writes, without manual deletion."
-    },
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "observed_head": "3eb796f297862572e3441bb7a707bb1820d8435d",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "Equal-second primary IN_PROGRESS hid scheduler terminal exhaustion and its incident. Deterministic JSON/health oracle now gives terminal failure precedence and resolves only verified successful completion of the same checkpoint."
-    },
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "observed_head": "394092f28a50619446bc80ff874ca8ee8c2d8c93",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "Selection/planning budget refusal escaped durable maintenance outcome handling and left prior READY/COMPLETE without an incident. Native ordinary-caller failure now persists sanitized typed FAILED under lease with current policy/plan checks, preserves protected bytes/effects/last-good and reaches fresh operational packet/watch; transient contention yields."
-    },
-    {
-      "role": "GOAL_DOD_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "observed_head": "394092f28a50619446bc80ff874ca8ee8c2d8c93",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "Ordinary maintenance planner failure was only transient CLI output, violating required actionable incident. Native failure-to-health-to-watch readback and approved budget-revision continuation now prove the owning outcome boundary."
-    },
-    {
-      "role": "OWNER_UX_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MINOR",
-      "observed_head": "394092f28a50619446bc80ff874ca8ee8c2d8c93",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "OPERATE retirement/policy approval omitted canonical digest derivation and exact install argv. Packet now uses existing owner policy_sha256 for entire canonical JSON, --input for both install commands and separately identifies plan_id semantics; disposable native recipe probes reject pretty-file SHA and accept canonical approval."
-    },
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "observed_head": "feb749c849cde3f321a7fd0ba117b9bd1bb9a1bc",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "Post-APPLY finalization reacquired lease without checking current authority and could delete a peer new plan and replace newer FAILED with stale READY. Both success and failure finalization now compare current policy, exact active plan and pre-apply maintenance snapshot under one native transaction; changed state or busy yields while committed effects/progress/pins and newer evidence survive."
-    },
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "observed_head": "a7dc0bfabdc6e41e9dbc69b322cd21f7e1e2bbff",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "Approved cold-root revision left durable registered cache bytes present while footprint counted only new policy root and incorrectly fell to zero. Existing footprint owner now charges source-owned current/pending/release cache references with overlap deduplication and UNKNOWN on invalid references; native registration/revision and actual file-byte oracle preserve pressure budget truth."
-    },
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "observed_head": "5238677b5360db7c6fff28ff34b246e59fe8e98d",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "Outer checkpoint refresh failure reacquired a lease but overwrote newer peer policy/plan/maintenance truth, moving incident time backward. Whole checkpoint-maintenance pipeline now compares source incarnation and exact policy/plan/state/pending/current/release context in native transactions, advances only owned changes, yields on peer changes, and preserves actual committed effects, pins, source clocks and last-good. Final isolated reviews cover the merged main PR406 candidate."
-    },
-    {
-      "role": "OWNER_UX_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "observed_head": "05de45fd479ffb7e67545f04cf777c83f724b30a",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "Explicit CLI OPERATE ignored rehearsal retirement mode and allowed native plan/APPLY body compaction without independent remote proof. Final candidate binds requested operation mode to exact signed retirement/plan and refuses rehearsal authority on production CLI paths before mutation; canonical document approvals remain unchanged. Actual CLI and raw SQLite independent regression/readback included."
-    },
-    {
-      "role": "CODE_REVIEWER",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "observed_head": "a2aaed60de2235caa53e285ba9dfb3d6870a463f",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "P2: accepted automatic ISOLATED_REHEARSAL policy could not execute because synthetic retirement hardcoded OPERATE. Automatic retirement now derives commissioned wrapper mode while unbound legacy stays OPERATE. Actual accepted-policy CLI regression is red before fix and green with body compaction, preserved ROWIDs/clocks/proof/signed policy; production OPERATE and legacy ordinary pipeline remain valid."
-    },
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "observed_head": "b3c12e3aa2d12c12cc3fa9afa1d1971ed14f9824",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "P1: research/control dependency traversal inside BEGIN IMMEDIATE continued9 manifest reads after a0.10s writer-fence budget and refused only after0.608s while a separate writer stayed blocked. Shared monotonic capture budget now guards enumeration/read/verify/native lookup/raw-ref/SQL boundaries with finite count/byte limits before materialization; budget refusal releases fences and refuses checkpoint success without weakening causal closure. Single in-flight native/OS calls remain non-preemptible, production latency acceptance pending."
-    },
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "observed_head": "481360b63c74d0127a5515ca4c1e4c0a100a5932",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "P1: staged SQLite SHA256 loop continued7 new reads after the shared writer-fence deadline. Native6MiB/60ms-read oracle refused only after0.561s while an independent writer stayed blocked. Hash chunk reads now check the same capture budget; outside capture semantics remain unchanged."
-    },
-    {
-      "role": "GOAL_DOD_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "observed_head": "481360b63c74d0127a5515ca4c1e4c0a100a5932",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "P1: post-copy SQLite hashing violated the explicit stop-subsequent-work capture DoD despite145 native I2 tests passing. Independent8MiB oracle reproduced8 new reads after deadline; native stream regression and fresh exact-head readback close the gap without narrowing StageA or runtimeB/C."
-    },
-    {
-      "role": "CODE_REVIEWER",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "observed_head": "481360b63c74d0127a5515ca4c1e4c0a100a5932",
-      "resolved_by_head": "47bdb804bd896e9a04c0a6317a90e7894e51c446",
-      "finding": "P2: staged SQLite hash reads and multi-file cache deletion performed subsequent native calls after their writer-lease budgets. Cache release returned RELEASED after0.384s on a0.15s policy, blocking the peer on all8 deletions. Cooperative per-read and per-unlink/rmdir checks now stop work; durable partial-delete token remains on YIELD and ordinary next-call resume preserves owner/inode/CAS authority and remote pins."
+      "finding": "P1 native post-fence SQLITE_FULL escaped the former fence exception handler: no typed JSON/trace and latest attempt falsely stayed successful. Real SQLite max_page_count=1 CLI/attempt/last-good/native-writer oracle now passes.",
+      "observed_head": "2bd02dcb563ab284b327a6e541fb7427f0239060",
+      "resolved_by_head": "06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c"
     }
   ]
 }

@@ -1,3 +1,63 @@
+# I2 — capture follow-up / текущая передатка
+
+Runtime: `304b16e682fb5b5760229d4fd39fcab7a35aa307`, Stage B BLOCKED после двух
+`BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED`. Внутренняя production-фаза UNKNOWN;
+третьего live capture, deploy или settings change в repair не было.
+
+Измеренная причина: большая SQLite copy, SHA уже captured DB и копирование
+immutable completed receipts находились внутри одного writer fence 30s.
+На DB 5,559,250,944 bytes исходный путь удерживал fence около 30s
+и отказал. Полный AFTER на DB 5,559,824,384 bytes и metadata >= production:
+
+- capture 81.514s; writer fence 1.399s;
+  backup ready 147.842s; independent restore 118.195s;
+- native writes 2009, ticks 252,
+  publications 7; ошибок 0; max write delay 1.418s;
+- sampled staging peak 5,569,070,903 bytes, WAL 4,124,152,
+  минимум свободного места 233,539,768,320; числа локального isolated volume;
+- fresh-process restore без чтения producer: exact inventory + authority1/transition1;
+  hard interruption на 19,165,184 bytes: last-good hash сохранён,
+  writer commit 0.007815s, native restart
+  80.658s, owned staging0, ручной правки state0.
+
+Под fence остаются membership, WAL read-view pinning и изменяемые open/flat jobs
+с member-layout/unit pointers и их необходимой dependency closure. SQLite Online
+Backup API читает закреплённую transaction после release; SHA и semantic control
+verification используют captured bytes после release. Inventory/ZIP читают один
+набор. Rollback-journal copy остаётся под fence, её SHA вынесен. Timeout/lock errors,
+integrity/freshness и dependencies не ослаблены. Fence cap30s прежний; общий capture
+ограничен существующим monitoring stall1800s, отдельно от fence; pending публикуется
+после native staging cleanup и сохраняет завершённый trace без изменения identity.
+
+CI выявил только source-wide text guard на diagnostic ContextVar keyword.
+Эквивалентный `get(None)` сохраняет fallback без secret defaults; защитный тест
+не изменён. Failed oracle и три direct capture regressions PASS; scale повторно
+не запускался. Measured-source SHA сохранён отдельно от текущего binding.
+
+Evidence: `capture-repair-proof.json`; reproducible fixture: `tests/i2_capture_rehearsal.py`.
+80 focused tests PASS; required critics рассматривают только follow-up diff, P0/P1.
+Новый production success не заявлен. Полный I2 и Stage C остаются обязательными.
+Следующий daily: 16.10 00:45Z / 03:45 МСК; repair готовится к штатным Git gates,
+успех deploy/backup до дедлайна не обещается. Старую deployed ветку третий раз не запускать.
+
+Следующее owner action появляется только после exact-head CI + native merge-readiness:
+одна exact merge phrase. Затем guarded merge/readback и обновлённый Stage B scope
+из `OPERATE_PACKET.md`; прежняя Stage B фраза/SHA не разрешают новый binary.
+
+Owner уточнил конечный результат: разово убрать ненужный legacy из HOT и новых
+routine backups, затем автоматически удерживать малый рабочий набор. В новом
+scope предпочтителен свежий самостоятельный сжатый full/checkpoint с independent
+restore вместо обязательной старой цепи25.7GB. Verified copy используется для
+retirement/reclaim rehearsal; после отдельно разрешённой уборки — компактный full
+baseline. Старые archives/checkpoints и pins до proof/authority не переписываются
+и не удаляются. Один finite legacy backlog должен завершиться в согласованном
+scope возобновляемыми chunks, не сотнями ежедневных maintenance runs. Подготовка
+Stage C продолжается безопасно; production-copy byte attribution пока UNKNOWN,
+синтетический scale proof её не подменяет. Текущий repair не объявлен I2 DONE.
+
+Ниже сохранена история Stage A / #407. Её сведения о capture fence/hash границе
+заменены текущей передаткой; прежние regression/retirement proofs не переаудируются.
+
 # I2_BACKUP_LEGACY_STORAGE_V1 — Stage A
 
 **OUTCOME: CODE_READY_RUNTIME_PENDING** при PASS независимых reviews, exact-head

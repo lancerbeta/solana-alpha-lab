@@ -2176,8 +2176,11 @@ def _prepare_checkpoint_operation(
                      "packed_local_verified_at": _stamp(wall_clock()),
                      "objects": objects, "checkpoint": checkpoint,
                      "candidate_chain": candidate, "terminal": terminal,
-                     "deploy_git_sha": deploy_git_sha}
-        _write_pending(root, offhost, operation)
+                     "deploy_git_sha": deploy_git_sha,
+                     "capture_trace": getattr(snapshot, "capture_trace", None)}
+    # Freeze diagnostics after owned staging cleanup, before hashing the pending
+    # identity. No upload starts before this durable pending operation exists.
+    _write_pending(root, offhost, operation)
     return operation
 
 
@@ -2228,6 +2231,7 @@ def _finish_checkpoint_operation(
         "verification_scope": "NEW_PAYLOADS_AND_CHECKPOINT_PRIOR_CHAIN_BOUND",
         "upload_completion_status": "OBSERVED" if uploaded_at else "UNKNOWN_ALREADY_PRESENT_RECONCILED",
         "deploy_git_sha": operation.get("deploy_git_sha"),
+        "capture_trace": operation.get("capture_trace"),
     }
     # Every remote object is proven before either local last-good changes.
     # Pending survives an interruption between pointer and receipt writes.
@@ -2342,6 +2346,7 @@ def run_offhost_checkpoint(
             "failure_code": str(exc).split(":", 1)[0], "deploy_git_sha": deploy_git_sha,
             "snapshot_data_as_of": operation.get("snapshot_data_as_of") if operation else None,
             "checkpoint_filename": operation["checkpoint"]["filename"] if operation else None,
+            "capture_trace": getattr(exc, "capture_trace", None),
         })
         raise
     except (subprocess.TimeoutExpired, TimeoutError, OSError) as exc:

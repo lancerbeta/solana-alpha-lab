@@ -60,6 +60,49 @@ class I2OffhostCheckpointTests(unittest.TestCase):
     def pending(self):
         return json.loads((self.root / self.config.pending_relative).read_text(encoding="utf-8"))["operation"]
 
+    def test_native_post_fence_sqlite_full_records_failure_and_one_cli_json(self) -> None:
+        from scripts import factory_offhost_backup_copy as cli
+        from solana_alpha_lab.factory import remote_ops as remote
+
+        self.run_checkpoint()
+        last_good = (self.root / self.config.receipt_relative).read_bytes()
+        source = self.root / "local/factory_v1/observation_schedule_state.sqlite"
+        with closing(sqlite3.connect(source)) as conn:
+            conn.execute("PRAGMA journal_mode=WAL")
+            conn.execute("CREATE TABLE changed_after_checkpoint(payload)")
+            conn.execute("INSERT INTO changed_after_checkpoint VALUES ('new state')")
+            conn.commit()
+        original = remote.consistent_sqlite_backup
+        def native_disk_full(source, dest, **kwargs):
+            pinned = kwargs.get("snapshot_connection")
+            if pinned is None:
+                return original(source, dest, **kwargs)
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            with closing(sqlite3.connect(dest)) as replica:
+                replica.execute("PRAGMA max_page_count=1")
+                return pinned.backup(replica, pages=256)
+
+        output = io.StringIO()
+        with patch.object(remote, "consistent_sqlite_backup", native_disk_full), \
+             patch.object(owner, "run_scheduled_offhost_checkpoint", side_effect=lambda *a, **k: self.run_checkpoint()), \
+             patch.object(sys, "argv", ["backup", "--root", str(self.root), "--mode", "daily"]), \
+             redirect_stdout(output):
+            self.assertEqual(cli.main(), 2)
+        result = json.loads(output.getvalue())
+        self.assertEqual(result, {"error": "BACKUP_CAPTURE_SQLITE_ERROR", "terminal": "COPY_FAILED"})
+        attempt = owner.read_offhost_attempt(self.root, self.config)
+        self.assertEqual(attempt["terminal"], "COPY_FAILED")
+        self.assertEqual(attempt["failure_code"], "BACKUP_CAPTURE_SQLITE_ERROR")
+        self.assertEqual(attempt["capture_trace"]["failure_phase"], "sqlite_copy_online")
+        copies = [p for p in attempt["capture_trace"]["phases"] if p["phase"] == "sqlite_copy_online"]
+        self.assertEqual(copies[0]["source"], "local/factory_v1/observation_schedule_state.sqlite")
+        self.assertEqual((self.root / self.config.receipt_relative).read_bytes(), last_good)
+        self.assertFalse((self.root / self.config.pending_relative).exists())
+        self.assertEqual(list((self.root / remote.BACKUP_SNAPSHOT_STAGING_RELATIVE).glob("capture-*")), [])
+        with closing(sqlite3.connect(source, timeout=0)) as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.rollback()
+
     def test_retry_never_recaptures_even_after_live_source_changes(self) -> None:
         self.runner.fail_copy_count = 1
         with self.assertRaisesRegex(owner.OffhostBackupError, "OFFHOST_COPY_FAILED"):

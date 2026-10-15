@@ -152,6 +152,42 @@ class I2BackupLegacyStorageTests(unittest.TestCase):
             self.assertEqual(conn.execute("SELECT seq FROM sqlite_sequence WHERE name='semantic_state'").fetchone(), (27,))
             self.assertEqual(conn.execute("SELECT resolved FROM restore_markers WHERE marker_id='UNRESOLVED'").fetchone(), (0,))
 
+    def test_online_copy_uses_pre_release_snapshot_while_native_writer_commits(self) -> None:
+        copy = remote.consistent_sqlite_backup
+        calls = []
+        def mutate_before_copy(source, dest, **kwargs):
+            self.assertIsNotNone(kwargs.get("snapshot_connection"))
+            self.mutate("committed while copying pinned snapshot")
+            calls.append(True)
+            return copy(source, dest, **kwargs)
+        with patch.object(remote, "consistent_sqlite_backup", mutate_before_copy):
+            with remote.backup_payload_snapshot(self.root, self.config) as snapshot:
+                with closing(sqlite3.connect(snapshot.staged_path(OPS))) as conn:
+                    self.assertEqual(conn.execute("SELECT payload FROM semantic_state").fetchone()[0], "original")
+                with closing(sqlite3.connect(self.root/OPS)) as conn:
+                    self.assertEqual(conn.execute("SELECT payload FROM semantic_state").fetchone()[0],
+                                     "committed while copying pinned snapshot")
+                self.assertIsNone(snapshot.capture_trace["failure_phase"])
+        self.assertEqual(calls, [True])
+
+    def test_deferred_receipt_revalidates_frozen_membership_after_release(self) -> None:
+        directory = self.root / RDP / "datasets/publication_jobs/completed"
+        directory.mkdir(parents=True)
+        receipt = directory / "frozen.json"
+        receipt.write_text('{"stage":"COMPLETE"}')
+        original = remote._capture_writer_fences
+        @contextmanager
+        def after_release(sources):
+            with original(sources):
+                yield
+            receipt.unlink()
+            (directory / "later.json").write_text('{"stage":"COMPLETE"}')
+        with patch.object(remote, "_capture_writer_fences", after_release):
+            with self.assertRaisesRegex(remote.RemoteOpsError, "BACKUP_SOURCE_CHANGED_DURING_CAPTURE"):
+                with remote.backup_payload_snapshot(self.root, self.config):
+                    self.fail("missing frozen member must not be skipped or replaced by new census")
+        self.assertEqual(list((self.root / remote.BACKUP_SNAPSHOT_STAGING_RELATIVE).glob("capture-*")), [])
+
     def test_nested_native_open_wal_cannot_override_captured_main_after_restore(self) -> None:
         from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 
@@ -527,19 +563,23 @@ print(json.dumps(remote.package_backup(root,config=config,sink_override=sink,pru
             return read(store,path)
 
         started = time.monotonic()
+        self.config["monitoring"] = {"stall_max_seconds": 0.10}
+        expected_error = ("BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED" if phase == "dependencies"
+                          else "BACKUP_CAPTURE_TOTAL_BUDGET_EXCEEDED")
         with patch.object(remote,"BACKUP_CAPTURE_FENCE_SECONDS",0.10), patch.object(
                 remote,"_capture_writer_fences",observed_fence), patch.object(
                 ResearchStore,"_read_manifest",delayed_native_read):
-            with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED"):
+            with self.assertRaisesRegex(remote.RemoteOpsError,expected_error):
                 self.full()
         elapsed = time.monotonic()-started
         print("I2_CAPTURE_CLOSURE_DEADLINE "+json.dumps({"phase":phase,"budget_seconds":0.10,
             "injected_native_read_seconds":0.06,"manifest_read_starts_seconds":reads,
             "writer_blocked_during_reads":blocked,"refusal_wall_seconds":round(elapsed,3)}))
         self.assertTrue(reads)
-        self.assertEqual(blocked,[True]*len(reads))
+        self.assertEqual(blocked,[phase == "dependencies"]*len(reads))
         self.assertLessEqual(len(reads),2)
-        self.assertTrue(all(stamp < 0.10 for stamp in reads))
+        if phase == "dependencies":
+            self.assertTrue(all(stamp < 0.10 for stamp in reads))
         self.assertEqual(_raw_sql_readback(self.root/OPS),before)
         with closing(sqlite3.connect(self.root/OPS,timeout=0)) as peer:
             peer.execute("BEGIN IMMEDIATE")
@@ -564,6 +604,7 @@ print(json.dumps(remote.package_backup(root,config=config,sink_override=sink,pru
         before = source.read_bytes()
         opened = Path.open
         clock = [0.0]
+        self.config["monitoring"] = {"stall_max_seconds": 0.10}
         reads, blocked = [], []
 
         class NativeHashReader:
@@ -597,10 +638,10 @@ print(json.dumps(remote.package_backup(root,config=config,sink_override=sink,pru
 
         with patch.object(remote,"BACKUP_CAPTURE_FENCE_SECONDS",0.10), patch.object(
                 remote.time,"monotonic",side_effect=lambda:clock[0]), patch.object(Path,"open",observed_open):
-            with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED"):
+            with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_CAPTURE_TOTAL_BUDGET_EXCEEDED"):
                 self.full()
         self.assertEqual(reads,[0.0,0.06])
-        self.assertEqual(blocked,[True,True])
+        self.assertEqual(blocked,[False,False])
         self.assertEqual(source.read_bytes(),before)
         with closing(sqlite3.connect(source,timeout=0)) as peer:
             peer.execute("BEGIN IMMEDIATE")

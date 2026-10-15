@@ -1,35 +1,35 @@
 {
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
-  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-FIT",
+  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-CAPTURE-FIT",
   "as_of": "2026-10-15",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "e8fe9ea75d072cb95fd39489ffbbb6bdbd0a002a6db23edbd7ec52d7dbe22516",
-  "reviewed_inventory_sha256": "754affeeae59033973d2bb7022f497e8fdabf0a0900d493481f2a795c31c2e76",
+  "reviewed_bindings_sha256": "412c4eb2684386886c8a30f8f8caef3977fa41a65e61fd5f52dd711b643c2f74",
+  "reviewed_inventory_sha256": "2f1e779e486266a573094f424da041abd18633d33e219e18f3f12555cc822319",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
-    "mission": "Complete I2 software stage: economical consistent backup, recoverable exact cold retirement/reclaim and ordinary bounded maintenance; no compression-only DONE.",
-    "flexibility_and_history": "Old STORED compatible; native scientific/account/profile/A/B/C1/C2 history preserved; append-only policy/retirement/pins, no fake missingness or clocks.",
-    "context_efficiency": "Existing owners and locked stdlib; independent falsifiers plus focused direct-consumer regression, no local pre-PR full gate.",
-    "research_truth": "Exact cold/source closure required; UNKNOWN ownership and source scientific pins protected; no alpha, estimand or promotion claim.",
-    "owner_operability": "One staged OPERATE packet; exact CLI adapter, final-current bindings, successful-path resume, typed failure and recovery; one policy/future children/no daily IDs.",
-    "execution_to_cashflow": "Storage/recovery capability only; no money, market call or trading claim.",
-    "monitoring_and_recovery": "Separate last-good/attempt/maintenance; finite scheduled busy retry/coalescing with visible exhaustion and exact pending resume; durable pre-allocation native reclaim guard, forward-only accepted cleanup and policy-revision intent reconciliation preserve prior effects and pins. Native selection/planning failures persist typed FAILED under current authority and reach watch; busy or changed policy/plan yields without clobbering fresh state. Exact retire/policy canonical digest and install commands are explicit in the single staged packet. Actual retained cache footprint follows durable current/pending/release/active-plan references through root revisions/disable, with overlap deduplication and UNKNOWN for unsafe or unresolvable roots; current placement never implies old bytes were released. Explicit CLI mode is checked before writable construction and native mutation; automatic maintenance inherits commissioned policy wrapper mode without changing signed policy JSON/hash. Rehearsal retirement/proof cannot authorize an OPERATE APPLY, and physical recovery binds durable mode or an exact approved historical plan. One cooperative monotonic capture deadline and finite enumeration/materialization limits cover native causal dependency traversal; refusal releases writer fences without accepting a checkpoint. Single in-flight native/OS calls cannot be preempted; installed filesystem latency and collector gaps remain mandatory runtime acceptance.",
-    "build_vs_buy": "ADOPT SQLite backup, zipfile, existing HOT90/archive/research/lifecycle/store; WRAP existing offhost caller. No service/dependency/connector.",
-    "security": "No credentials or production operations; explicit destructive grants; archive path/hash and independent restore oracle; default-off deletes/policy.",
-    "red_team": "Review found and closed sidecar replay, native closure omission, A-B-A chain corruption, fabricated prune proof, two starvation paths and crash staging leak; dedicated negative regressions. Final isolated architecture/goal review additionally killed publication-before-fence PIT identity loss and multi-batch raw/cache dependency cycle; both repaired with native negative-to-positive proofs. Owner follow-up independently challenged actual historical full/delta control closure, lease and weekly/daily retry, fresh-process reclaim rename/reboot windows and stale approved-policy intent; native negative-to-positive evidence closes all four, including terminal reclaim receipt portability and unfinished-capture refusal."
+    "mission": "Ordinary independent recoverability with bounded collector disruption and no daily manual step.",
+    "flexibility_and_history": "Complete original I2 and Stage C remain required; no scientific history or former acceptance re-audit.",
+    "context_efficiency": "One same-contract replan, same native owners, 80 direct regressions; scale rerun only for concrete P1 failure boundary and measured writer error. No local full gate before PR.",
+    "research_truth": "WAL views pinned while all admitted writers fenced; mutable jobs/member pointers and causal files frozen together. Native ResearchStore semantic validation and one inventory/ZIP use captured bytes; integrity/freshness and all dependencies retained.",
+    "owner_operability": "One current task and OPERATE packet, existing ordinary scheduled caller, phase trace in pending/receipt, preserved last-good and native owned-staging recovery. No production mutation or third blind retry. Updated owner OPERATE proposal prefers standalone fresh compressed full/restore, one finite retirement/reclaim, compact baseline and one sustainable recurring policy; no authority inferred.",
+    "execution_to_cashflow": "Backup recoverability only; no trading, alpha or cashflow acceptance.",
+    "monitoring_and_recovery": "Existing fence30s and monitoring stall1800s treated separately; finite closure caps retained; measured temp/WAL/free and native writer/publications on local comparable fixture. Production latency acceptance remains separate. Actual-process OS_EXIT_73 during >=5.3 GB page copy, native writer commit and next capture without manual state fix; verified prior bundle hash unchanged. Initial Windows launcher-kill experiment excluded, not hidden.",
+    "build_vs_buy": "ADOPT existing SQLite Online Backup API/read transactions (SQLite backup.html and isolation.html), WRAP existing native capture/offhost owner. Reuse registry/ADR-002 checked; no dependency/service/framework.",
+    "security": "No credentials, raw production payloads, deployment, live capture, remote upload/delete or policy changes; metadata-only production probe.",
+    "red_team": "Before/after native copy/hash/metadata fence costs; writer commits after view pinning, fresh-process producer-read-denied restore; actual-process hard death, native cleanup and restart; busy-retry remains one JSON document. Real SQLITE_FULL tests failed attempt/one CLI JSON/last-good; missing frozen deferred receipt refuses rather than new census or skip. Comparable writer failure is recorded and repaired in the same patch."
   },
   "capability_radar": {
-    "now": "NONE: existing native owners suffice; next is exact merge gate, then separately bound staged OPERATE.",
-    "watch": "I4 source-owned cold/scientific pin disposition when measured RDP/cold growth dominates 180d runway; bounded lifecycle task only after evidence, not silent TTL."
+    "now": "NONE: finish exact-head gates, then exact merged Stage B authorization. Stage C remains required after PACKAGING_LIVE_PROVEN.",
+    "watch": "If post-merge authorized runtime still exceeds collector/closure budget, replan this same measured critical section; no new framework or weakened limits."
   },
-  "recovery": "Exact pending/cursor replay. Reclaim resumes or rolls back via native inode-bound intent before acceptance; durable resume decision forbids rollback and cleanup is idempotent to FINALIZED. Ordinary writers/capture refuse unfinished switch; verified local terminal receipt stays outside portable backup. Approved policy revision supersedes only verified obsolete remainder; candidate/effect corruption remains FAILED. Post-APPLY success/failure finalization compares current policy, exact plan and maintenance snapshot in one native transaction; peer intent/FAILED/cursor and committed effects survive old-caller completion. Whole outer checkpoint refresh/register/release/outcome preserves the same native context through own transactions; changed source/policy/plan/state/pending/current/release yields. Exact durable inode/owner-intent-bound cache deletion intent resumes partial cleanup after missing proof files, preserves remote pins, and rejects foreign identity; pre-delete scan budget refuses without deleting files. Staged SQLite hashing checks the shared fence deadline before each chunk read. Cache release uses its original deadline across prepare/delete phases and checks between individual filesystem operations and before acknowledgement; exhaustion yields with the durable partial-delete token for ordinary bounded resume. OPEN P2: pathlib native directory pre-materialization can outlast cooperative census budgets; rejected capture/cache census preserves source/token/pins and releases writer afterward. Owner P0/P1-only review floor leaves this disclosed latency/count limitation open; no lazy-scandir repair is claimed.",
+  "recovery": "Actual-process OS_EXIT_73 during >=5.3 GB page copy, native writer commit and next capture without manual state fix; verified prior bundle hash unchanged. Initial Windows launcher-kill experiment excluded, not hidden.",
   "limits": [
-    "NO_PRODUCTION_RATIO_OR_94_PERCENT_RECLAIM",
-    "NO_MONTHS_RUNWAY_SUPPORTED",
-    "NO_SCIENTIFIC_ALPHA_OR_CASHFLOW_VERDICT",
-    "NO_CANONICAL_DONE",
-    "NO_MERGE_OR_OPERATE_AUTHORITY_FROM_EVIDENCE"
+    "NO_SCIENTIFIC_OR_ALPHA_CLAIM",
+    "NO_PRODUCTION_PACKAGING_PROVEN",
+    "NO_MERGE_OR_OPERATE_AUTHORITY_FROM_PROOF",
+    "NO_STAGE_C_CANCELLED",
+    "OPEN_P2_COOPERATIVE_NATIVE_FILESYSTEM_CALL_LATENCY"
   ]
 }
