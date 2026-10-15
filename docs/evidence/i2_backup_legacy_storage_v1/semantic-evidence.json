@@ -1,18 +1,22 @@
 [
   {
-    "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/proof.json",
-    "sha256_or_fingerprint": "f9ca8c739018640b0f68ab1b27bba8bd7d457175c6d6cb79193ed6df8a85fc21"
-  },
-  {
-    "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md",
-    "sha256_or_fingerprint": "1769173049d81f206bb928a3ab0b08dde37c5f8621a9272ecd81a97771af4c13"
+    "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/recovery-closure-proof.json",
+    "sha256_or_fingerprint": "e7a29a839ae70dfd8bd2d32253b678e8b7a21fbf7c1457261dbee55f1751101f"
   },
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md",
-    "sha256_or_fingerprint": "58e6d21e24ab2e31b7acc4b85e31835568077056baf069607913e2c1a8b1d1bd"
+    "sha256_or_fingerprint": "972e98571aa861bc104b9dd2f41fc28b4cd1f00504867e64c7a7db9d3c337476"
   },
   {
-    "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/review-follow-up.md",
-    "sha256_or_fingerprint": "11601856ef885191fcbeb1687e70e8717a84557d7541b98f970718d2c4080b93"
+    "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md",
+    "sha256_or_fingerprint": "38c91789fe0c26a86c8f808bb0d6ffbfbe477f3171100f98dec6ac179267529c"
+  },
+  {
+    "logical_ref": "src/solana_alpha_lab/factory/remote_ops.py",
+    "sha256_or_fingerprint": "393a237ce274d57b02fe5a295ad248494deaaf070027cd908992854c18e912ff"
+  },
+  {
+    "logical_ref": "tests/test_i2_backup_legacy_storage_v1.py",
+    "sha256_or_fingerprint": "51750d481534649008c76e1b62b0ad0f2333e076d6c5aadd8ddd2fe9dd0978c6"
   }
 ]

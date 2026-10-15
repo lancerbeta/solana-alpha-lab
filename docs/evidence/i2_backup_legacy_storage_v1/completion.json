@@ -1,11 +1,11 @@
 {
   "schema": "smial.delivery-completion-evidence",
   "schema_version": "1.0",
-  "acceptance_id": "I2_BACKUP_LEGACY_STORAGE_V1-CAPTURE-REPAIR",
-  "as_of": "2026-10-15",
+  "acceptance_id": "I2_BACKUP_LEGACY_STORAGE_V1-RECOVERY-CLOSURE-P1",
+  "as_of": "2026-10-16",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "state_change": "Repair the measured I2 capture boundary using pinned WAL read views and existing Online Backup API, preserve one captured inventory/ZIP and control closure, prove >=5.3 GB concurrent native writer/publication and hard interruption recovery. Runtime Stage B/C remain mandatory and separately authorized.",
-  "base_main": "304b16e682fb5b5760229d4fd39fcab7a35aa307",
+  "state_change": "Replace mandatory historical namespace census with source-owned exact native recovery identities/pointers and measured no-lookup metadata fallback outside fence. Preserve actual captured lifecycle/publication closure and one inventory/ZIP. Original I2 Stage B/C remain mandatory and separately authorized.",
+  "base_main": "2c39e5e47f2edb60a7720ef6621c2203b5d0561b",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
@@ -40,7 +40,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_80_CAPTURE_OFFHOST_LEGACY_CHAIN_REGRESSIONS_PLUS_5_56GB_NATIVE_WRITER_PUBLICATION_INDEPENDENT_RESTORE_AND_HARD_INTERRUPTION; see capture-repair-proof.json; PLUS_4_EXACT_CI_AND_CAPTURE_ORACLES_FOR_EQUIVALENT_CONTEXTVAR_FALLBACK_FIX",
+    "targeted": "PASS_Ran 45 tests in 733.338s_NATIVE_NAMESPACE_16670_TO_100000_SAME_SELECTED_CLOSURE_INDEPENDENT_RESTORE_TYPED_REFUSALS_INTERRUPTED_RETRY; PLUS4_FINAL_POINTER_NAMESPACE_CONSUMER_SEAMS; separate measured/final source hashes in recovery-closure-proof.json",
     "independent_review": {
       "path": "docs/evidence/i2_backup_legacy_storage_v1/independent-review.json",
       "sha256": "90b629facbe6f9a9ae5f2f466b4d83893b35213a68723bf071035153a92d07ea",
@@ -66,6 +66,6 @@
   "side_effects": {
     "repository": "bounded I2 branch code/tests/docs/Catalog",
     "local": "disposable native fixture roots and measurement receipts",
-    "external": "GitHub routine delivery only; no provider/production upload/deploy/delete"
+    "external": "One metadata-only production probe and GitHub routine delivery; no new live capture, deployment, uploads, deletion or policy changes."
   }
 }

@@ -1,4 +1,88 @@
-# I2 — capture follow-up / текущая передатка
+# I2 — recovery closure P1 / текущая передатка
+
+Production installed: `2c39e5e47f2edb60a7720ef6621c2203b5d0561b`.
+Один approved standalone full scope44c315f4… отказал
+BACKUP_PUBLICATION_PARTITION_SCAN_BUDGET_EXCEEDED до SQLite copy/ZIP/upload.
+Writer hold0.997608s, last-good сохранён. Новый live capture не запускался.
+I2 operational outcome BLOCKED до отдельной live acceptance.
+
+Корень: capture перечислял весь research namespace до фильтрации required
+events; entry16385 превышал cap16384. Заодно копировалась вся историческая
+control history вместо closure фактически captured activations.
+
+Read-only probe15Oct23:14Z: research16659 / dataset16590 entries;
+research/write_lookup_v1 уже VALID, pending/repair не требуется.
+Captured read transaction OPS: одна ACTIVE activation, authority существует,
+три exact native transaction pointers (schedule/authority/transition) полностью
+найдены и проверены; open OPS/jobs0. Probe2.539s, historical metadata scan
+2.488s/13,915,561bytes, RSS123,932KiB, writer fence0.
+Точные identities/hashes и isolated measurements — recovery-closure-proof.json.
+
+Repair выбирает actual captured ACTIVE/DRAINING OPS, без A/B constants.
+VALID lookup адресует required transactions и native state pointers captured activations.
+Committed prefix сохраняет prior ACTIVE для будущего DRAINING recovery. Если lookup отсутствует,
+streaming metadata fallback работает после writer release под существующим
+total stall deadline, с bounded per-header reads и namespace stamp refusal;
+история не материализуется в RAM и permanent index не создаётся.
+Pending/stale/corrupt lookup отказывают, capture не repairs/commissions lookup.
+
+Dataset validation receipt связывается hash с DatasetManifest и exact partition
+IDs; native validators проверяют fingerprint и actual artifacts. Ordinary native
+publisher не выпускает receipt: его MANIFEST/MARKER open job использует fallback
+только для своего dataset. При open jobs0 dataset scan не нужен. Stage-required
+OBS/MEM events обязательны, ARTIFACTS допускает ещё не committed event по native
+replay semantics.
+
+Под fence остаются authoritative membership, pinned SQLite view, mutable jobs,
+member-layout/unit mirrors и directory stamps. После release — SQLite copy/SHA,
+immutable closure и native verification captured bytes. Inventory/ZIP читают
+тот же набор. Только реально использованный fallback требует неизменного namespace;
+exact pointers допускают unrelated later native publication. Required missing/corrupt,
+broken pointer/fingerprint/hash и fallback namespace mutation дают typed refusal. Scientific history не удаляется и не
+перепроверяется целиком в routine backup.
+
+После exact merge/post-merge — один новый Stage B scope:
+exact deploy → ordinary compressed standalone full/checkpoint → existing Drive
+sink → independent restore → безопасная Stage C preparation. Scope44c315f4…
+consumed и новый rollout не разрешает. Existing window adapter/measurements
+переиспользуются при неизменных предпосылках. Reader32GB/8objects/3h — ceiling.
+Remote deletion, reclaim/APPLY, policy enable и изменение effective freshness/
+RPO/retention в repair не входят. Local proof не является production acceptance.
+
+WATCH:16Oct00:15Z local /00:45Z offhost могут повторить известный incident;
+контроллер не создаёт retries и не меняет timers/failed receipts.
+Last-good uploaded15Oct00:45:01Z, source clock UNKNOWN; upload clock не заменяет
+source freshness. Native freshness86400s/RPO24h сохраняются.
+B17Oct00:20:30Z и managed cutover18Oct00:00Z требуют fresh native preflight.
+Без новой verified copy нынешняя chain старше24h даже по upload clock:
+native gate должен отказать. Supported путь — authorized merged repair/full/
+restore до gate, без LOCAL_BUNDLE/grant/timer bypass.
+
+NEXT: CI/readiness → одна exact merge phrase → guarded merge/readback →
+новый Stage B approval → PACKAGING_LIVE_PROVEN → Stage C.
+Stage C обязателен: eligible/protected bytes с consumers, конечный native
+retirement/reclaim rehearsal, physical gain, полная pause (включая final-current
+upload/restore/register), throughput одной recurring policy. Destructive APPLY/
+policy enable требуют одного отдельно approved конечного scope.
+
+Изолированная vertical: Ran 45 tests in 733.338s, PASS.
+Namespace16670→100000 irrelevant entries в КАЖДОМ research/dataset directory;
+selected manifests11→11, native live opens14→14.
+Backup+restore wall78.468→405.231s; writer hold
+0.009551→0.014015s; peer writes14+14, blocked0.
+Peak RSS110284800bytes; ZIP168355→168355bytes.
+Native restore сохраняет3 transition/3 authority и SQL/ROWIDs;
+future DRAINING отдельно доказан с prior ACTIVE, без/с lookup.
+100k — измеренный fallback horizon, не гарантия неизменного роста;
+production VALID lookup не требует этого historical walk.
+
+Измеренный source d55a89b1… отделён от финального source393a237c…:
+после профильного прогона один P1 сузил namespace stamps до fallback.
+Fallback algorithm/cost не менялись; новый scale cycle не запускался.
+Native append после fence при VALID lookup → ZIP → independent restore
+с прежним captured OPS PASS1.089s; future DRAINING/MANIFEST/MARKER PASS.
+
+## История capture repair #408
 
 Runtime: `304b16e682fb5b5760229d4fd39fcab7a35aa307`, Stage B BLOCKED после двух
 `BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED`. Внутренняя production-фаза UNKNOWN;

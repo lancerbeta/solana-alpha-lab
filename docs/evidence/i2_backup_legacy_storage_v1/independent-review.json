@@ -1,8 +1,8 @@
 {
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
-  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-CAPTURE-REPAIR",
-  "as_of": "2026-10-15",
+  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-RECOVERY-CLOSURE-P1",
+  "as_of": "2026-10-16",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
   "reviewed_bindings_sha256": "412c4eb2684386886c8a30f8f8caef3977fa41a65e61fd5f52dd711b643c2f74",
   "reviewed_inventory_sha256": "2f1e779e486266a573094f424da041abd18633d33e219e18f3f12555cc822319",
@@ -12,43 +12,8 @@
     "ARCHITECTURE_CRITIC",
     "OWNER_UX_CRITIC"
   ],
-  "reviews": [
-    {
-      "role": "CODE_REVIEWER",
-      "verdict": "PASS",
-      "findings": [
-        "Isolated read-only P0/P1 refresh PASS on frozen content head 362a5dc97686ef508ebd033d45a3989c92aed969; no open P0/P1. All three ContextVar get(None) calls preserve fallback and token reset; the security test is unchanged.",
-        "Frozen candidate and current source bindings matched. Comparable measurements remain bound separately to content head 06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c. No additional tests, production writes or runtime authority."
-      ]
-    },
-    {
-      "role": "GOAL_DOD_CRITIC",
-      "verdict": "PASS",
-      "findings": [
-        "Isolated read-only P0/P1 refresh PASS on frozen content head 362a5dc97686ef508ebd033d45a3989c92aed969; no new P0/P1 gaps. ContextVar fallback is equivalent; snapshot, budgets and recovery are unchanged. Current source hashes matched; measured-source provenance remains separate.",
-        "Owner outcome and authority boundaries remain: fresh standalone full/restore, verified-copy finite native retirement/reclaim rehearsal, one scoped resumable cleanup, compact baseline and sustainable policy. Production attribution, pause and throughput remain UNKNOWN."
-      ]
-    },
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "verdict": "PASS",
-      "findings": [
-        "Isolated packet+diff-only P0/P1 review PASS; SEMANTIC_PREMISE=PASS on frozen content head 362a5dc97686ef508ebd033d45a3989c92aed969. Diff, contract and named evidence hashes matched. Equivalent constructor-default to get(None) change preserves all three reads and set/reset; snapshot, closure, budgets, ZIP and recovery unchanged.",
-        "Membership, WAL view and mutable closure remain consistent; native completed/legacy owner owns immutable bytes; missing or unsafe members refuse. OPS, native ResearchStore manifests/records and source/archive bytes remain truth, DuckDB derived. No new private cross-task imports or scientific authority.",
-        "Local proof can pass while production I/O, WAL pressure or larger closure delays collector and violates due/PIT coverage. Missed mandatory observations, backup-caused lock failure or restored closure divergence remain runtime falsifiers. No production acceptance or merge/OPERATE authority.",
-        "packet_fingerprint_sha256=2d46564fa9fe919ac060e4f72cff6a606bf48a10b33964cd9ec33037900e9aa4; independence=PACKET_INFORMATION_PATH; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN. Review read-only without test reruns."
-      ]
-    },
-    {
-      "role": "OWNER_UX_CRITIC",
-      "verdict": "PASS",
-      "findings": [
-        "Isolated read-only P0/P1 refresh PASS on frozen content head 362a5dc97686ef508ebd033d45a3989c92aed969; no P0/P1 owner-UX gaps. Readout explicitly states no scale rerun, while proof retains measured-source hashes and measured scale head 06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c.",
-        "Next owner action remains exact merge phrase after exact-head CI and native readiness. Runtime-pending/BLOCKED and separate Stage B/C authorization are preserved. No tests or writes by reviewer."
-      ]
-    }
-  ],
-  "verdict": "PASS",
+  "reviews": [],
+  "verdict": "NOT_READY",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "NO_REVIEW_MODEL_DIVERSITY_PROOF",
@@ -59,9 +24,15 @@
       "role": "CODE_REVIEWER",
       "prior_verdict": "NOT_READY",
       "severity": "MAJOR",
-      "finding": "P1 native post-fence SQLITE_FULL escaped the former fence exception handler: no typed JSON/trace and latest attempt falsely stayed successful. Real SQLite max_page_count=1 CLI/attempt/last-good/native-writer oracle now passes.",
-      "observed_head": "2bd02dcb563ab284b327a6e541fb7427f0239060",
-      "resolved_by_head": "06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c"
+      "finding": "Future prepared DRAINING requires committed prior ACTIVE native proof; capture now retains actual captured activation state prefix, with/without lookup; missing predecessor refuses.",
+      "resolved_by_source_sha256": "d55a89b12d686fc9e32844931d4c4506024c32acc52c39970f62ac8bd4132d5b"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Blanket namespace stamps invalidated exact immutable pointer snapshot after unrelated later native publication. Stamps now guard only actually used fallback namespaces; native append after fence->ZIP->independent restore preserves captured OPS.",
+      "resolved_by_source_sha256": "393a237ce274d57b02fe5a295ad248494deaaf070027cd908992854c18e912ff"
     }
   ]
 }

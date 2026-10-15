@@ -1,8 +1,8 @@
 {
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
-  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-CAPTURE-FIT",
-  "as_of": "2026-10-15",
+  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-RECOVERY-CLOSURE-FIT",
+  "as_of": "2026-10-16",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
   "reviewed_bindings_sha256": "412c4eb2684386886c8a30f8f8caef3977fa41a65e61fd5f52dd711b643c2f74",
   "reviewed_inventory_sha256": "2f1e779e486266a573094f424da041abd18633d33e219e18f3f12555cc822319",
@@ -11,25 +11,26 @@
   "dimensions": {
     "mission": "Ordinary independent recoverability with bounded collector disruption and no daily manual step.",
     "flexibility_and_history": "Complete original I2 and Stage C remain required; no scientific history or former acceptance re-audit.",
-    "context_efficiency": "One same-contract replan, same native owners, 80 direct regressions; scale rerun only for concrete P1 failure boundary and measured writer error. No local full gate before PR.",
-    "research_truth": "WAL views pinned while all admitted writers fenced; mutable jobs/member pointers and causal files frozen together. Native ResearchStore semantic validation and one inventory/ZIP use captured bytes; integrity/freshness and all dependencies retained.",
+    "context_efficiency": "One bounded defect PR, same I2 contract/native capture owner. Production metadata-only probe and one extended existing vertical fixture; no 5.5GB suite or general audit. P0/P1 critics only. No local full gate before PR.",
+    "research_truth": "Captured OPS ACTIVE/DRAINING, native ResearchStore transactions/state pointers, native publication stages and hash-bound dataset validation receipt own closure. Native prior ACTIVE for future DRAINING retained. Frozen mutable mirrors/namespace stamp under fence; immutable closure verification afterwards. Required missing/corrupt/stale or mutation refuses. Historical science stays in its original owner/archive, not globally re-certified.",
     "owner_operability": "One current task and OPERATE packet, existing ordinary scheduled caller, phase trace in pending/receipt, preserved last-good and native owned-staging recovery. No production mutation or third blind retry. Updated owner OPERATE proposal prefers standalone fresh compressed full/restore, one finite retirement/reclaim, compact baseline and one sustainable recurring policy; no authority inferred.",
     "execution_to_cashflow": "Backup recoverability only; no trading, alpha or cashflow acceptance.",
-    "monitoring_and_recovery": "Existing fence30s and monitoring stall1800s treated separately; finite closure caps retained; measured temp/WAL/free and native writer/publications on local comparable fixture. Production latency acceptance remains separate. Actual-process OS_EXIT_73 during >=5.3 GB page copy, native writer commit and next capture without manual state fix; verified prior bundle hash unchanged. Initial Windows launcher-kill experiment excluded, not hidden.",
-    "build_vs_buy": "ADOPT existing SQLite Online Backup API/read transactions (SQLite backup.html and isolation.html), WRAP existing native capture/offhost owner. Reuse registry/ADR-002 checked; no dependency/service/framework.",
-    "security": "No credentials, raw production payloads, deployment, live capture, remote upload/delete or policy changes; metadata-only production probe.",
-    "red_team": "Before/after native copy/hash/metadata fence costs; writer commits after view pinning, fresh-process producer-read-denied restore; actual-process hard death, native cleanup and restart; busy-retry remains one JSON document. Real SQLITE_FULL tests failed attempt/one CLI JSON/last-good; missing frozen deferred receipt refuses rather than new census or skip. Comparable writer failure is recorded and repaired in the same patch."
+    "monitoring_and_recovery": "Existing30s fence and1800s total stall budgets remain separate. Native pointer path avoids global walk; measured no-lookup100k metadata fallback outside fence after SQLite readers close. Real bytes restored, publication repaired, last-good/pending/owned staging semantics tested. No production acceptance.",
+    "build_vs_buy": "ADOPT existing ResearchStore/ResearchWriteLookup native transaction and state pointers, native manifest validators and validation receipt partition IDs. WRAP only existing capture owner. No index commissioning, new dependency/service/scheduler or new architecture.",
+    "security": "Read-only minimized production metadata probe; no raw market payloads or secrets, production mutation, live capture, upload/deletion or settings changes.",
+    "red_team": "16670->100000 irrelevant entries per namespace without lookup; selected manifests/live opens constant, writer commits unblocked; future DRAINING prior ACTIVE missing refuses; invalid/stale pointers, namespace changes, missing required bodies/partitions and broken receipts/fingerprint refuse; interrupted publication and retry use native recovery."
   },
   "capability_radar": {
     "now": "NONE: finish exact-head gates, then exact merged Stage B authorization. Stage C remains required after PACKAGING_LIVE_PROVEN.",
     "watch": "If post-merge authorized runtime still exceeds collector/closure budget, replan this same measured critical section; no new framework or weakened limits."
   },
-  "recovery": "Actual-process OS_EXIT_73 during >=5.3 GB page copy, native writer commit and next capture without manual state fix; verified prior bundle hash unchanged. Initial Windows launcher-kill experiment excluded, not hidden.",
+  "recovery": "Existing full/delta, interrupted capture/publication, native staging cleanup and last-good regressions reused; restored native control includes exact activation prefix and actual publication bytes. No new recovery framework.",
   "limits": [
     "NO_SCIENTIFIC_OR_ALPHA_CLAIM",
     "NO_PRODUCTION_PACKAGING_PROVEN",
     "NO_MERGE_OR_OPERATE_AUTHORITY_FROM_PROOF",
     "NO_STAGE_C_CANCELLED",
-    "OPEN_P2_COOPERATIVE_NATIVE_FILESYSTEM_CALL_LATENCY"
+    "COOPERATIVE_NATIVE_CALL_DEADLINE",
+    "NO_UNBOUNDED_HISTORY_RUNWAY_CLAIM"
   ]
 }

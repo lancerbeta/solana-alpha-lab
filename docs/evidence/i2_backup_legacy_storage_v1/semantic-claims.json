@@ -1,17 +1,12 @@
 [
   {
-    "claim_id": "I2_SINGLE_CAPTURE_RECOVERY",
-    "claim": "Inventory and full/delta archives share immutable captured bytes with causal native control/publication closure; final raw inventory precedes operational restore marker. Actual historical mutable-only full can receive first event closure in a new delta; standalone/final incomplete control refuses. One cooperative monotonic writer-fence budget guards dependency/control enumeration, native lookups and capture steps with finite resource limits; refusal releases writers without accepting incomplete closure. Individual in-flight OS/native calls are non-preemptible. The shared capture deadline also guards every staged-SQLite hash chunk read. Open P2: pathlib native directory pre-materialization can exceed census count/deadline before caller refusal; source/cache/token/pins remain preserved. Owner limits further blocking review to P0/P1; this limitation is not repaired or claimed production-ready.",
-    "scope": "Isolated native counterpart, old STORED/new DEFLATE readers; production pending."
+    "claim_id": "I2_CAPTURED_REQUIRED_RECOVERY_CLOSURE",
+    "claim": "Actual captured ACTIVE/DRAINING OPS and open publication stages select native exact transactions, captured activation state prefix and dataset dependencies. Existing VALID lookup and hash-bound validation receipts avoid global historical traversal; absent lookup/receipt uses measured streaming metadata fallback outside writer fences under unchanged total deadline. Native required identity, bytes/hash/fingerprint and namespace consistency failures refuse; inventory and ZIP consume the same staged set.",
+    "scope": "Isolated production-shaped namespace and native restoration; code capability only, production acceptance pending."
   },
   {
-    "claim_id": "I2_EXACT_COLD_RETIRE_RECLAIM",
-    "claim": "Retirement removes exact archived eligible bodies while preserving denominator/provenance/control; explicit native rebuild preserves ROWID/sequence/root identity and next writer. Durable pre-allocation intent blocks reboot/reconnected writers until exact recovery finalizes owned rollback/staging cleanup. Explicit CLI operation mode agrees with the exact approved retirement and applied authority before mutation; rehearsal proof cannot authorize the OPERATE path.",
-    "scope": "Exact approved scope/plan; default-off; quiesced final-current production authority separate."
-  },
-  {
-    "claim_id": "I2_ORDINARY_BOUNDED_MAINTENANCE",
-    "claim": "One approved lineage/scopes policy lets the existing checkpoint caller discover future terminal children and process bounded work across restart without daily IDs or manual backup records. Existing scheduled caller bounds busy retry/coalesces overlap; approved policy revisions reconcile stale intents without erasing effects or candidate conflicts. Native selection failures persist typed maintenance health and reach watch, while contention or changed policy/plan yields without overwriting newer authority. The same current-authority comparison spans outer checkpoint refresh/register/release and final failure reporting; durable inode-bound partial cache cleanup resumes without releasing remote pins, with pre-delete scan budgets and typed contention yields. Cache cleanup checks its original budget between individual filesystem deletions and before acknowledgement; exhaustion yields with the existing durable partial-delete token for ordinary continuation. Open P2: pathlib native directory pre-materialization can exceed census count/deadline before caller refusal; source/cache/token/pins remain preserved. Owner limits further blocking review to P0/P1; this limitation is not repaired or claimed production-ready.",
-    "scope": "Synthetic transport ordinary pipeline; installed production caller and normal cycles pending; scientific/cold pins survive."
+    "claim_id": "I2_RUNTIME_AUTHORITY_AND_PRODUCT_OUTCOME",
+    "claim": "No new live capture/deploy/upload, lookup commissioning, destructive operation or settings change. Original I2 finite legacy retirement/physical reclaim and one sustainable policy remain required after authorized PACKAGING_LIVE_PROVEN, with existing owners and separate exact runtime authorities.",
+    "scope": "Current recovery patch plus single existing OPERATE packet; no scientific truth or I3 grant changes."
   }
 ]

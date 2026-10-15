@@ -1,14 +1,6 @@
 {
   "authority_granted": false,
   "matched_paths": [
-    "catalog/schemas/factory_remote_operations_v1_1.schema.json",
-    "docs/contracts/system_operability_surface_v2.md",
-    "src/solana_alpha_lab/factory/collector_operational_packet.py",
-    "src/solana_alpha_lab/factory/managed_collection.py",
-    "src/solana_alpha_lab/factory/observation_schedule_retention.py",
-    "src/solana_alpha_lab/factory/observation_schedule_store.py",
-    "src/solana_alpha_lab/factory/offhost_backup.py",
-    "src/solana_alpha_lab/factory/operability_watch.py",
     "src/solana_alpha_lab/factory/remote_ops.py"
   ],
   "profile": "SEMANTIC_PREMISE",
