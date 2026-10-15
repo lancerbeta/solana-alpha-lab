@@ -6553,6 +6553,11 @@
       "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
     },
     {
+      "source_asset_id": "EVID-LIST-A-CONFIRMING-SOURCE-ROLE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIST-A-CONFIRMING-EXECUTION-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-ATOM3A-RECEIPT-001",
       "relation": "evidenced_by",
       "target_asset_id": "CATALOG-ROOT-001"

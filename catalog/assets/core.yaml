@@ -42887,7 +42887,7 @@ records:
     repository_path: docs/reports/list_a_confirming_producer_v1/OWNER_REPORT.md
   integrity:
     kind: sha256
-    sha256: 4622a18a13505d4e565a9d8c311163f13571d3f5760814ceb6fd96748d47c6e3
+    sha256: 4fac0cc362b4175105b1d90ad15071d7343c935c27390c1d54102c78ff634745
   access:
     mode: read_only
     method: file
@@ -42926,7 +42926,7 @@ records:
     repository_path: docs/reports/list_a_confirming_producer_v1/REPRODUCE.md
   integrity:
     kind: sha256
-    sha256: 1830d7d1700aa940744a187facdc2b6874d71ee901a1219456cb8dfc294417c9
+    sha256: bb1e78d23901bcb9fe85f9c7137c853addeedd5285b1fdfb9dcad467606638d7
   access:
     mode: read_only
     method: file
@@ -42965,7 +42965,7 @@ records:
     repository_path: docs/evidence/list_a_confirming_producer_v1/acceptance.json
   integrity:
     kind: sha256
-    sha256: 6cc57d3eb15d7545c7d20279c258f0952154c77038716d493e50622a031f618d
+    sha256: ab20ed3f25eae21b845137a8041a9fec00994e53d2cd08bca5106477036803b0
   access:
     mode: read_only
     method: file
@@ -43097,6 +43097,45 @@ records:
   - Git delivery only
   - retained review deviation
   - review-history
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVID-LIST-A-CONFIRMING-SOURCE-ROLE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Retain the P1 role-laundering witness, same-source typed refusal, independent
+    metadata oracle, zero preflight target decodes and bounded delivery blockers
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-10-14'
+  truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/list_a_confirming_producer_v1/qualification.json
+    repository_path: docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json
+  integrity:
+    kind: sha256
+    sha256: 3773aeb1e38d305525ab16e8ba99be8ef870af556c8aca5f9b056ee1efd4c5a3
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIST-A-CONFIRMING-EXECUTION-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
+  - List A confirmation
+  - Spec 1.5
+  - native confirming
+  - SYNTHETIC
+  - UNBOUND real sample
   classification:
     contains_secrets: false
     contains_raw_data: false

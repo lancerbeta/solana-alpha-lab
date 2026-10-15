@@ -89,6 +89,16 @@
       "evidence": "Literal -1/8 and zero, concentrated point1/256 with LOOmin0/max1/248 and seeded intervals lower0 -> INCONCLUSIVE; actual pooled all-first-label draws -> 4096 invalid per partition, no reroll",
       "requirement": "negative/zero/ambiguous and empty-bootstrap boundary predicates",
       "status": "PASS"
+    },
+    {
+      "evidence": "source-role-provenance.json: prior P1 acceptance proved; same source bytes typed refusal after repair; observation-only late-row/missing/invalid provenance and legitimate compatible domain-independent metadata checks",
+      "requirement": "authoritative original source-role provenance",
+      "status": "PASS_TARGETED_SYNTHETIC"
+    },
+    {
+      "evidence": "Prior PR406 workflow38663657983 failed; three legacy test fixture compatibility paths require separate exact write-set authority; no passing CI transferred",
+      "requirement": "fresh exact-head CI delivery",
+      "status": "BLOCKED_OUTSIDE_MANAGED_WRITE_SET"
     }
   ],
   "schema": "smial.list-a-confirmation-coverage",

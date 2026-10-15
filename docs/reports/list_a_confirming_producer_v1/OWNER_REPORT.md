@@ -130,3 +130,39 @@ Evidence: [acceptance](../../evidence/list_a_confirming_producer_v1/acceptance.j
 [REPRODUCE](REPRODUCE.md).
 
 15 октября owner возобновил Git delivery после изменения main. Новый delivery base `b3fb9d8ecffbffda468dccabaa81ca3392da6f15` интегрирован forward-only merge; история прежнего base и обоих review checkpoints сохранена. Все 22 пути scientific qualification и frozen control policy побайтно прежние. Конфликты затронули только производные Catalog hashes/counts; они пересоздаются штатным генератором. Git identity в task обновлена без изменения objective, write set, scientific contract или authority. Новый candidate проходит отдельный review/binding/CI; этот content checkpoint не утверждает их PASS и не даёт merge authority. Scientific campaign не перезапускается, новые environments не создаются.
+
+
+15 октября targeted checkpoint PR406 выявил **P1 source-role laundering** на
+head `3a1c5c79066364492ef8d8e93cef7614b190a72c`: штатные register-source → prepare →
+authorize → classify приняли native source с исходными `EXPLORATORY_REUSE` и
+`confirmatory_reuse_forbidden=true`, когда внешний Sample заявлял untouched/false.
+На committed repair `4a0a83f49bd0a0de451f8787f57836960cc90f9e` те же неизменные файлы
+получили `CONFIRMATORY_REUSE_FORBIDDEN` на каждом переходе, classify —
+`BLOCKED_BEFORE_RESERVE`. Target decodings/reservations/charges: **0/0/0**.
+Теперь authority принадлежит исходной census/observations metadata; читаются
+только две role columns. Native ingress также отказывает до публикации source
+authority. Missing/invalid provenance типизированы; compatible metadata проверена
+для обеих domain labels на synthetic TEST bytes, без REAL регистрации/чтения.
+3 targeted methods и 66 direct-consumer checks — PASS. Семь named charges,
+original trials/results, scientific core, clocks/seeds/thresholds не изменены;
+новых environments/containers/campaigns нет. Прежняя qualification остаётся
+исторической, новый source guard описан отдельной closure.
+
+**Delivery checkpoint:** прежний exact-head CI workflow `38663657983` завершился
+FAILURE (shards 0/3/5). Служебное SOURCE_DISPOSITION_REQUIRED исправлено добавлением
+`project_sources_disposition.kind=NO_CHANGE`; исходный scientific JSON payload
+проверен на точное равенство. Остались три legacy fixture compatibility blockers:
+`tests/test_factory_ordinary_market_hypothesis.py` (engineering capabilities hash),
+`tests/test_discovery_evidence_release_bridge.py` (accepted additions list),
+`tests/test_harness_sync.py` (positional schema selection). Эти пути отсутствуют в
+exact task managed_write_set; они не изменены. Fresh reviews/evidence rebind,
+preflight, push и CI текущего repair отмечаются по фактическим результатам,
+прежний PASS не переносится. Merge phrase не запрашивается.
+
+Доказательства: [source-role provenance](../../evidence/list_a_confirming_producer_v1/source-role-provenance.json).
+Ограничение: сохранённая исходная metadata не может быть переименована внешним
+Sample; намеренную подделку самих исходных source-owner labels эта граница не
+доказывает. Real sample, blind Actor, early P0 reader count и clean-host/shared
+Docker physical growth сохраняют прежние UNKNOWN/nonclaims.
+
+Footprint targeted checkpoint: **192.849 MiB owned / 232.035 MiB conservative cap charge**, 30 stopped containers. Host allocation и SizeRw прочитаны заново; unchanged proof volume использует сохранённый allocation snapshot (новых volume writes/containers нет). Замер до финальных review/delivery commits. Shared Docker VHDX/log metadata остаются UNKNOWN. Новая source provenance boundary не переименовывает старые input labels: исторические шесть результатов сохранены, их повторная qualification на новой closure не заявлена.

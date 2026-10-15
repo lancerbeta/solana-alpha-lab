@@ -158,7 +158,7 @@
       "status": "PASS"
     }
   ],
-  "exact_head_ci": "ENFORCED_LIVE_BEFORE_MERGE_READINESS",
+  "exact_head_ci": "PR406_ORIGINAL_HEAD_FAILURE; REPAIR_HEAD_NOT_PUSHED",
   "full_local_gate": "NOT_EXECUTED_PRE_PR; GUARDED_MERGE_IS_SOLE_EXECUTOR",
   "git_delivery_continuation": {
     "as_of": "2026-10-15",
@@ -224,6 +224,19 @@
   "production_bytes_unchanged_since_native_acceptance": false,
   "schema": "smial.list-a-confirmation-validation",
   "schema_version": "1.0",
+  "source_role_checkpoint": {
+    "direct_consumers": "66 PASS in 234.387s",
+    "evidence_ref": "repo://docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json",
+    "historical_ci_conclusion": "FAILURE",
+    "original_campaign_replayed": false,
+    "outside_write_set_delivery_blockers": [
+      "tests/test_factory_ordinary_market_hypothesis.py",
+      "tests/test_discovery_evidence_release_bridge.py",
+      "tests/test_harness_sync.py"
+    ],
+    "repair_head": "4a0a83f49bd0a0de451f8787f57836960cc90f9e",
+    "targeted": "3 methods PASS; native ingress, source registration, prepare, authorize, classifier before reserve"
+  },
   "test_artifacts": [
     "tests/test_list_a_confirmation_method_v1.py",
     "tests/test_list_a_confirmation_admission_v1.py",

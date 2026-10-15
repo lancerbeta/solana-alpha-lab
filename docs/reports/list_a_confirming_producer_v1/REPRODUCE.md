@@ -148,3 +148,35 @@ current production qualification — отдельная post_review_implementati
 Rollback: обычный code/schema/registry revert сохраняет stores, reservations,
 attempts/results и charges. Pending несовместимый trial не считается untouched;
 нельзя refund charge или менять core/thresholds ради повторного запуска.
+
+
+## Targeted source-role checkpoint (PR406)
+
+На существующем locked CPython runtime, без install/sync/new .venv:
+
+```text
+python -B -m unittest tests.test_list_a_confirmation_admission_v1.SourceRoleProvenanceTests -v
+python -B -m unittest tests.test_list_a_confirmation_admission_v1 tests.test_list_a_confirmation_vertical_v1 tests.test_fast_lane_classifier tests.test_experiment_evidence_decision_v1 -v
+```
+
+Первый тест конструирует только disposable synthetic TEST ingress; затем вызывает
+настоящий `register-source --source-input` с original source role/forbidden labels
+при outer untouched/false. Census-only, observations-only и обе поверхности,
+включая последнюю строку, должны отказать до SOURCEAUTH/grant/reservation/run.
+Instrumentation разрешает observation decoding только двух role columns; future
+target values не открываются. Missing/invalid labels fail closed. Domain-independent
+compatible-label oracle использует те же synthetic bytes; REAL grant не выдаётся.
+Unit stores имеют ordinary temporary cleanup и не являются replay named campaign.
+
+Сохранённый before/after native CLI witness использует один неизменный TEST source;
+до repair были SOURCE_PREPARED/SOURCE_REGISTERED/PREPARED/AUTHORIZED/FAST_LANE_READY,
+после — CONFIRMATORY_REUSE_FORBIDDEN и BLOCKED_BEFORE_RESERVE. Existing granted
+binding тоже отказывает. Raw receipt UTF-8 и hashes находятся в
+`source-role-provenance.json`; uncommitted after-native-1 явно не является proof
+исправленного Git head. Native observations reader metadata-only; 0 values,
+0 reservations, 0 charges. Все attempts сохранены в owned scratch.
+
+Старый PR406 CI FAILURE не повторяет эти targeted checks: три оставшихся legacy
+test compatibility paths вне managed_write_set перечислены в receipt. Новый full
+CI пока не заявлен. Historical qualification/results не переписываются для новой
+metadata границы; сохранённые charges остаются consumed. Merge phrase не запрашивать.

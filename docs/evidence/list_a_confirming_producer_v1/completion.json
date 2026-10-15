@@ -1,6 +1,8 @@
 {
   "acceptance_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-SYNTHETIC-NATIVE",
-  "active_stop_conditions": [],
+  "active_stop_conditions": [
+    "STOP_EXACT_TASK_WRITE_SET: THREE_LEGACY_TEST_FIXTURE_PATHS_OUTSIDE_MANAGED_WRITE_SET"
+  ],
   "as_of": "2026-10-15",
   "base_main": "b3fb9d8ecffbffda468dccabaa81ca3392da6f15",
   "capability_radar_now": "NONE",
@@ -77,7 +79,7 @@
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "external_material_action": false,
-    "material_owner_decision": false,
+    "material_owner_decision": true,
     "unresolved_safety_or_truth_conflict": false,
     "user_only_activation": false
   },
@@ -108,7 +110,7 @@
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
   "validation": {
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
-    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "github_ci": "PR406_ORIGINAL_HEAD_FAILURE; REPAIR_HEAD_NOT_PUSHED",
     "independent_review": {
       "path": "docs/evidence/list_a_confirming_producer_v1/independent-review.json",
       "sha256": "58a078faa9fee496e9e42b39dc06b4a8d3c2296305539137da87fd0c7e9075ca",
@@ -121,6 +123,6 @@
       "PASS_TYPED_ATOMIC_COMPLETION_DOSSIER_AND_PROMOTE_REFUSAL",
       "PASS_MEASURED_FORWARD_RESOURCE_ENVELOPE"
     ],
-    "targeted": "PASS_BOUNDED_NATIVE_METHOD_ADMISSION_VERTICAL_LEGACY_WITH_2_EXPLICIT_SKIPS"
+    "targeted": "PASS_SOURCE_ROLE_FALSIFIER_AND_66_DIRECT_CONSUMER_TESTS"
   }
 }

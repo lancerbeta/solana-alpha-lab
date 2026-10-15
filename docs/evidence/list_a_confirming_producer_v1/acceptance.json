@@ -811,6 +811,10 @@
     "scientific_attempts": 6,
     "status": "PASS"
   },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Owner-managed optional export; this implementation does not mutate Project Sources releases or activation"
+  },
   "schema": "smial.list-a-native-confirmation-acceptance",
   "schema_version": "1.0",
   "verdict": "PASS_IN_SYNTHETIC_SCOPE"
