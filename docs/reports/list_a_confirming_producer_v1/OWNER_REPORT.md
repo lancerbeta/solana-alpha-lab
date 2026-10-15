@@ -17,6 +17,13 @@ duplicate, два owner одного UTC cohort, foreign activation и explorato
 один frozen template кроме activation/SHA. Partial first-day intake допускается;
 fragmented same-day cohorts запрещены. Virtual aggregate schedule не создаётся.
 
+Независимый review7e16 дал code/goal/UX `NOT_READY` и architecture `PASS`.
+Закрыты точечные P2: relocated sample отказывает по общему input/cold layout
+до values/reservation; CLI сохраняет UNKNOWN расхода и показывает исходные
+scientific limits. Hash owner direction связан с текущими LF bytes; raw CRLF
+сохранён отдельно. Два metadata regression PASS; fresh review и cold limits
+regression ещё требуются. Первые verdicts сохранены, не переименованы в PASS.
+
 Сохранены все попытки: F02 late-refusal TEST charge1, F01 result-schema failure
 charge1, F01 completed engineering TEST charge1. Это отдельные disposable TEST
 stores; семь прежних scientific charges/results/attempts не перезапускались.

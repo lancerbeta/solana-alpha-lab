@@ -120,6 +120,9 @@ class VerticalTests(unittest.TestCase):
             result = response["result"]
             self.assertEqual(result["method"]["contrast"],0.125)
             self.assertEqual(response["protocol_terminal"],"ASSOCIATION_SUPPORTED_CONDITIONAL")
+            expected_limits = ["CONDITIONAL_ON_OBSERVED_TARGETS", "PREDICTIVE_OBSERVATIONAL", "NO_CAUSAL_CLAIM",
+                               "NO_EMPIRICAL_COVERAGE_GUARANTEE", "NO_STRATEGY_ACTIVATION_AUTHORITY"]
+            self.assertEqual(cli.public_response(response)["result"]["limits"], expected_limits)
             self.assertEqual(daily_ownership_oracle(store,sample_ref,oracle,result)["schedule_owners"],32)
             # Legacy six-file cardinality stays strict; new bindings carry
             # explicit original owners, never an unbounded opaque hash bag.
@@ -142,6 +145,13 @@ class VerticalTests(unittest.TestCase):
                     ResearchStore,"append",side_effect=AssertionError("COLD_NO_WRITES")):
                 cold = read_confirmation(ResearchStore(store.root,create_if_missing=False),trial_id=response["trial_id"],root=ROOT)
                 self.assertEqual(cold["new_evaluator_invocations"],0)
+                for command in ("status", "show"):
+                    out = io.StringIO()
+                    with contextlib.redirect_stdout(out):
+                        self.assertEqual(cli.main([command,"--data-root",str(store.root),"--trial-id",response["trial_id"]]),0)
+                    public = json.loads(out.getvalue())
+                    self.assertEqual(public["result"]["limits"], expected_limits)
+                    self.assertNotIn("membership", public["result"]["population"])
                 dossier = FactoryApplication(root=ROOT,research_data_root=store.root).research_detail(
                     parse_locator(spec["experiment_id"],"GIT","EXPERIMENT_SPEC"))["dossier"]
                 self.assertEqual(next(o for o in dossier["obligations"] if o["code"]=="RESULT")["status"],"PRESENT")

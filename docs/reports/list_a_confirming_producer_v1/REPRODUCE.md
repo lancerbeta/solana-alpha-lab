@@ -247,7 +247,7 @@ ordinary disposable synthetic TEST stores under the test cleanup policy:
 python -B -m unittest tests.test_list_a_confirmation_admission_v1.CalendarMaturityTests tests.test_list_a_confirmation_admission_v1.DailyScheduleAdmissionTests tests.test_list_a_confirmation_vertical_v1 -v
 ```
 
-Expected9 PASS. Native daily fixture is
+Expected11 PASS. Native daily fixture is
 `tests/fixtures/list_a_confirmation_v1/native.py:ingress(..., daily_schedules=True)`.
 It derives32daily child documents exactly like managed child planning: same frozen
 template, native validator, per-day activation, original native SHA and ACT-SHA ID.
@@ -289,3 +289,10 @@ correction. Cold independent-process proof binds launched Popen PID to the cold
 PID or its immediate parent (Windows environment launch may insert a wrapper),
 requires cold PID != caller and result digest equality;0Parquet/evaluator/writes.
 Do not rerun a charged failed attempt to make its history PASS.
+
+Review follow-up: DailyScheduleAdmissionTests includes unchanged sample bytes at a
+foreign parent (register-source/prepare refuse before values/reservation).
+CalendarMaturityTests includes CLI zero/consumed/null/read-failure branches and
+unknown history without a binding. Vertical daily cold status/show keeps the five
+persisted limits visible. Original review7e16 NOT_READY and CRLF request remain
+separate history in semantic-integration.json#review_followup.

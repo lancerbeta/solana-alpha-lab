@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
 from solana_alpha_lab.factory.list_a_confirmation_inputs import (
     DEFINITION, ConfirmationError, authorize_confirmation, load_json,
-    prepare_confirmation, revoke_confirmation, utc, write_native_confirmation_sample, register_source_authority,
+    prepare_confirmation, revoke_confirmation, utc, write_native_confirmation_sample, register_source_authority, records,
 )
 from solana_alpha_lab.factory.list_a_confirmation import (
     bound_confirmation_checkpoint, trial_confirmation_checkpoint, read_confirmation, resume_confirmation,
@@ -31,7 +31,8 @@ def public_response(response: dict) -> dict:
     if result:
         out["result"] = {"identity": result["identity"], "method": result["method"],
             "population": {k: v for k, v in result["population"].items() if k != "membership"},
-            "interval": [result["binding"]["interval_start"], result["binding"]["interval_end_exclusive"]]}
+            "interval": [result["binding"]["interval_start"], result["binding"]["interval_end_exclusive"]],
+            "limits": result["limits"]}
     return out
 
 
@@ -99,11 +100,25 @@ def main(argv=None) -> int:
                 checkpoint = bound_confirmation_checkpoint(ResearchStore(args.data_root, create_if_missing=False), args.binding_id)
             except (ValueError, OSError, KeyError, TypeError, RuntimeError):
                 pass  # Unavailable committed metadata stays UNKNOWN/null.
+        elif args.command in {"register-source", "prepare"}:
+            try:
+                history = records(ResearchStore(args.data_root, create_if_missing=False))
+                if not any(r["kind"] == "RUN_STARTED" or r["payload"].get("type") == "CONFIRMATION_RESERVATION" for r in history):
+                    checkpoint = {"scientific_charge": 0}
+            except (ValueError, OSError, KeyError, TypeError, RuntimeError):
+                pass  # Without an exact binding, only a wholly unspent history proves zero.
         charged_cold = args.command in {"status", "show"} and checkpoint.get("scientific_charge") == 1
-        immature = getattr(exc, "code", None) == "TARGET_NOT_MATURE_AT_CUTOFF" and checkpoint.get("scientific_charge") != 1
-        print(json.dumps({**checkpoint, "status": "UNVERIFIABLE" if charged_cold else "BOUND_CONTRACT_NOT_READY" if immature else "REFUSED",
+        maturity = getattr(exc, "code", None) == "TARGET_NOT_MATURE_AT_CUTOFF"
+        immature = maturity and checkpoint.get("scientific_charge") == 0
+        consumed_maturity = maturity and checkpoint.get("scientific_charge") == 1
+        unknown_maturity = maturity and checkpoint.get("scientific_charge") is None
+        print(json.dumps({**checkpoint, "status": "UNVERIFIABLE" if charged_cold else
+                          "BLOCKED_AFTER_RESERVE" if consumed_maturity else "BLOCKED_RESERVATION_UNKNOWN" if unknown_maturity else
+                          "BOUND_CONTRACT_NOT_READY" if immature else "REFUSED",
                           "reason_codes": [getattr(exc, "code", "CONFIRMATION_INPUT_OR_RUNTIME_INVALID")],
                           "next_action": "VERIFY_SAVED_ARTIFACT_KEEP_CONSUMED_ALLOWANCE" if charged_cold else
+                                         "VERIFY_SAVED_CHECKPOINT_KEEP_CONSUMED_ALLOWANCE" if consumed_maturity else
+                                         "VERIFY_SAVED_CHECKPOINT_NO_NEW_EXECUTION_AUTHORITY" if unknown_maturity else
                                          "WAIT_FOR_MATURITY_THEN_SEPARATELY_REBIND_EXACT_SAMPLE" if immature else
                                          "VERIFY_EXACT_INPUT_AND_SAVED_CHECKPOINT"}))
         return 2

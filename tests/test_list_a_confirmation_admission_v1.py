@@ -104,6 +104,35 @@ class SourceRoleProvenanceTests(unittest.TestCase):
 
 
 class CalendarMaturityTests(unittest.TestCase):
+    def test_cli_maturity_preserves_zero_consumed_unknown_and_failed_checkpoint_reads(self):
+        with tempfile.TemporaryDirectory(prefix="list-a-maturity-unit-") as tmp:
+            store = ResearchStore(Path(tmp)/"plane")
+            for charge, status, action in (
+                (0, "BOUND_CONTRACT_NOT_READY", "WAIT_FOR_MATURITY_THEN_SEPARATELY_REBIND_EXACT_SAMPLE"),
+                (1, "BLOCKED_AFTER_RESERVE", "VERIFY_SAVED_CHECKPOINT_KEEP_CONSUMED_ALLOWANCE"),
+                (None, "BLOCKED_RESERVATION_UNKNOWN", "VERIFY_SAVED_CHECKPOINT_NO_NEW_EXECUTION_AUTHORITY"),
+                ("READ_FAILED", "BLOCKED_RESERVATION_UNKNOWN", "VERIFY_SAVED_CHECKPOINT_NO_NEW_EXECUTION_AUTHORITY")):
+                out = io.StringIO()
+                checkpoint_options = {"side_effect":OSError("UNAVAILABLE")} if charge == "READ_FAILED" else {"return_value":{"scientific_charge":charge}}
+                with self.subTest(charge=charge), patch.object(cli, "authorize_confirmation", side_effect=ConfirmationError("TARGET_NOT_MATURE_AT_CUTOFF")), patch.object(
+                        cli, "bound_confirmation_checkpoint", **checkpoint_options), contextlib.redirect_stdout(out):
+                    rc = cli.main(["authorize", "--data-root", str(store.root), "--binding-id", "0"*64])
+                response = json.loads(out.getvalue())
+                self.assertEqual(rc, 2)
+                self.assertEqual(response["status"], status)
+                self.assertEqual(response["next_action"], action)
+                self.assertIs(response["scientific_charge"], None if charge == "READ_FAILED" else charge)
+            # No-binding input errors may prove zero only from complete unspent history.
+            for fail_history in (False, True):
+                out = io.StringIO()
+                with patch.object(cli, "prepare_confirmation", side_effect=ConfirmationError("TARGET_NOT_MATURE_AT_CUTOFF")), patch.object(
+                        cli, "records", side_effect=OSError("UNAVAILABLE") if fail_history else None, return_value=[]), contextlib.redirect_stdout(out):
+                    self.assertEqual(cli.main(["prepare", "--data-root", str(store.root)]), 2)
+                response = json.loads(out.getvalue())
+                self.assertEqual(response["status"], "BLOCKED_RESERVATION_UNKNOWN" if fail_history else "BOUND_CONTRACT_NOT_READY")
+                self.assertIs(response["scientific_charge"], None if fail_history else 0)
+            self.assertFalse(records(store))
+
     def test_native_grid_and_grace_maturity_before_source_authority_or_values(self):
         from solana_alpha_lab.factory.list_a_confirmation_inputs import write_native_confirmation_sample
         with tempfile.TemporaryDirectory(prefix="list-a-maturity-unit-") as tmp:
@@ -183,6 +212,35 @@ class CalendarMaturityTests(unittest.TestCase):
 
 
 class DailyScheduleAdmissionTests(unittest.TestCase):
+    def test_relocated_sample_ref_refuses_before_values_or_scientific_reservation(self):
+        from tests.fixtures.list_a_confirmation_v1.native import ingress
+        from solana_alpha_lab.factory.list_a_confirmation_inputs import register_source_authority, DEFINITION
+        from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
+        with tempfile.TemporaryDirectory(prefix="list-a-daily-unit-") as tmp:
+            store = ResearchStore(Path(tmp)/"plane")
+            ref, _ = ingress(ROOT, store, daily_schedules=True)
+            alias = "confirmation/aliases/sample.json"
+            (store.root/alias).parent.mkdir(parents=True)
+            (store.root/alias).write_bytes((store.root/ref).read_bytes())
+            # Independent oracle: identical sample bytes keep their original source paths.
+            self.assertEqual((store.root/ref).read_bytes(), (store.root/alias).read_bytes())
+            source = json.loads((store.root/alias).read_bytes())
+            self.assertTrue(all(p.startswith("confirmation/sources/SYNTH-LIST-A-V1/") for p in source["source_hashes"]))
+            before = records(store)
+            spec = load_experiment_spec(ROOT, DEFINITION)
+            reader = ValueReader(store)
+            with patch.object(pq, "read_table", reader.read), patch(
+                    "solana_alpha_lab.factory.list_a_confirmation.evaluate_native", side_effect=AssertionError("EVALUATOR")) as evaluator:
+                for operation in (lambda: register_source_authority(alias, root=ROOT, store=store),
+                                  lambda: prepare_confirmation(spec, alias, root=ROOT, store=store, now=NOW)):
+                    with self.assertRaisesRegex(ConfirmationError, "INPUT_SCHEDULE_OWNERS_CONFLICT"):
+                        operation()
+            self.assertEqual(reader.reads, [])
+            self.assertEqual(evaluator.call_count, 0)
+            self.assertEqual(records(store), before)
+            self.assertFalse(any(r["kind"] == "RUN_STARTED" or r["payload"].get("type") in {
+                "CONFIRMATION_GRANT", "EXECUTION_BINDING", "CONFIRMATION_RESERVATION"} for r in before))
+
     def test_original_daily_owners_and_calendar_maturity_are_metadata_only(self):
         from solana_alpha_lab.factory.list_a_confirmation_inputs import parse_sample, source_metadata, write_native_confirmation_sample
         with tempfile.TemporaryDirectory(prefix="list-a-daily-unit-") as tmp:

@@ -449,6 +449,18 @@ def qualify_local_storage(data_root: Path) -> str:
     raise ConfirmationError("STORAGE_QUALIFICATION_UNKNOWN")
 
 
+def validate_schedule_owner_paths(sample_ref: str, source_hashes: dict, owners: list[dict], *, stage: str) -> None:
+    """Use the same closed source layout before reservation and in cold results."""
+    prefix = sample_ref.rsplit("/", 1)[0]
+    expected = {prefix + "/" + name for name in ("census.parquet", "observations.parquet", "frames.json", "admissions.json", "protection.json")}
+    require(len(owners) == len({o["activation_id"] for o in owners}) == len({o["schedule_sha256"] for o in owners}) and
+            [o["schedule_sha256"] for o in owners] == sorted(o["schedule_sha256"] for o in owners), stage + "_SCHEDULE_OWNERS_CONFLICT")
+    for owner in owners:
+        require(owner["schedule_rel"] == prefix + "/schedules/" + owner["schedule_sha256"] + ".json", stage + "_SCHEDULE_OWNERS_CONFLICT")
+        expected.add(owner["schedule_rel"])
+    require(set(source_hashes) == expected, stage + "_SOURCE_SET_CONFLICT")
+
+
 def validate_confirmation_result(result: dict, *, root: Path) -> None:
     """Cold typed consistency, never re-evaluates values or the bootstrap."""
     import jsonschema
@@ -459,15 +471,7 @@ def validate_confirmation_result(result: dict, *, root: Path) -> None:
     binding = result["binding"]
     require(digest(binding["source_hashes"]) == binding["source_set_sha256"], "RESULT_SOURCE_SET_CONFLICT")
     if binding.get("source_input_version") == "1.1":
-        owners = binding["schedule_owners"]
-        prefix = binding["sample_ref"].rsplit("/", 1)[0]
-        expected = {prefix + "/" + name for name in ("census.parquet", "observations.parquet", "frames.json", "admissions.json", "protection.json")}
-        require(len(owners) == len({o["activation_id"] for o in owners}) == len({o["schedule_sha256"] for o in owners}) and
-                [o["schedule_sha256"] for o in owners] == sorted(o["schedule_sha256"] for o in owners), "RESULT_SCHEDULE_OWNERS_CONFLICT")
-        for owner in owners:
-            require(owner["schedule_rel"] == prefix + "/schedules/" + owner["schedule_sha256"] + ".json", "RESULT_SCHEDULE_OWNERS_CONFLICT")
-            expected.add(owner["schedule_rel"])
-        require(set(binding["source_hashes"]) == expected, "RESULT_SOURCE_SET_CONFLICT")
+        validate_schedule_owner_paths(binding["sample_ref"], binding["source_hashes"], binding["schedule_owners"], stage="RESULT")
     m, p = result["method"], result["population"]
     rows = p["membership"]
     require(rows == sorted(rows, key=lambda r: r["episode_id"]) and len({r["episode_id"] for r in rows}) == len(rows),
@@ -581,6 +585,8 @@ def inspect_confirmation(definition: dict, sample_ref: str, *, root: Path, data_
                  r["payload"].get("sample_sha256") == source_sha and r["producer"] == SOURCE_OWNER]
     require(len(authority) == 1, "SOURCE_AUTHORITY_UNBOUND")
     metadata = source_metadata(sample, root=root, data_root=data_root)
+    if isinstance(sample, MultiScheduleSample):
+        validate_schedule_owner_paths(sample_ref, sample.source_hashes, metadata["schedule_owners"], stage="INPUT")
     require(authority[0]["payload"].get("acquisition_identity_sha256") == metadata["acquisition_identity_sha256"] and
             authority[0]["payload"].get("exposure_sha256") == digest(sample.exposure.model_dump()), "SOURCE_AUTHORITY_CONFLICT")
     native_protection = current_native_protection(sample, metadata, data_root)
@@ -805,6 +811,8 @@ def register_source_authority(sample_ref: str, *, root: Path, store: ResearchSto
         r["payload"].get("source_set_sha256") == digest(sample.source_hashes) and
         r["payload"].get("format") == "VALUE_NEUTRAL_NATIVE_METADATA_V1" for r in history), "NATIVE_SOURCE_INGRESS_UNBOUND")
     metadata = source_metadata(sample, root=root, data_root=store.root)
+    if isinstance(sample, MultiScheduleSample):
+        validate_schedule_owner_paths(sample_ref, sample.source_hashes, metadata["schedule_owners"], stage="INPUT")
     current_native_protection(sample, metadata, store.root)
     sha = digest(sample.model_dump())
     authority = {"type": "SOURCE_AUTHORITY", "sample_sha256": sha, "source_id": sample.source_id,

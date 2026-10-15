@@ -79,12 +79,17 @@
   },
   "REAL_source_availability": "UNKNOWN_NO_REAL_GRANT_CONSUMPTION_OR_PROVIDER_PROBE",
   "current_verdict": "IMPLEMENTATION_COMPLETE_SYNTHETIC_NATIVE_VERIFIED_FRESH_REVIEW_CI_PENDING",
+  "historical_raw_owner_request": {
+    "path": "local/list_a_confirming_producer_v1/semantic-owner-request-original-crlf.md",
+    "representation": "Original CRLF request retained; tracked owner direction uses identical text with LF",
+    "sha256": "17bd953b4878db426c483bc9130d55660432a42c13f957d6f1b9d06fa0c5f48d"
+  },
   "historical_ready_head": "72151e2a011ce8a5899bebfdaa18cf23a4801039",
   "implementation_head": "d7dbb3d790c3441de8687ab88b7a78c31232537a",
   "merge_authority": false,
   "owner_direction": {
     "path": "docs/evidence/list_a_confirming_producer_v1/semantic-integration-owner-direction.md",
-    "sha256": "17bd953b4878db426c483bc9130d55660432a42c13f957d6f1b9d06fa0c5f48d"
+    "sha256": "52d5dd00aa3311113e1f3d216f0132beec4b5ea1c0294f6408291d4a135b1a90"
   },
   "real_source_integration": "UNVERIFIED",
   "retained_TEST_breakdown": {
@@ -100,6 +105,53 @@
     "F01 first numeric TEST refused at closed max6 result schema after one charge; original store/charge retained",
     "F01 second hot/cold succeeded; extra immediate-parent assertion failed on Windows launch; read-only process-chain correction retained"
   ],
+  "review_followup": {
+    "cold_limits_and_direct_consumers": "PENDING_COMMITTED_IMPLEMENTATION_CHECK",
+    "earlier_verdicts_preserved": true,
+    "findings": [
+      {
+        "after": "Shared exact5+N owner/path closure in register-source, inspect/prepare and cold result; relocated sample typed INPUT_SCHEDULE_OWNERS_CONFLICT before values/reservation",
+        "before": "Unchanged input1.1 sample copied to another safe parent can prepare but cold path closure fails after charge",
+        "role": "CODE_REVIEWER",
+        "severity": "P2"
+      },
+      {
+        "after": "Current LF hash bound; original CRLF raw request separately retained",
+        "before": "Owner direction path referenced historical CRLF hash",
+        "role": "GOAL_DOD_CRITIC",
+        "severity": "P2"
+      },
+      {
+        "after": "Only known zero gets wait/rebind; charge1 stays consumed; null/read failure explicitly BLOCKED_RESERVATION_UNKNOWN and no new authority; no-binding zero requires complete wholly unspent history",
+        "before": "CLI maturity condition !=1 treats null checkpoint as unspent",
+        "role": "OWNER_UX_CRITIC",
+        "severity": "P2"
+      },
+      {
+        "after": "Public submit/status/show/resume result includes unchanged persisted scientific and no-strategy-authority limits",
+        "before": "public_response drops persisted limits",
+        "role": "OWNER_UX_CRITIC",
+        "severity": "P2"
+      }
+    ],
+    "fresh_review": "PENDING_NEW_CONTENT_FINGERPRINT",
+    "metadata_regressions": {
+      "status": "PASS_2",
+      "trace": {
+        "path": "local/list_a_confirming_producer_v1/attempts/semantic-review-regressions-1.log",
+        "sha256": "f735d49e6c7854ddd586589ba87da01cf5b0ddfa3aef00fd42f4ea94c0f2216b"
+      }
+    },
+    "new_persistent_TEST_charges": 0,
+    "packet_sha256": "d9084b8d7399fdacd2cbe6dfc815331970264415b1ff1181932be81d41acb307",
+    "reviewed_head": "7e16f3435a98f7bc31fc2ffe4adb8d75ec49ef67",
+    "roles": {
+      "ARCHITECTURE_CRITIC": "PASS",
+      "CODE_REVIEWER": "NOT_READY",
+      "GOAL_DOD_CRITIC": "NOT_READY",
+      "OWNER_UX_CRITIC": "NOT_READY"
+    }
+  },
   "schema": "smial.list-a-semantic-integration-audit",
   "schema_version": "1.0",
   "scientific_history": "SEVEN_HISTORICAL_CHARGES_RESULTS_ATTEMPTS_CORE_IMMUTABLE",

@@ -94,8 +94,23 @@
       "verdict": "PASS"
     }
   ],
-  "next_review": "FRESH_FOUR_ROLE_AFTER_NAMED_DELIVERY_PROJECTION_REPAIR",
+  "next_review": "FRESH_FOUR_ROLE_AFTER_SEMANTIC_REVIEW_FOLLOWUP",
   "schema": "smial.list-a-confirmation-review-history",
   "schema_version": "1.0",
+  "semantic_review_rounds": [
+    {
+      "finding_refs": "repo://docs/evidence/list_a_confirming_producer_v1/semantic-integration.json#review_followup",
+      "head": "7e16f3435a98f7bc31fc2ffe4adb8d75ec49ef67",
+      "packet_sha256": "d9084b8d7399fdacd2cbe6dfc815331970264415b1ff1181932be81d41acb307",
+      "reason": "Actual independent review findings preserved; later repairs require new four-role review, not retroactive conversion.",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "PASS",
+        "CODE_REVIEWER": "NOT_READY",
+        "GOAL_DOD_CRITIC": "NOT_READY",
+        "OWNER_UX_CRITIC": "NOT_READY"
+      },
+      "verdict": "NOT_READY"
+    }
+  ],
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1"
 }
