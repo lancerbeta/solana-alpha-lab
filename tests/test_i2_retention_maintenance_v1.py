@@ -120,6 +120,153 @@ class NativeFixture(unittest.TestCase):
 
 
 class PolicyRevisionRecoveryTests(NativeFixture):
+    def planner_budget_source(self, *, active_plan=False):
+        add_call(self.store,'EARLIER',rowid=11,size=4096)
+        add_call(self.store,'OCC-1',rowid=317,size=4096)
+        def round_link():
+            self.store.record_episode_round(round_id='CLOSED',schedule_sha256='a'*64,
+                activation_id='LEGACY',lineage_id='L',round_started_at=render_utc(OLD),
+                state='COMPLETED',frame={'sources':[{'call_occurrence_id':'OCC-1'}]},clock=OLD)
+        if not active_plan:
+            round_link()
+        proof=self.archive()
+        document=self.commission(proof=proof,enabled=True,max_rows=1)
+        first=owner.run_maintenance_step(self.store,now=NOW,pressure=SAFE)
+        self.assertEqual(first['applied_call_compactions'],1)
+        if active_plan:
+            plan=self.plan(document)
+            self.assertEqual(len(plan['candidates']),1)
+            lease=self.store.acquire_lease('fixture-persist-plan',clock=NOW)
+            try:
+                owner._set_control(self.store,'active_plan',plan)
+                self.store._conn.commit()
+            finally:
+                self.store.release_lease(lease)
+            round_link()
+        # A conservative cold-object pin is metadata, never archive authority.
+        self.store._conn.execute('INSERT INTO retention_archive_pins VALUES(?,?)',
+            (Path(proof['archive_path']).name,proof['archive_sha256']))
+        self.store._conn.commit()
+        return document,proof
+
+    def planner_protected_rows(self):
+        with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+            return {table:raw.execute(f'SELECT rowid,* FROM {table} ORDER BY rowid').fetchall()
+                for table in ('call_ledger','due_observations','episode_rounds','retirement_scopes',
+                              'retention_progress','retention_archive_pins')}
+
+    def test_planner_budget_failure_persists_watch_incident_and_approved_recovery(self):
+        from solana_alpha_lab.factory.collector_operational_packet import build_collector_operational_packet
+        from solana_alpha_lab.factory.operability_watch import classify_incidents
+        document,proof=self.planner_budget_source()
+        protected=self.planner_protected_rows()
+        last_good=owner.retention_status(self.store)
+        result=owner.run_maintenance_step(self.store,now=NOW+timedelta(minutes=2),pressure=SAFE)
+        self.assertEqual(result['status'],'FAILED')
+        self.assertEqual(result['reason'],'CALL_OWNER_SCOPE_BUDGET_REFUSED')
+        self.assertEqual(self.planner_protected_rows(),protected)
+        self.store.close(); self.store=ObservationScheduleStore(self.path)
+        with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+            state=json.loads(raw.execute("SELECT payload_json FROM retention_control WHERE control_key='maintenance'").fetchone()[0])
+        self.assertEqual(state['state'],'FAILED')
+        self.assertEqual(state['last_reason'],'CALL_OWNER_SCOPE_BUDGET_REFUSED')
+        self.assertEqual(state['last_success_at'],last_good['last_success_at'])
+        self.assertEqual(state['next_cursor'],last_good['next_cursor'])
+        rdp=self.hot/'rdp'; rdp.mkdir()
+        packet=build_collector_operational_packet(root=self.base,store=self.store,now=NOW+timedelta(minutes=2),
+            observation_rdp=rdp,environ={})
+        self.assertEqual(packet['maintenance']['last_reason'],'CALL_OWNER_SCOPE_BUDGET_REFUSED')
+        self.assertIn('MAINTENANCE_FAILED',classify_incidents(packet))
+        self.assertEqual(self.ordinary_caller_process(NOW+timedelta(minutes=4))['status'],'FAILED')
+        self.assertEqual(self.planner_protected_rows(),protected)
+        self.assertEqual(owner._control(self.store,'policy')['policy'],document)
+        self.assertIsNone(owner._control(self.store,'active_plan'))
+        self.assertEqual(hashlib.sha256(Path(proof['archive_path']).read_bytes()).hexdigest(),proof['archive_sha256'])
+        revised={**document,'revision':2,'max_rows':2}
+        owner.install_maintenance_policy(self.store,policy=revised,
+            approved_sha256=owner.policy_sha256(revised),now=NOW+timedelta(minutes=5))
+        recovered=self.ordinary_caller_process(NOW+timedelta(minutes=6))
+        self.assertEqual(recovered['applied_call_compactions'],1,recovered)
+        self.assertEqual(owner.retention_status(self.store)['state'],'READY')
+        after=self.planner_protected_rows()
+        self.assertEqual(after['call_ledger'][0],protected['call_ledger'][0])
+        self.assertEqual([(row[0],row[-2],row[-1]) for row in after['call_ledger']],
+                         [(row[0],row[-2],row[-1]) for row in protected['call_ledger']])
+        for table in ('due_observations','episode_rounds','retirement_scopes','retention_archive_pins'):
+            self.assertEqual(after[table],protected[table])
+        self.assertNotIn('rows',self.store.call_payload('OCC-1'))
+
+    def test_active_plan_budget_failure_preserves_prior_effect_and_exact_intent(self):
+        self.planner_budget_source(active_plan=True)
+        protected=self.planner_protected_rows()
+        plan=owner._control(self.store,'active_plan')
+        last_good=owner.retention_status(self.store)
+        result=self.ordinary_caller_process(NOW+timedelta(minutes=2))
+        self.assertEqual(result['status'],'FAILED')
+        self.assertEqual(owner.retention_status(self.store)['last_reason'],'CALL_OWNER_SCOPE_BUDGET_REFUSED')
+        self.assertEqual(owner.retention_status(self.store)['last_success_at'],last_good['last_success_at'])
+        self.assertEqual(owner._control(self.store,'active_plan'),plan)
+        self.assertEqual(self.planner_protected_rows(),protected)
+
+    def test_planner_failure_yields_to_busy_lease_and_concurrent_policy_or_plan(self):
+        for conflict in ('WRITER_BUSY','POLICY_CHANGED','ACTIVE_PLAN_CHANGED'):
+            with self.subTest(conflict=conflict):
+                fixture=PolicyRevisionRecoveryTests(); fixture.setUp()
+                other=None; token=None
+                try:
+                    document,_=fixture.planner_budget_source()
+                    before=owner.retention_status(fixture.store)
+                    protected=fixture.planner_protected_rows()
+                    later=NOW+timedelta(minutes=2)
+                    original=owner.build_retirement_plan
+                    def select(*args,**kwargs):
+                        try:
+                            return original(*args,**kwargs)
+                        except owner.ObservationScheduleRetentionError:
+                            if conflict=='POLICY_CHANGED':
+                                revised={**document,'revision':2,'max_rows':2}
+                                owner.install_maintenance_policy(fixture.store,policy=revised,
+                                    approved_sha256=owner.policy_sha256(revised),now=later)
+                            elif conflict=='ACTIVE_PLAN_CHANGED':
+                                selected=original(fixture.store,now=later,policy=document,
+                                    after={'call_ledger':317,'poll_slots':0})
+                                lease=fixture.store.acquire_lease('other-planner',clock=later)
+                                try:
+                                    owner._set_control(fixture.store,'active_plan',selected)
+                                    fixture.store._conn.commit()
+                                finally:
+                                    fixture.store.release_lease(lease)
+                            raise
+                    if conflict=='WRITER_BUSY':
+                        other=ObservationScheduleStore(fixture.path)
+                        token=other.acquire_lease('ordinary-collector',clock=later)
+                        self.assertIsNotNone(token)
+                    with patch.object(owner,'build_retirement_plan',select):
+                        result=owner.run_maintenance_step(fixture.store,now=later,pressure=SAFE)
+                    self.assertEqual(result,{'status':'YIELD','reason':conflict})
+                    self.assertEqual(owner.retention_status(fixture.store),
+                        {**before,**({'policy_revision':2,'approved_policy_sha256':owner.policy_sha256({**document,'revision':2,'max_rows':2})}
+                                     if conflict=='POLICY_CHANGED' else {})})
+                    self.assertEqual(fixture.planner_protected_rows(),protected)
+                    if conflict=='ACTIVE_PLAN_CHANGED':
+                        self.assertIsNotNone(owner._control(fixture.store,'active_plan'))
+                finally:
+                    if other is not None:
+                        if token is not None: other.release_lease(token)
+                        other.close()
+                    fixture.tearDown()
+
+    def test_unexpected_planner_failure_persists_only_sanitized_reason(self):
+        self.planner_budget_source()
+        before=owner.retention_status(self.store)
+        with patch.object(owner,'build_retirement_plan',side_effect=RuntimeError('private path or payload')):
+            result=owner.run_maintenance_step(self.store,now=NOW+timedelta(minutes=2),pressure=SAFE)
+        self.assertEqual(result,{'status':'FAILED','reason':'OPTIONAL_MAINTENANCE_FAILED'})
+        state=owner.retention_status(self.store)
+        self.assertEqual(state['last_reason'],'OPTIONAL_MAINTENANCE_FAILED')
+        self.assertEqual(state['last_success_at'],before['last_success_at'])
+        self.assertEqual(state['next_cursor'],before['next_cursor'])
+
     def ordinary_caller_process(self, now):
         import yaml
         for relative in ('configs/observation_schedule_runtime_v1.yaml',

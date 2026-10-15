@@ -1444,15 +1444,53 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
     if pending_refresh and pending_refresh.get("reconciliation_state") == "BLOCKED_POLICY":
         return {"status":"FAILED", "reason":pending_refresh["reconciliation_reason"], **retention_status(store)}
     if plan is None:
-        plan = build_retirement_plan(store, now=now, policy=effective, after=state.get("next_cursor"))
+        try:
+            plan = build_retirement_plan(store, now=now, policy=effective, after=state.get("next_cursor"))
+        except Exception as exc:
+            # Selection is bounded and read-only, but its refusal is an actual
+            # maintenance incident too. Never leave the last-good READY signal
+            # masquerading as the current attempt's outcome after restart.
+            reason = str(exc) if (isinstance(exc, ObservationScheduleRetentionError)
+                and re.fullmatch(r"[A-Z0-9_:]+", str(exc))) else "OPTIONAL_MAINTENANCE_FAILED"
+            lease = store.acquire_lease("i2-maintenance-plan-incident", clock=now)
+            if lease is None:
+                return {"status": "YIELD", "reason": "WRITER_BUSY"}
+            try:
+                store._conn.execute("BEGIN IMMEDIATE")
+                store._require_write_lease(now, within_transaction=True)
+                if _control(store, "policy") != installed:
+                    store._conn.rollback()
+                    return {"status": "YIELD", "reason": "POLICY_CHANGED"}
+                if _control(store, "active_plan") is not None:
+                    store._conn.rollback()
+                    return {"status": "YIELD", "reason": "ACTIVE_PLAN_CHANGED"}
+                current = _control(store, "maintenance", {})
+                _set_control(store, "maintenance", {**current, "state": "FAILED",
+                    "last_reason": reason, "last_run_at": render_utc(now)})
+                store._conn.commit()
+            except Exception:
+                store._conn.rollback()
+                raise
+            finally:
+                store.release_lease(lease)
+            return {"status": "FAILED", "reason": reason}
         lease = store.acquire_lease("i2-maintenance-plan", clock=now)
         if lease is None:
             return {"status": "YIELD", "reason": "WRITER_BUSY"}
         try:
-            # Another caller may have persisted a plan between selection/lease.
-            plan = _control(store, "active_plan") or plan
+            store._conn.execute("BEGIN IMMEDIATE")
+            store._require_write_lease(now, within_transaction=True)
+            if _control(store, "policy") != installed:
+                store._conn.rollback()
+                return {"status": "YIELD", "reason": "POLICY_CHANGED"}
+            if _control(store, "active_plan") is not None:
+                store._conn.rollback()
+                return {"status": "YIELD", "reason": "ACTIVE_PLAN_CHANGED"}
             _set_control(store, "active_plan", plan)
             store._conn.commit()
+        except Exception:
+            store._conn.rollback()
+            raise
         finally:
             store.release_lease(lease)
     try:

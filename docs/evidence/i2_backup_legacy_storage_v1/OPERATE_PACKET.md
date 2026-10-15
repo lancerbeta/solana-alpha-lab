@@ -142,6 +142,35 @@ real data_root device/inode и следующий native writer. В production O
    независимо восстановить exact checkpoint и подтвердить: retired bodies
    отсутствуют в logical routine payload, DB-file физически уменьшен.
 
+Для `retire` и `policy` approved SHA256 — digest **всего JSON document** после
+канонизации existing owner: UTF-8, `sort_keys=True`, `separators=(",", ":")`,
+`ensure_ascii=False`. SHA исходного pretty-printed файла не подходит. Эти
+read-only команды из repository root печатают digest exact inputs; значения включаются в runtime
+packet для отдельного approval, сам расчёт разрешения не даёт:
+
+```sh
+uv run --locked --managed-python python -B -c 'import json,sys;from pathlib import Path;sys.path.insert(0,"src");from solana_alpha_lab.factory.observation_schedule_retention import policy_sha256;print(policy_sha256(json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))))' "$EXACT_RETIREMENT_JSON"
+uv run --locked --managed-python python -B -c 'import json,sys;from pathlib import Path;sys.path.insert(0,"src");from solana_alpha_lab.factory.observation_schedule_retention import policy_sha256;print(policy_sha256(json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))))' "$PROPOSED_POLICY_JSON"
+```
+
+После exact approval установить документы через существующие native commands.
+Оба используют `--input`; `--policy` служит только для чтения proposed policy
+командой `plan` выше:
+
+```sh
+uv run --locked --managed-python python -B scripts/observation_schedule_retention.py retire \
+  --store "$EXACT_OPS_STORE" --operation-mode OPERATE \
+  --input "$EXACT_RETIREMENT_JSON" --approved-sha256 "$APPROVED_RETIREMENT_SHA256" --i-understand-apply
+uv run --locked --managed-python python -B scripts/observation_schedule_retention.py policy \
+  --store "$EXACT_OPS_STORE" --operation-mode OPERATE \
+  --input "$PROPOSED_POLICY_JSON" --approved-sha256 "$APPROVED_POLICY_SHA256" --i-understand-apply
+```
+
+Для `apply` и `reclaim-apply` approved SHA256 — machine `plan_id` exact plan:
+owner хеширует каноническое содержимое **без поля `plan_id`**. Полный file SHA
+или digest документа вместе с `plan_id` не подставляются. `apply` дополнительно
+проверяет установленную approved policy/revision.
+
 Обязательный physical-path блок после разрешённого quiesce. `FINAL_CURRENT_PROOF_JSON`
 создан независимым restore **последнего current capture после остановки writers**;
 старый rehearsal proof не допускается. Все roots берутся из проверенного live
@@ -259,6 +288,12 @@ Caller — existing daily/weekly offhost backup command после заверш�
 native maintenance вновь берёт backup-plane lock до OPS fence и уступает due,
 foreign writer, restore, RAM/IO/CPU pressure. Ошибка optional maintenance
 сохраняет backup/last-good и источники, создаёт один incident через existing watch.
+Отказ bounded selection до APPLY также сохраняет typed `FAILED/last_reason`:
+например, `CALL_OWNER_SCOPE_BUDGET_REFUSED` требует разбора source consumer links
+и отдельно approved policy revision, а не автоматического расширения бюджета.
+Last-success/cursor, prior effects и pins сохраняются; transient busy или смена
+policy/plan дают `YIELD` без перезаписи более нового состояния. Проверить этот
+durable outcome через fresh operational packet/watch и TEST incident/recovery.
 Включение caller/policy требует installed readback; Git template не доказывает
 commissioning. Daily VACUUM не включать.
 

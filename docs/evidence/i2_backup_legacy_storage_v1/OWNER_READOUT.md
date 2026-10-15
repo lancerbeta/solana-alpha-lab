@@ -65,6 +65,23 @@ checkpoint/pins проходят ordinary restore/register и retirement под 
 Disable/enable сохраняет target; несовместимые cold-root/refresh limits дают
 `BLOCKED_POLICY/FAILED`, повреждение identity/source/pins остаётся отказом.
 
+Следующий архитектурный falsifier выявил потерю failure до APPLY: native planner
+при `max_rows=1` отказывал `CALL_OWNER_SCOPE_BUDGET_REFUSED`, но durable health
+оставался старым `READY/COMPLETE`, и watch не создавал incident. Owning boundary
+теперь сохраняет typed `FAILED` под lease после проверки актуальных policy/plan.
+Fresh ordinary caller → raw reopen → actual operational packet/watch показывает
+`MAINTENANCE_FAILED`; prior effect, ROWID/clocks, last-success, cursor, cold pins
+и backup last-good сохранены. Отдельно approved revision с `max_rows=2` позволяет
+штатно продолжить. Busy/изменившаяся authority дают `YIELD`, unexpected exception
+сохраняется как `OPTIONAL_MAINTENANCE_FAILED` без raw sensitive text.
+
+Owner UX также проверил actual команды единственного OPERATE packet: canonical
+JSON digest из existing owner принимается `retire`/`policy`, SHA pretty-file
+отказывается. Из документа запускаются обе read-only digest команды и exact
+`--input` install argv; raw SQL подтверждает exact documents. Для plan approval
+отдельно указан machine `plan_id`, исключающий собственное поле. Это isolated
+recipe proof; runtime input hashes и approval остаются отдельной authority.
+
 ## Проверенный эффект и предел чисел
 
 | Величина | BEFORE → AFTER | Что именно измерено |

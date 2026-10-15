@@ -34495,7 +34495,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_retention.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_retention.py}
-  integrity: {kind: sha256, sha256: fb31ce704b08d3740c6218b1633d6839618c23acefea1c50ce6e59ee7dc59335}
+  integrity: {kind: sha256, sha256: e7965745fc3789911976c584553d963ddb0af5f40bd2138274281429c261185b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -42356,7 +42356,7 @@ records:
     repository_path: docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md
   integrity:
     kind: sha256
-    sha256: 75713a7f5ea1fa32d83779aeff6ae06e3ff2215d0b64b56a445e428603a11c15
+    sha256: 77f519fa09fd91f39868a9543f6f20ced2f3163e77949a9a10ed3153e062f043
   access:
     mode: read_only
     method: file

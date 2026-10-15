@@ -562,6 +562,23 @@
         "result": "PASS",
         "tests": 39,
         "wall_seconds": 43.38
+      },
+      "final_planner_failure_direct_consumers": {
+        "result": "PASS",
+        "tests": 68,
+        "skipped": 1,
+        "wall_seconds": 60.954,
+        "modules": [
+          "tests.test_i2_retention_maintenance_v1",
+          "tests.test_i2_pipeline_v1",
+          "tests.test_factory_offhost_backup"
+        ],
+        "scope": "final native planner-health repair and direct callers; counts overlap previous suites"
+      },
+      "dedicated_planner_failure_falsifiers": {
+        "result": "PASS",
+        "tests": 4,
+        "wall_seconds": 2.139
       }
     },
     "production_mutations": false,
@@ -671,6 +688,60 @@
         "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.CheckpointRefreshPolicyRecoveryTests -q",
         "independent_oracle": "actual checkpoint+native pending under old approved policy, separately reopened ordinary caller, filesystem fake-remote exact bytes, raw SQLite body/ROWID/clock/provenance and canonical pin hash; no network",
         "production_gate": "separately approved actual revision and installed ordinary cold refresh/maintenance cycle"
+      }
+    },
+    "final_independent_remediation": {
+      "observed_head": "394092f28a50619446bc80ff874ca8ee8c2d8c93",
+      "prior_packet_fingerprint_sha256": "5c7411127572e3d46caef6e7fc550fd914d7bfec13b9760b3e29c51a6864f414",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "NOT_READY",
+        "ARCHITECTURE_CRITIC": "NOT_READY",
+        "OWNER_UX_CRITIC": "NOT_READY"
+      },
+      "planner_failure_health": {
+        "before": {
+          "native_source": "archived COMPLETED occurrence with due link and closed episode round source",
+          "approved_max_rows": 1,
+          "planner": "CALL_OWNER_SCOPE_BUDGET_REFUSED",
+          "durable_maintenance": "READY_COMPLETE",
+          "watch_incident": "ABSENT",
+          "backup_CLI": "optional transient FAILED output while backup exit0"
+        },
+        "owning_fix": "catch native selection failure in maintenance owner, acquire lease and recheck current approved policy/active plan, persist sanitized typed FAILED merging fresh durable state; transient busy or changed authority yields",
+        "after": {
+          "ordinary_fresh_process_reason": "CALL_OWNER_SCOPE_BUDGET_REFUSED",
+          "durable_maintenance": "FAILED_CALL_OWNER_SCOPE_BUDGET_REFUSED",
+          "watch_incident": "MAINTENANCE_FAILED",
+          "prior_committed_effect_ROWID11": "UNCHANGED",
+          "target_ROWID317_body_clocks": "UNCHANGED_ON_REFUSAL",
+          "last_good_last_success_cursors_pins_cold_bytes": "PRESERVED",
+          "approved_revision_max_rows2": "TARGET_RETIRED_READY",
+          "active_plan_revalidation_failure": "PRIOR_EFFECT_AND_EXACT_INTENT_PRESERVED",
+          "busy_lease_or_concurrent_policy_plan": "YIELD_NO_FRESH_STATE_OVERWRITE",
+          "unexpected_exception": "OPTIONAL_MAINTENANCE_FAILED_WITHOUT_RAW_EXCEPTION"
+        },
+        "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.PolicyRevisionRecoveryTests -q",
+        "independent_oracle": "actual ordinary checkpoint-maintenance child process, reopened raw SQLite, real collector operational packet and classify_incidents; protected row/body/ROWID/clocks/cold files/pins compared before and after",
+        "production_gate": "installed ordinary caller and actual watch incident/recovery delivery under separately approved OPERATE"
+      },
+      "operator_canonical_approval": {
+        "before": "OPERATE named approved SHA256 but omitted canonical JSON digest derivation and exact retire/policy install argv; pretty file SHA denied",
+        "first_recipe_probe": "standalone python -c could not import src owner; repaired explicit repository-root src path before documentation acceptance",
+        "owning_fix": "document read-only existing-owner policy_sha256 commands from repository root, entire UTF8 canonical JSON for retire/policy, exact --input argv; distinguish plan_id excluding itself for retirement/reclaim plan approval",
+        "after": {
+          "digest_commands": 2,
+          "digest_matches_independent_hashlib_JSON_with_unicode": true,
+          "retire_pretty_SHA": "EXIT2_RETIREMENT_APPROVAL_MISMATCH",
+          "retire_canonical_SHA": "EXIT0_RETIRED_DISALLOW_RESUME",
+          "policy_pretty_SHA": "EXIT2_POLICY_APPROVAL_MISMATCH",
+          "policy_canonical_SHA": "EXIT0_POLICY_INSTALLED",
+          "raw_SQL_installed_documents": "EXACT",
+          "both_plan_ids": "INDEPENDENT_HASH_EXCLUDING_PLAN_ID_MATCHES"
+        },
+        "reproduce": "execute documented digest plus retire/policy command argv on disposable tests.test_i2_retention_maintenance_v1.NativeFixture only",
+        "independent_oracle": "OWNER_UX critic extracted actual documented argv, checked independent hashlib/json canonicalization including Cyrillic and Omega, and reopened raw SQL; no production or tracked edits",
+        "production_gate": "runtime exact input artifacts, canonical digests and separate approved retirement/policy scopes; computing hash grants no authority"
       }
     }
   }
