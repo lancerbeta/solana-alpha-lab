@@ -388,3 +388,63 @@ counts. WATCH measures operational-packet wall against actual due-row count.
   immutable ResearchEvent written by the episode-only command; it does not
   additionally re-resolve the schedule kind. A late holdout inside a running
   activation needs a new schedule (the pinned assignment may not change).
+
+## 11. Managed collection continuity (`I3_MANAGED_COLLECTION_CONTINUITY_V1`)
+
+Default-off. Merge or deploy never enables it; it exists only after an owner
+approves one exact profile revision and OPERATE applies it.
+
+- **Standing grant.** One profile revision (`smial.managed-collection-profile`) is
+  the owner-approved parent: validity `UNTIL_REVOKED` or `UNTIL_DATE`, limits
+  (admissions/day, rolling-24h, active cap, shared account scope, calls/credits per
+  day, cumulative calls, zero cash), routes, the frozen child template and the
+  resource policy. Its exact phrase binds the profile hash. A planning horizon is a
+  forecast, never an expiry. `UNTIL_REVOKED` renews no entitlement and does not
+  reset cumulative budget; exhausting it is a real owner decision.
+- **Child authority.** Each child is a normal frozen V1 episode schedule of one UTC
+  admission day, window opened at the first lawful forward instant (never backdated
+  before a proven peer closure). Its authority receipt is derived from the grant
+  (`authority_basis=STANDING_GRANT`, `standing_grant_sha256`); `phrase_sha256` binds
+  the grant and the exact child envelope and is not an owner phrase. The child must
+  fit the grant (family key, schedule key, routes, limits, validity). Issuing also
+  requires the current revision, `desired_state=RUN` and no revocation; a tick only
+  re-checks the immutable fit, so revoke or expiry stops new intake and never kills
+  an already issued committed tail.
+- **One owner per UTC day.** A unique `(lineage, UTC day)` intent holds the exact
+  schedule bytes, window and storage envelope. A crash resumes the same intent:
+  register, authorize, activate are replayed; an ACTIVE row whose
+  `OBSERVATION_SCHEDULE_STATE` event is missing is repaired from the committed
+  transition. A day owner closed before its window ends is never replaced; the next
+  child starts at the next UTC boundary and an incident is raised.
+- **HOLD versus DRAIN.** A physical drain-reserve shortfall holds the round of a
+  managed child (`DRAIN_RESERVE_PRESSURE_HOLD`, same child, same day) instead of the
+  sticky early drain used for unmanaged activations. Owner stop, revocation and abort
+  still drain.
+- **Resource decision.** `EPISODE_PRODUCER_STORAGE_COMMISSIONING_V2_MANAGED` carries a
+  `storage_decision` and never `factory_storage_gate=PASS`. Three independent checks: the
+  physical free-space reserve; the projected whole-factory peak (OPS SQLite+WAL, resident RDP
+  without open publication jobs, the existing backup sink, transient staging, measured growth
+  and the prospective write peak, each byte counted once) against HARD and TARGET; and backup
+  freshness read from the existing backup owners (`OFFHOST_VERIFIED` state CURRENT or the
+  newest published `BACKUP_<sha>.zip` bundle), never from a typed hash. An unreadable part is
+  `FOOTPRINT_UNKNOWN` and blocks. `DEGRADED_TARGET` needs an exact scoped acceptance below
+  HARD. A block stops new intake only.
+- **Authority truth planes.** A child receipt (SQL) and its `OBSERVATION_SCHEDULE_AUTHORITY`
+  ResearchEvent are two planes: a kill between them is repaired by rebuilding the same
+  immutable event from the stored receipt, never by issuing a new receipt.
+- **Stop is sticky.** A rollback never changes `desired_state` or the revocation instant; only
+  an approved `collection-apply` re-enables intake. A rollback needs no phrase only when the
+  restored profile is no wider in limits, end date, routes, resource policy, template
+  (protection, exclusions, grid, filters, outputs) and handover timing.
+- **Shared account.** Unchanged: per-activation counters stay the only debit history
+  summed by the shared-account owner; new children bind natively.
+- **Tick order.** committed tails (draining first) -> one bounded reconcile (no
+  provider call, no credential read) -> first tick of a newly activated child. One
+  blocked activation no longer aborts the others.
+- **Alerts.** Open managed incidents (`STORAGE_BLOCKED`, `INTAKE_OWNER_MISSING`,
+  `GRANT_INVALID`, `CHILD_STEP_FAILED`, `RECONCILE_UNEXPECTED_ERROR`) enter the existing
+  collector packet and watch: one incident, one recovery, pending retry. A managed
+  child is not reported as a missing owner-registered successor.
+- **Limits.** The V1 episode validator ceiling (100 admissions/day) is not lifted; a
+  larger request is refused with numeric axes. Runway claims need I2 packaging
+  evidence; expected savings count as zero until applied.

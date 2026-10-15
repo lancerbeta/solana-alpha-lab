@@ -185,5 +185,5 @@
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
-  "verdict": "PASS"
+  "verdict": "PENDING"
 }

@@ -1584,10 +1584,17 @@ class _EpisodeTick:
             self.report["drain_headroom"]["decision_at"] = render_utc(decision_now)
             self.report["drain_headroom"]["round_started_at"] = render_utc(round_start(decision_now, period))
             if reserve["status"] in {"UNKNOWN_LOCAL_FREE_SPACE", "STOP_NEW_INTAKE"}:
-                stop_episode_intake(data_root=self.data_root, store=self.store,
-                    schedule_sha256=self.digest, activation_id=self.activation_id,
-                    now=self.provider_ctx.now(), producer_git_sha=self.producer)
-                self.report["stop_reason"] = "DRAIN_RESERVE_UNKNOWN" if free is None else "DRAIN_RESERVE_PRESSURE"
+                reason = "DRAIN_RESERVE_UNKNOWN" if free is None else "DRAIN_RESERVE_PRESSURE"
+                if isinstance(dict(self.activation.get("payload") or {}).get("managed_collection"), dict):
+                    # Managed child: a short resource shortfall holds this round only. Closing
+                    # the child would fragment the UTC admission day, and a closed child
+                    # cannot be resumed. Admission resumes in the same child when space returns.
+                    self.report["stop_reason"] = reason + "_HOLD"
+                else:
+                    stop_episode_intake(data_root=self.data_root, store=self.store,
+                        schedule_sha256=self.digest, activation_id=self.activation_id,
+                        now=self.provider_ctx.now(), producer_git_sha=self.producer)
+                    self.report["stop_reason"] = reason
             else:
                 self.nomination_round(decision_now=decision_now)
         self.process_slots()

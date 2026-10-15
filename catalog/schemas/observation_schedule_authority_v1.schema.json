@@ -82,7 +82,10 @@
         "pattern": "^CAP-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
       }
     },
-    "allowed_credential_class": {"const": "LOCAL_ENV_CREDENTIAL"}
+    "allowed_credential_class": {"const": "LOCAL_ENV_CREDENTIAL"},
+    "authority_basis": {"const": "STANDING_GRANT"},
+    "standing_grant_sha256": {"$ref": "#/$defs/sha256"},
+    "standing_grant_revision": {"type": "integer", "minimum": 1}
   },
   "$defs": {
     "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},

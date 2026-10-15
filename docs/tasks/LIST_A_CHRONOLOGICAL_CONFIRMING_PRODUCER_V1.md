@@ -13,9 +13,9 @@ required_review_roles:
 - OWNER_UX_CRITIC
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 07c81a99f2d0f385df66de2e1a5254e224c6b3b3
+  expected_base: b3fb9d8ecffbffda468dccabaa81ca3392da6f15
   expected_upstream: origin/main
-  expected_upstream_oid: 07c81a99f2d0f385df66de2e1a5254e224c6b3b3
+  expected_upstream_oid: b3fb9d8ecffbffda468dccabaa81ca3392da6f15
   expected_branch: codex/list-a-chronological-confirming-producer-v1
   dirty_mode: ALLOW_REPORTED
 objective: Implement the accepted List A chronological confirming producer as a complete

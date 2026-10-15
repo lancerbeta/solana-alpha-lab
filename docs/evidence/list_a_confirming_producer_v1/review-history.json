@@ -14,7 +14,22 @@
     "verdict": "PENDING"
   },
   "history_policy": "Original Git object and all remediation history remain immutable; current review is a separate later assessment.",
-  "next_review": "NEW_ISOLATED_REVIEW_REQUIRED_AFTER_OWNER_DECISION",
+  "later_snapshots": [
+    {
+      "git_object": "1dfe9ab1d8b8caadd546788db0ce4de199f0997c:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+      "git_object_sha256": "990929cf73684a170838d5ccbd3220fca7b12c51b0bbc968092631e944fb90fb",
+      "reason": "Actual independent post-owner review preserved before forward-only main integration; not automatically transferred to a new candidate.",
+      "reviewed_candidate_head": "8daef7ba3374e2c22ee6854997544ae34f9e7fe7",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "PASS",
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "OWNER_UX_CRITIC": "PASS"
+      },
+      "verdict": "PASS"
+    }
+  ],
+  "next_review": "NEW_ISOLATED_REVIEW_REQUIRED_AFTER_MAIN_INTEGRATION",
   "schema": "smial.list-a-confirmation-review-history",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1"

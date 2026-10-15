@@ -128,3 +128,5 @@ Evidence: [acceptance](../../evidence/list_a_confirming_producer_v1/acceptance.j
 [qualification](../../evidence/list_a_confirming_producer_v1/qualification.json),
 [footprint](../../evidence/list_a_confirming_producer_v1/footprint-checkpoint.json),
 [REPRODUCE](REPRODUCE.md).
+
+15 октября owner возобновил Git delivery после изменения main. Новый delivery base `b3fb9d8ecffbffda468dccabaa81ca3392da6f15` интегрирован forward-only merge; история прежнего base и обоих review checkpoints сохранена. Все 22 пути scientific qualification и frozen control policy побайтно прежние. Конфликты затронули только производные Catalog hashes/counts; они пересоздаются штатным генератором. Git identity в task обновлена без изменения objective, write set, scientific contract или authority. Новый candidate проходит отдельный review/binding/CI; этот content checkpoint не утверждает их PASS и не даёт merge authority. Scientific campaign не перезапускается, новые environments не создаются.

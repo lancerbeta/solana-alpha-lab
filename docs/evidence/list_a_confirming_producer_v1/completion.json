@@ -1,8 +1,6 @@
 {
   "acceptance_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-SYNTHETIC-NATIVE",
-  "active_stop_conditions": [
-    "OWNER_REQUESTED_PAUSE_BEFORE_PR_PENDING_MAIN_CHANGE"
-  ],
+  "active_stop_conditions": [],
   "as_of": "2026-10-15",
   "base_main": "07c81a99f2d0f385df66de2e1a5254e224c6b3b3",
   "capability_radar_now": "NONE",
@@ -114,7 +112,7 @@
     "independent_review": {
       "path": "docs/evidence/list_a_confirming_producer_v1/independent-review.json",
       "sha256": "990929cf73684a170838d5ccbd3220fca7b12c51b0bbc968092631e944fb90fb",
-      "verdict": "PASS"
+      "verdict": "PENDING"
     },
     "project_checks": [
       "PASS_ACTUAL_PRE_VALUES_RESERVATION",

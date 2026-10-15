@@ -1,0 +1,89 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "I3_MANAGED_COLLECTION_CONTINUITY_V1-SOFTWARE-CANDIDATE",
+  "as_of": "2026-10-14",
+  "task_id": "I3_MANAGED_COLLECTION_CONTINUITY_V1",
+  "state_change": "One owner-approved profile revision (standing grant) lets the ordinary tick derive child authority, activate one frozen one-UTC-day child per day inside the approved template, resume crash-safely, hold instead of drain on a short resource shortfall, decide new-intake resources without forging a storage PASS, and report incidents through the existing watch; default-off, prepared as a separate OPERATE packet.",
+  "base_main": "07c81a99f2d0f385df66de2e1a5254e224c6b3b3",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Git is the working context and evidence owner; no cloud export requested."
+  },
+  "capability_radar_now": "NONE: existing store, lifecycle owners, tick, watch, locked Python and SQLite suffice; no new package, connector, service, timer or automation.",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "5adb852a0f07bbbdd5c38bccee5c9a1fe89cfe4506a29314c31d67a9c23f36aa",
+    "catalog/assets/lifecycle.yaml": "22a164aad0dadd6604efd97cb3290d3ddcb32afbc56d32ca8ca48d2d03601007",
+    "catalog/catalog_manifest.yaml": "c80258736325263d64cf66befb5a312ce2eec6852764d657188b2d3d5b9b3c4c",
+    "catalog/generated/asset_edges.json": "e5b51051c1c69fbe20dbafac853ce85f52931e5c691b15bbaf82db30b9dfdd87",
+    "catalog/schemas/observation_schedule_authority_v1.schema.json": "9bbc2d83d19a1008d7e72272fb612d91e1bd234135485ece5178d5076bad1710",
+    "docs/PROJECT_MAP.md": "9e02f7765c56ac13d70b8a62f6da7e227b98fa333d54dd04457a6e35be69f305",
+    "docs/contracts/opportunity_episodes_jupiter_v1.md": "78a96c272269418bea3a03f9145e84aa11f89c7dfaf1b34287a00c9e06bdf1c5",
+    "docs/evidence/i3_managed_collection_continuity_v1/OPERATE_PACKET.md": "5a5987efd5eb73ca46af22c34f3fc4b47cf21306fe63a813fa3853e03bffaf68",
+    "docs/evidence/i3_managed_collection_continuity_v1/OWNER_READOUT.md": "553155fce4a235ccfb6da3e0bb1820f2246e52567bc14141327053f216ea31c6",
+    "docs/evidence/i3_managed_collection_continuity_v1/proof.json": "09995d867f01be99390817b3337f5292975bac4d2e8ccddedac723713959755d",
+    "docs/evidence/i3_managed_collection_continuity_v1/semantic-claims.json": "72ff0227a16a3a83413335d75c67174025f071b2849323ee2c30c0fb9a85da54",
+    "docs/evidence/i3_managed_collection_continuity_v1/semantic-classification.json": "a9f55713c66a14ce6e5dab981b486b2aa882a37216b64abd70bee91d98590f7b",
+    "docs/evidence/i3_managed_collection_continuity_v1/semantic-evidence.json": "d833aa828ee4985e817e7cebe1138a3b35a6ef77a141eadaf9341b08198e81c1",
+    "docs/evidence/i3_managed_collection_continuity_v1/semantic-non-claims.json": "da1358ee0f6ec3c10b9a758f5a261280171df2cbe41522c2ae26623275df8cdb",
+    "docs/evidence/i3_managed_collection_continuity_v1/source-contract.md": "49abf7967ec9998d200de0130ae7e5c054ca6e470f2e89d6251f955ee150145e",
+    "docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md": "123f7067546c2280ce7b5251e1e430345dffc19d5d27a8728832245030c0b745",
+    "docs/tasks/I3_MANAGED_COLLECTION_CONTINUITY_V1.md": "9e96b87bb4b11f637564bab9010760d4f5cbb1c826ca5c63a3354f0b0f99070e",
+    "scripts/observation_schedule.py": "380f89cd3ea7af9c9a2674eea9f5047850aeace57c0d2c5f5c1b21e9b7d0a79f",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "3718719bd31b107b819556d6bce7409ef64e0dd85a1765e72addb989dc06c5dc",
+    "src/solana_alpha_lab/factory/hot90_storage_admission.py": "4af5ef3c6ae7dde98a0ac3999959814ca7b3dca7459d7e7cd35d679d578579bf",
+    "src/solana_alpha_lab/factory/managed_collection.py": "ad519f07837a9aa8fc52a529fb661699a1b4eac6cee199ba55e14decd1ba1f51",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "872d75fc4b7c7c43169024e12bcd86c5443e943d1b648cf5fa4113551162be28",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "3a2cdb874f943b07197116cb1ceab7d263945b8fe14beadc766f7fd773862791",
+    "src/solana_alpha_lab/factory/operability_watch.py": "ff201549de21dc3fe36dfbfb03df1848fc9076b032c5cf7a65ff1cf048c07d18",
+    "src/solana_alpha_lab/factory/opportunity_episode_tick.py": "6bf6ad358d2dc257f10de6f948bf1a0e6b2beeb4317191d3d972ccae736b73d5",
+    "tests/test_managed_collection_continuity_v1.py": "c3286cd6fe394d982ee1eb91cff1f32c4f3eac1a2bdaecaeac4f175d5c6328b4",
+    "tests/test_managed_collection_release_seam_v1.py": "d30d934a2705db1acd26f61ce779966967b72e41a80556ef15952f704b1b7e9e"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/i3_managed_collection_continuity_v1/factory-fit.json",
+    "sha256": "56512ca8a901d180ca4efa8a6c1ac3d6d52d817d2f22554be650a36bf1c10a15",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_35_MANAGED_TESTS_PLUS_RELEASE_SEAM_48_MODULE_744_TEST_DIRECT_CONSUMER_REGRESSION_AND_7_MUTATION_CONTROLS",
+    "independent_review": {
+      "path": "docs/evidence/i3_managed_collection_continuity_v1/independent-review.json",
+      "sha256": "1965c7fbc0c7f231e7975923a99165f8485b44a1e79520731552ceb3a016b59a",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_CONTEXT",
+      "PASS_CATALOG_PROPAGATION",
+      "PASS_ORIGINAL_FALSIFIER_AND_TARGETED_MUTATION",
+      "PASS_NO_RUNTIME_COLLECTOR_MUTATION"
+    ]
+  },
+  "non_claims": [
+    "NO_PRODUCTION_DEPLOY_PROFILE_APPLY_OR_LIVE_GRANT",
+    "NO_CHANGE_TO_A_ARMED_B_TIMER_C1_C2_OR_FROZEN_IDENTITIES",
+    "NO_ADMISSION_RATE_ABOVE_V1_CEILING_100_PER_DAY",
+    "NO_MONTHS_RUNWAY_CLAIM_I2_PACKAGING_NOT_APPLIED",
+    "NO_LIVE_TELEGRAM_DELIVERY_OR_HOST_LOSS_DETECTION_CLAIM",
+    "NO_NEW_SCIENTIFIC_ESTIMAND_ALPHA_OR_CASHFLOW",
+    "NO_CANONICAL_DONE_OR_OWNER_SEMANTIC_ACCEPTANCE"
+  ],
+  "side_effects": {
+    "repository": "bounded I3 managed-continuity branch files and Catalog hashes",
+    "local": "disposable SQLite roots only",
+    "external": "none: no provider call, deploy, production read/write or Drive write"
+  }
+}

@@ -183,6 +183,31 @@
     "Early P0 actual numeric decoder count UNKNOWN",
     "Unit stores have explicit disposable TEST scope; named stores retained"
   ],
+  "main_integration": {
+    "as_of": "2026-10-15",
+    "contract_change": "Git identity metadata only; objective, write set, required roles, scientific semantics and authority unchanged",
+    "frozen_control_paths_unchanged": 9,
+    "historical_review_policy": "Old NOT_READY and subsequent actual PASS retained in immutable Git objects; a new candidate requires new independent reviews",
+    "merge_authority": "NONE_FRESH_EXACT_OWNER_PHRASE_AFTER_CI_AND_READINESS",
+    "mode": "FORWARD_ONLY_MERGE_NO_HISTORY_REWRITE",
+    "new_delivery_base": "b3fb9d8ecffbffda468dccabaa81ca3392da6f15",
+    "new_scientific_charges": 0,
+    "new_scientific_runs": 0,
+    "new_virtual_environments": 0,
+    "original_base_preserved": "07c81a99f2d0f385df66de2e1a5254e224c6b3b3",
+    "overlap": [
+      "catalog/assets/core.yaml",
+      "catalog/assets/lifecycle.yaml",
+      "catalog/catalog_manifest.yaml",
+      "catalog/generated/asset_edges.json",
+      "docs/PROJECT_MAP.md"
+    ],
+    "owner_resume": "Continue; main updated",
+    "paused_candidate_head": "1dfe9ab1d8b8caadd546788db0ce4de199f0997c",
+    "qualification_paths_unchanged": 22,
+    "scientific_history_rebound_or_modified": false,
+    "upstream_changed_paths": 30
+  },
   "no_post_review_named_scientific_attempts": true,
   "os_acceptance": "PASS actual process exit 86 and same-trial resume; separate from unit mocks",
   "post_review_changes": [
