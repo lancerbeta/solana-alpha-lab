@@ -5,8 +5,10 @@ import json
 import copy
 import contextlib
 import io
+import hashlib
 import tempfile
 import unittest
+from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import patch
 
@@ -28,6 +30,47 @@ from tests.fixtures.list_a_confirmation_v1.native import NOW, ingress
 from scripts import list_a_confirmation as cli
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def daily_ownership_oracle(store, sample_ref, expected, result=None):
+    """Independent file/date/join oracle; no producer clock/membership functions."""
+    sample = json.loads((store.root/sample_ref).read_bytes())
+    assert sample["schema_version"] == "1.1" and "schedule_rel" not in sample
+    for path, sha in sample["source_hashes"].items():
+        assert hashlib.sha256((store.root/path).read_bytes()).hexdigest() == sha
+    owners, days = {}, set()
+    for owner in sample["schedule_set"]:
+        doc = json.loads((store.root/owner["schedule_rel"]).read_bytes())
+        sha = doc["schedule_sha256"]
+        assert sha not in owners
+        a, b = (datetime.fromisoformat(doc["activation"][k].replace("Z","+00:00")) for k in ("starts_at","stops_admitting_at"))
+        assert b-a == timedelta(days=1) and a.hour == a.minute == a.second == 0
+        assert a.date() not in days
+        days.add(a.date())
+        owners[sha] = (owner["activation_id"], a, b)
+    admissions = json.loads((store.root/sample["admissions_rel"]).read_bytes())
+    frames = json.loads((store.root/sample["frames_rel"]).read_bytes())
+    census = pq.read_table(store.root/sample["census_rel"],columns=["episode_id","mint","t0","cohort_id","round_id"]).to_pylist()
+    assert len(census) == len(admissions) == len(expected) == 256
+    actual = {r["episode_id"]:r for r in census}
+    assert len(actual) == 256 and set(actual) == set(admissions) == {r["episode_id"] for r in expected}
+    for row in expected:
+        eid = row["episode_id"]
+        admission, source = admissions[eid], actual[eid]
+        activation, a, b = owners[admission["schedule_sha256"]]
+        assert admission["schedule_sha256"] == row["schedule_sha256"]
+        assert admission["activation_id"] == row["activation_id"] == activation == frames[source["round_id"]]["activation_id"]
+        assert a <= datetime.fromisoformat(source["t0"].replace("Z","+00:00")) < b
+        assert source["cohort_id"] == row["cohort_id"] and source["mint"] == row["mint"]
+    if result is not None:
+        population = result["population"]
+        assert population["admitted"] == population["scope_known"] == 256
+        assert population["decision_denominators"] == {"A":128,"C":128}
+        observed = [{k:r[k] for k in ("episode_id","mint","group","decision_nominal_due")} for r in population["membership"]]
+        oracle = [{k:r[k] for k in ("episode_id","mint","group","decision_nominal_due")} for r in expected]
+        assert sorted(observed,key=lambda r:r["episode_id"]) == sorted(oracle,key=lambda r:r["episode_id"])
+    return {"schedule_owners":len(owners),"UTC_days":len(days),"admissions":len(actual),
+            "original_schedule_activation_ownership":"PASS","full_population":"PASS"}
 
 
 def bound(store, *, case="POSITIVE", missing_a=0, source_id="SYNTH-LIST-A-V1", origin_label=None, **source_options):
@@ -59,6 +102,41 @@ class ValueReader:
 
 
 class VerticalTests(unittest.TestCase):
+    def test_native_daily_schedule_set_vertical_and_cold_dossier(self):
+        with tempfile.TemporaryDirectory(prefix="list-a-daily-unit-") as tmp:
+            store = ResearchStore(Path(tmp)/"plane")
+            reader = ValueReader(store)
+            with patch.object(pq, "read_table", reader.read):
+                spec, prepared, oracle = bound(store, daily_schedules=True)
+                self.assertEqual(reader.reads, [])
+                sample_ref = "confirmation/sources/SYNTH-LIST-A-V1/sample.json"
+                daily_ownership_oracle(store,sample_ref,oracle)
+                lane = classify_lane({"experiment_spec":spec,"execution_binding_id":prepared["binding_id"]},
+                    root=ROOT,data_root=store.root,as_of=NOW)
+                self.assertEqual(lane.terminal,"FAST_LANE_READY")
+                response = DocumentRunner(root=ROOT,store=None).start_document(spec,spec_sha256="0"*64,
+                    run_context=RunContext(store.root,"0"*64,lane),capture_hooks={"execution_context":{
+                        "binding_id":prepared["binding_id"],"now":NOW}})
+            result = response["result"]
+            self.assertEqual(result["method"]["contrast"],0.125)
+            self.assertEqual(response["protocol_terminal"],"ASSOCIATION_SUPPORTED_CONDITIONAL")
+            self.assertEqual(daily_ownership_oracle(store,sample_ref,oracle,result)["schedule_owners"],32)
+            for group in ("A","C"):
+                self.assertGreaterEqual(result["method"]["support"][group]["mints"],30)
+                for h in ("86400","172800"):
+                    self.assertGreaterEqual(result["method"]["support"][group]["blocks"][h],30)
+            before = store.diagnostics().committed_inventory_sha256
+            with patch.object(pq,"read_table",side_effect=AssertionError("COLD_NO_PARQUET")), patch(
+                    "solana_alpha_lab.factory.list_a_confirmation.evaluate_native",side_effect=AssertionError("COLD_NO_EVALUATOR")), patch.object(
+                    ResearchStore,"append",side_effect=AssertionError("COLD_NO_WRITES")):
+                cold = read_confirmation(ResearchStore(store.root,create_if_missing=False),trial_id=response["trial_id"],root=ROOT)
+                self.assertEqual(cold["new_evaluator_invocations"],0)
+                dossier = FactoryApplication(root=ROOT,research_data_root=store.root).research_detail(
+                    parse_locator(spec["experiment_id"],"GIT","EXPERIMENT_SPEC"))["dossier"]
+                self.assertEqual(next(o for o in dossier["obligations"] if o["code"]=="RESULT")["status"],"PRESENT")
+                self.assertFalse(dossier["science_guard"]["allowed"])
+            self.assertEqual(before,store.diagnostics().committed_inventory_sha256)
+
     def test_positive_real_vertical_reader_dossier_pause_and_repeat(self):
         with tempfile.TemporaryDirectory(prefix="list-a-unit-") as tmp:
             store = ResearchStore(Path(tmp) / "plane")

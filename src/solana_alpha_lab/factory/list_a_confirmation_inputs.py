@@ -25,7 +25,8 @@ from solana_alpha_lab.factory.list_a_confirmation_method import (
 )
 from solana_alpha_lab.factory.opportunity_episodes import (
     cycle_start, episode_id_for, resolve_point, validate_episode_schedule,
-    frame_receipt, inventory_from_documents,
+    frame_receipt, inventory_from_documents, collection_lineage_id, episode_cohort_family_key,
+    cohort_id_for_admission, cohort_day_bounds,
 )
 from solana_alpha_lab.factory.hfic_research_scope import (
     MembershipEvidence, ResolvedScope, add_admission_frame_membership, jupiter_definitions,
@@ -99,9 +100,8 @@ class Exposure(ClosedModel):
     development_target_available_max: str | None
 
 
-class Sample(ClosedModel):
+class SampleFields(ClosedModel):
     schema_tag: Literal["smial.list-a-confirmation-input"] = Field(alias="schema")
-    schema_version: Literal["1.0"]
     source_id: str
     lineage_id: str
     namespace: str
@@ -113,7 +113,6 @@ class Sample(ClosedModel):
     data_cutoff: str
     census_rel: str
     observations_rel: str
-    schedule_rel: str
     frames_rel: str
     admissions_rel: str
     protection_rel: str
@@ -122,6 +121,26 @@ class Sample(ClosedModel):
     frozen_protection_sha256: str
     universe_policy: Literal["EXACT_NATIVE_ADMISSIONS_KNOWN_REFERENCED"]
     purge_rule: Literal["INFORMATION_START_STRICT_AFTER_BOUNDARY"]
+
+
+class Sample(SampleFields):
+    schema_version: Literal["1.0"]
+    schedule_rel: str
+
+
+class ScheduleOwner(ClosedModel):
+    schedule_rel: str
+    activation_id: str
+
+
+class MultiScheduleSample(SampleFields):
+    schema_version: Literal["1.1"]
+    schedule_set: list[ScheduleOwner] = Field(min_length=1)
+
+
+def parse_sample(document: dict) -> Sample | MultiScheduleSample:
+    model = MultiScheduleSample if document.get("schema_version") == "1.1" else Sample
+    return model.model_validate(document)
 
 
 def utc(value: str) -> datetime:
@@ -203,9 +222,12 @@ def records(store) -> list[dict]:
             for r in store.iter_committed_records()]
 
 
-def source_metadata(sample: Sample, *, root: Path, data_root: Path) -> dict:
+def source_metadata(sample: Sample | MultiScheduleSample, *, root: Path, data_root: Path) -> dict:
     """Opaque hashes plus allowlisted census and list frames; no observations decoder."""
-    expected_paths = {sample.census_rel, sample.observations_rel, sample.schedule_rel, sample.frames_rel, sample.protection_rel, sample.admissions_rel}
+    multi = isinstance(sample, MultiScheduleSample)
+    owners = sample.schedule_set if multi else [ScheduleOwner(schedule_rel=sample.schedule_rel, activation_id="LEGACY")]
+    expected_paths = {sample.census_rel, sample.observations_rel, sample.frames_rel, sample.protection_rel, sample.admissions_rel,
+                      *(o.schedule_rel for o in owners)}
     require(set(sample.source_hashes) == expected_paths, "SOURCE_SET_INCOMPLETE")
     for relative, sha in sample.source_hashes.items():
         require(file_sha(safe_path(data_root, relative)) == sha, "SOURCE_HASH_MISMATCH")
@@ -221,20 +243,39 @@ def source_metadata(sample: Sample, *, root: Path, data_root: Path) -> dict:
                             isinstance(row["confirmatory_reuse_forbidden"], bool), "SOURCE_ROLE_PROVENANCE_INVALID")
                     require(row["evidence_role"] == "UNTOUCHED_FORWARD_HOLDOUT" and
                             row["confirmatory_reuse_forbidden"] is False, "CONFIRMATORY_REUSE_FORBIDDEN")
-    schedule = validate_episode_schedule(load_json(safe_path(data_root, sample.schedule_rel)), root=root)
+    schedules = [validate_episode_schedule(load_json(safe_path(data_root, o.schedule_rel)), root=root) for o in owners]
+    by_sha = {s["schedule_sha256"]: (s, o.activation_id) for s, o in zip(schedules, owners)}
+    if multi:
+        require(len(by_sha) == len(owners) == len({o.schedule_rel for o in owners}) == len({o.activation_id for o in owners}),
+                "NATIVE_SCHEDULE_OWNER_DUPLICATE")
+        require([s["schedule_sha256"] for s in schedules] == sorted(by_sha), "NATIVE_SCHEDULE_SET_NOT_CANONICAL")
+        first = schedules[0]
+        # Same frozen-template compatibility used by the managed child producer;
+        # no synthetic aggregate schedule and no relaxation of capture semantics.
+        projection = lambda s: {k: v for k, v in s.items() if k not in {"activation", "schedule_sha256"}}
+        require(all(collection_lineage_id(s) == sample.lineage_id and
+                    episode_cohort_family_key(s) == episode_cohort_family_key(first) and
+                    projection(s) == projection(first) for s in schedules), "NATIVE_SCHEDULE_FAMILY_CONFLICT")
+        cohorts = set()
+        for s in schedules:
+            start, stop = (utc(s["activation"][k]) for k in ("starts_at", "stops_admitting_at"))
+            cohort = cohort_id_for_admission(start)
+            a, b = cohort_day_bounds(cohort)
+            require(a <= start < stop <= b, "NATIVE_SCHEDULE_NOT_DAILY")
+            require(cohort not in cohorts, "NATIVE_COHORT_MULTIPLE_OWNERS")
+            cohorts.add(cohort)
     assignment_documents = load_json(safe_path(data_root, sample.protection_rel))["assignments"]
     inventory = inventory_from_documents(assignment_documents)
     require(inventory.status == "ALLOW", "NATIVE_FROZEN_PROTECTION_UNRESOLVED")
-    expected_assignments = sorted((i["assignment_id"], i["sha256"]) for i in schedule["protection"]["assignment_sources"])
-    require(expected_assignments == sorted((i["assignment_id"], i["sha256"]) for i in inventory.sources),
+    require(all(sorted((i["assignment_id"], i["sha256"]) for i in s["protection"]["assignment_sources"]) ==
+                sorted((i["assignment_id"], i["sha256"]) for i in inventory.sources) for s in schedules),
             "NATIVE_FROZEN_PROTECTION_MISMATCH")
-    schedule_binding = {**schedule["observation_schedule"],
-                        "witness_max_age_seconds": schedule["nomination"]["witness_max_age_seconds"]}
     census = pq.read_table(safe_path(data_root, sample.census_rel), columns=SOURCE_COLUMNS).to_pylist()
     frames = load_json(safe_path(data_root, sample.frames_rel))
     admissions = load_json(safe_path(data_root, sample.admissions_rel))
     acquisition_keys = []
     unique = {}
+    episode_schedule_bindings, schedule_census = {}, {sha: [] for sha in by_sha}
     for row in census:
         t0 = utc(row["t0"])
         require(utc(row["admission_request_started_at"]) <= utc(row["admission_response_received_at"]) <=
@@ -247,6 +288,17 @@ def source_metadata(sample: Sample, *, root: Path, data_root: Path) -> dict:
         key = (sample.namespace, row["episode_id"])
         frame = frames.get(row["round_id"], {})
         admission = admissions.get(row["episode_id"], {})
+        require(admission.get("schedule_sha256") in by_sha, "NATIVE_ADMISSION_FOREIGN_SCHEDULE" if multi else
+                "NATIVE_ADMISSION_SOURCE_CLOCK_CONFLICT")
+        schedule, activation_id = by_sha[admission["schedule_sha256"]]
+        schedule_binding = {**schedule["observation_schedule"],
+                            "witness_max_age_seconds": schedule["nomination"]["witness_max_age_seconds"]}
+        if multi:
+            require(admission.get("activation_id") == activation_id == frame.get("activation_id"),
+                    "NATIVE_ADMISSION_ACTIVATION_CONFLICT")
+            require(row["cohort_id"] == cohort_id_for_admission(t0) ==
+                    cohort_id_for_admission(utc(schedule["activation"]["starts_at"])), "NATIVE_COHORT_OWNER_CONFLICT")
+        episode_schedule_bindings[row["episode_id"]] = schedule_binding
         require(all(admission.get(k) == row[k] for k in ("episode_id", "mint", "t0", "cohort_id", "round_id", "frame_sha256")) and
                 admission.get("population") == "OPPORTUNITY_EPISODES" and admission.get("membership_state") == "ADMITTED" and
                 admission.get("collection_lineage_id") == sample.lineage_id, "NATIVE_ADMISSION_WITNESS_CONFLICT")
@@ -279,12 +331,16 @@ def source_metadata(sample: Sample, *, root: Path, data_root: Path) -> dict:
         require(resolve_point(schedule_binding, t0, "E14400").availability_deadline <= utc(sample.data_cutoff),
                 "TARGET_NOT_MATURE_AT_CUTOFF")
         if key in unique:
+            require(not multi, "NATIVE_ADMISSION_DUPLICATE")
             require(unique[key] == row, "DUPLICATE_EPISODE_CONFLICT")
         unique[key] = row
+        schedule_census[schedule["schedule_sha256"]].append(row)
     census = sorted(unique.values(), key=lambda r: r["episode_id"])
     evidence = MembershipEvidence()
-    add_admission_frame_membership(evidence, schedule_document=schedule, census=census, frames=frames)
-    definitions = jupiter_definitions(schedule)
+    require(not multi or all(schedule_census.values()), "NATIVE_SCHEDULE_OWNER_UNUSED")
+    for sha, (schedule, _) in by_sha.items():
+        add_admission_frame_membership(evidence, schedule_document=schedule, census=schedule_census[sha], frames=frames)
+    definitions = jupiter_definitions(schedules[0])
     core = yaml.safe_load((root / "configs/list_a_chronological_confirmation_v1.yaml").read_text(encoding="utf-8"))["protocol_core"]
     require(digest(core) == CORE_SHA, "PROTOCOL_CORE_MISMATCH")
     require(definitions[LIST_A]["definition_sha256"] == core["question"]["list_definition_sha256"], "LIST_DEFINITION_MISMATCH")
@@ -307,7 +363,7 @@ def source_metadata(sample: Sample, *, root: Path, data_root: Path) -> dict:
     for group, signal in (("A", "TRUE"), ("C", "FALSE")):
         rows = [r for r in census if resolved.signal[r["episode_id"]] == signal]
         upper[group] = {"mints": len({r["mint"] for r in rows}),
-            "blocks": {str(h): len({block_for(resolve_point(schedule_binding, utc(r["t0"]), "E1800").nominal_due, h)
+            "blocks": {str(h): len({block_for(resolve_point(episode_schedule_bindings[r["episode_id"]], utc(r["t0"]), "E1800").nominal_due, h)
                                    for r in rows}) for h in PARTITIONS}}
     require(all(v["mints"] >= 30 and all(n >= 30 for n in v["blocks"].values()) for v in upper.values()),
             "INSUFFICIENT_POTENTIAL_SUPPORT")
@@ -315,7 +371,9 @@ def source_metadata(sample: Sample, *, root: Path, data_root: Path) -> dict:
     require(set(admissions) == {r["episode_id"] for r in census}, "NATIVE_ADMISSION_INVENTORY_CONFLICT")
     metadata = {"census": census, "scope": resolved, "compiled_query": compiled,
             "acquisition_keys": acquisition_keys, "acquisition_identity_sha256": digest(acquisition_keys),
-            "schedule_binding": schedule_binding, "potential_support": upper, "census_semantic_sha256": digest(census)}
+            "schedule_binding": {**schedules[0]["observation_schedule"], "witness_max_age_seconds": schedules[0]["nomination"]["witness_max_age_seconds"]},
+            "episode_schedule_bindings": episode_schedule_bindings,
+            "potential_support": upper, "census_semantic_sha256": digest(census)}
     purpose_protection(sample, metadata, inventory, "FROZEN")
     return metadata
 
@@ -459,7 +517,7 @@ def validate_confirmation_result(result: dict, *, root: Path) -> None:
 def purpose_protection(sample: Sample, metadata: dict, inventory, stage: str) -> None:
     require(inventory.status == "ALLOW", stage + "_NATIVE_PROTECTION_UNRESOLVED")
     start = utc(sample.information_start)
-    end = max(utc(sample.interval_end_exclusive), *(resolve_point(metadata["schedule_binding"], utc(r["t0"]), "E14400").availability_deadline
+    end = max(utc(sample.interval_end_exclusive), *(resolve_point(metadata["episode_schedule_bindings"][r["episode_id"]], utc(r["t0"]), "E14400").availability_deadline
               + timedelta(microseconds=1) for r in metadata["census"]))
     for mint in {r["mint"] for r in metadata["census"]}:
         for entry in inventory.entries.get(mint, ()):
@@ -498,7 +556,7 @@ def inspect_confirmation(definition: dict, sample_ref: str, *, root: Path, data_
     qualify_local_storage(data_root)
     require(now.tzinfo is not None, "TIMESTAMP_INVALID")
     try:
-        sample = Sample.model_validate(load_json(safe_path(data_root, sample_ref)))
+        sample = parse_sample(load_json(safe_path(data_root, sample_ref)))
     except ValueError as exc:
         raise ConfirmationError("INPUT_CONTRACT_INVALID") from exc
     validate_exposure(sample)
@@ -648,19 +706,21 @@ def validate_exact_grant(record: dict, binding: dict, binding_id: str) -> None:
 
 def write_native_confirmation_sample(*, root: Path, store: ResearchStore, source_id: str,
         lineage_id: str, namespace: str, census: list[dict], observations: list[dict],
-        schedule: dict, frames: dict, admission_documents: list[dict], protection_documents: list[dict], interval_start: str, interval_end_exclusive: str,
+        schedule: dict | None = None, schedules: list[dict] | None = None, frames: dict, admission_documents: list[dict], protection_documents: list[dict], interval_start: str, interval_end_exclusive: str,
         information_start: str, data_cutoff: str, exposure: dict, domain: str,
         role: str = "UNTOUCHED_FORWARD_HOLDOUT") -> str:
     """Native source ingress only: no result, reservation, metric or decision."""
     identifier(source_id)
     identifier(lineage_id)
     identifier(namespace)
+    require((schedule is None) != (schedules is None), "NATIVE_SCHEDULE_INPUT_AMBIGUOUS")
     prefix = f"confirmation/sources/{source_id}"
     frames = {key: frame_receipt(frame) for key, frame in frames.items()}
     admissions = {}
     for document in admission_documents:
         projected = {k: document.get(k) for k in ADMISSION_COLUMNS}
         eid = projected["episode_id"]
+        require(schedules is None or eid not in admissions, "NATIVE_ADMISSION_DUPLICATE")
         require(eid not in admissions or admissions[eid] == projected, "NATIVE_ADMISSION_DUPLICATE_CONFLICT")
         admissions[eid] = projected
     source_hashes = {}
@@ -672,7 +732,19 @@ def write_native_confirmation_sample(*, root: Path, store: ResearchStore, source
         relative = f"{prefix}/{name}"
         publish(store.root, relative, raw)
         source_hashes[relative] = hashlib.sha256(raw).hexdigest()
-    for name, document in (("schedule.json", schedule), ("frames.json", frames),
+    schedule_documents, schedule_set = [], []
+    if schedules is None:
+        schedule_documents.append(("schedule.json", schedule))
+    else:
+        require(bool(schedules), "NATIVE_SCHEDULE_SET_EMPTY")
+        for entry in schedules:
+            require(set(entry) == {"document", "activation_id"}, "NATIVE_SCHEDULE_OWNER_INVALID")
+            doc = validate_episode_schedule(entry["document"], root=root)
+            name = "schedules/" + doc["schedule_sha256"] + ".json"
+            schedule_documents.append((name, doc))
+            schedule_set.append({"schedule_rel": f"{prefix}/{name}", "activation_id": identifier(entry["activation_id"])})
+        schedule_set.sort(key=lambda o: o["schedule_rel"])
+    for name, document in (*schedule_documents, ("frames.json", frames),
                            ("admissions.json", admissions),
                            ("protection.json", {"assignments": protection_documents})):
         relative, raw = f"{prefix}/{name}", finite_bytes(document)
@@ -680,12 +752,14 @@ def write_native_confirmation_sample(*, root: Path, store: ResearchStore, source
         source_hashes[relative] = hashlib.sha256(raw).hexdigest()
     protection_body = {"type": "PROTECTION", "source_id": source_id, "status": role, "namespace": namespace}
     protection_sha = digest(protection_body)
-    sample = Sample.model_validate({"schema": "smial.list-a-confirmation-input", "schema_version": "1.0",
+    schedule_fields = {"schema_version": "1.0", "schedule_rel": f"{prefix}/schedule.json"} if schedules is None else {
+        "schema_version": "1.1", "schedule_set": schedule_set}
+    sample = parse_sample({"schema": "smial.list-a-confirmation-input", **schedule_fields,
         "source_id": source_id, "lineage_id": lineage_id, "namespace": namespace, "domain": domain, "role": role,
         "interval_start": interval_start, "interval_end_exclusive": interval_end_exclusive,
         "information_start": information_start, "data_cutoff": data_cutoff,
         "census_rel": f"{prefix}/census.parquet", "observations_rel": f"{prefix}/observations.parquet",
-        "schedule_rel": f"{prefix}/schedule.json", "frames_rel": f"{prefix}/frames.json",
+        "frames_rel": f"{prefix}/frames.json",
         "protection_rel": f"{prefix}/protection.json",
         "admissions_rel": f"{prefix}/admissions.json",
         "source_hashes": source_hashes, "exposure": exposure, "frozen_protection_sha256": protection_sha,
@@ -709,7 +783,7 @@ def write_native_confirmation_sample(*, root: Path, store: ResearchStore, source
 def register_source_authority(sample_ref: str, *, root: Path, store: ResearchStore,
                               owner_phrase: str | None = None) -> dict:
     """Separate source-owner preview/authorize. Ingress and grant confer no source authority."""
-    sample = Sample.model_validate(load_json(safe_path(store.root, sample_ref)))
+    sample = parse_sample(load_json(safe_path(store.root, sample_ref)))
     validate_exposure(sample)
     history = records(store)
     require(any(r["record_id"] == "LA-INGRESS-" + digest(sample.model_dump()) and r["producer"] == SOURCE_OWNER and

@@ -73,137 +73,303 @@
       ],
       "title": "Exposure",
       "type": "object"
-    }
-  },
-  "additionalProperties": false,
-  "properties": {
-    "schema": {
-      "const": "smial.list-a-confirmation-input",
-      "title": "Schema",
-      "type": "string"
     },
-    "schema_version": {
-      "const": "1.0",
-      "title": "Schema Version",
-      "type": "string"
-    },
-    "source_id": {
-      "title": "Source Id",
-      "type": "string"
-    },
-    "lineage_id": {
-      "title": "Lineage Id",
-      "type": "string"
-    },
-    "namespace": {
-      "title": "Namespace",
-      "type": "string"
-    },
-    "domain": {
-      "enum": [
-        "SYNTHETIC",
-        "REAL"
-      ],
-      "title": "Domain",
-      "type": "string"
-    },
-    "role": {
-      "enum": [
-        "UNTOUCHED_FORWARD_HOLDOUT",
-        "EXPLORATORY_REUSE"
-      ],
-      "title": "Role",
-      "type": "string"
-    },
-    "interval_start": {
-      "title": "Interval Start",
-      "type": "string"
-    },
-    "interval_end_exclusive": {
-      "title": "Interval End Exclusive",
-      "type": "string"
-    },
-    "information_start": {
-      "title": "Information Start",
-      "type": "string"
-    },
-    "data_cutoff": {
-      "title": "Data Cutoff",
-      "type": "string"
-    },
-    "census_rel": {
-      "title": "Census Rel",
-      "type": "string"
-    },
-    "observations_rel": {
-      "title": "Observations Rel",
-      "type": "string"
-    },
-    "schedule_rel": {
-      "title": "Schedule Rel",
-      "type": "string"
-    },
-    "frames_rel": {
-      "title": "Frames Rel",
-      "type": "string"
-    },
-    "admissions_rel": {
-      "title": "Admissions Rel",
-      "type": "string"
-    },
-    "protection_rel": {
-      "title": "Protection Rel",
-      "type": "string"
-    },
-    "source_hashes": {
-      "additionalProperties": {
-        "type": "string"
+    "MultiScheduleSample": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "smial.list-a-confirmation-input",
+          "title": "Schema",
+          "type": "string"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "lineage_id": {
+          "title": "Lineage Id",
+          "type": "string"
+        },
+        "namespace": {
+          "title": "Namespace",
+          "type": "string"
+        },
+        "domain": {
+          "enum": [
+            "SYNTHETIC",
+            "REAL"
+          ],
+          "title": "Domain",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "UNTOUCHED_FORWARD_HOLDOUT",
+            "EXPLORATORY_REUSE"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "interval_start": {
+          "title": "Interval Start",
+          "type": "string"
+        },
+        "interval_end_exclusive": {
+          "title": "Interval End Exclusive",
+          "type": "string"
+        },
+        "information_start": {
+          "title": "Information Start",
+          "type": "string"
+        },
+        "data_cutoff": {
+          "title": "Data Cutoff",
+          "type": "string"
+        },
+        "census_rel": {
+          "title": "Census Rel",
+          "type": "string"
+        },
+        "observations_rel": {
+          "title": "Observations Rel",
+          "type": "string"
+        },
+        "frames_rel": {
+          "title": "Frames Rel",
+          "type": "string"
+        },
+        "admissions_rel": {
+          "title": "Admissions Rel",
+          "type": "string"
+        },
+        "protection_rel": {
+          "title": "Protection Rel",
+          "type": "string"
+        },
+        "source_hashes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Source Hashes",
+          "type": "object"
+        },
+        "exposure": {
+          "$ref": "#/$defs/Exposure"
+        },
+        "frozen_protection_sha256": {
+          "title": "Frozen Protection Sha256",
+          "type": "string"
+        },
+        "universe_policy": {
+          "const": "EXACT_NATIVE_ADMISSIONS_KNOWN_REFERENCED",
+          "title": "Universe Policy",
+          "type": "string"
+        },
+        "purge_rule": {
+          "const": "INFORMATION_START_STRICT_AFTER_BOUNDARY",
+          "title": "Purge Rule",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "schedule_set": {
+          "items": {
+            "$ref": "#/$defs/ScheduleOwner"
+          },
+          "minItems": 1,
+          "title": "Schedule Set",
+          "type": "array"
+        }
       },
-      "title": "Source Hashes",
+      "required": [
+        "schema",
+        "source_id",
+        "lineage_id",
+        "namespace",
+        "domain",
+        "role",
+        "interval_start",
+        "interval_end_exclusive",
+        "information_start",
+        "data_cutoff",
+        "census_rel",
+        "observations_rel",
+        "frames_rel",
+        "admissions_rel",
+        "protection_rel",
+        "source_hashes",
+        "exposure",
+        "frozen_protection_sha256",
+        "universe_policy",
+        "purge_rule",
+        "schema_version",
+        "schedule_set"
+      ],
+      "title": "MultiScheduleSample",
       "type": "object"
     },
-    "exposure": {
-      "$ref": "#/$defs/Exposure"
+    "Sample": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "smial.list-a-confirmation-input",
+          "title": "Schema",
+          "type": "string"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "lineage_id": {
+          "title": "Lineage Id",
+          "type": "string"
+        },
+        "namespace": {
+          "title": "Namespace",
+          "type": "string"
+        },
+        "domain": {
+          "enum": [
+            "SYNTHETIC",
+            "REAL"
+          ],
+          "title": "Domain",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "UNTOUCHED_FORWARD_HOLDOUT",
+            "EXPLORATORY_REUSE"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "interval_start": {
+          "title": "Interval Start",
+          "type": "string"
+        },
+        "interval_end_exclusive": {
+          "title": "Interval End Exclusive",
+          "type": "string"
+        },
+        "information_start": {
+          "title": "Information Start",
+          "type": "string"
+        },
+        "data_cutoff": {
+          "title": "Data Cutoff",
+          "type": "string"
+        },
+        "census_rel": {
+          "title": "Census Rel",
+          "type": "string"
+        },
+        "observations_rel": {
+          "title": "Observations Rel",
+          "type": "string"
+        },
+        "frames_rel": {
+          "title": "Frames Rel",
+          "type": "string"
+        },
+        "admissions_rel": {
+          "title": "Admissions Rel",
+          "type": "string"
+        },
+        "protection_rel": {
+          "title": "Protection Rel",
+          "type": "string"
+        },
+        "source_hashes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Source Hashes",
+          "type": "object"
+        },
+        "exposure": {
+          "$ref": "#/$defs/Exposure"
+        },
+        "frozen_protection_sha256": {
+          "title": "Frozen Protection Sha256",
+          "type": "string"
+        },
+        "universe_policy": {
+          "const": "EXACT_NATIVE_ADMISSIONS_KNOWN_REFERENCED",
+          "title": "Universe Policy",
+          "type": "string"
+        },
+        "purge_rule": {
+          "const": "INFORMATION_START_STRICT_AFTER_BOUNDARY",
+          "title": "Purge Rule",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "schedule_rel": {
+          "title": "Schedule Rel",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema",
+        "source_id",
+        "lineage_id",
+        "namespace",
+        "domain",
+        "role",
+        "interval_start",
+        "interval_end_exclusive",
+        "information_start",
+        "data_cutoff",
+        "census_rel",
+        "observations_rel",
+        "frames_rel",
+        "admissions_rel",
+        "protection_rel",
+        "source_hashes",
+        "exposure",
+        "frozen_protection_sha256",
+        "universe_policy",
+        "purge_rule",
+        "schema_version",
+        "schedule_rel"
+      ],
+      "title": "Sample",
+      "type": "object"
     },
-    "frozen_protection_sha256": {
-      "title": "Frozen Protection Sha256",
-      "type": "string"
-    },
-    "universe_policy": {
-      "const": "EXACT_NATIVE_ADMISSIONS_KNOWN_REFERENCED",
-      "title": "Universe Policy",
-      "type": "string"
-    },
-    "purge_rule": {
-      "const": "INFORMATION_START_STRICT_AFTER_BOUNDARY",
-      "title": "Purge Rule",
-      "type": "string"
+    "ScheduleOwner": {
+      "additionalProperties": false,
+      "properties": {
+        "schedule_rel": {
+          "title": "Schedule Rel",
+          "type": "string"
+        },
+        "activation_id": {
+          "title": "Activation Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schedule_rel",
+        "activation_id"
+      ],
+      "title": "ScheduleOwner",
+      "type": "object"
     }
   },
-  "required": [
-    "schema",
-    "schema_version",
-    "source_id",
-    "lineage_id",
-    "namespace",
-    "domain",
-    "role",
-    "interval_start",
-    "interval_end_exclusive",
-    "information_start",
-    "data_cutoff",
-    "census_rel",
-    "observations_rel",
-    "schedule_rel",
-    "frames_rel",
-    "admissions_rel",
-    "protection_rel",
-    "source_hashes",
-    "exposure",
-    "frozen_protection_sha256",
-    "universe_policy",
-    "purge_rule"
-  ],
-  "title": "Sample",
-  "type": "object"
+  "anyOf": [
+    {
+      "$ref": "#/$defs/Sample"
+    },
+    {
+      "$ref": "#/$defs/MultiScheduleSample"
+    }
+  ]
 }

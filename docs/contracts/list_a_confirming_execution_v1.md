@@ -23,6 +23,26 @@ Git definition `configs/experiment_specs/list_a_chronological_confirmation_v1.ya
 Эта инженерная кампания разрешает только свои disposable SYNTHETIC registrations.
 REAL grant и values требуют отдельного owner scope.
 
+Native input `1.0` сохраняет single `schedule_rel` и прежнюю canonical sample
+identity. Совместимый input `1.1` содержит canonical `schedule_set` из
+`{schedule_rel, activation_id}` (порядок по native schedule SHA). Ingress принимает
+`schedules: [{document: <original frozen child>, activation_id: <original>}]`
+вместо `schedule`. Все original documents входят в source_hashes без изменения
+SHA, admissions и activation identities. Result/ExperimentSpec и scientific core
+не версионируются: это расширение source binding.
+
+Каждый admission проходит через свой original schedule, activation, суточное
+окно, frame witness и clocks. Принимается только одна совместимая collection
+lineage/cohort family с одинаковым frozen template (кроме activation/SHA),
+включая population, nomination, list/capture/exclusion, observation grid и
+protection. Окно child может начинаться после UTC midnight, как у managed
+collector, но не пересекает сутки. Один UTC cohort имеет ровно одного owner;
+fragmented same-day cohorts, duplicate admissions, foreign schedule/activation
+и unused schedule owners запрещены. Virtual multi-month schedule не создаётся.
+Full census/admission inventory и decision denominator сохраняются. Acquisition
+identity/study budget вычисляются по прежнему правилу; переупаковка не сбрасывает
+allowance. Поддержка daily set не предоставляет REAL source authority/grant.
+
 Вход: native census, observations, schedule, bounded frame receipts,
 `opportunity_episodes.admission_record` документы и frozen assignment inventory.
 Даты/идентичности census связываются с native admission; nomination occurrence

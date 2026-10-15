@@ -198,7 +198,7 @@ def evaluate_native(context: dict, *, store, phase=None) -> tuple[dict, dict]:
             "FOREIGN_OBSERVATION_IDENTITY")
     for row in metadata["census"]:
         group = "A" if metadata["scope"].signal[row["episode_id"]] == "TRUE" else "C"
-        clocks = {point: resolve_point(metadata["schedule_binding"], utc(row["t0"]), point)
+        clocks = {point: resolve_point(metadata["episode_schedule_bindings"][row["episode_id"]], utc(row["t0"]), point)
                   for point in ("E1800", "E14400")}
         cells = {}
         for point in ("E1800", "E14400"):

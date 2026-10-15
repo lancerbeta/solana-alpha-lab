@@ -126,7 +126,7 @@ class CalendarMaturityTests(unittest.TestCase):
             source_input.write_bytes(finite_bytes(payload))
             out = io.StringIO()
             with patch.object(pq, "read_table", metadata_only), contextlib.redirect_stdout(out):
-                rc = cli.main(["register-source", "--data-root", str(store.root), "--source-input", str(source_input),
+                rc = cli.main(["register-source", "--data-root", str(Path(tmp)/"cli-plane"), "--source-input", str(source_input),
                                "--as-of", NOW.isoformat()])
             self.assertEqual(rc, 2)
             response = json.loads(out.getvalue())
@@ -180,6 +180,71 @@ class CalendarMaturityTests(unittest.TestCase):
                 self.assertEqual(lane.terminal, terminal)
                 self.assertEqual(lane.next_action, action)
                 self.assertIs(lane.confirmation_checkpoint["scientific_charge"], charge)
+
+
+class DailyScheduleAdmissionTests(unittest.TestCase):
+    def test_original_daily_owners_and_calendar_maturity_are_metadata_only(self):
+        from solana_alpha_lab.factory.list_a_confirmation_inputs import parse_sample, source_metadata, write_native_confirmation_sample
+        with tempfile.TemporaryDirectory(prefix="list-a-daily-unit-") as tmp:
+            store = ResearchStore(Path(tmp)/"plane")
+            payload = SourceRoleProvenanceTests().source(store, lambda _: None, daily_schedules=True)
+            original = pq.read_table
+            def metadata_only(path, *args, **kwargs):
+                self.assertNotEqual(Path(path).name, "observations.parquet")
+                return original(path, *args, **kwargs)
+            with patch.object(pq, "read_table", metadata_only):
+                ref = write_native_confirmation_sample(root=ROOT, store=store, **payload)
+                sample = parse_sample(json.loads((store.root/ref).read_bytes()))
+                metadata = source_metadata(sample, root=ROOT, data_root=store.root)
+            self.assertEqual(sample.schema_version, "1.1")
+            self.assertEqual(len(sample.schedule_set), 32)
+            self.assertEqual(len(metadata["census"]), 256)
+            self.assertEqual(len(metadata["episode_schedule_bindings"]), 256)
+            for group in ("A", "C"):
+                self.assertGreaterEqual(metadata["potential_support"][group]["mints"], 30)
+                self.assertEqual(metadata["potential_support"][group]["blocks"], {"86400":32,"172800":32})
+            with patch.object(pq, "read_table", metadata_only), self.assertRaisesRegex(ConfirmationError, "TARGET_NOT_MATURE_AT_CUTOFF"):
+                source_metadata(sample.model_copy(update={"data_cutoff":"2027-01-03T03:00:00Z"}),root=ROOT,data_root=store.root)
+            self.assertFalse(any(r["kind"]=="RUN_STARTED" for r in records(store)))
+
+    def test_foreign_family_duplicate_cohort_and_activation_refuse_without_values_or_charge(self):
+        from solana_alpha_lab.factory.list_a_confirmation_inputs import write_native_confirmation_sample
+        from solana_alpha_lab.factory.opportunity_episodes import validate_episode_schedule
+        cases = (("foreign","NATIVE_ADMISSION_FOREIGN_SCHEDULE"), ("family","NATIVE_SCHEDULE_FAMILY_CONFLICT"),
+                 ("duplicate","NATIVE_ADMISSION_DUPLICATE"), ("same-cohort","NATIVE_COHORT_MULTIPLE_OWNERS"),
+                 ("activation","NATIVE_ADMISSION_ACTIVATION_CONFLICT"), ("exploratory","CONFIRMATORY_REUSE_FORBIDDEN"))
+        for case, reason in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory(prefix="list-a-daily-unit-") as tmp:
+                store = ResearchStore(Path(tmp)/"plane")
+                payload = SourceRoleProvenanceTests().source(store, lambda _: None, daily_schedules=True)
+                if case == "foreign":
+                    payload["admission_documents"][-1]["schedule_sha256"] = "0"*64
+                elif case == "family":
+                    doc = payload["schedules"][-1]["document"]
+                    doc.pop("schedule_sha256")
+                    doc["capture_floor"]["holders_min"] += 1
+                    payload["schedules"][-1]["document"] = validate_episode_schedule(doc, root=ROOT)
+                elif case == "duplicate":
+                    doc = copy.deepcopy(payload["admission_documents"][0])
+                    doc["activation_id"] = "ACT-FOREIGN"
+                    payload["admission_documents"].append(doc)
+                elif case == "same-cohort":
+                    doc = copy.deepcopy(payload["schedules"][0]["document"])
+                    doc.pop("schedule_sha256")
+                    doc["activation"]["starts_at"] = "2026-11-02T12:00:00Z"
+                    payload["schedules"].append({"document":validate_episode_schedule(doc,root=ROOT),"activation_id":"ACT-OTHER-OWNER"})
+                elif case == "activation":
+                    payload["admission_documents"][-1]["activation_id"] = "ACT-FOREIGN"
+                else:
+                    payload["observations"][-1].update(evidence_role="EXPLORATORY_REUSE",confirmatory_reuse_forbidden=True)
+                original = pq.read_table
+                def metadata_only(path, *args, **kwargs):
+                    self.assertNotEqual(Path(path).name, "observations.parquet")
+                    return original(path, *args, **kwargs)
+                with patch.object(pq, "read_table", metadata_only), self.assertRaisesRegex(ConfirmationError, reason):
+                    write_native_confirmation_sample(root=ROOT, store=store, **payload)
+                self.assertFalse(any(r["kind"]=="RUN_STARTED" or r["payload"].get("type") in {
+                    "SOURCE_AUTHORITY","CONFIRMATION_GRANT","CONFIRMATION_RESERVATION"} for r in records(store)))
 
 
 class AdmissionTests(unittest.TestCase):
