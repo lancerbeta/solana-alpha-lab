@@ -54,7 +54,7 @@
   "decision": "ACCEPT_ONE_RETAINED_REVIEW_ENVIRONMENT_DEVIATION_GIT_DELIVERY_ONLY",
   "decision_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-OWNER-DEVIATION-ACCEPTANCE-20261015",
   "exact_owner_text": "**Owner decision — `LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1`**\nПринимаю одно документированное отклонение: создание при review пустой локальной `.venv` (~0.49 MiB) вопреки исходному запрету. Условия принятия: зависимости не устанавливались, среда не использовалась продуктом или научными вычислениями, архив сохранён, footprint учтён.\nРазрешаю продолжить **только Git delivery** текущего кандидата: устранить delivery blockers, провести необходимые повторные независимые review, обновить evidence bindings, выполнить preflight, push, создать PR и пройти exact-head CI.\nНе переписывать историю нарушения и не представлять первоначальные `NOT_READY` как `PASS` без нового review. Не создавать новые среды, не перезапускать scientific campaign и не менять scientific charges, результаты, контракты или пороги ради delivery.\nЭто разрешение не распространяется на реальные данные, grants, provider calls, deploy и merge. Если независимый review остаётся `NOT_READY` или machine gate возвращает `DENY`, остановиться с точным blocker.\nПосле полного CI PASS и `merge-readiness PASS` запросить отдельную exact owner phrase для merge.",
-  "failure_stop": "NEW_INDEPENDENT_NOT_READY_OR_MACHINE_DENY",
+  "failure_stop": "MATERIAL_BOUNDARY_OR_UNRESOLVED_MACHINE_BLOCKER; ROUTINE_NOT_READY_REQUIRES_REPAIR_REVIEW_REBIND",
   "forbidden": [
     "NEW_ENVIRONMENT",
     "NEW_SCIENTIFIC_CAMPAIGN",
@@ -65,6 +65,31 @@
     "DEPLOY",
     "MERGE"
   ],
+  "goal_based_delivery_mandate": {
+    "as_of": "2026-10-15",
+    "authority_interpretation": "Explicit clauses1-7 and stated material boundaries apply; no missing trailing clause or merge authority inferred.",
+    "effective_target": "IMPLEMENTATION_COMPLETE_INDEPENDENTLY_REVIEWED_CI_GREEN_MERGE_READY",
+    "exact_owner_text": "## OWNER DECISION — GOAL-BASED DELIVERY AUTONOMY\n\nTask: `LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1`\nPR: #406\n\nРазрешаю продолжить и самостоятельно довести этот атом до **implementation-complete, independently reviewed, CI-green, merge-ready** состояния.\n\n**Приоритет — согласованный product outcome и научная корректность, а не буквальное соблюдение избыточно узкого первоначального списка файлов.**\n\n### Делегирую исполнителю\n\n1. Самостоятельно исправлять все локальные инженерные дефекты, ошибки интеграции, Catalog/URI/bindings, compatibility fixtures, CLI, tests, docs и derived metadata, непосредственно необходимые для завершения этого атома.\n\n2. Расширять и актуализировать `managed_write_set` текущего task contract на реально необходимые файлы внутри данного outcome. Зафиксировать этот owner mandate в Git и сохранить историю изменений. Не использовать изменение task contract для обхода base Git policy или machine gates.\n\n3. Считать `NOT_READY` от reviewer **задачей на исправление, а не поводом обращаться к владельцу**. Исправить → проверить затронутый seam → повторить необходимый review → обновить evidence. Повторять автономно до PASS либо обнаружения действительно материального blocker.\n\n4. Самостоятельно устранять ошибки CI, регрессии, несовместимые fixtures и локальные недостатки implementation. Разрешены необходимые корректировки продуктового кода в рамках прежнего scientific/functional contract, а не только documentation-only delivery.\n\n5. Самому выбирать минимально достаточные проверки, инструменты, порядок работ и технические решения. Не требовать отдельного согласования на безопасные обратимые инженерные микрошаги. Не плодить вспомогательные PR и задачи.\n\n6. Сохранять утверждённые scientific semantics, историю attempts, семь charges, frozen evidence, source/protection/chronology guards и честные UNKNOWN. Не добиваться PASS изменением oracle или ослаблением требований.\n\n7. После исправлений самостоятельно выполнить весь обычный Git delivery: review, evidence binding, preflight, push, PR update и exact-head CI. **Никаких дополнительных owner-запросов по routine engineering.**\n\n### Когда действительно остановиться\n\nТолько если требуется моё материальное решение: изменение estimand, scientific protocol или согласованного outcome; новые внешние обязательства, credentials/provider/real-data grants, расходы, deployment, необратимые действия; нарушение существенного resource/safety boundary; либо",
+    "historical_decision_git_object": "86ef8bd045fd5a44edf0148f12f25d6eda1b81b8:docs/evidence/list_a_confirming_producer_v1/owner-decision.json",
+    "historical_decision_sha256": "ad7ba748d542bba8dc721387b8905b4567640065946259500e778a0e5b701cff",
+    "no_new_scientific_campaign_authority": true,
+    "origin": "DIRECT_OWNER_MESSAGE",
+    "preserves": [
+      "BASE_GIT_POLICY_AND_MACHINE_GATES",
+      "SCIENTIFIC_SEMANTICS_CORE_AND_THRESHOLDS",
+      "SEVEN_CHARGES_ALL_ATTEMPTS_RESULTS_FROZEN_EVIDENCE",
+      "SOURCE_PROTECTION_CHRONOLOGY_GUARDS",
+      "RESOURCE_BOUNDARY",
+      "HONEST_UNKNOWNS",
+      "SEPARATE_EXACT_MERGE_AUTHORITY"
+    ],
+    "received_message_ends_with": "либо",
+    "supersedes": [
+      "Earlier stop on fresh NOT_READY for routine engineering",
+      "Earlier per-file/narrow documentation-only restrictions within this exact outcome"
+    ]
+  },
+  "historical_failure_stop": "NEW_INDEPENDENT_NOT_READY_OR_MACHINE_DENY",
   "historical_review_git_object": "871682f5ff23fadb053647db146479444b58c073:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
   "historical_review_git_object_sha256": "06cd44aa4076c8dedaae9ca65018286538a83dd96bf87069e227fece1ce9d258",
   "historical_violation_preserved": true,

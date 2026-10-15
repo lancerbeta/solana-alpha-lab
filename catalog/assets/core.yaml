@@ -42887,7 +42887,7 @@ records:
     repository_path: docs/reports/list_a_confirming_producer_v1/OWNER_REPORT.md
   integrity:
     kind: sha256
-    sha256: d33598a8317b44e520607317d3a46fffea3e8415eb24b9b765e60561f5a8bf34
+    sha256: 87a1e238c16af716fe860bb6a261bf6bafbbaa14ac3e22cd2612e3c0db4a6ad8
   access:
     mode: read_only
     method: file
@@ -42926,7 +42926,7 @@ records:
     repository_path: docs/reports/list_a_confirming_producer_v1/REPRODUCE.md
   integrity:
     kind: sha256
-    sha256: ae4d29e13e309e260855e677720378a3ac619ad167c6ce62d8afb6e8ccd476d6
+    sha256: 49e359574be2209b58fe4337e20d9f69e3abaac6c69c734b847e4a1b1b781f7b
   access:
     mode: read_only
     method: file
@@ -43042,7 +43042,7 @@ records:
     repository_path: docs/evidence/list_a_confirming_producer_v1/owner-decision.json
   integrity:
     kind: sha256
-    sha256: ad7ba748d542bba8dc721387b8905b4567640065946259500e778a0e5b701cff
+    sha256: 45a4f52e29881c3d09dc735307a08dda1a90d7eef289e6b9de2c36756b138cbe
   access:
     mode: read_only
     method: file
@@ -43079,7 +43079,7 @@ records:
     repository_path: docs/evidence/list_a_confirming_producer_v1/review-history.json
   integrity:
     kind: sha256
-    sha256: 1bdf2dbe63504847bc537dbe1fc010b32ebaebe65184a7c952e432f154c55d95
+    sha256: 40b99062e2dbf01b098c0e06745da96fc209f6f37777e4670aac526066b69ebb
   access:
     mode: read_only
     method: file
@@ -43112,11 +43112,11 @@ records:
   truth_owner: LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1
   location:
     kind: git_path
-    logical_uri: repo://docs/evidence/list_a_confirming_producer_v1/qualification.json
+    logical_uri: repo://docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json
     repository_path: docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json
   integrity:
     kind: sha256
-    sha256: 5db74b502126ff1f7c7186d3637fcf6b3067d534dfdccbd8224f592c22e8df19
+    sha256: 2f581996df26ba7caad1d628164fae08b00447ddf9144c3de49a32d384125df9
   access:
     mode: read_only
     method: file

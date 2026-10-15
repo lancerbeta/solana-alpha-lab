@@ -1,5 +1,7 @@
 # List A confirming producer: owner handback
 
+Текущий checkpoint15октября: новый owner mandate разрешает автономно закрыть этот outcome до independently-reviewed/CI-green/merge-ready; routineNOT_READY — задача исправления. CatalogURI исправлен, native resolver и независимый exactURI oracle PASS. Productruntime и scientificreceipts/семьcharges неизменны; свежийreview/binding/CI ещёpending. Ниже сохранены исторические checkpoints своихheads. Mergeотдельно.
+
 Текущий P2 checkpoint: **разрешённый точный recovery-copy применён**, 34 narrow checks PASS. На прежнем exploratory TEST source classify и submit отказывают до reservation и направляют остановить этот source, сохранить labels/history и получить отдельную source authority. Targets/evaluator/reservations/charges/store writes: **0/0/0/0/0**; 17 файлов store неизменны. Prior55 compatibility checks и семь scientific charges/results сохранены. Fresh review/bindings/exact-head CI ещё не заявлены; merge не разрешён. Нижеследующие checkpoints сохраняют историю своих heads.
 
 Текущий compatibility checkpoint 15 октября: **55 targeted PASS**, включая source-role provenance; production/scientific bytes не изменены. P2 recovery-copy остаётся незакрытым и не разрешён текущим scope. Fresh review/bindings/fullCI отдельно; прежние NOT_READY и научные результаты ниже относятся к своим historical heads.
@@ -194,3 +196,8 @@ oracle audit — source-role-provenance.json#compatibility_delivery_20261015.
 
 
 Отдельное разрешение owner на P2 от15октября: patch381fc5e1fc06be5768b16facd8c9e6e7eb76ecea8b815f33acaed7877fc335ba меняет только next_action в lane_classifier.py. Терминалы, причина отказа, charge1, UNKNOWN/null и прочие отказы сохранены четырьмя unit branch oracles. Native classify/submit не входят в runner/evaluator и не изменяют прежний TESTstore; scientificcampaign не перезапускалась. 34 direct-consumer tests PASS за6.825s. Новой qualification прежних scientific результатов нет. Уточнение подсчёта прежнего compatibility audit:276 assertion sites состоят из274 assert-method calls и2 Python assert statements; все сохранены. Предыдущие NOT_READY остаются в Git object7de44a91080fc12ed2ef5e179fb1247ef26540ca.
+
+
+Новый goal-based mandate supersedes прежние узкие file/documentation-only и routineNOT_READY stops. История прежнего отказа сохранена через Git86ef8bd. Исправлен один canonicalCataloglogicalURI, derivedнавигация пересоздаётся штатно. Дополнительного managed_write_set expansion для этого URI не требуется. Material science/resource/external boundaries и exact mergegate сохраняются.
+
+Catalog direct-consumer regression:26PASS/9.900s, включая strictschema, ranked/exactURI search, resolver и livegoldqueries. Product/sciencebytes не менялись. Fresh4-role review, rebind и exact-headCI следуют отдельно; этот contentfreeze не утверждает их PASS.

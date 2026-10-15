@@ -197,6 +197,48 @@
   "fresh_exact_head_ci": "NOT_RUN_NOT_PUSHED",
   "fresh_preflight": "PENDING",
   "fresh_review": "PENDING",
+  "goal_autonomy_catalog_uri_20261015": {
+    "applied_patch_sha256": "1905509a6739b08083ba296c55b77e7dec88cd75b4a3c45de14f395328208e5d",
+    "as_of": "2026-10-15",
+    "asset_id": "EVID-LIST-A-CONFIRMING-SOURCE-ROLE-001",
+    "catalog_regression": {
+      "checks": 26,
+      "elapsed_seconds": 9.9,
+      "module": "tests.test_catalog_canonical_binding_discovery",
+      "new_environments": 0,
+      "new_scientific_runs": 0,
+      "status": "PASS",
+      "trace_sha256": "02a0d2e5eb3159228986c16ea4ffac7890fe845517e8863e3c3ec4a59cb1cfe9"
+    },
+    "correct_logical_uri": "repo://docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json",
+    "exact_uri_identity_match": {
+      "asset_id": "EVID-LIST-A-CONFIRMING-SOURCE-ROLE-001",
+      "matched_by": [
+        {
+          "component": "EXACT_LOGICAL_URI",
+          "value": "repo://docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json"
+        }
+      ],
+      "score": 98000
+    },
+    "fresh_reviews_binding_ci": "PENDING",
+    "historical_NOT_READY_preserved": true,
+    "independent_oracle": "Logical URI equals repo://repository_path and targets the evidence whose bytes match integrity; exact-URI ranked discovery returns this asset with EXACT_LOGICAL_URI identity.",
+    "merge_authority": false,
+    "named_charges_unchanged": 7,
+    "new_containers": 0,
+    "new_environments": 0,
+    "new_named_scientific_runs": 0,
+    "old_logical_uri": "repo://docs/evidence/list_a_confirming_producer_v1/qualification.json",
+    "ordinary_resolve_receipt": {
+      "raw_utf8": "{\r\n  \"access\": {\r\n    \"method\": \"file\",\r\n    \"mode\": \"read_only\",\r\n    \"network_required\": false,\r\n    \"secrets_required\": false\r\n  },\r\n  \"as_of\": \"2026-10-14\",\r\n  \"asset_id\": \"EVID-LIST-A-CONFIRMING-SOURCE-ROLE-001\",\r\n  \"asset_type\": \"control_document\",\r\n  \"classification\": {\r\n    \"contains_raw_data\": false,\r\n    \"contains_secrets\": false,\r\n    \"sensitivity\": \"INTERNAL_NON_SECRET\"\r\n  },\r\n  \"consumers\": [\r\n    \"FACTORY-001\",\r\n    \"GOAL-OWNER\"\r\n  ],\r\n  \"evidence\": [],\r\n  \"integrity\": {\r\n    \"kind\": \"sha256\",\r\n    \"sha256\": \"5db74b502126ff1f7c7186d3637fcf6b3067d534dfdccbd8224f592c22e8df19\"\r\n  },\r\n  \"location\": {\r\n    \"kind\": \"git_path\",\r\n    \"logical_uri\": \"repo://docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json\",\r\n    \"repository_path\": \"docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json\"\r\n  },\r\n  \"origin\": \"REPOSITORY\",\r\n  \"purpose\": \"Retain the P1 role-laundering witness, same-source typed refusal, independent metadata oracle, zero preflight target decodes and bounded delivery blockers\",\r\n  \"record_version\": \"1.0\",\r\n  \"relations\": [\r\n    {\r\n      \"relation_type\": \"governed_by\",\r\n      \"target_asset_id\": \"CTRL-LIST-A-CONFIRMING-EXECUTION-001\"\r\n    }\r\n  ],\r\n  \"search_terms\": [\r\n    \"LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1\",\r\n    \"List A confirmation\",\r\n    \"Spec 1.5\",\r\n    \"native confirming\",\r\n    \"SYNTHETIC\",\r\n    \"UNBOUND real sample\"\r\n  ],\r\n  \"status\": \"VALIDATED_ACTIVE\",\r\n  \"truth_owner\": \"LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1\"\r\n}\r\n",
+      "sha256": "5468fd64394b9f7319a0c2899cb708b778a076bb6bf76c5e24520a4a99c5b989"
+    },
+    "owner_ref": "repo://docs/evidence/list_a_confirming_producer_v1/owner-decision.json#goal_based_delivery_mandate",
+    "parent_head": "86ef8bd045fd5a44edf0148f12f25d6eda1b81b8",
+    "production_runtime_changed": false,
+    "scientific_receipts_unchanged": true
+  },
   "independent_oracle": "Original exploratory role and forbidden=true dominate external untouched role/false; same retained immutable source bytes refuse on every ordinary metadata entry point",
   "merge_phrase_requested": false,
   "named_campaign_charges_unchanged": 7,

@@ -221,3 +221,10 @@ python -B -m unittest tests.test_fast_lane_classifier tests.test_list_a_confirma
 Expected34 PASS on shared existing runtime; no new environment/install. Prior55
 compatibility checks need not repeat for a copy-only change. No campaign replay,
 requalification of saved science, REAL scope or merge authority follows.
+
+
+## Goal-based delivery and source-role Catalog URI
+
+python -B scripts/catalog_cli.py resolve-asset EVID-LIST-A-CONFIRMING-SOURCE-ROLE-001 --json
+
+Expected location.logical_uri is repo://docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json, exactly repo:// plus repository_path. Match integrity against those bytes, then exact-URI discovery must return the same asset with EXACT_LOGICAL_URI. Native harness_sync owns all derived propagation. Original wrong-URI resolver witness/review remain in Git86ef8bd; no science is rerun or requalified. New owner mandate governs autonomous routine repair/review/bind/CI, preserving base policy and exact merge authority.

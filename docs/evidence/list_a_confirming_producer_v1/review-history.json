@@ -66,9 +66,22 @@
         "OWNER_UX_CRITIC": "NOT_READY"
       },
       "verdict": "NOT_READY"
+    },
+    {
+      "git_object": "86ef8bd045fd5a44edf0148f12f25d6eda1b81b8:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+      "git_object_sha256": "42085c82b1b8d22345b63d4a06385c695229d8d40a64d74be63b749cbf21eada",
+      "reason": "Actual recovery-copy review: codeNOT_READY solelywrongCatalogURI, other3PASS. New goal-based autonomy permits engineering repair/review, never retroactive verdict conversion.",
+      "reviewed_candidate_head": "6c72738caa261175a1dee94aa66aa1e4ff197102",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "PASS",
+        "CODE_REVIEWER": "NOT_READY",
+        "GOAL_DOD_CRITIC": "PASS",
+        "OWNER_UX_CRITIC": "PASS"
+      },
+      "verdict": "NOT_READY"
     }
   ],
-  "next_review": "NEW_ISOLATED_REVIEW_AFTER_SEPARATELY_AUTHORIZED_P2_RECOVERY_COPY",
+  "next_review": "NEW_REQUIRED_FOUR_ROLE_REVIEW_AFTER_CATALOG_URI_AND_OWNER_MANDATE",
   "schema": "smial.list-a-confirmation-review-history",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1"

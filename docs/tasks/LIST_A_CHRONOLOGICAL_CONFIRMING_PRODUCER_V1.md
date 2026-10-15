@@ -145,3 +145,17 @@ keep labels/history, require separate source authority; preserve guards, termina
 charge1 and all other refusals. Narrow checks and ordinary Git delivery only;
 no new scientific runs, real data or merge. Prior extension limits remain scoped
 to their historical phase, not retroactively rewritten.
+
+Owner GOAL-BASED DELIVERY AUTONOMY mandate 2026-10-15 for this task/PR406:
+finish implementation-complete, independently-reviewed, CI-green, merge-ready.
+Current effective owner authority is owner-decision.json#goal_based_delivery_mandate.
+Outcome-local product/CLI/tests/Catalog/URI/bindings/fixtures/docs/derived repairs
+and necessary exact managed_write_set updates are autonomous. Reviewer NOT_READY
+is repair work, not an owner micro-gate; repair, verify, independently re-review,
+rebind and repeat normal delivery. This supersedes earlier per-file limitations
+and routine NOT_READY stops without retroactively changing history. Frozen base
+policy/machine gates, scientific contract/guards/core, all seven charges/results,
+resource boundary and honest UNKNOWN remain. No new named scientific campaign,
+real-data/provider/grant/credential/spend/deploy or merge authority is implied.
+Stop at a material boundary or exact merge gate. No write-set addition needed
+for the current Catalog URI repair: all actual paths are already covered.
