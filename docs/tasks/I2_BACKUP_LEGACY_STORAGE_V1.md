@@ -230,3 +230,11 @@ meaning. Prove refusal releases a separate ordinary SQLite writer, creates no
 accepted checkpoint/marker, and preserves normal/legacy full-delta closure.
 Single in-flight OS/native calls remain non-preemptible; state that limit and
 do not claim a hard real-time guarantee or production latency acceptance.
+
+The follow-up sweep on 481360b6 found two remaining Python loops under writer
+leases: staged SQLite hash reads and multi-file cache deletion. Apply the same
+cooperative deadline before each subsequent read/unlink/rmdir. Cache exhaustion
+must yield with its existing durable partial-delete token, then resume through
+the ordinary caller without weakening owner/inode/CAS/pin checks. Verify actual
+stream/file operations with an independent SQLite writer. No new authority,
+scientific owner change or additional production scope follows.

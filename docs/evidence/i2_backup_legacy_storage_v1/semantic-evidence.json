@@ -1,15 +1,15 @@
 [
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/proof.json",
-    "sha256_or_fingerprint": "a753debf7c1ebda73034261b2cbdd7381fa8388f7815a95d7449993540df020d"
+    "sha256_or_fingerprint": "36e51dd99c3425a181490694c00e8c551f7dd472af57f865b1798048168cc67e"
   },
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md",
-    "sha256_or_fingerprint": "dd955b970ca4e338b0741028fe67eafeacfe873849abce757e7db3a24f0172ec"
+    "sha256_or_fingerprint": "08af3186165bf8aa8d353763d2402c8f42de208a15ea53bafa8938f4e01d3617"
   },
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md",
-    "sha256_or_fingerprint": "c015c66af4a998d55658f1f2c31b763aa98726810f79a6112da4c11b9ad08b0b"
+    "sha256_or_fingerprint": "81624e70e0235f741001ed29e209b547cba38f71c87b378849660641d84d86ff"
   },
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/review-follow-up.md",

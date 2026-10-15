@@ -555,6 +555,61 @@ print(json.dumps(remote.package_backup(root,config=config,sink_override=sink,pru
     def test_control_lookup_checks_deadline_inside_native_history(self) -> None:
         self._assert_recovery_closure_deadline("control")
 
+    def test_staged_sqlite_hash_checks_shared_deadline_before_each_chunk(self) -> None:
+        source = self.root/OPS
+        with closing(sqlite3.connect(source)) as conn:
+            conn.execute("CREATE TABLE large_native_payload(body BLOB)")
+            conn.execute("INSERT INTO large_native_payload VALUES(zeroblob(6291456))")
+            conn.commit()
+        before = source.read_bytes()
+        opened = Path.open
+        clock = [0.0]
+        reads, blocked = [], []
+
+        class NativeHashReader:
+            def __init__(reader, handle):
+                reader.handle = handle
+            def __enter__(reader):
+                reader.handle.__enter__()
+                return reader
+            def __exit__(reader, *args):
+                return reader.handle.__exit__(*args)
+            def read(reader, count=-1):
+                reads.append(clock[0])
+                with closing(sqlite3.connect(source,timeout=0)) as peer:
+                    try:
+                        peer.execute("BEGIN IMMEDIATE")
+                    except sqlite3.OperationalError:
+                        blocked.append(True)
+                    else:
+                        blocked.append(False)
+                        peer.rollback()
+                data = reader.handle.read(count)
+                clock[0] += 0.06
+                return data
+
+        def observed_open(path, *args, **kwargs):
+            handle = opened(path,*args,**kwargs)
+            if (args and args[0] == "rb" and path.name == source.name
+                    and any(part.startswith("capture-") for part in path.parts)):
+                return NativeHashReader(handle)
+            return handle
+
+        with patch.object(remote,"BACKUP_CAPTURE_FENCE_SECONDS",0.10), patch.object(
+                remote.time,"monotonic",side_effect=lambda:clock[0]), patch.object(Path,"open",observed_open):
+            with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED"):
+                self.full()
+        self.assertEqual(reads,[0.0,0.06])
+        self.assertEqual(blocked,[True,True])
+        self.assertEqual(source.read_bytes(),before)
+        with closing(sqlite3.connect(source,timeout=0)) as peer:
+            peer.execute("BEGIN IMMEDIATE")
+            peer.rollback()
+        self.assertFalse(self.sink.exists() and list(self.sink.glob("*.zip")))
+        self.assertFalse(list((self.root/remote.BACKUP_SNAPSHOT_STAGING_RELATIVE).glob("capture-*")))
+        # Hash consumers outside capture keep the existing ordinary API.
+        self.assertEqual(remote._sha256_file(source),hashlib.sha256(before).hexdigest())
+
     def test_recovery_manifest_census_refuses_before_materialized_native_reads(self) -> None:
         from solana_alpha_lab.factory.research_store import ResearchStore
         self._seed_real_control_activation()

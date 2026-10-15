@@ -1868,6 +1868,51 @@ def refresh_checkpoint_archive(
         store.close()
 
 
+def _remove_checkpoint_archive_cache(target: Path, entries: list[tuple[Path, bool]], *,
+        deadline: float, cache_binding: Mapping[str, int]) -> None:
+    """Delete a bounded, no-follow census, yielding between native OS calls."""
+    from solana_alpha_lab.factory.observation_schedule_retention import ObservationScheduleRetentionError
+
+    def check_budget() -> None:
+        if time.monotonic() >= deadline:
+            raise ObservationScheduleRetentionError("CACHE_RELEASE_BUDGET")
+
+    def directory(path: Path) -> os.stat_result:
+        check_budget()
+        info = path.lstat()
+        if (not stat.S_ISDIR(info.st_mode) or stat.S_ISLNK(info.st_mode)
+                or getattr(info, "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)):
+            raise OffhostBackupError("CHECKPOINT_CACHE_RELEASE_TARGET_UNSAFE")
+        return info
+
+    # The census is finite before sorting or mutation. Parents follow their
+    # children; every destructive operation gets the original phase deadline.
+    check_budget()
+    ordered = sorted(entries, key=lambda item: len(item[0].parts), reverse=True)
+    for candidate, is_directory in [*ordered, (target, True)]:
+        root_stat = directory(target)
+        if {"device": root_stat.st_dev, "inode": root_stat.st_ino} != dict(cache_binding):
+            raise ObservationScheduleRetentionError("CHECKPOINT_CACHE_RELEASE_DELETION_IDENTITY_CONFLICT")
+        if candidate != target:
+            if not candidate.is_relative_to(target):
+                raise OffhostBackupError("CHECKPOINT_CACHE_RELEASE_TARGET_UNSAFE")
+            for parent in candidate.relative_to(target).parents:
+                directory(target / parent)
+        check_budget()
+        info = candidate.lstat()
+        if (stat.S_ISLNK(info.st_mode)
+                or getattr(info, "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)
+                or stat.S_ISDIR(info.st_mode) != is_directory):
+            raise OffhostBackupError("CHECKPOINT_CACHE_RELEASE_TARGET_UNSAFE")
+        check_budget()
+        # One OS call and transaction cleanup cannot be wall-preempted. No
+        # subsequent unlink/rmdir starts after this cooperative deadline.
+        if is_directory:
+            candidate.rmdir()
+        else:
+            candidate.unlink()
+
+
 def release_checkpoint_archive_cache(root: Path, *, now: datetime,
                                       expected_context: dict[str, Any] | None = None) -> dict[str, Any]:
     """Release only a native source-owned, superseded cache; remote pins stay."""
@@ -1879,6 +1924,7 @@ def release_checkpoint_archive_cache(root: Path, *, now: datetime,
     from solana_alpha_lab.factory.observation_schedule_runtime import load_runtime_config
     from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 
+    started = time.monotonic()
     runtime = load_runtime_config(root, "configs/observation_schedule_runtime_v1.yaml")
     path = root / runtime["ops_store_relative"]
     if not path.is_file():
@@ -1887,16 +1933,25 @@ def release_checkpoint_archive_cache(root: Path, *, now: datetime,
         store = ObservationScheduleStore(path)
         try:
             expected = checkpoint_maintenance_context(store) if expected_context is None else expected_context
+            deadline = None
             # Prepare the durable partial-delete token, then recheck every
             # authority/consumer before deletion in a second short native
             # transaction. A peer change between phases yields. No network
             # runs under either OPS lease.
             for _phase in range(2):
+                if deadline is not None and time.monotonic() >= deadline:
+                    raise ObservationScheduleRetentionError("CACHE_RELEASE_BUDGET")
                 with checkpoint_maintenance_write(store, expected_context=expected, now=now,
                         lease_owner="i2-checkpoint-cache-release"):
                     decision = checkpoint_archive_cache_releasable(store)
                     if decision["status"] != "RELEASABLE":
                         return {"status": decision["status"], "reason": decision.get("reason")}
+                    if deadline is None:
+                        installed = json.loads(expected["controls"]["policy"] or "{}")
+                        budget = installed.get("policy", {}).get("max_wall_seconds", 0)
+                        if not isinstance(budget, (int, float)) or isinstance(budget, bool) or not 0 < budget <= 30:
+                            raise ObservationScheduleRetentionError("CACHE_RELEASE_BUDGET")
+                        deadline = started + budget
                     token = decision["token"]
                     raw_target = Path(token["cache_root"])
                     target = raw_target.resolve()
@@ -1905,27 +1960,29 @@ def release_checkpoint_archive_cache(root: Path, *, now: datetime,
                         raise OffhostBackupError("CHECKPOINT_CACHE_RELEASE_TARGET_UNSAFE")
                     removed_bytes = 0
                     if target.exists():
-                        installed = json.loads(expected["controls"]["policy"] or "{}")
-                        budget = installed.get("policy", {}).get("max_wall_seconds", 0)
-                        if not isinstance(budget, (int, float)) or isinstance(budget, bool) or not 0 < budget <= 30:
-                            raise ObservationScheduleRetentionError("CACHE_RELEASE_BUDGET")
-                        started, entries = time.monotonic(), 0
+                        entries: list[tuple[Path, bool]] = []
                         for candidate in target.rglob("*"):
-                            entries += 1
-                            if entries > BACKUP_PARTITION_SCAN_MAX_FILES or time.monotonic() - started >= budget:
+                            if len(entries) >= BACKUP_PARTITION_SCAN_MAX_FILES or time.monotonic() >= deadline:
                                 raise ObservationScheduleRetentionError("CACHE_RELEASE_BUDGET")
                             if candidate.is_symlink() or not candidate.resolve().is_relative_to(target):
                                 raise OffhostBackupError("CHECKPOINT_CACHE_RELEASE_TARGET_UNSAFE")
-                            if candidate.is_file():
-                                removed_bytes += candidate.stat().st_size
-                        if time.monotonic() - started >= budget:
+                            info = candidate.lstat()
+                            if getattr(info, "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0):
+                                raise OffhostBackupError("CHECKPOINT_CACHE_RELEASE_TARGET_UNSAFE")
+                            entries.append((candidate, stat.S_ISDIR(info.st_mode)))
+                            if stat.S_ISREG(info.st_mode):
+                                removed_bytes += info.st_size
+                        if time.monotonic() >= deadline:
                             raise ObservationScheduleRetentionError("CACHE_RELEASE_BUDGET")
                         if not token.get("deletion_started"):
                             start_checkpoint_archive_cache_deletion(store, token=token, now=now)
+                            if time.monotonic() >= deadline:
+                                raise ObservationScheduleRetentionError("CACHE_RELEASE_BUDGET")
                             continue  # Commit exact deletion authority before any filesystem mutation.
-                        # The census bounds work before delete. Individual OS
-                        # deletion syscalls cannot be hard wall-preempted.
-                        shutil.rmtree(target)
+                        _remove_checkpoint_archive_cache(target, entries, deadline=deadline,
+                            cache_binding=token["deletion_started"]["cache_binding"])
+                    if time.monotonic() >= deadline:
+                        raise ObservationScheduleRetentionError("CACHE_RELEASE_BUDGET")
                     _acknowledge_checkpoint_archive_cache_release(store,
                         checkpoint_sha256=token["checkpoint_sha256"])
                     break

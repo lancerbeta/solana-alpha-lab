@@ -1051,11 +1051,122 @@ class CheckpointRefreshPolicyRecoveryTests(NativeFixture):
                     if peer is not None:peer.close()
                     fixture.tearDown()
 
+    def test_cache_release_deadline_spans_prepare_and_each_native_delete_then_resumes(self):
+        from solana_alpha_lab.factory import offhost_backup as backup
+        document,pending,remote_root=self.pending_checkpoint()
+        config,remote,transport=self.native_refresh_transport(remote_root)
+        with patch.object(backup,'load_offhost_config',return_value=config):
+            self.assertEqual(backup.refresh_checkpoint_archive(self.hot,{},now=NOW,runner=transport)['status'],'REGISTERED')
+            add_call(self.store,'THIRD',rowid=47,size=1000)
+            receipt=backup.run_offhost_checkpoint(self.hot,mode='daily',config=config,
+                runner=transport,now=NOW+timedelta(seconds=2))
+            self.assertEqual(backup.refresh_checkpoint_archive(self.hot,receipt,
+                now=NOW+timedelta(seconds=2),runner=transport)['status'],'REGISTERED')
+        old=owner._control(self.store,'checkpoint_archive_cache_release')
+        target=Path(old['cache_root'])
+        document={**document,'revision':2,'max_wall_seconds':0.15,'auto_retire_terminal':False}
+        owner.install_maintenance_policy(self.store,policy=document,
+            approved_sha256=owner.policy_sha256(document),now=NOW+timedelta(seconds=3))
+        pins=list(self.store._conn.execute('SELECT * FROM retention_archive_pins ORDER BY object_name'))
+        rows=list(self.store._conn.execute('SELECT rowid,* FROM call_ledger ORDER BY rowid'))
+        files={p.relative_to(target).as_posix():p.read_bytes() for p in target.rglob('*') if p.is_file()}
+        original_unlink=backup.os.unlink
+        start_deletion=owner.start_checkpoint_archive_cache_deletion
+        clock=[0.0]
+        deletions=[]
+        def prepare(*args,**kwargs):
+            start_deletion(*args,**kwargs)
+            clock[0]+=0.10
+        def unlink(path,*args,**kwargs):
+            candidate=Path(path)
+            if candidate.is_absolute() and candidate.is_relative_to(target):
+                with closing(sqlite3.connect(self.path,timeout=0)) as peer:
+                    try:
+                        peer.execute('BEGIN IMMEDIATE')
+                    except sqlite3.OperationalError:
+                        blocked=True
+                    else:
+                        blocked=False
+                        peer.rollback()
+                deletions.append((clock[0],blocked))
+                clock[0]+=0.04
+            return original_unlink(path,*args,**kwargs)
+        def native_initial(root,*,now,**kwargs):
+            return owner.run_maintenance_step(self.store,now=now,pressure=SAFE,**kwargs)
+        with patch.object(backup.time,'monotonic',side_effect=lambda:clock[0]), \
+                patch.object(owner,'start_checkpoint_archive_cache_deletion',side_effect=prepare), \
+                patch.object(backup.os,'unlink',side_effect=unlink), \
+                patch.object(owner,'maintenance_after_checkpoint',side_effect=native_initial):
+            result=backup.run_checkpoint_maintenance(self.hot,{},now=NOW+timedelta(seconds=4),
+                runner=lambda argv:self.fail('cache release needed remote work'))
+        self.assertEqual((result['status'],result['reason']),('YIELD','CACHE_RELEASE_BUDGET'))
+        self.assertEqual([round(stamp,2) for stamp,_ in deletions],[0.10,0.14])
+        self.assertTrue(all(blocked for _,blocked in deletions))
+        deleting=owner._control(self.store,'checkpoint_archive_cache_release')
+        self.assertEqual(deleting['deletion_started']['checkpoint_sha256'],old['checkpoint_sha256'])
+        self.assertTrue(target.exists())
+        remaining={p.relative_to(target).as_posix():p.read_bytes() for p in target.rglob('*') if p.is_file()}
+        self.assertGreater(len(remaining),0)
+        self.assertLess(len(remaining),len(files))
+        self.assertTrue(all(files[name]==data for name,data in remaining.items()))
+        self.assertEqual(list(self.store._conn.execute('SELECT rowid,* FROM call_ledger ORDER BY rowid')),rows)
+        self.assertEqual(list(self.store._conn.execute('SELECT * FROM retention_archive_pins ORDER BY object_name')),pins)
+        with closing(sqlite3.connect(self.path,timeout=0)) as peer:
+            peer.execute('BEGIN IMMEDIATE');peer.rollback()
+        # A fresh native source connection and ordinary pipeline retry consume
+        # the exact committed partial-deletion token without remote work.
+        self.store.close();self.store=ObservationScheduleStore(self.path)
+        self.assertEqual(owner._control(self.store,'checkpoint_archive_cache_release'),deleting)
+        original_rmdir=backup.os.rmdir
+        clock[0]=0.0
+        def last_rmdir(path,*args,**kwargs):
+            original_rmdir(path,*args,**kwargs)
+            if Path(path)==target:
+                clock[0]+=0.20  # One in-flight syscall may cross the deadline.
+        with patch.object(backup.time,'monotonic',side_effect=lambda:clock[0]), \
+                patch.object(backup.os,'rmdir',side_effect=last_rmdir), \
+                patch.object(owner,'maintenance_after_checkpoint',side_effect=native_initial):
+            before_ack=backup.run_checkpoint_maintenance(self.hot,{},now=NOW+timedelta(seconds=65),
+                runner=lambda argv:self.fail('partial cache resume needed remote work'))
+        self.assertEqual((before_ack['status'],before_ack['reason']),('YIELD','CACHE_RELEASE_BUDGET'))
+        self.assertFalse(target.exists())
+        self.assertEqual(owner._control(self.store,'checkpoint_archive_cache_release'),deleting)
+        # Missing-target recovery still applies the current original deadline
+        # before ACK; an expired metadata read cannot discard the token.
+        decision=owner.checkpoint_archive_cache_releasable
+        clock[0]=0.0
+        def delayed_decision(store):
+            result=decision(store)
+            clock[0]+=0.20
+            return result
+        with patch.object(backup.time,'monotonic',side_effect=lambda:clock[0]), \
+                patch.object(owner,'checkpoint_archive_cache_releasable',side_effect=delayed_decision):
+            with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,'CACHE_RELEASE_BUDGET'):
+                backup.release_checkpoint_archive_cache(self.hot,now=NOW+timedelta(seconds=66))
+        self.assertEqual(owner._control(self.store,'checkpoint_archive_cache_release'),deleting)
+        with patch.object(owner,'maintenance_after_checkpoint',side_effect=native_initial):
+            resumed=backup.run_checkpoint_maintenance(self.hot,{},now=NOW+timedelta(seconds=125),
+                runner=lambda argv:self.fail('delete-before-ACK resume needed remote work'))
+        self.assertEqual(resumed['status'],'COMPLETE',resumed)
+        self.assertEqual(resumed['cache_release']['status'],'RELEASED')
+        self.assertFalse(target.exists())
+        self.assertIsNone(owner._control(self.store,'checkpoint_archive_cache_release'))
+        self.assertEqual(list(self.store._conn.execute('SELECT rowid,* FROM call_ledger ORDER BY rowid')),rows)
+        self.assertEqual(list(self.store._conn.execute('SELECT * FROM retention_archive_pins ORDER BY object_name')),pins)
+        print('I2_CACHE_RELEASE_DEADLINE '+json.dumps({'budget_seconds':0.15,
+            'prepare_seconds':0.10,'delete_seconds':0.04,
+            'native_unlink_starts_seconds':[round(stamp,2) for stamp,_ in deletions],
+            'writer_blocked_each_delete':[blocked for _,blocked in deletions],
+            'terminal':result['reason'],'partial_token_survived':True,'raw_rows_and_rowids_preserved':True,
+            'remote_pins_preserved':True,'ordinary_resume':resumed['cache_release']['status'],
+            'delete_before_ack_budget_yield':before_ack['reason'],'absent_target_expired_ack_refused':True}))
+
     def test_cache_release_context_and_consumer_decision_share_native_fence(self):
         from solana_alpha_lab.factory import offhost_backup as backup
         document,pending,remote_root=self.pending_checkpoint()
         config,remote,transport=self.native_refresh_transport(remote_root)
         peer=ObservationScheduleStore(self.path)
+        peer._conn.execute('PRAGMA busy_timeout=0')
         try:
             # Native independent readback and registration produce both cache
             # generations and the actual release token; no fabricated proof.
@@ -1095,16 +1206,16 @@ class CheckpointRefreshPolicyRecoveryTests(NativeFixture):
                 from itertools import count
                 budget_patch=(patch.object(backup,'BACKUP_PARTITION_SCAN_MAX_FILES',0) if budget=='entries'
                     else patch.object(backup.time,'monotonic',side_effect=count(0,100)))
-                with budget_patch,patch.object(backup.shutil,'rmtree',side_effect=AssertionError('budget deleted files')):
+                with budget_patch,patch.object(backup,'_remove_checkpoint_archive_cache',side_effect=AssertionError('budget deleted files')):
                     with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,'CACHE_RELEASE_BUDGET'):
                         backup.release_checkpoint_archive_cache(self.hot,now=NOW)
                 self.assertEqual(owner._control(self.store,'checkpoint_archive_cache_release'),old)
                 self.assertEqual({path.relative_to(target).as_posix():path.read_bytes()
                     for path in target.rglob('*') if path.is_file()},files_before)
-            def interrupted_intent(path):
+            def interrupted_intent(path,*args,**kwargs):
                 (path/'.remote-restore-intent.json').unlink()
                 raise RuntimeError('process lost after removing owner intent')
-            with patch.object(backup.shutil,'rmtree',side_effect=interrupted_intent):
+            with patch.object(backup,'_remove_checkpoint_archive_cache',side_effect=interrupted_intent):
                 with self.assertRaisesRegex(RuntimeError,'process lost'):
                     backup.release_checkpoint_archive_cache(self.hot,now=NOW)
             deleting=owner._control(self.store,'checkpoint_archive_cache_release')
@@ -1121,11 +1232,11 @@ class CheckpointRefreshPolicyRecoveryTests(NativeFixture):
                 backup.release_checkpoint_archive_cache(self.hot,now=NOW)
             self.assertTrue(intent.is_file())
             intent.unlink()
-            def interrupted_bindings(path):
+            def interrupted_bindings(path,*args,**kwargs):
                 Path(old['archive_path']).unlink()
                 Path(old['inventory_path']).unlink()
                 raise RuntimeError('process lost after removing archive and index')
-            with patch.object(backup.shutil,'rmtree',side_effect=interrupted_bindings):
+            with patch.object(backup,'_remove_checkpoint_archive_cache',side_effect=interrupted_bindings):
                 with self.assertRaisesRegex(RuntimeError,'process lost'):
                     backup.release_checkpoint_archive_cache(self.hot,now=NOW)
             self.assertEqual(owner._control(self.store,'checkpoint_archive_cache_release'),deleting)

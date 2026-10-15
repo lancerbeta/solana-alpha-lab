@@ -309,3 +309,20 @@ exact causal closure и old full/new delta semantics сохранены. Native 
 writer/cleanup oracle и нормальные direct consumers записаны в proof.json.
 Один начатый OS/native вызов нельзя жёстко прервать: это cooperative deadline,
 а не hard real-time гарантия. Actual Linux latency/collector gaps — mandatory B/C.
+
+## Writer-lease I/O loops
+
+Независимый sweep на `481360b6` нашёл ещё два Python-цикла под writer leases:
+SHA256 staged SQLite и multi-file cache cleanup. В первом native 6MiB/60ms-read
+при budget0.10s давал 7 новых чтений после deadline и refusal через0.561s;
+во втором actual verified cache, budget0.15s и40ms-unlink возвращал RELEASED
+через0.384s. Независимый SQLite writer оставался blocked во время операций.
+Это последовательные вызовы, поэтому оговорка об одном OS syscall их не покрывала.
+
+Shared capture deadline теперь проверяется перед каждым hash chunk read.
+Cache release проверяет исходный бюджет между отдельными unlink/rmdir и перед
+ACK; при исчерпании уступает writer, сохраняет durable partial-delete token и
+продолжается обычным caller. Owner/inode/CAS checks и remote pins сохранены.
+Native red/green, next-call resume и direct-consumer results находятся в proof.
+Один уже начатый OS/native вызов и обязательный cleanup остаются non-preemptible;
+actual Linux latency/collector gaps — mandatory B/C, не подтверждённый результат.

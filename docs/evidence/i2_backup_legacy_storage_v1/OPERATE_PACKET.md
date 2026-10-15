@@ -86,6 +86,15 @@ writers. Проверить incident/last-good и повторить обычн�
 отбросить causal dependencies или молча поднять limits. Один уже начатый OS/native
 вызов не preemptible; Linux filesystem latency и collector gaps измерить при B/C.
 
+
+Writer-lease I/O проверяет budget перед каждым SHA256 chunk-read captured SQLite
+и между отдельными cache unlink/rmdir. При `CACHE_RELEASE_BUDGET` ordinary
+maintenance возвращает `YIELD`: durable partial-delete token сохраняется,
+writer освобождается, следующий обычный вызов продолжает exact cleanup.
+Не удалять token/cache вручную и не менять authority ради ускорения. Remote
+checkpoint pins сохраняются. ACK возможен только после полного owned cleanup
+и проверки оставшегося бюджета; один уже начатый native/OS вызов не preemptible.
+
 ## 2. Подготовка exact destructive APPLY
 
 На consistent изолированной копии уточнить известный benchmark: exact legacy

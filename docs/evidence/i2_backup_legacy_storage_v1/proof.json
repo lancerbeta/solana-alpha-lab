@@ -1362,6 +1362,332 @@
       },
       "scientific_semantics": "Exact OPS control/publication/authority causal closure still required; native scientific parsers/verifiers unchanged; absent/corrupt closure refuses without accepted marker.",
       "limit": "Cooperative monotonic deadline stops subsequent work; individual in-flight OS/native calls cannot be hard-preempted. Installed filesystem latency and live collector gaps remain mandatory B/C acceptance."
+    },
+    "writer_lease_io_loop_remediation": {
+      "observed_head": "481360b63c74d0127a5515ca4c1e4c0a100a5932",
+      "prior_packet_fingerprint_sha256": "41d678b53ffb475d00ca133a4f3cfee6c5f8ebe406512e85405dc7c3b88e437c",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "NOT_READY",
+        "ARCHITECTURE_CRITIC": "NOT_READY",
+        "GOAL_DOD_CRITIC": "NOT_READY"
+      },
+      "before": {
+        "independent_architecture_hash_oracle": {
+          "sqlite_bytes": 6291456,
+          "budget_seconds": 0.1,
+          "delay_per_read_seconds": 0.06,
+          "read_starts_seconds": [
+            0.055,
+            0.118,
+            0.182,
+            0.244,
+            0.306,
+            0.369,
+            0.432,
+            0.493
+          ],
+          "new_reads_after_deadline": 7,
+          "independent_writer_blocked_each_read": true,
+          "refusal_wall_seconds": 0.561
+        },
+        "independent_goal_hash_oracle": {
+          "sqlite_bytes": 8388608,
+          "budget_seconds": 0.1,
+          "delay_per_read_seconds": 0.03,
+          "read_count": 10,
+          "new_reads_after_deadline": 8,
+          "independent_writer_blocked_each_read": true,
+          "refusal_wall_seconds": 0.391
+        },
+        "independent_code_cache_oracle": {
+          "native_verified_cache_generations": 2,
+          "approved_budget_seconds": 0.15,
+          "delay_per_unlink_seconds": 0.04,
+          "delete_starts_seconds": [
+            0.024,
+            0.069,
+            0.11,
+            0.151,
+            0.193,
+            0.235,
+            0.276,
+            0.318
+          ],
+          "independent_writer_blocked_each_delete": true,
+          "result": "RELEASED",
+          "wall_seconds": 0.384
+        },
+        "meaning": "Python loops issued subsequent native reads/deletions after the budget while retaining writer leases; single-call non-preemption did not cover this behavior."
+      },
+      "native_capture_hash_validation": {
+        "schema": "smial.i2-capture-hash-deadline-followup.v1",
+        "result": "PASS",
+        "base_head": "481360b63c74d0127a5515ca4c1e4c0a100a5932",
+        "source_frozen": true,
+        "owned_paths_sha256": {
+          "src/solana_alpha_lab/factory/remote_ops.py": "95f7b5f1e15cd4484f5174e7f61fe7303ffeb3b8e29428529adee445b9944cd9",
+          "src/solana_alpha_lab/factory/offhost_backup.py": "68d9f333264590a5c2d97ba6b404ac98891d64ad6855e51a956526cc9993fe8a",
+          "tests/test_i2_backup_legacy_storage_v1.py": "28b519aa0b29c559525a5be7f0caa7ef202f0093512bbb4443b5f27fdd18275e",
+          "tests/test_i2_retention_maintenance_v1.py": "03dbd8254d619cbbdc89e75722e43096449a591244c0d22ed00f6c0abcf3e498"
+        },
+        "previous_top_level_record": "Historical completed capture-closure repair; previous base and hashes retained unchanged.",
+        "change": "Existing _sha256_file checks the existing shared capture deadline immediately before and after every native read, including EOF. Outside capture both checks are no-ops.",
+        "before": {
+          "native_command": "uv run --locked --managed-python python -B local/i2_review/architecture_capture_hash_deadline_probe.py",
+          "native_sqlite_payload_bytes": 6291456,
+          "budget_seconds": 0.1,
+          "injected_read_seconds": 0.06,
+          "read_starts_seconds": [
+            0.056629,
+            0.119303,
+            0.182085,
+            0.244482,
+            0.30737,
+            0.370273,
+            0.43337,
+            0.49453
+          ],
+          "reads": 8,
+          "reads_started_after_deadline": 7,
+          "independent_writer_blocked_each_read": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "terminal": "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED",
+          "refusal_wall_seconds": 0.562589,
+          "writer_after_refusal": "ADMITTED",
+          "accepted_backup_zip_count": 0,
+          "regression": {
+            "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1.I2BackupLegacyStorageTests.test_staged_sqlite_hash_checks_shared_deadline_before_each_chunk",
+            "tests_run": 1,
+            "failures": 1,
+            "errors": 0,
+            "wall_seconds": 0.164,
+            "controlled_read_starts_seconds": [
+              0,
+              0.06,
+              0.12,
+              0.18,
+              0.24,
+              0.3,
+              0.36,
+              0.42
+            ]
+          }
+        },
+        "after": {
+          "native_command": "uv run --locked --managed-python python -B local/i2_review/architecture_capture_hash_deadline_probe.py",
+          "budget_seconds": 0.1,
+          "injected_read_seconds": 0.06,
+          "read_starts_seconds": [
+            0.059319
+          ],
+          "reads": 1,
+          "reads_started_after_deadline": 0,
+          "independent_writer_blocked_each_read": [
+            true
+          ],
+          "terminal": "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED",
+          "refusal_wall_seconds": 0.126961,
+          "writer_after_refusal": "ADMITTED",
+          "accepted_backup_zip_count": 0,
+          "controlled_regression": {
+            "read_starts_seconds": [
+              0,
+              0.06
+            ],
+            "writer_blocked_each_read": [
+              true,
+              true
+            ],
+            "source_sqlite_bytes": "UNCHANGED",
+            "owned_capture_staging": "ABSENT",
+            "backup_zip": "ABSENT",
+            "ordinary_hash_outside_capture": "PASS"
+          },
+          "targeted_suite": {
+            "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1 tests.test_i2_retention_maintenance_v1 tests.test_i2_pipeline_v1 tests.test_i2_offhost_checkpoint_v1 tests.test_factory_offhost_backup tests.test_factory_remote_operations tests.test_mutable_backup_zip64_repair_v1",
+            "tests_run": 182,
+            "passed": 181,
+            "skipped": 1,
+            "skip_reason": "Existing POSIX-only symlink proof",
+            "failures": 0,
+            "errors": 0,
+            "wall_seconds": 117.763,
+            "source_binding": "remote_ops and its backup regression were final; suite process loaded offhost before final relocation of original start marker to function entry. The last clock-only delta is covered by final cache regressions, actual slow-delete oracle and final FACTORY_STATIC below."
+          },
+          "factory_static": {
+            "result": "PASS",
+            "wall_seconds": 0.964,
+            "executor": "root",
+            "source_binding": "final stable owned bytes"
+          }
+        },
+        "limits": [
+          "One in-flight native read and transaction rollback/cleanup cannot be interrupted at a hard wall time; no later read or ordinary hash work starts after cooperative deadline detection.",
+          "Injected native I/O timings are isolated fault evidence, not production timing or live B/C capacity proof.",
+          "No new policy, schema, dependency, production mutation or scientific parser owner change."
+        ]
+      },
+      "native_cache_release_validation": {
+        "schema": "smial.i2-cache-release-deadline-validation.v1",
+        "result": "PASS",
+        "base_head": "481360b63c74d0127a5515ca4c1e4c0a100a5932",
+        "source_frozen": true,
+        "owned_paths_sha256": {
+          "src/solana_alpha_lab/factory/remote_ops.py": "95f7b5f1e15cd4484f5174e7f61fe7303ffeb3b8e29428529adee445b9944cd9",
+          "src/solana_alpha_lab/factory/offhost_backup.py": "68d9f333264590a5c2d97ba6b404ac98891d64ad6855e51a956526cc9993fe8a",
+          "tests/test_i2_backup_legacy_storage_v1.py": "28b519aa0b29c559525a5be7f0caa7ef202f0093512bbb4443b5f27fdd18275e",
+          "tests/test_i2_retention_maintenance_v1.py": "03dbd8254d619cbbdc89e75722e43096449a591244c0d22ed00f6c0abcf3e498"
+        },
+        "change": "Existing source-owned deletion token and native backup-plane -> OPS fence now use one original call-entry deadline across prepare, census, partial deletion and ACK. A finite 16384-entry no-follow census precedes a postorder plan; each unlink/rmdir rechecks deadline, root inode, reparse/symlink and ancestor guards. CACHE_RELEASE_BUDGET rolls back ACK and yields through ordinary checkpoint maintenance.",
+        "before": {
+          "command": "uv run --locked --managed-python python -B local/i2_review/repro_cache_release_deadline.py",
+          "oracle": "actual two independently restored and registered cold checkpoint generations",
+          "approved_policy_revision": 2,
+          "budget_seconds": 0.15,
+          "injected_native_unlink_seconds": 0.04,
+          "delete_starts_seconds": [
+            0.024,
+            0.069,
+            0.111,
+            0.153,
+            0.194,
+            0.235,
+            0.277,
+            0.318
+          ],
+          "deletions_started_after_deadline": 5,
+          "independent_writer_blocked_each_delete": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "terminal": "RELEASED",
+          "wall_seconds": 0.367,
+          "released_local_bytes": 460999,
+          "target_exists": false,
+          "regression": {
+            "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.CheckpointRefreshPolicyRecoveryTests.test_cache_release_deadline_spans_prepare_and_each_native_delete_then_resumes",
+            "tests_run": 1,
+            "failures": 1,
+            "errors": 0,
+            "wall_seconds": 1.277,
+            "observed_terminal": "COMPLETE instead of YIELD"
+          }
+        },
+        "after": {
+          "command": "uv run --locked --managed-python python -B local/i2_review/repro_cache_release_deadline.py",
+          "oracle": "same actual two cold generations with actual delayed native os.unlink and independent SQLite writer",
+          "approved_policy_revision": 2,
+          "budget_seconds": 0.15,
+          "injected_native_unlink_seconds": 0.04,
+          "delete_starts_seconds": [
+            0.027,
+            0.072,
+            0.114
+          ],
+          "deletions_started_after_deadline": 0,
+          "independent_writer_blocked_each_delete": [
+            true,
+            true,
+            true
+          ],
+          "terminal": "YIELD",
+          "reason": "CACHE_RELEASE_BUDGET",
+          "wall_seconds": 0.163,
+          "target_exists_after_yield": true,
+          "remaining_files_after_yield": 5,
+          "durable_existing_deletion_token_preserved": true,
+          "writer_after_yield": "ADMITTED",
+          "ordinary_native_resume": "RELEASED",
+          "target_exists_after_resume": false,
+          "release_token_after_resume": null,
+          "source_raw_rows_body_and_rowids": "UNCHANGED",
+          "remote_pins": "UNCHANGED"
+        },
+        "final_controlled_native_regressions": {
+          "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.CheckpointRefreshPolicyRecoveryTests.test_cache_release_deadline_spans_prepare_and_each_native_delete_then_resumes tests.test_i2_retention_maintenance_v1.CheckpointRefreshPolicyRecoveryTests.test_cache_release_context_and_consumer_decision_share_native_fence",
+          "tests_run": 2,
+          "passed": 2,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "wall_seconds": 2.585,
+          "phase_budget_seconds": 0.15,
+          "prepare_seconds": 0.1,
+          "native_delete_seconds": 0.04,
+          "native_unlink_starts_seconds": [
+            0.1,
+            0.14
+          ],
+          "writer_blocked_each_delete": [
+            true,
+            true
+          ],
+          "first_terminal": "YIELD:CACHE_RELEASE_BUDGET",
+          "fresh_source_reopen_token": "PRESERVED",
+          "remaining_file_bytes": "EXACT",
+          "source_call_rows_body_rowids_and_row_clocks": "UNCHANGED",
+          "remote_pins": "UNCHANGED",
+          "ordinary_retry_after_cadence": "RELEASED",
+          "last_rmdir_crossed_budget": "YIELD before ACK; target absent, token preserved",
+          "expired_missing_target_decision": "CACHE_RELEASE_BUDGET before ACK; token preserved",
+          "next_ordinary_missing_target_resume": "RELEASED; token acknowledged",
+          "existing_owner_guards": [
+            "stale exact context refuses",
+            "pre-delete census budget refuses with zero filesystem deletion",
+            "removed owner intent resumes only with prior native deletion token",
+            "still-present modified owner intent refuses",
+            "partial archive/index removal resumes",
+            "replacement root inode refuses",
+            "active consumer decision shares native write fence"
+          ]
+        },
+        "targeted_suite": {
+          "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1 tests.test_i2_retention_maintenance_v1 tests.test_i2_pipeline_v1 tests.test_i2_offhost_checkpoint_v1 tests.test_factory_offhost_backup tests.test_factory_remote_operations tests.test_mutable_backup_zip64_repair_v1",
+          "tests_run": 182,
+          "passed": 181,
+          "skipped": 1,
+          "skip_reason": "Existing POSIX-only symlink proof",
+          "failures": 0,
+          "errors": 0,
+          "wall_seconds": 117.763,
+          "source_binding": "remote_ops and its backup regression were final; suite process loaded offhost before final relocation of original start marker to function entry. The last clock-only delta is covered by final cache regressions, actual slow-delete oracle and final FACTORY_STATIC below."
+        },
+        "factory_static": {
+          "result": "PASS",
+          "wall_seconds": 0.964,
+          "executor": "root",
+          "source_binding": "final stable owned bytes"
+        },
+        "api_and_authority": {
+          "public_signature": "UNCHANGED",
+          "durable_schema": "UNCHANGED; reuse existing deletion_started",
+          "policy": "UNCHANGED; honor installed exact max_wall_seconds",
+          "automatic_pipeline": "typed CACHE_RELEASE_BUDGET becomes YIELD; ordinary next eligible call resumes",
+          "remote_pins": "PRESERVED",
+          "scientific_owner_and_history": "UNCHANGED"
+        },
+        "limits": [
+          "One in-flight filesystem syscall, metadata verification call, commit and rollback cleanup cannot be interrupted at a hard wall time; the next destructive operation does not start after budget detection.",
+          "The isolated injected delay measures cooperative interruption and resumability, not production timing. Live B/C capacity remains UNKNOWN.",
+          "released_local_bytes remains the bytes removed in the successful current call, rather than a new persisted cumulative counter across interrupted calls.",
+          "No production deployment, upload, compaction/reclaim or maintenance activation was performed."
+        ]
+      },
+      "limit": "Cooperative checks stop subsequent operations and preserve resumable state; one in-flight native/OS operation and necessary cleanup cannot be hard-preempted. Production B/C remains mandatory pending."
     }
   },
   "main_integration": {

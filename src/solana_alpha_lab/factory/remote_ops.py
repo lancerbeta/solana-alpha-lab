@@ -80,7 +80,9 @@ def _sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         while True:
+            _capture_closure_step()
             chunk = handle.read(BACKUP_STREAM_CHUNK)
+            _capture_closure_step()
             if not chunk:
                 break
             digest.update(chunk)
