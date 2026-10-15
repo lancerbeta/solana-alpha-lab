@@ -34550,7 +34550,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_operability_signal_calibration_v1.py', repository_path: tests/test_factory_operability_signal_calibration_v1.py}
-  integrity: {kind: sha256, sha256: 724152a96f70047bf2ad5ec01b6d8301038d0aa7f843dc3c5de40dd186268f99}
+  integrity: {kind: sha256, sha256: fac20143420fba1e85c4bd968ff22912dc49760d18723256ee588859f489875a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001}
@@ -34604,7 +34604,7 @@ records:
   as_of: '2026-09-11'
   truth_owner: FACTORY_OPERABILITY_MEMORY_COLLISION_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_operability_memory_collision_repair_v1.py', repository_path: tests/test_factory_operability_memory_collision_repair_v1.py}
-  integrity: {kind: sha256, sha256: 735dfd70877c09a4af05c9a9929857daee7e66f9d0c815323c41ef90a5aeda86}
+  integrity: {kind: sha256, sha256: a8e10ab7738847467c11fe347e194cdb480cac8616bce04629b79feb84894d95}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-OPERABILITY-MEMORY-COLLISION-REPAIR-001}
@@ -42280,7 +42280,7 @@ records:
     repository_path: docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md
   integrity:
     kind: sha256
-    sha256: d6c495fa2e9d60224a385850920de5bc2a1237fedea83883c40e8e94a455229f
+    sha256: 0ea9cb04a649de4634e491806549da1f4e38b198f2df83e64b0ab7fc850eaa3d
   access:
     mode: read_only
     method: file

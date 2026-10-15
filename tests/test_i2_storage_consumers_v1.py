@@ -23,6 +23,18 @@ from solana_alpha_lab.factory import operability_watch as watch  # noqa: E402
 
 
 class StorageConsumerTests(unittest.TestCase):
+    def test_missing_factory_configuration_never_zero_fills_topology(self) -> None:
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            rdp = root / "rdp"
+            rdp.mkdir()
+            ops = root / "ops.sqlite"
+            ops.write_bytes(b"isolated size-only fixture")
+            measured = mc.measure_whole_factory(store=SimpleNamespace(path=ops), data_root=rdp, root=root)
+            self.assertEqual(measured["backup_sink_bytes"], "UNKNOWN")
+            self.assertEqual(measured["other_store_bytes"], "UNKNOWN")
+            self.assertEqual(measured["maintenance_staging_bytes"], "UNKNOWN")
+
     def test_approved_cold_cache_outside_rdp_is_charged(self) -> None:
         with tempfile.TemporaryDirectory() as name:
             root = Path(name)

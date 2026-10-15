@@ -1,6 +1,6 @@
 ---
 task_id: I2_BACKUP_LEGACY_STORAGE_V1
-task_version: '1.0'
+task_version: '1.1'
 status: IN_PROGRESS
 as_of: '2026-10-15'
 owner: GOAL_OWNER
@@ -45,6 +45,8 @@ managed_write_set:
 - tests/test_i2_storage_consumers_v1.py
 - tests/test_i2_pipeline_v1.py
 - tests/test_managed_collection_continuity_v1.py
+- tests/test_factory_operability_signal_calibration_v1.py
+- tests/test_factory_operability_memory_collision_repair_v1.py
 - catalog/assets/**
 - catalog/catalog_manifest.yaml
 - catalog/generated/**

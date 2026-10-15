@@ -1,7 +1,7 @@
 [
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/proof.json",
-    "sha256_or_fingerprint": "fdb68fc9f541016a5e7c83b51860cd65dea94730a80bfb0257d0fbef69f7d016"
+    "sha256_or_fingerprint": "0a422a0e349c6b0e1f292a85493b9f392f9238ec2734e1d8ae5bed61b4a0eb58"
   },
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md",

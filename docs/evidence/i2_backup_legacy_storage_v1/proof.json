@@ -286,6 +286,24 @@
         "tests.test_i2_pipeline_v1"
       ],
       "subsequent_test_only_strengthening": "PASS_4_FORGED_COLD_CASES_NEW_CALL_COUNTER_ADMISSION_SAME_ROWCOUNT_BODY_0.864s"
+    },
+    "ci_fixture_repair": {
+      "failed_run": 38707216385,
+      "failed_head": "b8ed4be809652714065b0db6c54fe454a8129ec7",
+      "cause": "five numeric-runway assertions used disposable roots without factory topology configuration; new consumer correctly returned UNKNOWN",
+      "single_variable_probe": "PASS_ADD_ONLY_CONFIG_AND_SCHEMA_TO_ONE_FAILING_FIXTURE",
+      "fix": "seed existing config/schema in positive fixtures; preserve missing-config UNKNOWN and add real-filesystem negative control",
+      "production_code_changed": false,
+      "targeted_modules": [
+        "tests.test_factory_operability_signal_calibration_v1",
+        "tests.test_factory_operability_memory_collision_repair_v1",
+        "tests.test_i2_storage_consumers_v1"
+      ],
+      "result": "PASS",
+      "tests": 49,
+      "wall_seconds": 1.942,
+      "remaining_first_run_jobs": "ALL_OTHER_SHARDS_SUCCESS_NO_FURTHER_FAILURES",
+      "failed_run_url": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/38707216385"
     }
   },
   "runtime_mandatory_pending": [
