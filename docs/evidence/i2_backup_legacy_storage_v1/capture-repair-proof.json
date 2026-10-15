@@ -263,7 +263,7 @@
     "production-source-shape.json": "91a8d1423f1983b89d8c0221131972d2b2aefc8f37d7d676e3eff19f9e22ad45"
   },
   "source_bindings": {
-    "src/solana_alpha_lab/factory/remote_ops.py": "481239077eb54b90964e35ea2a1ab7c088ec075c2745f5b6beb873c4211d7ea8",
+    "src/solana_alpha_lab/factory/remote_ops.py": "d4bc29f89992ebd53cbc91c3c27f106fc3f138a255be0fe4ea6b47b2953d1fd5",
     "src/solana_alpha_lab/factory/offhost_backup.py": "3769b77f4e18e7923eaca3eb2d7643f60984a83676cb47ab74765c5ac29871fa",
     "tests/i2_capture_rehearsal.py": "0955f11b1fe4e3d4f3b73d6c8e7619fb5e9f39d741ae4a71f658c64090fed2b5"
   },
@@ -293,5 +293,21 @@
       },
       "oracle": "tests.test_i2_backup_legacy_storage_v1.I2BackupLegacyStorageTests.test_deferred_receipt_revalidates_frozen_membership_after_release; final comparable native writer profile"
     }
-  ]
+  ],
+  "measured_source_bindings": {
+    "src/solana_alpha_lab/factory/remote_ops.py": "481239077eb54b90964e35ea2a1ab7c088ec075c2745f5b6beb873c4211d7ea8",
+    "src/solana_alpha_lab/factory/offhost_backup.py": "3769b77f4e18e7923eaca3eb2d7643f60984a83676cb47ab74765c5ac29871fa",
+    "tests/i2_capture_rehearsal.py": "0955f11b1fe4e3d4f3b73d6c8e7619fb5e9f39d741ae4a71f658c64090fed2b5"
+  },
+  "post_proof_mechanical_fix": {
+    "failed_ci_head": "61dc1bb5c80055ee431c7e7de16c213263e94180",
+    "failed_ci_run": 38791038070,
+    "oracle": "test_factory_remote_operations.FactoryRemoteOperationsTests.test_secret_has_no_default",
+    "cause": "Existing source-wide secret-default text guard found diagnostic ContextVar(default=None). No secret default exists; protection test remains unchanged.",
+    "change": "ContextVar has no constructor default; all three reads use get(None). Same fallback and token/reset behavior, no snapshot/data/budget/ZIP/restore path change.",
+    "scale_content_head": "06875d992f7be0b61e24f455ffd2b8f4f9cc4d5c",
+    "scale_rerun": false,
+    "targeted": "PASS_4: exact failed security oracle, pinned snapshot/concurrent commit, deferred missing receipt, real SQLITE_FULL CLI/attempt/last-good",
+    "output_sha256": "befcd68495394486b08859fec66da17fb166b0129c3963963a7b41188688fe78"
+  }
 }

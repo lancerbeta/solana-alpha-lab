@@ -54,7 +54,7 @@ BACKUP_PARTITION_SCAN_MAX_FILES = 16384
 BACKUP_PARTITION_SCAN_MAX_BYTES = 32 * 1024 * 1024
 _CAPTURE_CLOSURE_BUDGET: ContextVar[dict[str, Any] | None] = ContextVar(
     "backup_capture_closure_budget")
-_CAPTURE_TRACE: ContextVar[dict[str, Any] | None] = ContextVar("backup_capture_trace", default=None)
+_CAPTURE_TRACE: ContextVar[dict[str, Any] | None] = ContextVar("backup_capture_trace")
 PROTECTED_LIVE_NAMES = frozenset(
     {
         "observation_rdp",
@@ -72,7 +72,7 @@ class RemoteOpsError(ValueError):
 @contextmanager
 def _capture_phase(name: str, *, size: int = 0, count: int = 0,
                    source: str | None = None) -> Iterator[dict[str, Any]]:
-    trace = _CAPTURE_TRACE.get()
+    trace = _CAPTURE_TRACE.get(None)
     phase: dict[str, Any] = {"elapsed_seconds": 0.0, "bytes": size, "count": count}
     if source is not None:
         phase["source"] = source
@@ -1180,7 +1180,7 @@ def _capture_writer_fences(sources: Sequence[tuple[str, Path, bool]]) -> Iterato
                 raise RemoteOpsError("WRITER_BUSY")
         _capture_closure_step()
         acquired_at = time.monotonic()
-        trace = _CAPTURE_TRACE.get()
+        trace = _CAPTURE_TRACE.get(None)
         if trace is not None:
             trace["writer_fence_wait_seconds"] = round(acquired_at - started, 6)
         yield
@@ -1193,7 +1193,7 @@ def _capture_writer_fences(sources: Sequence[tuple[str, Path, bool]]) -> Iterato
         for conn in reversed(connections):
             conn.rollback()
             conn.close()
-        trace = _CAPTURE_TRACE.get()
+        trace = _CAPTURE_TRACE.get(None)
         if trace is not None:
             # Include release, and partial acquisition on a failed later DB.
             trace["writer_fence_hold_seconds"] = round(time.monotonic() - first_acquired_at, 6) if first_acquired_at is not None else 0.0

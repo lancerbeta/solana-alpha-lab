@@ -29,6 +29,11 @@ integrity/freshness и dependencies не ослаблены. Fence cap30s пре
 ограничен существующим monitoring stall1800s, отдельно от fence; pending публикуется
 после native staging cleanup и сохраняет завершённый trace без изменения identity.
 
+CI выявил только source-wide text guard на diagnostic ContextVar keyword.
+Эквивалентный `get(None)` сохраняет fallback без secret defaults; защитный тест
+не изменён. Failed oracle и три direct capture regressions PASS; scale повторно
+не запускался. Measured-source SHA сохранён отдельно от текущего binding.
+
 Evidence: `capture-repair-proof.json`; reproducible fixture: `tests/i2_capture_rehearsal.py`.
 80 focused tests PASS; required critics рассматривают только follow-up diff, P0/P1.
 Новый production success не заявлен. Полный I2 и Stage C остаются обязательными.
