@@ -169,6 +169,38 @@
       "resolved_by_head": "9ce5ee6a4873b172b48b0824080f571f62d4891c",
       "role": "CODE_REVIEWER",
       "severity": "MINOR"
+    },
+    {
+      "finding": "Relocated unchanged input1.1 sample consumed attempt before cold source-path refusal; shared register/inspect/cold closure now refuses pre-values/reservation",
+      "observed_head": "7e16f3435a98f7bc31fc2ffe4adb8d75ec49ef67",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "eb5e86d667a45b3ee4a12e7480dd3b634b951ff6",
+      "role": "CODE_REVIEWER",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "Owner direction path bound historical CRLF bytes; current LF ref corrected and raw CRLF preserved separately",
+      "observed_head": "7e16f3435a98f7bc31fc2ffe4adb8d75ec49ef67",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "eb5e86d667a45b3ee4a12e7480dd3b634b951ff6",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "CLI maturity null/read-failure falsely unspent; now UNKNOWN blocks new authority, consumed allowance retained, zero proven",
+      "observed_head": "7e16f3435a98f7bc31fc2ffe4adb8d75ec49ef67",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "eb5e86d667a45b3ee4a12e7480dd3b634b951ff6",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "CLI projection omitted stored scientific limits; persisted limits now visible on public result and native cold status/show",
+      "observed_head": "7e16f3435a98f7bc31fc2ffe4adb8d75ec49ef67",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "eb5e86d667a45b3ee4a12e7480dd3b634b951ff6",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
     }
   ],
   "required_roles": [
@@ -177,41 +209,68 @@
     "ARCHITECTURE_CRITIC",
     "OWNER_UX_CRITIC"
   ],
-  "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-SEMANTIC-INTEGRATION-PENDING",
-  "reviewed_bindings_sha256": "b895fb33bece2bb31887066ab6eb349f583d57e7569b4288ec2e2e4375d46339",
-  "reviewed_inventory_sha256": "83075f33b0c92cd62bfc9d7124317ab7944c06dde63cc6b7f06d60daa42d9e96",
+  "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-SEMANTIC-INTEGRATION-FINAL",
+  "reviewed_bindings_sha256": "76c2ff86d042645225556761c48e7c91645f553b326b0cbdbe059ef43c69b233",
+  "reviewed_inventory_sha256": "abffb3d838fffc8badba768ad41966219f7c8f39a465c1e8025c2c8d6e8f1dba",
   "reviews": [
     {
       "findings": [
-        "F02/F01 continuation changed implementation; fresh independent review pending. Previous PASS remains historical in Git and does not qualify this candidate."
+        "Fresh actual isolated read-only review of head1e29a23d5951c87b68d1f5434a62307610203389; baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15; all56 implementation hashes verified. Prior7e16 NOT_READY remains in semantic-integration.json#review_followup and review-history.json; no retrospective conversion.",
+        "reviewed_bindings_sha256=76c2ff86d042645225556761c48e7c91645f553b326b0cbdbe059ef43c69b233; reviewed_inventory_sha256=abffb3d838fffc8badba768ad41966219f7c8f39a465c1e8025c2c8d6e8f1dba; packet_fingerprint_sha256=4ebb48237abb9391c62517e0a9b1895dfe80518feedbc68871991988062a7e09",
+        "F01 original32 daily owners/256admissions/native clocks/fullD128+128/numeric0.125/B4096/coldPRESENT independent ownership oracle. F02 native rounded maturity before values/reservation; mature MISSING_TYPED retains denominator. Source-role laundering forbidden; original labels dominate outer envelope. Seven named charges/core/results immutable; retained engineeringTESTcharges3 separate; no new campaign/REAL/provider/env/dependency/deploy/merge.",
+        "16 direct-consumer PASS includes source-layout alias zero-value/evaluator/record refusal, CLI consumed/null/read-failure safety, actual cold status/show persistedlimits, legacy replay/source-role. Current committed native F02 fiveentrypoint/source-role readbacks values/evaluator/reservations/charges/writes0, originalstores unchanged. Read-only critics did not run tests/product CLI/network/writes/environments.",
+        "Synthetic scope only. REAL source availability/integration UNKNOWN; blindActor/modeldiversity/earlyP0decoder/cleanhost/sharedphysicaltotals unverified. Current content review does not establish exactCI/readiness/ownermergeauthority.",
+        "Actual isolated CODE_REVIEWER PASS; actionable findings none. Independently verified all56 implementation hashes and21 audit refs, retained16PASS log and native zero-value/charge witnesses.",
+        "Prior P2 source-path alias closed: shared exact source layout in registration, inspect and cold result refuses unchanged relocated sample before values/reservation; regression zero evaluator/read/records. CLI unknown/readfailure/consumed preserved and limits visible; LF/rawCRLF references exact. Legacy shape, method, overlap/crash/cold invariants unchanged."
       ],
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     {
       "findings": [
-        "F02/F01 continuation changed implementation; fresh independent review pending. Previous PASS remains historical in Git and does not qualify this candidate."
+        "Fresh actual isolated read-only review of head1e29a23d5951c87b68d1f5434a62307610203389; baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15; all56 implementation hashes verified. Prior7e16 NOT_READY remains in semantic-integration.json#review_followup and review-history.json; no retrospective conversion.",
+        "reviewed_bindings_sha256=76c2ff86d042645225556761c48e7c91645f553b326b0cbdbe059ef43c69b233; reviewed_inventory_sha256=abffb3d838fffc8badba768ad41966219f7c8f39a465c1e8025c2c8d6e8f1dba; packet_fingerprint_sha256=4ebb48237abb9391c62517e0a9b1895dfe80518feedbc68871991988062a7e09",
+        "F01 original32 daily owners/256admissions/native clocks/fullD128+128/numeric0.125/B4096/coldPRESENT independent ownership oracle. F02 native rounded maturity before values/reservation; mature MISSING_TYPED retains denominator. Source-role laundering forbidden; original labels dominate outer envelope. Seven named charges/core/results immutable; retained engineeringTESTcharges3 separate; no new campaign/REAL/provider/env/dependency/deploy/merge.",
+        "16 direct-consumer PASS includes source-layout alias zero-value/evaluator/record refusal, CLI consumed/null/read-failure safety, actual cold status/show persistedlimits, legacy replay/source-role. Current committed native F02 fiveentrypoint/source-role readbacks values/evaluator/reservations/charges/writes0, originalstores unchanged. Read-only critics did not run tests/product CLI/network/writes/environments.",
+        "Synthetic scope only. REAL source availability/integration UNKNOWN; blindActor/modeldiversity/earlyP0decoder/cleanhost/sharedphysicaltotals unverified. Current content review does not establish exactCI/readiness/ownermergeauthority.",
+        "Actual isolated GOAL_DOD_CRITIC PASS; evidence-backed gaps none. Independently recomputed56 committed/worktree bindings,19packet evidence refs and21 semantic links; matches exact frozen candidate.",
+        "F01/F02 accepted outcome met within synthetic scope; original32 owners/fullpopulation, native maturity/maturemissing, sourcealias refusal, CLI zero/consumed/UNKNOWN and limits verified. Original CRLF request retained with separate locator, current LF hash correct. Seven historical charges/core/method immutable and retainedTESTcharges3. REAL integration UNKNOWN."
       ],
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     {
       "findings": [
-        "F02/F01 continuation changed implementation; fresh independent review pending. Previous PASS remains historical in Git and does not qualify this candidate."
+        "Fresh actual isolated read-only review of head1e29a23d5951c87b68d1f5434a62307610203389; baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15; all56 implementation hashes verified. Prior7e16 NOT_READY remains in semantic-integration.json#review_followup and review-history.json; no retrospective conversion.",
+        "reviewed_bindings_sha256=76c2ff86d042645225556761c48e7c91645f553b326b0cbdbe059ef43c69b233; reviewed_inventory_sha256=abffb3d838fffc8badba768ad41966219f7c8f39a465c1e8025c2c8d6e8f1dba; packet_fingerprint_sha256=4ebb48237abb9391c62517e0a9b1895dfe80518feedbc68871991988062a7e09",
+        "F01 original32 daily owners/256admissions/native clocks/fullD128+128/numeric0.125/B4096/coldPRESENT independent ownership oracle. F02 native rounded maturity before values/reservation; mature MISSING_TYPED retains denominator. Source-role laundering forbidden; original labels dominate outer envelope. Seven named charges/core/results immutable; retained engineeringTESTcharges3 separate; no new campaign/REAL/provider/env/dependency/deploy/merge.",
+        "16 direct-consumer PASS includes source-layout alias zero-value/evaluator/record refusal, CLI consumed/null/read-failure safety, actual cold status/show persistedlimits, legacy replay/source-role. Current committed native F02 fiveentrypoint/source-role readbacks values/evaluator/reservations/charges/writes0, originalstores unchanged. Read-only critics did not run tests/product CLI/network/writes/environments.",
+        "Synthetic scope only. REAL source availability/integration UNKNOWN; blindActor/modeldiversity/earlyP0decoder/cleanhost/sharedphysicaltotals unverified. Current content review does not establish exactCI/readiness/ownermergeauthority.",
+        "Actual ARCHITECTURE_CRITIC PASS; SEMANTIC_PREMISE PASS. Frozen packet+diff only,56candidate bindings/19evidence refs/Git bytes verified. packet_fingerprint_sha256=4ebb48237abb9391c62517e0a9b1895dfe80518feedbc68871991988062a7e09. PACKET_INFORMATION_PATH only; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN; builder flags not live-launch attestation.",
+        "Each admission retains original scheduleSHA/activation/frame/UTCcohort/clocks; one compatible frozen template; no duplicate/cohort owner/foreignfamily. Independent raw file/date/join oracle binds full population. Native E14400 deadline <=frozen cutoff before target values/missingness/reservation; mature missing remains D128/128. No mandatory premise correction.",
+        "Source registration, exact execution grant, protection, reservation and result completion remain separate authority boundaries. Kernel lock and committed reservation/RUN_STARTED precede values, acquisition alias never restores allowance. Cold schema/hash/source/grant/reservation/atomic carriers required; orphan not PRESENT. PRESENT availability is not hypothesis acceptance; synthetic nonpromotable. UNKNOWN/null not zero, CLI unknown/consumed blocks new authority and keeps persistedlimits.",
+        "Compatibility keeps closed input1.1 and original1.0/sixfile result closure. Shared input/cold layout prevents charge-before-layout failure. No new foreign private API imports. WithoutDuckDB truth remains Git core/definition, immutable sources/result and ResearchStore committed partitions/manifests; ordinary dossier is derived view. Existing public owners/ResearchStore/kernel lock suffice; no new platform/dependency.",
+        "What can pass tests yet break research validity: inaccurate trusted exposure/source/availability, unseen prior data use, or real dependence/MNAR violating empirical bootstrap coverage. Synthetic conditional observational validation does not prove REAL availability/integration, alpha, causality or frequentist coverage. Premise falsifiers: foreigndaily owner accepted, immature deadline reserves, maturemissing removed fromD, alias resetsallowance, coldPRESENT without whole committedlineage; none found. Local negative terminal is exact protocol/question/boundary, no family closure/strategy authority."
       ],
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     {
       "findings": [
-        "F02/F01 continuation changed implementation; fresh independent review pending. Previous PASS remains historical in Git and does not qualify this candidate."
+        "Fresh actual isolated read-only review of head1e29a23d5951c87b68d1f5434a62307610203389; baseb3fb9d8ecffbffda468dccabaa81ca3392da6f15; all56 implementation hashes verified. Prior7e16 NOT_READY remains in semantic-integration.json#review_followup and review-history.json; no retrospective conversion.",
+        "reviewed_bindings_sha256=76c2ff86d042645225556761c48e7c91645f553b326b0cbdbe059ef43c69b233; reviewed_inventory_sha256=abffb3d838fffc8badba768ad41966219f7c8f39a465c1e8025c2c8d6e8f1dba; packet_fingerprint_sha256=4ebb48237abb9391c62517e0a9b1895dfe80518feedbc68871991988062a7e09",
+        "F01 original32 daily owners/256admissions/native clocks/fullD128+128/numeric0.125/B4096/coldPRESENT independent ownership oracle. F02 native rounded maturity before values/reservation; mature MISSING_TYPED retains denominator. Source-role laundering forbidden; original labels dominate outer envelope. Seven named charges/core/results immutable; retained engineeringTESTcharges3 separate; no new campaign/REAL/provider/env/dependency/deploy/merge.",
+        "16 direct-consumer PASS includes source-layout alias zero-value/evaluator/record refusal, CLI consumed/null/read-failure safety, actual cold status/show persistedlimits, legacy replay/source-role. Current committed native F02 fiveentrypoint/source-role readbacks values/evaluator/reservations/charges/writes0, originalstores unchanged. Read-only critics did not run tests/product CLI/network/writes/environments.",
+        "Synthetic scope only. REAL source availability/integration UNKNOWN; blindActor/modeldiversity/earlyP0decoder/cleanhost/sharedphysicaltotals unverified. Current content review does not establish exactCI/readiness/ownermergeauthority.",
+        "Actual fresh isolated OWNER_UX_CRITIC PASS; confirmed operability gaps none on exact frozenhead/fingerprint.",
+        "Both prior P2 closed: UNKNOWN/read-failure cannot issue new execution authority, wait/rebind only knownzero; consumed stays visible. Public CLI preserves original persisted scientific limits. Review does not claim current CI/readiness/merge authority."
       ],
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     }
   ],
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
-  "verdict": "NOT_READY"
+  "verdict": "PASS"
 }

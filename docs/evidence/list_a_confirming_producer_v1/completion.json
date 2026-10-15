@@ -9,8 +9,8 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/list_a_confirming_producer_v1/factory-fit.json",
-    "sha256": "2884df0129ec5f5afec998b4757db993f1592b920bdd28f622bf09264500ac46",
-    "verdict": "NOT_READY"
+    "sha256": "2d57e11edc5922557516654bd5236504816a178029735e6a8a9d47f69066bbc4",
+    "verdict": "PASS"
   },
   "implementation_bindings": {
     "catalog/assets/core.yaml": "f8498871b610df2259e47327a6a69fc047d16de7fdc6e2e591e356f5934c34e5",
@@ -112,15 +112,15 @@
     "spend": 0,
     "strategy_activation_paper_writes": 0
   },
-  "state_change": "F02 and F01 implementation complete, native synthetic verified: rounded maturity before reservation/values; compatible original daily owners through numeric result/cold dossier; exact typed versioned result source set. Seven historical charges/results/core unchanged. Three separately authorized retained engineering TEST charges and all failures/corrections preserved. Fresh four-role review/evidence binding/exact-head CI/readiness pending; no merge authority.",
+  "state_change": "F01/F02 complete on native synthetic path with original daily identities, maturity pre-values/pre-reservation, versioned typed result/cold dossier. First7e16 NOT_READY findings retained; shared source-layout admission, exact ownerhash, truthful CLI UNKNOWN and persistedlimits repaired. All4fresh actual isolated roles PASS on1e29/fingerprint76c2. 16direct-consumerPASS; retained native F02/source-role zero values/reservation/charge/writes. Seven historical charges/results immutable; three separate retainedTESTcharges and all failures/corrections preserved. Native binding/preflight/fresh exactCI/readiness separate; no mergeauthority.",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
   "validation": {
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/list_a_confirming_producer_v1/independent-review.json",
-      "sha256": "3d480dcf1651bca1656afec9c18c4e62ce5961d3f5d6aca97d569f4aa208c3ad",
-      "verdict": "NOT_READY"
+      "sha256": "61f4806dd017a09b3ef92bcf49aa15f8ad2ce81b55546d32e0d9a68ce16ce4b1",
+      "verdict": "PASS"
     },
     "project_checks": [
       "PASS_ACTUAL_PRE_VALUES_RESERVATION",
@@ -140,8 +140,10 @@
       "PASS_FRESH_FOUR_ROLE_REVIEW_BINDINGS_b895fb33bece2bb31887066ab6eb349f583d57e7569b4288ec2e2e4375d46339",
       "PASS_F02_NATIVE_METADATA_MATURITY_ZERO_VALUES_RESERVATIONS_CHARGES",
       "PASS_F01_ORIGINAL32_DAILY_OWNERS_256_POPULATION_NUMERIC_AND_COLD",
-      "PASS_F01_TYPED_RESULT_LEGACY6_OR_VERSIONED_EXACT5_PLUS_N"
+      "PASS_F01_TYPED_RESULT_LEGACY6_OR_VERSIONED_EXACT5_PLUS_N",
+      "PASS_FRESH_FOUR_ROLE_REVIEW_BINDINGS_76c2ff86d042645225556761c48e7c91645f553b326b0cbdbe059ef43c69b233",
+      "PASS_SHARED_INPUT_COLD_LAYOUT_ZERO_CHARGE_REFUSAL_AND_CLI_UNKNOWN_LIMITS_16_REGRESSIONS"
     ],
-    "targeted": "PASS_F01_NATIVE_DAILY_SET_NUMERIC_COLD_OWNERSHIP_ALIAS;F02_ZERO_VALUE_CHARGE_WITNESS_GRID_GRACE_MISSING;7_RESULT_MATURITY;3_COMPAT;PRIOR67_OF68_WITH_RETAINED_FIXED_RESULT_SCHEMA_ERROR"
+    "targeted": "PASS_F01_NATIVE_DAILY_SET_NUMERIC_COLD_OWNERSHIP_ALIAS;F02_ZERO_VALUE_CHARGE_WITNESS_GRID_GRACE_MISSING;7_RESULT_MATURITY;3_COMPAT;PRIOR67_OF68_WITH_RETAINED_FIXED_RESULT_SCHEMA_ERROR;PASS_16_SEMANTIC_REVIEW_DIRECT_CONSUMERS_AND_CURRENT_NATIVE_READBACKS"
   }
 }
