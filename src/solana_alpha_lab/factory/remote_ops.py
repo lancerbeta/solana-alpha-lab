@@ -20,7 +20,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
-from contextlib import ExitStack, closing, contextmanager
+from contextlib import ExitStack, closing, contextmanager, nullcontext
 from contextvars import ContextVar
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath, PureWindowsPath
@@ -54,6 +54,7 @@ BACKUP_PARTITION_SCAN_MAX_FILES = 16384
 BACKUP_PARTITION_SCAN_MAX_BYTES = 32 * 1024 * 1024
 _CAPTURE_CLOSURE_BUDGET: ContextVar[dict[str, Any] | None] = ContextVar(
     "backup_capture_closure_budget")
+_CAPTURE_TRACE: ContextVar[dict[str, Any] | None] = ContextVar("backup_capture_trace", default=None)
 PROTECTED_LIVE_NAMES = frozenset(
     {
         "observation_rdp",
@@ -66,6 +67,26 @@ PROTECTED_LIVE_NAMES = frozenset(
 
 class RemoteOpsError(ValueError):
     """Raised when remote operations cannot proceed fail-closed."""
+
+
+@contextmanager
+def _capture_phase(name: str, *, size: int = 0, count: int = 0) -> Iterator[dict[str, Any]]:
+    trace = _CAPTURE_TRACE.get()
+    phase: dict[str, Any] = {"elapsed_seconds": 0.0, "bytes": size, "count": count}
+    started = time.monotonic()
+    try:
+        yield phase
+    except BaseException:
+        if trace is not None and trace.get("failure_phase") is None:
+            trace["failure_phase"] = name
+        raise
+    finally:
+        if trace is not None:
+            phase["elapsed_seconds"] = round(time.monotonic() - started, 6)
+            if len(trace["phases"]) < 256:
+                trace["phases"].append({"phase": name, **phase})
+            else:
+                trace["additional_phase_count"] = trace.get("additional_phase_count", 0) + 1
 
 
 def _now() -> str:
@@ -360,7 +381,9 @@ def _select_v1_1_config(root: Path, loaded: Mapping[str, Any]) -> dict[str, Any]
     return dict(loaded)
 
 
-def consistent_sqlite_backup(source: Path, dest: Path, *, deadline_monotonic: float | None = None) -> None:
+def consistent_sqlite_backup(source: Path, dest: Path, *, deadline_monotonic: float | None = None,
+                             snapshot_connection: sqlite3.Connection | None = None,
+                             budget_error: str = "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED") -> None:
     import sqlite3
 
     if (
@@ -377,18 +400,19 @@ def consistent_sqlite_backup(source: Path, dest: Path, *, deadline_monotonic: fl
     dest.parent.mkdir(parents=True, exist_ok=True)
     if dest.exists():
         dest.unlink()
-    conn = sqlite3.connect(f"file:{source.as_posix()}?mode=ro", uri=True)
+    conn = snapshot_connection or sqlite3.connect(f"file:{source.as_posix()}?mode=ro", uri=True)
     replica = sqlite3.connect(dest)
     try:
         def progress(_status: int, _remaining: int, _total: int) -> None:
             if deadline_monotonic is not None and time.monotonic() > deadline_monotonic:
-                raise RemoteOpsError("BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED")
+                raise RemoteOpsError(budget_error)
         conn.backup(replica, pages=256, progress=progress)
         replica.commit()
         _check_backup_reclaim(source)
     finally:
         replica.close()
-        conn.close()
+        if snapshot_connection is None:
+            conn.close()
 
 
 def require_secret(name: str, environ: Mapping[str, str] | None = None) -> str:
@@ -954,7 +978,7 @@ class BackupPayloadSnapshot:
 
 
 def _capture_closure_step(kind: str | None = None, *, size: int = 0, count: int = 1) -> None:
-    """Charge closure work to the original writer-fence deadline and finite caps.
+    """Charge work to its current capture deadline and finite closure caps.
 
     One native filesystem/Parquet call cannot be interrupted here. Check before
     and after it, and refuse oversized materialization before native parsing.
@@ -963,7 +987,7 @@ def _capture_closure_step(kind: str | None = None, *, size: int = 0, count: int 
     if budget is None:
         return
     if time.monotonic() > budget["deadline"]:
-        raise RemoteOpsError("BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED")
+        raise RemoteOpsError(budget.get("error_code", "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED"))
     if kind is not None:
         counts = budget["counts"]
         counts[kind] = counts.get(kind, 0) + count
@@ -1081,7 +1105,7 @@ def _capture_sql_deadline(conn: sqlite3.Connection) -> Iterator[None]:
         yield
     except sqlite3.OperationalError as exc:
         if budget is not None and time.monotonic() > budget["deadline"]:
-            raise RemoteOpsError("BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED") from exc
+            raise RemoteOpsError(budget.get("error_code", "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED")) from exc
         raise
     finally:
         if budget is not None:
@@ -1115,11 +1139,15 @@ def _capture_writer_fences(sources: Sequence[tuple[str, Path, bool]]) -> Iterato
     """Reserve existing SQLite writers without changing business or lease state.
 
     The backup-plane lock is always outermost. A current scheduler lease defers
-    capture; BEGIN IMMEDIATE prevents a new lease/write until capture finishes.
-    No fence survives staging, compression, upload, or an exception.
+    capture; BEGIN IMMEDIATE protects membership, read-view pinning and mutable
+    job/dependency bytes. WAL page copying, captured SHA and control verification
+    run after release. Rollback-journal DB copying remains fenced. Every failure
+    releases all acquired writer reservations.
     """
     connections: list[sqlite3.Connection] = []
     started = time.monotonic()
+    acquired_at = None
+    first_acquired_at = None
     try:
         for _relative, source, is_sqlite in sorted(sources):
             _capture_closure_step()
@@ -1129,11 +1157,17 @@ def _capture_writer_fences(sources: Sequence[tuple[str, Path, bool]]) -> Iterato
             conn = sqlite3.connect(source.as_uri() + "?mode=rw", uri=True, timeout=0)
             connections.append(conn)
             conn.execute("BEGIN IMMEDIATE")
+            if first_acquired_at is None:
+                first_acquired_at = time.monotonic()
             _check_backup_reclaim(source)
             exists = conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='scheduler_leases'").fetchone()
             if exists and conn.execute("SELECT 1 FROM scheduler_leases WHERE expires_at > ? LIMIT 1", (_now(),)).fetchone():
                 raise RemoteOpsError("WRITER_BUSY")
         _capture_closure_step()
+        acquired_at = time.monotonic()
+        trace = _CAPTURE_TRACE.get()
+        if trace is not None:
+            trace["writer_fence_wait_seconds"] = round(acquired_at - started, 6)
         yield
         _capture_closure_step()
         if time.monotonic() - started > BACKUP_CAPTURE_FENCE_SECONDS:
@@ -1144,9 +1178,14 @@ def _capture_writer_fences(sources: Sequence[tuple[str, Path, bool]]) -> Iterato
         for conn in reversed(connections):
             conn.rollback()
             conn.close()
+        trace = _CAPTURE_TRACE.get()
+        if trace is not None:
+            # Include release, and partial acquisition on a failed later DB.
+            trace["writer_fence_hold_seconds"] = round(time.monotonic() - first_acquired_at, 6) if first_acquired_at is not None else 0.0
 
 
-def _capture_source(captured: dict[str, dict[str, Any]], staging: Path, relative: str, source: Path, is_sqlite: bool, *, deadline: float | None = None) -> None:
+def _capture_source(captured: dict[str, dict[str, Any]], staging: Path, relative: str, source: Path, is_sqlite: bool, *, deadline: float | None = None,
+                    hash_sqlite: bool = True) -> None:
     _capture_closure_step()
     if relative == BACKUP_SNAPSHOT_OWNER_NAME:
         raise RemoteOpsError("BACKUP_SNAPSHOT_OWNER_PATH_RESERVED")
@@ -1155,8 +1194,13 @@ def _capture_source(captured: dict[str, dict[str, Any]], staging: Path, relative
     staged = staging / relative
     staged.parent.mkdir(parents=True, exist_ok=True)
     if is_sqlite:
-        consistent_sqlite_backup(source, staged, deadline_monotonic=deadline)
-        digest, size = _sha256_file(staged), staged.stat().st_size
+        with _capture_phase("sqlite_copy_fenced", size=source.stat().st_size, count=1):
+            consistent_sqlite_backup(source, staged, deadline_monotonic=deadline)
+        size = staged.stat().st_size
+        digest = None
+        if hash_sqlite:
+            with _capture_phase("captured_sqlite_sha256", size=size, count=1):
+                digest = _sha256_file(staged)
     else:
         copied = _capture_mutable_file(source, staged)
         if copied is None:
@@ -1259,7 +1303,8 @@ def _capture_publication_partitions(root: Path, data_root: Path, staging: Path,
         raise RemoteOpsError("BACKUP_PUBLICATION_PARTITION_INVALID") from exc
 
 
-def _capture_recovery_dependencies(root: Path, staging: Path, captured: dict[str, dict[str, Any]]) -> None:
+def _capture_recovery_dependencies(root: Path, staging: Path, captured: dict[str, dict[str, Any]],
+                                   *, sqlite_readers: Mapping[str, sqlite3.Connection] | None = None) -> None:
     """Narrow control-event and open-publication closure, never a full RDP copy.
 
     OPS owns grants, children, debts and transition IDs. ResearchStore owns the
@@ -1350,7 +1395,10 @@ def _capture_recovery_dependencies(root: Path, staging: Path, captured: dict[str
         ops_item = captured.get(ops_by_data_root.get(data_relative, ""))
         if ops_item and ops_item.get("kind") == "SQLITE_BACKUP_API":
             # Only unresolved recovery rows; never parse historical call bodies.
-            with closing(sqlite3.connect(ops_item["staged"].as_uri() + "?mode=ro&immutable=1", uri=True)) as conn, _capture_sql_deadline(conn):
+            reader = (sqlite_readers or {}).get(ops_by_data_root[data_relative])
+            owned = (nullcontext(reader) if reader is not None else closing(sqlite3.connect(
+                ops_item["staged"].as_uri() + "?mode=ro&immutable=1", uri=True)))
+            with owned as conn, _capture_sql_deadline(conn):
                 tables = {row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
                 for table, column, predicate in (
                     ("episode_outbox", "row_json", "1=1"),
@@ -1497,7 +1545,8 @@ def _owned_snapshot_staging(root: Path, parent: Path) -> Iterator[Path]:
         yield staging
     finally:
         if directory is not None:
-            directory.cleanup()
+            with _capture_phase("cleanup", count=1):
+                directory.cleanup()
 
 
 @contextmanager
@@ -1508,6 +1557,28 @@ def backup_payload_snapshot(
     staging_parent: Path | None = None,
 ) -> Iterator[BackupPayloadSnapshot]:
     """Capture one immutable mapping; no downstream consumer reopens live paths."""
+    started = time.monotonic()
+    trace: dict[str, Any] = {"phases": [], "failure_phase": None}
+    token = _CAPTURE_TRACE.set(trace)
+    try:
+        with _backup_payload_snapshot(root, loaded, staging_parent=staging_parent) as snapshot:
+            trace["capture_elapsed_seconds"] = round(time.monotonic() - started, 6)
+            snapshot.capture_trace = trace
+            yield snapshot
+    except RemoteOpsError as exc:
+        trace["failure_phase"] = trace["failure_phase"] or (
+            "post_capture_consumer" if "capture_elapsed_seconds" in trace else
+            "writer_fence_admission" if str(exc) == "WRITER_BUSY" else "capture_guard")
+        exc.capture_trace = trace
+        raise
+    finally:
+        trace["lifecycle_wall_seconds"] = round(time.monotonic() - started, 6)
+        _CAPTURE_TRACE.reset(token)
+
+
+@contextmanager
+def _backup_payload_snapshot(root: Path, loaded: Mapping[str, Any], *,
+                             staging_parent: Path | None = None) -> Iterator[BackupPayloadSnapshot]:
     loaded = _select_v1_1_config(root, loaded)
     captured_at = _now()
     captured: dict[str, dict[str, Any]] = {}
@@ -1515,34 +1586,89 @@ def backup_payload_snapshot(
     _reject_symlink_components(parent.absolute())
     parent.mkdir(parents=True, exist_ok=True)
     sqlite_api = str(loaded.get("schema_version")) == "1.1"
+    capture_deadline = time.monotonic() + float(loaded.get("monitoring", {}).get("stall_max_seconds", 1800))
     # This provisional census admits only the SQLite writer-fence set. It is
     # never the checkpoint's file membership: a publication can commit before
     # those fences are acquired.
-    provisional_sqlite = [(relative, path, True)
-                          for relative, path, is_sqlite in _backup_source_paths(root, loaded)
-                          if is_sqlite and sqlite_api]
-    with _owned_snapshot_staging(root, parent) as staging:
+    with _capture_phase("enumeration_provisional") as phase:
+        provisional_sqlite = [(relative, path, True)
+                              for relative, path, is_sqlite in _backup_source_paths(root, loaded)
+                              if is_sqlite and sqlite_api]
+        phase["count"] = len(provisional_sqlite)
+    with _owned_snapshot_staging(root, parent) as staging, ExitStack() as readers:
         deadline = time.monotonic() + BACKUP_CAPTURE_FENCE_SECONDS
         token = _CAPTURE_CLOSURE_BUDGET.set({"deadline":deadline,"counts":{},"bytes":0})
         try:
             with _capture_writer_fences(provisional_sqlite):
                 # Freeze authoritative membership only after every admitted writer
                 # is fenced, with traversal charged to the same capture deadline.
-                sources = [(relative, path, is_sqlite and sqlite_api)
-                           for relative, path, is_sqlite in _backup_source_paths(
-                               root, loaded, deadline_monotonic=deadline)]
+                with _capture_phase("enumeration_fenced") as phase:
+                    sources = [(relative, path, is_sqlite and sqlite_api)
+                               for relative, path, is_sqlite in _backup_source_paths(
+                                   root, loaded, deadline_monotonic=deadline)]
+                    phase["count"] = len(sources)
                 fenced_sqlite = {relative for relative, _path, _sqlite in provisional_sqlite}
                 if any(is_sqlite and relative not in fenced_sqlite for relative, _path, is_sqlite in sources):
                     raise RemoteOpsError("BACKUP_UNFENCED_SQLITE_DISCOVERED")
+                sqlite_readers: dict[str, sqlite3.Connection] = {}
                 for relative, source, is_sqlite in sources:
-                    if is_sqlite or _is_publication_job_path(relative):
-                        _capture_source(captured, staging, relative, source, is_sqlite, deadline=deadline)
-                _capture_recovery_dependencies(root, staging, captured)
-                _verify_recovery_control(staging)
+                    if is_sqlite:
+                        conn = readers.enter_context(closing(sqlite3.connect(source.as_uri() + "?mode=ro", uri=True)))
+                        # A read transaction pins the WAL snapshot while every
+                        # admitted writer is still fenced. BEGIN alone is lazy.
+                        # Rollback-journal readers would block writer COMMIT.
+                        if conn.execute("PRAGMA journal_mode").fetchone()[0].lower() != "wal":
+                            conn.close()
+                            _capture_source(captured, staging, relative, source, True, deadline=deadline,
+                                            hash_sqlite=False)
+                            continue
+                        conn.execute("BEGIN")
+                        conn.execute("SELECT rootpage FROM sqlite_schema LIMIT 1").fetchall()
+                        sqlite_readers[relative] = conn
+                        captured[relative] = {"kind":"SQLITE_BACKUP_API", "staged":staging/relative}
+                    # The native completed owner is write-once; legacy_full
+                    # preserves exact bytes. Their fixed membership is copied
+                    # after release. Open/flat jobs can change and stay fenced.
+                    elif (_is_publication_job_path(relative)
+                          and "/completed/" not in relative and "/legacy_full/" not in relative):
+                        _capture_source(captured, staging, relative, source, False, deadline=deadline)
+                # Jobs and mutable member-layout/unit pointers must be frozen
+                # with OPS. Dependency discovery queries the same pinned view;
+                # immutable artifacts are copied into our owned staging here.
+                with _capture_phase("recovery_dependencies") as phase:
+                    _capture_recovery_dependencies(root, staging, captured, sqlite_readers=sqlite_readers)
+                    phase["count"] = len(captured)
+                    phase["bytes"] = sum(item.get("bytes", 0) for item in captured.values())
         finally:
             _CAPTURE_CLOSURE_BUDGET.reset(token)
-        for relative, source, is_sqlite in sources:
-            _capture_source(captured, staging, relative, source, is_sqlite)
+        # The existing stall threshold bounds capture wall separately from the
+        # unchanged 30s writer fence. No live config, lease or cadence changes.
+        copy_deadline = capture_deadline
+        token = _CAPTURE_CLOSURE_BUDGET.set({"deadline":copy_deadline,"counts":{},"bytes":0,
+            "error_code":"BACKUP_CAPTURE_TOTAL_BUDGET_EXCEEDED"})
+        try:
+            for relative, source, is_sqlite in sources:
+                if relative in sqlite_readers:
+                    staged = staging/relative
+                    with _capture_phase("sqlite_copy_online", size=source.stat().st_size, count=1):
+                        consistent_sqlite_backup(source, staged, snapshot_connection=sqlite_readers[relative],
+                            deadline_monotonic=copy_deadline, budget_error="BACKUP_CAPTURE_TOTAL_BUDGET_EXCEEDED")
+                    # End WAL retention before SHA or other file copies.
+                    sqlite_readers[relative].rollback()
+                    sqlite_readers[relative].close()
+                if is_sqlite:
+                    staged = captured[relative]["staged"]
+                    with _capture_phase("captured_sqlite_sha256", size=staged.stat().st_size, count=1):
+                        captured[relative].update(sha256=_sha256_file(staged), bytes=staged.stat().st_size)
+            with _capture_phase("control_verification"):
+                _verify_recovery_control(staging)
+            with _capture_phase("remaining_files") as phase:
+                for relative, source, is_sqlite in sources:
+                    _capture_source(captured, staging, relative, source, is_sqlite)
+                phase["count"] = len(captured)
+                phase["bytes"] = sum(item["bytes"] for item in captured.values())
+        finally:
+            _CAPTURE_CLOSURE_BUDGET.reset(token)
         yield BackupPayloadSnapshot(captured, captured_at=captured_at)
 
 

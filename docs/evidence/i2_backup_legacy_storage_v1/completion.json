@@ -1,11 +1,11 @@
 {
   "schema": "smial.delivery-completion-evidence",
   "schema_version": "1.0",
-  "acceptance_id": "I2_BACKUP_LEGACY_STORAGE_V1-SOFTWARE-CANDIDATE",
+  "acceptance_id": "I2_BACKUP_LEGACY_STORAGE_V1-CAPTURE-REPAIR",
   "as_of": "2026-10-15",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "state_change": "Complete I2 software stage: one captured full/delta checkpoint, retry-safe offhost recovery, exact cold retirement, ROWID-preserving reclaim and default-off bounded ordinary maintenance; isolated proof, production staged separately.",
-  "base_main": "3ff9df44331d8063274132c3da7022e46d859d92",
+  "state_change": "Repair the measured I2 capture boundary using pinned WAL read views and existing Online Backup API, preserve one captured inventory/ZIP and control closure, prove >=5.3 GB concurrent native writer/publication and hard interruption recovery. Runtime Stage B/C remain mandatory and separately authorized.",
+  "base_main": "304b16e682fb5b5760229d4fd39fcab7a35aa307",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
@@ -70,7 +70,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_NATIVE_FOUR_P1_BEFORE_AFTER_PLUS_RECLAIM_BACKUP_INITIAL_INTENT_PENDING_POLICY_SAME_SECOND_INCIDENT_PLANNER_HEALTH_POST_APPLY_CAS_WHOLE_CHECKPOINT_AUTHORITY_DURABLE_CACHE_FOOTPRINT_EXPLICIT_CLI_MODE_AUTHORITY_AUTOMATIC_REHEARSAL_CAPTURE_CLOSURE_DEADLINE_HASH_CHUNK_AND_CACHE_DELETE_YIELD_RESUME_AND_DIRECT_CONSUMERS_ON_MERGED_MAIN; OPEN_P2_EAGER_DIRECTORY_CENSUS_DISCLOSED_OWNER_P0_P1_ONLY; POST_FINAL_MODE_OFFHOST24PASS_1EXISTING_SKIP_4.786S; COUNTS_OVERLAP_SEE_PROOF",
+    "targeted": "PASS_78_CAPTURE_OFFHOST_LEGACY_CHAIN_REGRESSIONS_PLUS_5_56GB_NATIVE_WRITER_PUBLICATION_INDEPENDENT_RESTORE_AND_HARD_INTERRUPTION; see capture-repair-proof.json",
     "independent_review": {
       "path": "docs/evidence/i2_backup_legacy_storage_v1/independent-review.json",
       "sha256": "80f13c214de8111e42b226004485bafcb1707ed8afb01605ab4d0aec9197c17d",

@@ -1,3 +1,50 @@
+# I2 — capture repair / следующий Stage B scope
+
+Действующий runtime: 304b16e682fb5b5760229d4fd39fcab7a35aa307; capture BLOCKED.
+Предыдущая authorization scope1bcd396f… была применена к этому SHA и не разрешает
+repair deploy или ещё один старый capture. Новый target = exact merged follow-up
+SHA ПОСЛЕ guarded merge и зелёного post-merge readback; пока UNBOUND / NOT_AUTHORIZED.
+Adapter/scope/readout и scope SHA строятся согласованно после этого readback.
+
+При новой подписи Stage B сохранить единый прежний scope: fresh read-only preflight
+installed SHA, A/B, APPLIED managed profile/shared counters, armed B timer, pending/
+last-good, actual due/rollover и место. Existing install adapter сохраняет native
+gates и измеренный window criterion209s entry /29s после quiesce /180s native drain;
+порог не переносить автоматически, если новый exact install/preflight его опровергнет.
+Frozen schedule/availability не менять, business stop-intake не использовать.
+
+Разрешаемые записи: exact release существующим installer, восстановление прежних
+triggers, owned snapshot staging/ZIP/pending/attempt/checkpoint/chain через ordinary
+caller. Один обычный daily delta к прежнему full + prefix deltas; новых full ради
+процедуры нет. Upload только новой delta и checkpoint в прежний commissioned remote.
+Native capacity/reader checks; independent restore <=32 GB closure /8 objects /3h,
+MemoryMax1GB CPUQuota100% Nice10 IOWeight10 без изменения collector resources.
+Native writer fence30s прежний; total capture использует existing stall1800s;
+transport timeout10800s, busy retry7200s/30s, owner operator deadline18000s прежние.
+
+Runtime acceptance: actual phase trace с fence wait/hold отдельно от service wall;
+ноль backup-caused collector lock failures и пропущенных обязательных due;
+DEFLATE8, один inventory/ZIP set, exact ordinary delta chain, independent restore
+с control closure и source clocks, A/B/profile envelopes сохранены, shared counters
+монотонны, last-good обновлён только после независимого remote verification.
+Записать фактические bytes/time/WAL/temp/free/collector impact. Изолированный
+compression ratio не считать production ratio. При отказе сохранить last-good и
+attempt; без слепого capture retry или ручного удаления pending/lock/state.
+
+Rollback: installer rollback только в его разрешённой pre-write recovery boundary.
+После новых ordinary writes — fail closed, сохранить source/last-good и диагностировать;
+старые DB/binary не восстанавливать поверх новых writes без отдельной authority.
+Никаких object deletion, retirement, reclaim, policy enable или effective freshness/
+RPO/retention changes. A/B/managed grants/science и ручные C/D не менять.
+
+После PACKAGING_LIVE_PROVEN безопасно и самостоятельно подготовить уже предусмотренный
+Stage C из verified copy: exact retirement/reclaim rehearsal и одну recurring policy.
+Destructive APPLY и policy enable требуют одного отдельно согласованного scope;
+не выполнять на сломанном backup или в конфликте с due/activation/rollover.
+
+Дальше — сохранённый master OPERATE packet; этот header определяет актуальную
+Stage B capture repair boundary, прежние Stage C обязательства остаются в силе.
+
 # I2 — staged OPERATE packet
 
 Статус: PREPARED, NOT_AUTHORIZED. Единственный execution contract:

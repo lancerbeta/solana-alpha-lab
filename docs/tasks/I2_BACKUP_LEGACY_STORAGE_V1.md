@@ -1,6 +1,6 @@
 ---
 task_id: I2_BACKUP_LEGACY_STORAGE_V1
-task_version: '1.3'
+task_version: '1.4'
 status: IN_PROGRESS
 as_of: '2026-10-15'
 owner: GOAL_OWNER
@@ -8,10 +8,10 @@ allowed_routes: [DIRECT_CODEX_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 3ff9df44331d8063274132c3da7022e46d859d92
+  expected_base: 304b16e682fb5b5760229d4fd39fcab7a35aa307
   expected_upstream: origin/main
-  expected_upstream_oid: 3ff9df44331d8063274132c3da7022e46d859d92
-  expected_branch: codex/i2-backup-legacy-storage-v1
+  expected_upstream_oid: 304b16e682fb5b5760229d4fd39fcab7a35aa307
+  expected_branch: codex/i2-capture-fence-repair
   dirty_mode: ALLOW_REPORTED
 objective: Implement the complete I2 backup, legacy retirement, physical reclaim and bounded maintenance capability on existing owners; prove it on isolated stores, deliver reviewed exact-head CI and machine merge-readiness, and prepare one staged OPERATE packet without production mutations.
 managed_write_set:
@@ -40,6 +40,7 @@ managed_write_set:
 - tests/test_mutable_backup_zip64_repair_v1.py
 - tests/test_collector_operability_retention_and_owner_pulse.py
 - tests/test_i2_backup_legacy_storage_v1.py
+- tests/i2_capture_rehearsal.py
 - tests/test_i2_offhost_checkpoint_v1.py
 - tests/test_i2_retention_maintenance_v1.py
 - tests/test_i2_storage_consumers_v1.py
@@ -84,6 +85,26 @@ context_requirements:
 ---
 
 # I2_BACKUP_LEGACY_STORAGE_V1
+
+## Production capture replan — 2026-10-15
+
+Owner EXECUTE replans this same I2 after two deployed 304b16e capture failures
+(`BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED`). The internal production phase remains
+UNKNOWN. No third blind retry, production deploy/settings/live backup, or Stage C
+execution is authorized by this replan. Existing Stage B authority pins 304b16e
+and cannot authorize the follow-up binary.
+
+Current bounded delta: phase trace, minimal capture/direct-consumer repair,
+isolated >=5.3 GB native-schema rehearsal with parallel native writer and
+publication, exact restore/control closure and interrupted-capture recovery;
+then one reviewed follow-up through exact-head CI and native merge-readiness.
+Separate writer-fence wait/hold from service wall and total backup budget.
+Preserve production limits, A/B, APPLIED profile, shared counters and last-good.
+No compression rebenchmark, I1/I3 acceptance, framework or general audit.
+The ordinary daily remains 2026-10-16T00:45:00Z. Before it, identify a proven
+repair or one concrete temporary recovery path and its required authority.
+Unproven scale is BLOCKED, never a ready patch. The complete original I2 and
+Stage C outcome remain required after PACKAGING_LIVE_PROVEN.
 
 Owner EXECUTE accepts the single PRD/SSD imported without semantic changes as
 `docs/evidence/i2_backup_legacy_storage_v1/source-contract.md`. Its section 15

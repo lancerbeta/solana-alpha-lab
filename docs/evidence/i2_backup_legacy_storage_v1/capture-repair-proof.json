@@ -1,0 +1,274 @@
+{
+  "schema": "smial.i2-capture-repair-proof",
+  "schema_version": "1.0",
+  "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
+  "production": {
+    "deployed_sha": "304b16e682fb5b5760229d4fd39fcab7a35aa307",
+    "confirmed_failures": 2,
+    "internal_failure_phase": "UNKNOWN",
+    "new_capture_attempts": 0,
+    "mutations": 0,
+    "next_daily": "2026-10-16T00:45:00Z"
+  },
+  "measured_cause": "SQLite copy, captured SHA and immutable completed receipt copying shared the 30s writer fence. Source scale alone exceeds that critical-section budget. Production internal phase remains UNKNOWN.",
+  "source_shape_readonly": {
+    "shape": {
+      "flat": {
+        "files": 0,
+        "bytes": 0,
+        "max_file_bytes": 0,
+        "directory_entries": 3
+      },
+      "open": {
+        "files": 0,
+        "bytes": 0,
+        "max_file_bytes": 0,
+        "directory_entries": 0
+      },
+      "completed": {
+        "files": 8214,
+        "bytes": 8953548,
+        "max_file_bytes": 1096,
+        "directory_entries": 8214
+      },
+      "legacy_full": {
+        "files": 0,
+        "bytes": 0,
+        "max_file_bytes": 0,
+        "directory_entries": 0
+      }
+    },
+    "wall_seconds": 0.043549557914957404,
+    "production_writes": 0,
+    "market_payload_reads": 0
+  },
+  "fixture": {
+    "build_seconds": 38.19938450001064,
+    "closed_call_ledger_rows": 84000,
+    "db_bytes": 5559250944,
+    "metadata_files": 8120,
+    "native_open_job_stage": "MANIFEST",
+    "schema": "native ObservationScheduleStore",
+    "synthetic": true,
+    "market_payload_reads": 0,
+    "source": "PRODUCTION_METADATA_ONLY_PROBE",
+    "synthetic_completed_bytes": 9182142,
+    "synthetic_completed_files": 8214,
+    "padding_metadata": "Synthetic completed-file metadata; real native open publication/control closure and native schema/history. No scientific data acceptance."
+  },
+  "before": {
+    "db_bytes": 5559250944,
+    "failure": "BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED",
+    "capture_cleanup_wall_seconds": 36.49843989999499,
+    "peak_staging_bytes": 5559254250,
+    "peak_wal_bytes": 0,
+    "staging_remaining": 0,
+    "trace": [
+      {
+        "count": 8122,
+        "elapsed": 5.4054561000084504,
+        "phase": "enumeration",
+        "start": 0.6767459999828134,
+        "writer_fenced": false
+      },
+      {
+        "count": 1,
+        "elapsed": 0.00513819998013787,
+        "phase": "fence_wait"
+      },
+      {
+        "count": 8122,
+        "elapsed": 5.451380400016205,
+        "phase": "enumeration",
+        "start": 6.106791899976088,
+        "writer_fenced": true
+      },
+      {
+        "bytes": 5559250944,
+        "elapsed": 14.690920000022743,
+        "phase": "sqlite_copy",
+        "source": "observation_schedule_state.sqlite",
+        "start": 11.559805699973367,
+        "writer_fenced": true
+      },
+      {
+        "bytes": 5559250944,
+        "elapsed": 9.314617099997122,
+        "phase": "sha256",
+        "source": "observation_schedule_state.sqlite",
+        "start": 26.250729199993657,
+        "writer_fenced": true
+      },
+      {
+        "elapsed": 29.995880400005262,
+        "phase": "fence_hold"
+      },
+      {
+        "elapsed": 30.00159229998826,
+        "phase": "fence_total"
+      }
+    ]
+  },
+  "after": {
+    "db_bytes": 5559480320,
+    "capture_seconds": 85.48099459998775,
+    "packaging_seconds": 64.59783000001335,
+    "backup_ready_seconds": 150.09286209999118,
+    "restore_seconds": 126.40550660001463,
+    "capture_cleanup_wall_seconds": 278.41471740001,
+    "inventory_sha256": "c2645a99f48003771572b2f8c67e805d61e34baa03afc0ee2911900ab23a6ad3",
+    "snapshot_db_sha256": "2af6de0c5d0e80af8dc0964bf264ccf79141deaa5a5a91162a680d09fa5fbbba",
+    "snapshot_native_events": 2377,
+    "entries": 8229,
+    "peak_staging_bytes": 5568714263,
+    "peak_wal_bytes": 4124152,
+    "min_free_bytes": 240072724480,
+    "staging_remaining": 0
+  },
+  "capture_trace": {
+    "capture_elapsed_seconds": 84.920808,
+    "failure_phase": null,
+    "lifecycle_wall_seconds": 277.854503,
+    "phases": [
+      {
+        "bytes": 0,
+        "count": 1,
+        "elapsed_seconds": 5.022173,
+        "phase": "enumeration_provisional"
+      },
+      {
+        "bytes": 0,
+        "count": 8223,
+        "elapsed_seconds": 5.155435,
+        "phase": "enumeration_fenced"
+      },
+      {
+        "bytes": 43197,
+        "count": 7,
+        "elapsed_seconds": 0.116537,
+        "phase": "recovery_dependencies"
+      },
+      {
+        "bytes": 5559480320,
+        "count": 1,
+        "elapsed_seconds": 14.220848,
+        "phase": "sqlite_copy_online"
+      },
+      {
+        "bytes": 5559480320,
+        "count": 1,
+        "elapsed_seconds": 8.982603,
+        "phase": "captured_sqlite_sha256"
+      },
+      {
+        "bytes": 0,
+        "count": 0,
+        "elapsed_seconds": 0.048404,
+        "phase": "control_verification"
+      },
+      {
+        "bytes": 5568714043,
+        "count": 8229,
+        "elapsed_seconds": 51.342252,
+        "phase": "remaining_files"
+      },
+      {
+        "bytes": 0,
+        "count": 1,
+        "elapsed_seconds": 1.907839,
+        "phase": "cleanup"
+      }
+    ],
+    "writer_fence_hold_seconds": 5.275858,
+    "writer_fence_wait_seconds": 0.005512
+  },
+  "writer": {
+    "write": {
+      "successful": 2202,
+      "failures": 0,
+      "max_seconds": 5.295555300021078
+    },
+    "publication_tick": {
+      "successful": 276,
+      "failures": 0,
+      "max_seconds": 0.9139786000014283
+    },
+    "publications": 7
+  },
+  "restore": {
+    "control": {
+      "authorities": 1,
+      "transitions": 1
+    },
+    "fresh_process": true,
+    "producer_reads": "FORBIDDEN_VERIFIED",
+    "raw_inventory_sha256": "c2645a99f48003771572b2f8c67e805d61e34baa03afc0ee2911900ab23a6ad3"
+  },
+  "interrupted_capture": {
+    "actual_capture_pid": 49380,
+    "fault": "OS_EXIT_73_IN_ACTUAL_CAPTURE_PROCESS",
+    "last_good_bundle_hashes_unchanged": true,
+    "launcher_pid": 41956,
+    "manual_state_fix": false,
+    "next_capture_seconds": 80.65766949998215,
+    "next_inventory_sha256": "579e813c343f05baf7e9369a86fa48a68b77edcb28fb788f0bd076e3eb96367c",
+    "orphan_count_before_native_restart": 1,
+    "partial_copy_bytes_at_kill": 19165184,
+    "staging_remaining": 0,
+    "writer_commit_after_kill_seconds": 0.007814899989170954
+  },
+  "zip": {
+    "bytes": 63892952,
+    "sha256": "322708e3a1fa0eb282b1676b0512bbd082f3f24da1d9ae0b98370acc772e71e2",
+    "method": "DEFLATE_LEVEL_1_ZIP64",
+    "source": "SYNTHETIC_SCALE_PROOF_NOT_PRODUCTION_RATIO"
+  },
+  "excluded_experiments": [
+    {
+      "experiment": "external kill of Windows venv launcher",
+      "verdict": "INVALID_FAULT_TARGET",
+      "reason": "launcher PID differs from capture PID; initial I/O subcause UNKNOWN. Replaced by actual-process OS_EXIT_73 fault, no I/O suppression or manual SQLite state fix."
+    },
+    {
+      "experiment": "move only WAL page copy out of fence, leave all completed receipts fenced",
+      "verdict": "FAILED_SAME_PATCH_REVISED",
+      "reason": "completed metadata copying consumed the 30s fence; no PR/deploy from that candidate"
+    }
+  ],
+  "regressions": {
+    "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1 tests.test_i2_offhost_checkpoint_v1 tests.test_mutable_backup_zip64_repair_v1",
+    "count": 78,
+    "seconds": 36.914,
+    "outcome": "PASS",
+    "output_sha256": "c3ba3a045fb1d2c2310d9c05d054261cdbb064d2f2e7095e7a6d3bf26f4becb5",
+    "diagnostic_regression": "expected busy retry must retain one JSON output; trace is persisted in existing pending/receipt, no warning output"
+  },
+  "reproduce": [
+    "uv run --locked --managed-python python -B tests/i2_capture_rehearsal.py build",
+    "uv run --locked --managed-python python -B tests/i2_capture_rehearsal.py ledger-before --baseline",
+    "uv run --locked --managed-python python -B tests/i2_capture_rehearsal.py production-metadata",
+    "uv run --locked --managed-python python -B tests/i2_capture_rehearsal.py ledger-final --package",
+    "uv run --locked --managed-python python -B tests/i2_capture_rehearsal.py interrupt"
+  ],
+  "artifacts_sha256": {
+    "ledger-before.json": "bd3b2c2c91fe07b7adfbaec1bf7934e5a29a12217bccd5793d9da940f5cece35",
+    "ledger-final.json": "c27c02ee1559e9d525448d3672b6d2a97b987385858667b2f7fc58c66ac64bd2",
+    "ledger-final.writer.json": "755b45016cf472d9ecd0c8c24407df64198faa1ce47a3e0c0701ec15ccf92ec5",
+    "ledger-final.restore.json": "ee543909060d3ee57a60e437e6fd763ce591ef3786fa2810960f84d4d20fbf37",
+    "interrupt.json": "1deaec92ccc27c4cda5c3c76dca0ccc160b74f4d4d49bd8c2521aa605d804ab3",
+    "production-source-shape.json": "91a8d1423f1983b89d8c0221131972d2b2aefc8f37d7d676e3eff19f9e22ad45"
+  },
+  "source_bindings": {
+    "src/solana_alpha_lab/factory/remote_ops.py": "0b164f155b46ddeac3ac1973474c8cf59f13cc7dcb686dccba5723363dbe9712",
+    "src/solana_alpha_lab/factory/offhost_backup.py": "3769b77f4e18e7923eaca3eb2d7643f60984a83676cb47ab74765c5ac29871fa",
+    "tests/i2_capture_rehearsal.py": "0955f11b1fe4e3d4f3b73d6c8e7619fb5e9f39d741ae4a71f658c64090fed2b5"
+  },
+  "limits": [
+    "LOCAL_WINDOWS_ISOLATED_SCALE_NOT_PRODUCTION_LATENCY_SLA",
+    "NO_LIVE_OFFHOST_UPLOAD_OR_STAGE_B_ACCEPTANCE",
+    "NO_STAGE_C_APPLY_OR_POLICY_ENABLE",
+    "Original isolated interruption used 8120 small padding files; final full profile meets/exceeds current production completed metadata count and bytes.",
+    "Individual native/OS calls are cooperative and cannot be preempted; historical pathlib eager census P2 remains disclosed."
+  ],
+  "verdict": "ISOLATED_SCALE_PROVEN_RUNTIME_PENDING"
+}
