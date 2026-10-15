@@ -1,7 +1,7 @@
 [
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/proof.json",
-    "sha256_or_fingerprint": "a8d2bd92e173dccaab6a4fd77d8fa60f895482a726ac5a682d1ab52fa5446c0f"
+    "sha256_or_fingerprint": "341b0de14c335264dcc9dcb52ed5756fcd00c2762460cda3377f39b767db3d7d"
   },
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md",
@@ -9,7 +9,7 @@
   },
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md",
-    "sha256_or_fingerprint": "9cf01273687bbc042c6703f9427be9545f00fa250ca99023aa75af1e51c9f97a"
+    "sha256_or_fingerprint": "2bda638d513126468c53178229892d1f11e60127ec056cc9dd882014ef506b96"
   },
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/review-follow-up.md",

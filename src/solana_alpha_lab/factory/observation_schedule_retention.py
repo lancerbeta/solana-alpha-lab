@@ -1140,7 +1140,7 @@ def _automatic_retirement(store: ObservationScheduleStore, scope: tuple[str, str
         return None
     return {"schedule_sha256": scope[0], "activation_id": scope[1], "disallow_resume": True,
             "automatic": True, "retire_pending_due": False, "retire_entities": True,
-            "operation_mode": "OPERATE", "archive_proof": archive,
+            "operation_mode": _effective_operation_mode(store, None) or "OPERATE", "archive_proof": archive,
             "policy_sha256": policy_sha256(policy), "archive_locator": archive["checkpoint_filename"]}
 
 

@@ -283,3 +283,12 @@ explicit CLI `OPERATE` принимал rehearsal retirement, а следующ�
 выполнил 2 compactions с сохранением ROWID/source clocks. Семь focused checks
 прошли за 8.720s, включая существующий полный CLI rehearsal. Factory static PASS.
 Production B/C остаются обязательными pending.
+
+Независимый CODE review выявил смежный P2 первого mode repair: accepted
+automatic rehearsal policy не выполнялась из-за hardcoded OPERATE в synthetic
+retirement. Owner теперь берёт commissioned wrapper mode; unbound legacy
+сохраняет OPERATE. Actual CLI regression: 1 failure до fix; после — 8 focused
+checks PASS/10.004s с обеими mode branches и полным CLI rehearsal. Legacy ordinary
+pipeline отдельно PASS/11.170s; factory static PASS. Raw SQL сохраняет ROWIDs,
+source clocks/state, exact proof и signed policy; принятую rehearsal policy
+следующий same-mode caller выполняет без повышения authority.

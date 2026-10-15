@@ -1153,7 +1153,50 @@
           "No new live scientific or economic claim; protected scientific histories, counters and source clocks preserved by existing native checks"
         ]
       },
-      "authority": "Only isolated native stores. No deployment, live retirement/reclaim, policy enable or effective freshness/retention change."
+      "authority": "Only isolated native stores. No deployment, live retirement/reclaim, policy enable or effective freshness/retention change.",
+      "automatic_rehearsal_followup": {
+        "observed_head": "a2aaed60de2235caa53e285ba9dfb3d6870a463f",
+        "prior_packet_fingerprint_sha256": "439d386679c2842b1c72a157c6dea58a20f2841dc872829860be36106840adf0",
+        "role": "CODE_REVIEWER",
+        "prior_verdict": "NOT_READY",
+        "priority": "P2",
+        "before": {
+          "tests": 1,
+          "failures": 1,
+          "wall_seconds": 1.467,
+          "native_trace": "Actual CLI successfully commissions ISOLATED_REHEARSAL automatic policy with independently restored registered REMOTE checkpoint; next same-mode maintenance-step exits2 OPERATION_MODE_MISMATCH and leaves FIRST/SECOND HOT."
+        },
+        "owning_fix": "Existing automatic retirement reads commissioned policy wrapper mode; legacy no-mode wrapper retains OPERATE. Canonical signed policy and independent proof unchanged.",
+        "after": {
+          "focused_command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.CLIOperationModeTests tests.test_i2_retention_maintenance_v1.NativeCutoverAndCLITests.test_full_real_cli_plan_apply_reclaim_and_next_writer -q",
+          "focused_tests": 8,
+          "focused_wall_seconds": 10.004,
+          "failures": 0,
+          "skips": 0,
+          "actual_rehearsal_cli": "Accepted policy then same-mode maintenance-step succeeds with2 compactions; raw SQL ROWIDs11/29/clocks/state preserved, original body removed, exact registered proof and signed policy unchanged; synthetic retirement is ISOLATED_REHEARSAL.",
+          "production_mode_compatibility": "Actual registered OPERATE path and all mode/proof denial cases still PASS; inherited automatic OPERATE remains PASS.",
+          "legacy_pipeline_command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_pipeline_v1.ManagedMaintenancePipelineTests.test_generated_children_use_one_policy_and_ordinary_caller_after_restart -q",
+          "legacy_pipeline_tests": 1,
+          "legacy_pipeline_wall_seconds": 11.17,
+          "legacy_pipeline_result": "PASS",
+          "factory_static": "PASS",
+          "full_cli_rehearsal": {
+            "before_db_bytes": 2494464,
+            "after_db_bytes": 397312,
+            "before_body_bytes": 2097175,
+            "after_body_bytes": 0,
+            "retained_provenance_payload_bytes": 614,
+            "rowid": 313,
+            "source_root_inode": "PRESERVED",
+            "next_native_writer": "PASS",
+            "next_checkpoint_retired_body_count": 0,
+            "next_checkpoint_bytes": 12373,
+            "cli_chain_wall_seconds": 1.768,
+            "actual_parent_test_interpreter_peak_rss_bytes": 85016576,
+            "cli_child_peak_rss_bytes": "UNKNOWN"
+          }
+        }
+      }
     }
   },
   "main_integration": {

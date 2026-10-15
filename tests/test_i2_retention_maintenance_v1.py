@@ -250,6 +250,33 @@ class CLIOperationModeTests(NativeFixture):
         self.assertTrue(owner._scope_retirement(self.store,('a'*64,'LEGACY'))['automatic'])
         self.assertNotIn('rows',self.store.call_payload('SECOND'))
 
+    def test_automatic_cli_rehearsal_uses_commissioned_mode(self):
+        document,proof=self.registered_checkpoint()
+        revised={**document,'revision':2}
+        policy_path=self.artifact('automatic-rehearsal-policy.json',revised)
+        pressure_path=self.artifact('safe-pressure.json',SAFE)
+        original=[tuple(row) for row in self.store._conn.execute(
+            'SELECT rowid,created_at,updated_at,state FROM call_ledger ORDER BY rowid')]
+        self.store.close()
+        commissioned=self.cli('policy','--input',policy_path,'--approved-sha256',owner.policy_sha256(revised),
+            '--i-understand-apply',mode='ISOLATED_REHEARSAL')
+        self.assertEqual(commissioned.returncode,0,commissioned.stderr)
+        result=self.cli('maintenance-step','--pressure-input',pressure_path,
+            '--i-understand-apply',mode='ISOLATED_REHEARSAL')
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+        self.assertEqual(json.loads(result.stdout)['applied_call_compactions'],2)
+        self.store=ObservationScheduleStore(self.path)
+        self.assertEqual([tuple(row) for row in self.store._conn.execute(
+            'SELECT rowid,created_at,updated_at,state FROM call_ledger ORDER BY rowid')],original)
+        retirement=owner._scope_retirement(self.store,('a'*64,'LEGACY'))
+        self.assertTrue(retirement['automatic'])
+        self.assertEqual(retirement['operation_mode'],'ISOLATED_REHEARSAL')
+        self.assertEqual(owner._control(self.store,'policy'),{'policy':revised,
+            'approved_policy_sha256':owner.policy_sha256(revised),'operation_mode':'ISOLATED_REHEARSAL'})
+        self.assertEqual(owner._control(self.store,'checkpoint_archive'),proof)
+        self.assertNotIn('rows',self.store.call_payload('FIRST'))
+        self.assertNotIn('rows',self.store.call_payload('SECOND'))
+
     def test_reclaim_flag_and_historical_recovery_require_exact_mode(self):
         add_call(self.store,rowid=313,size=4096)
         proof=self.archive()
