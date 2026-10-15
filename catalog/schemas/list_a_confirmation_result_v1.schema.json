@@ -869,7 +869,6 @@
         "source_hashes": {
           "type": "object",
           "minProperties": 6,
-          "maxProperties": 6,
           "additionalProperties": {
             "$ref": "#/$defs/hash"
           }
@@ -1105,8 +1104,63 @@
               }
             }
           }
+        },
+        "source_input_version": {
+          "const": "1.1"
+        },
+        "schedule_owners": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "schedule_rel",
+              "schedule_sha256",
+              "activation_id"
+            ],
+            "properties": {
+              "schedule_rel": {
+                "type": "string",
+                "minLength": 1
+              },
+              "schedule_sha256": {
+                "$ref": "#/$defs/hash"
+              },
+              "activation_id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "source_input_version"
+            ]
+          },
+          "then": {
+            "required": [
+              "schedule_owners"
+            ]
+          },
+          "else": {
+            "properties": {
+              "source_hashes": {
+                "maxProperties": 6
+              }
+            },
+            "not": {
+              "required": [
+                "schedule_owners"
+              ]
+            }
+          }
+        }
+      ]
     },
     "lineage": {
       "type": "object",

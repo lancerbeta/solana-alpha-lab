@@ -373,6 +373,7 @@ def source_metadata(sample: Sample | MultiScheduleSample, *, root: Path, data_ro
             "acquisition_keys": acquisition_keys, "acquisition_identity_sha256": digest(acquisition_keys),
             "schedule_binding": {**schedules[0]["observation_schedule"], "witness_max_age_seconds": schedules[0]["nomination"]["witness_max_age_seconds"]},
             "episode_schedule_bindings": episode_schedule_bindings,
+            "schedule_owners": [{**o.model_dump(), "schedule_sha256": s["schedule_sha256"]} for o, s in zip(owners, schedules)],
             "potential_support": upper, "census_semantic_sha256": digest(census)}
     purpose_protection(sample, metadata, inventory, "FROZEN")
     return metadata
@@ -455,6 +456,18 @@ def validate_confirmation_result(result: dict, *, root: Path) -> None:
         jsonschema.validate(result, load_json(root / "catalog/schemas/list_a_confirmation_result_v1.schema.json"))
     except jsonschema.ValidationError as exc:
         raise ConfirmationError("TYPED_RESULT_SCHEMA_INVALID") from exc
+    binding = result["binding"]
+    require(digest(binding["source_hashes"]) == binding["source_set_sha256"], "RESULT_SOURCE_SET_CONFLICT")
+    if binding.get("source_input_version") == "1.1":
+        owners = binding["schedule_owners"]
+        prefix = binding["sample_ref"].rsplit("/", 1)[0]
+        expected = {prefix + "/" + name for name in ("census.parquet", "observations.parquet", "frames.json", "admissions.json", "protection.json")}
+        require(len(owners) == len({o["activation_id"] for o in owners}) == len({o["schedule_sha256"] for o in owners}) and
+                [o["schedule_sha256"] for o in owners] == sorted(o["schedule_sha256"] for o in owners), "RESULT_SCHEDULE_OWNERS_CONFLICT")
+        for owner in owners:
+            require(owner["schedule_rel"] == prefix + "/schedules/" + owner["schedule_sha256"] + ".json", "RESULT_SCHEDULE_OWNERS_CONFLICT")
+            expected.add(owner["schedule_rel"])
+        require(set(binding["source_hashes"]) == expected, "RESULT_SOURCE_SET_CONFLICT")
     m, p = result["method"], result["population"]
     rows = p["membership"]
     require(rows == sorted(rows, key=lambda r: r["episode_id"]) and len({r["episode_id"] for r in rows}) == len(rows),
@@ -600,6 +613,8 @@ def inspect_confirmation(definition: dict, sample_ref: str, *, root: Path, data_
         "acquisition_identity_sha256": metadata["acquisition_identity_sha256"], "acquisition_keys": metadata["acquisition_keys"],
         "study_budget_sha256": digest({"question": CORE_SHA, "native_acquisition": metadata["acquisition_identity_sha256"]}),
         "max_scientific_attempts": 1, "adaptive_allowance": 0}
+    if isinstance(sample, MultiScheduleSample):
+        binding.update(source_input_version="1.1", schedule_owners=metadata["schedule_owners"])
     return {"binding": binding, "metadata": metadata, "sample": sample}
 
 

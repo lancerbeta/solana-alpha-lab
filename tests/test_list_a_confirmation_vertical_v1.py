@@ -121,6 +121,17 @@ class VerticalTests(unittest.TestCase):
             self.assertEqual(result["method"]["contrast"],0.125)
             self.assertEqual(response["protocol_terminal"],"ASSOCIATION_SUPPORTED_CONDITIONAL")
             self.assertEqual(daily_ownership_oracle(store,sample_ref,oracle,result)["schedule_owners"],32)
+            # Legacy six-file cardinality stays strict; new bindings carry
+            # explicit original owners, never an unbounded opaque hash bag.
+            for mutate, reason in (
+                (lambda b:b.pop("source_input_version"), "TYPED_RESULT_SCHEMA_INVALID"),
+                (lambda b:b["schedule_owners"].pop(), "RESULT_SOURCE_SET_CONFLICT"),
+                (lambda b:b["schedule_owners"].append(copy.deepcopy(b["schedule_owners"][0])), "RESULT_SCHEDULE_OWNERS_CONFLICT"),
+                (lambda b:b["source_hashes"].pop(next(iter(b["source_hashes"]))), "RESULT_SOURCE_SET_CONFLICT")):
+                forged = copy.deepcopy(result)
+                mutate(forged["binding"])
+                with self.assertRaisesRegex(ConfirmationError, reason):
+                    validate_confirmation_result(forged,root=ROOT)
             for group in ("A","C"):
                 self.assertGreaterEqual(result["method"]["support"][group]["mints"],30)
                 for h in ("86400","172800"):
