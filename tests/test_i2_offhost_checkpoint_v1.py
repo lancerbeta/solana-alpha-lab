@@ -522,6 +522,30 @@ raise SystemExit(cli.main())
         owner._atomic_write_json(owner._scheduled_incident_path(self.root, self.config, "daily"), incident)
         self.assertEqual(owner.read_offhost_attempt(self.root, self.config)["terminal"], "WEEKLY_FULL_VERIFIED")
 
+    def test_same_second_exhaustion_wins_in_progress_and_reaches_incident_classifier(self) -> None:
+        from solana_alpha_lab.factory.operability_watch import classify_incidents
+        self.run_checkpoint()
+        checkpoint = "RECOVERY_CHECKPOINT_pending.json"
+        stamp = owner._stamp(self.clock + timedelta(minutes=1))
+        primary_path = self.root / (self.config.receipt_relative + ".attempt.json")
+        incident_path = self.root / (self.config.receipt_relative + ".scheduler-daily.json")
+        primary_path.write_text(json.dumps({"terminal": "IN_PROGRESS", "observed_at": stamp,
+            "checkpoint_filename": checkpoint}), encoding="utf-8")
+        incident_path.write_text(json.dumps({"terminal": "COPY_FAILED", "failed_at": stamp,
+            "failure_code": "OFFHOST_BUSY_RETRY_EXHAUSTED", "checkpoint_filename": checkpoint}), encoding="utf-8")
+        raw_primary = json.loads(primary_path.read_text())
+        raw_incident = json.loads(incident_path.read_text())
+        self.assertEqual(raw_primary["observed_at"], raw_incident["failed_at"])
+        health = owner.offhost_health_snapshot(self.root, config=self.config,
+            now=self.clock + timedelta(minutes=2))
+        self.assertEqual(health["offhost_last_attempt_terminal"], "COPY_FAILED")
+        self.assertIn("MUTABLE_BACKUP_FAILED", classify_incidents(health))
+        for completed_checkpoint, expected in (("a different checkpoint", "COPY_FAILED"),
+                                                (checkpoint, "WEEKLY_FULL_VERIFIED")):
+            primary_path.write_text(json.dumps({"terminal": "WEEKLY_FULL_VERIFIED", "verified_at": stamp,
+                "checkpoint_filename": completed_checkpoint}), encoding="utf-8")
+            self.assertEqual(owner.read_offhost_attempt(self.root, self.config)["terminal"], expected)
+
     def test_same_size_remote_corruption_is_not_accepted(self) -> None:
         self.runner.fail_copy_count = 1
         with self.assertRaises(owner.OffhostBackupError):

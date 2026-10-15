@@ -234,6 +234,7 @@ def read_offhost_attempt(root: Path, config: OffhostConfig) -> dict[str, Any] | 
     ]
     selected = None
     selected_at = datetime.min.replace(tzinfo=UTC)
+    selected_precedence = -1
     primary = None
     for path in paths:
         try:
@@ -247,10 +248,12 @@ def read_offhost_attempt(root: Path, config: OffhostConfig) -> dict[str, Any] | 
                 continue
         except (OSError, json.JSONDecodeError, TypeError, ValueError, AttributeError):
             continue
-        # The backup owner's success wins a same-second tie, so a later commit
-        # resolves the incident even on the existing second-resolution clocks.
-        if selected is None or observed > selected_at:
-            selected, selected_at = payload, observed
+        # Second-resolution clocks can tie. A terminal failure must remain
+        # visible over IN_PROGRESS or an unrelated successful checkpoint.
+        precedence = 2 if payload.get("terminal") in FAILURE_TERMINALS else (
+            1 if payload.get("terminal") in CHECKPOINT_TERMINALS else 0)
+        if selected is None or (observed, precedence) > (selected_at, selected_precedence):
+            selected, selected_at, selected_precedence = payload, observed, precedence
         if path == paths[0]:
             primary = payload
     if (primary and primary.get("terminal") in CHECKPOINT_TERMINALS and selected

@@ -76,7 +76,8 @@ def main(argv: list[str] | None = None) -> int:
         if args.command in {'reclaim-resume','reclaim-rollback'}:
             result = recover_physical_reclaim(path, data_root=data_root,
                 action='resume' if args.command == 'reclaim-resume' else 'rollback',
-                approved_plan_sha256=args.approved_sha256 or '')
+                approved_plan_sha256=args.approved_sha256 or '',
+                plan=_load(args.plan) if args.plan else None)
         else:
             store = ObservationScheduleStore(path, readonly=readonly, immutable=False)
             if args.command in {'status','dry-run'}:

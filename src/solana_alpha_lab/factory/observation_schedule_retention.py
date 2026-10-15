@@ -21,7 +21,7 @@ from typing import Any, Mapping
 
 from solana_alpha_lab.factory.observation_panel_coverage import SCIENTIFIC_CLOSED_DUE_STATES
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
-from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+from solana_alpha_lab.factory.observation_schedule_store import GLOBAL_LEASE_ID, ObservationScheduleStore
 
 COMPACTION_MARKER = "COMPACTED_PROVENANCE_ONLY"
 BODY_KEYS = frozenset({"rows", "body", "raw_body", "response_body", "payload_rows"})
@@ -348,6 +348,80 @@ def _supersede_stale_policy_plan(store: ObservationScheduleStore, *,
     return True
 
 
+def _reconcile_pending_refresh_policy(store: ObservationScheduleStore, *,
+        policy: Mapping[str, Any], approved_policy_sha256: str, now: datetime) -> bool:
+    """Rebind immutable readback under new approval, never an old apply plan.
+
+    Native lease/transaction belongs to the caller. Only bounded metadata is
+    read here; the existing independent restore still owns every byte oracle.
+    Incompatible limits suspend the same target visibly, retaining its cache
+    and pins instead of allocating an orphan generation or widening authority.
+    """
+    pending = _control(store, "checkpoint_archive_refresh_pending")
+    if not pending or pending.get("policy_sha256") == approved_policy_sha256:
+        return False
+    from solana_alpha_lab.factory.offhost_backup import _checkpoint_canonical, CHECKPOINT_SCHEMA
+    try:
+        payload = pending["checkpoint"]
+        encoded = _checkpoint_canonical(payload)
+        digest = hashlib.sha256(encoded).hexdigest()
+        if (len(_json(pending).encode()) > MAX_PLAN_BYTES or payload.get("schema") != CHECKPOINT_SCHEMA
+                or payload.get("schema_version") != "1.0" or digest != pending["checkpoint_sha256"]
+                or not re.fullmatch(r"RECOVERY_CHECKPOINT_\d{8}T\d{6}Z_"+digest+r"\.json", pending["checkpoint_filename"])):
+            raise ValueError("checkpoint")
+        names = {pending["checkpoint_filename"]}
+        known_bytes = len(encoded)
+        for index,item in enumerate([payload["base_full"], *payload["ordered_deltas"]]):
+            expected = ("BACKUP_" if index == 0 else "DELTA_")+item["sha256"]+".zip"
+            if (not re.fullmatch(r"(?:BACKUP|DELTA)_[0-9a-f]{64}\.zip",expected)
+                    or item["filename"] != expected or expected in names
+                    or type(item["bytes"]) is not int or item["bytes"] <= 0):
+                raise ValueError("reference")
+            names.add(expected)
+            known_bytes += item["bytes"]
+        raw_members = 0
+        for item in pending.get("supplemental_archives", []):
+            name = item["filename"]
+            if (not re.fullmatch(r"ARCHIVE_[0-9a-f]{64}\.zip",name)
+                    or item["sha256"] != name[8:-4] or name in names):
+                raise ValueError("supplement")
+            names.add(name)
+            raw_members += len(item["raw_entries"])
+        if (len(names) > 128 or raw_members > MAX_PLAN_ROWS or sorted(names) != pending["pin_objects"]
+                or not re.fullmatch(r"[0-9a-f]{64}",pending["policy_sha256"])):
+            raise ValueError("closure")
+        if pending.get("source_id") and pending["source_id"] != _source_identity(store)["source_id"]:
+            raise ObservationScheduleRetentionError("ARCHIVE_REFRESH_PENDING_SOURCE_CHANGED")
+        # Historical intents predate source_id. Their actual reconstructed
+        # source UUID is still checked before native registration or retirement.
+        for name in names:
+            if store._conn.execute("SELECT 1 FROM retention_archive_pins WHERE object_name=?",(name,)).fetchone() is None:
+                raise ObservationScheduleRetentionError("ARCHIVE_REFRESH_PENDING_PINS_MISSING")
+    except (KeyError, TypeError, ValueError) as exc:
+        if isinstance(exc, ObservationScheduleRetentionError):
+            raise
+        raise ObservationScheduleRetentionError("ARCHIVE_REFRESH_PENDING_IDENTITY_CONFLICT") from exc
+    refresh = policy.get("archive_refresh", {})
+    enabled = policy.get("enabled") and policy.get("auto_retire_terminal") and refresh.get("enabled") is True
+    blocked = None
+    if enabled:
+        if pending["cold_root_relative"] != refresh["cold_root_relative"]:
+            blocked = "ARCHIVE_REFRESH_PENDING_COLD_ROOT_CHANGED"
+        elif len(names) > int(refresh["max_objects"]) or known_bytes > int(refresh["max_bytes"]):
+            blocked = "ARCHIVE_REFRESH_PENDING_BUDGET_EXCEEDED"
+    rebound = {**pending, "policy_sha256": approved_policy_sha256,
+        "previous_policy_sha256": pending["policy_sha256"], "policy_reconciled_at": render_utc(now),
+        "reconciliation_state": "BLOCKED_POLICY" if blocked else ("READY" if enabled else "SUSPENDED_POLICY"),
+        "reconciliation_reason": blocked}
+    _set_control(store, "checkpoint_archive_refresh_pending", rebound)
+    state = _control(store, "maintenance", {})
+    state.update(state="FAILED" if blocked else "YIELD", last_reason=blocked or "POLICY_RECONCILED",
+        next_cursor={"call_ledger":0,"poll_slots":0}, archive_discovery=[])
+    state.pop("last_run_at", None)
+    _set_control(store, "maintenance", state)
+    return True
+
+
 def install_maintenance_policy(store: ObservationScheduleStore, *, policy: Mapping[str, Any],
                                approved_sha256: str, now: datetime) -> dict[str, Any]:
     validate_policy(policy)
@@ -365,6 +439,7 @@ def install_maintenance_policy(store: ObservationScheduleStore, *, policy: Mappi
             raise ObservationScheduleRetentionError("POLICY_REVISION_NOT_MONOTONIC")
         _check_frozen_lower_bounds(store, policy)
         _supersede_stale_policy_plan(store, approved_policy_sha256=approved_sha256, now=now)
+        _reconcile_pending_refresh_policy(store, policy=policy, approved_policy_sha256=approved_sha256, now=now)
         _set_control(store, "policy", {"policy": dict(policy), "approved_policy_sha256": approved_sha256})
         # Explicit commissioning, never startup, owns these consumer indices.
         store._conn.execute("CREATE INDEX IF NOT EXISTS idx_due_retention_occurrence ON due_observations(call_occurrence_id)")
@@ -646,6 +721,8 @@ def checkpoint_archive_refresh_required(root: Path, *, now: datetime) -> dict[st
         if pending:
             if pending.get("policy_sha256") != installed["approved_policy_sha256"]:
                 return {"required": False, "reason": "ARCHIVE_REFRESH_PENDING_POLICY_CHANGED"}
+            if pending.get("reconciliation_state") == "BLOCKED_POLICY":
+                return {"required": False, "reason": pending["reconciliation_reason"]}
             return {"required": True, "reason": "RESUME_EXACT_ARCHIVE_REFRESH", "pending": pending,
                     "budget": dict(refresh), "policy_sha256": installed["approved_policy_sha256"]}
         state = _control(store, "maintenance", {})
@@ -700,7 +777,8 @@ def checkpoint_archive_refresh_intent(store: ObservationScheduleStore, *, checkp
     intent = {"checkpoint_filename": filename, "checkpoint_sha256": digest,
               "checkpoint": payload, "cold_root_relative": cold_relative, "pin_objects": sorted(names),
               "supplemental_archives": supplemental,
-              "policy_sha256": installed["approved_policy_sha256"], "created_at": render_utc(now)}
+              "policy_sha256": installed["approved_policy_sha256"], "created_at": render_utc(now),
+              "source_id": _source_identity(store)["source_id"]}
     from solana_alpha_lab.factory.remote_ops import backup_plane_lock
     with backup_plane_lock(source_root, timeout_seconds=0):
         lease = store.acquire_lease("i2-archive-refresh-intent", clock=now)
@@ -711,6 +789,8 @@ def checkpoint_archive_refresh_intent(store: ObservationScheduleStore, *, checkp
             if pending is not None:
                 if pending.get("policy_sha256") != installed["approved_policy_sha256"]:
                     raise ObservationScheduleRetentionError("ARCHIVE_REFRESH_PENDING_POLICY_CHANGED")
+                if pending.get("reconciliation_state") == "BLOCKED_POLICY":
+                    raise ObservationScheduleRetentionError(pending["reconciliation_reason"])
                 return pending
             store._conn.executemany("INSERT OR IGNORE INTO retention_archive_pins VALUES(?,?)", [(name, digest) for name in names])
             _set_control(store, "checkpoint_archive_refresh_pending", intent)
@@ -1327,7 +1407,9 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
     if reason:
         return {"status": "YIELD", "reason": reason, **retention_status(store)}
     plan = _control(store, "active_plan")
-    if plan and plan.get("policy_sha256") != installed["approved_policy_sha256"]:
+    pending_refresh = _control(store, "checkpoint_archive_refresh_pending")
+    if ((plan and plan.get("policy_sha256") != installed["approved_policy_sha256"])
+            or (pending_refresh and pending_refresh.get("policy_sha256") != installed["approved_policy_sha256"])):
         # Upgrade recovery for a policy installed by a previous binary. The
         # same strict check as commissioning runs once under the native fence;
         # arbitrary candidate/integrity failures never trigger replanning.
@@ -1342,20 +1424,25 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
                 store._conn.rollback()
                 return {"status": "YIELD", "reason": "POLICY_CHANGED"}
             _supersede_stale_policy_plan(store, approved_policy_sha256=installed["approved_policy_sha256"], now=now)
+            _reconcile_pending_refresh_policy(store, policy=effective,
+                approved_policy_sha256=installed["approved_policy_sha256"], now=now)
             store._conn.commit()
             plan = _control(store, "active_plan")
             state = _control(store, "maintenance", {})
         except ObservationScheduleRetentionError as exc:
             store._conn.rollback()
             _set_control(store, "maintenance", {**state, "state":"FAILED", "last_reason":str(exc),
-                "last_run_at":render_utc(now), "active_plan_id":plan["plan_id"]})
+                "last_run_at":render_utc(now), "active_plan_id":plan["plan_id"] if plan else None})
             store._conn.commit()
-            return {"status":"FAILED", "reason":str(exc), "plan_id":plan["plan_id"]}
+            return {"status":"FAILED", "reason":str(exc), "plan_id":plan["plan_id"] if plan else None}
         except Exception:
             store._conn.rollback()
             raise
         finally:
             store.release_lease(lease)
+    pending_refresh = _control(store, "checkpoint_archive_refresh_pending")
+    if pending_refresh and pending_refresh.get("reconciliation_state") == "BLOCKED_POLICY":
+        return {"status":"FAILED", "reason":pending_refresh["reconciliation_reason"], **retention_status(store)}
     if plan is None:
         plan = build_retirement_plan(store, now=now, policy=effective, after=state.get("next_cursor"))
         lease = store.acquire_lease("i2-maintenance-plan", clock=now)
@@ -1756,14 +1843,77 @@ def _apply_physical_reclaim(store: ObservationScheduleStore, *, plan: Mapping[st
         raise
 
 
+def _initial_reclaim_intent_from_plan(path: Path, data_root: Path, plan: Mapping[str, Any],
+                                      approved_plan_sha256: str) -> dict[str, Any]:
+    """Recover a torn first temp write only from the exact approved native plan."""
+    document = dict(plan)
+    plan_id = document.pop("plan_id", None)
+    if (plan_id != approved_plan_sha256 or plan_id != _hash(document)
+            or _root_binding(data_root) != document.get("data_root_binding")
+            or path.is_symlink() or not path.is_file()):
+        raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_IDENTITY_MISMATCH")
+    source = document.get("source", {})
+    if (_root_binding(path) != source.get("db_binding")
+            or _root_binding(path.parent) != source.get("root_binding")):
+        raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_IDENTITY_MISMATCH")
+    with _sqlite_connection(path.as_uri() + "?mode=ro", uri=True) as connection:
+        if native_identity_fingerprint(connection) != document.get("fingerprint"):
+            raise ObservationScheduleRetentionError("RECLAIM_NEW_WRITES_FORWARD_REPAIR_REQUIRED")
+        row = connection.execute("SELECT payload_json FROM retention_control WHERE control_key='source_identity'").fetchone()
+        if row is None or json.loads(row[0]).get("source_id") != source.get("source_id"):
+            raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_IDENTITY_MISMATCH")
+        lease = connection.execute("SELECT owner,lease_token FROM scheduler_leases WHERE lease_id=?", (GLOBAL_LEASE_ID,)).fetchone()
+        if lease is not None and lease[0] != "i2-physical-reclaim":
+            raise ObservationScheduleRetentionError("WRITER_BUSY")
+    return {"schema":"smial.observation-reclaim-intent.v1", "state":"ALLOCATING", "plan_id":plan_id,
+            "fingerprint":document["fingerprint"], "source":source,
+            "data_root_binding":document["data_root_binding"], "lease_token":lease[1] if lease else "",
+            "before_bytes":path.stat().st_size, "initial_recovery_from_approved_plan":True}
+
+
 def recover_physical_reclaim(path: Path, *, data_root: Path, action: str,
-                             approved_plan_sha256: str) -> dict[str, Any]:
+                             approved_plan_sha256: str,
+                             plan: Mapping[str, Any] | None = None) -> dict[str, Any]:
     compact, rollback, intent_path = _reclaim_paths(path)
-    intent = json.loads(intent_path.read_text(encoding="utf-8"))
-    if (intent.get("schema") != "smial.observation-reclaim-intent.v1"
-            or intent["plan_id"] != approved_plan_sha256
-            or _root_binding(data_root) != intent["data_root_binding"]
-            or _root_binding(path.parent) != intent["source"]["root_binding"]):
+    temporary = intent_path.with_suffix(intent_path.suffix + ".tmp")
+    if intent_path.is_symlink() or temporary.is_symlink():
+        raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_IDENTITY_MISMATCH")
+    reconstructed = False
+    try:
+        intent = json.loads(intent_path.read_text(encoding="utf-8")) if intent_path.exists() else None
+        unpublished = (intent is None or (intent.get("plan_id") != approved_plan_sha256
+                       and intent.get("state") in {"FINALIZED", "ROLLBACK_FINALIZED"}))
+        if unpublished:
+            if temporary.is_symlink() or not temporary.is_file():
+                raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_IDENTITY_MISMATCH")
+            previous = intent
+            try:
+                intent = json.loads(temporary.read_text(encoding="utf-8"))
+            except (ValueError, UnicodeError):
+                if plan is None:
+                    raise ObservationScheduleRetentionError("RECLAIM_INITIAL_PLAN_REQUIRED")
+                intent = _initial_reclaim_intent_from_plan(path, data_root, plan, approved_plan_sha256)
+                reconstructed = True
+            # Only the first durable ALLOCATING publication may precede the
+            # final intent. No allocation/rename is authorized before it.
+            if (intent.get("state") != "ALLOCATING"
+                    or any(Path(str(item) + suffix).exists() for item in (compact, rollback)
+                           for suffix in ("", "-wal", "-shm", "-journal"))
+                    or (previous is not None and (previous.get("schema") != "smial.observation-reclaim-intent.v1"
+                        or previous.get("final_db_binding") != _root_binding(path)))):
+                raise ObservationScheduleRetentionError("RECLAIM_STAGING_BINDING_INVALID")
+    except ObservationScheduleRetentionError:
+        raise
+    except (OSError, ValueError, TypeError, AttributeError) as exc:
+        raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_IDENTITY_MISMATCH") from exc
+    try:
+        identity_matches = (intent.get("schema") == "smial.observation-reclaim-intent.v1"
+            and intent["plan_id"] == approved_plan_sha256
+            and _root_binding(data_root) == intent["data_root_binding"]
+            and _root_binding(path.parent) == intent["source"]["root_binding"])
+    except (KeyError, TypeError, AttributeError):
+        identity_matches = False
+    if not identity_matches:
         raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_IDENTITY_MISMATCH")
     if action not in {"rollback", "resume"}:
         raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_ACTION_INVALID")
@@ -1773,6 +1923,8 @@ def recover_physical_reclaim(path: Path, *, data_root: Path, action: str,
     if state in {"ROLLING_BACK", "ROLLED_BACK", "ROLLBACK_FINALIZED"} and action == "resume":
         raise ObservationScheduleRetentionError("RECLAIM_RESUME_AFTER_ROLLBACK_DENIED")
     if state in {"FINALIZED", "ROLLBACK_FINALIZED"}:
+        if temporary.exists():
+            raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_REQUIRED")
         if not path.is_file() or _root_binding(path) != intent.get("final_db_binding"):
             raise ObservationScheduleRetentionError("RECLAIM_RECOVERY_IDENTITY_MISMATCH")
         if any(item.exists() for item in (compact, rollback)):
@@ -1802,6 +1954,17 @@ def recover_physical_reclaim(path: Path, *, data_root: Path, action: str,
         verify(rollback, intent["source"]["db_binding"])
     elif not path.exists():
         raise ObservationScheduleRetentionError("RECLAIM_FINAL_CURRENT_ROLLBACK_MISSING")
+    if unpublished:
+        verify(path, intent["source"]["db_binding"])
+        if action != "rollback":
+            raise ObservationScheduleRetentionError("RECLAIM_SWITCH_INCOMPLETE_USE_ROLLBACK")
+        # Publish the fully validated, fsynced initial bytes before any recovery
+        # transition overwrites the temp file. Repeated kills now have a durable
+        # final intent, and the ordinary exact rollback owns all cleanup.
+        if reconstructed:
+            _write_intent(intent_path, intent)
+        else:
+            _reclaim_replace(temporary, intent_path)
     if action == "resume":
         if state != "RESUMED":
             if compact.exists():

@@ -721,8 +721,17 @@ candidate/integrity conflict остаётся FAILED/refusal и не вызыв�
 replan. Ни SQL-редактирование, ни ежедневный owner action для обычной смены
 approved policy не требуются.
 
+Pending cold refresh также reconciles approved revision: exact checkpoint и pins
+сохраняются, допустимый target получает новую policy binding и проходит обычный
+restore/register. Disable приостанавливает target; после enable действует новая
+selection/scope. Несовместимый cold root/refresh budget виден как BLOCKED_POLICY/
+FAILED и требует точной допустимой revision; false COMPLETE и новая cache
+generation не создаются. Повреждённые identity/source/pins остаются отказом.
+
 Backup contention автоматически повторяется существующим caller ≤120min/30s;
 weekly/daily overlap объединяется по verified bytes и durable pointer. Exhausted
 wait даёт COPY_FAILED/OFFHOST_BUSY_RETRY_EXHAUSTED в bounded scheduler receipt,
 точный pending/resume и existing watch incident; last-good остаётся прежним.
 Успех active backup owner снимает incident. Timers/RPO24h не меняются.
+При одинаковой секунде timestamps terminal failure имеет приоритет над
+IN_PROGRESS; success снимает такой incident только для того же checkpoint.

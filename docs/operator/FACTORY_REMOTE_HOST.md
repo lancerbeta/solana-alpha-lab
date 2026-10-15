@@ -192,3 +192,8 @@ opens/ticks и уже открытые writers отказывают при unfin
 выполняются по staged OPERATE. После durable resume decision rollback запрещён;
 повтор resume заканчивает owned cleanup и оставляет небольшой FINALIZED receipt,
 удаляя точные rollback/staging bytes. Не удалять intent/staging вручную.
+Первый fsynced intent.tmp штатно принимает exact rollback. Для torn first JSON
+передать сохранённый approved `--plan` с теми же roots/hash; отсутствие plan даёт
+`RECLAIM_INITIAL_PLAN_REQUIRED`. Проверяются original inode/native fingerprint,
+отсутствие stages и точный plan self-hash. Backup отказывает при unfinished
+reclaim; проверенная terminal inode-bound квитанция в portable payload не входит.

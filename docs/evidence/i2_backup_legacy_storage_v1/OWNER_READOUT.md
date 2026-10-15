@@ -45,6 +45,26 @@ terminal inode-bound квитанцию. Actual nested full и sibling mutable r
 чужой terminal inode также DENY. Production backup после finalized reclaim остаётся
 частью того же staged acceptance.
 
+Независимый code review нашёл ещё первую durable `.intent.json.tmp` до публикации:
+guard отказывал, recovery получал `FileNotFoundError`. Теперь exact rollback
+проверяет plan/roots/source inode/fingerprint и принимает только initial
+`ALLOCATING` без staged DB. Отдельный kill-process → обычный collector DENY без
+mutation → штатный CLI rollback → writer PASS проверен для первой и следующей
+операции. Wrong approval/premature resume отказывают; ручное удаление не требуется.
+Torn first JSON также восстанавливается тем же CLI с сохранённым approved
+`--plan`: проверяются self-hash/source roots/inode/native fingerprint и отсутствие
+stages; без plan — typed `RECLAIM_INITIAL_PLAN_REQUIRED`. Partial-write kill
+проверен для первой и следующей операции, исходные UUID/ROWID/counters сохранены.
+
+Тот же review выявил same-second incident race и pending cold-refresh policy
+deadlock. Raw JSON/health oracle теперь сохраняет terminal exhaustion поверх
+`IN_PROGRESS`; exact same-checkpoint success снимает incident. Реальный pending
+checkpoint после narrower revision до ремонта давал 4×COMPLETE при DISABLED
+refresh и неизменных HOT bodies. После bounded metadata reconciliation тот же
+checkpoint/pins проходят ordinary restore/register и retirement под новой policy.
+Disable/enable сохраняет target; несовместимые cold-root/refresh limits дают
+`BLOCKED_POLICY/FAILED`, повреждение identity/source/pins остаётся отказом.
+
 ## Проверенный эффект и предел чисел
 
 | Величина | BEFORE → AFTER | Что именно измерено |

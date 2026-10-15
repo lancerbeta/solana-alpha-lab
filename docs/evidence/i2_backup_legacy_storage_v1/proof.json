@@ -528,7 +528,7 @@
       "health_topology_direct_consumers": {
         "result": "PASS",
         "tests": 49,
-        "wall_seconds": 2.084
+        "wall_seconds": 2.03
       },
       "factory_static": "PASS",
       "reclaim_backup_seam": {
@@ -545,6 +545,23 @@
         "result": "PASS",
         "tests": 62,
         "wall_seconds": 17.584
+      },
+      "initial_temp_and_torn_write": {
+        "result": "PASS",
+        "tests": 2,
+        "wall_seconds": 4.907
+      },
+      "combined_owner_pipeline_before_last_root_import": {
+        "result": "PASS",
+        "tests": 100,
+        "skipped": 1,
+        "wall_seconds": 80.271,
+        "scope": "before last root recovery import; final retention run supersedes that module"
+      },
+      "final_retention_owner": {
+        "result": "PASS",
+        "tests": 39,
+        "wall_seconds": 43.38
       }
     },
     "production_mutations": false,
@@ -578,6 +595,83 @@
       "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1 -q",
       "independent_oracle": "actual native reclaim and fresh target inode; raw SQLite rows/ROWIDs/sequence and filesystem absence/hash readbacks; standard marker reconciliation then native event write",
       "production_gate": "ordinary backup after finalized native reclaim, independent restore/reconciliation and next writer in separately authorized staged acceptance"
+    },
+    "independent_review_remediation": {
+      "observed_head": "3eb796f297862572e3441bb7a707bb1820d8435d",
+      "prior_packet_fingerprint_sha256": "e30f89cd0324108ed4c03286a159deb676e3d5535d36acc18ec89a4068f20ac3",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "NOT_READY",
+        "GOAL_DOD_CRITIC": "NOT_READY",
+        "ARCHITECTURE_CRITIC": "NOT_READY"
+      },
+      "initial_reclaim_temp": {
+        "before": "child exit73 after first temp fsync before atomic publication; native writer REFUSE, exact resume/rollback FileNotFoundError",
+        "owning_fix": "validate initial ALLOCATING temp against approved plan/root/source inode/native fingerprint, publish before ordinary rollback; optional existing CLI --plan reconstructs torn first JSON only from self-hashed exact plan with no staged DB and matching native source/lease",
+        "after": {
+          "actual_collector": "RECLAIM_RECOVERY_REQUIRED_BEFORE_ANY_FILE_MUTATION",
+          "first_and_after_previous_terminal": "EXACT_CLI_ROLLBACK_THEN_NEXT_NATIVE_WRITER_PASS",
+          "torn_first_JSON": "EXACT_CLI_ROLLBACK_WITH_APPROVED_PLAN",
+          "missing_plan_for_torn_JSON": "RECLAIM_INITIAL_PLAN_REQUIRED",
+          "wrong_approval": "DENY",
+          "premature_resume": "DENY",
+          "source_uuid_ROWID317_debits19_271": "EXACT",
+          "temp_after_cleanup": "ABSENT",
+          "terminal": "ROLLBACK_FINALIZED"
+        },
+        "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.ReclaimRestartSafetyTests -q",
+        "independent_oracle": "separate child death at fsynced and partial first write; actual collector CLI, exact recovery CLI, raw mode=ro SQLite fingerprint/ROWID/counter and main/WAL/intent hashes; read-only recovery may regenerate SHM cache",
+        "production_gate": "Linux actual source/filesystem staged exact recovery; hardware power-loss not established"
+      },
+      "same_second_exhaustion": {
+        "before": "primary IN_PROGRESS observed_at=T hides scheduler COPY_FAILED failed_at=T; failure_code absent and MUTABLE_BACKUP_FAILED absent",
+        "owning_fix": "terminal precedence at equal timestamp while retaining exact same-checkpoint successful-owner resolution",
+        "after": {
+          "selected": "COPY_FAILED",
+          "incident": "MUTABLE_BACKUP_FAILED",
+          "unrelated_same_second_success": "DOES_NOT_HIDE_FAILURE",
+          "same_checkpoint_owner_success": "RESOLVES"
+        },
+        "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_offhost_checkpoint_v1.I2OffhostCheckpointTests.test_same_second_exhaustion_wins_in_progress_and_reaches_incident_classifier -q",
+        "independent_oracle": "direct disposable receipt JSON with identical timestamps plus actual read_offhost_attempt and classify_incidents; no timing/sleep oracle",
+        "production_gate": "actual scheduled exhaustion/incident/recovery delivery remains staged"
+      },
+      "pending_refresh_policy": {
+        "before": {
+          "ordinary_cycles": 4,
+          "maintenance": "COMPLETE_READY",
+          "refresh": "DISABLED_ARCHIVE_REFRESH_PENDING_POLICY_CHANGED",
+          "HOT_bodies": [
+            2,
+            2,
+            2,
+            2
+          ],
+          "registered_archive": "ABSENT"
+        },
+        "owning_fix": "native approved-install and previous-binary ordinary path reconcile bounded exact pending metadata/source/pins to current policy, preserve target identity, suspend disabled policy, expose incompatible authority as BLOCKED_POLICY/FAILED without new cache or old wider apply",
+        "after": {
+          "ordinary_fresh_process_HOT_bodies": [
+            2,
+            1,
+            0,
+            0
+          ],
+          "max_rows": 1,
+          "first_refresh": "REGISTERED_CHECKPOINT_COLD_PIN_REGISTERED",
+          "same_checkpoint_sha256_observed": "3bec5dda5c34a7dd1723bb94e4d17294684096dfae47670cff5b7419dd0aad50",
+          "pin_count": 2,
+          "before_after_pin_canonical_sha256_observed": "b8e8a1031a9db80dc487cd4ae571083001f85380ecd1d7bceae55c6202709bf4",
+          "hash_scope": "this disposable fixture only; not production pins",
+          "ROWIDs_clocks_remote_bytes": "UNCHANGED",
+          "pending_after_success": "CLEARED",
+          "disable_enable_new_scope": "OLD_BODIES_PRESERVED_NEW_SELECTION_ONLY",
+          "incompatible_max_objects1": "TWO_ORDINARY_FAILED_ARCHIVE_REFRESH_PENDING_BUDGET_EXCEEDED_NO_ALLOCATION_OR_BODY_EFFECTS",
+          "identity_source_pin_conflicts": "REFUSAL_PREVIOUS_POLICY_UNCHANGED"
+        },
+        "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.CheckpointRefreshPolicyRecoveryTests -q",
+        "independent_oracle": "actual checkpoint+native pending under old approved policy, separately reopened ordinary caller, filesystem fake-remote exact bytes, raw SQLite body/ROWID/clock/provenance and canonical pin hash; no network",
+        "production_gate": "separately approved actual revision and installed ordinary cold refresh/maintenance cycle"
+      }
     }
   }
 }

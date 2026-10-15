@@ -304,6 +304,219 @@ with patch.object(owner,'compact_payload',side_effect=die_on_second):
         self.assertEqual(self.store._conn.execute('SELECT payload_json FROM call_ledger WHERE rowid=11').fetchone()[0],before[0][1])
 
 
+class CheckpointRefreshPolicyRecoveryTests(NativeFixture):
+    def pending_checkpoint(self):
+        from dataclasses import replace
+        import yaml
+        from tests.test_factory_offhost_backup import FakeRcloneRunner, _seed_tree
+        from solana_alpha_lab.factory import offhost_backup as backup
+        _seed_tree(self.hot)
+        self.store.close()
+        target=self.hot/'local/factory_v1/observation_schedule_state.sqlite'
+        target.unlink()
+        self.path.replace(target)
+        self.path=target
+        self.store=ObservationScheduleStore(self.path)
+        for relative in ('configs/observation_schedule_runtime_v1.yaml',
+                         'catalog/schemas/observation_schedule_runtime_v1.schema.json'):
+            target=self.hot/relative; target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes((ROOT/relative).read_bytes())
+        runtime_path=self.hot/'configs/observation_schedule_runtime_v1.yaml'
+        source_relative=self.path.relative_to(self.hot).as_posix()
+        runtime=yaml.safe_load(runtime_path.read_text()); runtime['ops_store_relative']=source_relative
+        runtime_path.write_text(yaml.safe_dump(runtime),encoding='utf-8')
+        config_path=self.hot/'configs/factory_remote_operations_v1_1.yaml'
+        loaded=yaml.safe_load(config_path.read_text())
+        previous=loaded['stores']['observation_schedule_relative']
+        loaded['stores']['observation_schedule_relative']=source_relative
+        for key in ('source_relative_paths','mutable_only_source_relative_paths'):
+            loaded['backup'][key]=[source_relative if relative==previous else relative
+                                    for relative in loaded['backup'][key]]
+        config_path.write_text(yaml.safe_dump(loaded),encoding='utf-8')
+        credentials=self.hot/'rclone-fixture.conf'
+        credentials.write_text('[fixture]\ntype = drive\n',encoding='utf-8'); credentials.chmod(0o600)
+        config=replace(backup.load_offhost_config(self.hot),rclone_config_absolute=credentials)
+        add_scope(self.store,'LEGACY','COMPLETE')
+        for occurrence,rowid in (('FIRST',11),('SECOND',29)):
+            add_call(self.store,occurrence,rowid=rowid,size=1000)
+        document=policy(enabled=True)
+        document.update(max_rows=2,auto_retire_terminal=True,allowed_classes=['call_ledger'],
+            archive_refresh={'enabled':True,'max_objects':32,'max_bytes':16*1024*1024,
+                'max_wall_seconds':30,'cold_root_relative':'cold','minimum_interval_seconds':1,
+                'local_cache_retained':1})
+        owner.install_maintenance_policy(self.store,policy=document,
+            approved_sha256=owner.policy_sha256(document),now=NOW)
+        remote=FakeRcloneRunner()
+        receipt=backup.run_offhost_checkpoint(self.hot,mode='daily',config=config,runner=remote,now=NOW)
+        checkpoint_path=next(self.hot.rglob(receipt['checkpoint_filename']))
+        checkpoint={'checkpoint_filename':receipt['checkpoint_filename'],
+            'checkpoint_sha256':receipt['checkpoint_sha256'],
+            'checkpoint':backup.validate_recovery_checkpoint(checkpoint_path)}
+        pending=owner.checkpoint_archive_refresh_intent(self.store,checkpoint=checkpoint,
+            cold_relative='cold',now=NOW,source_root=self.hot)
+        remote_root=self.base/'independent-remote'; remote_root.mkdir()
+        for name,payload in remote.payloads.items():
+            (remote_root/Path(name).name).write_bytes(payload)
+        return document,pending,remote_root
+
+    def ordinary_refresh_process(self, remote, now):
+        self.store.close()
+        child=r'''import hashlib,json,subprocess,sys
+from dataclasses import replace
+from pathlib import Path
+from unittest.mock import patch
+sys.path.insert(0,str(Path.cwd()/'src'))
+from solana_alpha_lab.factory import observation_schedule_retention as owner, offhost_backup as backup
+from solana_alpha_lab.factory.observation_schedule import parse_utc
+root,remote=Path(sys.argv[1]),Path(sys.argv[2])
+config=replace(backup.load_offhost_config(root),rclone_config_absolute=root/'rclone-fixture.conf')
+def transport(argv):
+ command=argv[3]
+ if command=='copyto':
+  source=remote/Path(argv[-2]).name
+  if not source.is_file(): return subprocess.CompletedProcess(argv,1,'','object not found')
+  Path(argv[-1]).write_bytes(source.read_bytes())
+  return subprocess.CompletedProcess(argv,0,'','')
+ source=remote/Path(argv[-1]).name
+ if not source.is_file(): return subprocess.CompletedProcess(argv,1,'[]','object not found')
+ if command=='lsjson': return subprocess.CompletedProcess(argv,0,json.dumps([{'Path':source.name,'Size':source.stat().st_size}]),'')
+ if command=='hashsum': return subprocess.CompletedProcess(argv,0,hashlib.md5(source.read_bytes(),usedforsecurity=False).hexdigest()+'  '+source.name+'\n','')
+ raise AssertionError(command)
+original=Path.read_text
+def pressure(path,*args,**kwargs):
+ if path.as_posix()=='/proc/meminfo': return 'MemAvailable: 1048576 kB\n'
+ if path.as_posix()=='/proc/pressure/io': return 'some avg10=0.00 avg60=0.00 avg300=0.00 total=0\n'
+ return original(path,*args,**kwargs)
+with patch.object(backup,'load_offhost_config',return_value=config),patch.object(owner.os,'getloadavg',return_value=(0,0,0),create=True),patch.object(Path,'read_text',pressure):
+ print(json.dumps(backup.run_checkpoint_maintenance(root,{},now=parse_utc(sys.argv[3]),runner=transport)))
+'''
+        result=subprocess.run([sys.executable,'-B','-c',child,str(self.hot),str(remote),render_utc(now)],
+            cwd=ROOT,capture_output=True,text=True,timeout=30)
+        self.store=ObservationScheduleStore(self.path)
+        self.assertEqual(result.returncode,0,result.stderr)
+        return json.loads(result.stdout)
+
+    def test_pending_refresh_rebinds_approved_narrower_policy_and_ordinary_restart_progresses(self):
+        document,pending,remote=self.pending_checkpoint()
+        with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+            pins_before=raw.execute('SELECT * FROM retention_archive_pins ORDER BY object_name').fetchall()
+            rows_before=raw.execute('SELECT rowid,created_at,updated_at,payload_json FROM call_ledger ORDER BY rowid').fetchall()
+        remote_before={path.name:hashlib.sha256(path.read_bytes()).hexdigest() for path in remote.iterdir()}
+        revised={**document,'revision':2,'max_rows':1}
+        owner.install_maintenance_policy(self.store,policy=revised,
+            approved_sha256=owner.policy_sha256(revised),now=NOW+timedelta(minutes=1))
+        rebound=owner._control(self.store,'checkpoint_archive_refresh_pending')
+        self.assertEqual(rebound['checkpoint'],pending['checkpoint'])
+        self.assertEqual(rebound['pin_objects'],pending['pin_objects'])
+        results=[]; remaining=[]
+        for minute in (2,4,6,8):
+            results.append(self.ordinary_refresh_process(remote,NOW+timedelta(minutes=minute)))
+            with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+                remaining.append(raw.execute("SELECT count(*) FROM call_ledger WHERE json_extract(payload_json,'$.raw_payload_retention') IS NULL").fetchone()[0])
+            self.assertLessEqual((remaining[-2] if len(remaining)>1 else 2)-remaining[-1],1)
+        with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+            archive_row=raw.execute("SELECT payload_json FROM retention_control WHERE control_key='checkpoint_archive'").fetchone()
+            pins_after=raw.execute('SELECT * FROM retention_archive_pins ORDER BY object_name').fetchall()
+            rows_after=raw.execute('SELECT rowid,created_at,updated_at,payload_json FROM call_ledger ORDER BY rowid').fetchall()
+        self.assertIsNotNone(archive_row,(remaining,results))
+        archive=json.loads(archive_row[0])
+        self.assertEqual(rebound['policy_sha256'],owner.policy_sha256(revised))
+        self.assertEqual(remaining[-1],0,(remaining,results))
+        self.assertEqual(archive['checkpoint_sha256'],pending['checkpoint_sha256'])
+        self.assertEqual(pins_after,pins_before)
+        self.assertEqual([row[:3] for row in rows_after],[row[:3] for row in rows_before])
+        self.assertEqual({path.name:hashlib.sha256(path.read_bytes()).hexdigest() for path in remote.iterdir()},remote_before)
+        self.assertIsNone(owner._control(self.store,'checkpoint_archive_refresh_pending'))
+
+    def test_previous_binary_pending_reconciles_through_ordinary_restart(self):
+        import types
+        document,pending,remote=self.pending_checkpoint()
+        historical=types.ModuleType('i2_frozen_pending_policy_owner')
+        source=subprocess.check_output(['git','show',
+            '3eb796f297862572e3441bb7a707bb1820d8435d:src/solana_alpha_lab/factory/observation_schedule_retention.py'],cwd=ROOT)
+        exec(compile(source,'<pinned-pending-policy-owner>','exec'),historical.__dict__)
+        revised={**document,'revision':2,'max_rows':1}
+        historical.install_maintenance_policy(self.store,policy=revised,
+            approved_sha256=owner.policy_sha256(revised),now=NOW+timedelta(minutes=1))
+        self.assertEqual(owner._control(self.store,'checkpoint_archive_refresh_pending'),pending)
+        results=[self.ordinary_refresh_process(remote,NOW+timedelta(minutes=minute)) for minute in (2,4,6,8)]
+        with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+            archive=json.loads(raw.execute("SELECT payload_json FROM retention_control WHERE control_key='checkpoint_archive'").fetchone()[0])
+            remaining=raw.execute("SELECT count(*) FROM call_ledger WHERE json_extract(payload_json,'$.raw_payload_retention') IS NULL").fetchone()[0]
+            pins=raw.execute('SELECT object_name FROM retention_archive_pins').fetchall()
+        self.assertEqual(remaining,0,results)
+        self.assertEqual(archive['checkpoint_sha256'],pending['checkpoint_sha256'])
+        self.assertEqual({row[0] for row in pins},set(pending['pin_objects']))
+
+    def test_disable_then_enable_new_scope_preserves_old_bodies_and_exact_cache_target(self):
+        document,pending,remote=self.pending_checkpoint()
+        disabled={**document,'revision':2,'enabled':False,'max_rows':1}
+        owner.install_maintenance_policy(self.store,policy=disabled,
+            approved_sha256=owner.policy_sha256(disabled),now=NOW+timedelta(minutes=1))
+        self.assertEqual(self.ordinary_refresh_process(remote,NOW+timedelta(minutes=2))['status'],'DISABLED')
+        suspended=owner._control(self.store,'checkpoint_archive_refresh_pending')
+        self.assertEqual(suspended['reconciliation_state'],'SUSPENDED_POLICY')
+        enabled={**disabled,'revision':3,'enabled':True,
+            'allowed_scopes':[{'schedule_sha256':'a'*64,'activation_id':'OTHER'}]}
+        owner.install_maintenance_policy(self.store,policy=enabled,
+            approved_sha256=owner.policy_sha256(enabled),now=NOW+timedelta(minutes=3))
+        for minute in (4,6):
+            self.assertNotEqual(self.ordinary_refresh_process(remote,NOW+timedelta(minutes=minute))['status'],'FAILED')
+        with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+            bodies=[json.loads(row[0]) for row in raw.execute('SELECT payload_json FROM call_ledger')]
+            retired=raw.execute('SELECT count(*) FROM retirement_scopes').fetchone()[0]
+            archive=json.loads(raw.execute("SELECT payload_json FROM retention_control WHERE control_key='checkpoint_archive'").fetchone()[0])
+        self.assertTrue(all('rows' in body for body in bodies))
+        self.assertEqual(retired,0)
+        self.assertEqual(archive['checkpoint_sha256'],pending['checkpoint_sha256'])
+        self.assertEqual([path.name for path in (self.hot/'cold').iterdir()],[pending['checkpoint_sha256']])
+
+    def test_incompatible_pending_budget_is_visible_without_widening_or_losing_pins(self):
+        document,pending,remote=self.pending_checkpoint()
+        revised={**document,'revision':2,'max_rows':1,
+            'archive_refresh':{**document['archive_refresh'],'max_objects':1}}
+        owner.install_maintenance_policy(self.store,policy=revised,
+            approved_sha256=owner.policy_sha256(revised),now=NOW+timedelta(minutes=1))
+        before=owner._control(self.store,'checkpoint_archive_refresh_pending')
+        for minute in (2,4):
+            outcome=self.ordinary_refresh_process(remote,NOW+timedelta(minutes=minute))
+            self.assertEqual(outcome['status'],'FAILED',outcome)
+            self.assertEqual(outcome['reason'],'ARCHIVE_REFRESH_PENDING_BUDGET_EXCEEDED')
+        self.assertEqual(owner._control(self.store,'checkpoint_archive_refresh_pending'),before)
+        self.assertEqual(before['checkpoint'],pending['checkpoint'])
+        self.assertEqual(before['pin_objects'],pending['pin_objects'])
+        self.assertEqual(before['reconciliation_state'],'BLOCKED_POLICY')
+        self.assertTrue(all('rows' in json.loads(row[0]) for row in self.store._conn.execute('SELECT payload_json FROM call_ledger')))
+        self.assertEqual(self.store._conn.execute('SELECT count(*) FROM retention_archive_pins').fetchone()[0],len(pending['pin_objects']))
+        self.assertFalse((self.hot/'cold').exists())
+
+    def test_policy_reconciliation_does_not_hide_pending_identity_source_or_pin_conflict(self):
+        for conflict,reason in (('checkpoint','ARCHIVE_REFRESH_PENDING_IDENTITY_CONFLICT'),
+                ('source','ARCHIVE_REFRESH_PENDING_SOURCE_CHANGED'),('pins','ARCHIVE_REFRESH_PENDING_PINS_MISSING')):
+            with self.subTest(conflict=conflict):
+                fixture=CheckpointRefreshPolicyRecoveryTests(); fixture.setUp()
+                try:
+                    document,pending,_=fixture.pending_checkpoint()
+                    if conflict=='checkpoint':
+                        pending['checkpoint']['result_inventory_sha256']='0'*64
+                        owner._set_control(fixture.store,'checkpoint_archive_refresh_pending',pending)
+                    elif conflict=='source':
+                        owner._set_control(fixture.store,'source_identity',{'source_id':'a genuinely different source'})
+                    else:
+                        fixture.store._conn.execute('DELETE FROM retention_archive_pins WHERE object_name=?',(pending['pin_objects'][0],))
+                    fixture.store._conn.commit()
+                    before=owner._control(fixture.store,'checkpoint_archive_refresh_pending')
+                    revised={**document,'revision':2,'max_rows':1}
+                    with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,reason):
+                        owner.install_maintenance_policy(fixture.store,policy=revised,
+                            approved_sha256=owner.policy_sha256(revised),now=NOW+timedelta(minutes=1))
+                    self.assertEqual(owner._control(fixture.store,'policy')['policy'],document)
+                    self.assertEqual(owner._control(fixture.store,'checkpoint_archive_refresh_pending'),before)
+                    self.assertTrue(all('rows' in json.loads(row[0]) for row in fixture.store._conn.execute('SELECT payload_json FROM call_ledger')))
+                finally:
+                    fixture.tearDown()
+
+
 class NativeRetentionTests(NativeFixture):
     def discovery_policy(self):
         document=policy(scope='TARGET',enabled=True)
@@ -1040,12 +1253,20 @@ path, root, phase = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
 plan, proof = json.loads(sys.argv[4]), json.loads(sys.argv[5])
 write, replace = o._write_intent, o.os.replace
 def checkpoint(target, value):
+    if phase == 'PARTIAL_INITIAL_INTENT' and value['state'] == 'ALLOCATING':
+        with target.with_suffix(target.suffix+'.tmp').open('w') as partial:
+            partial.write('{"schema":')
+            partial.flush()
+            os.fsync(partial.fileno())
+        os._exit(73)
     if phase == 'NEW_BEFORE_INTENT' and value['state'] == 'PREPARED':
         os._exit(73)
     write(target, value)
     if value['state'] == phase:
         os._exit(73)
 def rename(source, target):
+    if phase == 'INITIAL_INTENT_TMP' and Path(target) == o._reclaim_paths(path)[2]:
+        os._exit(73)
     replace(source, target)
     if phase == 'RENAME_BEFORE_INTENT' and Path(source) == path and Path(target) == o._reclaim_paths(path)[1]:
         os._exit(73)
@@ -1059,6 +1280,71 @@ with patch.object(o, '_write_intent', checkpoint), patch.object(o.os, 'replace',
             json.dumps(plan),json.dumps(proof),render_utc(NOW)],capture_output=True,text=True,cwd=ROOT)
         self.assertEqual(result.returncode,73,result.stderr)
         return plan
+
+    def test_first_durable_temp_intent_and_next_operation_recover_via_exact_cli(self):
+        self._assert_initial_temp_recovery(partial=False)
+
+    def test_torn_initial_temp_write_requires_approved_plan_then_exact_cli_rollback(self):
+        self._assert_initial_temp_recovery(partial=True)
+
+    def _assert_initial_temp_recovery(self, *, partial):
+        self.store.close()
+        self.path=self.path.rename(self.hot/'observation_schedule_state.sqlite')
+        self.store=ObservationScheduleStore(self.path)
+        for previous_terminal in (False, True):
+            with self.subTest(previous_terminal=previous_terminal):
+                if previous_terminal:
+                    self.store.record_event('NEXT_EXACT_RECLAIM',{},clock=NOW)
+                suffix='next' if previous_terminal else 'first'
+                with patch.object(self,'archive',lambda: owner.create_cold_archive(self.store,
+                        archive_path=self.base/(suffix+'-archive.sqlite'),
+                        restored_path=self.base/(suffix+'-restored.sqlite'),routine_roots=[self.hot])):
+                    plan=self._killed_reclaim('PARTIAL_INITIAL_INTENT' if partial else 'INITIAL_INTENT_TMP')
+                compact, rollback, intent=owner._reclaim_paths(self.path)
+                temporary=intent.with_suffix(intent.suffix+'.tmp')
+                self.assertEqual(intent.exists(),previous_terminal)
+                if partial:
+                    self.assertEqual(temporary.read_text(),'{"schema":')
+                    with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,'RECLAIM_INITIAL_PLAN_REQUIRED'):
+                        owner.recover_physical_reclaim(self.path,data_root=self.hot,action='rollback',
+                            approved_plan_sha256=plan['plan_id'])
+                else:
+                    self.assertEqual(json.loads(temporary.read_text())['state'],'ALLOCATING')
+                self.assertFalse(compact.exists())
+                self.assertFalse(rollback.exists())
+                before={p.name:hashlib.sha256(p.read_bytes()).hexdigest()
+                    for p in self.path.parent.iterdir() if p.is_file()}
+                collector=subprocess.run([sys.executable,'-B',str(ROOT/'scripts/observation_schedule.py'),
+                    'tick','--once','--data-root',str(self.path.parent)],capture_output=True,text=True,cwd=ROOT)
+                self.assertEqual(collector.returncode,2,collector.stdout+collector.stderr)
+                self.assertEqual(json.loads(collector.stdout)['terminal'],'RECLAIM_RECOVERY_REQUIRED')
+                self.assertEqual({p.name:hashlib.sha256(p.read_bytes()).hexdigest()
+                    for p in self.path.parent.iterdir() if p.is_file()},before)
+                for action, approval, error in (
+                        ('rollback','0'*64,'RECLAIM_RECOVERY_IDENTITY_MISMATCH'),
+                        ('resume',plan['plan_id'],'RECLAIM_SWITCH_INCOMPLETE_USE_ROLLBACK')):
+                    with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,error):
+                        owner.recover_physical_reclaim(self.path,data_root=self.hot,action=action,
+                            approved_plan_sha256=approval,plan=plan if partial else None)
+                self.assertEqual({p.name:hashlib.sha256(p.read_bytes()).hexdigest()
+                    for p in self.path.parent.iterdir() if p.is_file() and not p.name.endswith('-shm')},
+                    {name:digest for name,digest in before.items() if not name.endswith('-shm')})
+                saved_plan=self.base/(suffix+'-approved-plan.json')
+                saved_plan.write_text(json.dumps(plan))
+                recovery=subprocess.run([sys.executable,'-B',str(ROOT/'scripts/observation_schedule_retention.py'),
+                    'reclaim-rollback','--store',str(self.path),'--data-root',str(self.hot),
+                    '--approved-sha256',plan['plan_id'],'--i-understand-apply',
+                    *(['--plan',str(saved_plan)] if partial else [])],
+                    capture_output=True,text=True,cwd=ROOT)
+                self.assertEqual(recovery.returncode,0,recovery.stdout+recovery.stderr)
+                self.assertEqual(json.loads(recovery.stdout)['status'],'ROLLED_BACK')
+                self.assertFalse(temporary.exists())
+                self.assertEqual(json.loads(intent.read_text())['state'],'ROLLBACK_FINALIZED')
+                with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+                    self.assertEqual(owner.native_identity_fingerprint(raw),plan['fingerprint'])
+                    self.assertEqual(raw.execute('SELECT rowid FROM call_ledger').fetchone()[0],317)
+                    self.assertEqual(raw.execute('SELECT provider_calls,canonical_bytes FROM lifetime_counters').fetchone(),(19,271))
+                self.store=ObservationScheduleStore(self.path)
 
     def test_reboot_writer_refuses_all_reclaim_crash_windows_before_native_open(self):
         # Each phase is a real child-process death, not exception cleanup.

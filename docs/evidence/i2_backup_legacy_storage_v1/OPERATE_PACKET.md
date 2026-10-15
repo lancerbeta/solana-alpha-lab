@@ -188,6 +188,7 @@ data_root identity должны совпасть с plan. Затем обяза�
 uv run --locked --managed-python python -B scripts/observation_schedule_retention.py reclaim-resume \
   --store "$EXACT_OPS_STORE" --operation-mode OPERATE \
   --factory-root "$EXACT_FACTORY_ROOT" --data-root "$EXACT_FROZEN_DATA_ROOT" \
+  --plan "$NEW_RECLAIM_PLAN_JSON" \
   --approved-sha256 "$APPROVED_RECLAIM_PLAN_SHA256" --i-understand-apply
 ```
 
@@ -219,6 +220,8 @@ reclaim guard до SQLite creation/mutation. При незавершённом s
 
 | Durable phase после interruption | Допустимый следующий шаг при quiesced writers |
 |---|---|
+| первая fsynced intent.tmp, final ещё отсутствует либо относится к прошлой terminal operation | exact rollback проверяет plan/roots/source inode/native fingerprint, публикует initial ALLOCATING и завершает штатный cleanup; resume до allocation отказывает |
+| первая intent.tmp содержит torn/неполный JSON | `reclaim-rollback --plan "$NEW_RECLAIM_PLAN_JSON"` с теми же exact roots/hash; self-hashed plan и current native fingerprint восстанавливают initial intent только без new/rollback stages. Без plan — `RECLAIM_INITIAL_PLAN_REQUIRED`; ручное удаление не требуется |
 | ALLOCATING / owned incomplete new | exact rollback; original current, unfinished new удаляется только после проверки ownership |
 | PREPARED | exact resume завершает switch либо exact rollback сохраняет original |
 | между rename и intent update / ORIGINAL_MOVED | exact recovery определяет phase по inode identities; resume либо rollback |
@@ -241,6 +244,16 @@ ROWIDs/pins, отменяет только неприменённый остат
 также восстанавливает stale plan, оставленный предыдущим бинарником. Настоящий
 candidate/archive/effect conflict остаётся FAILED/refusal; автоматического
 пересоздания вокруг него нет. Возраст, clocks и approvals не сбрасываются.
+
+Pending cold refresh также переходит на approved policy после bounded metadata/
+source/pin checks, без deep ZIP IO под install lease. Exact checkpoint и pins
+сохраняются; restore/register по новым limits остаётся обязательным byte oracle.
+Disable приостанавливает тот же target, enable продолжает под новым scope.
+Несовместимый cold root или refresh budget сохраняет target как `BLOCKED_POLICY`
+с FAILED, без новой cache generation. Исправление — допустимая exact policy
+revision; не удалять pending/pins вручную. Повреждение identity/source/pins даёт
+refusal. Same-second backup terminal failure также виден через existing watch;
+снять его может подтверждённый success того же checkpoint.
 
 Caller — existing daily/weekly offhost backup command после завершения checkpoint;
 native maintenance вновь берёт backup-plane lock до OPS fence и уступает due,
