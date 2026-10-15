@@ -105,11 +105,11 @@
     "spend": 0,
     "strategy_activation_paper_writes": 0
   },
-  "state_change": "Implementation/recovery/source-role/Catalogidentity repairs completewithinunchangedscientificcontract. Newownergoalmandate recorded; current53bindings freshlyreviewed byall4requiredroles PASS includingSEMANTIC_PREMISE. Nativecommittedclassify/submit zero values/evaluator/reserve/charge/storewrites;26Catalogchecks plusprior34/55PASS. Sevennamedcharges/results/core immutable; historicalNOT_READYpreserved. Bind/preflight/push/exactCI/readiness follow separately; no mergeauthority.",
+  "state_change": "Implementation/recovery/source-role/Catalogidentity repairs completewithinunchangedscientificcontract. Newownergoalmandate recorded; current53bindings freshlyreviewed byall4requiredroles PASS includingSEMANTIC_PREMISE. Nativecommittedclassify/submit zero values/evaluator/reserve/charge/storewrites;26Catalogchecks plusprior34/55PASS. Sevennamedcharges/results/core immutable; historicalNOT_READYpreserved. Bind/preflight/push/exactCI/readiness follow separately; no mergeauthority. Nativecompletionformat corrected toproject-bound/liveCIenforcementdeclarations, notclaimedgatePASS; actualbind1typedformatfailure retained. ExactheadCIstillpending.",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
   "validation": {
-    "full_gate": "NOT_EXECUTED_PRE_PR; GUARDED_MERGE_SOLE_EXECUTOR; MERGE_NOT_AUTHORIZED",
-    "github_ci": "CURRENT_CANDIDATE_PRE_PUSH_PENDING;ORIGINAL_PR406_HEAD3A_FAILURE_PRESERVED",
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/list_a_confirming_producer_v1/independent-review.json",
       "sha256": "451965eb14f734b9ae5a4f0b8093dd6d065b8e246c164b0b36184191323ddb24",
@@ -123,12 +123,12 @@
       "PASS_MEASURED_FORWARD_RESOURCE_ENVELOPE",
       "PASS_CURRENT_NATIVE_SOURCE_ROLE_FALSIFIER_2B906_WITNESS_SHA256_2c4577a7a72106b40bc40855f7ce228c310446873ba94adad2e2a9d01ce552f1",
       "PASS_COMMITTED_RECOVERY_NATIVE_WITNESS_SHA256_aa559e30492285bbe3c9a1141a8f9dd0bc190a8f9c21714e7194a7e718d8d594",
-      "CONFIRMED_CATALOG_WRONG_URI_RESOLVE_ASSET_PROBE_SHA256_7eb8364b2700fd982973081d0a3492ae340eeefe4a89b29b1c2d499e9311ca22",
-      "FOOTPRINT_CONTENT6C727_OWNED195.831MIB_CAPCHARGED236.696MIB_30STOPPED_NO_CLEANUP_SHARED_TOTALS_UNKNOWN",
+      "PASS_HISTORICAL_CATALOG_WRONG_URI_FALSIFIER_RETAINED_RESOLVE_ASSET_PROBE_SHA256_7eb8364b2700fd982973081d0a3492ae340eeefe4a89b29b1c2d499e9311ca22",
+      "PASS_HISTORICAL_OWNED_RESOURCE_MEASUREMENT_CONTENT6C727_OWNED195.831MIB_CAPCHARGED236.696MIB_30STOPPED_NO_CLEANUP_SHARED_TOTALS_UNKNOWN",
       "PASS_CATALOG26_TRACE_02a0d2e5eb3159228986c16ea4ffac7890fe845517e8863e3c3ec4a59cb1cfe9",
       "PASS_CURRENT_NATIVE_RECOVERY_WITNESS_c5f9610e2b934deb952f89a6a0b92b324fdecc82144da1158c658115f443a088",
       "PASS_FRESH_FOUR_ROLE_REVIEW_BINDINGS_b89271b07dc146d5e4fda147c1191966f9d0df8b5563f082be0322d675f3c98a",
-      "CURRENT9CE_FOOTPRINT_OWNED195.973MIB_CAPCHARGED238.081MIB;30STOPPED;SCIENCEUNCHANGED;SHARED_PHYSICAL_TOTALS_UNKNOWN"
+      "PASS_CURRENT9CE_OWNED_RESOURCE_BOUNDARY_OWNED195.973MIB_CAPCHARGED238.081MIB;30STOPPED;SCIENCEUNCHANGED;SHARED_PHYSICAL_TOTALS_UNKNOWN"
     ],
     "targeted": "PASS_26_CATALOG;PRIOR_34_RECOVERY_AND_55_COMPATIBILITY;CURRENT_NATIVE_ZERO_VALUE_CHARGE_WRITE_WITNESS"
   }
