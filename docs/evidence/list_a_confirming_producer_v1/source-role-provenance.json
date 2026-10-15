@@ -114,6 +114,42 @@
     "historical_qualification_rebound": false,
     "named_results_revalidated_or_recomputed": false
   },
+  "delivery_projection_repair_20261015": {
+    "as_of": "2026-10-15",
+    "defect": "Task exact paths named deliveryevidence but l2_roles omitted DELIVERY_EVIDENCE; context deferred all3 so native factoryfitgrounding correctlydenied",
+    "first_exact_head_CI": {
+      "conclusion": "success",
+      "head": "d9751d30f616b2d55a70cf711e2649c2e490f40d",
+      "run_id": 38698541162,
+      "url": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/38698541162"
+    },
+    "first_native_readiness": {
+      "raw_utf8": "{\r\n  \"decision\": \"DENY\",\r\n  \"identity_mode\": \"TASK_CONTEXT_RECEIPT\",\r\n  \"merge_checks\": {\r\n    \"branch_preserved\": true,\r\n    \"ci_exact_head_pass\": true,\r\n    \"context_receipt_bound\": true,\r\n    \"context_receipt_sha256\": \"463eec8aa653d6d4c01034e9df63b6d090c2e7f4dc5f29a665e626b152e92ebd\",\r\n    \"context_route\": \"DIRECT_CODEX_DELIVERY\",\r\n    \"exact_pr_head_bound\": true,\r\n    \"factory_fit_pass\": false,\r\n    \"full_gate_pass\": true,\r\n    \"mergeable\": true,\r\n    \"no_unresolved_reviews\": true,\r\n    \"observed_head_sha\": \"d9751d30f616b2d55a70cf711e2649c2e490f40d\",\r\n    \"observed_tree_sha\": \"7b078398f7cfbe6de95ae9e6df7b6caa1bac582a\",\r\n    \"pr_number\": 406,\r\n    \"required_tests_pass\": true,\r\n    \"secret_scan_pass\": true,\r\n    \"settings_unchanged\": true,\r\n    \"standard_merge\": true,\r\n    \"write_set_pass\": true\r\n  },\r\n  \"merge_submitted\": false,\r\n  \"owner_phrase\": null,\r\n  \"ready_for_owner_phrase\": false,\r\n  \"reasons\": [\r\n    \"MERGE_CHECK_FAILED:factory_fit_pass\"\r\n  ],\r\n  \"schema\": \"smial.merge-readiness\",\r\n  \"schema_version\": \"1.0\"\r\n}\r\n",
+      "sha256": "0ee26790597b0628120398b88b7e0374633364c1cce84cdd31ec84d7ae023472"
+    },
+    "fresh_reviews_rebind_exact_head_CI_readiness": "PENDING",
+    "merge_authority": false,
+    "named_charges_unchanged": 7,
+    "native_ab_preview": {
+      "raw_utf8": "{\n  \"actual_readiness1\": \"DENY_factory_fit_pass_FALSE; original retained\",\n  \"after_context_sha256\": \"5e94416b5bdb6a9851e5e7f1843f366b4f6301b53053312eb9647aa17be3f8ec\",\n  \"as_of\": \"2026-10-15\",\n  \"before_context_sha256\": \"463eec8aa653d6d4c01034e9df63b6d090c2e7f4dc5f29a665e626b152e92ebd\",\n  \"head_before\": \"d9751d30f616b2d55a70cf711e2649c2e490f40d\",\n  \"native_after\": {\n    \"active_stop_conditions\": [],\n    \"factory_fit_pass\": true,\n    \"triggers\": {\n      \"auth_or_access_recovery\": false,\n      \"external_material_action\": false,\n      \"material_owner_decision\": false,\n      \"unresolved_safety_or_truth_conflict\": false,\n      \"user_only_activation\": false\n    }\n  },\n  \"native_before\": {\n    \"active_stop_conditions\": [\n      \"DELIVERY_EVIDENCE_NOT_GROUNDED\"\n    ],\n    \"factory_fit_pass\": false,\n    \"triggers\": {\n      \"auth_or_access_recovery\": false,\n      \"external_material_action\": false,\n      \"material_owner_decision\": false,\n      \"unresolved_safety_or_truth_conflict\": true,\n      \"user_only_activation\": false\n    }\n  },\n  \"new_environments\": 0,\n  \"new_scientific_runs\": 0,\n  \"only_contract_delta\": \"Require existing exact3 DELIVERY_EVIDENCE paths in L2; no new permissions/role-set/base-policy/science change\",\n  \"prior_exact_head_CI\": \"38698541162_SUCCESS_ON_D9751D30\",\n  \"schema\": \"smial.list-a-delivery-projection-preview\",\n  \"scientific_changes\": 0,\n  \"scope\": \"UNCOMMITTED_TASK_CONTEXT_AB_PREVIEW_NOT_READINESS_NOT_NEW_CI\",\n  \"selected_after\": [\n    \"docs/evidence/list_a_confirming_producer_v1/completion.json\",\n    \"docs/evidence/list_a_confirming_producer_v1/factory-fit.json\",\n    \"docs/evidence/list_a_confirming_producer_v1/independent-review.json\"\n  ],\n  \"selected_before\": []\n}\n",
+      "scope": "UNCOMMITTED_TASK_CONTEXT_AB_PREVIEW_NOT_READINESS_NOT_NEW_CI",
+      "sha256": "7aa999bcd000ef56c877f578fc9f632ce75851a48e581ebda0f6088c399a310a"
+    },
+    "new_environments": 0,
+    "new_gate_or_scientific_semantics": false,
+    "new_named_scientific_runs": 0,
+    "owner_microapproval_required": false,
+    "parent_head": "d9751d30f616b2d55a70cf711e2649c2e490f40d",
+    "production_or_test_code_changed": false,
+    "regression": {
+      "elapsed_seconds": 6.825,
+      "scope": "Existing evidencequorum/cloudconstants, providerL2notloadedbydefault, equivalentCursor/Codexcontext",
+      "status": "PASS",
+      "tests": 3,
+      "trace_sha256": "5a84e054e14bf9e58b8b9b59eb8967baecb5c4609d9f30f6645a58704496a152"
+    },
+    "repair": "Require existing exact3 DELIVERY_EVIDENCE paths inL2; taskmetadata only, no gate orrole-set/authority/science change"
+  },
   "engineering_attempts": [
     {
       "attempt": "before",

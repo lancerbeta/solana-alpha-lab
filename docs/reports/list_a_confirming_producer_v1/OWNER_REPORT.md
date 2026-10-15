@@ -1,5 +1,7 @@
 # List A confirming producer: owner handback
 
+Текущий delivery checkpoint: CI1 наd975 полностьюPASS, но native readiness1 корректноDENY — вtaskL2 не включена DELIVERY_EVIDENCE. Добавлена только обязательная projection трёх уже существующих receipts. Native A/B-preview false→true и3regressionsPASS. Product/tests/gates/science/семьcharges неизменны; freshreview/rebind/новыйexactCI/readiness ещёpending. Исторические checkpoints ниже относятся ксвоимheads.
+
 Текущий checkpoint15октября: новый owner mandate разрешает автономно закрыть этот outcome до independently-reviewed/CI-green/merge-ready; routineNOT_READY — задача исправления. CatalogURI исправлен, native resolver и независимый exactURI oracle PASS. Productruntime и scientificreceipts/семьcharges неизменны; свежийreview/binding/CI ещёpending. Ниже сохранены исторические checkpoints своихheads. Mergeотдельно.
 
 Текущий P2 checkpoint: **разрешённый точный recovery-copy применён**, 34 narrow checks PASS. На прежнем exploratory TEST source classify и submit отказывают до reservation и направляют остановить этот source, сохранить labels/history и получить отдельную source authority. Targets/evaluator/reservations/charges/store writes: **0/0/0/0/0**; 17 файлов store неизменны. Prior55 compatibility checks и семь scientific charges/results сохранены. Fresh review/bindings/exact-head CI ещё не заявлены; merge не разрешён. Нижеследующие checkpoints сохраняют историю своих heads.
@@ -201,3 +203,6 @@ oracle audit — source-role-provenance.json#compatibility_delivery_20261015.
 Новый goal-based mandate supersedes прежние узкие file/documentation-only и routineNOT_READY stops. История прежнего отказа сохранена через Git86ef8bd. Исправлен один canonicalCataloglogicalURI, derivedнавигация пересоздаётся штатно. Дополнительного managed_write_set expansion для этого URI не требуется. Material science/resource/external boundaries и exact mergegate сохраняются.
 
 Catalog direct-consumer regression:26PASS/9.900s, включая strictschema, ranked/exactURI search, resolver и livegoldqueries. Product/sciencebytes не менялись. Fresh4-role review, rebind и exact-headCI следуют отдельно; этот contentfreeze не утверждает их PASS.
+
+
+Readiness1: factory_fit_pass=false при всех остальных checks=true, включаяCIexacthead. Это missingcontextprojection, не новый product/scientific gap и не отрицательный scientific result. Исправление taskL2 усиливает связывание существующих deliveryreceipts; базовый gate не изменён. ПервыйCIgreen иDENY сохраняются отдельно; новый head обязан пройти свежие review/bind/CI/readiness.

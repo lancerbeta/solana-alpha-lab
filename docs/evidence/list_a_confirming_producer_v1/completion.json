@@ -9,8 +9,8 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/list_a_confirming_producer_v1/factory-fit.json",
-    "sha256": "faf3810422ddf7b1683de4e9d37ad36a95ab8dc6558ef064c90d61583c963ffd",
-    "verdict": "PASS"
+    "sha256": "f8bd216baa6c4a98450477fcee51b17c3f4929806bf6136c69635c29cdb0cb8f",
+    "verdict": "PENDING"
   },
   "implementation_bindings": {
     "catalog/assets/core.yaml": "31bb81f3be480a7787cb11573a2d3b56c840a40809df5edd275a8b4123ff6282",
@@ -109,15 +109,15 @@
     "spend": 0,
     "strategy_activation_paper_writes": 0
   },
-  "state_change": "Implementation/recovery/source-role/Catalogidentity repairs completewithinunchangedscientificcontract. Newownergoalmandate recorded; current53bindings freshlyreviewed byall4requiredroles PASS includingSEMANTIC_PREMISE. Nativecommittedclassify/submit zero values/evaluator/reserve/charge/storewrites;26Catalogchecks plusprior34/55PASS. Sevennamedcharges/results/core immutable; historicalNOT_READYpreserved. Bind/preflight/push/exactCI/readiness follow separately; no mergeauthority. Nativecompletionformat corrected toproject-bound/liveCIenforcementdeclarations, notclaimedgatePASS; actualbind1typedformatfailure retained. ExactheadCIstillpending.",
+  "state_change": "CI1 onD975fullyPASS; native readiness1 DENY retained: taskL2 omittedDELIVERY_EVIDENCE. Existingexact3receiptpaths nowrequired; nativeuncommittedABgrounding false→true and3context/evidence regressionsPASS. No product/test/gate/sciencechange;7charges/resultsfrozen. Prior4PASSandCI1nottransferred; freshreview/rebind/newexactCI/readinesspending. No mergeauthority.",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
   "validation": {
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/list_a_confirming_producer_v1/independent-review.json",
-      "sha256": "451965eb14f734b9ae5a4f0b8093dd6d065b8e246c164b0b36184191323ddb24",
-      "verdict": "PASS"
+      "sha256": "14a3f597ad8d51ccaf96a1df3e866388ef4d528053270a4f6a6bf64ea9ca5bce",
+      "verdict": "PENDING"
     },
     "project_checks": [
       "PASS_ACTUAL_PRE_VALUES_RESERVATION",
@@ -132,7 +132,8 @@
       "PASS_CATALOG26_TRACE_02a0d2e5eb3159228986c16ea4ffac7890fe845517e8863e3c3ec4a59cb1cfe9",
       "PASS_CURRENT_NATIVE_RECOVERY_WITNESS_c5f9610e2b934deb952f89a6a0b92b324fdecc82144da1158c658115f443a088",
       "PASS_FRESH_FOUR_ROLE_REVIEW_BINDINGS_b89271b07dc146d5e4fda147c1191966f9d0df8b5563f082be0322d675f3c98a",
-      "PASS_CURRENT9CE_OWNED_RESOURCE_BOUNDARY_OWNED195.973MIB_CAPCHARGED238.081MIB;30STOPPED;SCIENCEUNCHANGED;SHARED_PHYSICAL_TOTALS_UNKNOWN"
+      "PASS_CURRENT9CE_OWNED_RESOURCE_BOUNDARY_OWNED195.973MIB_CAPCHARGED238.081MIB;30STOPPED;SCIENCEUNCHANGED;SHARED_PHYSICAL_TOTALS_UNKNOWN",
+      "PASS_NATIVE_UNCOMMITTED_PROJECTION_AB_AND_3_REGRESSIONS;CI1GREEN_READINESS1DENY_RETAINED;NEW_CI_PENDING"
     ],
     "targeted": "PASS_26_CATALOG;PRIOR_34_RECOVERY_AND_55_COMPATIBILITY;CURRENT_NATIVE_ZERO_VALUE_CHARGE_WRITE_WITNESS"
   }

@@ -79,9 +79,22 @@
         "OWNER_UX_CRITIC": "PASS"
       },
       "verdict": "NOT_READY"
+    },
+    {
+      "git_object": "d9751d30f616b2d55a70cf711e2649c2e490f40d:docs/evidence/list_a_confirming_producer_v1/independent-review.json",
+      "git_object_sha256": "451965eb14f734b9ae5a4f0b8093dd6d065b8e246c164b0b36184191323ddb24",
+      "reason": "Actualall4PASSandCI1green onD975 retained; native readiness1 DENY uncoveredmissingDELIVERY_EVIDENCEL2 projection. No pastverdictconversion orCItransfer to changedcontract.",
+      "reviewed_candidate_head": "9ce5ee6a4873b172b48b0824080f571f62d4891c",
+      "roles": {
+        "ARCHITECTURE_CRITIC": "PASS",
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "OWNER_UX_CRITIC": "PASS"
+      },
+      "verdict": "PASS"
     }
   ],
-  "next_review": "NEW_REQUIRED_FOUR_ROLE_REVIEW_AFTER_CATALOG_URI_AND_OWNER_MANDATE",
+  "next_review": "FRESH_FOUR_ROLE_AFTER_NAMED_DELIVERY_PROJECTION_REPAIR",
   "schema": "smial.list-a-confirmation-review-history",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1"

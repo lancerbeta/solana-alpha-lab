@@ -177,7 +177,7 @@
     "ARCHITECTURE_CRITIC",
     "OWNER_UX_CRITIC"
   ],
-  "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-GOAL-AUTONOMY-INDEPENDENT",
+  "review_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1-DELIVERY-PROJECTION-FRESH",
   "reviewed_bindings_sha256": "b89271b07dc146d5e4fda147c1191966f9d0df8b5563f082be0322d675f3c98a",
   "reviewed_inventory_sha256": "156db5299c9d0234d3c5a2ecf78ec5db5b805596171470a77bbaa18a6806e108",
   "reviews": [
@@ -250,5 +250,5 @@
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1",
-  "verdict": "PASS"
+  "verdict": "PENDING"
 }

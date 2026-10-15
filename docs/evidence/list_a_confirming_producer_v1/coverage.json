@@ -116,6 +116,11 @@
       "evidence": "goal_autonomy_catalog_uri_20261015: Catalog URI equals repository_path/source-role-provenance.json; native resolver and exact URI ranked discovery agree. Historical wrong URI and CODE_NOT_READY retained in Git86ef8bd; fresh review/bind/CI pending. All26Catalogschema/rankedsearch/resolver/livegoldqueriesPASS; no newtests/assertion changes orscientificruns.",
       "requirement": "Correct discoverable source-role evidence URI",
       "status": "PASS_NATIVE_RESOLVE_AND_EXACT_URI_ORACLE"
+    },
+    {
+      "evidence": "CI1 onD975 PASS; readiness1 correctlyDENY becauseDELIVERY_EVIDENCE deferred. TaskL2 nowrequires existingexact3paths; nativeuncommittedAB false→true and3regressionsPASS. No gate/source/sciencechange. Fresh4review/rebind/CI2/readiness2 pending.",
+      "requirement": "Readiness context contains exact delivery evidence",
+      "status": "PASS_NATIVE_AB_PREVIEW_AND_3_REGRESSIONS;NEW_EXACT_HEAD_CI_PENDING"
     }
   ],
   "schema": "smial.list-a-confirmation-coverage",

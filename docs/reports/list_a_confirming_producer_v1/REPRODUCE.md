@@ -228,3 +228,10 @@ requalification of saved science, REAL scope or merge authority follows.
 python -B scripts/catalog_cli.py resolve-asset EVID-LIST-A-CONFIRMING-SOURCE-ROLE-001 --json
 
 Expected location.logical_uri is repo://docs/evidence/list_a_confirming_producer_v1/source-role-provenance.json, exactly repo:// plus repository_path. Match integrity against those bytes, then exact-URI discovery must return the same asset with EXACT_LOGICAL_URI. Native harness_sync owns all derived propagation. Original wrong-URI resolver witness/review remain in Git86ef8bd; no science is rerun or requalified. New owner mandate governs autonomous routine repair/review/bind/CI, preserving base policy and exact merge authority.
+
+
+## Native readiness delivery-context projection
+
+Task context_requirements.l2_roles must include DELIVERY_EVIDENCE, in addition to the existing ARCHITECTURE_DECISIONS. The three exact_role_paths are completion.json, independent-review.json and factory-fit.json. After final binding/commit, generate context with native delivery_harness.py context --contract docs/tasks/LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1.md --task-id LIST_A_CHRONOLOGICAL_CONFIRMING_PRODUCER_V1 --route DIRECT_CODEX_DELIVERY --write-receipt --format json. Confirm exactly3selected DELIVERY_EVIDENCE references, not DEFERRED_ON_DEMAND. Use its native local_receipt for merge-readiness after exact-head CI.
+
+Before/after uncommitted native bound_delivery_evidence preview false->true is a diagnostic only; it is not final context/readiness/CI authority. Original CI38698541162 success onD975 and readiness1 DENY remain in the audit. Never hand-edit a native context receipt or use LIVE_PR_HEAD for product diff. Re-run normal evidence binding/preflight/newexactCI/readiness on the changed contract.
