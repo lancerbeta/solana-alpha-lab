@@ -52,14 +52,14 @@
     "unresolved_safety_or_truth_conflict": false
   },
   "factory_fit": {
-    "path": "",
+    "path": "docs/evidence/i3_managed_collection_continuity_v1/factory-fit.json",
     "sha256": "56512ca8a901d180ca4efa8a6c1ac3d6d52d817d2f22554be650a36bf1c10a15",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_35_MANAGED_TESTS_PLUS_RELEASE_SEAM_48_MODULE_744_TEST_DIRECT_CONSUMER_REGRESSION_AND_7_MUTATION_CONTROLS",
     "independent_review": {
-      "path": "",
+      "path": "docs/evidence/i3_managed_collection_continuity_v1/independent-review.json",
       "sha256": "1965c7fbc0c7f231e7975923a99165f8485b44a1e79520731552ceb3a016b59a",
       "verdict": "PASS"
     },
