@@ -579,6 +579,25 @@
         "result": "PASS",
         "tests": 4,
         "wall_seconds": 2.139
+      },
+      "dedicated_post_apply_authority_falsifiers": {
+        "result": "PASS",
+        "tests": 3,
+        "wall_seconds": 1.949,
+        "before": "3 tests with 8 matrix failures; unchanged-state control already passed",
+        "scope": "actual native APPLY then separate peer writes; success/failure x new policy/new plan/new state/foreign lease; unchanged owner metadata control"
+      },
+      "final_post_apply_cas_direct_consumers": {
+        "result": "PASS",
+        "tests": 71,
+        "skipped": 1,
+        "wall_seconds": 62.346,
+        "modules": [
+          "tests.test_i2_retention_maintenance_v1",
+          "tests.test_i2_pipeline_v1",
+          "tests.test_factory_offhost_backup"
+        ],
+        "scope": "final CAS repair; supersedes these earlier module runs, counts overlap"
       }
     },
     "production_mutations": false,
@@ -743,6 +762,37 @@
         "independent_oracle": "OWNER_UX critic extracted actual documented argv, checked independent hashlib/json canonicalization including Cyrillic and Omega, and reopened raw SQL; no production or tracked edits",
         "production_gate": "runtime exact input artifacts, canonical digests and separate approved retirement/policy scopes; computing hash grants no authority"
       }
+    },
+    "post_apply_authority_remediation": {
+      "observed_head": "feb749c849cde3f321a7fd0ba117b9bd1bb9a1bc",
+      "prior_packet_fingerprint_sha256": "1c212fd591dbbe30c74c295020ba5b343013ae531ca55dd47548364af72c75fd",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "ARCHITECTURE_CRITIC": "NOT_READY",
+        "OWNER_UX_CRITIC": "PASS"
+      },
+      "before": {
+        "native_interleave": "real old-policy APPLY completes, separate native peer installs approved revision2 and exact new plan with durable FAILED, old caller resumes cursor finalization",
+        "policy_revision": 2,
+        "new_active_plan": "INCORRECTLY_DELETED",
+        "new_health": "INCORRECTLY_OVERWRITTEN_FAILED_TO_READY_COMPLETE",
+        "cursor": "INCORRECTLY_REPLACED_ZERO_WITH_OLD11",
+        "same_policy_new_plan_and_same_plan_new_failed_state": "ALSO_REPRODUCED"
+      },
+      "owning_fix": "post-APPLY success and exception paths acquire native lease and BEGIN IMMEDIATE, compare current approved policy/exact active plan/pre-apply maintenance snapshot, merge only current unchanged state and delete only owned unchanged plan; changed authority/state or busy yields",
+      "after": {
+        "new_approved_policy": "YIELD_POLICY_CHANGED",
+        "same_policy_new_plan": "YIELD_ACTIVE_PLAN_CHANGED",
+        "same_exact_policy_plan_new_failed_state": "YIELD_MAINTENANCE_STATE_CHANGED",
+        "foreign_lease": "YIELD_WRITER_BUSY",
+        "success_and_exception_finalization": "NEWER_STATE_AND_EXACT_PLAN_PRESERVED",
+        "actual_prior_APPLY_effects_progress_ROWIDs_clocks_cold_pins": "PRESERVED",
+        "fresh_operational_packet_watch": "NEWER_MAINTENANCE_FAILED_REMAINS_VISIBLE"
+      },
+      "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1.PolicyRevisionRecoveryTests -q",
+      "independent_oracle": "real native APPLY then separate peer ObservationScheduleStore and native lease/approved policy installation; raw SQLite reopen and actual operational packet/watch compare peer plan/state/cursor and committed effects/pins",
+      "production_gate": "same staged separately approved installed ordinary maintenance and incident/recovery acceptance; no production fault injection performed"
     }
   }
 }

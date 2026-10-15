@@ -120,6 +120,135 @@ class NativeFixture(unittest.TestCase):
 
 
 class PolicyRevisionRecoveryTests(NativeFixture):
+    def outcome_source(self, *, fail_apply=False):
+        add_call(self.store,'FIRST',rowid=11,size=4096)
+        add_call(self.store,'SECOND',rowid=29,size=4096)
+        proof=self.archive()
+        document=self.commission(proof=proof,enabled=True,max_rows=2 if fail_apply else 1)
+        lease=self.store.acquire_lease('fixture-last-good',clock=NOW)
+        try:
+            owner._set_control(self.store,'maintenance',{'state':'READY','last_reason':'COMPLETE',
+                'last_success_at':render_utc(NOW-timedelta(minutes=2)),
+                'next_cursor':{'call_ledger':0,'poll_slots':0},'retained_owner_metadata':'PRESERVE'})
+            self.store._conn.execute('INSERT INTO retention_archive_pins VALUES(?,?)',
+                (Path(proof['archive_path']).name,proof['archive_sha256']))
+            self.store._conn.commit()
+        finally:
+            self.store.release_lease(lease)
+        return document,proof
+
+    def outcome_controls(self):
+        with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+            return raw.execute("SELECT control_key,payload_json FROM retention_control WHERE control_key IN ('policy','active_plan','maintenance') ORDER BY control_key").fetchall()
+
+    def outcome_interleave(self, conflict, *, fail_apply=False):
+        document,_=self.outcome_source(fail_apply=fail_apply)
+        original=owner.apply_retirement_plan
+        archive_match=owner._archive_candidate_matches
+        captured={}
+        peer=ObservationScheduleStore(self.path)
+        held=None
+        def fail_second(candidate):
+            if candidate['row']['source_rowid']==29:
+                raise owner.ObservationScheduleRetentionError('PLAN_STALE_CANDIDATE')
+            return archive_match(candidate)
+        def apply_then_peer(store,**kwargs):
+            failure=None
+            try:
+                if fail_apply:
+                    with patch.object(owner,'_archive_candidate_matches',side_effect=fail_second):
+                        result=original(store,**kwargs)
+                else:
+                    result=original(store,**kwargs)
+            except owner.ObservationScheduleRetentionError as exc:
+                failure=exc
+            self.assertEqual(store._conn.execute('SELECT next_candidate FROM retention_progress WHERE plan_id=?',
+                (kwargs['plan']['plan_id'],)).fetchone()[0],1)
+            if conflict=='POLICY_CHANGED':
+                revised={**document,'revision':2}
+                owner.install_maintenance_policy(peer,policy=revised,
+                    approved_sha256=owner.policy_sha256(revised),now=NOW)
+            if conflict in ('POLICY_CHANGED','ACTIVE_PLAN_CHANGED'):
+                selected=owner.build_retirement_plan(peer,now=NOW+timedelta(seconds=1),
+                    policy=owner._control(peer,'policy')['policy'],after={'call_ledger':11,'poll_slots':0})
+                lease=peer.acquire_lease('peer-new-plan',clock=NOW)
+                try:
+                    owner._set_control(peer,'active_plan',selected)
+                    peer._conn.commit()
+                finally:
+                    peer.release_lease(lease)
+            owner.record_maintenance_outcome(peer,state='FAILED',reason='PEER_PLAN_REVALIDATION_FAILED',
+                now=NOW+timedelta(seconds=1))
+            nonlocal held
+            if conflict=='WRITER_BUSY':
+                held=peer.acquire_lease('ordinary-collector',clock=NOW)
+                self.assertIsNotNone(held)
+            captured['controls']=self.outcome_controls()
+            captured['protected']=self.planner_protected_rows()
+            if failure is not None:
+                raise failure
+            return result
+        try:
+            with patch.object(owner,'apply_retirement_plan',side_effect=apply_then_peer):
+                result=owner.run_maintenance_step(self.store,now=NOW,pressure=SAFE)
+        finally:
+            if held is not None:
+                peer.release_lease(held)
+            peer.close()
+        self.assertEqual(result['status'],'YIELD',result)
+        self.assertEqual(result['reason'],conflict,result)
+        self.assertEqual(self.outcome_controls(),captured['controls'])
+        self.assertEqual(self.planner_protected_rows(),captured['protected'])
+        self.store.close(); self.store=ObservationScheduleStore(self.path)
+        self.assertEqual(self.outcome_controls(),captured['controls'])
+        from solana_alpha_lab.factory.collector_operational_packet import build_collector_operational_packet
+        from solana_alpha_lab.factory.operability_watch import classify_incidents
+        rdp=self.hot/'rdp'; rdp.mkdir()
+        packet=build_collector_operational_packet(root=self.base,store=self.store,now=NOW+timedelta(seconds=1),
+            observation_rdp=rdp,environ={})
+        self.assertEqual(packet['maintenance']['last_reason'],'PEER_PLAN_REVALIDATION_FAILED')
+        self.assertIn('MAINTENANCE_FAILED',classify_incidents(packet))
+        self.assertNotIn('rows',self.store.call_payload('FIRST'))
+        self.assertIn('rows',self.store.call_payload('SECOND'))
+        return result
+
+    def test_apply_finalization_yields_to_peer_policy_plan_or_state(self):
+        for conflict in ('POLICY_CHANGED','ACTIVE_PLAN_CHANGED','MAINTENANCE_STATE_CHANGED','WRITER_BUSY'):
+            with self.subTest(conflict=conflict):
+                fixture=PolicyRevisionRecoveryTests(); fixture.setUp()
+                try:
+                    result=fixture.outcome_interleave(conflict)
+                    self.assertEqual(result['applied_call_compactions'],1)
+                finally:
+                    fixture.tearDown()
+
+    def test_apply_failure_finalization_yields_to_peer_policy_plan_or_state(self):
+        for conflict in ('POLICY_CHANGED','ACTIVE_PLAN_CHANGED','MAINTENANCE_STATE_CHANGED','WRITER_BUSY'):
+            with self.subTest(conflict=conflict):
+                fixture=PolicyRevisionRecoveryTests(); fixture.setUp()
+                try:
+                    fixture.outcome_interleave(conflict,fail_apply=True)
+                finally:
+                    fixture.tearDown()
+
+    def test_unchanged_apply_finalization_keeps_owner_metadata_and_committed_progress(self):
+        self.outcome_source()
+        before=self.planner_protected_rows()
+        first=owner.run_maintenance_step(self.store,now=NOW,pressure=SAFE)
+        self.assertEqual(first['status'],'COMPLETE')
+        state=owner.retention_status(self.store)
+        self.assertEqual(state['retained_owner_metadata'],'PRESERVE')
+        self.assertEqual(state['next_cursor'],{'call_ledger':11,'poll_slots':0})
+        self.assertIsNone(owner._control(self.store,'active_plan'))
+        first_effect=self.planner_protected_rows()['call_ledger'][0]
+        self.assertEqual(self.ordinary_caller_process(NOW+timedelta(minutes=2))['applied_call_compactions'],1)
+        after=self.planner_protected_rows()
+        self.assertEqual(after['call_ledger'][0],first_effect)
+        self.assertEqual([(r[0],r[-2],r[-1]) for r in after['call_ledger']],
+                         [(r[0],r[-2],r[-1]) for r in before['call_ledger']])
+        for table in ('due_observations','retirement_scopes','retention_archive_pins'):
+            self.assertEqual(after[table],before[table])
+
     def planner_budget_source(self, *, active_plan=False):
         add_call(self.store,'EARLIER',rowid=11,size=4096)
         add_call(self.store,'OCC-1',rowid=317,size=4096)

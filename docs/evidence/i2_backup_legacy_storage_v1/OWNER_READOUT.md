@@ -75,6 +75,16 @@ Fresh ordinary caller → raw reopen → actual operational packet/watch пок�
 штатно продолжить. Busy/изменившаяся authority дают `YIELD`, unexpected exception
 сохраняется как `OPTIONAL_MAINTENANCE_FAILED` без raw sensitive text.
 
+Отдельный independent interleave после actual APPLY обнаружил stale finalizer:
+старый caller удалял новый peer plan и заменял новый `FAILED` на `READY`. Успешная
+и ошибочная finalization теперь под одной native transaction сверяют approved
+policy, exact active plan и pre-apply maintenance state. При расхождении —
+`YIELD/POLICY_CHANGED`, `ACTIVE_PLAN_CHANGED` либо `MAINTENANCE_STATE_CHANGED`;
+при foreign lease — `WRITER_BUSY`. Новые plan/failure/cursor сохраняются вместе
+с уже выполненными effects/progress, ROWID/clocks и cold pins; watch продолжает
+видеть peer failure. Проверены separate native peer store и обе finalization
+ветки, включая unchanged-policy/same-plan interleave.
+
 Owner UX также проверил actual команды единственного OPERATE packet: canonical
 JSON digest из existing owner принимается `retire`/`policy`, SHA pretty-file
 отказывается. Из документа запускаются обе read-only digest команды и exact

@@ -294,6 +294,11 @@ foreign writer, restore, RAM/IO/CPU pressure. Ошибка optional maintenance
 Last-success/cursor, prior effects и pins сохраняются; transient busy или смена
 policy/plan дают `YIELD` без перезаписи более нового состояния. Проверить этот
 durable outcome через fresh operational packet/watch и TEST incident/recovery.
+После APPLY caller повторно сверяет policy, exact plan и durable maintenance
+state под native transaction. Если другой caller уже изменил их, старый outcome
+уступает с `POLICY_CHANGED`, `ACTIVE_PLAN_CHANGED` или `MAINTENANCE_STATE_CHANGED`;
+новые intent/incident/cursor и выполненные effects остаются сохранены. Продолжать
+обычным caller, не удалять новый plan и не сбрасывать health вручную.
 Включение caller/policy требует installed readback; Git template не доказывает
 commissioning. Daily VACUUM не включать.
 

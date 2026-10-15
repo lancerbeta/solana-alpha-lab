@@ -1493,26 +1493,56 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
             raise
         finally:
             store.release_lease(lease)
+    expected_outcome_state = _control(store, "maintenance", {})
+
+    def current_outcome_state():
+        # Apply commits row effects/progress, never the maintenance control.
+        # A peer may own a newer outcome after the chunk releases its lease.
+        if _control(store, "policy") != installed:
+            return "POLICY_CHANGED", None
+        if _control(store, "active_plan") != plan:
+            return "ACTIVE_PLAN_CHANGED", None
+        current = _control(store, "maintenance", {})
+        if current != expected_outcome_state:
+            return "MAINTENANCE_STATE_CHANGED", None
+        return None, current
+
     try:
         result = apply_retirement_plan(store, plan=plan, approved_plan_sha256=plan["plan_id"], now=now)
     except Exception as exc:
         reason = str(exc) if isinstance(exc, ObservationScheduleRetentionError) else "OPTIONAL_MAINTENANCE_FAILED"
         closure_deficit = reason in {"RAW_ARCHIVE_DEPENDENCY_NOT_VERIFIED", "COLD_ARCHIVE_CANDIDATE_MISMATCH", "RAW_BODY_DEPENDENCY_NOT_ARCHIVED"}
         lease = store.acquire_lease("i2-maintenance-incident", clock=now)
-        if lease is not None:
-            try:
-                _set_control(store, "maintenance", {**state, "state": "YIELD" if closure_deficit else "FAILED", "last_reason": reason,
-                             "last_run_at": render_utc(now), "active_plan_id": plan["plan_id"]})
-                store._conn.commit()
-            finally:
-                store.release_lease(lease)
+        if lease is None:
+            return {"status": "YIELD", "reason": "WRITER_BUSY", "plan_id": plan["plan_id"]}
+        try:
+            store._conn.execute("BEGIN IMMEDIATE")
+            store._require_write_lease(now, within_transaction=True)
+            conflict, current = current_outcome_state()
+            if conflict:
+                store._conn.rollback()
+                return {"status": "YIELD", "reason": conflict, "plan_id": plan["plan_id"]}
+            _set_control(store, "maintenance", {**current, "state": "YIELD" if closure_deficit else "FAILED", "last_reason": reason,
+                         "last_run_at": render_utc(now), "active_plan_id": plan["plan_id"]})
+            store._conn.commit()
+        except Exception:
+            store._conn.rollback()
+            raise
+        finally:
+            store.release_lease(lease)
         return {"status": "YIELD" if closure_deficit else "FAILED", "reason": "ARCHIVE_REFRESH_REQUIRED" if closure_deficit else "OPTIONAL_MAINTENANCE_FAILED", "plan_id": plan["plan_id"]}
     if result["status"] == "YIELD":
         return result
     lease = store.acquire_lease("i2-maintenance-cursor", clock=now)
     if lease is None:
-        return result
+        return {**result, "status": "YIELD", "reason": "WRITER_BUSY"}
     try:
+        store._conn.execute("BEGIN IMMEDIATE")
+        store._require_write_lease(now, within_transaction=True)
+        conflict, state = current_outcome_state()
+        if conflict:
+            store._conn.rollback()
+            return {**result, "status": "YIELD", "reason": conflict}
         state.update(state="FAILED" if result.get("refused_rows") else "READY", last_run_at=render_utc(now),
                      last_reason="OVERSIZE_PAYLOAD_REFUSED" if result.get("refused_rows") else result["status"], active_plan_id=plan["plan_id"])
         if not result.get("refused_rows"):
@@ -1525,6 +1555,9 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
             store._conn.execute("DELETE FROM retention_control WHERE control_key='active_plan'")
         _set_control(store, "maintenance", state)
         store._conn.commit()
+    except Exception:
+        store._conn.rollback()
+        raise
     finally:
         store.release_lease(lease)
     if result.get("refused_rows"):
