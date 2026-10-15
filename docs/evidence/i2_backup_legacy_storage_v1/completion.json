@@ -15,13 +15,13 @@
   },
   "capability_radar_now": "NONE: existing owners, Git/gh, locked Python/SQLite/zipfile suffice; no new dependency/service/connector/timer.",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "03c967ae61ac1fc07d472e96397d08e5c157e96025ba6bf63d529f6de50aa74b",
+    "catalog/assets/core.yaml": "d4519d16ed4c81a93f844110930d4b495a6c956c07753e18f7aab24e87c1ecde",
     "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md": "83ca808924babc9a8a473d9d3b153337901d48eb2190030aa1989346482c0835",
-    "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md": "fcaea60b0dddfe7b2752dfd80cdc44facd640c7b0f1d748eea3a80a9f539a345",
-    "docs/evidence/i2_backup_legacy_storage_v1/capture-repair-proof.json": "3d14422e382db1bd3ca6fa7100f7a3a67b8a2b130faaf72a553b4bdfd67415b5",
+    "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md": "6271be173cb77ba80e02a332cee4d6149817583e0606636c6e7a7eeeab23db02",
+    "docs/evidence/i2_backup_legacy_storage_v1/capture-repair-proof.json": "be9e3e2b8690d40dee2d2de53beb7252c32ffbaf19e372adc1ce1a4ec223f480",
     "docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md": "7bfcc9a06cb241793456d9f4cd6625dd3af3de6e4211ee1544584e22eb8f4907",
     "src/solana_alpha_lab/factory/offhost_backup.py": "3769b77f4e18e7923eaca3eb2d7643f60984a83676cb47ab74765c5ac29871fa",
-    "src/solana_alpha_lab/factory/remote_ops.py": "481239077eb54b90964e35ea2a1ab7c088ec075c2745f5b6beb873c4211d7ea8",
+    "src/solana_alpha_lab/factory/remote_ops.py": "d4bc29f89992ebd53cbc91c3c27f106fc3f138a255be0fe4ea6b47b2953d1fd5",
     "tests/i2_capture_rehearsal.py": "0955f11b1fe4e3d4f3b73d6c8e7619fb5e9f39d741ae4a71f658c64090fed2b5",
     "tests/test_i2_backup_legacy_storage_v1.py": "c12afaf8a670730938932d409b1587f6db9e0ff388eb1bf52901ac36ac454466",
     "tests/test_i2_offhost_checkpoint_v1.py": "bcc09560fc088fe701acf668cdf8645455da6297d129af8f795e3e42af4ce06b"
@@ -36,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/i2_backup_legacy_storage_v1/factory-fit.json",
-    "sha256": "a222a0282ed1eeb55fb1d81f9a5e11567c8446d6593c1120565deb48fa05dfa2",
+    "sha256": "7e18be386deef3f158171d0a1a85015aff7c16c9f04065e39b6c691beb834d34",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_80_CAPTURE_OFFHOST_LEGACY_CHAIN_REGRESSIONS_PLUS_5_56GB_NATIVE_WRITER_PUBLICATION_INDEPENDENT_RESTORE_AND_HARD_INTERRUPTION; see capture-repair-proof.json; PLUS_4_EXACT_CI_AND_CAPTURE_ORACLES_FOR_EQUIVALENT_CONTEXTVAR_FALLBACK_FIX",
     "independent_review": {
       "path": "docs/evidence/i2_backup_legacy_storage_v1/independent-review.json",
-      "sha256": "7acd4c00525a953f4d39b5efd0bb3c798b9f91a4b873639287f83710c28badce",
+      "sha256": "90b629facbe6f9a9ae5f2f466b4d83893b35213a68723bf071035153a92d07ea",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
