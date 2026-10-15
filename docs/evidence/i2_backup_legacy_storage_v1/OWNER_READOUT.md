@@ -5,7 +5,7 @@ CI и machine merge-readiness, связанных `completion.json`. Это soft
 всего I2: snapshot, full/delta recovery, cold retirement, physical reclaim и
 обычная bounded maintenance. Полного live I2 DONE пока нет.
 
-FACT: base `b3fb9d8ecffbffda468dccabaa81ca3392da6f15`; candidate content связан
+FACT: base `3ff9df44331d8063274132c3da7022e46d859d92`; candidate content связан
 implementation inventory в `completion.json`, финальный delivery head — exact
 head PR/merge-readiness receipt. Source input SHA256
 `a63241c261748dca5a271d0e3f99b7c22400fa72d786c934b6bf68e2989c6b80`.
@@ -233,3 +233,38 @@ destructive APPLY scope. Не повторять исходный sampling bench
 import, C1/C2 research, ручные collection windows или ежедневный approval.
 NEXT_MODEL_EFFORT: ROUTINE_NO_SWITCH для merge/readback; runtime OPERATE требует
 своей оценки по фактическому destructive scope.
+
+## Обновлённый main
+
+Main PR #406 (`3ff9df44`) включён обычным merge `8a62062d`; task v1.3
+перепривязан к этой базе. Все 54 неагрегатных upstream blobs
+сохранены точно, включая List A producer, научные contracts/history/evidence.
+Общий Catalog объединён и пересчитан штатным generator. Legacy compatibility
+по-прежнему проверяет actual producer b3fb9d8; исторический pin не переносится
+на новую базу. Финальные reviews/CI/readiness относятся к новому кандидату.
+
+## Whole checkpoint maintenance authority
+
+Независимый architecture falsifier на `5238677b` показал: actual APPLY
+сохранил первый effect, peer установил revision2 и FAILED в 12:00:01Z,
+а поздняя ошибка старого refresh записала ARCHIVE_REFRESH_FAILED в 12:00:00Z.
+Один native context теперь проходит всю цепочку maintenance → intent →
+restore/register → cache release → outcome. Под lease/transaction сравниваются
+source incarnation, policy, exact plan/state, pending/current/release checkpoint.
+Изменение peer даёт typed YIELD, сохраняя его intent/incident/cursor, prior
+effects, ROWIDs/clocks/pins и last-good; сеть не держит OPS lease. Неизменная
+authority сохраняет genuine failure в health/watch и допускает ordinary retry.
+
+Partial local cache deletion воспроизведён отдельно. Existing release token
+до удаления фиксирует exact checkpoint/root inode/owner-intent SHA; retry
+завершает cleanup даже после удаления intent/archive/index, лишь при этом
+durable token. Подменённые inode/owner и active consumer отказывают. Pre-delete
+scan ограничен approved wall budget и existing16384entry cap; CACHE_RELEASE_BUDGET
+ничего не удаляет. Отдельный OS syscall нельзя жёстко прервать по wall clock.
+
+Финальный targeted maintenance/pipeline/offhost набор: 77 tests, PASS,
+1 existing skip, 77.561s; health/footprint/watch: 54 PASS, 4.370s; factory
+static PASS. Наборы перекрываются с прежними; суммы не являются числом
+уникальных tests. Native многопакетный ordinary путь завершил bodies
+[3,3,2,2,1,1,0], одновременно retained cache generations=1. Production B/C
+и Linux/filesystem/cadence/pressure acceptance остаются обязательными pending.

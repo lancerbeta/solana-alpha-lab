@@ -120,6 +120,190 @@ class NativeFixture(unittest.TestCase):
 
 
 class PolicyRevisionRecoveryTests(NativeFixture):
+    def checkpoint_outer_interleave(self, conflict, *, phase='refresh', fail=True):
+        from solana_alpha_lab.factory import offhost_backup as backup
+        document,_=self.outcome_source()
+        peer=ObservationScheduleStore(self.path)
+        captured={}
+        held=None
+        def controls():
+            with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
+                return raw.execute('SELECT control_key,payload_json FROM retention_control ORDER BY control_key').fetchall()
+        def native_initial(root, *, now, **kwargs):
+            return owner.run_maintenance_step(self.store,now=now,pressure=SAFE,**kwargs)
+        def late_peer(*args, **kwargs):
+            nonlocal held
+            self.assertNotIn('rows',peer.call_payload('FIRST'))
+            if conflict=='POLICY_CHANGED':
+                revised={**document,'revision':2}
+                owner.install_maintenance_policy(peer,policy=revised,
+                    approved_sha256=owner.policy_sha256(revised),now=NOW+timedelta(seconds=1))
+            elif conflict=='ACTIVE_PLAN_CHANGED':
+                plan=owner.build_retirement_plan(peer,now=NOW+timedelta(seconds=1),policy=document,
+                    after={'call_ledger':11,'poll_slots':0})
+                lease=peer.acquire_lease('peer-checkpoint-plan',clock=NOW)
+                try:
+                    owner._set_control(peer,'active_plan',plan)
+                    peer._conn.commit()
+                finally:
+                    peer.release_lease(lease)
+            elif conflict in ('PENDING_CHECKPOINT_CHANGED','CHECKPOINT_ARCHIVE_CHANGED','CACHE_RELEASE_CHANGED','SOURCE_CHANGED'):
+                key={'PENDING_CHECKPOINT_CHANGED':'checkpoint_archive_refresh_pending',
+                    'CHECKPOINT_ARCHIVE_CHANGED':'checkpoint_archive','CACHE_RELEASE_CHANGED':'checkpoint_archive_cache_release',
+                    'SOURCE_CHANGED':'source_identity'}[conflict]
+                lease=peer.acquire_lease('peer-checkpoint-identity',clock=NOW)
+                try:
+                    value=owner._control(peer,key,{})
+                    owner._set_control(peer,key,{**value,'source_id':'peer-source'} if key=='source_identity'
+                        else {**value,'checkpoint_sha256':'f'*64})
+                    peer._conn.commit()
+                finally:
+                    peer.release_lease(lease)
+            owner.record_maintenance_outcome(peer,state='FAILED',reason='PEER_PLAN_REVALIDATION_FAILED',
+                now=NOW+timedelta(seconds=1))
+            if conflict=='WRITER_BUSY':
+                held=peer.acquire_lease('ordinary-collector',clock=NOW)
+                self.assertIsNotNone(held)
+            captured['controls']=controls()
+            captured['protected']=self.planner_protected_rows()
+            if fail:
+                raise RuntimeError('controlled late old checkpoint phase failure')
+            return {'status':'REGISTERED'}
+        try:
+            with patch.object(owner,'maintenance_after_checkpoint',side_effect=native_initial), \
+                    patch.object(backup,'release_checkpoint_archive_cache',
+                        side_effect=late_peer if phase=='release' else None,
+                        return_value={'status':'NONE'}), \
+                    patch.object(backup,'refresh_checkpoint_archive',side_effect=late_peer), \
+                    patch('solana_alpha_lab.factory.observation_schedule_runtime.load_runtime_config',
+                        return_value={'ops_store_relative':'ops.sqlite'}):
+                result=backup.run_checkpoint_maintenance(self.hot,{},now=NOW)
+        finally:
+            if held is not None:
+                peer.release_lease(held)
+            peer.close()
+        self.assertEqual(result['status'],'YIELD',result)
+        self.assertEqual(result['reason'],conflict,result)
+        self.assertEqual(controls(),captured['controls'])
+        self.assertEqual(self.planner_protected_rows(),captured['protected'])
+        self.store.close();self.store=ObservationScheduleStore(self.path)
+        self.assertEqual(controls(),captured['controls'])
+        self.assertEqual(owner.retention_status(self.store)['last_reason'],'PEER_PLAN_REVALIDATION_FAILED')
+        self.assertNotIn('rows',self.store.call_payload('FIRST'))
+        self.assertIn('rows',self.store.call_payload('SECOND'))
+        from solana_alpha_lab.factory.collector_operational_packet import build_collector_operational_packet
+        from solana_alpha_lab.factory.operability_watch import classify_incidents
+        rdp=self.hot/'rdp';rdp.mkdir()
+        packet=build_collector_operational_packet(root=self.base,store=self.store,now=NOW+timedelta(seconds=1),
+            observation_rdp=rdp,environ={})
+        self.assertEqual(packet['maintenance']['last_reason'],'PEER_PLAN_REVALIDATION_FAILED')
+        self.assertIn('MAINTENANCE_FAILED',classify_incidents(packet))
+        return result
+
+    def test_checkpoint_late_failure_preserves_peer_authority_and_health(self):
+        for conflict in ('POLICY_CHANGED','ACTIVE_PLAN_CHANGED','MAINTENANCE_STATE_CHANGED',
+                'PENDING_CHECKPOINT_CHANGED','CHECKPOINT_ARCHIVE_CHANGED','CACHE_RELEASE_CHANGED','SOURCE_CHANGED','WRITER_BUSY'):
+            with self.subTest(conflict=conflict):
+                fixture=PolicyRevisionRecoveryTests();fixture.setUp()
+                try:
+                    fixture.checkpoint_outer_interleave(conflict)
+                finally:
+                    fixture.tearDown()
+
+    def test_checkpoint_release_failure_and_successful_refresh_cannot_bless_peer_state(self):
+        for phase,fail in (('release',True),('refresh',False)):
+            with self.subTest(phase=phase,fail=fail):
+                fixture=PolicyRevisionRecoveryTests();fixture.setUp()
+                try:
+                    fixture.checkpoint_outer_interleave('POLICY_CHANGED',phase=phase,fail=fail)
+                finally:
+                    fixture.tearDown()
+
+    def test_checkpoint_unchanged_failure_is_durable_and_ordinary_retry_progresses(self):
+        from solana_alpha_lab.factory import offhost_backup as backup
+        from solana_alpha_lab.factory.collector_operational_packet import build_collector_operational_packet
+        from solana_alpha_lab.factory.operability_watch import classify_incidents
+        for phase in ('release','refresh'):
+            with self.subTest(phase=phase):
+                fixture=PolicyRevisionRecoveryTests();fixture.setUp()
+                try:
+                    fixture.outcome_source()
+                    before=fixture.planner_protected_rows()
+                    def native_initial(root, *, now, **kwargs):
+                        return owner.run_maintenance_step(fixture.store,now=now,pressure=SAFE,**kwargs)
+                    with patch.object(owner,'maintenance_after_checkpoint',side_effect=native_initial), \
+                            patch.object(backup,'release_checkpoint_archive_cache',return_value={'status':'NONE'},
+                                side_effect=RuntimeError('bounded release failure') if phase=='release' else None), \
+                            patch.object(backup,'refresh_checkpoint_archive',side_effect=RuntimeError('bounded refresh failure')), \
+                            patch('solana_alpha_lab.factory.observation_schedule_runtime.load_runtime_config',
+                                return_value={'ops_store_relative':'ops.sqlite'}):
+                        failed=backup.run_checkpoint_maintenance(fixture.hot,{},now=NOW)
+                    self.assertEqual(failed,{'status':'FAILED','reason':'ARCHIVE_REFRESH_FAILED','backup_unchanged':True})
+                    fixture.store.close();fixture.store=ObservationScheduleStore(fixture.path)
+                    state=owner.retention_status(fixture.store)
+                    self.assertEqual(state['state'],'FAILED')
+                    self.assertEqual(state['last_reason'],'ARCHIVE_REFRESH_FAILED')
+                    self.assertEqual(state['last_success_at'],render_utc(NOW))
+                    self.assertEqual(state['next_cursor'],{'call_ledger':11,'poll_slots':0})
+                    first_effect=fixture.planner_protected_rows()['call_ledger'][0]
+                    rdp=fixture.hot/'rdp';rdp.mkdir()
+                    packet=build_collector_operational_packet(root=fixture.base,store=fixture.store,now=NOW,
+                        observation_rdp=rdp,environ={})
+                    self.assertIn('MAINTENANCE_FAILED',classify_incidents(packet))
+                    with patch.object(owner,'maintenance_after_checkpoint',side_effect=native_initial), \
+                            patch.object(backup,'release_checkpoint_archive_cache',return_value={'status':'NONE'}), \
+                            patch.object(backup,'refresh_checkpoint_archive',return_value={'status':'DISABLED'}), \
+                            patch('solana_alpha_lab.factory.observation_schedule_runtime.load_runtime_config',
+                                return_value={'ops_store_relative':'ops.sqlite'}):
+                        retry=backup.run_checkpoint_maintenance(fixture.hot,{},now=NOW+timedelta(minutes=2))
+                    self.assertEqual(retry['status'],'COMPLETE',retry)
+                    after=fixture.planner_protected_rows()
+                    self.assertEqual(after['call_ledger'][0],first_effect)
+                    self.assertNotIn('rows',fixture.store.call_payload('SECOND'))
+                    for table in ('due_observations','retirement_scopes','retention_archive_pins'):
+                        self.assertEqual(after[table],before[table])
+                    self.assertEqual([(r[0],r[-2],r[-1]) for r in after['call_ledger']],
+                        [(r[0],r[-2],r[-1]) for r in before['call_ledger']])
+                    self.assertEqual(owner.retention_status(fixture.store)['state'],'READY')
+                    self.assertNotIn('controls',json.dumps(retry))
+                finally:
+                    fixture.tearDown()
+
+    def test_checkpoint_busy_phase_stays_yield_after_peer_releases_lease(self):
+        from solana_alpha_lab.factory import offhost_backup as backup
+        self.outcome_source()
+        peer=ObservationScheduleStore(self.path)
+        release=backup.release_checkpoint_archive_cache
+        captured={}
+        def native_initial(root, *, now, **kwargs):
+            return owner.run_maintenance_step(self.store,now=now,pressure=SAFE,**kwargs)
+        def busy_release(root, **kwargs):
+            lease=peer.acquire_lease('ordinary-collector',clock=NOW)
+            self.assertIsNotNone(lease)
+            try:
+                try:
+                    return release(root,**kwargs)
+                except owner.ObservationScheduleRetentionError as exc:
+                    self.assertEqual(str(exc),'WRITER_BUSY')
+                    captured['controls']=self.outcome_controls()
+                    raise
+            finally:
+                peer.release_lease(lease)
+        try:
+            with patch.object(owner,'maintenance_after_checkpoint',side_effect=native_initial), \
+                    patch.object(backup,'release_checkpoint_archive_cache',side_effect=busy_release), \
+                    patch.object(owner,'record_maintenance_outcome',side_effect=AssertionError('transient became failure')), \
+                    patch('solana_alpha_lab.factory.observation_schedule_runtime.load_runtime_config',
+                        return_value={'ops_store_relative':'ops.sqlite'}):
+                result=backup.run_checkpoint_maintenance(self.hot,{},now=NOW)
+        finally:
+            peer.close()
+        self.assertEqual(result['status'],'YIELD',result)
+        self.assertEqual(result['reason'],'WRITER_BUSY')
+        self.assertEqual(self.outcome_controls(),captured['controls'])
+        self.assertEqual(owner.retention_status(self.store)['state'],'READY')
+        self.assertNotIn('rows',self.store.call_payload('FIRST'))
+
     def outcome_source(self, *, fail_apply=False):
         add_call(self.store,'FIRST',rowid=11,size=4096)
         add_call(self.store,'SECOND',rowid=29,size=4096)
@@ -581,6 +765,199 @@ with patch.object(owner,'compact_payload',side_effect=die_on_second):
 
 
 class CheckpointRefreshPolicyRecoveryTests(NativeFixture):
+    def native_refresh_transport(self, remote_root):
+        from dataclasses import replace
+        from tests.test_factory_offhost_backup import FakeRcloneRunner
+        from solana_alpha_lab.factory import offhost_backup as backup
+        config=replace(backup.load_offhost_config(self.hot),rclone_config_absolute=self.hot/'rclone-fixture.conf')
+        remote=FakeRcloneRunner()
+        for path in remote_root.iterdir():
+            remote.payloads[config.remote_object(path.name)]=path.read_bytes()
+            remote.objects[config.remote_object(path.name)]=path.stat().st_size
+        def transport(argv):
+            sub=remote._subcommand(argv)
+            if sub=='copyto' and argv[-2].startswith(config.remote_prefix):
+                payload=remote.payloads.get(argv[-2])
+                if payload is None:
+                    return subprocess.CompletedProcess(argv,1,'','object absent')
+                target=Path(argv[-1]);target.parent.mkdir(parents=True,exist_ok=True)
+                target.write_bytes(payload)
+                return subprocess.CompletedProcess(argv,0,'','')
+            return remote(argv)
+        return config,remote,transport
+
+    def test_registration_checks_native_context_after_remote_reconstruction(self):
+        from solana_alpha_lab.factory import offhost_backup as backup
+        for conflict in ('POLICY_CHANGED','ACTIVE_PLAN_CHANGED','PENDING_CHECKPOINT_CHANGED'):
+            with self.subTest(conflict=conflict):
+                fixture=CheckpointRefreshPolicyRecoveryTests();fixture.setUp()
+                peer=None
+                try:
+                    document,pending,remote_root=fixture.pending_checkpoint()
+                    config,remote,transport=fixture.native_refresh_transport(remote_root)
+                    peer=ObservationScheduleStore(fixture.path)
+                    expected=owner.checkpoint_maintenance_context(fixture.store)
+                    native_verify=owner._verify_checkpoint_archive
+                    captured={}
+                    def collector_free_transport(argv):
+                        lease=peer.acquire_lease('collector-during-remote-readback',clock=NOW)
+                        self.assertIsNotNone(lease,'remote readback held the OPS fence')
+                        peer.release_lease(lease)
+                        captured['network_calls']=captured.get('network_calls',0)+1
+                        return transport(argv)
+                    def late_peer(record, *, deep):
+                        native_verify(record,deep=deep)
+                        if not deep:
+                            return
+                        if conflict=='POLICY_CHANGED':
+                            revised={**document,'revision':2}
+                            owner.install_maintenance_policy(peer,policy=revised,
+                                approved_sha256=owner.policy_sha256(revised),now=NOW+timedelta(seconds=1))
+                        else:
+                            lease=peer.acquire_lease('peer-new-checkpoint-owner',clock=NOW)
+                            try:
+                                if conflict=='ACTIVE_PLAN_CHANGED':
+                                    plan=owner.build_retirement_plan(peer,now=NOW,policy=document)
+                                    owner._set_control(peer,'active_plan',plan)
+                                else:
+                                    owner._set_control(peer,'checkpoint_archive_refresh_pending',
+                                        {**pending,'checkpoint_sha256':'f'*64})
+                                peer._conn.commit()
+                            finally:
+                                peer.release_lease(lease)
+                        owner.record_maintenance_outcome(peer,state='FAILED',reason='PEER_PLAN_REVALIDATION_FAILED',
+                            now=NOW+timedelta(seconds=1))
+                        captured['controls']=list(peer._conn.execute('SELECT * FROM retention_control ORDER BY control_key'))
+                        captured['pins']=list(peer._conn.execute('SELECT * FROM retention_archive_pins ORDER BY object_name'))
+                    with patch.object(backup,'load_offhost_config',return_value=config), \
+                            patch.object(owner,'_verify_checkpoint_archive',side_effect=late_peer):
+                        with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,conflict):
+                            backup.refresh_checkpoint_archive(fixture.hot,{},now=NOW,runner=collector_free_transport,
+                                expected_context=expected)
+                    self.assertGreater(captured['network_calls'],0)
+                    self.assertEqual(list(peer._conn.execute('SELECT * FROM retention_control ORDER BY control_key')),captured['controls'])
+                    self.assertEqual(list(peer._conn.execute('SELECT * FROM retention_archive_pins ORDER BY object_name')),captured['pins'])
+                    self.assertIsNone(owner._control(peer,'checkpoint_archive'))
+                    self.assertTrue(all('rows' in peer.call_payload(name) for name in ('FIRST','SECOND')))
+                    self.assertEqual({path.name:path.read_bytes() for path in remote_root.iterdir()},
+                        {Path(name).name:payload for name,payload in remote.payloads.items()})
+                finally:
+                    if peer is not None:peer.close()
+                    fixture.tearDown()
+
+    def test_cache_release_context_and_consumer_decision_share_native_fence(self):
+        from solana_alpha_lab.factory import offhost_backup as backup
+        document,pending,remote_root=self.pending_checkpoint()
+        config,remote,transport=self.native_refresh_transport(remote_root)
+        peer=ObservationScheduleStore(self.path)
+        try:
+            # Native independent readback and registration produce both cache
+            # generations and the actual release token; no fabricated proof.
+            with patch.object(backup,'load_offhost_config',return_value=config):
+                first=backup.refresh_checkpoint_archive(self.hot,{},now=NOW,runner=transport)
+                self.assertEqual(first['status'],'REGISTERED')
+                add_call(self.store,'THIRD',rowid=47,size=1000)
+                receipt=backup.run_offhost_checkpoint(self.hot,mode='daily',config=config,
+                    runner=transport,now=NOW+timedelta(seconds=2))
+                second=backup.refresh_checkpoint_archive(self.hot,receipt,now=NOW+timedelta(seconds=2),runner=transport)
+                self.assertEqual(second['status'],'REGISTERED')
+            old=owner._control(self.store,'checkpoint_archive_cache_release')
+            self.assertIsNotNone(old)
+            target=Path(old['cache_root'])
+            self.assertTrue(target.is_dir())
+            expected=owner.checkpoint_maintenance_context(self.store)
+            plan=owner.build_retirement_plan(peer,now=NOW,policy=document)
+            lease=peer.acquire_lease('peer-new-plan',clock=NOW)
+            try:
+                owner._set_control(peer,'active_plan',plan)
+                peer._conn.commit()
+            finally:
+                peer.release_lease(lease)
+            with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,'ACTIVE_PLAN_CHANGED'):
+                backup.release_checkpoint_archive_cache(self.hot,now=NOW,expected_context=expected)
+            self.assertTrue(target.is_dir())
+            self.assertEqual(owner._control(peer,'checkpoint_archive_cache_release'),old)
+            lease=peer.acquire_lease('peer-clear-test-plan',clock=NOW)
+            try:
+                peer._conn.execute("DELETE FROM retention_control WHERE control_key='active_plan'")
+                peer._conn.commit()
+            finally:
+                peer.release_lease(lease)
+            files_before={path.relative_to(target).as_posix():path.read_bytes()
+                for path in target.rglob('*') if path.is_file()}
+            for budget in ('entries','wall'):
+                from itertools import count
+                budget_patch=(patch.object(backup,'BACKUP_PARTITION_SCAN_MAX_FILES',0) if budget=='entries'
+                    else patch.object(backup.time,'monotonic',side_effect=count(0,100)))
+                with budget_patch,patch.object(backup.shutil,'rmtree',side_effect=AssertionError('budget deleted files')):
+                    with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,'CACHE_RELEASE_BUDGET'):
+                        backup.release_checkpoint_archive_cache(self.hot,now=NOW)
+                self.assertEqual(owner._control(self.store,'checkpoint_archive_cache_release'),old)
+                self.assertEqual({path.relative_to(target).as_posix():path.read_bytes()
+                    for path in target.rglob('*') if path.is_file()},files_before)
+            def interrupted_intent(path):
+                (path/'.remote-restore-intent.json').unlink()
+                raise RuntimeError('process lost after removing owner intent')
+            with patch.object(backup.shutil,'rmtree',side_effect=interrupted_intent):
+                with self.assertRaisesRegex(RuntimeError,'process lost'):
+                    backup.release_checkpoint_archive_cache(self.hot,now=NOW)
+            deleting=owner._control(self.store,'checkpoint_archive_cache_release')
+            self.assertEqual(deleting['deletion_started']['checkpoint_sha256'],old['checkpoint_sha256'])
+            self.assertEqual(deleting['deletion_started']['intent_sha256'],
+                hashlib.sha256(files_before['.remote-restore-intent.json']).hexdigest())
+            self.store.close();self.store=ObservationScheduleStore(self.path)
+            self.assertEqual(owner._control(self.store,'checkpoint_archive_cache_release'),deleting)
+            # A committed deletion token tolerates missing proof files, while
+            # a still-present mutated intent and replacement inode refuse.
+            intent=target/'.remote-restore-intent.json'
+            intent.write_text('{"checkpoint_sha256":"foreign"}',encoding='utf-8')
+            with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,'DELETION_IDENTITY_CONFLICT'):
+                backup.release_checkpoint_archive_cache(self.hot,now=NOW)
+            self.assertTrue(intent.is_file())
+            intent.unlink()
+            def interrupted_bindings(path):
+                Path(old['archive_path']).unlink()
+                Path(old['inventory_path']).unlink()
+                raise RuntimeError('process lost after removing archive and index')
+            with patch.object(backup.shutil,'rmtree',side_effect=interrupted_bindings):
+                with self.assertRaisesRegex(RuntimeError,'process lost'):
+                    backup.release_checkpoint_archive_cache(self.hot,now=NOW)
+            self.assertEqual(owner._control(self.store,'checkpoint_archive_cache_release'),deleting)
+            self.assertTrue(target.is_relative_to(self.hot))
+            held=target.with_name('isolated-held-cache')
+            self.assertTrue(held.is_relative_to(self.hot))
+            target.rename(held)
+            target.mkdir();(target/'foreign-file').write_bytes(b'preserve')
+            with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,'DELETION_IDENTITY_CONFLICT'):
+                backup.release_checkpoint_archive_cache(self.hot,now=NOW)
+            self.assertEqual((target/'foreign-file').read_bytes(),b'preserve')
+            (target/'foreign-file').unlink();target.rmdir();held.rename(target)
+            native_decision=owner.checkpoint_archive_cache_releasable
+            observed={}
+            def consumer_attempt(store):
+                decision=native_decision(store)
+                observed['decision']=decision['status']
+                observed['peer_lease']=peer.acquire_lease('peer-pin-before-delete',clock=NOW)
+                self.assertIsNone(observed['peer_lease'])
+                return decision
+            pins=list(self.store._conn.execute('SELECT * FROM retention_archive_pins ORDER BY object_name'))
+            def native_initial(root, *, now, **kwargs):
+                return owner.run_maintenance_step(self.store,now=now,pressure=SAFE,**kwargs)
+            with patch.object(owner,'checkpoint_archive_cache_releasable',side_effect=consumer_attempt), \
+                    patch.object(owner,'maintenance_after_checkpoint',side_effect=native_initial):
+                ordinary=backup.run_checkpoint_maintenance(self.hot,{},now=NOW+timedelta(seconds=4),
+                    runner=lambda argv:self.fail('cache recovery needed remote work'))
+            self.assertEqual(ordinary['status'],'COMPLETE',ordinary)
+            released=ordinary['cache_release']
+            self.assertEqual(observed['decision'],'RELEASABLE')
+            self.assertEqual(released['status'],'RELEASED')
+            self.assertGreater(released['released_local_bytes'],0)
+            self.assertFalse(target.exists())
+            self.assertIsNone(owner._control(self.store,'checkpoint_archive_cache_release'))
+            self.assertEqual(list(self.store._conn.execute('SELECT * FROM retention_archive_pins ORDER BY object_name')),pins)
+        finally:
+            peer.close()
+
     def pending_checkpoint(self):
         from dataclasses import replace
         import yaml

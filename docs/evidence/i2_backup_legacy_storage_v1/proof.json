@@ -853,6 +853,214 @@
       "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_storage_consumers_v1 -q",
       "independent_oracle": "existing native pending-checkpoint fixture, actual ordinary restore/register and approved revision, raw filesystem file-size sum and durable SQL references; separate synthetic overlap and invalid-reference negative controls",
       "production_gate": "actual filesystem/root topology and permitted retained cache locations under exact OPERATE; production sizing remains UNKNOWN"
+    },
+    "checkpoint_pipeline_authority_remediation": {
+      "observed_head": "5238677b5360db7c6fff28ff34b246e59fe8e98d",
+      "prior_packet_fingerprint_sha256": "eb79af4455c2490cec6ecfc86e8e973c92c35e12898d926c9c62416bae46b740",
+      "prior_role_verdicts": {
+        "CODE_REVIEWER": "PASS",
+        "GOAL_DOD_CRITIC": "PASS",
+        "ARCHITECTURE_CRITIC": "NOT_READY"
+      },
+      "before": {
+        "native_first_apply": "FIRST body compacted and progress committed before separate native peer",
+        "peer_authority": "approved revision2 and FAILED/PEER_PLAN_REVALIDATION_FAILED at 12:00:01Z",
+        "late_old_refresh_exception": "overwrote newer failure with ARCHIVE_REFRESH_FAILED at 12:00:00Z",
+        "first_red_matrix": "2 test methods,10 native interleavings:9 failures and1 initial release uncaught exception;1.306s",
+        "adjacent_partial_cache_delete": "missing intent/archive/index stranded existing release token on ordinary retry"
+      },
+      "owning_fix": "One bounded in-memory native context across maintenance, refresh intent, independently reconstructed registration, cache release and terminal outcome. Exact source incarnation and policy/plan/maintenance/pending/current/release bytes compare under native lease and BEGIN IMMEDIATE; token advances only from own pre-commit snapshot. Network holds no OPS lease. Typed transient and peer conflicts yield before any stale outcome write.",
+      "partial_cache_recovery": "Existing release token durably records verified root inode, checkpoint and owner-intent SHA before deletion. Each phase rechecks exact context and active consumers. Only that committed token permits expected missing proof files; foreign inode or mutated surviving owner intent refuses. Pinned remote objects remain retained; ordinary checkpoint retry completes interrupted local cleanup.",
+      "cache_budget": "Pre-delete census uses installed policy.max_wall_seconds and existing16384entry scan bound; exhaustion yields CACHE_RELEASE_BUDGET before deletion. Two native phases are separately bounded; individual OS deletion syscalls cannot be hard wall-preempted.",
+      "native_validation": {
+        "schema": "smial.i2-checkpoint-maintenance-pipeline-repair-validation.v1",
+        "observed_base_head": "8a62062d21b01a2a5b663675fdb1248a5c474066",
+        "original_architecture_finding_head": "5238677b5360db7c6fff28ff34b246e59fe8e98d",
+        "scope": "Existing native maintenance, checkpoint refresh/registration and cache release owners only; no production activity, dependency, policy/schema migration or scientific change.",
+        "before": {
+          "outer_race": "Actual first APPLY compacts FIRST at ROWID11. Separate native peer changes authority/outcome at 12:00:01. Old checkpoint failure records ARCHIVE_REFRESH_FAILED at 12:00:00 over the newer truth.",
+          "new_native_oracle_tests": 2,
+          "interleavings": 10,
+          "failures": 9,
+          "errors": 1,
+          "wall_seconds": 1.306,
+          "release_error": "Initial release exception escaped before the old try boundary.",
+          "historical_partial_delete": {
+            "command": "uv run --locked --managed-python python -B local/i2_review/pipeline-partial-before.py",
+            "producer": "Actual two native independently verified cache generations, historical release function extracted from exact pre-repair commit.",
+            "interruption": "Owner intent removed before controlled failure; native release token and remaining cache preserved.",
+            "ordinary_retry": "FileNotFoundError_OWNER_INTENT_MISSING",
+            "durable_deletion_started": false,
+            "artifact": "local/i2_review/pipeline-partial-before.json"
+          }
+        },
+        "repair": {
+          "authority_context": [
+            "source UUID and database/root inode",
+            "exact policy",
+            "exact active plan",
+            "pending checkpoint",
+            "current archive",
+            "cache release token",
+            "archive refresh timestamp",
+            "maintenance outcome"
+          ],
+          "context_semantics": "One bounded SQLite control-row snapshot; native lease + BEGIN IMMEDIATE compare before mutation; advance from owned bytes before commit releases transaction. Never capture a replacement authority after failure. Context remains internal, absent from receipts.",
+          "covered_phases": [
+            "initial and subsequent maintenance",
+            "pre-network refresh intent",
+            "post-reconstruction registration",
+            "cache preparation/deletion/acknowledgement",
+            "terminal failure outcome",
+            "no-op finish"
+          ],
+          "peer_change": "Typed YIELD preserves all newer control bytes, effects/progress, pins, clocks and last-good outcome.",
+          "transient": "Native WRITER_BUSY remains YIELD even after peer releases its lease before outer catch. Reclaim/source reconnection refusals are typed YIELD.",
+          "unchanged_failure": "Actual release/refresh failure persists FAILED ARCHIVE_REFRESH_FAILED; fresh-store packet/watch reports MAINTENANCE_FAILED; ordinary subsequent attempt progresses and clears incident through native success.",
+          "remote_locking": "Actual native transport oracle acquires/releases an independent collector OPS lease during every network call. No OPS lease spans remote verification.",
+          "cache_partial_delete_recovery": "Existing release token durably gains exact checkpoint/root-inode/owner-intent-hash deletion_started before any filesystem deletion. Second short native fence rechecks authority and consumers; exact interrupted deletion can resume after owner-intent/archive/index removal. Still-present changed intent or replacement root inode refuses. Remote pins remain intact.",
+          "cache_budget": "Existing BACKUP_PARTITION_SCAN_MAX_FILES=16384 conservative census and installed max_wall_seconds; budget refusal occurs before deleting any cache file or committing deletion_started. Wrapper maps CACHE_RELEASE_BUDGET to YIELD. Individual filesystem syscalls/rmtree cannot be hard wall-preempted.",
+          "schema": "No SQLite schema change; bounded metadata added inside existing source-owned release token."
+        },
+        "after_native_oracles": {
+          "outer_interleavings": 10,
+          "outer_conflicts": [
+            "POLICY_CHANGED",
+            "ACTIVE_PLAN_CHANGED",
+            "MAINTENANCE_STATE_CHANGED",
+            "PENDING_CHECKPOINT_CHANGED",
+            "CHECKPOINT_ARCHIVE_CHANGED",
+            "CACHE_RELEASE_CHANGED",
+            "SOURCE_CHANGED",
+            "WRITER_BUSY"
+          ],
+          "outer_boundary_extras": [
+            "initial release fails after peer revision",
+            "successful late refresh cannot bless peer revision"
+          ],
+          "unchanged_failure_phases": [
+            "release",
+            "refresh"
+          ],
+          "registration_conflicts_after_actual_remote_reconstruction": [
+            "POLICY_CHANGED",
+            "ACTIVE_PLAN_CHANGED",
+            "PENDING_CHECKPOINT_CHANGED"
+          ],
+          "cache_oracles": [
+            "stale peer plan prevents deletion",
+            "entries and wall budget preserve every file and release token",
+            "controlled partial owner-intent removal then fresh-store restart",
+            "controlled archive/index removal",
+            "changed still-present owner intent refuses",
+            "foreign replacement inode preserves foreign file",
+            "peer lease unavailable between native release decision and deletion",
+            "ordinary checkpoint retry completes cleanup without remote transport",
+            "remote pins unchanged"
+          ],
+          "preserved": [
+            "committed FIRST compaction",
+            "SECOND body while newer peer owns outcome",
+            "ROWIDs11/29 and source created/updated clocks",
+            "owner metadata and cursor",
+            "cold pins",
+            "newer peer FAILED@12:00:01",
+            "fresh-store packet/watch MAINTENANCE_FAILED"
+          ]
+        },
+        "validation": {
+          "command": "uv run --locked --managed-python python -B -m unittest tests.test_i2_retention_maintenance_v1 tests.test_i2_pipeline_v1 tests.test_factory_offhost_backup",
+          "result": "PASS",
+          "tests": 77,
+          "skipped": 1,
+          "wall_seconds": 77.561,
+          "new_test_methods": [
+            "PolicyRevisionRecoveryTests.test_checkpoint_late_failure_preserves_peer_authority_and_health",
+            "PolicyRevisionRecoveryTests.test_checkpoint_release_failure_and_successful_refresh_cannot_bless_peer_state",
+            "PolicyRevisionRecoveryTests.test_checkpoint_unchanged_failure_is_durable_and_ordinary_retry_progresses",
+            "PolicyRevisionRecoveryTests.test_checkpoint_busy_phase_stays_yield_after_peer_releases_lease",
+            "CheckpointRefreshPolicyRecoveryTests.test_registration_checks_native_context_after_remote_reconstruction",
+            "CheckpointRefreshPolicyRecoveryTests.test_cache_release_context_and_consumer_decision_share_native_fence"
+          ],
+          "existing_multi_batch_native_rehearsal": {
+            "remaining_bodies_after_ordinary_cycles": [
+              3,
+              3,
+              2,
+              2,
+              1,
+              1,
+              0
+            ],
+            "cache_generations_after_cycles": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            "max_rows": 1,
+            "remote_pins": "PRESERVED"
+          },
+          "existing_cli_reclaim_native_rehearsal": {
+            "before_bytes": 2494464,
+            "after_bytes": 397312,
+            "rowid": 313,
+            "root_inode": "PRESERVED",
+            "next_native_writer": "PASS",
+            "retired_body_before_bytes": 2097175,
+            "retired_body_after_bytes": 0,
+            "next_full_checkpoint_bytes": 12371,
+            "independently_restored_retired_body_count": 0,
+            "cli_chain_wall_seconds": 1.739,
+            "cli_child_peak_rss_bytes": "UNKNOWN"
+          }
+        },
+        "tracked_files": [
+          "src/solana_alpha_lab/factory/observation_schedule_retention.py",
+          "src/solana_alpha_lab/factory/offhost_backup.py",
+          "tests/test_i2_retention_maintenance_v1.py"
+        ],
+        "tracked_mutations": "STOPPED_AFTER_FINAL_GREEN"
+      },
+      "direct_health_consumers": {
+        "result": "PASS",
+        "tests": 54,
+        "wall_seconds": 4.37,
+        "native_actual_cache_before_after_root_revision_bytes": [
+          460999,
+          460999
+        ],
+        "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_factory_operability_signal_calibration_v1 tests.test_factory_operability_memory_collision_repair_v1 tests.test_i2_storage_consumers_v1 tests.test_managed_collection_continuity_v1.ManagedFootprintTests -q"
+      },
+      "factory_static": "PASS",
+      "independent_oracle": "Real first native APPLY, separate peer store/approved policy/plan/outcome, reopened raw SQLite, actual registered reconstructed checkpoints/two cache generations, filesystem SHA/inode checks and operational packet/watch; transport callbacks only at deliberate concurrency/failure boundaries",
+      "production_gate": "Same mandatory separately approved installed ordinary maintenance/caller and incident/recovery acceptance. No production mutation, new policy field, scientific authority or live capacity claim."
     }
+  },
+  "main_integration": {
+    "owner_direction": "Check changed main before PR delivery; changed main confirmed by owner",
+    "prior_base": "b3fb9d8ecffbffda468dccabaa81ca3392da6f15",
+    "new_frozen_base": "3ff9df44331d8063274132c3da7022e46d859d92",
+    "ordinary_merge_commit": "8a62062d21b01a2a5b663675fdb1248a5c474066",
+    "upstream_pr": 406,
+    "upstream_changed_paths": 59,
+    "unchanged_upstream_nonaggregate_blobs": 54,
+    "preserved_upstream_inventory_sha256": "0dfa4166845c66adeb6476727e7dbd89135812a8d70c3f87e1bce7482066d9cc",
+    "shared_aggregate_resolution": "Both append-only asset sets preserved; 3 source Catalog conflicts resolved; native harness_sync regenerated hashes/counts/navigation; no generated hand edits",
+    "authority_and_harness_changes_from_upstream": "NONE_IN_EXACT_AUTHORITY_PATHS",
+    "legacy_producer_historical_anchor": "b3fb9d8ecffbffda468dccabaa81ca3392da6f15",
+    "new_dependencies_profile_grants_or_scientific_semantic_changes_by_I2": "NONE",
+    "live_main_transport_and_api": "BOTH_MATCH_NEW_FROZEN_BASE",
+    "review_ci_disposition": "All final role reviews, evidence and exact-head CI must bind updated candidate; prior results remain historical",
+    "targeted_snapshot_chain_direct_consumer_validation": {
+      "result": "PASS",
+      "tests": 62,
+      "wall_seconds": 17.435,
+      "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_i2_backup_legacy_storage_v1 tests.test_observation_schedule_remote_ops tests.test_mutable_backup_zip64_repair_v1 tests.test_factory_remote_operations -q"
+    },
+    "reproduce": "git diff --name-only b3fb9d8ecffbffda468dccabaa81ca3392da6f15 3ff9df44331d8063274132c3da7022e46d859d92; compare each nonaggregate Git blob to 8a62062d21b01a2a5b663675fdb1248a5c474066; native harness_sync owns shared aggregates"
   }
 }

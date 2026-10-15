@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 from solana_alpha_lab.factory.remote_ops import (
+    BACKUP_PARTITION_SCAN_MAX_FILES,
     RemoteOpsError,
     _backup_newest,
     _effective_backup_lists,
@@ -1792,7 +1793,7 @@ def apply_remote_backup_prune(
 
 def refresh_checkpoint_archive(
     root: Path, checkpoint_receipt: Mapping[str, Any], *, now: datetime,
-    runner: RcloneRunner | None = None,
+    runner: RcloneRunner | None = None, expected_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Existing caller's optional, policy-bound independent cold refresh."""
     from solana_alpha_lab.factory.observation_schedule_retention import (
@@ -1802,7 +1803,8 @@ def refresh_checkpoint_archive(
     from solana_alpha_lab.factory.observation_schedule_runtime import load_runtime_config
     from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 
-    decision = checkpoint_archive_refresh_required(root, now=now)
+    expected = {} if expected_context is None else expected_context
+    decision = checkpoint_archive_refresh_required(root, now=now, expected_context=expected)
     if decision.get("required") is not True:
         return {"status": "DISABLED", "reason": decision["reason"]}
     budget = decision["budget"]
@@ -1840,7 +1842,7 @@ def refresh_checkpoint_archive(
                             else retirement_raw_archive_dependencies(store, source_root=root, now=now))
             checkpoint_identity["supplemental_archives"] = dependencies["archives"]
         intent = checkpoint_archive_refresh_intent(store, checkpoint=checkpoint_identity,
-            cold_relative=cold_relative, now=now, source_root=root)
+            cold_relative=cold_relative, now=now, source_root=root, expected_context=expected)
         cache = cold_root / str(intent["checkpoint_sha256"])
         # The small local checkpoint is reconstructed from the exact native
         # intent if a later local full prune removed its original sink copy.
@@ -1857,7 +1859,7 @@ def refresh_checkpoint_archive(
                 max_wall_seconds=float(budget["max_wall_seconds"]),
                 supplemental_archives=intent.get("supplemental_archives") or [])
         registered = register_checkpoint_retirement_archive(store, proof=proof,
-            isolated_root=cache, source_root=root, now=now)
+            isolated_root=cache, source_root=root, now=now, expected_context=expected)
         return {"status": "REGISTERED", "checkpoint_sha256": intent["checkpoint_sha256"],
                 "downloaded_closure_bytes": proof["downloaded_closure_bytes"],
                 "staging_final_bytes": proof["staging_final_bytes"],
@@ -1866,10 +1868,13 @@ def refresh_checkpoint_archive(
         store.close()
 
 
-def release_checkpoint_archive_cache(root: Path, *, now: datetime) -> dict[str, Any]:
+def release_checkpoint_archive_cache(root: Path, *, now: datetime,
+                                      expected_context: dict[str, Any] | None = None) -> dict[str, Any]:
     """Release only a native source-owned, superseded cache; remote pins stay."""
     from solana_alpha_lab.factory.observation_schedule_retention import (
-        acknowledge_checkpoint_archive_cache_release, checkpoint_archive_cache_releasable,
+        ObservationScheduleRetentionError,
+        _acknowledge_checkpoint_archive_cache_release, checkpoint_archive_cache_releasable,
+        checkpoint_maintenance_context, checkpoint_maintenance_write, start_checkpoint_archive_cache_deletion,
     )
     from solana_alpha_lab.factory.observation_schedule_runtime import load_runtime_config
     from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
@@ -1881,30 +1886,49 @@ def release_checkpoint_archive_cache(root: Path, *, now: datetime) -> dict[str, 
     with backup_plane_lock(root, timeout_seconds=0):
         store = ObservationScheduleStore(path)
         try:
-            decision = checkpoint_archive_cache_releasable(store)
-            if decision["status"] != "RELEASABLE":
-                return {"status": decision["status"], "reason": decision.get("reason")}
-            token = decision["token"]
-            raw_target = Path(token["cache_root"])
-            target = raw_target.resolve()
-            if (target.name != token["checkpoint_sha256"] or not target.is_relative_to(root.resolve())
-                    or target == root.resolve() or raw_target.is_symlink()):
-                raise OffhostBackupError("CHECKPOINT_CACHE_RELEASE_TARGET_UNSAFE")
-            removed_bytes = 0
-            if target.exists():
-                owned = json.loads((target / ".remote-restore-intent.json").read_text(encoding="utf-8"))
-                if owned.get("checkpoint_sha256") != token["checkpoint_sha256"]:
-                    raise OffhostBackupError("CHECKPOINT_CACHE_RELEASE_IDENTITY_CONFLICT")
-                for candidate in target.rglob("*"):
-                    if candidate.is_symlink() or not candidate.resolve().is_relative_to(target):
+            expected = checkpoint_maintenance_context(store) if expected_context is None else expected_context
+            # Prepare the durable partial-delete token, then recheck every
+            # authority/consumer before deletion in a second short native
+            # transaction. A peer change between phases yields. No network
+            # runs under either OPS lease.
+            for _phase in range(2):
+                with checkpoint_maintenance_write(store, expected_context=expected, now=now,
+                        lease_owner="i2-checkpoint-cache-release"):
+                    decision = checkpoint_archive_cache_releasable(store)
+                    if decision["status"] != "RELEASABLE":
+                        return {"status": decision["status"], "reason": decision.get("reason")}
+                    token = decision["token"]
+                    raw_target = Path(token["cache_root"])
+                    target = raw_target.resolve()
+                    if (target.name != token["checkpoint_sha256"] or not target.is_relative_to(root.resolve())
+                            or target == root.resolve() or raw_target.is_symlink()):
                         raise OffhostBackupError("CHECKPOINT_CACHE_RELEASE_TARGET_UNSAFE")
-                    if candidate.is_file():
-                        removed_bytes += candidate.stat().st_size
-                # Exact absolute target was checked above; this cache is owned
-                # by the matched immutable intent and a native release token.
-                shutil.rmtree(target)
-            acknowledge_checkpoint_archive_cache_release(store,
-                checkpoint_sha256=token["checkpoint_sha256"], now=now)
+                    removed_bytes = 0
+                    if target.exists():
+                        installed = json.loads(expected["controls"]["policy"] or "{}")
+                        budget = installed.get("policy", {}).get("max_wall_seconds", 0)
+                        if not isinstance(budget, (int, float)) or isinstance(budget, bool) or not 0 < budget <= 30:
+                            raise ObservationScheduleRetentionError("CACHE_RELEASE_BUDGET")
+                        started, entries = time.monotonic(), 0
+                        for candidate in target.rglob("*"):
+                            entries += 1
+                            if entries > BACKUP_PARTITION_SCAN_MAX_FILES or time.monotonic() - started >= budget:
+                                raise ObservationScheduleRetentionError("CACHE_RELEASE_BUDGET")
+                            if candidate.is_symlink() or not candidate.resolve().is_relative_to(target):
+                                raise OffhostBackupError("CHECKPOINT_CACHE_RELEASE_TARGET_UNSAFE")
+                            if candidate.is_file():
+                                removed_bytes += candidate.stat().st_size
+                        if time.monotonic() - started >= budget:
+                            raise ObservationScheduleRetentionError("CACHE_RELEASE_BUDGET")
+                        if not token.get("deletion_started"):
+                            start_checkpoint_archive_cache_deletion(store, token=token, now=now)
+                            continue  # Commit exact deletion authority before any filesystem mutation.
+                        # The census bounds work before delete. Individual OS
+                        # deletion syscalls cannot be hard wall-preempted.
+                        shutil.rmtree(target)
+                    _acknowledge_checkpoint_archive_cache_release(store,
+                        checkpoint_sha256=token["checkpoint_sha256"])
+                    break
             return {"status": "RELEASED", "checkpoint_sha256": token["checkpoint_sha256"],
                     "released_local_bytes": removed_bytes}
         finally:
@@ -1916,31 +1940,63 @@ def run_checkpoint_maintenance(
     now: datetime, runner: RcloneRunner | None = None,
 ) -> dict[str, Any]:
     """Run only after the verified backup released its lock; default-off."""
-    from solana_alpha_lab.factory.observation_schedule_retention import maintenance_after_checkpoint
+    from solana_alpha_lab.factory.observation_schedule_retention import (
+        CHECKPOINT_MAINTENANCE_YIELD_REASONS, ObservationScheduleRetentionError,
+        checkpoint_maintenance_write, maintenance_after_checkpoint, record_maintenance_outcome,
+    )
+    from solana_alpha_lab.factory.observation_schedule_runtime import load_runtime_config
+    from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore, ObservationScheduleStoreError
 
-    result = maintenance_after_checkpoint(root, now=now)
+    expected: dict[str, Any] = {}
+    transient_types = (ObservationScheduleRetentionError, ObservationScheduleStoreError, RemoteOpsError)
+    try:
+        result = maintenance_after_checkpoint(root, now=now, expected_context=expected)
+    except transient_types as exc:
+        if str(exc) in CHECKPOINT_MAINTENANCE_YIELD_REASONS:
+            return {"status": "YIELD", "reason": str(exc), "backup_unchanged": True}
+        raise
     if (result.get("status") not in {"COMPLETE", "PROGRESS"}
             and not (result.get("status") == "YIELD" and result.get("reason") == "ARCHIVE_REFRESH_REQUIRED")):
         return result
-    released = release_checkpoint_archive_cache(root, now=now)
-    if released.get("status") == "WAIT":
-        return {**result, "cache_release": released}
     try:
-        refresh = refresh_checkpoint_archive(root, checkpoint_receipt, now=now, runner=runner)
+        released = release_checkpoint_archive_cache(root, now=now, expected_context=expected)
+        if released.get("status") == "WAIT":
+            return {**result, "cache_release": released}
+        refresh = refresh_checkpoint_archive(root, checkpoint_receipt, now=now, runner=runner,
+            expected_context=expected)
         if refresh.get("status") == "REGISTERED":
-            result = maintenance_after_checkpoint(root, now=now)
-            released = release_checkpoint_archive_cache(root, now=now)
-        return {**result, "archive_refresh": refresh, "cache_release": released}
-    except Exception:
-        from solana_alpha_lab.factory.observation_schedule_retention import record_maintenance_outcome
-        from solana_alpha_lab.factory.observation_schedule_runtime import load_runtime_config
-        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+            result = maintenance_after_checkpoint(root, now=now, expected_context=expected)
+            released = release_checkpoint_archive_cache(root, now=now, expected_context=expected)
         runtime = load_runtime_config(root, "configs/observation_schedule_runtime_v1.yaml")
         store = ObservationScheduleStore(root / runtime["ops_store_relative"])
         try:
-            record_maintenance_outcome(store, state="FAILED", reason="ARCHIVE_REFRESH_FAILED", now=now)
+            # Also linearize a disabled/no-op refresh against the phase token;
+            # an intervening peer result must not become this attempt's result.
+            with checkpoint_maintenance_write(store, expected_context=expected, now=now,
+                    lease_owner="i2-checkpoint-maintenance-finish"):
+                pass
         finally:
             store.close()
+        return {**result, "archive_refresh": refresh, "cache_release": released}
+    except Exception as exc:
+        # A phase's transient/refused authority stays a YIELD even when the
+        # busy peer releases its fence before failure recording could run.
+        if isinstance(exc, transient_types) and str(exc) in CHECKPOINT_MAINTENANCE_YIELD_REASONS:
+            return {**result, "status": "YIELD", "reason": str(exc), "backup_unchanged": True}
+        try:
+            runtime = load_runtime_config(root, "configs/observation_schedule_runtime_v1.yaml")
+            store = ObservationScheduleStore(root / runtime["ops_store_relative"])
+            try:
+                outcome = record_maintenance_outcome(store, state="FAILED", reason="ARCHIVE_REFRESH_FAILED", now=now,
+                    expected_context=expected)
+            finally:
+                store.close()
+        except transient_types as refusal:
+            if str(refusal) in CHECKPOINT_MAINTENANCE_YIELD_REASONS:
+                return {**result, "status": "YIELD", "reason": str(refusal), "backup_unchanged": True}
+            raise
+        if outcome["status"] == "YIELD":
+            return {**result, **outcome, "backup_unchanged": True}
         return {"status": "FAILED", "reason": "ARCHIVE_REFRESH_FAILED", "backup_unchanged": True}
 
 

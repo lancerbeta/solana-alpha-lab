@@ -309,6 +309,26 @@ state под native transaction. Если другой caller уже измен�
 Включение caller/policy требует installed readback; Git template не доказывает
 commissioning. Daily VACUUM не включать.
 
+Вся ordinary checkpoint-maintenance цепочка сверяет source incarnation и exact
+policy/plan/state/pending/current/release context перед каждой native mutation.
+`SOURCE_CHANGED`, `PENDING_CHECKPOINT_CHANGED`, `CHECKPOINT_ARCHIVE_CHANGED` и
+`CACHE_RELEASE_CHANGED`, как и policy/plan/state conflicts или transient busy,
+возвращают typed YIELD и сохраняют новые bytes. Следующий обычный caller
+перечитывает актуальную authority; не сбрасывать health/cursor/plan вручную.
+Сеть не держит OPS lease. Genuine failure при неизменной authority остаётся
+`ARCHIVE_REFRESH_FAILED` с incident, last-good не изменяется.
+
+При partial local cache cleanup повторить обычный checkpoint caller. Existing
+release token до удаления фиксирует checkpoint, root inode и owner-intent SHA;
+только этот durable token позволяет продолжить после исчезновения файлов
+intent/archive/index. При подмене root/inode или оставшегося owner intent —
+остановиться на typed identity conflict; не пересоздавать root и не удалять
+token вручную. Remote pins не снимаются этим cleanup. До удаления каждая scan
+проверяет approved `max_wall_seconds` и existing16384entry bound; при
+`CACHE_RELEASE_BUDGET` файловых удалений нет. Два local native этапа имеют
+свои pre-delete бюджеты; отдельный OS deletion syscall не preemptible по wall
+clock. Installed budget и actual filesystem latency проверить при commissioning.
+
 ## 4. Freshness decision внутри commissioning
 
 Рекомендуемый вариант после измерения package/upload/verify: policy revision 2,

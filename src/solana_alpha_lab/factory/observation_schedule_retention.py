@@ -21,7 +21,9 @@ from typing import Any, Mapping
 
 from solana_alpha_lab.factory.observation_panel_coverage import SCIENTIFIC_CLOSED_DUE_STATES
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
-from solana_alpha_lab.factory.observation_schedule_store import GLOBAL_LEASE_ID, ObservationScheduleStore
+from solana_alpha_lab.factory.observation_schedule_store import (
+    GLOBAL_LEASE_ID, ObservationScheduleStore, ObservationScheduleStoreError,
+)
 
 COMPACTION_MARKER = "COMPACTED_PROVENANCE_ONLY"
 BODY_KEYS = frozenset({"rows", "body", "raw_body", "response_body", "payload_rows"})
@@ -468,31 +470,108 @@ def retention_status(store: ObservationScheduleStore) -> dict[str, Any]:
             "archive_refresh_checkpoint_sha256": pending.get("checkpoint_sha256") if pending else None}
 
 
-def record_maintenance_outcome(store: ObservationScheduleStore, *, state: str, reason: str, now: datetime) -> None:
-    if state not in {"FAILED", "READY", "YIELD"} or not re.fullmatch(r"[A-Z0-9_:]+", reason):
-        raise ObservationScheduleRetentionError("MAINTENANCE_OUTCOME_INVALID")
-    lease = store.acquire_lease("i2-maintenance-outcome", clock=now)
+_CHECKPOINT_CONTEXT_KEYS = (
+    "source_identity", "policy", "active_plan", "checkpoint_archive_refresh_pending",
+    "checkpoint_archive", "checkpoint_archive_cache_release", "archive_refreshed_at", "maintenance",
+)
+_CHECKPOINT_CONTEXT_REASONS = (
+    "SOURCE_CHANGED", "POLICY_CHANGED", "ACTIVE_PLAN_CHANGED", "PENDING_CHECKPOINT_CHANGED",
+    "CHECKPOINT_ARCHIVE_CHANGED", "CACHE_RELEASE_CHANGED", "CHECKPOINT_ARCHIVE_CHANGED", "MAINTENANCE_STATE_CHANGED",
+)
+CHECKPOINT_MAINTENANCE_YIELD_REASONS = frozenset({*_CHECKPOINT_CONTEXT_REASONS, "WRITER_BUSY",
+    "RECLAIM_RECOVERY_REQUIRED", "RECLAIM_CONNECTION_REOPEN_REQUIRED", "CACHE_RELEASE_BUDGET"})
+
+
+def checkpoint_maintenance_context(store: ObservationScheduleStore) -> dict[str, Any]:
+    """Bounded local CAS token; never serialize this internal context in receipts.
+
+    One SQLite statement observes the exact native control bytes together.
+    The source UUID and physical incarnation prevent a resumed old caller from
+    attributing an outcome to a replaced OPS store. Collector row writes do
+    not invalidate the token or hold a lease across remote readback.
+    """
+    keys = ",".join("?" for _ in _CHECKPOINT_CONTEXT_KEYS)
+    rows = dict(store._conn.execute(
+        f"SELECT control_key,payload_json FROM retention_control WHERE control_key IN ({keys})",
+        _CHECKPOINT_CONTEXT_KEYS))
+    return {"source_binding": {"database": _root_binding(store.path), "root": _root_binding(store.path.parent)},
+            "controls": {key: rows.get(key) for key in _CHECKPOINT_CONTEXT_KEYS}}
+
+
+def _checkpoint_context_conflict(store: ObservationScheduleStore, expected: Mapping[str, Any]) -> str | None:
+    current = checkpoint_maintenance_context(store)
+    if current["source_binding"] != expected.get("source_binding"):
+        return "SOURCE_CHANGED"
+    for key, reason in zip(_CHECKPOINT_CONTEXT_KEYS, _CHECKPOINT_CONTEXT_REASONS):
+        if current["controls"][key] != expected.get("controls", {}).get(key):
+            return reason
+    return None
+
+
+def _commit_checkpoint_context(store: ObservationScheduleStore, expected: dict[str, Any]) -> None:
+    # Capture our own bytes before commit releases the transaction. A read
+    # after commit could bless a peer's intervening policy/plan/outcome.
+    advanced = checkpoint_maintenance_context(store)
+    store._conn.commit()
+    expected.clear()
+    expected.update(advanced)
+
+
+@contextmanager
+def checkpoint_maintenance_write(store: ObservationScheduleStore, *, expected_context: dict[str, Any],
+                                 now: datetime, lease_owner: str):
+    """Short native metadata fence shared by checkpoint phases; no network."""
+    lease = store.acquire_lease(lease_owner, clock=now)
     if lease is None:
-        return
+        raise ObservationScheduleRetentionError("WRITER_BUSY")
     try:
-        value = _control(store, "maintenance", {})
-        value.update(state=state, last_reason=reason, last_run_at=render_utc(now))
-        if state == "READY":
-            value["last_success_at"] = render_utc(now)
-        _set_control(store, "maintenance", value)
-        store._conn.commit()
+        store._conn.execute("BEGIN IMMEDIATE")
+        store._require_write_lease(now, within_transaction=True)
+        conflict = _checkpoint_context_conflict(store, expected_context)
+        if conflict:
+            raise ObservationScheduleRetentionError(conflict)
+        yield
+        _commit_checkpoint_context(store, expected_context)
+    except Exception:
+        store._conn.rollback()
+        raise
     finally:
         store.release_lease(lease)
 
 
+def record_maintenance_outcome(store: ObservationScheduleStore, *, state: str, reason: str, now: datetime,
+                               expected_context: dict[str, Any] | None = None) -> dict[str, Any]:
+    if state not in {"FAILED", "READY", "YIELD"} or not re.fullmatch(r"[A-Z0-9_:]+", reason):
+        raise ObservationScheduleRetentionError("MAINTENANCE_OUTCOME_INVALID")
+    expected = checkpoint_maintenance_context(store) if expected_context is None else expected_context
+    try:
+        with checkpoint_maintenance_write(store, expected_context=expected, now=now,
+                lease_owner="i2-maintenance-outcome"):
+            value = _control(store, "maintenance", {})
+            value.update(state=state, last_reason=reason, last_run_at=render_utc(now))
+            if state == "READY":
+                value["last_success_at"] = render_utc(now)
+            _set_control(store, "maintenance", value)
+    except (ObservationScheduleRetentionError, ObservationScheduleStoreError) as exc:
+        if str(exc) in CHECKPOINT_MAINTENANCE_YIELD_REASONS:
+            return {"status": "YIELD", "reason": str(exc)}
+        raise
+    return {"status": "RECORDED", "state": state, "reason": reason}
+
+
 def register_checkpoint_retirement_archive(store: ObservationScheduleStore, *,
-        proof: Mapping[str, Any], isolated_root: Path, source_root: Path, now: datetime) -> dict[str, Any]:
+        proof: Mapping[str, Any], isolated_root: Path, source_root: Path, now: datetime,
+        expected_context: dict[str, Any] | None = None) -> dict[str, Any]:
     """Wrap the existing independent checkpoint restore as a durable cold pin.
 
     Called by the normal checkpoint owner after actual remote content readback;
     no new provider/service. The independent restored source files remain COLD.
     A disk-backed path index keeps future candidate checks bounded.
     """
+    expected = checkpoint_maintenance_context(store) if expected_context is None else expected_context
+    conflict = _checkpoint_context_conflict(store, expected)
+    if conflict:
+        raise ObservationScheduleRetentionError(conflict)
     if proof.get("terminal") != "REMOTE_CHECKPOINT_RESTORE_VERIFIED":
         raise ObservationScheduleRetentionError("INDEPENDENT_CHECKPOINT_RESTORE_REQUIRED")
     if proof.get("result_inventory_sha256") != (proof.get("restore") or {}).get("raw_inventory_sha256"):
@@ -580,10 +659,8 @@ def register_checkpoint_retirement_archive(store: ObservationScheduleStore, *,
     _verify_checkpoint_archive(record, deep=True)
     from solana_alpha_lab.factory.remote_ops import backup_plane_lock
     with backup_plane_lock(source_root, timeout_seconds=0):
-        lease = store.acquire_lease("i2-verified-checkpoint-pin", clock=now)
-        if lease is None:
-            raise ObservationScheduleRetentionError("WRITER_BUSY")
-        try:
+        with checkpoint_maintenance_write(store, expected_context=expected, now=now,
+                lease_owner="i2-verified-checkpoint-pin"):
             previous = _control(store, "checkpoint_archive")
             previous_release = _control(store, "checkpoint_archive_cache_release")
             if previous_release and (not previous or previous["checkpoint_sha256"] != record["checkpoint_sha256"]):
@@ -605,9 +682,6 @@ def register_checkpoint_retirement_archive(store: ObservationScheduleStore, *,
             if maintenance.get("archive_discovery"):
                 maintenance["archive_discovery"] = []
                 _set_control(store, "maintenance", maintenance)
-            store._conn.commit()
-        finally:
-            store.release_lease(lease)
     release = checkpoint_archive_cache_releasable(store)
     return {"status": "CHECKPOINT_COLD_PIN_REGISTERED", "checkpoint_sha256": record["checkpoint_sha256"], "pin_objects": record["pin_objects"],
             "previous_cache_release": release.get("token")}
@@ -640,23 +714,52 @@ def checkpoint_archive_cache_releasable(store: ObservationScheduleStore, isolate
         return {"status": "WAIT", "reason": "CHECKPOINT_CACHE_REMOTE_PINS_REQUIRED"}
     if not Path(token["cache_root"]).exists():
         return {"status": "RELEASABLE", "token": token}  # Delete-before-ack recovery.
-    if [_archive_binding(Path(token[key])) for key in ("archive_path", "inventory_path")] != token["file_bindings"]:
+    deleting = token.get("deletion_started")
+    if deleting is not None:
+        # Missing archive/index/owner-intent files are expected only after
+        # this exact native deletion intent was committed before filesystem
+        # mutation. An arbitrary incomplete restore never gains this bypass.
+        if (not isinstance(deleting, dict) or deleting.get("checkpoint_sha256") != token["checkpoint_sha256"]
+                or not re.fullmatch(r"[0-9a-f]{64}",str(deleting.get("intent_sha256", "")))
+                or deleting.get("cache_binding") != _root_binding(Path(token["cache_root"]))):
+            raise ObservationScheduleRetentionError("CHECKPOINT_CACHE_RELEASE_DELETION_IDENTITY_CONFLICT")
+        intent_path = Path(token["cache_root"]) / ".remote-restore-intent.json"
+        if intent_path.is_symlink() or (intent_path.exists() and _file_hash(intent_path) != deleting["intent_sha256"]):
+            raise ObservationScheduleRetentionError("CHECKPOINT_CACHE_RELEASE_DELETION_IDENTITY_CONFLICT")
+    elif [_archive_binding(Path(token[key])) for key in ("archive_path", "inventory_path")] != token["file_bindings"]:
         raise ObservationScheduleRetentionError("CHECKPOINT_CACHE_RELEASE_BINDING_CHANGED")
     return {"status": "RELEASABLE", "token": token}
 
 
-def acknowledge_checkpoint_archive_cache_release(store: ObservationScheduleStore, *, checkpoint_sha256: str, now: datetime) -> None:
+def start_checkpoint_archive_cache_deletion(store: ObservationScheduleStore, *,
+        token: Mapping[str, Any], now: datetime) -> None:
+    """Persist exact partial-delete recovery inside the caller's native fence."""
+    if not store._conn.in_transaction:
+        raise ObservationScheduleRetentionError("CHECKPOINT_CACHE_RELEASE_FENCE_REQUIRED")
+    store._require_write_lease(now, within_transaction=True)
+    if _control(store, "checkpoint_archive_cache_release") != dict(token):
+        raise ObservationScheduleRetentionError("CACHE_RELEASE_CHANGED")
+    target = Path(token["cache_root"])
+    encoded = (target / ".remote-restore-intent.json").read_bytes()
+    if json.loads(encoded).get("checkpoint_sha256") != token["checkpoint_sha256"]:
+        raise ObservationScheduleRetentionError("CHECKPOINT_CACHE_RELEASE_IDENTITY_CONFLICT")
+    _set_control(store, "checkpoint_archive_cache_release", {**token, "deletion_started": {
+        "checkpoint_sha256": token["checkpoint_sha256"], "cache_binding": _root_binding(target),
+        "intent_sha256": hashlib.sha256(encoded).hexdigest(), "started_at": render_utc(now)}})
+
+
+def _acknowledge_checkpoint_archive_cache_release(store: ObservationScheduleStore, *, checkpoint_sha256: str) -> None:
     token = _control(store, "checkpoint_archive_cache_release")
     if not token or token["checkpoint_sha256"] != checkpoint_sha256 or Path(token["cache_root"]).exists():
         raise ObservationScheduleRetentionError("CHECKPOINT_CACHE_RELEASE_NOT_COMPLETED")
-    lease = store.acquire_lease("i2-cache-release-ack", clock=now)
-    if lease is None:
-        raise ObservationScheduleRetentionError("WRITER_BUSY")
-    try:
-        store._conn.execute("DELETE FROM retention_control WHERE control_key='checkpoint_archive_cache_release'")
-        store._conn.commit()
-    finally:
-        store.release_lease(lease)
+    store._conn.execute("DELETE FROM retention_control WHERE control_key='checkpoint_archive_cache_release'")
+
+
+def acknowledge_checkpoint_archive_cache_release(store: ObservationScheduleStore, *, checkpoint_sha256: str, now: datetime,
+                                                expected_context: dict[str, Any] | None = None) -> None:
+    expected = checkpoint_maintenance_context(store) if expected_context is None else expected_context
+    with checkpoint_maintenance_write(store, expected_context=expected, now=now, lease_owner="i2-cache-release-ack"):
+        _acknowledge_checkpoint_archive_cache_release(store, checkpoint_sha256=checkpoint_sha256)
 
 
 def _verify_checkpoint_archive(record: Mapping[str, Any], *, deep: bool) -> None:
@@ -699,7 +802,8 @@ def _verify_archived_raw(proof: Mapping[str, Any], relative: str, *, max_bytes: 
         raise ObservationScheduleRetentionError("RAW_ARCHIVE_DEPENDENCY_NOT_VERIFIED")
 
 
-def checkpoint_archive_refresh_required(root: Path, *, now: datetime) -> dict[str, Any]:
+def checkpoint_archive_refresh_required(root: Path, *, now: datetime,
+                                        expected_context: dict[str, Any] | None = None) -> dict[str, Any]:
     """Pure bounded signal; external readback needs approved refresh policy.
 
     A previously independently restored checkpoint remains sufficient for rows
@@ -712,6 +816,12 @@ def checkpoint_archive_refresh_required(root: Path, *, now: datetime) -> dict[st
         return {"required": False, "reason": "SOURCE_NOT_PRESENT"}
     store = ObservationScheduleStore(path, readonly=True, immutable=False)
     try:
+        if expected_context is not None:
+            if not expected_context:
+                expected_context.update(checkpoint_maintenance_context(store))
+            conflict = _checkpoint_context_conflict(store, expected_context)
+            if conflict:
+                raise ObservationScheduleRetentionError(conflict)
         installed = _control(store, "policy", {})
         policy = installed.get("policy", {})
         refresh = policy.get("archive_refresh", {})
@@ -747,8 +857,10 @@ def checkpoint_archive_refresh_required(root: Path, *, now: datetime) -> dict[st
 
 
 def checkpoint_archive_refresh_intent(store: ObservationScheduleStore, *, checkpoint: Mapping[str, Any],
-        cold_relative: str, now: datetime, source_root: Path) -> dict[str, Any]:
+        cold_relative: str, now: datetime, source_root: Path,
+        expected_context: dict[str, Any] | None = None) -> dict[str, Any]:
     """Pre-pin exact recovery closure before network; retries reuse this target."""
+    expected = checkpoint_maintenance_context(store) if expected_context is None else expected_context
     installed = _control(store, "policy", {})
     policy = installed.get("policy", {})
     refresh = policy.get("archive_refresh", {})
@@ -781,10 +893,8 @@ def checkpoint_archive_refresh_intent(store: ObservationScheduleStore, *, checkp
               "source_id": _source_identity(store)["source_id"]}
     from solana_alpha_lab.factory.remote_ops import backup_plane_lock
     with backup_plane_lock(source_root, timeout_seconds=0):
-        lease = store.acquire_lease("i2-archive-refresh-intent", clock=now)
-        if lease is None:
-            raise ObservationScheduleRetentionError("WRITER_BUSY")
-        try:
+        with checkpoint_maintenance_write(store, expected_context=expected, now=now,
+                lease_owner="i2-archive-refresh-intent"):
             pending = _control(store, "checkpoint_archive_refresh_pending")
             if pending is not None:
                 if pending.get("policy_sha256") != installed["approved_policy_sha256"]:
@@ -794,10 +904,7 @@ def checkpoint_archive_refresh_intent(store: ObservationScheduleStore, *, checkp
                 return pending
             store._conn.executemany("INSERT OR IGNORE INTO retention_archive_pins VALUES(?,?)", [(name, digest) for name in names])
             _set_control(store, "checkpoint_archive_refresh_pending", intent)
-            store._conn.commit()
             return intent
-        finally:
-            store.release_lease(lease)
 
 
 def retirement_raw_archive_dependencies(store: ObservationScheduleStore, *, source_root: Path,
@@ -1384,7 +1491,14 @@ def apply_retention(store: ObservationScheduleStore, *, now: datetime, raw_reten
 
 def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
                          policy: Mapping[str, Any] | None = None, pressure: Mapping[str, Any] | None = None,
-                         checkpoint_active: bool = False) -> dict[str, Any]:
+                         checkpoint_active: bool = False,
+                         expected_context: dict[str, Any] | None = None) -> dict[str, Any]:
+    expected = checkpoint_maintenance_context(store) if expected_context is None else expected_context
+    if not expected:
+        expected.update(checkpoint_maintenance_context(store))
+    conflict = _checkpoint_context_conflict(store, expected)
+    if conflict:
+        return {"status": "YIELD", "reason": conflict}
     installed = _control(store, "policy")
     if not installed or not installed["policy"].get("enabled"):
         return {"status": "DISABLED", "reason": "MAINTENANCE_NOT_COMMISSIONED"}
@@ -1419,6 +1533,10 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
         try:
             store._conn.execute("BEGIN IMMEDIATE")
             store._require_write_lease(now, within_transaction=True)
+            conflict = _checkpoint_context_conflict(store, expected)
+            if conflict:
+                store._conn.rollback()
+                return {"status": "YIELD", "reason": conflict}
             current = _control(store, "policy")
             if current != installed:
                 store._conn.rollback()
@@ -1426,14 +1544,20 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
             _supersede_stale_policy_plan(store, approved_policy_sha256=installed["approved_policy_sha256"], now=now)
             _reconcile_pending_refresh_policy(store, policy=effective,
                 approved_policy_sha256=installed["approved_policy_sha256"], now=now)
-            store._conn.commit()
+            _commit_checkpoint_context(store, expected)
             plan = _control(store, "active_plan")
             state = _control(store, "maintenance", {})
         except ObservationScheduleRetentionError as exc:
             store._conn.rollback()
+            store._conn.execute("BEGIN IMMEDIATE")
+            store._require_write_lease(now, within_transaction=True)
+            conflict = _checkpoint_context_conflict(store, expected)
+            if conflict:
+                store._conn.rollback()
+                return {"status": "YIELD", "reason": conflict}
             _set_control(store, "maintenance", {**state, "state":"FAILED", "last_reason":str(exc),
                 "last_run_at":render_utc(now), "active_plan_id":plan["plan_id"] if plan else None})
-            store._conn.commit()
+            _commit_checkpoint_context(store, expected)
             return {"status":"FAILED", "reason":str(exc), "plan_id":plan["plan_id"] if plan else None}
         except Exception:
             store._conn.rollback()
@@ -1458,6 +1582,10 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
             try:
                 store._conn.execute("BEGIN IMMEDIATE")
                 store._require_write_lease(now, within_transaction=True)
+                conflict = _checkpoint_context_conflict(store, expected)
+                if conflict:
+                    store._conn.rollback()
+                    return {"status": "YIELD", "reason": conflict}
                 if _control(store, "policy") != installed:
                     store._conn.rollback()
                     return {"status": "YIELD", "reason": "POLICY_CHANGED"}
@@ -1467,7 +1595,7 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
                 current = _control(store, "maintenance", {})
                 _set_control(store, "maintenance", {**current, "state": "FAILED",
                     "last_reason": reason, "last_run_at": render_utc(now)})
-                store._conn.commit()
+                _commit_checkpoint_context(store, expected)
             except Exception:
                 store._conn.rollback()
                 raise
@@ -1480,6 +1608,10 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
         try:
             store._conn.execute("BEGIN IMMEDIATE")
             store._require_write_lease(now, within_transaction=True)
+            conflict = _checkpoint_context_conflict(store, expected)
+            if conflict:
+                store._conn.rollback()
+                return {"status": "YIELD", "reason": conflict}
             if _control(store, "policy") != installed:
                 store._conn.rollback()
                 return {"status": "YIELD", "reason": "POLICY_CHANGED"}
@@ -1487,24 +1619,19 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
                 store._conn.rollback()
                 return {"status": "YIELD", "reason": "ACTIVE_PLAN_CHANGED"}
             _set_control(store, "active_plan", plan)
-            store._conn.commit()
+            _commit_checkpoint_context(store, expected)
         except Exception:
             store._conn.rollback()
             raise
         finally:
             store.release_lease(lease)
-    expected_outcome_state = _control(store, "maintenance", {})
-
     def current_outcome_state():
         # Apply commits row effects/progress, never the maintenance control.
         # A peer may own a newer outcome after the chunk releases its lease.
-        if _control(store, "policy") != installed:
-            return "POLICY_CHANGED", None
-        if _control(store, "active_plan") != plan:
-            return "ACTIVE_PLAN_CHANGED", None
+        conflict = _checkpoint_context_conflict(store, expected)
+        if conflict:
+            return conflict, None
         current = _control(store, "maintenance", {})
-        if current != expected_outcome_state:
-            return "MAINTENANCE_STATE_CHANGED", None
         return None, current
 
     try:
@@ -1524,7 +1651,7 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
                 return {"status": "YIELD", "reason": conflict, "plan_id": plan["plan_id"]}
             _set_control(store, "maintenance", {**current, "state": "YIELD" if closure_deficit else "FAILED", "last_reason": reason,
                          "last_run_at": render_utc(now), "active_plan_id": plan["plan_id"]})
-            store._conn.commit()
+            _commit_checkpoint_context(store, expected)
         except Exception:
             store._conn.rollback()
             raise
@@ -1554,7 +1681,7 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
             state["active_plan_id"] = None
             store._conn.execute("DELETE FROM retention_control WHERE control_key='active_plan'")
         _set_control(store, "maintenance", state)
-        store._conn.commit()
+        _commit_checkpoint_context(store, expected)
     except Exception:
         store._conn.rollback()
         raise
@@ -1565,7 +1692,8 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
     return result
 
 
-def maintenance_after_checkpoint(root: Path, *, now: datetime) -> dict[str, Any]:
+def maintenance_after_checkpoint(root: Path, *, now: datetime,
+                                 expected_context: dict[str, Any] | None = None) -> dict[str, Any]:
     from solana_alpha_lab.factory.observation_schedule_runtime import load_runtime_config
     runtime = load_runtime_config(root, "configs/observation_schedule_runtime_v1.yaml")
     path = (root / str(runtime["ops_store_relative"])).resolve()
@@ -1594,7 +1722,7 @@ def maintenance_after_checkpoint(root: Path, *, now: datetime) -> dict[str, Any]
             pass  # Unknown pressure yields; no ad-hoc aggressive cleanup.
         store = ObservationScheduleStore(path)
         try:
-            return run_maintenance_step(store, now=now, pressure=pressure)
+            return run_maintenance_step(store, now=now, pressure=pressure, expected_context=expected_context)
         finally:
             store.close()
 
