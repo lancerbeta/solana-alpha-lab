@@ -14,7 +14,23 @@
     "reason": "Git is the working context and evidence owner; no cloud export requested."
   },
   "capability_radar_now": "NONE: existing shared reader, versioned validator, store and CLI suffice; no new package, connector, service or automation.",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "09249247fd29e2712b405a2c7add696f710508c58d77d17ef83a7ef1f173f3d3",
+    "docs/evidence/hfic_historical_reservation_market_basis_v1/proof.json": "3263ad8f8ed95fc9ffded18fb9aef43acc62aa344eae14a4308f4227b1786919",
+    "docs/evidence/hfic_historical_reservation_market_basis_v1/semantic-claims.json": "a6870e8a7a3f1dc4d115a6afc43fe97fd0a3d9be011d297daff30aae02e0a695",
+    "docs/evidence/hfic_historical_reservation_market_basis_v1/semantic-classification.json": "05afb39f48c47ed99cc5396656a7d367edb7a3122884236b3212ce816c211b22",
+    "docs/evidence/hfic_historical_reservation_market_basis_v1/semantic-evidence.json": "a528d50436f8bfc54d83c439998c57e3cf336f87ef6b3b0c453ee7bdaa612e27",
+    "docs/evidence/hfic_historical_reservation_market_basis_v1/semantic-non-claims.json": "3169c6a8a84e4bbf7d408ec272ff8a09beabf89e0474b94ef24cf124d94b6a58",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "5c7acc1c508b14a88680dd98420770ac3ba5795598c963363c4329b18830f229",
+    "docs/tasks/HFIC_HISTORICAL_RESERVATION_MARKET_BASIS_V1.md": "fcfaaf603c82eff64d830913393e1413bace1e08e744afde77273e1a1075866e",
+    "scripts/hypothesis_forge.py": "882348cd9670c405a5670988252ef604007bc15b541ffd59d5956296a6303ebc",
+    "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "305b3d491709e3e4f190e59ac1985553001b92b70af7972d4fe8f86d6bb58468",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "628b9f0ea0c83bc54e6d43be9e5949d03dd8877a8a5caea126c41e237a8567a2",
+    "tests/test_forge_evidence_identity_and_owner_gold_v1.py": "d500d2d6a013ea0491b125cb5694e5db862ff11a4186bc40d433e2cd1d72c760",
+    "tests/test_hfic_cli.py": "b676b7a65a10acb95d6ab6e2a6927d38b64cf530dda8df35427bde27fcab3269",
+    "tests/test_hfic_market_evidence_epoch_decision_basis_v2.py": "170a87dde38aee1664acaa641e78bff839924aa3a5261f0335062f58adc982b0",
+    "tests/test_hfic_selection_robustness_gate_v1.py": "ce78b9509a31ecb42dac77a95864ad5d1d0f7ac200937b7460f8e807b15fce89"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -25,14 +41,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_historical_reservation_market_basis_v1/factory-fit.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "ed8d3285a8b71e522a1781b378f8e55fc0a3eec068633b27d2423ba67ff73d7e",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FOCUSED_RESERVATION_BASIS_VERTICAL_AND_PRECEDENCE_TESTS_11_MODULE_DIRECT_CONSUMER_REGRESSION_AND_5_MUTATION_CONTROLS",
     "independent_review": {
       "path": "docs/evidence/hfic_historical_reservation_market_basis_v1/independent-review.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "e92ead2a704c55bf227d6b8eb3096af7c1410a68ebd1035e381d6f6a5375377d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
