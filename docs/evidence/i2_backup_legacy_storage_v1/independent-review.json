@@ -4,8 +4,8 @@
   "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-RAW-DEPENDENCY-SELECTION-P1",
   "as_of": "2026-10-16",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "UNBOUND_PENDING_ISOLATED_REVIEW",
-  "reviewed_inventory_sha256": "UNBOUND_PENDING_ISOLATED_REVIEW",
+  "reviewed_bindings_sha256": "ba0bf5340c4d54c10c4fa0b1145363ed01950193e63d586ab80dd648f36119f9",
+  "reviewed_inventory_sha256": "c6c47c00df4c59249fbd6aa6eea0f9a57bbbae187c0191fced75aa73f06dc095",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -15,34 +15,39 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Frozen content pending isolated P0/P1 review; prior #409 verdict does not cover this diff."
+        "Isolated read-only P0/P1 PASS on frozen content head7bdd376dd89ff361423f7e34586408a7a95928d6, inventoryc6c47c00df4c59249fbd6aa6eea0f9a57bbbae187c0191fced75aa73f06dc095; no open P0/P1. All9 implementation bindings matched, sourceb3444324352204055104a730f72b56057456e29fa6ca489805a278872f8a105f. Four frozen review roles sufficient.",
+        "Actual pointers charge raw_ref; ordinary JSON/SQL rows only check deadline. Canonical terminal states plus raw substring or any JSON escape preserve potential terminal bytes; native hash checked on staged bytes. ZIP/independent source-unavailable restore checks raw bytes, exact SQL/ROWIDs and control. No tests/edits by critic; production authority unchanged."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Frozen content pending isolated P0/P1 review; prior #409 verdict does not cover this diff."
+        "Isolated read-only P0/P1 PASS on frozen content head7bdd376dd89ff361423f7e34586408a7a95928d6, inventoryc6c47c00df4c59249fbd6aa6eea0f9a57bbbae187c0191fced75aa73f06dc095; no open P0/P1. Complete80466-row census and probe/output hashes checked; no sample/LIMIT. >=12373pending/67447terminal,74239pending growth, late nested pointer and escaped terminal witness verified by authored actual-byte oracle.",
+        "Existing native full/checkpoint and independent remote restore with source unavailable verify110 raw bytes and control. Missing/corrupt/interruption preserve last-good and native retry succeeds; saved3-test result/output hash checked without rerunning. Local proof vs live acceptance, new exact StageB and mandatory StageC boundaries retained."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Frozen content pending isolated P0/P1 review; prior #409 verdict does not cover this diff."
+        "Isolated read-only P0/P1 PASS on frozen content head7bdd376dd89ff361423f7e34586408a7a95928d6, inventoryc6c47c00df4c59249fbd6aa6eea0f9a57bbbae187c0191fced75aa73f06dc095; no open P0/P1. SEMANTIC_PREMISE PASS; diff/task/five evidence hashes matched packet. Canonical terminal enum owns scheduling, raw preservation remains a separate obligation. Conservative escaped-key path does not promote current refs0 to future deletion authority. Existing total-wall/payload/actual-ref bounds and staged identity remain.",
+        "Tests may PASS operational restore while independent scientific archive or PIT/availability lineage is missing. Operational closure is not full scientific recovery; no scientific status/freshness/production acceptance follows from local proof. ResearchStore owns immutable events and DuckDB is rebuildable; no new authority/service/index.",
+        "packet_fingerprint_sha256=b41a3ca35aced8379281b45519735cdc13b242398336b9ebb206b8d118071b98; independence=PACKET_INFORMATION_PATH; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN. Packet flags alone do not attest launch isolation. Critic launched with packet+diff only and no inherited transcript; no tests/edits."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Frozen content pending isolated P0/P1 review; prior #409 verdict does not cover this diff."
+        "Isolated read-only P0/P1 PASS on frozen content head7bdd376dd89ff361423f7e34586408a7a95928d6, inventoryc6c47c00df4c59249fbd6aa6eea0f9a57bbbae187c0191fced75aa73f06dc095; no open P0/P1. Installed5a and consumedf52, productionBLOCKED, actual-merge/post-merge requirement and one new exact StageB scope align across task/OPERATE/readout.",
+        "B17Oct00:20:30Z DEGRADED/sourceclockUNKNOWN warning and daily00:45Z timing explicit. StageC remains required, full technical pause includes final-current upload/restore/register, finite chunks and one separately authorized destructive scope/policy. No blind retries, suffix PR, timer/grant/LOCAL_BUNDLE bypass or per-chunk approvals. No tests/edits/production actions."
       ]
     }
   ],
-  "verdict": "NOT_READY",
+  "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "NO_REVIEW_MODEL_DIVERSITY_PROOF",
