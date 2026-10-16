@@ -1,0 +1,71 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC_HISTORICAL_RESERVATION_MARKET_BASIS_V1-FINAL",
+  "as_of": "2026-10-17",
+  "task_id": "HFIC_HISTORICAL_RESERVATION_MARKET_BASIS_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only review 5442b0833f9890b1da88cc7b22b6acc955bdb276 (NOT_READY: P1 recompute guard untested; P2 version disagreement untested, donor last-wins, integrity+upstream STOP readout unpinned) -> delta 783be727151a16b1bda480908619844dac0e2930 PASS. One shared reader for epoch_search_budget_usage and resolve_scientific_admission; action never reassigned to/from STOP after the new guards; slot hash built from named fields so the ephemeral proof key cannot change identity; new search_budget field appears only on borrowed proofs. Residual: RESOLVE_SELECTION_GATE readout branch is a legacy path for bodies without terminal."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "5442b0833f9890b1da88cc7b22b6acc955bdb276 NOT_READY (minimal saved result missing from vertical; wrong_hash was a second missing-proof case; disagreeing versions untested) -> 783be727151a16b1bda480908619844dac0e2930 PASS: A met by proof.json real reproducer; B met by g9 persist_generated_draft + fresh-process replay/readback with independent stamp oracle; C met incl. reimport, publication-only, same-market occupancy, missing proof, explicit null (existing), wrong hash, invalid basis, versions, own-history conflict, JSON and human next under upstream STOP plus caveat. No registry/cache/schema/CLI; no per-caller fallback."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SEMANTIC_PREMISE=PASS; packet_fingerprint_sha256=36b0f79f8e1dfff49a6fa15e1edecf64e064ffb2bc3161f8fa56c1d4bf75d554 (delta re-review on 783be727151a16b1bda480908619844dac0e2930; earlier packet 5c70d3132680cfdd46359af89471d83ae41ce6fbf7a2722da8ce06e0c76353da PASS with P2s). PACKET_INFORMATION_PATH only; launch isolation is PROCESS_OBLIGATION. Can it pass tests and break research validity: no - donors come only from saved sessions, the borrowed basis is the exact preimage of the reservation stamp, same/different market is still decided by the existing V1/V2 continuity logic, mixed versions and unnamed donors refuse, explicit null and own-history conflict are not healed, spent budget is never returned. Residual: search_budget has no closed schema (checked: none under catalog/schemas)."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "5442b0833f9890b1da88cc7b22b6acc955bdb276 PASS with P2s; delta 783be727151a16b1bda480908619844dac0e2930 PASS. Upstream STOP keeps reason and one correct next action; caveat note marks the historical warning; READY readout unchanged; integrity-invalid gate routes to RESTORE first and the doc now says so; proof provenance stays JSON-only as the owner asked. Residual: no CLI line for borrowed proofs."
+      ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1: exact recompute guard was never reached by tests; closed with same-stamp tampered and invalid-basis donors asserted at reader level plus mutation control.",
+      "observed_head": "5442b0833f9890b1da88cc7b22b6acc955bdb276",
+      "resolved_by_head": "783be727151a16b1bda480908619844dac0e2930"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Vertical lacked the minimal saved result; wrong hash and disagreeing versions untested; closed by persist_generated_draft replay/readback in g9 and new refusal cases.",
+      "observed_head": "5442b0833f9890b1da88cc7b22b6acc955bdb276",
+      "resolved_by_head": "783be727151a16b1bda480908619844dac0e2930"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_REVIEW_MODEL_DIVERSITY_PROOF",
+    "NO_PRODUCTION_DEPLOY_OR_COMMISSIONING",
+    "NO_NEW_PIT_SCIENTIFIC_ALPHA_OR_CASHFLOW_VERDICT",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_REVIEW"
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC_HISTORICAL_RESERVATION_MARKET_BASIS_V1-SOFTWARE-CANDIDATE",
+  "as_of": "2026-10-17",
+  "task_id": "HFIC_HISTORICAL_RESERVATION_MARKET_BASIS_V1",
+  "state_change": "A historical orphan reservation without a basis field is read with an exactly recomputing saved frozen basis so ordinary preflight no longer reports a false continuity STOP; an upstream STOP keeps its reason ahead of a historical selection caveat.",
+  "base_main": "13fb33812361c5f8ea1378dbf0251844938a8cd6",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Git is the working context and evidence owner; no cloud export requested."
+  },
+  "capability_radar_now": "NONE: existing shared reader, versioned validator, store and CLI suffice; no new package, connector, service or automation.",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_historical_reservation_market_basis_v1/factory-fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FOCUSED_RESERVATION_BASIS_VERTICAL_AND_PRECEDENCE_TESTS_11_MODULE_DIRECT_CONSUMER_REGRESSION_AND_5_MUTATION_CONTROLS",
+    "independent_review": {
+      "path": "docs/evidence/hfic_historical_reservation_market_basis_v1/independent-review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_CONTEXT",
+      "PASS_CATALOG_PROPAGATION",
+      "PASS_ORIGINAL_FALSIFIER_AND_TARGETED_MUTATION",
+      "PASS_READ_ONLY_REAL_REPRODUCER_NO_WRITES"
+    ]
+  },
+  "non_claims": [
+    "NO_SCIENTIFIC_LOOK_SESSION_OR_RESERVATION_ON_REAL_DATA",
+    "NO_HISTORICAL_RECEIPT_REWRITE_OR_BASIS_BACKFILL",
+    "NO_QUOTA_RESET_QUARANTINE_NEW_FOCUS_OR_STORE",
+    "NO_SELECTION_ROBUSTNESS_CLAIM_CAVEAT_REMAINS",
+    "NO_DEPLOY_OR_PROVIDER_CALL",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_LOCAL_EVIDENCE"
+  ],
+  "side_effects": {
+    "repository": "bounded reader/preflight/CLI/test/doc files and Catalog hashes",
+    "local": "read-only real reproducer and disposable temp roots",
+    "external": "none: no provider call, deploy, VPS or Drive write"
+  }
+}

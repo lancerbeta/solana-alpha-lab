@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC_HISTORICAL_RESERVATION_MARKET_BASIS_V1-FIT",
+  "as_of": "2026-10-17",
+  "task_id": "HFIC_HISTORICAL_RESERVATION_MARKET_BASIS_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "Ordinary OPPORTUNITY_EPISODES entry is no longer blocked by a provably different-market historical reservation; the canonical reproducer moves from a masked STOP to START with computed budget.",
+    "flexibility_and_history": "Append-only history untouched; the borrowed basis is ephemeral and read-only; rollback is a reader revert with no data change.",
+    "context_efficiency": "Three functions changed in existing owners; compact tests in four existing modules; no new subsystem.",
+    "research_truth": "Same-market occupancy and publication-only republish keep spent budget; unresolved continuity still STOPs; the selection caveat is preserved as a warning, never erased.",
+    "owner_operability": "JSON and CLI show the real STOP reason and one next action; proof provenance in search_budget; operator doc updated.",
+    "execution_to_cashflow": "Unblocks the next metadata/admission step only; no scientific look, alpha or cashflow claim.",
+    "monitoring_and_recovery": "Unknown or contradictory proof stays a typed STOP with existing PROVE_MARKET_CONTINUITY guidance.",
+    "build_vs_buy": "WRAP existing shared reader and versioned validator; no dependency, registry, cache or service.",
+    "security": "No credentials, provider, VPS or deploy; read-only real-data reproducer.",
+    "red_team": "Mutation controls: removing own-history guard, recompute guard, version check or STOP precedence each fails a test."
+  },
+  "capability_radar": {
+    "now": "NONE: existing reader, validator, store and CLI suffice.",
+    "watch": "Merged-reader read-only check on the actual corpus after the pinned I4 path; borrowed-proof CLI line only if owners need it."
+  },
+  "recovery": "Ordinary Git revert of the reader; historical records, receipts and real reservations are never modified.",
+  "limits": [
+    "NO_SCIENTIFIC_LOOK_SESSION_OR_RESERVATION_ON_REAL_DATA",
+    "NO_HISTORICAL_RECEIPT_REWRITE_OR_BASIS_BACKFILL",
+    "NO_QUOTA_RESET_QUARANTINE_NEW_FOCUS_OR_STORE",
+    "NO_SELECTION_ROBUSTNESS_CLAIM_CAVEAT_REMAINS",
+    "NO_DEPLOY_OR_PROVIDER_CALL",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_LOCAL_EVIDENCE"
+  ]
+}
