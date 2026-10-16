@@ -411,6 +411,19 @@ class HficCliContractTests(unittest.TestCase):
                 self.assertIn("writes: research_store=0", readout)
                 if terminal == "SEARCH_BUDGET_EXHAUSTED":
                     self.assertIn("не сбрасывайте budget", readout)
+                # A historical selection caveat cannot replace the real reason.
+                caveated = _preflight_owner_readout(
+                    {
+                        "terminal": terminal,
+                        "owner_class": "OBSERVABILITY_BLOCKED",
+                        "router_decision": "BLOCK_FORGE_SELECTION_RISK",
+                        "selection_gate": {"caveat": True},
+                        "writes": {},
+                    }
+                )
+                self.assertIn(expected_next, caveated)
+                self.assertIn("не причина этого STOP", caveated)
+                self.assertNotIn("RESOLVE_SELECTION_GATE", caveated)
 
     def test_selection_gate_integrity_stop_routes_outside_a5_without_trial(self) -> None:
         cases = [

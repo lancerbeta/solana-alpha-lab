@@ -798,12 +798,11 @@ def epoch_search_budget_usage(
         _reservation_with_market_basis,
     )
 
-    observed_sessions: list[Mapping[str, Any]] = [
-        *(sessions or []), *(
-            _reservation_with_market_basis(item, sessions or [])
-            for item in (reservations or [])
-        )
+    proven_reservations = [
+        _reservation_with_market_basis(item, sessions or [])
+        for item in (reservations or [])
     ]
+    observed_sessions: list[Mapping[str, Any]] = [*(sessions or []), *proven_reservations]
     same_epoch = list(
         sessions_for_market_budget(
             observed_sessions, market_evidence_epoch=evidence_epoch,
@@ -853,7 +852,7 @@ def epoch_search_budget_usage(
         session_id = item.get("session_id")
         if isinstance(session_id, str) and session_id:
             entry["session_ids"].append(session_id)
-    return {
+    usage = {
         "evidence_epoch_sha256": evidence_epoch,
         "auto_sessions_used": auto_used,
         "auto_sessions_per_evidence_epoch": auto_sessions_per_market,
@@ -866,6 +865,20 @@ def epoch_search_budget_usage(
         "representation_slots": list(representation_slots.values()),
         "legacy_market_occupancy": legacy_market_occupancy,
     }
+    # Read-only provenance of a market description proven by another saved
+    # session for a historical reservation; nothing was rewritten.
+    borrowed = [
+        {
+            "session_id": item.get("session_id"),
+            "market_evidence_epoch_sha256": item.get("market_evidence_epoch_sha256"),
+            "proof_session_ids": list(item["market_evidence_basis_proof_session_ids"]),
+        }
+        for item in proven_reservations
+        if isinstance(item, Mapping) and "market_evidence_basis_proof_session_ids" in item
+    ]
+    if borrowed:
+        usage["reservation_market_basis_proofs"] = borrowed
+    return usage
 
 
 def term_set(value: str) -> set[str]:
@@ -3485,6 +3498,9 @@ def run_preflight(
     if (
         selection_gate_view.get("applicable")
         and selection_gate_view.get("action") == "STOP"
+        # Only a gate-created STOP owns the terminal; an upstream refusal
+        # keeps its own reason and the gate stays attached below.
+        and action != "STOP"
     ):
         stop_body = {
             "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
@@ -3697,7 +3713,9 @@ def run_preflight(
                 selection_gate_view.get("full_lifecycle_equivalent")
             ),
         }
-        if selection_gate_view.get("caveat"):
+        if selection_gate_view.get("integrity_invalid"):
+            receipt_body["selection_gate"]["integrity_invalid"] = True
+        if selection_gate_view.get("caveat") and action != "STOP":
             # The historical gate is scoped evidence, not a second admission
             # engine.  Make the allowed owner next explicit so a START result
             # cannot be misread as silently ignoring BLOCK_FORGE_SELECTION_RISK.

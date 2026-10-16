@@ -1758,6 +1758,151 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 store.diagnostics().committed_inventory_sha256, inventory_before
             )
 
+    def test_g9_orphan_old_market_reservation_admits_new_cohorts_once(self) -> None:
+        """Historical orphan reservation -> public preflight -> one durable slot."""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            base_dir = Path(tmp)
+            data_root = base_dir / "rdp"
+            data_root.mkdir()
+            releases = [_seal_week(base_dir, week)[0] for week in range(4)]
+            for week in (0, 1):
+                import_live_cohort(
+                    release_root=releases[week],
+                    data_root=data_root,
+                    import_time=datetime(2026, 1, 20 + 7 * week, tzinfo=UTC),
+                )
+            store = ResearchStore(data_root)
+            control_preflight = _actual_production_preflight(data_root)
+            from tests.test_hfic_cli import bind_draft
+
+            control_draft = bind_draft(
+                json.loads(
+                    (ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json")
+                    .read_text(encoding="utf-8")
+                ),
+                control_preflight,
+            )
+            control = freeze_draft(
+                control_draft, preflight_receipt=control_preflight, store=store, repo_root=ROOT
+            )
+            persist_no_worthy_session(
+                store,
+                control,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(control_draft["candidates"]),
+                draft=control_draft,
+                preflight_receipt=control_preflight,
+            )
+            store.rebuild_projection()
+            # A generated V1 draft reserves its slot; its lifecycle never lands.
+            v1_preflight, _envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(control["session_id"]),
+                model_provenance_sha256="11" * 32,
+            )
+            v1_draft = bind_draft(
+                json.loads(
+                    (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json")
+                    .read_text(encoding="utf-8")
+                ),
+                v1_preflight,
+            )
+            v1_draft["preflight_receipt_id"] = v1_preflight["receipt_id"]
+            v1_draft["preflight_receipt_sha256"] = v1_preflight["preflight_receipt_sha256"]
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_imported_control_fixture,
+            ):
+                orphan = persist_generated_draft(
+                    store,
+                    v1_draft,
+                    preflight_receipt=v1_preflight,
+                    repo_root=ROOT,
+                    representation_id="NORMALIZED_TRAJECTORY_V1",
+                    model_provenance_sha256="11" * 32,
+                )
+            store.rebuild_projection()
+            old_market = control_preflight["market_evidence_epoch_sha256"]
+            for week in (2, 3):
+                import_live_cohort(
+                    release_root=releases[week],
+                    data_root=data_root,
+                    import_time=datetime(2026, 2, 3 + 7 * week, tzinfo=UTC),
+                )
+
+            entry = _run_production_preflight(
+                data_root, enumerator=_enumerate_imported_control_fixture
+            )
+            market = entry["market_evidence_epoch_sha256"]
+            self.assertNotEqual(market, old_market)
+            self.assertEqual(entry["action"], "START_NEW_SESSION")
+            self.assertEqual(entry["search_budget"]["auto_sessions_used"], 0)
+            self.assertEqual(
+                entry["search_budget"]["reservation_market_basis_proofs"],
+                [
+                    {
+                        "session_id": orphan["session_id"],
+                        "market_evidence_epoch_sha256": old_market,
+                        "proof_session_ids": [control["session_id"]],
+                    }
+                ],
+            )
+            binding = {
+                **entry,
+                "session_id": "HFIC-SESS-" + str(entry["search_key_sha256"])[:16].upper(),
+            }
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_imported_control_fixture,
+            ):
+                reserved = persist_scientific_slot_admission(store, binding, repo_root=ROOT)
+            self.assertIsNotNone(reserved)
+            binding_path = base_dir / "binding.json"
+            binding_path.write_text(json.dumps(binding), encoding="utf-8")
+            history = list_scientific_slot_admissions(store)
+
+            # Fresh interpreter: durable readback plus exact admission replay.
+            script = (
+                "import json,sys\n"
+                "from pathlib import Path\n"
+                "from unittest.mock import patch\n"
+                "sys.path[:0]=[sys.argv[1],sys.argv[1]+'/src']\n"
+                "from tests.test_forge_evidence_identity_and_owner_gold_v1 import "
+                "_run_production_preflight,_enumerate_imported_control_fixture\n"
+                "from solana_alpha_lab.factory.research_store import ResearchStore\n"
+                "from solana_alpha_lab.factory.hfic_session import persist_scientific_slot_admission\n"
+                "data=Path(sys.argv[2]);store=ResearchStore(data)\n"
+                "with patch('solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets',"
+                "side_effect=_enumerate_imported_control_fixture):\n"
+                "    replay=persist_scientific_slot_admission(store,"
+                "json.loads(Path(sys.argv[3]).read_text()),repo_root=Path(sys.argv[1]))\n"
+                "receipt=_run_production_preflight(data,enumerator=_enumerate_imported_control_fixture)\n"
+                "print(json.dumps({'replay':replay['scientific_slot_sha256'],"
+                "'action':receipt['action'],'terminal':receipt['terminal'],"
+                "'budget':receipt.get('search_budget')}))\n"
+            )
+            completed = subprocess.run(
+                [sys.executable, "-B", "-c", script, str(ROOT), str(data_root), str(binding_path)],
+                capture_output=True,
+                text=True,
+                timeout=600,
+                cwd=ROOT,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr[-2000:])
+            fresh = json.loads(completed.stdout.strip().splitlines()[-1])
+            after = list_scientific_slot_admissions(ResearchStore(data_root))
+            # Independent oracle: plain stamp equality over durable records.
+            self.assertEqual(after, history)
+            self.assertEqual(len(after), 3)
+            self.assertEqual(
+                sum(item["market_evidence_epoch_sha256"] == market for item in after), 1
+            )
+            self.assertEqual(fresh["replay"], reserved["scientific_slot_sha256"])
+            self.assertEqual(fresh["budget"]["auto_sessions_used"], 1)
+            self.assertNotEqual(fresh["action"], "START_NEW_SESSION")
+
     def test_ordinary_stamped_preflight_uses_normal_run_preflight(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
