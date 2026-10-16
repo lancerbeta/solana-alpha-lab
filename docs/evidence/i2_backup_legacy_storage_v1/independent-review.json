@@ -17,34 +17,37 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Frozen content head dbee02729e726cc8ebd8eca050b885654467627f, base93e08efa290c18ae28a7d0bb5f012bfa98180be7; inventory68bbb8d9a84cf75a7c6e75f84a72aabba1c51d4b984ecb1280b124a1c259464d; bindings666f3702b606fc27498a4bf23aa2a28c348253d8e141d5ecff598c69086a5770. Isolated read-only P0/P1 PASS, no open findings. No tests/edits/production mutation by final reviewers.",
-        "Exact frozen diff, committed/worktree bindings and durable proof source hashes checked. Prior P1 poll occurrence pin and unified budget/clock/effects through effectful refresh closed. Only later production-code delta reader validator300->10800 matches existing3h reader; boundary checked. Four-role review plan sufficient."
+        "Frozen content head b9e675f889365c96d1c9926ce8d04606e839b877, base93e08efa290c18ae28a7d0bb5f012bfa98180be7; inventory1b53c24a386c957c4fac4fa99181b2787f209085e9f4ac37bfea68eafe4cf89a; bindingsf24b709af0a26faa0e27395741b2825d1edb453d137a9175f91047a9189eff44. Isolated read-only P0/P1 PASS; exact-delta reattestation, no open findings. No reviewer tests/edits/production mutation.",
+        "Exact frozen diff and16 committed/worktree bindings verified. Eleven bindings unchanged; five reflect loaded-config forwarding, existing regression and hash propagation. Prior poll occurrence pin and shared refresh budget/clock/effects P1 fixes remain. All four required roles retained. Doctor config reaches package_backup on every retry; native config selection, busy policy and other typed errors preserved. Ten targeted doctor/local-retry checks PASS; no large proof rerun."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Frozen content head dbee02729e726cc8ebd8eca050b885654467627f, base93e08efa290c18ae28a7d0bb5f012bfa98180be7; inventory68bbb8d9a84cf75a7c6e75f84a72aabba1c51d4b984ecb1280b124a1c259464d; bindings666f3702b606fc27498a4bf23aa2a28c348253d8e141d5ecff598c69086a5770. Isolated read-only P0/P1 PASS, no open findings. No tests/edits/production mutation by final reviewers.",
-        "16 implementation and17 source/helper hashes match; frozen diff exact. Actual finite drain/restart, quiet-copy recurring throughput, full/independent restore/reclaim/resume/native writer support bounded code outcome. Drive/live due capacity and physical observation window remain future acceptance; staged logical+policy stays proposed, StageC PARTIAL and I2 not DONE."
+        "Frozen content head b9e675f889365c96d1c9926ce8d04606e839b877, base93e08efa290c18ae28a7d0bb5f012bfa98180be7; inventory1b53c24a386c957c4fac4fa99181b2787f209085e9f4ac37bfea68eafe4cf89a; bindingsf24b709af0a26faa0e27395741b2825d1edb453d137a9175f91047a9189eff44. Isolated read-only P0/P1 PASS; exact-delta reattestation, no open findings. No reviewer tests/edits/production mutation.",
+        "16 implementation and17 source/helper hashes match; frozen diff exact. Actual finite drain/restart, quiet-copy recurring throughput, full/independent restore/reclaim/resume/native writer support bounded code outcome. Drive/live due capacity and physical observation window remain future acceptance; staged logical+policy stays proposed, StageC PARTIAL and I2 not DONE.",
+        "Exact delta preserves loaded config on all local attempts. Native new inventory/bindings and unchanged measured proof verified; prior verdict reused only for unchanged bytes. Physical deferred/PARTIAL and no live capacity acceptance remain."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Frozen content head dbee02729e726cc8ebd8eca050b885654467627f, base93e08efa290c18ae28a7d0bb5f012bfa98180be7; inventory68bbb8d9a84cf75a7c6e75f84a72aabba1c51d4b984ecb1280b124a1c259464d; bindings666f3702b606fc27498a4bf23aa2a28c348253d8e141d5ecff598c69086a5770. Isolated read-only P0/P1 PASS, no open findings. No tests/edits/production mutation by final reviewers.",
+        "Frozen content head b9e675f889365c96d1c9926ce8d04606e839b877, base93e08efa290c18ae28a7d0bb5f012bfa98180be7; inventory1b53c24a386c957c4fac4fa99181b2787f209085e9f4ac37bfea68eafe4cf89a; bindingsf24b709af0a26faa0e27395741b2825d1edb453d137a9175f91047a9189eff44. Isolated read-only P0/P1 PASS; exact-delta reattestation, no open findings. No reviewer tests/edits/production mutation.",
         "SEMANTIC_PREMISE PASS. Exact native occurrence/request/response hash, unique lifecycle owner, lease revalidation and source payload hash protect body retirement. Ambiguous consumers/pins/UNKNOWN/accounting/PIT/science remain. Scientific falsifier: mistaken owner/no-resume proof could make resumed scheduler read compacted cache as an empty successful result; exact native identity and retired activation resume refusal protect this boundary.",
         "Ordinary caller rechecks due/pressure/CAS, releases locks and shares monotonic budget/effects after cold refresh. Restore449s/register696s have explicit separate cost;1800s is cooperative chunk admission. Sufficient checkpoint reused; only pending/discovery/exact closure gap triggers refresh. No inevitable perpetual YIELD found. Quiet copy and native outer fixture do not establish live capacity.",
-        "packet_fingerprint_sha256=34c9808833778122b573b6178b8a2243cda33871a32090246be498d18932c18f. Seven packet evidence hashes/task/diff verified; inventory/bindings supplied launch bindings. independence=PACKET_INFORMATION_PATH; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN. Critic launched packet+diff only without transcript. No new platform or scientific authority."
+        "packet_fingerprint_sha256=05ec8a2ae6a609b3670df335d9c42911aada3f338e1aa31ebe03b97efb889b7b. Seven packet evidence hashes/task/diff verified; inventory/bindings supplied launch bindings. independence=PACKET_INFORMATION_PATH; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN. Critic launched packet+diff only without transcript. No new platform or scientific authority.",
+        "Fresh packet-only exact-delta critic verified new packet/task/seven refs/frozen diff; prior PASS used only for unchanged bytes. New seam falsifier: retry drops source/sink config and verifies a different recovery corpus. Same loaded config now forwarded on every attempt; existing regression checks object identity. Optional keyword compatibility/native selection/lock/failures retained. No new truth owner or scientific authority."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Frozen content head dbee02729e726cc8ebd8eca050b885654467627f, base93e08efa290c18ae28a7d0bb5f012bfa98180be7; inventory68bbb8d9a84cf75a7c6e75f84a72aabba1c51d4b984ecb1280b124a1c259464d; bindings666f3702b606fc27498a4bf23aa2a28c348253d8e141d5ecff598c69086a5770. Isolated read-only P0/P1 PASS, no open findings. No tests/edits/production mutation by final reviewers.",
-        "Native inventory/bindings and16 implementation files verified; frozen diff exact. Merge/runtime scopes separated, actual-merge target deliberately UNBOUND before merge. Whole physical pause and recovery/return disclosed; staged logical+policy preferred, physical deferred with StageC PARTIAL. One merge phrase then one new exact OPERATE authority; no per-chunk approval or dense-gap permission."
+        "Frozen content head b9e675f889365c96d1c9926ce8d04606e839b877, base93e08efa290c18ae28a7d0bb5f012bfa98180be7; inventory1b53c24a386c957c4fac4fa99181b2787f209085e9f4ac37bfea68eafe4cf89a; bindingsf24b709af0a26faa0e27395741b2825d1edb453d137a9175f91047a9189eff44. Isolated read-only P0/P1 PASS; exact-delta reattestation, no open findings. No reviewer tests/edits/production mutation.",
+        "Native inventory/bindings and16 implementation files verified; frozen diff exact. Merge/runtime scopes separated, actual-merge target deliberately UNBOUND before merge. Whole physical pause and recovery/return disclosed; staged logical+policy preferred, physical deferred with StageC PARTIAL. One merge phrase then one new exact OPERATE authority; no per-chunk approval or dense-gap permission.",
+        "Native new inventory/bindings and16 files verified. OWNER_READOUT, OPERATE and operator docs byte-identical. Loaded config forwarding changes no runtime approval, staged reclaim/PARTIAL or owner action."
       ]
     }
   ],
