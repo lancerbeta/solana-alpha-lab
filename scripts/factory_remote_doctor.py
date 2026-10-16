@@ -21,7 +21,6 @@ from solana_alpha_lab.factory.remote_ops import (  # noqa: E402
     doctor_packet,
     emit_health_alert,
     load_config,
-    package_backup,
     write_heartbeat,
 )
 
@@ -89,7 +88,8 @@ def main() -> int:
             print(json.dumps({"heartbeat": path.as_posix()}, indent=2, sort_keys=True))
             return 0
         if args.backup:
-            packed = package_backup(root, config=config)
+            from solana_alpha_lab.factory.offhost_backup import run_scheduled_local_backup
+            packed = run_scheduled_local_backup(root)
             print(json.dumps(packed, indent=2, sort_keys=True))
             return 0
         if args.offhost_status:

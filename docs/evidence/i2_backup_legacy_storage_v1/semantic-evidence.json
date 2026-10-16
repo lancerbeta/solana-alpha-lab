@@ -1,22 +1,30 @@
 [
   {
-    "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/raw-dependency-proof.json",
-    "sha256_or_fingerprint": "3d7de991d29cfa08fad43ac72d2f3e993ef4e6081a4f458da16b5f45bc62c2ef"
+    "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/remaining-outcome-proof.json",
+    "sha256_or_fingerprint": "43f3e3cedbc59cdb4ab53e4630ef9430ecb77c27201960f334232315e9e8df7c"
   },
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md",
-    "sha256_or_fingerprint": "fba09617441fbadf32d5705b28455eaaab8d57199fce0eda605eb550be8b5f40"
+    "sha256_or_fingerprint": "b60c5eb434525e4b948a11584801170e9365aed691f266e6d6b4034b4e7ac38d"
   },
   {
     "logical_ref": "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md",
-    "sha256_or_fingerprint": "56661bd78758cd211e5506ba9cd6a7a79713f43ad56ebf14f353da84291746df"
+    "sha256_or_fingerprint": "ff124b9cb0a9a287fba8992e8b01155f6926c2d9f096a9b12d1184021f8258ff"
   },
   {
-    "logical_ref": "src/solana_alpha_lab/factory/remote_ops.py",
-    "sha256_or_fingerprint": "b3444324352204055104a730f72b56057456e29fa6ca489805a278872f8a105f"
+    "logical_ref": "src/solana_alpha_lab/factory/observation_schedule_retention.py",
+    "sha256_or_fingerprint": "e9f2f636d63286bdb4ffb04f4867118243c909c7ff6e30e6539f026cc1158431"
   },
   {
-    "logical_ref": "tests/test_i2_backup_legacy_storage_v1.py",
-    "sha256_or_fingerprint": "9dad2c97002e9cb1ae0181512e53bbebb3311dddda115b73ef59962e5c3c3e2d"
+    "logical_ref": "src/solana_alpha_lab/factory/offhost_backup.py",
+    "sha256_or_fingerprint": "08a7f6c63f89cd3dfb063e4d723874b94964e1d35787a79bda7844f8672d9514"
+  },
+  {
+    "logical_ref": "tests/test_i2_retention_maintenance_v1.py",
+    "sha256_or_fingerprint": "2ad4cf273b8d0f4447ed9185375705dfa22636582936a354e3e7c5f58cfd3f21"
+  },
+  {
+    "logical_ref": "tests/test_i2_offhost_checkpoint_v1.py",
+    "sha256_or_fingerprint": "5cc52169731b78b1a0474074b14dbe5b14e28690cc0c36f5434ee7eef8b767ea"
   }
 ]

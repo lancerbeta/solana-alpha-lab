@@ -695,9 +695,35 @@ Native owner — `observation_schedule_retention.py`, CLI —
 predicate, реальные frozen minimum ages, source/cold closure, rows/bytes/wall,
 cadence и pressure/due guards. Future managed children не требуют новых IDs.
 
+Одобренные `max_run_chunks` и `max_run_wall_seconds` позволяют одному запуску
+обработать конечный backlog несколькими chunks; без этих полей сохраняется
+старый single-step режим. Все locks/leases отпускаются между chunks. Приоритет
+due/pressure и CAS повторяются на каждом шаге; краткий YIELD ждёт без writer,
+исчерпанный run сохраняет durable cursor до следующего штатного caller.
+Archive refresh использует тот же отсчёт времени, суммарные effects и остаток
+chunk budget; завершённый chunk перед refresh также расходует лимит. Cadence
+допускает новый RUN и сама по себе не создаёт таймер или дополнительные вызовы.
+
+COMPLETED occurrence и request-keyed poll-cache проверяются отдельно. Совпадение
+request с другим STARTED не объединяет ответы; UNKNOWN остаётся без изменений.
+Poll body требует точного native occurrence, COMPLETED source с тем же request
+и response hash, однозначного lifecycle owner и всех consumer/pin/cold guards.
+Request-only, stale или неоднозначная ссылка защищается. DISCOVERY ownership
+восстанавливается штатным deterministic identity, а не альтернативной наукой.
+Commissioned policy создаёт индекс существующего poll occurrence pointer один
+раз; ordinary startup/history не сканирует. Full recovery fingerprint сохраняет
+прежние bytes/ROWIDs/schema/sequences; bounded small cells читаются одним SQL,
+large cells по-прежнему хешируются потоково.
+
 Обычный existing daily/weekly offhost caller после verified checkpoint запускает
 maintenance, вновь беря backup-plane lock перед OPS fence. Independent remote
-restore и source-verified HOT90 raw day archives дают exact cold proof. Один
+restore получает собственный hash-bound policy budget в пределах existing reader3h;
+бывший300s ceiling был меньше измеренного449.54s restore на production-sized copy.
+Это допустимость новой approved policy, не автоматическое увеличение production
+лимита. Recurring closure может содержать9обычных weekly/daily объектов плюс
+raw archives, поэтому single-full8objects/600s не являются гарантией. Signed
+policy отдельно фиксирует native ceilings и фактическую required closure;
+registration измеряется отдельно и не объявляется бесплатной. Source-verified HOT90 raw day archives дают exact cold proof. Один
 completed cache и один pending admission ограничивают local overlap; remote
 scientific pins сохраняются до отдельного source/I4 disposition. Нет нового
 timer, daily agent или ежедневного `record-backup`. Daily physical reclaim
@@ -727,6 +753,12 @@ restore/register. Disable приостанавливает target; после en
 selection/scope. Несовместимый cold root/refresh budget виден как BLOCKED_POLICY/
 FAILED и требует точной допустимой revision; false COMPLETE и новая cache
 generation не создаются. Повреждённые identity/source/pins остаются отказом.
+
+Local-full сохраняет отдельную 12h local recovery obligation; daily offhost
+24h source-clock gate её не заменяет. Его ordinary scheduled caller повторяет
+только typed `WRITER_BUSY` теми же ≤120min/30s, без нового daemon, изменения
+units/cadence/RPO или правки offhost last-good/pending. Исчерпание видно как
+`LOCAL_BACKUP_BUSY_RETRY_EXHAUSTED`; другие отказы не маскируются retry.
 
 Backup contention автоматически повторяется существующим caller ≤120min/30s;
 weekly/daily overlap объединяется по verified bytes и durable pointer. Exhausted

@@ -1,6 +1,6 @@
 ---
 task_id: I2_BACKUP_LEGACY_STORAGE_V1
-task_version: '1.6'
+task_version: '1.7'
 status: IN_PROGRESS
 as_of: '2026-10-16'
 owner: GOAL_OWNER
@@ -8,10 +8,10 @@ allowed_routes: [DIRECT_CODEX_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 5a68d602d5135038e7dd49c8fe14f69cb893fa8a
+  expected_base: 93e08efa290c18ae28a7d0bb5f012bfa98180be7
   expected_upstream: origin/main
-  expected_upstream_oid: 5a68d602d5135038e7dd49c8fe14f69cb893fa8a
-  expected_branch: codex/i2-raw-dependency-selection-p1
+  expected_upstream_oid: 93e08efa290c18ae28a7d0bb5f012bfa98180be7
+  expected_branch: codex/i2-legacy-maintenance-outcome
   dirty_mode: ALLOW_REPORTED
 objective: Implement the complete I2 backup, legacy retirement, physical reclaim and bounded maintenance capability on existing owners; prove it on isolated stores, deliver reviewed exact-head CI and machine merge-readiness, and prepare one staged OPERATE packet without production mutations.
 managed_write_set:
@@ -31,6 +31,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hot90_closed_day_loop.py
 - scripts/observation_schedule_retention.py
 - scripts/factory_offhost_backup_copy.py
+- scripts/factory_remote_doctor.py
 - configs/factory_remote_operations_v1_1.yaml
 - configs/factory_remote_ops/**
 - catalog/schemas/factory_remote_operations_v1_1.schema.json
@@ -85,6 +86,57 @@ context_requirements:
 ---
 
 # I2_BACKUP_LEGACY_STORAGE_V1
+
+## Remaining operational outcome — 2026-10-16
+
+Owner EXECUTE continues the same I2: packaging is LIVE_PROVEN at installed
+93e08efa290c18ae28a7d0bb5f012bfa98180be7, checkpoint 994e7d64bacb9003d2867ce181f16acbf59288996aa13e8afbeceefb5c7319fe.
+Use that verified copy; do not repeat the capture/scale baselines. Independently
+prove completed occurrence and request-keyed cache consumers, preserve all
+STARTED/UNKNOWN and accounting, remove only false identity coupling. Pass all
+age/scope/no-resume/cold/size/consumer gates on the selected slice before PR.
+
+Implement the minimum missing capability in existing retention/caller owners:
+finite resumable multi-chunk drain, bounded recurring work that exceeds measured
+eligible inflow, and supported local/offhost backup contention handling. No new
+framework, service, scheduler or PRD. Production unit/cadence/RPO changes remain
+proposals for one exact OPERATE scope. Neither 31-day minima nor science/pins,
+membership, RUN/grants/source identities/counters may change implicitly.
+
+One connected isolated proof: native plan, actual compaction chunks, restart/
+resume, next compressed backup/independent restore, ordinary native reader/
+writer; actual bytes/DB/ZIP/scan/cold cost and all reclaim recovery checks.
+Compare ledger occurrences with a shared request, ambiguous request consumers,
+interrupted chunks and policy replacement. Preserve last-good; optional
+maintenance must not invalidate a successful checkpoint. Full pause and affected
+obligations must be measured before destructive authority is proposed.
+
+ENTRY_DECISION: START_AS_WRITTEN. SPEC_ROUTE=NONE (existing PRD/SSD).
+DECISION_DELTA: deliver useful finite retirement and sustainable unattended work.
+UNCERTAINTY_REMOVED: exact consumer independence, all slice gates, real throughput
+and recovery/pause cost. CAPABILITY_OR_EVIDENCE: one measured coherent path on the
+existing verified copy and one updated task/OPERATE packet. Tools: existing
+delivery-harness/Git/gh/native scripts only; new tool/dependency/service NONE.
+STOP: reviewed exact-head CI + merge-readiness; production deploy/settings/APPLY/
+policy enable require one new exact scope; stop early only for real new owner
+risk, not an ordinary technical defect. NEXT: merge phrase, guarded readback,
+one consolidated OPERATE decision. Model recommendation SOL_XHIGH.
+
+Measured checkpoint: same-copy initial28666effects/1,234,151,283body bytes,
+native reclaim5,330,194,432→4,084,056,064B, next eligible day138,475,277B/92.830s,
+compact standalone ZIP800,382,744B, independent restore237.978s and native writer
+PASS. Whole physical measured components2308.382s, proposed calibrated window60min
+does not fit dense300s due grid. Recommend staged logical+one recurring policy;
+physical remains an explicit deferred owner window decision, StageC PARTIAL.
+Proof and limits: remaining-outcome-proof.json, OPERATE_PACKET, OWNER_READOUT.
+No production mutation or canonical DONE. No extra cleanup task/PRD.
+
+Prior runtime evidence and sealed approvals remain immutable. B17Oct00:20:30Z,
+offhost17Oct00:45Z and managed18/19Oct00:00Z remain WATCH; no manual C/D.
+
+Historical delivery phases below preserve their original runtime assertions;
+they are superseded by the Remaining operational outcome header and current
+OPERATE/OWNER_READOUT. No old StageB signature grants new runtime authority.
 
 ## Raw dependency selection P1 — 2026-10-16
 

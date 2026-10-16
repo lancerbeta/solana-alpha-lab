@@ -29917,7 +29917,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/factory_remote_doctor.py', repository_path: scripts/factory_remote_doctor.py}
-  integrity: {kind: sha256, sha256: 0a7ae73947920a6bae3a1355b4fbdfc59ccf3a0c0149c93e8001fe6dd5c72067}
+  integrity: {kind: sha256, sha256: 206a59b7a57049512a5732f47b2d42601c948b2c6363c9e00fb2c384baac3ae1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: MODULE-FACTORY-REMOTE-OPS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -30016,7 +30016,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_REMOTE_HOST.md', repository_path: docs/operator/FACTORY_REMOTE_HOST.md}
-  integrity: {kind: sha256, sha256: 338b2351baf92b8c0575635cd738dc51f70beb3339c332dd521413a3f86c8832}
+  integrity: {kind: sha256, sha256: c9e4fd42c4373ffc8ac38c67037b33a408a708a44b792d0bfc1e32bdf0292be1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -34495,7 +34495,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_retention.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_retention.py}
-  integrity: {kind: sha256, sha256: 9ef8c5b7d9584732138a60f9ce33b10024e6462bb866de38c7c13c6142903dff}
+  integrity: {kind: sha256, sha256: e9f2f636d63286bdb4ffb04f4867118243c909c7ff6e30e6539f026cc1158431}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -36565,7 +36565,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_UNATTENDED_OPERABILITY.md', repository_path: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md}
-  integrity: {kind: sha256, sha256: dfb46685a7397ebbcff7c7a9f21c177da751d3e18b882a1812c7e7292eaed0fb}
+  integrity: {kind: sha256, sha256: 39c4c5b8f2d16023f1467fe00ff457ed9f5448a7fe2c9505b83cff6e908a3752}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -43157,7 +43157,7 @@ records:
     repository_path: docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md
   integrity:
     kind: sha256
-    sha256: 7122b7bdfbf6f70a9cdb77492311dda5508c3d8ceb43538916d7ad1c8c9257e0
+    sha256: 8e05b826ea4051f8fbf5073d5abb2831a3ab0929d33ce84c18d490c263651356
   access:
     mode: read_only
     method: file
@@ -43233,7 +43233,7 @@ records:
     repository_path: docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md
   integrity:
     kind: sha256
-    sha256: fba09617441fbadf32d5705b28455eaaab8d57199fce0eda605eb550be8b5f40
+    sha256: b60c5eb434525e4b948a11584801170e9365aed691f266e6d6b4034b4e7ac38d
   access:
     mode: read_only
     method: file

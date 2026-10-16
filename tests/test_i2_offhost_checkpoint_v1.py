@@ -24,6 +24,28 @@ from solana_alpha_lab.factory.remote_ops import backup_plane_lock
 
 
 class I2OffhostCheckpointTests(unittest.TestCase):
+    def test_local_backup_reuses_bounded_busy_retry_without_touching_offhost_state(self):
+        self.run_checkpoint()
+        original=(self.root/self.config.receipt_relative).read_bytes()
+        elapsed=[0.0]
+        def sleep(seconds):elapsed[0]+=seconds
+        with patch.object(owner,'package_backup',side_effect=[owner.RemoteOpsError('WRITER_BUSY'),
+                owner.RemoteOpsError('WRITER_BUSY'),{'bundle':'verified-local-full'}]) as pack:
+            result=owner.run_scheduled_local_backup(self.root,monotonic_clock=lambda:elapsed[0],sleeper=sleep)
+        self.assertEqual(pack.call_count,3)
+        self.assertEqual(result['scheduled_retry']['deferred_attempts'],2)
+        self.assertEqual(elapsed[0],60.0)
+        self.assertEqual((self.root/self.config.receipt_relative).read_bytes(),original)
+        with patch.object(owner,'package_backup',side_effect=owner.RemoteOpsError('WRITER_BUSY')):
+            with self.assertRaisesRegex(owner.RemoteOpsError,'LOCAL_BACKUP_BUSY_RETRY_EXHAUSTED'):
+                owner.run_scheduled_local_backup(self.root,monotonic_clock=lambda:elapsed[0],sleeper=sleep,
+                    busy_retry_budget_seconds=30)
+        self.assertEqual((self.root/self.config.receipt_relative).read_bytes(),original)
+        with patch.object(owner,'package_backup',side_effect=owner.RemoteOpsError('BACKUP_INTEGRITY_FAILED')) as pack:
+            with self.assertRaisesRegex(owner.RemoteOpsError,'BACKUP_INTEGRITY_FAILED'):
+                owner.run_scheduled_local_backup(self.root)
+            self.assertEqual(pack.call_count,1)
+
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.root = _seed_tree(Path(self.temporary.name) / "factory")

@@ -263,7 +263,13 @@ def install_retirement(store: ObservationScheduleStore, *, retirement: Mapping[s
     document = dict(retirement)
     if _hash(document) != approved_sha256 or document.get("disallow_resume") is not True:
         raise ObservationScheduleRetentionError("RETIREMENT_APPROVAL_MISMATCH")
-    verify_cold_archive(document["archive_proof"])
+    # Registration already reconstructed and independently verified these exact
+    # immutable checkpoint bytes. Recheck their binding per scope, not the full
+    # multi-GB archive once for every retirement record.
+    registered = _control(store, "checkpoint_archive")
+    reuse_registered = (document["archive_proof"].get("proof_class") == "REMOTE_CHECKPOINT_RESTORE_VERIFIED"
+                        and registered == document["archive_proof"])
+    verify_cold_archive(document["archive_proof"], deep=not reuse_registered)
     mode = document.get("operation_mode")
     if mode not in {"ISOLATED_REHEARSAL", "OPERATE"}:
         raise ObservationScheduleRetentionError("EXACT_OPERATION_MODE_REQUIRED")
@@ -324,6 +330,11 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         raise ObservationScheduleRetentionError("MAINTENANCE_POLICY_INVALID")
     if not isinstance(policy.get("retained_restore_points"), int) or policy["retained_restore_points"] < 1:
         raise ObservationScheduleRetentionError("RESTORE_POINT_POLICY_REQUIRED")
+    if "max_run_chunks" in policy or "max_run_wall_seconds" in policy:
+        if (type(policy.get("max_run_chunks")) is not int or not 1 <= policy["max_run_chunks"] <= 4096
+                or type(policy.get("max_run_wall_seconds")) is not int
+                or not 2 * float(policy["max_wall_seconds"]) <= policy["max_run_wall_seconds"] <= 1800):
+            raise ObservationScheduleRetentionError("MAINTENANCE_RUN_BUDGET_INVALID")
     refresh = policy.get("archive_refresh", {})
     if refresh.get("enabled") is True:
         raw_relative = str(refresh.get("cold_root_relative", "")).replace("\\", "/")
@@ -331,7 +342,7 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         if (not relative.parts or relative.is_absolute() or any(p in {"", ".", ".."} for p in raw_relative.split("/")) or ":" in raw_relative
                 or not 0 < int(refresh.get("max_objects", 0)) <= 128
                 or int(refresh.get("max_bytes", 0)) <= 0
-                or not 0 < float(refresh.get("max_wall_seconds", 0)) <= 300
+                or not 0 < float(refresh.get("max_wall_seconds", 0)) <= 10800
                 or int(refresh.get("minimum_interval_seconds", 0)) < 1):
             raise ObservationScheduleRetentionError("ARCHIVE_REFRESH_BUDGET_INVALID")
 
@@ -530,6 +541,7 @@ def install_maintenance_policy(store: ObservationScheduleStore, *, policy: Mappi
         # Explicit commissioning, never startup, owns these consumer indices.
         store._conn.execute("CREATE INDEX IF NOT EXISTS idx_due_retention_occurrence ON due_observations(call_occurrence_id)")
         store._conn.execute("CREATE INDEX IF NOT EXISTS idx_due_retention_request ON due_observations(request_sha256)")
+        store._conn.execute("CREATE INDEX IF NOT EXISTS idx_poll_retention_occurrence ON poll_slots(json_extract(payload_json,'$.call_occurrence_id'))")
         store._conn.execute("CREATE INDEX IF NOT EXISTS idx_call_retention_pending ON call_ledger(call_occurrence_id) WHERE json_extract(payload_json,'$.raw_payload_retention') IS NULL AND (json_extract(payload_json,'$.rows') NOT IN ('[]','{}','') OR json_extract(payload_json,'$.body') NOT IN ('[]','{}','') OR json_extract(payload_json,'$.raw_body') NOT IN ('[]','{}','') OR json_extract(payload_json,'$.response_body') NOT IN ('[]','{}','') OR json_extract(payload_json,'$.payload_rows') NOT IN ('[]','{}','') OR json_extract(payload_json,'$.entities') NOT IN ('[]','{}',''))")
         store._conn.execute("CREATE INDEX IF NOT EXISTS idx_admission_retention_witness ON episode_admissions(json_extract(record_json,'$.witness_call_occurrence_id'))")
         for number in range(3):
@@ -1144,6 +1156,29 @@ def _automatic_retirement(store: ObservationScheduleStore, scope: tuple[str, str
             "policy_sha256": policy_sha256(policy), "archive_locator": archive["checkpoint_filename"]}
 
 
+def _discovery_scope(store: ObservationScheduleStore, *, slot: str, occurrence: str,
+                     request: str, limit: int) -> tuple[str, str]:
+    """Invert the existing native identity over bounded activation metadata.
+
+    A poll cache is keyed by a time/scope slot, not by transport request SHA.
+    Its stored occurrence pointer must agree with the scheduler's exact hash.
+    No scientific body or successful outcome is inferred from an absent due.
+    """
+    from solana_alpha_lab.factory.observation_primitives import call_occurrence_id
+    from solana_alpha_lab.factory.observation_scheduler import DISCOVERY
+    # Metadata ownership is independent of the chosen effect chunk size.
+    activations = list(store._conn.execute(
+        "SELECT schedule_sha256,activation_id FROM schedule_activations LIMIT ?", (MAX_PLAN_ROWS + 1,)))
+    if len(activations) > MAX_PLAN_ROWS:
+        raise ObservationScheduleRetentionError("CALL_OWNER_SCOPE_BUDGET_REFUSED")
+    matches = [tuple(scope) for scope in activations if call_occurrence_id(
+        schedule_sha256=str(scope[0]), activation_id=str(scope[1]), primitive_id=DISCOVERY,
+        point_id="DISCOVERY", due_at=slot, claim_identity_set=(), request_digest=request) == occurrence]
+    if len(matches) != 1:
+        raise ObservationScheduleRetentionError("POLL_OWNER_IDENTITY_UNPROVEN")
+    return matches[0]
+
+
 def _call_owner_scopes(store: ObservationScheduleStore, *, occurrence: str, request: str,
                        limit: int) -> set[tuple[str, str]]:
     """Exact indexed links from the native due, witness and round owners."""
@@ -1160,6 +1195,15 @@ def _call_owner_scopes(store: ObservationScheduleStore, *, occurrence: str, requ
             if examined > limit:
                 raise ObservationScheduleRetentionError("CALL_OWNER_SCOPE_BUDGET_REFUSED")
             scopes.add((str(row[0]), str(row[1])))
+    # Discovery calls have no due row. Their already persisted cache pointer
+    # plus the native deterministic occurrence identity names their exact owner.
+    for row in store._conn.execute("SELECT poll_slot_id,request_sha256 FROM poll_slots WHERE json_extract(payload_json,'$.call_occurrence_id')=? LIMIT ?", (occurrence, limit + 1)):
+        examined += 1
+        if examined > limit:
+            raise ObservationScheduleRetentionError("CALL_OWNER_SCOPE_BUDGET_REFUSED")
+        if row[1] != request:
+            raise ObservationScheduleRetentionError("POLL_SOURCE_IDENTITY_MISMATCH")
+        scopes.add(_discovery_scope(store, slot=str(row[0]), occurrence=occurrence, request=request, limit=limit))
     return scopes
 
 
@@ -1175,21 +1219,43 @@ def _protect(store: ObservationScheduleStore, row: Mapping[str, Any], table: str
         return "YOUNGER_THAN_RETENTION", []
     if occurrence in policy.get("protected_occurrence_ids", []) or request in policy.get("protected_request_sha256", []):
         return "FROZEN_EXPORT_CAPTURE_PIN", []
-    if conn.execute("SELECT 1 FROM call_ledger WHERE request_sha256=? AND state <> 'COMPLETED' LIMIT 1", (request,)).fetchone():
-        return "STARTED_UNKNOWN_OR_NONTERMINAL_ATTEMPT", []
+    if table == "poll_slots":
+        from solana_alpha_lab.factory.observation_scheduler import DISCOVERY
+        # A request-only cache remains ambiguous. A typed cache pointer is usable
+        # only when its COMPLETED source and native slot/scope identity agree.
+        payload = json.loads(conn.execute("SELECT payload_json FROM poll_slots WHERE rowid=?", (row["source_rowid"],)).fetchone()[0])
+        occurrence = str(payload.get("call_occurrence_id") or "")
+        if occurrence in policy.get("protected_occurrence_ids", []):
+            return "FROZEN_EXPORT_CAPTURE_PIN", []
+        source = conn.execute("SELECT state,request_sha256,primitive_id,length(CAST(payload_json AS BLOB)) FROM call_ledger WHERE call_occurrence_id=?", (occurrence,)).fetchone()
+        if not occurrence or source is None:
+            return "POLL_SOURCE_IDENTITY_UNPROVEN", []
+        if source[0] != "COMPLETED":
+            return "STARTED_UNKNOWN_OR_NONTERMINAL_ATTEMPT", []
+        if source[1] != request or source[2] != DISCOVERY or int(source[3]) > int(policy["max_bytes"]):
+            return "POLL_SOURCE_IDENTITY_MISMATCH", []
+        original = json.loads(conn.execute("SELECT payload_json FROM call_ledger WHERE call_occurrence_id=?", (occurrence,)).fetchone()[0])
+        if not payload.get("response_sha256") or payload["response_sha256"] != original.get("response_sha256"):
+            return "POLL_SOURCE_IDENTITY_MISMATCH", []
     # Occurrence-less legacy links are ambiguous shared-request consumers.
     projection = "schedule_sha256,activation_id,state,length(CAST(payload_json AS BLOB)) AS payload_bytes,(instr(payload_json,'\"frozen') OR instr(payload_json,'\"export') OR instr(payload_json,'\"capture') OR instr(payload_json,'\"raw_member')) AS dependency_pin"
     query = f"SELECT {projection} FROM due_observations WHERE request_sha256=?"
     params: tuple = (request,)
-    if table == "call_ledger":
-        query += " AND (call_occurrence_id=? OR call_occurrence_id IS NULL OR call_occurrence_id='')"
-        params = (request, occurrence)
+    query += " AND (call_occurrence_id=? OR call_occurrence_id IS NULL OR call_occurrence_id='')"
+    params = (request, occurrence)
     due = [dict(item) for item in conn.execute(query + " LIMIT ?", (*params, int(policy["max_rows"]) + 1))]
     if len(due) > int(policy["max_rows"]) or sum(int(item["payload_bytes"]) for item in due) > int(policy["max_bytes"]):
         return "DEPENDENCY_SCAN_BUDGET_REFUSED", []
     scopes = {(str(item["schedule_sha256"]), str(item["activation_id"])) for item in due}
-    if table == "call_ledger":
+    try:
         scopes.update(_call_owner_scopes(store, occurrence=occurrence, request=request, limit=int(policy["max_rows"])))
+        if table == "poll_slots":
+            scopes.add(_discovery_scope(store, slot=str(row["poll_slot_id"]), occurrence=occurrence,
+                                       request=request, limit=int(policy["max_rows"])))
+    except ObservationScheduleRetentionError as exc:
+        if str(exc) in {"POLL_SOURCE_IDENTITY_MISMATCH", "POLL_OWNER_IDENTITY_UNPROVEN"}:
+            return str(exc), []
+        raise  # Budget/reader failures remain persisted maintenance incidents.
     if not scopes:
         # No due row is NOT proof of no consumers. An exact orphan identity
         # named by retirement is the sole alternate ownership path.
@@ -1590,7 +1656,8 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
                          policy: Mapping[str, Any] | None = None, pressure: Mapping[str, Any] | None = None,
                          checkpoint_active: bool = False,
                          expected_context: dict[str, Any] | None = None,
-                         operation_mode: str | None = None) -> dict[str, Any]:
+                         operation_mode: str | None = None,
+                         _continuation_policy_sha256: str | None = None) -> dict[str, Any]:
     expected = checkpoint_maintenance_context(store) if expected_context is None else expected_context
     if not expected:
         expected.update(checkpoint_maintenance_context(store))
@@ -1602,6 +1669,10 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
         policy=(installed or {}).get("policy"), plan=_control(store, "active_plan"), now=now)
     if not installed or not installed["policy"].get("enabled"):
         return {"status": "DISABLED", "reason": "MAINTENANCE_NOT_COMMISSIONED"}
+    if (_continuation_policy_sha256 is not None
+            and (_continuation_policy_sha256 != installed["approved_policy_sha256"]
+                 or expected_context is None or not installed["policy"].get("max_run_chunks"))):
+        return {"status": "YIELD", "reason": "POLICY_CHANGED"}
     effective = installed["policy"]
     if policy is not None and dict(policy) != effective:
         raise ObservationScheduleRetentionError("POLICY_APPROVAL_MISMATCH")
@@ -1616,7 +1687,8 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
         reason = "RESTORE_UNRESOLVED"
     elif store._conn.execute("SELECT 1 FROM due_observations WHERE state IN ('PENDING','STARTED','IN_FLIGHT','UNKNOWN','RETRY_PENDING') AND due_at<=? AND deadline_at>=? LIMIT 1", (render_utc(now + timedelta(seconds=int(effective.get("due_guard_seconds", 120)))), render_utc(now))).fetchone():
         reason = "DUE_OR_TAIL_PRIORITY"
-    elif state.get("last_run_at") and (now - parse_utc(state["last_run_at"])).total_seconds() < int(effective["cadence_seconds"]):
+    elif (_continuation_policy_sha256 is None and state.get("last_run_at")
+          and (now - parse_utc(state["last_run_at"])).total_seconds() < int(effective["cadence_seconds"])):
         reason = "CADENCE_WAIT"
     if reason:
         return {"status": "YIELD", "reason": reason, **retention_status(store)}
@@ -1797,8 +1869,8 @@ def run_maintenance_step(store: ObservationScheduleStore, *, now: datetime,
     return result
 
 
-def maintenance_after_checkpoint(root: Path, *, now: datetime,
-                                 expected_context: dict[str, Any] | None = None) -> dict[str, Any]:
+def _maintenance_after_checkpoint_step(root: Path, *, now: datetime,
+        expected_context: dict[str, Any], continuation_policy_sha256: str | None = None) -> dict[str, Any]:
     from solana_alpha_lab.factory.observation_schedule_runtime import load_runtime_config
     runtime = load_runtime_config(root, "configs/observation_schedule_runtime_v1.yaml")
     path = (root / str(runtime["ops_store_relative"])).resolve()
@@ -1827,9 +1899,99 @@ def maintenance_after_checkpoint(root: Path, *, now: datetime,
             pass  # Unknown pressure yields; no ad-hoc aggressive cleanup.
         store = ObservationScheduleStore(path)
         try:
-            return run_maintenance_step(store, now=now, pressure=pressure, expected_context=expected_context)
+            result = run_maintenance_step(store, now=now, pressure=pressure, expected_context=expected_context,
+                _continuation_policy_sha256=continuation_policy_sha256)
+            if (result.get("status") in {"COMPLETE", "PROGRESS"}
+                    and _control(store, "maintenance", {}).get("archive_discovery")):
+                result.update(status="YIELD", reason="ARCHIVE_REFRESH_REQUIRED", completed_chunk=True)
+            return result
         finally:
             store.close()
+
+
+def maintenance_after_checkpoint(root: Path, *, now: datetime,
+        expected_context: dict[str, Any] | None = None,
+        _continuation_policy_sha256: str | None = None,
+        _run_context: dict[str, Any] | None = None,
+        monotonic_clock=time.monotonic, sleeper=time.sleep) -> dict[str, Any]:
+    """One admitted caller drains bounded chunks, releasing all locks per step.
+
+    Cadence admits a RUN, not one 8MiB page per daily invocation. The signed
+    optional run budget preserves legacy single-step callers. Every continuation
+    rechecks the native CAS, actual due/pressure, policy and writer lease.
+    """
+    from solana_alpha_lab.factory.observation_schedule_runtime import load_runtime_config
+    runtime = load_runtime_config(root, "configs/observation_schedule_runtime_v1.yaml")
+    path = root / str(runtime["ops_store_relative"])
+    if not path.is_file():
+        return {"status": "DISABLED", "reason": "SOURCE_NOT_PRESENT"}
+    store = ObservationScheduleStore(path, readonly=True, immutable=False)
+    try:
+        installed = _control(store, "policy", {})
+        policy = installed.get("policy", {})
+        if not policy.get("enabled"):
+            return {"status": "DISABLED", "reason": "MAINTENANCE_NOT_COMMISSIONED"}
+        validate_policy(policy)
+        expected = checkpoint_maintenance_context(store) if expected_context is None else expected_context
+        if not expected:
+            expected.update(checkpoint_maintenance_context(store))
+    finally:
+        store.close()
+    chunks = int(policy.get("max_run_chunks", 1))
+    budget = float(policy.get("max_run_wall_seconds", 2 * float(policy["max_wall_seconds"])))
+    digest = installed["approved_policy_sha256"]
+    context = {} if _run_context is None else _run_context
+    if not context:
+        context.update(policy_sha256=digest, root=str(root.resolve()), started=monotonic_clock(),
+            now=now, totals={"applied_call_compactions": 0, "applied_poll_slot_compactions": 0,
+                            "scanned_rows": 0, "scanned_bytes": 0},
+            completed=0, attempts=0, admitted=False)
+    if context["policy_sha256"] != digest or context["root"] != str(root.resolve()):
+        return {"status": "YIELD", "reason": "POLICY_CHANGED"}
+    continuation = _continuation_policy_sha256
+    started, now = context["started"], context["now"]
+    totals = context["totals"]
+    completed, attempts = context["completed"], context["attempts"]
+    admitted = context["admitted"] or continuation is not None
+    result: dict[str, Any] = {"status": "YIELD", "reason": "RUN_BUDGET_EXHAUSTED"}
+    while attempts < 4096:
+        elapsed = monotonic_clock() - started
+        if attempts and (completed >= chunks or elapsed + 2 * float(policy["max_wall_seconds"]) >= budget):
+            result = {**result, "status": "YIELD", "reason": "RUN_BUDGET_EXHAUSTED" if completed < chunks else "RUN_CHUNK_LIMIT"}
+            break
+        result = _maintenance_after_checkpoint_step(root, now=now + timedelta(seconds=elapsed),
+            expected_context=expected, continuation_policy_sha256=continuation)
+        attempts += 1
+        context["attempts"] = attempts
+        for key in totals:
+            totals[key] += int(result.get(key, 0))
+        completed_chunk = result.get("status") in {"COMPLETE", "PROGRESS"} or result.get("completed_chunk") is True
+        if completed_chunk:
+            completed += 1
+            admitted = True
+            context.update(completed=completed, admitted=True)
+            continuation = digest if chunks > 1 else None
+        if result.get("reason") == "ARCHIVE_REFRESH_REQUIRED":
+            admitted = True
+            context["admitted"] = True
+            break
+        if completed_chunk:
+            if result.get("selection_complete") and result.get("candidates_complete") or chunks == 1:
+                break
+            continue
+        if (chunks == 1 or result.get("status") != "YIELD"
+                or result.get("reason") not in {"WRITER_BUSY", "DUE_OR_TAIL_PRIORITY", "PRESSURE_UNKNOWN_OR_UNSAFE"}):
+            break
+        remaining = budget - (monotonic_clock() - started) - 2 * float(policy["max_wall_seconds"])
+        if remaining <= 0:
+            break
+        # A bounded wait in this existing oneshot, with neither lock nor lease.
+        sleeper(min(5.0, remaining))
+    if chunks == 1:
+        return result
+    return {**result, **totals, "run": {"completed_chunks": completed, "attempts": attempts,
+        "wall_seconds": monotonic_clock() - started, "max_wall_seconds": budget,
+        "admitted_policy_sha256": digest if admitted else None}}
 
 
 # Explicit native ObservationSchedule tables. An unexpected plugin/virtual table
@@ -1886,7 +2048,13 @@ def native_identity_fingerprint(conn: sqlite3.Connection, *, deadline: float | N
         count = 0
         columns = [str(row[1]) for row in conn.execute(f"PRAGMA table_info({_quote(name)})")]
         # Hash large TEXT/BLOB cells incrementally via SQLite's blob reader.
-        expressions = ",".join(f"typeof({_quote(c)}),length(CAST({_quote(c)} AS BLOB))" for c in columns)
+        # Fetch bounded small cells in this same statement. The former N+1
+        # SELECT per column generated millions of SQLite reads on the real
+        # snapshot. Large cells keep the identical incremental byte oracle.
+        expressions = ",".join(
+            f"typeof({_quote(c)}),length(CAST({_quote(c)} AS BLOB)),"
+            f"CASE WHEN typeof({_quote(c)}) IN ('text','blob') AND length(CAST({_quote(c)} AS BLOB))>65536 THEN NULL ELSE {_quote(c)} END"
+            for c in columns)
         where = ""
         parameters = ()
         if recovery_causal and name == "retention_control":
@@ -1898,7 +2066,7 @@ def native_identity_fingerprint(conn: sqlite3.Connection, *, deadline: float | N
             rowid = int(descriptor[0])
             digest.update(_json(rowid).encode())
             for i, column in enumerate(columns):
-                kind, length = descriptor[1 + 2 * i:3 + 2 * i]
+                kind, length, value = descriptor[1 + 3 * i:4 + 3 * i]
                 digest.update(_json([column, kind, length]).encode())
                 if kind in {"text", "blob"} and length and length > 65536:
                     with conn.blobopen(name, column, rowid, readonly=True) as blob:
@@ -1907,7 +2075,6 @@ def native_identity_fingerprint(conn: sqlite3.Connection, *, deadline: float | N
                                 raise ObservationScheduleRetentionError("RECLAIM_WINDOW_EXCEEDED")
                             digest.update(block)
                 else:
-                    value = conn.execute(f"SELECT {_quote(column)} FROM {_quote(name)} WHERE rowid=?", (rowid,)).fetchone()[0]
                     digest.update(value if isinstance(value, bytes) else _json(value).encode())
             count += 1
         counts[name] = count
@@ -1920,7 +2087,12 @@ def native_identity_fingerprint(conn: sqlite3.Connection, *, deadline: float | N
 def build_reclaim_plan(store: ObservationScheduleStore, *, data_root: Path,
                         max_wall_seconds: float = 60, backup_root: Path | None = None,
                         operation_mode: str = "ISOLATED_REHEARSAL") -> dict[str, Any]:
-    if max_wall_seconds <= 0 or max_wall_seconds > 90:
+    # The default remains the short native window. A larger explicit budget is
+    # part of the exact approved plan, never an automatic retry/timeout bump.
+    # Full fingerprints on an existing million-row store already exceed 90s;
+    # an approved maintenance window must include them rather than skip them.
+    if (not isinstance(max_wall_seconds, (int, float)) or isinstance(max_wall_seconds, bool)
+            or not math.isfinite(max_wall_seconds) or not 0 < max_wall_seconds <= 1800):
         raise ObservationScheduleRetentionError("RECLAIM_WINDOW_INVALID")
     nested = store.path.resolve().is_relative_to(data_root.resolve())
     sibling = store.path.parent.resolve() == data_root.parent.resolve()

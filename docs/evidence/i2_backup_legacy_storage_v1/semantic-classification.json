@@ -1,7 +1,8 @@
 {
   "authority_granted": false,
   "matched_paths": [
-    "src/solana_alpha_lab/factory/remote_ops.py"
+    "src/solana_alpha_lab/factory/observation_schedule_retention.py",
+    "src/solana_alpha_lab/factory/offhost_backup.py"
   ],
   "profile": "SEMANTIC_PREMISE",
   "reason": "PATH_PREFIX",
