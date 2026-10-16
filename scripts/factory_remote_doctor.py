@@ -89,7 +89,7 @@ def main() -> int:
             return 0
         if args.backup:
             from solana_alpha_lab.factory.offhost_backup import run_scheduled_local_backup
-            packed = run_scheduled_local_backup(root)
+            packed = run_scheduled_local_backup(root, config=config)
             print(json.dumps(packed, indent=2, sort_keys=True))
             return 0
         if args.offhost_status:

@@ -2389,13 +2389,14 @@ def _retry_scheduled_contention(operation: Callable[[], dict[str, Any]], *, budg
                     "busy_retry_budget_seconds": budget}
 
 
-def run_scheduled_local_backup(root: Path, *, monotonic_clock=time.monotonic, sleeper=time.sleep,
+def run_scheduled_local_backup(root: Path, *, config: Mapping[str, Any] | None = None,
+        monotonic_clock=time.monotonic, sleeper=time.sleep,
         busy_retry_budget_seconds: float = SCHEDULED_BUSY_RETRY_BUDGET_SECONDS,
         busy_retry_interval_seconds: float = SCHEDULED_BUSY_RETRY_INTERVAL_SECONDS) -> dict[str, Any]:
     """Preserve the 12h local recovery point using the existing busy policy."""
     def attempt():
         try:
-            return package_backup(root)
+            return package_backup(root, config=config)
         except RemoteOpsError as exc:
             if str(exc) != "WRITER_BUSY":
                 raise

@@ -29917,7 +29917,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/factory_remote_doctor.py', repository_path: scripts/factory_remote_doctor.py}
-  integrity: {kind: sha256, sha256: 206a59b7a57049512a5732f47b2d42601c948b2c6363c9e00fb2c384baac3ae1}
+  integrity: {kind: sha256, sha256: 87ddf363f57838f3d02529191ee7aac75048b80a641bcb6b8566c415a7e3e7f2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: MODULE-FACTORY-REMOTE-OPS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]

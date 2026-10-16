@@ -17,7 +17,7 @@
   },
   {
     "logical_ref": "src/solana_alpha_lab/factory/offhost_backup.py",
-    "sha256_or_fingerprint": "08a7f6c63f89cd3dfb063e4d723874b94964e1d35787a79bda7844f8672d9514"
+    "sha256_or_fingerprint": "dc730f68e4bfec24b9fca8ce18b6bcf5f97d8930260be7cd329f2de772e2432f"
   },
   {
     "logical_ref": "tests/test_i2_retention_maintenance_v1.py",
@@ -25,6 +25,6 @@
   },
   {
     "logical_ref": "tests/test_i2_offhost_checkpoint_v1.py",
-    "sha256_or_fingerprint": "5cc52169731b78b1a0474074b14dbe5b14e28690cc0c36f5434ee7eef8b767ea"
+    "sha256_or_fingerprint": "be58f3c0660c029a0048de56e1bfcd75c6fa179ba0247ab1f38922dc1c3de9fd"
   }
 ]

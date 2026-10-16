@@ -28,11 +28,15 @@ class I2OffhostCheckpointTests(unittest.TestCase):
         self.run_checkpoint()
         original=(self.root/self.config.receipt_relative).read_bytes()
         elapsed=[0.0]
+        local_config = {"schema_version": "1.0"}
         def sleep(seconds):elapsed[0]+=seconds
         with patch.object(owner,'package_backup',side_effect=[owner.RemoteOpsError('WRITER_BUSY'),
                 owner.RemoteOpsError('WRITER_BUSY'),{'bundle':'verified-local-full'}]) as pack:
-            result=owner.run_scheduled_local_backup(self.root,monotonic_clock=lambda:elapsed[0],sleeper=sleep)
+            result=owner.run_scheduled_local_backup(self.root,config=local_config,
+                monotonic_clock=lambda:elapsed[0],sleeper=sleep)
         self.assertEqual(pack.call_count,3)
+        for attempt in pack.call_args_list:
+            self.assertIs(attempt.kwargs['config'], local_config)
         self.assertEqual(result['scheduled_retry']['deferred_attempts'],2)
         self.assertEqual(elapsed[0],60.0)
         self.assertEqual((self.root/self.config.receipt_relative).read_bytes(),original)
