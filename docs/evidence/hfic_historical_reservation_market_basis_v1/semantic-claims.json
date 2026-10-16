@@ -1,0 +1,17 @@
+[
+  {
+    "claim_id": "ORPHAN_RESERVATION_EXACT_MARKET_PROOF",
+    "claim": "A reservation with an absent basis field, a valid stamp and no own lifecycle rows is read with the frozen basis of identity-valid saved sessions stamped with the same epoch whose basis recomputes exactly to that stamp; only the market description is borrowed.",
+    "scope": "Shared _reservation_with_market_basis owner consumed by epoch_search_budget_usage and resolve_scientific_admission; read-only, never persisted."
+  },
+  {
+    "claim_id": "NO_BUDGET_RETURN",
+    "claim": "Same-market reservations stay occupied, publication-only republish keeps occupancy, explicit null, own-history conflict, wrong hash or missing proof keep MARKET_EPOCH_CONTINUITY_UNRESOLVED.",
+    "scope": "Existing V1/V2 versioned epoch semantics; quotas unchanged AUTO=1/focus=3."
+  },
+  {
+    "claim_id": "UPSTREAM_STOP_PRECEDENCE",
+    "claim": "A historical selection caveat never replaces an upstream STOP terminal in JSON or CLI readout; only a gate-created integrity STOP routes to the selection gate.",
+    "scope": "hfic_preflight.run_preflight and hypothesis_forge preflight readout."
+  }
+]
