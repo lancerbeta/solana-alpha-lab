@@ -2052,11 +2052,14 @@ def _reservation_with_market_basis(
     stamped = reservation.get("market_evidence_epoch_sha256")
     if own or not isinstance(stamped, str) or re.fullmatch(r"[0-9a-f]{64}", stamped) is None:
         return reservation
-    donors: dict[str, Mapping[str, Any]] = {}
+    donors: list[tuple[str, str, Mapping[str, Any]]] = []
     for row in sessions:
         frozen = row.get("market_evidence_basis")
+        donor_id = row.get("session_id")
         if (
             not isinstance(frozen, Mapping)
+            or not isinstance(donor_id, str)
+            or not donor_id
             or row.get("market_evidence_epoch_sha256") != stamped
             or _session_identity_is_invalid(row)
         ):
@@ -2068,14 +2071,16 @@ def _reservation_with_market_basis(
                 continue
         except EvidenceIdentityError:
             continue
-        donors[str(row.get("session_id") or "")] = frozen
-    if not donors or len({item.get("basis_version") for item in donors.values()}) != 1:
+        donors.append((donor_id, canonical_sha256(dict(frozen)), frozen))
+    if not donors or len({item[2].get("basis_version") for item in donors}) != 1:
         return reservation
-    proof_ids = sorted(donors)
+    # Deterministic choice, independent of history order; all candidates
+    # already share the stamped scientific identity.
+    donors.sort(key=lambda item: (item[0], item[1]))
     return {
         **reservation,
-        "market_evidence_basis": donors[proof_ids[0]],
-        "market_evidence_basis_proof_session_ids": proof_ids,
+        "market_evidence_basis": donors[0][2],
+        "market_evidence_basis_proof_session_ids": sorted({item[0] for item in donors}),
     }
 
 

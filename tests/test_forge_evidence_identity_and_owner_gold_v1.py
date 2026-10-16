@@ -1849,21 +1849,30 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                     }
                 ],
             )
-            binding = {
-                **entry,
-                "session_id": "HFIC-SESS-" + str(entry["search_key_sha256"])[:16].upper(),
-            }
+            # Ordinary admission: the generator reply is the minimal saved
+            # result; persisting it reserves the slot atomically.
+            draft = bind_draft(
+                json.loads(
+                    (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json")
+                    .read_text(encoding="utf-8")
+                ),
+                entry,
+            )
+            draft["preflight_receipt_id"] = entry["receipt_id"]
+            draft["preflight_receipt_sha256"] = entry["preflight_receipt_sha256"]
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_imported_control_fixture,
             ):
-                reserved = persist_scientific_slot_admission(store, binding, repo_root=ROOT)
-            self.assertIsNotNone(reserved)
-            binding_path = base_dir / "binding.json"
-            binding_path.write_text(json.dumps(binding), encoding="utf-8")
+                saved = persist_generated_draft(
+                    store, draft, preflight_receipt=entry, repo_root=ROOT
+                )
+            store.rebuild_projection()
+            draft_path = base_dir / "draft.json"
+            draft_path.write_text(json.dumps({"draft": draft, "entry": entry}), encoding="utf-8")
             history = list_scientific_slot_admissions(store)
 
-            # Fresh interpreter: durable readback plus exact admission replay.
+            # Fresh interpreter: exact replay, then durable readback.
             script = (
                 "import json,sys\n"
                 "from pathlib import Path\n"
@@ -1872,19 +1881,21 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 "from tests.test_forge_evidence_identity_and_owner_gold_v1 import "
                 "_run_production_preflight,_enumerate_imported_control_fixture\n"
                 "from solana_alpha_lab.factory.research_store import ResearchStore\n"
-                "from solana_alpha_lab.factory.hfic_session import persist_scientific_slot_admission\n"
+                "from solana_alpha_lab.factory.hfic_session import persist_generated_draft\n"
                 "data=Path(sys.argv[2]);store=ResearchStore(data)\n"
+                "saved=json.loads(Path(sys.argv[3]).read_text())\n"
                 "with patch('solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets',"
                 "side_effect=_enumerate_imported_control_fixture):\n"
-                "    replay=persist_scientific_slot_admission(store,"
-                "json.loads(Path(sys.argv[3]).read_text()),repo_root=Path(sys.argv[1]))\n"
+                "    replay=persist_generated_draft(store,saved['draft'],"
+                "preflight_receipt=saved['entry'],repo_root=Path(sys.argv[1]))\n"
                 "receipt=_run_production_preflight(data,enumerator=_enumerate_imported_control_fixture)\n"
-                "print(json.dumps({'replay':replay['scientific_slot_sha256'],"
-                "'action':receipt['action'],'terminal':receipt['terminal'],"
+                "print(json.dumps({'replay':replay['payload_sha256'],"
+                "'action':receipt['action'],'next':receipt.get('next'),"
+                "'draft':receipt.get('generated_draft_sha256'),"
                 "'budget':receipt.get('search_budget')}))\n"
             )
             completed = subprocess.run(
-                [sys.executable, "-B", "-c", script, str(ROOT), str(data_root), str(binding_path)],
+                [sys.executable, "-B", "-c", script, str(ROOT), str(data_root), str(draft_path)],
                 capture_output=True,
                 text=True,
                 timeout=600,
@@ -1899,9 +1910,11 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             self.assertEqual(
                 sum(item["market_evidence_epoch_sha256"] == market for item in after), 1
             )
-            self.assertEqual(fresh["replay"], reserved["scientific_slot_sha256"])
+            self.assertEqual(fresh["replay"], saved["payload_sha256"])
+            self.assertEqual(fresh["draft"], saved["payload_sha256"])
+            self.assertEqual(fresh["action"], "RESUME_EXISTING_SESSION")
+            self.assertTrue(str(fresh["next"]).startswith("RESUME_GENERATED_DRAFT"))
             self.assertEqual(fresh["budget"]["auto_sessions_used"], 1)
-            self.assertNotEqual(fresh["action"], "START_NEW_SESSION")
 
     def test_ordinary_stamped_preflight_uses_normal_run_preflight(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

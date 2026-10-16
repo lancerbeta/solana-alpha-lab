@@ -438,6 +438,17 @@ class HficCliContractTests(unittest.TestCase):
                     }
                 },
             ),
+            # An invalid gate is restored first even behind an upstream STOP;
+            # the upstream reason stays in `reason:` and returns after restore.
+            (
+                "SEARCH_BUDGET_EXHAUSTED",
+                {
+                    "selection_gate": {
+                        "integrity_invalid": True,
+                        "router_decision": "BLOCK_FORGE_EVIDENCE_GAP",
+                    }
+                },
+            ),
         ]
         for terminal, extra in cases:
             with self.subTest(terminal=terminal, extra=extra):

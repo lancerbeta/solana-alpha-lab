@@ -241,7 +241,7 @@ class ScientificMarketV2Tests(unittest.TestCase):
         }
         refusals = {
             "missing_proof": ([], orphan),
-            "wrong_hash": ([donor], orphan_of(self.session("c" * 64, old_basis))),
+            "unknown_stamp": ([donor], orphan_of(self.session("c" * 64, old_basis))),
             "own_history_conflict": ([donor, {**donor, "session_id": "HFIC-SESS-ORPHAN", "identity_binding_status": "CONFLICT"}], orphan),
             "own_history_other_slot": ([donor, other_slot], orphan),
         }
@@ -251,6 +251,26 @@ class ScientificMarketV2Tests(unittest.TestCase):
                     epoch_search_budget_usage(sessions, reservations=[reservation], evidence_epoch=epoch, market_evidence_basis=basis)
                 refused = admit(sessions, [reservation], epoch, basis)
                 self.assertEqual((refused["action"], refused["reason_code"]), ("STOP", "MARKET_EPOCH_CONTINUITY_UNRESOLVED"))
+
+        # Same stamp is not proof: the saved basis itself must recompute to it.
+        from solana_alpha_lab.factory import hfic_evidence_identity as identity
+        tampered = copy.deepcopy(donor)
+        tampered["market_evidence_basis"]["scientific_projection"]["datasets"][0]["partitions"][0]["row_count"] += 1
+        unreadable = copy.deepcopy(donor)
+        del unreadable["market_evidence_basis"]["scientific_projection"]
+        legacy = {**donor, "session_id": "HFIC-SESS-V1", "market_evidence_basis": _v1_publication_basis(old_basis)}
+        for name, sessions in {"wrong_hash": [tampered], "invalid_basis": [unreadable]}.items():
+            with self.subTest(refusal=name):
+                self.assertIs(identity._reservation_with_market_basis(orphan, sessions), orphan)
+        with self.subTest(refusal="disagreeing_versions"), patch.object(identity, "market_evidence_epoch_sha256", return_value=old_epoch):
+            self.assertIs(identity._reservation_with_market_basis(orphan, [donor, legacy]), orphan)
+        republished = copy.deepcopy(donor)
+        republished["market_evidence_basis"]["datasets"][0]["dataset_fingerprint"] = "f" * 64
+        self.assertEqual(market_evidence_epoch_sha256(republished["market_evidence_basis"]), old_epoch)
+        forward = identity._reservation_with_market_basis(orphan, [donor, republished])
+        backward = identity._reservation_with_market_basis(orphan, [republished, donor])
+        self.assertEqual(forward, backward)
+        self.assertEqual(forward["market_evidence_basis_proof_session_ids"], ["SCRATCH_CONSUMED_AUTO"])
 
         # A same-market orphan keeps its slot, also after a publication-only republish.
         current = orphan_of(self.session(epoch, basis))

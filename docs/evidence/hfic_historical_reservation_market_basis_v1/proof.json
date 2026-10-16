@@ -15,7 +15,9 @@
       "market_evidence_epoch_sha256": "9343fc57b0c5059f73c71e66aa8867fa63c970c0e94260fe1c1ad9fd07361437",
       "basis_field_present": false,
       "own_lifecycle_rows": 0,
-      "proof_session_ids": ["HFIC-SESS-72BDEC113DBFD18A"],
+      "proof_session_ids": [
+        "HFIC-SESS-72BDEC113DBFD18A"
+      ],
       "proof_basis_version": "MARKET_EVIDENCE_BASIS_V2",
       "classified": "DIFFERENT_MARKET"
     },
@@ -27,7 +29,11 @@
       "next": "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
       "masked_upstream_reason": "MARKET_EPOCH_CONTINUITY_UNRESOLVED",
       "search_budget": "UNRESOLVED (not shown)",
-      "writes": {"research_store": 0, "forge_context": 0, "session": 0}
+      "writes": {
+        "research_store": 0,
+        "forge_context": 0,
+        "session": 0
+      }
     },
     "after_candidate": {
       "preflight_receipt_sha256": "a4ab3b376b769e81cb8a0eedd8cf1c3f51c542d91c17055080957349c0d603e3",
@@ -35,19 +41,30 @@
       "terminal": "NO_GIT_FAST_LANE_PROVEN",
       "router_decision": "BLOCK_FORGE_SELECTION_RISK",
       "owner_next": "CONTINUE_WITH_SCOPED_SELECTION_CAVEAT",
-      "search_budget": {"auto_sessions_used": 0, "auto_sessions_per_evidence_epoch": 1, "distinct_focus_used": 0, "distinct_focus_remaining": 3},
-      "writes": {"research_store": 0, "forge_context": 0, "session": 0}
+      "search_budget": {
+        "auto_sessions_used": 0,
+        "auto_sessions_per_evidence_epoch": 1,
+        "distinct_focus_used": 0,
+        "distinct_focus_remaining": 3
+      },
+      "writes": {
+        "research_store": 0,
+        "forge_context": 0,
+        "session": 0
+      }
     },
     "note": "Receipt SHA values differ also by capability epoch (code change). Sessions, reservations, looks, MAIN/PREVIEW/ADAPTIVE: none created."
   },
   "synthetic_vertical": {
     "test": "tests/test_forge_evidence_identity_and_owner_gold_v1.py::OwnerGoldSequentialTests::test_g9_orphan_old_market_reservation_admits_new_cohorts_once",
     "pre_fix_result_on_same_fixture": "STOP MARKET_EPOCH_CONTINUITY_UNRESOLVED, search_budget UNRESOLVED",
-    "post_fix": "START_NEW_SESSION, AUTO 0/1 -> one ordinary reservation -> fresh-process replay returns the same slot; durable reservations 3 before and after replay; exactly one stamped with the current market; fresh preflight AUTO 1/1 and no START"
+    "post_fix": "START_NEW_SESSION, AUTO 0/1 -> ordinary persist_generated_draft (saved generator draft + atomic slot reservation) -> fresh-process exact replay returns the same draft payload; durable reservations 3 before and after replay; exactly one stamped with the current market; fresh preflight RESUME_EXISTING_SESSION / RESUME_GENERATED_DRAFT with the same draft sha and AUTO 1/1"
   },
   "mutation_controls": [
     "Pre-fix identity owner fails the positive orphan case (MARKET_EPOCH_CONTINUITY_UNRESOLVED).",
     "Dropping the own-history guard makes own_history_conflict and own_history_other_slot PASS (test fails).",
+    "Dropping the exact recompute guard makes wrong_hash and invalid_basis donors PASS (test fails).",
+    "Dropping the single-basis-version check makes disagreeing_versions PASS (test fails).",
     "Pre-fix preflight/CLI renders upstream SEARCH_BUDGET_EXHAUSTED and MARKET_EPOCH_CONTINUITY_UNRESOLVED as terminal null under the selection gate (test fails)."
   ],
   "known_unrelated_local_failure": "tests.test_forge_input_truth_and_visibility_v1::test_packet_bound_capacity_blocks_without_preview_mock fails identically on base 13fb3381 against the local canonical data plane (FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED); it skips in CI without that plane."

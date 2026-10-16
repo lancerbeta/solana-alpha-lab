@@ -125,11 +125,12 @@ upstream terminal/budget reason; a gate-created integrity STOP stays.
 A. Canonical reproducer no longer reports a false continuity STOP; budget is
 computed, not zeroed; any other real refusal is named.
 B. Synthetic production-import vertical: orphan V1 reservation at an old
-market, two new cohorts, public preflight, ordinary reservation, fresh-process
-readback and exact replay without a second spend (independent stamp oracle).
+market, two new cohorts, public preflight, ordinary admission that persists
+the generated draft (minimal saved result) and reserves the slot, fresh-process
+exact replay and readback without a second spend (independent stamp oracle).
 C. Parameterized: two new cohorts plus exact reimport, publication-only change,
-same-market occupancy, missing proof/wrong hash/own-history conflict (explicit
-null already covered), JSON and human next action with upstream STOP plus
+same-market occupancy, missing proof/wrong hash/invalid basis/disagreeing versions/own-history
+conflict (explicit null already covered), JSON and human next action with upstream STOP plus
 caveat.
 
 Rollback: ordinary Git revert of the reader; historical records, receipts and
