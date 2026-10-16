@@ -4,8 +4,8 @@
   "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-RAW-SELECTION-FIT",
   "as_of": "2026-10-16",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "db1bb3d364520fa1b1e6bf56449aaca3a8524770aca5701a769519c6dc7f9663",
-  "reviewed_inventory_sha256": "bc3aecdad8a5f32ddd9059e4b49f8c4069b829e6749bc3d2c2ac0d9053a588bf",
+  "reviewed_bindings_sha256": "ba0bf5340c4d54c10c4fa0b1145363ed01950193e63d586ab80dd648f36119f9",
+  "reviewed_inventory_sha256": "c6c47c00df4c59249fbd6aa6eea0f9a57bbbae187c0191fced75aa73f06dc095",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
