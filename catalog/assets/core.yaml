@@ -29901,7 +29901,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/remote_ops.py', repository_path: src/solana_alpha_lab/factory/remote_ops.py}
-  integrity: {kind: sha256, sha256: 393a237ce274d57b02fe5a295ad248494deaaf070027cd908992854c18e912ff}
+  integrity: {kind: sha256, sha256: b3444324352204055104a730f72b56057456e29fa6ca489805a278872f8a105f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -43157,7 +43157,7 @@ records:
     repository_path: docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md
   integrity:
     kind: sha256
-    sha256: 1c480ef660d138394623b56696e69eae7c164d8007ad2edf8cd2013cb68859d0
+    sha256: 7122b7bdfbf6f70a9cdb77492311dda5508c3d8ceb43538916d7ad1c8c9257e0
   access:
     mode: read_only
     method: file
@@ -43233,7 +43233,7 @@ records:
     repository_path: docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md
   integrity:
     kind: sha256
-    sha256: 972e98571aa861bc104b9dd2f41fc28b4cd1f00504867e64c7a7db9d3c337476
+    sha256: fba09617441fbadf32d5705b28455eaaab8d57199fce0eda605eb550be8b5f40
   access:
     mode: read_only
     method: file

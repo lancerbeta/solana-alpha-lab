@@ -1,28 +1,28 @@
 {
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
-  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-RECOVERY-CLOSURE-FIT",
+  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-RAW-SELECTION-FIT",
   "as_of": "2026-10-16",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "db1bb3d364520fa1b1e6bf56449aaca3a8524770aca5701a769519c6dc7f9663",
-  "reviewed_inventory_sha256": "bc3aecdad8a5f32ddd9059e4b49f8c4069b829e6749bc3d2c2ac0d9053a588bf",
+  "reviewed_bindings_sha256": "ba0bf5340c4d54c10c4fa0b1145363ed01950193e63d586ab80dd648f36119f9",
+  "reviewed_inventory_sha256": "c6c47c00df4c59249fbd6aa6eea0f9a57bbbae187c0191fced75aa73f06dc095",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
     "mission": "Ordinary independent recoverability with bounded collector disruption and no daily manual step.",
     "flexibility_and_history": "Complete original I2 and Stage C remain required; no scientific history or former acceptance re-audit.",
-    "context_efficiency": "One bounded defect PR, same I2 contract/native capture owner. Production metadata-only probe and one extended existing vertical fixture; no 5.5GB suite or general audit. P0/P1 critics only. No local full gate before PR.",
-    "research_truth": "Captured OPS ACTIVE/DRAINING, native ResearchStore transactions/state pointers, native publication stages and hash-bound dataset validation receipt own closure. Native prior ACTIVE for future DRAINING retained. Frozen mutable mirrors/namespace stamp under fence; immutable closure verification afterwards. Required missing/corrupt/stale or mutation refuses. Historical science stays in its original owner/archive, not globally re-certified.",
+    "context_efficiency": "Complete production census once, same task, one narrow remote_ops patch and two extensions to existing fixtures. Three focused tests38.973s; #408/#409 scale paths reused. Four mandatory P0/P1 roles only; no local full gate before PR.",
+    "research_truth": "All captured OPS bytes/ROWIDs preserved. Canonical native terminal states plus conservative raw/escaped-key prefilter; terminal dependencies retained absent proof of another owner. Native content-address hashes checked on staged bytes. No scientific history deletion/certification, frozen state or availability change.",
     "owner_operability": "One current task and OPERATE packet, existing ordinary scheduled caller, phase trace in pending/receipt, preserved last-good and native owned-staging recovery. No production mutation or third blind retry. Updated owner OPERATE proposal prefers standalone fresh compressed full/restore, one finite retirement/reclaim, compact baseline and one sustainable recurring policy; no authority inferred.",
     "execution_to_cashflow": "Backup recoverability only; no trading, alpha or cashflow acceptance.",
-    "monitoring_and_recovery": "Existing30s fence and1800s total stall budgets remain separate. Native pointer path avoids global walk; measured no-lookup100k metadata fallback outside fence after SQLite readers close. Real bytes restored, publication repaired, last-good/pending/owned staging semantics tested. No production acceptance.",
-    "build_vs_buy": "ADOPT existing ResearchStore/ResearchWriteLookup native transaction and state pointers, native manifest validators and validation receipt partition IDs. WRAP only existing capture owner. No index commissioning, new dependency/service/scheduler or new architecture.",
+    "monitoring_and_recovery": "Ordinary JSON/due visits check existing total deadline; actual pointers alone charge raw_ref cap. Same material244 across12373->74239 pending, raw0->2, source unavailable restore verifies110 bytes and3 authorities/transitions. Missing/corrupt/interrupted captures retain last-good and writer/staging; native retry needs no state edit. B remains honestly DEGRADED.",
+    "build_vs_buy": "ADOPT native _TERMINAL_DUE_STATES, existing capture/hash/ZIP/checkpoint/restore and state recovery owners; WRAP existing raw selection only. No universal scanner, new index/service/dependency or production cap increase.",
     "security": "Read-only minimized production metadata probe; no raw market payloads or secrets, production mutation, live capture, upload/deletion or settings changes.",
-    "red_team": "16670->100000 irrelevant entries per namespace without lookup; selected manifests/live opens constant, writer commits unblocked; future DRAINING prior ACTIVE missing refuses; invalid/stale pointers, namespace changes, missing required bodies/partitions and broken receipts/fingerprint refuse; interrupted publication and retry use native recovery."
+    "red_team": "Full current terminal67447 with0 raw vs future terminal escaped witness with no outbox/cold proof; final-row nested raw beyond74238 pending; actual pointer cap vs70000 irrelevant nodes and expired deadline; missing/corrupt/interruption/retry and existing managed accounting/publication recovery."
   },
   "capability_radar": {
-    "now": "NONE: finish exact-head gates, then exact merged Stage B authorization. Stage C remains required after PACKAGING_LIVE_PROVEN.",
-    "watch": "If post-merge authorized runtime still exceeds collector/closure budget, replan this same measured critical section; no new framework or weakened limits."
+    "now": "NONE: exact Git delivery then new actual-merge StageB authority, not production-ready from local proof.",
+    "watch": "B17Oct00:20:30Z needs fresh native backup; daily00:45Z is after B. If another historic capture cap fails, one bounded minimal-operational-set replan, no automatic suffix PR. StageC follows live verified copy."
   },
   "recovery": "Existing full/delta, interrupted capture/publication, native staging cleanup and last-good regressions reused; restored native control includes exact activation prefix and actual publication bytes. No new recovery framework.",
   "limits": [

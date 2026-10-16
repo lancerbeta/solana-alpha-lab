@@ -1,11 +1,11 @@
 {
   "schema": "smial.delivery-completion-evidence",
   "schema_version": "1.0",
-  "acceptance_id": "I2_BACKUP_LEGACY_STORAGE_V1-RECOVERY-CLOSURE-P1",
+  "acceptance_id": "I2_BACKUP_LEGACY_STORAGE_V1-RAW-DEPENDENCY-SELECTION-P1",
   "as_of": "2026-10-16",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "state_change": "Replace mandatory historical namespace census with source-owned exact native recovery identities/pointers and measured no-lookup metadata fallback outside fence. Preserve actual captured lifecycle/publication closure and one inventory/ZIP. Original I2 Stage B/C remain mandatory and separately authorized.",
-  "base_main": "2c39e5e47f2edb60a7720ef6621c2203b5d0561b",
+  "state_change": "Charge actual raw recovery references rather than ordinary JSON nodes/due rows; select due recovery using canonical native terminal states while preserving unowned terminal raw bytes and staged hashes. Full-population/growth checkpoint+independent restore and interrupted retry proven. Original I2 StageB/C remain mandatory and separately authorized.",
+  "base_main": "5a68d602d5135038e7dd49c8fe14f69cb893fa8a",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
@@ -13,18 +13,17 @@
     "kind": "NO_CHANGE",
     "reason": "Git is the working context and evidence owner; no cloud export requested."
   },
-  "capability_radar_now": "NONE: existing owners, Git/gh, locked Python/SQLite/zipfile suffice; no new dependency/service/connector/timer.",
+  "capability_radar_now": "NONE: existing capture/native state owners, SQLite, Git/gh and locked runtime suffice; no new tool/index/service.",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "db4dfc05d0427eb1b7d3e1ee968fe0d20670b4492e15daf2cdae32522dbb28e5",
-    "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md": "38c91789fe0c26a86c8f808bb0d6ffbfbe477f3171100f98dec6ac179267529c",
-    "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md": "972e98571aa861bc104b9dd2f41fc28b4cd1f00504867e64c7a7db9d3c337476",
-    "docs/evidence/i2_backup_legacy_storage_v1/recovery-closure-proof.json": "e7a29a839ae70dfd8bd2d32253b678e8b7a21fbf7c1457261dbee55f1751101f",
-    "docs/evidence/i2_backup_legacy_storage_v1/semantic-claims.json": "852b9f2640a1658ab7ebfb44b513efebea7d693b211365f8205c7ed9e9caa31c",
-    "docs/evidence/i2_backup_legacy_storage_v1/semantic-classification.json": "3994f6fda65dee6952a8009b258ce6d6ff98544aad52a03501a6db9876b38f83",
-    "docs/evidence/i2_backup_legacy_storage_v1/semantic-evidence.json": "632d38fbe4e38edade1e494641b3ddf109db86167a74b3853be959d126deba3e",
-    "docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md": "1c480ef660d138394623b56696e69eae7c164d8007ad2edf8cd2013cb68859d0",
-    "src/solana_alpha_lab/factory/remote_ops.py": "393a237ce274d57b02fe5a295ad248494deaaf070027cd908992854c18e912ff",
-    "tests/test_i2_backup_legacy_storage_v1.py": "51750d481534649008c76e1b62b0ad0f2333e076d6c5aadd8ddd2fe9dd0978c6"
+    "catalog/assets/core.yaml": "8fa2387fe8437b79df25b1c868ef78e967216976ab9d975785dc491cf9132a14",
+    "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md": "56661bd78758cd211e5506ba9cd6a7a79713f43ad56ebf14f353da84291746df",
+    "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md": "fba09617441fbadf32d5705b28455eaaab8d57199fce0eda605eb550be8b5f40",
+    "docs/evidence/i2_backup_legacy_storage_v1/raw-dependency-proof.json": "3d7de991d29cfa08fad43ac72d2f3e993ef4e6081a4f458da16b5f45bc62c2ef",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-claims.json": "3b0e4b0bb6971f290f2a49a0ca4f09dd47ba2a07f988cc6ef36af92a83cf228c",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-evidence.json": "31bd757a4cc7851f24f17eadc8e0a3e73bcfb5ba6e9e6a0db184b29eeb4a8c54",
+    "docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md": "7122b7bdfbf6f70a9cdb77492311dda5508c3d8ceb43538916d7ad1c8c9257e0",
+    "src/solana_alpha_lab/factory/remote_ops.py": "b3444324352204055104a730f72b56057456e29fa6ca489805a278872f8a105f",
+    "tests/test_i2_backup_legacy_storage_v1.py": "9dad2c97002e9cb1ae0181512e53bbebb3311dddda115b73ef59962e5c3c3e2d"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -36,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/i2_backup_legacy_storage_v1/factory-fit.json",
-    "sha256": "b498f13426768ca874422fd5e7dcc3e7c11b053b41abce8c9b5f2891e6ebaeb4",
+    "sha256": "f16dc997d9df2f000b07d4a7434009fd2fe08be2312a5d2869db8028c5b0abf8",
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_Ran 45 tests in 733.338s_NATIVE_NAMESPACE_16670_TO_100000_SAME_SELECTED_CLOSURE_INDEPENDENT_RESTORE_TYPED_REFUSALS_INTERRUPTED_RETRY; PLUS4_FINAL_POINTER_NAMESPACE_CONSUMER_SEAMS; separate measured/final source hashes in recovery-closure-proof.json",
+    "targeted": "PASS_Ran3tests_in38.973s_FULL_CURRENT_DUE_POPULATION_12373_PENDING_67447_TERMINAL_TO_74239_PENDING_LATE_RAW_AND_TERMINAL_WITNESS_NATIVE_CHECKPOINT_INDEPENDENT_RESTORE_MISSING_CORRUPT_INTERRUPTED_RETRY_PLUS_MANAGED_ACCOUNTING_PUBLICATION_CONSUMER",
     "independent_review": {
       "path": "docs/evidence/i2_backup_legacy_storage_v1/independent-review.json",
-      "sha256": "9e16c1625be6978cac88b28c12d340fe1ca23af112750816e60633bbfb71f36f",
+      "sha256": "36098ec1585b8f1b1384c905ad685ac0c695d1cebede13566821f9a724e738ca",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
@@ -66,6 +65,6 @@
   "side_effects": {
     "repository": "bounded I2 branch code/tests/docs/Catalog",
     "local": "disposable native fixture roots and measurement receipts",
-    "external": "One metadata-only production probe and GitHub routine delivery; no new live capture, deployment, uploads, deletion or policy changes."
+    "external": "Two bounded complete-census/B-watch read-only production probes; Git routine delivery only. No capture/retry/deploy/upload/settings or receipt cleanup."
   }
 }

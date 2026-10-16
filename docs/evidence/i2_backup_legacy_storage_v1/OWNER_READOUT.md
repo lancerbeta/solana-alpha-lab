@@ -1,4 +1,68 @@
-# I2 — recovery closure P1 / текущая передатка
+# I2 — raw dependency selection P1 / текущая передатка
+
+LOCAL_REPAIR_PROVEN; I2 runtime BLOCKED. Installed5a68d602 unchanged.
+One approved full09:26Z failed09:27:24Z; last-good/failed receipt retained,
+no new live capture, ZIP/upload/restore or production mutation in this repair.
+
+Complete09:55:42Z read-only census4.469s, writer fence0: 80466 rows,
+47345395 JSON bytes, 1057256 nodes, actual raw refs/paths/bytes0.
+Old eligible17800 rows charged292986 raw_ref units for no pointer. Of all
+67447 terminal due rows,4781 CENSORED_LATE/MISSING_TYPED were wrongly eligible;
+all current terminal refs0. This does not prove future terminal bytes obsolete:
+native atomic terminalization/outbox/publication owns their science, so any
+unproven terminal raw pointer stays required. No historical science deletion.
+
+One repair in remote_ops: raw_ref counts actual pointers; ordinary JSON visits
+and recovery rows only check total-wall deadline. Canonical native terminal
+states plus conservative raw/escaped-key prefilter; native content-address
+hash check uses immutable staged bytes. Per-payload2MiB, actual-ref caps, all
+production budgets/settings and prior SQLite/ResearchStore owners unchanged.
+No no-code OFFHOST path: installed owner deterministically exhausts the cap
+before reaching the full eligible population. No monkeypatch/bypass deployed.
+
+One disposable native checkpoint/independent-remote-restore oracle:
+
+| PENDING / terminal | raw refs / restored bytes | full checkpoint / restore | writer fence |
+|---|---|---|---|
+|12373 /67447|0 /0|1.672s /1.707s|0.0307s|
+|74238 /67447|0 /0|2.817s /3.080s|0.0338s|
+|74239 /67447, late+terminal refs|2 /110|3.007s /2.900s|0.0500s|
+|same, native retry|2 /110|1.944s /3.155s|0.0344s|
+
+material count244 stays constant across growth, raw_ref0→2; ZIP3.914→6.978MB,
+DEFLATE8. Native ACTIVE+multiple DRAINING/managed children; restore with source
+unavailable preserves raw SQL/ROWIDs and3 authorities/3 transitions. Missing
+and corrupt required bytes refuse; interrupted capture preserves last-good/
+chain/remote objects, frees writer and cleans own staging; retry needs no state
+edit. Peak process RSS439873536B includes fixture authoring and full raw-SQL
+oracle, not production service RSS; writer probes6/6 unblocked. Three focused
+tests PASS38.973s, existing managed revoke/accounting/open-publication recovery
+consumer included. No #4085.5GB or #409historical-namespace suite rerun.
+
+Exact measurements, hashes, limitations and current B readback:
+raw-dependency-proof.json. Local full/remote transport are disposable tests,
+not production PACKAGING_LIVE_PROVEN. Required next live result remains one
+newly approved actual-merge deploy/full/Drive/independent restore/next tick.
+
+EARLY WATCH16Oct10:08Z: last-good snapshot_data_as_of NULL; native DEGRADED,
+lower-bound age120181.8s >86400s. Armed B17Oct00:20:30Z would see age171329s
+without a new verified backup. Daily17Oct00:45Z is too late for B. Supported
+path is guarded merge and separately authorized repaired StageB before B;
+no upload-clock fiction, LOCAL_BUNDLE/grant/timer bypass or success promise.
+
+STOP: exact-head CI+machine readiness → one owner merge phrase. New deploy
+target is actual merge SHA after green readback; consumed scopef52baf… grants
+no new runtime action. Immediately after PACKAGING_LIVE_PROVEN, prepare finite
+StageC on that copy: removable/protected/residual bytes, native retirement,
+physical gain, WHOLE technical pause including final-current upload/restore/
+register, compact full/restore and sustainable recurring throughput. Destructive
+APPLY/policy enable remains one separate exact scope approval. StageC is not
+cancelled or demoted to non-goals. Another historical cap requires one bounded
+operational-recovery replan, not automatic suffix PR. NEXT_MODEL_EFFORT after
+merge gate: ROUTINE_NO_SWITCH for guarded merge/readback; SOL_XHIGH for StageC
+data/recovery tradeoff. Existing OPERATE packet owns the continuation.
+
+## Historical #409 readout (superseded runtime identity)
 
 Production installed: `2c39e5e47f2edb60a7720ef6621c2203b5d0561b`.
 Один approved standalone full scope44c315f4… отказал
