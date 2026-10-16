@@ -1,17 +1,17 @@
 ---
 task_id: I2_BACKUP_LEGACY_STORAGE_V1
-task_version: '1.4'
+task_version: '1.5'
 status: IN_PROGRESS
-as_of: '2026-10-15'
+as_of: '2026-10-16'
 owner: GOAL_OWNER
 allowed_routes: [DIRECT_CODEX_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 304b16e682fb5b5760229d4fd39fcab7a35aa307
+  expected_base: 2c39e5e47f2edb60a7720ef6621c2203b5d0561b
   expected_upstream: origin/main
-  expected_upstream_oid: 304b16e682fb5b5760229d4fd39fcab7a35aa307
-  expected_branch: codex/i2-capture-fence-repair
+  expected_upstream_oid: 2c39e5e47f2edb60a7720ef6621c2203b5d0561b
+  expected_branch: codex/i2-recovery-closure-p1
   dirty_mode: ALLOW_REPORTED
 objective: Implement the complete I2 backup, legacy retirement, physical reclaim and bounded maintenance capability on existing owners; prove it on isolated stores, deliver reviewed exact-head CI and machine merge-readiness, and prepare one staged OPERATE packet without production mutations.
 managed_write_set:
@@ -85,6 +85,47 @@ context_requirements:
 ---
 
 # I2_BACKUP_LEGACY_STORAGE_V1
+
+## Recovery closure P1 — 2026-10-16
+
+Owner EXECUTE continues the same I2 after the one authorized deployed2c39e5e
+full refused BACKUP_PUBLICATION_PARTITION_SCAN_BUDGET_EXCEEDED. Native directory
+admission failed at16385 entries before filtering required control events;
+readback research16619 / dataset16550 entries, fence hold0.997608s. Last-good
+is intact. No new production capture/deploy/settings/upload is authorized here.
+
+Bounded delta: one short read-only probe of captured OPS lifecycle references,
+actual open jobs/stages, existing write_lookup state and dataset validation
+receipt pointers; then repair only existing capture/direct consumers. Prefer
+source-owned exact identities and native verification; find_record without a
+commissioned lookup is not bounded. No mandatory lookup commissioning, cap
+increase, new permanent index/service/scheduler, historical science rewrite or
+deletion. If direct pointers cannot prove complete closure, a measured bounded
+metadata fallback must run outside writer fences, freeze its namespace and
+support justified30–90day growth. Material architecture pivots stop for owner.
+
+One vertical existing seam fixture uses small DBs with production-shaped
+irrelevant history>16619 and an enlarged corpus, no prepared lookup, ACTIVE+
+DRAINING+next managed child, significant publication stages, missing/corrupt
+required references and interrupted retry. Actual source→inventory→ZIP/checkpoint
+→independently restored bytes→native recovery oracle. Measure enumerated/opened
+manifests, wall/fence/RSS; do not repeat #4085.5GB SQLite scale proof.
+
+Keep four existing isolated review roles, bounded to this delta and P0/P1.
+One patch PR through exact-head CI/native readiness; stop for one owner merge
+phrase. After merge, prepare one exact deploy/full/remote restore OPERATE scope;
+old StageB signatures cannot authorize the new target. PACKAGING_LIVE_PROVEN
+then immediately resumes safe StageC preparation on that verified copy.
+Destructive APPLY/policy enable remain separately gated. Before B activation
+2026-10-17T00:20:30Z and managed cutover2026-10-18T00:00:00Z, preserve honest
+source freshness/OFFHOST status; no local substitute, timer/grant/limit changes
+or blind retries. Existing16Oct scheduled incidents stay visible.
+
+DECISION_DELTA: make required recovery closure independent of irrelevant
+historical manifest namespace without weakening native completeness/integrity.
+UNCERTAINTY_REMOVED: whether existing pointers suffice and the exact bounded
+fallback cost for missing links. STOP: merge-readiness or material owner blocker.
+NEXT: authorized merge→one rollout scope→PACKAGING_LIVE_PROVEN→STAGE_C.
 
 ## Production capture replan — 2026-10-15
 

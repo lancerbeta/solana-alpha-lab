@@ -1,0 +1,229 @@
+{
+  "schema": "smial.i2-recovery-closure-proof",
+  "schema_version": "1.0",
+  "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
+  "as_of": "2026-10-16",
+  "measured_source_bindings": {
+    "src/solana_alpha_lab/factory/remote_ops.py": "d55a89b12d686fc9e32844931d4c4506024c32acc52c39970f62ac8bd4132d5b",
+    "tests/test_i2_backup_legacy_storage_v1.py": "4d7317dbb228002e6e0b4d8c690e0f8d486f02becf690550a1e3203e1f476d78"
+  },
+  "final_source_bindings": {
+    "src/solana_alpha_lab/factory/remote_ops.py": "393a237ce274d57b02fe5a295ad248494deaaf070027cd908992854c18e912ff",
+    "tests/test_i2_backup_legacy_storage_v1.py": "51750d481534649008c76e1b62b0ad0f2333e076d6c5aadd8ddd2fe9dd0978c6"
+  },
+  "post_profile_delta": {
+    "reason": "GOAL_DOD P1: global namespace stamp also invalidated exact-pointer snapshot after unrelated later publication. Scope stamps only to actually used fallback namespaces; retain all selected bytes/native validation checks.",
+    "scale_rerun": "NONE: metadata fallback algorithm/cost unchanged; one native append->exact lookup->ZIP->restore seam proves fixed path.",
+    "exact_publication_result": "test_exact_lookup_and_namespace_or_pointer_refusal (test_i2_backup_legacy_storage_v1.I2BackupLegacyStorageTests.test_exact_lookup_and_namespace_or_pointer_refusal) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 1.089s\n\nOK",
+    "exact_publication_output_sha256": "6902a33d4f76310d0bf326316a268c2084fd9725d3e4545b26ed47879edd39d7",
+    "other_affected_seams": "Native future DRAINING and MANIFEST/MARKER consumers rerun separately; see focused_results."
+  },
+  "focused_results": {
+    "terminal": "PASS_4_AFFECTED_SEAMS",
+    "native_exact_append_and_restore": "PASS1.089s",
+    "future_draining_prior_active": "PASS",
+    "manifest_no_receipt_fallback_native_restore": "PASS",
+    "marker_exact_receipt_native_restore": "PASS",
+    "consumer_run_output_sha256": "7db85f45394afcfa6fbc6d15a1de394dd55876c09a100166aebc35cceded8d8d",
+    "consumer_run_summary": "4 tests102.705s:3 consumer PASS; first exact-append fixture used invalid transaction prefix and ERROR. Corrected native RESEARCH-TXN prefix then exact-append seam PASS1.089s. No production failure/retry and no repeated scale profile."
+  },
+  "production_readonly_probe": {
+    "activations": [
+      {
+        "activation_id": "ACT-4744D4017AC4B196",
+        "authority_present": true,
+        "authority_receipt_sha256": "c2c937b4462b28f45a423bb42d702c3052f9a996bf4d399e58168d6e378db038",
+        "last_transition_event_id": "OBS-TRANS-3ef813618af0d43961ce326008fa7eb69e6fbb80a527089645c746df37ee67a0",
+        "projection_sha256": "b0ee3b4196b72eac790bf00b82759bf3532c5ef4a15ff97d57fcd4d371f7f248",
+        "required_transactions": [
+          "RESEARCH-TXN-OBS-SCHED-4744D4017AC4",
+          "RESEARCH-TXN-OBS-TRANS-3EF813618AF0D43961CE326008FA7EB69E6FBB80A527089645C746DF37EE67A0",
+          "RESEARCH-TXN-OBS-AUTHZ-C2C937B4462B"
+        ],
+        "schedule_sha256": "4744d4017ac4b19625c5ee11ce4e20fdd4b36c6744f8c0889467052e2a6ef23c",
+        "state": "ACTIVE",
+        "transition_sequence": 1
+      }
+    ],
+    "dataset_partition_entries": 16590,
+    "installed_sha": "2c39e5e47f2edb60a7720ef6621c2203b5d0561b",
+    "jobs": [],
+    "last_good": {
+      "checkpoint_sha256": "fb4ace799084373bfb42f99169999d83a3c3f60dd02ebc2665b43304e29eebaa",
+      "sha256": "4a9526a0bf0180345170c2ff3f0b43f3f1f01609f7f8759c1b0d539f2efa5ec9",
+      "terminal": "DAILY_DELTA_VERIFIED",
+      "uploaded_at": "2026-10-15T00:45:01Z"
+    },
+    "lookup": {
+      "present": true,
+      "state": "VALID",
+      "transaction_pointers": {
+        "RESEARCH-TXN-OBS-AUTHZ-C2C937B4462B": {
+          "manifest_id": "partition-08dcb9290e45d2a71e6396ad8caae23e98670bc5de1dc84496eba305fb1d0406",
+          "transaction_id": "RESEARCH-TXN-OBS-AUTHZ-C2C937B4462B"
+        },
+        "RESEARCH-TXN-OBS-SCHED-4744D4017AC4": {
+          "manifest_id": "partition-d21681129469e9aa16bf7e877593fb1364dca87c287c71f4696c521c6c15e549",
+          "transaction_id": "RESEARCH-TXN-OBS-SCHED-4744D4017AC4"
+        },
+        "RESEARCH-TXN-OBS-TRANS-3EF813618AF0D43961CE326008FA7EB69E6FBB80A527089645C746DF37EE67A0": {
+          "manifest_id": "partition-77ea8b0a0fc106b00571f2b9ff637f78379bed40b528730c04c5c90964d96a22",
+          "transaction_id": "RESEARCH-TXN-OBS-TRANS-3EF813618AF0D43961CE326008FA7EB69E6FBB80A527089645C746DF37EE67A0"
+        }
+      }
+    },
+    "max_rss_kib": 123932,
+    "observed_at": "2026-10-15T23:14:00.414083+00:00",
+    "open_ops_jobs": [],
+    "read_only": true,
+    "research": {
+      "entries": 16659,
+      "metadata_bytes": 13915561,
+      "missing_transactions": [],
+      "namespace_stable": true,
+      "selected": {
+        "RESEARCH-TXN-OBS-AUTHZ-C2C937B4462B": [
+          {
+            "bytes": 11973,
+            "manifest_id": "partition-08dcb9290e45d2a71e6396ad8caae23e98670bc5de1dc84496eba305fb1d0406",
+            "manifest_sha256": "796d92b389b02cd9163c6b60f5732c3b272533e067d29ddad5543efc15a3bbd5",
+            "record_ids": [
+              "OBS-AUTHZ-C2C937B4462B28F4"
+            ],
+            "record_kinds": [
+              "OBSERVATION_SCHEDULE_AUTHORITY"
+            ]
+          }
+        ],
+        "RESEARCH-TXN-OBS-SCHED-4744D4017AC4": [
+          {
+            "bytes": 20577,
+            "manifest_id": "partition-d21681129469e9aa16bf7e877593fb1364dca87c287c71f4696c521c6c15e549",
+            "manifest_sha256": "a22c1ac06a9bc26d70570c3941ef35cdc715e40595da641b4b564ab396827319",
+            "record_ids": [
+              "OBS-SCHED-4744D4017AC4B196"
+            ],
+            "record_kinds": [
+              "OBSERVATION_SCHEDULE"
+            ]
+          }
+        ],
+        "RESEARCH-TXN-OBS-TRANS-3EF813618AF0D43961CE326008FA7EB69E6FBB80A527089645C746DF37EE67A0": [
+          {
+            "bytes": 8502,
+            "manifest_id": "partition-77ea8b0a0fc106b00571f2b9ff637f78379bed40b528730c04c5c90964d96a22",
+            "manifest_sha256": "0e491781e2674a76dbc6e0cdf804f4c71120014a68d8d6d4fa47586a9bcd7b34",
+            "record_ids": [
+              "OBS-TRANS-3ef813618af0d43961ce326008fa7eb69e6fbb80a527089645c746df37ee67a0"
+            ],
+            "record_kinds": [
+              "OBSERVATION_SCHEDULE_STATE"
+            ]
+          }
+        ]
+      },
+      "unparseable_headers": 0,
+      "wall_seconds": 2.4884519670158625
+    },
+    "wall_seconds": 2.5385110329370946
+  },
+  "production_probe_sha256": "20c00cfd2da8e61149a59978900c5de3aac77e09093ee17e4520d3fa275e779e",
+  "production_mutations": 0,
+  "new_live_capture_attempts": 0,
+  "before": {
+    "installed_sha": "2c39e5e47f2edb60a7720ef6621c2203b5d0561b",
+    "failure": "BACKUP_PUBLICATION_PARTITION_SCAN_BUDGET_EXCEEDED",
+    "research_entries": 16619,
+    "dataset_entries": 16550,
+    "count_cap": 16384,
+    "writer_hold_seconds": 0.997608,
+    "wall_seconds": 3.46431,
+    "new_zip_objects": 0,
+    "new_remote_objects": 0,
+    "runtime_handback_sha256": "852138b6f823fc66622d5b6ff98ec10dfd4c9468500e734519792f2908476164"
+  },
+  "selection": {
+    "research": "Actual captured ACTIVE/DRAINING OPS schedule/current transition/authority deterministic native transactions; existing VALID lookup exact transaction and state pointers. Preserve committed prefix for captured activations, including prior ACTIVE needed by future DRAINING recovery. No hardcoded A/B and no index commissioning.",
+    "absent_lookup": "Streaming metadata fallback after fence release and after pinned SQLite readers close. Per-header bounded read2MiB+1, existing total stall deadline1800s; selected material/byte caps unchanged. Matching lifecycle state candidates are native-verified to select captured activation prefix, so lifecycle-state candidate bodies may be opened to determine membership; other irrelevant event bodies are not read. No permanent index.",
+    "dataset": "Hash-bound validation receipt exact partition_manifest_ids plus native DatasetManifest/PartitionManifest/fingerprint/artifact checks. Without native receipt, MANIFEST/MARKER open job uses measured metadata fallback for its dataset; zero open jobs causes zero dataset walk.",
+    "jobs": "Captured job stage determines required OBS/MEM transactions; ARTIFACTS may precede commit or follow commit before durable stage update. Mutable member-layout/unit mirrors frozen under fence; immutable closure read/validated afterwards.",
+    "namespace": "Research and dataset partition directory stamps captured under fence; only actually used fallback namespaces are checked before/after scan and closure. Exact immutable pointers tolerate unrelated later native publication; selected pointer/body mutations, stale/pending/corrupt lookup, missing identities and broken native hashes/fingerprint refuse with typed error."
+  },
+  "final_vertical": {
+    "terminal": "PASS",
+    "test_summary": "Ran 45 tests in 733.338s",
+    "output_sha256": "90b842ba7fba2197b2ebb5b479f71e38bf2881822c9f72338e3167a5efb34262",
+    "samples": [
+      {
+        "fallback": {
+          "bytes": 11221094,
+          "count": 16698,
+          "elapsed_seconds": 77.217297,
+          "phase": "recovery_metadata_fallback"
+        },
+        "historical_entries_per_namespace": 16670,
+        "native_manifests_opened": 14,
+        "process_peak_rss_bytes": 110284800,
+        "restore_control": {
+          "authorities": 3,
+          "transitions": 3
+        },
+        "selected_manifests": 11,
+        "wall_seconds": 78.46767649999992,
+        "writer_attempts": 14,
+        "writer_blocked": 0,
+        "writer_hold_seconds": 0.00955100000010134,
+        "zip_bytes": 168355
+      },
+      {
+        "fallback": {
+          "bytes": 67302184,
+          "count": 100028,
+          "elapsed_seconds": 403.925585,
+          "phase": "recovery_metadata_fallback"
+        },
+        "historical_entries_per_namespace": 100000,
+        "native_manifests_opened": 14,
+        "process_peak_rss_bytes": 110284800,
+        "restore_control": {
+          "authorities": 3,
+          "transitions": 3
+        },
+        "selected_manifests": 11,
+        "wall_seconds": 405.2311808999998,
+        "writer_attempts": 14,
+        "writer_blocked": 0,
+        "writer_hold_seconds": 0.014015199999903416,
+        "zip_bytes": 168355
+      }
+    ],
+    "reproduce": "I2_CLOSURE_HISTORY_LARGE=100000 uv run --locked --managed-python python -B -m unittest discover -s tests -p test_i2_backup_legacy_storage_v1.py",
+    "ci_default_larger_history": 33340,
+    "oracle": "Native managed3 children, ACTIVE+multiple DRAINING, no lookup; exact immutable source hashes->captured inventory->DEFLATE full ZIP->isolated restore, native control closure and SQL/ROWIDs. Native writers commit after fence release; selected/live-opened manifests constant across irrelevant history growth.",
+    "seams": [
+      "VALID lookup forbids fallback; pending/stale/corrupt pointers refuse",
+      "Future prepared DRAINING native continuity retains prior ACTIVE, lookup present/absent; missing prior event refuses",
+      "ARTIFACTS/RDP_OBSERVATION_BATCH/RDP_MEMBER_BATCH/MANIFEST/MARKER publication replay and native restored data",
+      "MANIFEST without receipt with16670 irrelevant dataset headers; MARKER hash-bound validation receipt exact IDs with fallback forbidden",
+      "Required event/partition missing or corrupt, incomplete receipt/fingerprint, concurrent namespace mutation refuse",
+      "Interrupted capture/publication restart, existing last-good, owned staging cleanup, full/delta compatibility and native checks"
+    ]
+  },
+  "fallback_horizon": {
+    "measured_ceiling_entries": 100000,
+    "current_research_entries": 16659,
+    "observed_growth_entries": 40,
+    "observed_interval_seconds_approx": 4800,
+    "conditional_90d_projection_entries_approx": 81459,
+    "interpretation": "One short observed interval is not a guaranteed forecast. 100k namespaces (>6x current) measured under unchanged1800s total budget; actual production VALID lookup uses exact pointers, no global metadata walk. No-lookup fallback is bounded operational recovery for this horizon, not indefinite O(history) acceptance. Fallback directory change refuses safely; no writer lock or pinned WAL readers retained during historical walk."
+  },
+  "limitations": [
+    "LOCAL_PROOF_NOT_PRODUCTION_ACCEPTANCE",
+    "NO_5_5GB_SCALE_RERUN_COPY_AND_FENCE_UNCHANGED",
+    "NO_LIVE_UPLOAD_RESTORE_OR_STAGE_C_APPLY",
+    "NO_GUARANTEED_GROWTH_FORECAST",
+    "OS_NATIVE_CALLS_COOPERATIVE_DEADLINE_NOT_PREEMPTIBLE",
+    "LAST_GOOD_SOURCE_CLOCK_UNKNOWN"
+  ],
+  "runtime_next": "Exact-head CI/readiness -> owner merge phrase -> guarded merge/post-merge readback -> one new exact Stage B deploy/standalone compressed full/Drive remote verify/independent restore approval -> PACKAGING_LIVE_PROVEN -> safe Stage C native finite retirement/reclaim and sustainable policy preparation. Destructive APPLY/policy enable separately approved once."
+}

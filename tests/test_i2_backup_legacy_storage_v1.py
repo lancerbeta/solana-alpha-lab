@@ -31,6 +31,26 @@ RDP = "local/factory_v1/observation_rdp"
 LEGACY_PRODUCER_BASE = "b3fb9d8ecffbffda468dccabaa81ca3392da6f15"
 
 
+def _peak_rss_bytes() -> int:
+    if os.name != "nt":
+        import resource
+        return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * (1 if sys.platform == "darwin" else 1024)
+    import ctypes
+    from ctypes import wintypes
+    class Counters(ctypes.Structure):
+        _fields_=[("cb",wintypes.DWORD),("PageFaultCount",wintypes.DWORD)]+[(name,ctypes.c_size_t) for name in
+            ("PeakWorkingSetSize","WorkingSetSize","QuotaPeakPagedPoolUsage","QuotaPagedPoolUsage",
+             "QuotaPeakNonPagedPoolUsage","QuotaNonPagedPoolUsage","PagefileUsage","PeakPagefileUsage")]
+    counters=Counters();counters.cb=ctypes.sizeof(counters)
+    kernel=ctypes.windll.kernel32;kernel.GetCurrentProcess.restype=wintypes.HANDLE
+    probe=ctypes.windll.psapi.GetProcessMemoryInfo
+    probe.argtypes=[wintypes.HANDLE,ctypes.c_void_p,wintypes.DWORD]
+    probe.restype=wintypes.BOOL
+    if not probe(kernel.GetCurrentProcess(),ctypes.byref(counters),counters.cb):
+        raise OSError("RSS_PROBE_FAILED")
+    return counters.PeakWorkingSetSize
+
+
 def _raw_sql_readback(path: Path, *, isolated: bool = False) -> dict:
     """Independent row/ROWID oracle; the restore marker is the only decoration."""
     uri = path.as_uri() + "?mode=ro" + ("&immutable=1" if isolated else "")
@@ -564,8 +584,7 @@ print(json.dumps(remote.package_backup(root,config=config,sink_override=sink,pru
 
         started = time.monotonic()
         self.config["monitoring"] = {"stall_max_seconds": 0.10}
-        expected_error = ("BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED" if phase == "dependencies"
-                          else "BACKUP_CAPTURE_TOTAL_BUDGET_EXCEEDED")
+        expected_error = "BACKUP_CAPTURE_TOTAL_BUDGET_EXCEEDED"
         with patch.object(remote,"BACKUP_CAPTURE_FENCE_SECONDS",0.10), patch.object(
                 remote,"_capture_writer_fences",observed_fence), patch.object(
                 ResearchStore,"_read_manifest",delayed_native_read):
@@ -576,7 +595,7 @@ print(json.dumps(remote.package_backup(root,config=config,sink_override=sink,pru
             "injected_native_read_seconds":0.06,"manifest_read_starts_seconds":reads,
             "writer_blocked_during_reads":blocked,"refusal_wall_seconds":round(elapsed,3)}))
         self.assertTrue(reads)
-        self.assertEqual(blocked,[phase == "dependencies"]*len(reads))
+        self.assertEqual(blocked,[False]*len(reads))
         self.assertLessEqual(len(reads),2)
         if phase == "dependencies":
             self.assertTrue(all(stamp < 0.10 for stamp in reads))
@@ -651,18 +670,192 @@ print(json.dumps(remote.package_backup(root,config=config,sink_override=sink,pru
         # Hash consumers outside capture keep the existing ordinary API.
         self.assertEqual(remote._sha256_file(source),hashlib.sha256(before).hexdigest())
 
-    def test_recovery_manifest_census_refuses_before_materialized_native_reads(self) -> None:
+    def test_selected_manifest_cap_refuses_before_native_materialization(self) -> None:
         from solana_alpha_lab.factory.research_store import ResearchStore
         self._seed_real_control_activation()
         directory=self.root/RDP/"research/manifests/partitions"
         for number in range(3):
             (directory/f"unmatched-{number}.txt").write_text("unmatched",encoding="utf-8")
-        with patch.object(remote,"BACKUP_PARTITION_SCAN_MAX_FILES",3), patch.object(
+        with patch.object(remote,"BACKUP_PARTITION_SCAN_MAX_FILES",0), patch.object(
                 ResearchStore,"_read_manifest",side_effect=AssertionError("native read after capped census")) as read:
             with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_PUBLICATION_PARTITION_SCAN_BUDGET_EXCEEDED"):
                 self.full()
         self.assertEqual(read.call_count,0)
         self.assertFalse(self.sink.exists())
+
+    def test_recovery_closure_growth_without_lookup_and_native_managed_successors(self) -> None:
+        from tests.test_managed_collection_continuity_v1 import D0,D1,D2,D3,ManagedScenario
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from solana_alpha_lab.storage.manifests import build_partition_manifest
+        sc=ManagedScenario(self.root/RDP)
+        with patch.dict(os.environ,{remote.BACKUP_SINK_ENV:str(sc.sink)}):
+            sc.commission_account()
+            self.assertEqual(sc.apply(D0+timedelta(hours=1))["terminal"],"MANAGED_APPLIED")
+            for day in (D1,D2,D3):
+                sc.backup(day-timedelta(hours=1))
+                sc.nominate_round(day,day.isoformat(),count=1)
+                self.assertEqual(sc.tick(day+timedelta(seconds=5))["managed"]["terminal"],"RECONCILE_CHILD_ACTIVATED")
+        self.assertEqual(len(sc.children()),3)
+        with closing(sqlite3.connect(sc.ops_path)) as conn:
+            states=[r[0] for r in conn.execute("SELECT state FROM schedule_activations")]
+        self.assertIn("ACTIVE",states)
+        self.assertGreaterEqual(states.count("DRAINING"),2)
+        ops=sc.ops_path.relative_to(self.root).as_posix()
+        self.config["backup"]["source_relative_paths"]=[ops]
+        self.config["backup"]["recursive_relative_paths"]=[f"{RDP}/datasets/publication_jobs"]
+        lookup=sc.data_root/"research/write_lookup_v1"
+        self.assertFalse(lookup.exists())
+        research_dir=sc.data_root/"research/manifests/partitions"
+        dataset_dir=sc.data_root/"datasets/manifests/partitions"
+        dataset_dir.mkdir(parents=True,exist_ok=True)
+        # Headers are native manifests; irrelevant historical body verification
+        # is deliberately not an operational-backup prerequisite.
+        native_read=ResearchStore._read_manifest
+        original_fence=remote._capture_writer_fences
+        measurements=[]
+        previous=0
+        for count in (16670,int(os.environ.get("I2_CLOSURE_HISTORY_LARGE","33340"))):
+            for index in range(previous,count):
+                manifest=build_partition_manifest(dataset_id="DATASET-IRRELEVANT-HISTORY",dataset_version="v1",
+                    partition_id=f"HIST-{index}",logical_location=f"research/events/historical/{index}.parquet",
+                    file_sha256="a"*64,content_sha256="b"*64,row_count=1,
+                    first_reliable_available_at=D0,created_at=D0)
+                name=manifest.partition_manifest_id+".json"
+                raw=manifest.model_dump_json().encode()
+                (research_dir/name).write_bytes(raw)
+                (dataset_dir/name).write_bytes(raw)
+            previous=count
+            opened=[];blocked=[];fence_seconds=[]
+            @contextmanager
+            def observed_fence(sources):
+                began=time.monotonic()
+                with original_fence(sources):yield
+                fence_seconds.append(time.monotonic()-began)
+            def observed_read(store,path):
+                if path.is_relative_to(sc.data_root):
+                    opened.append(path.name)
+                    with closing(sqlite3.connect(sc.ops_path,timeout=0)) as peer:
+                        try:peer.execute("BEGIN IMMEDIATE")
+                        except sqlite3.OperationalError:blocked.append(True)
+                        else:
+                            blocked.append(False)
+                            peer.execute("UPDATE semantic_state SET payload=payload") if peer.execute("SELECT 1 FROM sqlite_master WHERE name='semantic_state'").fetchone() else None
+                            peer.commit()
+                return native_read(store,path)
+            started=time.monotonic()
+            with patch.object(remote,"_capture_writer_fences",observed_fence),patch.object(ResearchStore,"_read_manifest",observed_read):
+                with remote.backup_payload_snapshot(self.root,self.config) as snapshot:
+                    packed=remote.package_backup(self.root,config=self.config,snapshot=snapshot,sink_override=self.sink,prune_superseded=False)
+                    trace=snapshot.capture_trace
+            source_inventory={i["path"]:i["sha256"] for i in packed["entries"]}
+            for path,digest in source_inventory.items():
+                if not path.endswith(".sqlite"):
+                    self.assertEqual(hashlib.sha256((self.root/path).read_bytes()).hexdigest(),digest)
+            restored=Path(self.temp.name)/f"growth-restored-{count}"
+            result=remote.restore_incremental_chain_isolated(full_bundle=self.sink/packed["bundle"],deltas=[],dest_root=restored,expected_inventory_sha256=packed["inventory_sha256"])
+            self.assertGreaterEqual(result["recovery_control"]["transitions"],3)
+            self.assertEqual(_raw_sql_readback(restored/ops,isolated=True),_raw_sql_readback(sc.ops_path))
+            self.assertFalse(any(blocked));self.assertFalse(lookup.exists())
+            self.assertLess(len(opened),64)
+            if measurements:
+                self.assertEqual(len(opened),measurements[0]["native_manifests_opened"])
+            fallback=[p for p in trace["phases"] if p["phase"]=="recovery_metadata_fallback"]
+            self.assertEqual(len(fallback),1)
+            measurements.append({"historical_entries_per_namespace":count,"native_manifests_opened":len(opened),
+                "selected_manifests":sum('/research/manifests/partitions/' in p for p in source_inventory),
+                "wall_seconds":time.monotonic()-started,"writer_hold_seconds":fence_seconds[0],
+                "process_peak_rss_bytes":_peak_rss_bytes(),
+                "writer_attempts":len(blocked),"writer_blocked":sum(blocked),"fallback":fallback[0],
+                "zip_bytes":packed["bytes"],"restore_control":result["recovery_control"]})
+            print("I2_CLOSURE_SAMPLE "+json.dumps(measurements[-1],sort_keys=True),flush=True)
+        print("I2_CLOSURE_GROWTH "+json.dumps(measurements,sort_keys=True))
+
+    def test_exact_lookup_and_namespace_or_pointer_refusal(self) -> None:
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        self._seed_real_control_activation()
+        store=ResearchStore(self.root/RDP)
+        self.assertEqual(store.prepare_write_lookup()["status"],"PREPARED")
+        from test_research_store import event_fixture
+        before=_raw_sql_readback(self.root/OPS)
+        original_copy=remote.consistent_sqlite_backup
+        published=[]
+        def publish_after_fence(*args,**kwargs):
+            result=original_copy(*args,**kwargs)
+            if not published:
+                transaction="RESEARCH-TXN-I2-LATER-IRRELEVANT-PUBLICATION"
+                receipt=store.append([event_fixture(transaction_id=transaction)],transaction_id=transaction)
+                published.append(receipt)
+            return result
+        with patch.object(remote,"_capture_metadata_matches",side_effect=AssertionError("unexpected historical scan")),patch.object(remote,"consistent_sqlite_backup",publish_after_fence):
+            packed=self.full()
+        self.assertEqual(len(published),1)
+        restored=Path(self.temp.name)/"exact-after-publication"
+        result=remote.restore_incremental_chain_isolated(full_bundle=self.sink/packed["bundle"],deltas=[],dest_root=restored,expected_inventory_sha256=packed["inventory_sha256"])
+        self.assertEqual(_raw_sql_readback(restored/OPS,isolated=True),before)
+        self.assertEqual(result["recovery_control"]["transitions"],1)
+        state=self.root/RDP/"research/write_lookup_v1/state.json"
+        original=state.read_bytes()
+        for kind in ("pending","stale","corrupt","namespace"):
+            with self.subTest(kind=kind):
+                pending=state.with_name("pending.json")
+                if kind=="pending":pending.write_bytes(b"{}")
+                elif kind=="corrupt":state.write_bytes(b"{}")
+                elif kind=="stale":
+                    path=self.root/RDP/"research/manifests/partitions/unrelated.txt"
+                    path.write_bytes(b"irrelevant")
+                try:
+                    if kind=="namespace":
+                        lookup=state.parent
+                        absent=lookup.with_name("lookup-not-installed")
+                        lookup.rename(absent)
+                        original_copy=remote.consistent_sqlite_backup
+                        def mutate(*args,**kwargs):
+                            result=original_copy(*args,**kwargs)
+                            (self.root/RDP/"research/manifests/partitions/concurrent.txt").write_bytes(b"new")
+                            return result
+                        try:
+                            with patch.object(remote,"consistent_sqlite_backup",mutate):
+                                with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_RECOVERY_NAMESPACE_CHANGED"):self.full()
+                        finally:
+                            absent.rename(lookup)
+                    else:
+                        with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_RECOVERY_WRITE_LOOKUP_"):self.full()
+                finally:
+                    pending.unlink(missing_ok=True);state.write_bytes(original)
+                self.assertFalse(list((self.root/remote.BACKUP_SNAPSHOT_STAGING_RELATIVE).glob("capture-*")))
+
+    def test_future_rollover_restores_prior_active_proof_and_refuses_missing_predecessor(self) -> None:
+        from solana_alpha_lab.factory.observation_schedule import load_observation_schedule
+        from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+            prepare_schedule_authority,authorize_schedule,rollover_schedule,
+            activation_transition_research_event_proven)
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        activation,_=self._seed_real_control_activation()
+        now=datetime(2026,9,1,0,10,1,tzinfo=UTC)
+        successor=load_observation_schedule(ROOT,"tests/fixtures/observation_schedule/successor_y259200.yaml")
+        store=ObservationScheduleStore(self.root/OPS)
+        try:
+            prepared=prepare_schedule_authority(root=ROOT,data_root=self.root/RDP,store=store,document=successor,now=now,producer_git_sha="c"*40)
+            authorize_schedule(root=ROOT,data_root=self.root/RDP,store=store,schedule_sha256=successor["schedule_sha256"],phrase=prepared["authority_request"]["exact_owner_phrase"],now=now,producer_git_sha="c"*40)
+            rollover_schedule(root=ROOT,data_root=self.root/RDP,store=store,
+                predecessor_schedule_sha256=activation["schedule_sha256"],predecessor_activation_id=activation["activation_id"],
+                successor_schedule_sha256=successor["schedule_sha256"],successor_activation_id="ACT-I2-FUTURE",
+                cutover_at="2026-09-01T00:20:00Z",now=now,producer_git_sha="c"*40)
+            draining=store.get_activation(activation["schedule_sha256"],activation["activation_id"])
+            self.assertTrue(activation_transition_research_event_proven(self.root/RDP,draining,now=now))
+        finally:store.close()
+        for indexed in (False,True):
+            if indexed:ResearchStore(self.root/RDP).prepare_write_lookup()
+            packed=self.full()
+            restored=Path(self.temp.name)/f"future-rollover-{indexed}"
+            remote.restore_incremental_chain_isolated(full_bundle=self.sink/packed["bundle"],deltas=[],dest_root=restored,expected_inventory_sha256=packed["inventory_sha256"])
+            self.assertIsNotNone(ResearchStore(restored/RDP).find_record(activation["last_transition_event_id"]))
+            self.assertTrue(activation_transition_research_event_proven(restored/RDP,draining,now=now))
+        shutil.rmtree(self.root/RDP/"research/write_lookup_v1")
+        for path in (self.root/RDP/"research/manifests/partitions").glob("*.json"):
+            if json.loads(path.read_bytes())["partition_id"]==f"RESEARCH-TXN-{activation['last_transition_event_id'].upper()}":path.unlink()
+        with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_RECOVERY_PRIOR_ACTIVE_EVENT_MISSING"):self.full()
 
     def test_recovery_partition_size_refuses_before_native_materialization(self) -> None:
         from solana_alpha_lab.factory.research_store import ResearchStore
@@ -761,7 +954,7 @@ print(json.dumps(remote.package_backup(root,config=config,sink_override=sink,pru
             body = json.loads(path.read_text(encoding="utf-8"))
             if body["partition_id"].startswith("RESEARCH-TXN-OBS-TRANS-"):
                 path.unlink()
-        with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_RECOVERY_TRANSITION_EVENT_MISSING"):
+        with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_RECOVERY_REQUIRED_RESEARCH_EVENT_MISSING"):
             self.full()
 
     def _legacy_control_checkpoint(self, state: str) -> dict:
@@ -1213,6 +1406,31 @@ except Exception as exc:
             (sc.data_root/"datasets/manifests/partitions").glob("partition-*.json")
             if json.loads(path.read_text(encoding="utf-8"))["dataset_manifest_id"]==job["dataset_manifest_id"]}
         self.assertEqual(len(source_parts),2)
+        if fault=="AFTER_MANIFEST":
+            directory=sc.data_root/"datasets/manifests/partitions"
+            # Production-shaped metadata namespace, deliberately irrelevant to
+            # this open job; only its two exact native descriptors may survive.
+            for index in range(16670):
+                (directory/f"partition-{index:064x}.json").write_text(
+                    json.dumps({"dataset_manifest_id":"HISTORICAL-OTHER","partition_id":f"past-{index}"}),encoding="utf-8")
+        else:
+            from solana_alpha_lab.contracts.schema_v1 import DatasetManifest,PartitionManifest
+            from solana_alpha_lab.storage.manifests import build_dataset_manifest
+            path=sc.data_root/f"datasets/manifests/{job['dataset_manifest_id']}.json"
+            dataset=DatasetManifest.model_validate_json(path.read_bytes())
+            receipt=json.dumps({"partition_manifest_ids":[Path(p).stem for p in sorted(source_parts)]}).encode()
+            receipt_path=path.with_suffix(".validation.json")
+            receipt_path.write_bytes(receipt)
+            parts=[PartitionManifest.model_validate_json((self.root/p).read_bytes()) for p in sorted(source_parts)]
+            amended=build_dataset_manifest(**{k:getattr(dataset,k) for k in
+                ("dataset_id","dataset_version","schema_id","schema_sha256","generation_task_id","generation_run_id","first_reliable_available_at","created_at")},
+                validation_receipt_sha256=hashlib.sha256(receipt).hexdigest(),partitions=parts)
+            path.write_text(amended.model_dump_json(),encoding="utf-8")
+            original_receipt=receipt_path.read_bytes()
+            for broken in (b'{}',json.dumps({"partition_manifest_ids":[]}).encode()):
+                receipt_path.write_bytes(broken)
+                with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_PUBLICATION_PARTITION_INVALID"):self.full()
+            receipt_path.write_bytes(original_receipt)
         self.config["backup"]["source_relative_paths"]=[sc.ops_path.relative_to(self.root).as_posix()]
         self.config["backup"]["recursive_relative_paths"]=[f"{RDP}/datasets/publication_jobs"]
         with patch.object(remote,"BACKUP_PARTITION_SCAN_MAX_FILES",0):
@@ -1226,7 +1444,13 @@ except Exception as exc:
                 self.full()
         finally:
             removed.write_bytes(exact_partition)
-        packed=self.full()
+        fallback=remote._capture_metadata_matches
+        def guard_dataset_fallback(directory,*args):
+            if fault=="AFTER_MARKER":
+                self.assertNotIn("datasets",directory.parts)
+            return fallback(directory,*args)
+        with patch.object(remote,"_capture_metadata_matches",guard_dataset_fallback):
+            packed=self.full()
         self.assertTrue(source_parts <= {item["path"] for item in packed["entries"]})
         sc.data_root.rename(sc.data_root.with_name("manifest-source-unavailable"))
         restored=Path(self.temp.name)/"after-manifest-restored"

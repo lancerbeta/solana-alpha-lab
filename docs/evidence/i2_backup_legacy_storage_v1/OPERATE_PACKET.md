@@ -1,4 +1,63 @@
-# I2 — capture repair / следующий Stage B scope
+# I2 — recovery closure P1 / актуальный Stage B
+
+Installed `2c39e5e47f2edb60a7720ef6621c2203b5d0561b`.
+Approved scope44c315f47c859032fe855c79d3770c1fce73d5aa817f5101ce6166db4927c8d6
+consumed: COPY_FAILED / BACKUP_PUBLICATION_PARTITION_SCAN_BUDGET_EXCEEDED,
+phase recovery_dependencies; fence0.997608s; новых ZIP/remote objects0.
+Last-good сохранён. Ещё один live capture этим repair не разрешён.
+
+Bounded patch: captured ACTIVE/DRAINING OPS → exact native research transaction
+pointers; existing production lookup VALID, новое commissioning не требуется.
+Absent lookup использует измеренный streaming metadata fallback вне writer
+fence. Dataset validation receipt адресует exact IDs с native fingerprint/hash
+verification; ordinary native publisher без receipt использует fallback лишь
+для open-job dataset. Mutable mirrors frozen с OPS/jobs; immutable closure и
+native validation captured bytes — после release. Fallback namespace change, required
+missing/corrupt и pending/stale pointer — typed refusal. Exact immutable pointers
+допускают unrelated later native publication. Measurements:
+recovery-closure-proof.json / OWNER_READOUT.md. Историческая science не удаляется.
+
+Первый STOP: exact-head CI + machine readiness → новая exact merge phrase.
+Production до отдельной Stage B authorization не менять. Target следующего
+scope = actual guarded merge SHA и зелёный post-merge readback этого patch.
+Existing deploy-window adapter и measured entry criterion переиспользовать;
+rehearsal нужен только при material изменении предпосылок.
+Fresh preflight: installed SHA, A/B/APPLIED profile/shared counters, armed B timer,
+pending/locks/last-good, due/activation/rollover, WAL/staging/free, scheduled overlap.
+
+Один новый Stage B scope после merge: exact deploy → один ordinary compressed
+standalone full/checkpoint existing caller → existing Drive sink → remote verified
++ independent restore → безопасная Stage C preparation на той же copy.
+Full начинает новую chain; старые archives/pins не переписывать и не удалять.
+Reader32GB/8objects/3h — ceiling, старую25.7GB chain лишний раз не читать.
+Native gates/resources/limits и triggers сохраняются, без business stop-intake,
+ручных provider calls, дополнительных retries и pending cleanup ради PASS.
+Rollback остаётся у existing installer, старую DB поверх новых writes не класть.
+
+Live acceptance: actual wall/fence hold, enumerated/opened/selected manifests,
+writer errors/missed due, ZIP method8/size, upload/restore time, inventory/control
+closure/source clocks, A/B/profile/counter monotonicity/B timer, WAL/temp/free.
+Следующий ordinary backup работает без ручного lookup/manifest IDs commissioning.
+При material refusal сохранить trace/last-good и остановить именно live run.
+
+Immediately after PACKAGING_LIVE_PROVEN безопасная Stage C preparation разрешена:
+finite archive-bound retirement/reclaim rehearsal existing owners, eligible/
+protected/residual bytes с consumers, physical gain, полная pause включая
+final-current upload/restore/register, recurring service rate/inflow.
+Destructive APPLY + policy enable — одно отдельное exact approval на весь
+конечный scope. Не удалять ResearchEvents/frozen science, не менять RUN/grants/
+freshness/RPO. Если полная pause не помещается между due — один измеренный owner
+tradeoff с obligations; gap и zero-gap обещания не разрешены.
+
+WATCH:16Oct00:15Z local /00:45Z offhost могут повторить incident. Не дублировать
+scheduled backup, не менять timers. B17Oct00:20:30Z, cutover18Oct00:00Z:
+required fresh OFFHOST_VERIFIED не заменять LOCAL_BUNDLE.
+Last-good source clock UNKNOWN; upload15Oct00:45:01Z его не восстанавливает.
+
+Ниже сохранены master/historical contracts. Этот header заменяет прежние
+runtime identity и approval; исходные обязательства Stage C остаются в силе.
+
+## История capture repair #408
 
 Действующий runtime: 304b16e682fb5b5760229d4fd39fcab7a35aa307; capture BLOCKED.
 Предыдущая authorization scope1bcd396f… была применена к этому SHA и не разрешает
