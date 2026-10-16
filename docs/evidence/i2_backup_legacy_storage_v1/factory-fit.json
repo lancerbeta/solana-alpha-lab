@@ -1,36 +1,37 @@
 {
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
-  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-RAW-SELECTION-FIT",
+  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-REMAINING-OUTCOME-FIT",
   "as_of": "2026-10-16",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "ba0bf5340c4d54c10c4fa0b1145363ed01950193e63d586ab80dd648f36119f9",
-  "reviewed_inventory_sha256": "c6c47c00df4c59249fbd6aa6eea0f9a57bbbae187c0191fced75aa73f06dc095",
+  "reviewed_bindings_sha256": "f24b709af0a26faa0e27395741b2825d1edb453d137a9175f91047a9189eff44",
+  "reviewed_inventory_sha256": "1b53c24a386c957c4fac4fa99181b2787f209085e9f4ac37bfea68eafe4cf89a",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
-    "mission": "Ordinary independent recoverability with bounded collector disruption and no daily manual step.",
-    "flexibility_and_history": "Complete original I2 and Stage C remain required; no scientific history or former acceptance re-audit.",
-    "context_efficiency": "Complete production census once, same task, one narrow remote_ops patch and two extensions to existing fixtures. Three focused tests38.973s; #408/#409 scale paths reused. Four mandatory P0/P1 roles only; no local full gate before PR.",
-    "research_truth": "All captured OPS bytes/ROWIDs preserved. Canonical native terminal states plus conservative raw/escaped-key prefilter; terminal dependencies retained absent proof of another owner. Native content-address hashes checked on staged bytes. No scientific history deletion/certification, frozen state or availability change.",
-    "owner_operability": "One current task and OPERATE packet, existing ordinary scheduled caller, phase trace in pending/receipt, preserved last-good and native owned-staging recovery. No production mutation or third blind retry. Updated owner OPERATE proposal prefers standalone fresh compressed full/restore, one finite retirement/reclaim, compact baseline and one sustainable recurring policy; no authority inferred.",
-    "execution_to_cashflow": "Backup recoverability only; no trading, alpha or cashflow acceptance.",
-    "monitoring_and_recovery": "Ordinary JSON/due visits check existing total deadline; actual pointers alone charge raw_ref cap. Same material244 across12373->74239 pending, raw0->2, source unavailable restore verifies110 bytes and3 authorities/transitions. Missing/corrupt/interrupted captures retain last-good and writer/staging; native retry needs no state edit. B remains honestly DEGRADED.",
-    "build_vs_buy": "ADOPT native _TERMINAL_DUE_STATES, existing capture/hash/ZIP/checkpoint/restore and state recovery owners; WRAP existing raw selection only. No universal scanner, new index/service/dependency or production cap increase.",
-    "security": "Read-only minimized production metadata probe; no raw market payloads or secrets, production mutation, live capture, upload/deletion or settings changes.",
-    "red_team": "Full current terminal67447 with0 raw vs future terminal escaped witness with no outbox/cold proof; final-row nested raw beyond74238 pending; actual pointer cap vs70000 irrelevant nodes and expired deadline; missing/corrupt/interruption/retry and existing managed accounting/publication recovery."
+    "mission": "Live standalone backup preserved; finite useful legacy cleanup and unattended recurring progress measured on same verified copy; StageC runtime remains mandatory.",
+    "flexibility_and_history": "Exact native occurrence vs request-keyed cache distinction. All STARTED/accounting/source ROWIDs/science/denominator and frozen31d minima remain.",
+    "context_efficiency": "Same task/OPERATE and verified copy. Existing regression seams, no prior large capture/compression/I1/I3 reruns, P0/P1 reviews only.",
+    "research_truth": "Operational archive-bound body compaction is not scientific deletion or promotion. Ambiguous due/cache/witness/pins remain protected; membership residual has native consumers.",
+    "owner_operability": "One exact merge gate then one merged staged OPERATE scope; no per-chunk approvals. Measured38m28s physical path needs proposed60min window and affected-obligation decision; logical-only stage explicitly PARTIAL.",
+    "execution_to_cashflow": "Storage/recovery operability only; return product focus to native mature cohorts/Forge after adequate storage result, no alpha/cashflow claim.",
+    "monitoring_and_recovery": "Interrupted native effects persist, resumed cursor progresses, independent full/restore/native writer PASS. Shared chunk budget survives refresh; local WRITER_BUSY uses same bounded retry; ordinary failed receipts/last-good retained.",
+    "build_vs_buy": "ADOPT existing retention/SQLite/checkpoint/retry/Drive owners; WRAP multichunk caller and native pointer validation. No new infrastructure.",
+    "security": "Minimized read-only live metadata and isolated own copy; no raw market data/secrets or production mutation.",
+    "red_team": "Same request with UNKNOWN, ambiguous/null due, request-only cache, occurrence pins, effectful-refresh budget reset, stale policy CAS, interruption/retry and native canonical cold release covered. Full fingerprint parity preserved."
   },
   "capability_radar": {
-    "now": "NONE: exact Git delivery then new actual-merge StageB authority, not production-ready from local proof.",
-    "watch": "B17Oct00:20:30Z needs fresh native backup; daily00:45Z is after B. If another historic capture cap fails, one bounded minimal-operational-set replan, no automatic suffix PR. StageC follows live verified copy."
+    "now": "NONE: finish exact code gates then one staged existing OPERATE scope on actual merge SHA.",
+    "watch": "Existing B17Oct00:20:30Z/daily00:45Z/managed18-19Oct and mature native cohort delivery. Record next ordinary storage/inflow and live maintenance completion; no new timers/manual C/D."
   },
-  "recovery": "Existing full/delta, interrupted capture/publication, native staging cleanup and last-good regressions reused; restored native control includes exact activation prefix and actual publication bytes. No new recovery framework.",
+  "recovery": "Native retirement/reclaim/cold/current fingerprint plus standalone full/independent restore. Physical source/ROWID/native writer preserved; no shortcut weakening final-current gate.",
   "limits": [
-    "NO_SCIENTIFIC_OR_ALPHA_CLAIM",
-    "NO_PRODUCTION_PACKAGING_PROVEN",
-    "NO_MERGE_OR_OPERATE_AUTHORITY_FROM_PROOF",
-    "NO_STAGE_C_CANCELLED",
-    "COOPERATIVE_NATIVE_CALL_DEADLINE",
-    "NO_UNBOUNDED_HISTORY_RUNWAY_CLAIM"
+    "NO_LIVE_STAGE_C_ACCEPTANCE",
+    "NO_ZERO_GAP_RECLAIM",
+    "NO_MONTHS_RUNWAY_FROM_ONE_SNAPSHOT",
+    "QUIET_COPY_CAPACITY_NOT_LIVE_DUE_PROOF",
+    "ISOLATED_FILE_TRANSPORT_NOT_DRIVE_SPEED",
+    "COOPERATIVE_RUN_ADMISSION_AND_SEPARATE_COLD_BUDGET",
+    "NO_CANONICAL_DONE"
   ]
 }

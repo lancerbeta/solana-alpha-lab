@@ -1,11 +1,11 @@
 {
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
-  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-RAW-DEPENDENCY-SELECTION-P1",
+  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-REMAINING-OUTCOME",
   "as_of": "2026-10-16",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "ba0bf5340c4d54c10c4fa0b1145363ed01950193e63d586ab80dd648f36119f9",
-  "reviewed_inventory_sha256": "c6c47c00df4c59249fbd6aa6eea0f9a57bbbae187c0191fced75aa73f06dc095",
+  "reviewed_bindings_sha256": "f24b709af0a26faa0e27395741b2825d1edb453d137a9175f91047a9189eff44",
+  "reviewed_inventory_sha256": "1b53c24a386c957c4fac4fa99181b2787f209085e9f4ac37bfea68eafe4cf89a",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -17,33 +17,37 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only P0/P1 PASS on frozen content head7bdd376dd89ff361423f7e34586408a7a95928d6, inventoryc6c47c00df4c59249fbd6aa6eea0f9a57bbbae187c0191fced75aa73f06dc095; no open P0/P1. All9 implementation bindings matched, sourceb3444324352204055104a730f72b56057456e29fa6ca489805a278872f8a105f. Four frozen review roles sufficient.",
-        "Actual pointers charge raw_ref; ordinary JSON/SQL rows only check deadline. Canonical terminal states plus raw substring or any JSON escape preserve potential terminal bytes; native hash checked on staged bytes. ZIP/independent source-unavailable restore checks raw bytes, exact SQL/ROWIDs and control. No tests/edits by critic; production authority unchanged."
+        "Frozen content head b9e675f889365c96d1c9926ce8d04606e839b877, base93e08efa290c18ae28a7d0bb5f012bfa98180be7; inventory1b53c24a386c957c4fac4fa99181b2787f209085e9f4ac37bfea68eafe4cf89a; bindingsf24b709af0a26faa0e27395741b2825d1edb453d137a9175f91047a9189eff44. Isolated read-only P0/P1 PASS; exact-delta reattestation, no open findings. No reviewer tests/edits/production mutation.",
+        "Exact frozen diff and16 committed/worktree bindings verified. Eleven bindings unchanged; five reflect loaded-config forwarding, existing regression and hash propagation. Prior poll occurrence pin and shared refresh budget/clock/effects P1 fixes remain. All four required roles retained. Doctor config reaches package_backup on every retry; native config selection, busy policy and other typed errors preserved. Ten targeted doctor/local-retry checks PASS; no large proof rerun."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only P0/P1 PASS on frozen content head7bdd376dd89ff361423f7e34586408a7a95928d6, inventoryc6c47c00df4c59249fbd6aa6eea0f9a57bbbae187c0191fced75aa73f06dc095; no open P0/P1. Complete80466-row census and probe/output hashes checked; no sample/LIMIT. >=12373pending/67447terminal,74239pending growth, late nested pointer and escaped terminal witness verified by authored actual-byte oracle.",
-        "Existing native full/checkpoint and independent remote restore with source unavailable verify110 raw bytes and control. Missing/corrupt/interruption preserve last-good and native retry succeeds; saved3-test result/output hash checked without rerunning. Local proof vs live acceptance, new exact StageB and mandatory StageC boundaries retained."
+        "Frozen content head b9e675f889365c96d1c9926ce8d04606e839b877, base93e08efa290c18ae28a7d0bb5f012bfa98180be7; inventory1b53c24a386c957c4fac4fa99181b2787f209085e9f4ac37bfea68eafe4cf89a; bindingsf24b709af0a26faa0e27395741b2825d1edb453d137a9175f91047a9189eff44. Isolated read-only P0/P1 PASS; exact-delta reattestation, no open findings. No reviewer tests/edits/production mutation.",
+        "16 implementation and17 source/helper hashes match; frozen diff exact. Actual finite drain/restart, quiet-copy recurring throughput, full/independent restore/reclaim/resume/native writer support bounded code outcome. Drive/live due capacity and physical observation window remain future acceptance; staged logical+policy stays proposed, StageC PARTIAL and I2 not DONE.",
+        "Exact delta preserves loaded config on all local attempts. Native new inventory/bindings and unchanged measured proof verified; prior verdict reused only for unchanged bytes. Physical deferred/PARTIAL and no live capacity acceptance remain."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only P0/P1 PASS on frozen content head7bdd376dd89ff361423f7e34586408a7a95928d6, inventoryc6c47c00df4c59249fbd6aa6eea0f9a57bbbae187c0191fced75aa73f06dc095; no open P0/P1. SEMANTIC_PREMISE PASS; diff/task/five evidence hashes matched packet. Canonical terminal enum owns scheduling, raw preservation remains a separate obligation. Conservative escaped-key path does not promote current refs0 to future deletion authority. Existing total-wall/payload/actual-ref bounds and staged identity remain.",
-        "Tests may PASS operational restore while independent scientific archive or PIT/availability lineage is missing. Operational closure is not full scientific recovery; no scientific status/freshness/production acceptance follows from local proof. ResearchStore owns immutable events and DuckDB is rebuildable; no new authority/service/index.",
-        "packet_fingerprint_sha256=b41a3ca35aced8379281b45519735cdc13b242398336b9ebb206b8d118071b98; independence=PACKET_INFORMATION_PATH; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN. Packet flags alone do not attest launch isolation. Critic launched with packet+diff only and no inherited transcript; no tests/edits."
+        "Frozen content head b9e675f889365c96d1c9926ce8d04606e839b877, base93e08efa290c18ae28a7d0bb5f012bfa98180be7; inventory1b53c24a386c957c4fac4fa99181b2787f209085e9f4ac37bfea68eafe4cf89a; bindingsf24b709af0a26faa0e27395741b2825d1edb453d137a9175f91047a9189eff44. Isolated read-only P0/P1 PASS; exact-delta reattestation, no open findings. No reviewer tests/edits/production mutation.",
+        "SEMANTIC_PREMISE PASS. Exact native occurrence/request/response hash, unique lifecycle owner, lease revalidation and source payload hash protect body retirement. Ambiguous consumers/pins/UNKNOWN/accounting/PIT/science remain. Scientific falsifier: mistaken owner/no-resume proof could make resumed scheduler read compacted cache as an empty successful result; exact native identity and retired activation resume refusal protect this boundary.",
+        "Ordinary caller rechecks due/pressure/CAS, releases locks and shares monotonic budget/effects after cold refresh. Restore449s/register696s have explicit separate cost;1800s is cooperative chunk admission. Sufficient checkpoint reused; only pending/discovery/exact closure gap triggers refresh. No inevitable perpetual YIELD found. Quiet copy and native outer fixture do not establish live capacity.",
+        "packet_fingerprint_sha256=05ec8a2ae6a609b3670df335d9c42911aada3f338e1aa31ebe03b97efb889b7b. Seven packet evidence hashes/task/diff verified; inventory/bindings supplied launch bindings. independence=PACKET_INFORMATION_PATH; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN. Critic launched packet+diff only without transcript. No new platform or scientific authority.",
+        "Fresh packet-only exact-delta critic verified new packet/task/seven refs/frozen diff; prior PASS used only for unchanged bytes. New seam falsifier: retry drops source/sink config and verifies a different recovery corpus. Same loaded config now forwarded on every attempt; existing regression checks object identity. Optional keyword compatibility/native selection/lock/failures retained. No new truth owner or scientific authority."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only P0/P1 PASS on frozen content head7bdd376dd89ff361423f7e34586408a7a95928d6, inventoryc6c47c00df4c59249fbd6aa6eea0f9a57bbbae187c0191fced75aa73f06dc095; no open P0/P1. Installed5a and consumedf52, productionBLOCKED, actual-merge/post-merge requirement and one new exact StageB scope align across task/OPERATE/readout.",
-        "B17Oct00:20:30Z DEGRADED/sourceclockUNKNOWN warning and daily00:45Z timing explicit. StageC remains required, full technical pause includes final-current upload/restore/register, finite chunks and one separately authorized destructive scope/policy. No blind retries, suffix PR, timer/grant/LOCAL_BUNDLE bypass or per-chunk approvals. No tests/edits/production actions."
+        "Frozen content head b9e675f889365c96d1c9926ce8d04606e839b877, base93e08efa290c18ae28a7d0bb5f012bfa98180be7; inventory1b53c24a386c957c4fac4fa99181b2787f209085e9f4ac37bfea68eafe4cf89a; bindingsf24b709af0a26faa0e27395741b2825d1edb453d137a9175f91047a9189eff44. Isolated read-only P0/P1 PASS; exact-delta reattestation, no open findings. No reviewer tests/edits/production mutation.",
+        "Native inventory/bindings and16 implementation files verified; frozen diff exact. Merge/runtime scopes separated, actual-merge target deliberately UNBOUND before merge. Whole physical pause and recovery/return disclosed; staged logical+policy preferred, physical deferred with StageC PARTIAL. One merge phrase then one new exact OPERATE authority; no per-chunk approval or dense-gap permission.",
+        "Native new inventory/bindings and16 files verified. OWNER_READOUT, OPERATE and operator docs byte-identical. Loaded config forwarding changes no runtime approval, staged reclaim/PARTIAL or owner action."
       ]
     }
   ],

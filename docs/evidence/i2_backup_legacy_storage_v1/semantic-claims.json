@@ -1,12 +1,12 @@
 [
   {
-    "claim_id": "I2_RAW_RECOVERY_SET_BUDGET",
-    "claim": "Captured OPS recovery JSON is scanned under the existing monotonic deadline; only actual raw pointers consume raw_ref cap. Native due terminal semantics plus conservative escaped/raw-key text prefilter retain terminal raw bytes without a proven other owner. Immutable staged content-address hashes and inventory/ZIP are one source. Ordinary due rows do not consume material cap.",
-    "scope": "Bounded capture patch, not historical scientific integrity or production acceptance."
+    "claim_id": "I2_OCCURRENCE_AND_CACHE_RETIREMENT",
+    "claim": "Retire only exact archived COMPLETED response bodies; same request alone does not couple UNKNOWN attempts. Poll cache separately proves native occurrence/request/response hash and unique lifecycle owner; pins, ambiguous due/round/witness/admission/publication/raw/science guards remain. STARTED/accounting/ROWIDs/source/science preserved.",
+    "scope": "Same verified copy native retirement/reclaim/restore; production StageC not authorized."
   },
   {
-    "claim_id": "I2_RUNTIME_AND_PRODUCT_BOUNDARY",
-    "claim": "Existing SQLite/ResearchStore, grants, budgets, A/B, shared accounting and science owners remain. One new exact StageB approval follows actual merge/readback. StageC finite native cleanup/reclaim/policy remains mandatory after live verified copy. DEGRADED/source-clock UNKNOWN and B warning remain honest.",
-    "scope": "Same task/OPERATE; no new service, scheduler, index commissioning, production writes or scientific promotion."
+    "claim_id": "I2_FINITE_RECURRING_RECOVERY",
+    "claim": "Existing caller drains resumable bounded chunks with per-step writer release and one policy/CAS/clock/effect budget across archive refresh; local contention uses existing bounded retry. Registered exact checkpoint reused; fingerprint protocol unchanged. Full recovery pause measured, not rename-only.",
+    "scope": "Isolated capacity and native seam regression evidence; no live due, gap, monthly runway, freshness or retention-policy authority."
   }
 ]

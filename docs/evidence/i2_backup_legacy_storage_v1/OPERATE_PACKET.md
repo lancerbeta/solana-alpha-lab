@@ -1,4 +1,181 @@
-# I2 — raw dependency selection P1 / актуальный OPERATE
+# I2 — remaining legacy/maintenance outcome / текущий OPERATE
+
+## Подтверждённая граница
+
+PACKAGING_LIVE_PROVEN на installed `93e08efa290c18ae28a7d0bb5f012bfa98180be7`.
+Checkpoint `994e7d64bacb9003d2867ce181f16acbf59288996aa13e8afbeceefb5c7319fe`,
+snapshot_data_as_of `2026-10-16T11:55:38Z`, remote verified `12:00:49Z`.
+Самостоятельный DEFLATE8 full1,081,179,801B, backup310.345s, writerhold0.618545s;
+independent restore449.540s и следующий12:10 native tick PASS. A/B/APPLIED/I3,
+shared counters, source clocks и armed B timer сохранены. Sealed StageB scope
+ffd5b8f60aa438e2bc0107f4b3e15e89c02923cae24d7190a759c302e5bcc475 исчерпан;
+его execution-receipt SHA256 c34fba8a384accaabb33d1e3d7e4b7e39b8cd9aac4cdc2ca224e44e24b1c2331.
+Старые scopes/FAILED receipts/pins неизменны. Эта кодовая доставка не разрешает
+production deploy, upload, compaction, reclaim или policy enable.
+
+Выбран существующий retention owner: COMPLETED occurrence имеет собственный
+response identity; request-only совпадение с другой UNKNOWN attempt не связывает
+все тела. Request-keyed poll-cache получает отдельное доказательство native
+occurrence/request/response SHA/unique lifecycle owner и прежних consumers/pins.
+Ambiguous/null due, witness/admission/round/publication/raw closure защищаются.
+646 STARTED/UNKNOWN83,980B, accounting, ROWIDs/source identity и science не меняются.
+31d minima не снижаются. Нет нового framework/service/scheduler.
+
+На той же verified copy: interrupted chunk сохранил1effect, reopen/replay ещё198;
+затем ordinary native caller исполнил437chunks за365.810s. Итого28,666 bodies
+(ledger17,151/cache11,515), removed body1,234,151,283B, net payload1,219,995,895B.
+Max lease2.437s; locks освобождаются между chunks. File5,330,173,952→5,330,194,432B;
+freelist1,190,748,160B. Это logical retirement, не physical shrink. Protected
+business/science/table/identity hashes совпали, в том числе866,029 memberships.
+
+Исходная frozen copy сохраняла12,336 PENDING и не исполняла collector. Поэтому
+rehearsal явно сдвинул только isolated observation clock за последний captured
+deadline, поднял local min_age31→35 для сохранения исходного cutoff; due rows и
+scientific clocks не редактировались. Это quiet-copy capacity measurement, не
+доказательство live zero-gap. Production policy остаётся31d и native due guard120s.
+
+## Предлагаемый единый staged scope — до merge NOT_AUTHORIZED
+
+Deployment target UNBOUND: только фактический merge SHA после guarded merge и
+зелёного post-merge readback. Новый exact scope SHA строится по окончательным
+adapter/settings/политике/исключениям; прежние StageB approvals не переиспользовать.
+Первый STOP этой доставки — exact-head CI+machine readiness и одна merge phrase.
+После разрешённого merge подготовить одну runtime подпись на этот конечный scope.
+
+Рекомендуемый rollout: deploy → canonical cold commissioning → конечный logical
+backlog и одна recurring policy → fresh compact logical full/independent restore;
+physical reclaim отложить до явно разрешённого полного maintenance window.
+Так полезный cleanup не требует самостоятельно выбранного observation gap.
+StageC с отложенным reclaim остаётся PARTIAL, не DONE.
+
+Fresh read-only preflight binds installed/target, A/B/APPLIED/profile/I3/counters,
+B timer, last-good source clock/freshness, jobs/pending/locks, due/activation/
+rollover и storage peak. Existing canonical-forward installer/window adapter
+209s entry /29s final entry /180s drain переиспользуется при сохранении предпосылок.
+Не расширять frozen availability, RUN или grant; не дублировать scheduled jobs.
+Для commissioning использовать native API и canonical cold root
+`local/factory_v1/retirement_cold/<checkpointSHA>` вне routine source lists.
+Не переносить isolated absolute cache paths в production policy/control.
+Original verified baseline cache сохраняется; fixture bootstrap root не является
+разрешением удалить его или обойти native cache-release guard.
+
+Одна approved policy задаёт legacy scopes из measured proof плюс текущую managed
+lineage; future children допускаются native lineage/terminal predicates, без
+ежедневных IDs от владельца. Только call_ledger/poll_slots; auto terminal
+retirement с no-resume, retire_pending_due=False, proven entity bodies allowed.
+Chunk≤1000rows/8MiB/30s, run≤1024chunks/1800s, cadence60s, due guard120s,
+pressure/CAS/cold/pins guards; physical_reclaim=False, retained_restore_points2.
+Resource proposal для existing backup units: MemoryMax1GB/CPUQuota100%/Nice10/
+IOWeight10; current ordinary unit readback не доказывает эти caps. Drop-in bytes/
+hashes и возврат прежних triggers связываются новым runtime scope; ничего не
+применять молча. Schedules/12h local/24h offhost freshness и grants неизменны.
+Finite backlog завершается первым полным archive-bound cursor pass в одном
+разрешённом scope, с durable resume после YIELD/restart и без per-chunk approval.
+Policy hash и exact allowed scopes/lineage получают runtime binding после merge.
+Archive refresh proposal: max_objects128/max_bytes32GB/max_wall10800s,
+interval86400s, то есть существующие native reader ceilings, отдельно одобряемые
+для StageC policy.8objects/600s подходят одиночному full, но не гарантируют normal
+weekly full +7daily deltas +checkpoint (9objects) и supplemental raw archives.
+Это потолки необходимой closure, не обязательный download128objects/32GB. Native
+coverage signal не восстанавливает архив ежедневно: достаточный зарегистрированный
+checkpoint переиспользуется; новый refresh только при доказанном coverage gap/
+durable discovery/pending retry. StageB sealed8objects не расширяется задним числом.
+Policy validator допускает existing3h reader ceiling вместо непроходимого300s.
+Chunk run wall1800s — cooperative admission budget с единым clock через refresh;
+restore имеет отдельный явный3h budget, registration отдельно измерена696.14s.
+Нельзя обещать whole caller≤1800s при refresh: его I/O и cleanup учитываются в
+стоимости и могут пересечь chunk admission deadline; новые chunks после этого
+не стартуют. Writer на cold restore/register историческом обходе не удерживается.
+Новый full/restore в existing Drive разрешается только новой runtime подписью;
+он начинает самостоятельную компактную цепь. Старые archive/checkpoint pins и
+objects не переписываются и не удаляются. Reader для этого нового standalone full:32GB/8objects/3h — ceiling; recurring refresh выше отдельно128objects.
+
+Existing daily/weekly offhost caller после verified checkpoint — единственный
+recurring trigger. Cadence не создаёт запусков. Каждый chunk заново проверяет
+due/pressure/lease и отпускает backup-plane/OPS writer; bounded wait без locks
+позволяет продолжить работу после тика. Cold restore/register выполняется при
+native refresh decision, не на каждом chunk. Успешный checkpoint не отменяется
+из-за optional maintenance; failure/YIELD/cursor остаются видимы existing watch.
+
+Local full сохраняет самостоятельный12h recovery SLO; daily offhost24h его не
+заменяет. Repair переиспользует existing120min/30s contention retry только для
+WRITER_BUSY, без новых units/cadence/RPO/settings.12:15 FAILED receipt сохраняется;
+следующий ordinary local run пользуется исправленным caller после deploy.
+
+На копии physical path PASS:5,330,194,432→4,084,056,064B, gain1,246,138,368B.
+Native plan203.091s, apply519.714s, resume/disposition277.275s, integrity/reader/
+writer return57.919s; full capture/finish204.886s +restore349.356s +register696.140s.
+Сумма всех measured компонентов2,308.382s (38m28s), без operator idle и без Drive
+эмуляции как сетевой скорости. Для production window переиспользуется реальная
+baseline full+Drive+restore759.885s вместо isolated554.241s: +205.644s.
+Добавляем native quiesce upper180s +return budget29s и25% запас, округляя вверх
+до60min. Это предлагаемое maintenance window, не разрешение gaps. Dense-сетка
+даёт минимум12пятиминутных точек внутри часа; точные due rows и другие obligations
+нужно связать с реально выбранным интервалом перед authorization. Сейчас gap такого
+размера не доказан. Рекомендуется staged logical APPLY, physical BLOCKED_NATIVE_ZERO_GAP
+до естественного≥60min окна либо отдельного решения по затронутым obligations.
+Final-current gate защищает все commits до switch: старый snapshot11:55 нельзя
+объявить final-current после новых collector writes. Прежний full+rollback сам по
+себе не разрешает ослабление этого gate.
+
+## Physical reclaim — отдельная явная часть runtime decision
+
+Живой read-only sample16Oct13:35:47Z: tick13:35:45–13:35:46Z PASS, next due13:40Z:
+254s свободно, с native120s guard134s. Уже760s full+restore не помещаются.
+Полный window включает quiesce, final-current recovery capture/upload/independent
+restore/register, plan fingerprints, rebuild/switch/checks, durable native resume/
+byte disposition и возврат прежних triggers/следующий writer. Rename не является
+стоимостью этого перехода. Default reclaim plan60s неизменен; explicit hash-bound
+план допускает measured apply budget≤1800s, что не даёт runtime authority.
+Один full5.3GB fingerprint занял120.646s и byte-for-byte совпал с прежним oracle;
+старое90s ограничение физически не допускало даже одну обязательную проверку.
+Все fingerprint/integrity/final-current/source/ROWID/sequence checks сохранены.
+
+До разрешения gaps запрещены; непрерывную dense-сетку не менять. Exact reclaim
+не включать рядом с B/managed due/activation/rollover. Если полное окно не
+помещается — сохранить logical gain и свободные SQLite pages для reuse; это
+не освобождение disk-file. Один последующий owner window decision должен
+перечислить все затронутые obligations, гарантии/rollback и deadline с запасом.
+После новых writer commits старую DB не накладывать поверх них; native unfinished
+intent требует exact resume/rollback, не ручного удаления staging/state.
+
+## Законченные измерения на копии
+
+Следующие сутки eligibility:3,374bodies/138,475,277B за92.830s включая scan/guards,
+302steps/300completed chunks, max writer lease3.456s. Это1.49MB/s против
+source-day payload upper≤143.68MB/day; live due capacity ещё нужно принять.
+После reclaim+этой порции file4,084,215,808B и новый standalone ZIP800,382,744B
+(live baseline1,081,179,801B); full148.002s, restore237.978s, fence0.620206s,
+inventory8508, DEFLATE8, native3SQLite/control/следующий writer PASS.
+Initial fresh index commissioning5.248s, registered cold cost696.140s; canonical
+refresh/release7cycles доказан существующей vertical fixture. Large-copy cache
+был noncanonical bootstrap: original proof сохранён, release guard не обойдён,
+production canonical commissioning входит в новый scope.
+
+Protected residual: initial bodies2,389,554,456B(после next day2,251,079,179B),
+compact provenance51,136,150B и STARTED646/83,980B. Membership866,029rows /
+1,335,857,152B table+PK обслуживает native scheduler X membership availability,
+candidate source_row/x_evidence и scientific denominator; retirement owner не
+имеет membership cold disposition. Нет permission на whole-table deletion.
+Min observed shared free44.31GB; monthly runway/неохваченный inflow UNKNOWN.
+
+## WATCH / ограничение выводов
+
+B17Oct00:20:30Z: текущий verified snapshot тогда будет возрастом12h24m52s<24h.
+Это подтверждает только backup freshness eligibility; RUN/intended state не
+подменяет actual ACTIVE и остальные native activation gates. Next daily offhost
+17Oct00:45Z; managed cutovers18/19Oct00:00Z. Existing watch, без ручных C/D,
+подмены OFFHOST_VERIFIED на LOCAL_BUNDLE, timer/grant/freshness/RPO changes.
+Проверять следующий обычный backup и зрелую когорту по native delivery gate.
+Месячный runway по одному snapshot UNKNOWN. Новая observation/scientific либо
+retention authority из code PASS не возникает. Следующие measured physical/
+recurring figures и final scope находятся в remaining-outcome-proof.json и
+OWNER_READOUT.md. Isolated PASS не является live StageC acceptance.
+
+---
+
+## Historical raw dependency selection #410 packet (superseded runtime identity)
+
 
 Installed `5a68d602d5135038e7dd49c8fe14f69cb893fa8a`, read back16Oct10:08Z.
 StageB scopef52baf8448f76417ef2974be53172acc6ce59da2864fc3e724d363189417ca8e

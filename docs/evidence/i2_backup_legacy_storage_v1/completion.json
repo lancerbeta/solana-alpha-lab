@@ -1,11 +1,11 @@
 {
   "schema": "smial.delivery-completion-evidence",
   "schema_version": "1.0",
-  "acceptance_id": "I2_BACKUP_LEGACY_STORAGE_V1-RAW-DEPENDENCY-SELECTION-P1",
+  "acceptance_id": "I2_BACKUP_LEGACY_STORAGE_V1-REMAINING-OUTCOME",
   "as_of": "2026-10-16",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "state_change": "Charge actual raw recovery references rather than ordinary JSON nodes/due rows; select due recovery using canonical native terminal states while preserving unowned terminal raw bytes and staged hashes. Full-population/growth checkpoint+independent restore and interrupted retry proven. Original I2 StageB/C remain mandatory and separately authorized.",
-  "base_main": "5a68d602d5135038e7dd49c8fe14f69cb893fa8a",
+  "state_change": "Preserve live packaging; prove exact archive-bound legacy body retirement, finite multichunk/restart and recurring capacity on the same verified copy. Native physical reclaim, compact standalone full/independent restore/writer measured; production physical pause requires a separate observation-window decision. Code delivery is not StageC runtime acceptance or canonical I2 DONE.",
+  "base_main": "93e08efa290c18ae28a7d0bb5f012bfa98180be7",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
@@ -13,17 +13,24 @@
     "kind": "NO_CHANGE",
     "reason": "Git is the working context and evidence owner; no cloud export requested."
   },
-  "capability_radar_now": "NONE: existing capture/native state owners, SQLite, Git/gh and locked runtime suffice; no new tool/index/service.",
+  "capability_radar_now": "NONE: existing native retention, checkpoint, retry, Git/gh and locked runtime suffice; no new service/scheduler/framework/dependency.",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "8fa2387fe8437b79df25b1c868ef78e967216976ab9d975785dc491cf9132a14",
-    "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md": "56661bd78758cd211e5506ba9cd6a7a79713f43ad56ebf14f353da84291746df",
-    "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md": "fba09617441fbadf32d5705b28455eaaab8d57199fce0eda605eb550be8b5f40",
-    "docs/evidence/i2_backup_legacy_storage_v1/raw-dependency-proof.json": "3d7de991d29cfa08fad43ac72d2f3e993ef4e6081a4f458da16b5f45bc62c2ef",
-    "docs/evidence/i2_backup_legacy_storage_v1/semantic-claims.json": "3b0e4b0bb6971f290f2a49a0ca4f09dd47ba2a07f988cc6ef36af92a83cf228c",
-    "docs/evidence/i2_backup_legacy_storage_v1/semantic-evidence.json": "31bd757a4cc7851f24f17eadc8e0a3e73bcfb5ba6e9e6a0db184b29eeb4a8c54",
-    "docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md": "7122b7bdfbf6f70a9cdb77492311dda5508c3d8ceb43538916d7ad1c8c9257e0",
-    "src/solana_alpha_lab/factory/remote_ops.py": "b3444324352204055104a730f72b56057456e29fa6ca489805a278872f8a105f",
-    "tests/test_i2_backup_legacy_storage_v1.py": "9dad2c97002e9cb1ae0181512e53bbebb3311dddda115b73ef59962e5c3c3e2d"
+    "catalog/assets/core.yaml": "a3a20fe4a615419911b63c383e894fe8dfd8ebaef968b23eb981044b3b259233",
+    "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md": "ff124b9cb0a9a287fba8992e8b01155f6926c2d9f096a9b12d1184021f8258ff",
+    "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md": "b60c5eb434525e4b948a11584801170e9365aed691f266e6d6b4034b4e7ac38d",
+    "docs/evidence/i2_backup_legacy_storage_v1/remaining-outcome-proof.json": "43f3e3cedbc59cdb4ab53e4630ef9430ecb77c27201960f334232315e9e8df7c",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-claims.json": "29347ec3253292ba71cc2ae685ba52b51161ccd4ef4d05d8cd0a82d3002fd10f",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-classification.json": "d6e78d224b4c62384b30929f3426ae9c59bf62adb609e9a701343e7525c7091a",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-evidence.json": "98537b4a4291691e1f17d282e1aa6e901b45c0bd812eeab269cc239a7e0415b2",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-non-claims.json": "0e1a99d7d8d9a8cff59559e200a24fb687eddcca42463a4054de86a25e829ffa",
+    "docs/operator/FACTORY_REMOTE_HOST.md": "c9e4fd42c4373ffc8ac38c67037b33a408a708a44b792d0bfc1e32bdf0292be1",
+    "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "39c4c5b8f2d16023f1467fe00ff457ed9f5448a7fe2c9505b83cff6e908a3752",
+    "docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md": "8e05b826ea4051f8fbf5073d5abb2831a3ab0929d33ce84c18d490c263651356",
+    "scripts/factory_remote_doctor.py": "87ddf363f57838f3d02529191ee7aac75048b80a641bcb6b8566c415a7e3e7f2",
+    "src/solana_alpha_lab/factory/observation_schedule_retention.py": "e9f2f636d63286bdb4ffb04f4867118243c909c7ff6e30e6539f026cc1158431",
+    "src/solana_alpha_lab/factory/offhost_backup.py": "dc730f68e4bfec24b9fca8ce18b6bcf5f97d8930260be7cd329f2de772e2432f",
+    "tests/test_i2_offhost_checkpoint_v1.py": "be58f3c0660c029a0048de56e1bfcd75c6fa179ba0247ab1f38922dc1c3de9fd",
+    "tests/test_i2_retention_maintenance_v1.py": "2ad4cf273b8d0f4447ed9185375705dfa22636582936a354e3e7c5f58cfd3f21"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -35,14 +42,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/i2_backup_legacy_storage_v1/factory-fit.json",
-    "sha256": "f16dc997d9df2f000b07d4a7434009fd2fe08be2312a5d2869db8028c5b0abf8",
+    "sha256": "f7b8209dfa4e763595e13adf1026ad741394addf954a9f2b79ff157885b12b88",
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_Ran3tests_in38.973s_FULL_CURRENT_DUE_POPULATION_12373_PENDING_67447_TERMINAL_TO_74239_PENDING_LATE_RAW_AND_TERMINAL_WITNESS_NATIVE_CHECKPOINT_INDEPENDENT_RESTORE_MISSING_CORRUPT_INTERRUPTED_RETRY_PLUS_MANAGED_ACCOUNTING_PUBLICATION_CONSUMER",
+    "targeted": "PASS_97_AFFECTED_78.257s_PLUS_38_OFFHOST_AND_READER_BOUNDARY_SAME_VERIFIED_5.3GB_COPY_NATIVE_RETIRE_RESUME_RECLAIM_AGING_FULL_RESTORE_WRITER; PASS_10_DOCTOR_DISPATCH_AND_LOCAL_RETRY_CONFIG_FORWARDING_0.658s_AFTER_CI_CONSUMER_FINDING",
     "independent_review": {
       "path": "docs/evidence/i2_backup_legacy_storage_v1/independent-review.json",
-      "sha256": "36098ec1585b8f1b1384c905ad685ac0c695d1cebede13566821f9a724e738ca",
+      "sha256": "667e88fdf04f5eae86f59d87e9b01828198dc9a78d0c76e2e6bd84bd207461f9",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
@@ -50,21 +57,22 @@
     "project_checks": [
       "PASS_DELIVERY_CONTEXT",
       "PASS_CATALOG_PROPAGATION",
-      "PASS_FALSIFIERS_AND_ISOLATED_REHEARSAL",
-      "PASS_NO_PRODUCTION_MUTATION"
+      "PASS_NATIVE_SAME_COPY_OPERATIONAL_PROOF",
+      "PASS_NO_PRODUCTION_MUTATION_IN_THIS_ATOM"
     ]
   },
   "non_claims": [
-    "NO_PRODUCTION_RATIO_OR_94_PERCENT_RECLAIM",
-    "NO_MONTHS_RUNWAY_SUPPORTED",
+    "NO_PRODUCTION_STAGE_C_ACCEPTANCE",
+    "NO_CANONICAL_I2_DONE",
+    "NO_ZERO_GAP_PHYSICAL_RECLAIM",
+    "NO_MONTH_RUNWAY_SUPPORTED",
     "NO_SCIENTIFIC_ALPHA_OR_CASHFLOW_VERDICT",
-    "NO_CANONICAL_DONE",
-    "NO_MERGE_OR_OPERATE_AUTHORITY_FROM_EVIDENCE",
-    "NO_DEPLOY_UPLOAD_APPLY_POLICY_ENABLE_OR_EFFECTIVE_FRESHNESS_RETENTION_CHANGE"
+    "NO_MERGE_OR_RUNTIME_AUTHORITY_FROM_EVIDENCE",
+    "NO_GRANT_TIMER_RPO_RETENTION_MINIMA_CHANGE"
   ],
   "side_effects": {
-    "repository": "bounded I2 branch code/tests/docs/Catalog",
-    "local": "disposable native fixture roots and measurement receipts",
-    "external": "Two bounded complete-census/B-watch read-only production probes; Git routine delivery only. No capture/retry/deploy/upload/settings or receipt cleanup."
+    "repository": "Bounded code/tests/current task/OPERATE/evidence/Catalog task branch.",
+    "local": "Existing verified copy reused on owned isolated workspace; artifacts retained; no general cleanup.",
+    "external": "Read-only runtime/watch and isolated native copy rehearsal on existing host; no production deploy/settings/upload/deletion/retirement/policy mutation. Routine Git/GitHub delivery."
   }
 }

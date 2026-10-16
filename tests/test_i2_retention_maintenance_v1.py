@@ -335,7 +335,7 @@ class PolicyRevisionRecoveryTests(NativeFixture):
         def controls():
             with closing(sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True)) as raw:
                 return raw.execute('SELECT control_key,payload_json FROM retention_control ORDER BY control_key').fetchall()
-        def native_initial(root, *, now, **kwargs):
+        def native_initial(root, *, now, _run_context=None, **kwargs):
             return owner.run_maintenance_step(self.store,now=now,pressure=SAFE,**kwargs)
         def late_peer(*args, **kwargs):
             nonlocal held
@@ -435,7 +435,7 @@ class PolicyRevisionRecoveryTests(NativeFixture):
                 try:
                     fixture.outcome_source()
                     before=fixture.planner_protected_rows()
-                    def native_initial(root, *, now, **kwargs):
+                    def native_initial(root, *, now, _run_context=None, **kwargs):
                         return owner.run_maintenance_step(fixture.store,now=now,pressure=SAFE,**kwargs)
                     with patch.object(owner,'maintenance_after_checkpoint',side_effect=native_initial), \
                             patch.object(backup,'release_checkpoint_archive_cache',return_value={'status':'NONE'},
@@ -481,7 +481,7 @@ class PolicyRevisionRecoveryTests(NativeFixture):
         peer=ObservationScheduleStore(self.path)
         release=backup.release_checkpoint_archive_cache
         captured={}
-        def native_initial(root, *, now, **kwargs):
+        def native_initial(root, *, now, _run_context=None, **kwargs):
             return owner.run_maintenance_step(self.store,now=now,pressure=SAFE,**kwargs)
         def busy_release(root, **kwargs):
             lease=peer.acquire_lease('ordinary-collector',clock=NOW)
@@ -1091,7 +1091,7 @@ class CheckpointRefreshPolicyRecoveryTests(NativeFixture):
                 deletions.append((clock[0],blocked))
                 clock[0]+=0.04
             return original_unlink(path,*args,**kwargs)
-        def native_initial(root,*,now,**kwargs):
+        def native_initial(root,*,now,_run_context=None,**kwargs):
             return owner.run_maintenance_step(self.store,now=now,pressure=SAFE,**kwargs)
         with patch.object(backup.time,'monotonic',side_effect=lambda:clock[0]), \
                 patch.object(owner,'start_checkpoint_archive_cache_deletion',side_effect=prepare), \
@@ -1258,7 +1258,7 @@ class CheckpointRefreshPolicyRecoveryTests(NativeFixture):
                 self.assertIsNone(observed['peer_lease'])
                 return decision
             pins=list(self.store._conn.execute('SELECT * FROM retention_archive_pins ORDER BY object_name'))
-            def native_initial(root, *, now, **kwargs):
+            def native_initial(root, *, now, _run_context=None, **kwargs):
                 return owner.run_maintenance_step(self.store,now=now,pressure=SAFE,**kwargs)
             with patch.object(owner,'checkpoint_archive_cache_releasable',side_effect=consumer_attempt), \
                     patch.object(owner,'maintenance_after_checkpoint',side_effect=native_initial):
@@ -1488,6 +1488,151 @@ with patch.object(backup,'load_offhost_config',return_value=config),patch.object
 
 
 class NativeRetentionTests(NativeFixture):
+    def test_one_existing_caller_drains_chunks_and_resumes_after_due_yield(self):
+        import os,yaml
+        for name in ('ONE','TWO','THREE'):
+            add_call(self.store,name,size=1000)
+        self.commission(enabled=True,max_rows=1,max_run_chunks=8,max_run_wall_seconds=60)
+        runtime=yaml.safe_load((ROOT/'configs/observation_schedule_runtime_v1.yaml').read_text())
+        runtime['ops_store_relative']='ops.sqlite'
+        target=self.hot/'configs/observation_schedule_runtime_v1.yaml';target.parent.mkdir()
+        target.write_text(yaml.safe_dump(runtime))
+        target=self.hot/'catalog/schemas/observation_schedule_runtime_v1.schema.json';target.parent.mkdir(parents=True)
+        target.write_bytes((ROOT/'catalog/schemas/observation_schedule_runtime_v1.schema.json').read_bytes())
+        original_read=Path.read_text
+        def pressure(path,*args,**kwargs):
+            if path.as_posix()=='/proc/meminfo':return 'MemAvailable: 1048576 kB\n'
+            if path.as_posix()=='/proc/pressure/io':return 'some avg10=0.00\n'
+            return original_read(path,*args,**kwargs)
+        original_step=owner._maintenance_after_checkpoint_step
+        attempts=[]
+        def due_once(*args,**kwargs):
+            attempts.append(1)
+            if len(attempts)==2:return {'status':'YIELD','reason':'DUE_OR_TAIL_PRIORITY'}
+            return original_step(*args,**kwargs)
+        elapsed=[0.0]
+        def sleep(seconds):elapsed[0]+=seconds
+        with patch.object(Path,'read_text',new=pressure),patch.object(os,'getloadavg',return_value=(0,0,0),create=True),patch.object(owner,'_maintenance_after_checkpoint_step',side_effect=due_once):
+            result=owner.maintenance_after_checkpoint(self.hot,now=NOW,monotonic_clock=lambda:elapsed[0],sleeper=sleep)
+        self.assertEqual(result['applied_call_compactions'],3,result)
+        self.assertGreaterEqual(result['run']['completed_chunks'],3)
+        self.assertEqual(elapsed[0],5.0)
+        self.assertEqual(self.store._conn.execute("SELECT count(*) FROM call_ledger WHERE json_extract(payload_json,'$.rows') IS NOT NULL").fetchone()[0],0)
+        # Same-policy restart respects run cadence, instead of permanently
+        # inheriting a transient YIELD or requiring another owner list of IDs.
+        self.assertIsNone(owner._control(self.store,'active_plan'))
+
+    def test_checkpoint_refresh_shares_total_run_budget_clock_and_effects(self):
+        from solana_alpha_lab.factory import offhost_backup as backup
+        for limit in ('chunks','wall','effectful_refresh'):
+            with self.subTest(limit=limit):
+                fixture=NativeRetentionTests();fixture.setUp()
+                try:
+                    fixture.commission(enabled=True,max_run_chunks=2,max_run_wall_seconds=60)
+                    elapsed=[0.0];observed=[]
+                    original=owner.maintenance_after_checkpoint
+                    def caller(*args,**kwargs):
+                        return original(*args,**kwargs,monotonic_clock=lambda:elapsed[0])
+                    def step(root, *, now, **kwargs):
+                        observed.append(now)
+                        elapsed[0]+=1
+                        if len(observed)==2:
+                            return {'status':'YIELD','reason':'ARCHIVE_REFRESH_REQUIRED',
+                                **({'completed_chunk':True,'applied_call_compactions':1,'scanned_rows':1}
+                                    if limit=='effectful_refresh' else {})}
+                        return {'status':'PROGRESS','applied_call_compactions':1,'scanned_rows':1}
+                    def refresh(*args,**kwargs):
+                        elapsed[0]+=55 if limit=='wall' else 7
+                        return {'status':'REGISTERED'}
+                    with patch.object(owner,'maintenance_after_checkpoint',side_effect=caller), \
+                            patch.object(owner,'_maintenance_after_checkpoint_step',side_effect=step), \
+                            patch.object(backup,'release_checkpoint_archive_cache',return_value={'status':'NONE'}), \
+                            patch.object(backup,'refresh_checkpoint_archive',side_effect=refresh), \
+                            patch('solana_alpha_lab.factory.observation_schedule_runtime.load_runtime_config',
+                                return_value={'ops_store_relative':'ops.sqlite'}):
+                        result=backup.run_checkpoint_maintenance(fixture.hot,{},now=NOW)
+                    completed=1 if limit=='wall' else 2
+                    self.assertEqual(result['run']['completed_chunks'],completed,result)
+                    self.assertEqual(result['applied_call_compactions'],completed,result)
+                    self.assertEqual(result['scanned_rows'],completed,result)
+                    self.assertEqual(result['run']['attempts'],2 if limit=='effectful_refresh' else completed+1,result)
+                    self.assertEqual(result['run']['wall_seconds'],elapsed[0],result)
+                    self.assertEqual(result['reason'],'RUN_BUDGET_EXHAUSTED' if limit=='wall' else 'RUN_CHUNK_LIMIT')
+                    if limit=='chunks':
+                        self.assertEqual(observed[-1],NOW+timedelta(seconds=9))
+                finally:
+                    fixture.tearDown()
+
+    def test_cold_restore_budget_uses_existing_reader_ceiling(self):
+        document=policy(enabled=True)
+        document['archive_refresh']={'enabled':True,'cold_root_relative':'local/cold',
+            'max_objects':8,'max_bytes':32000000000,'max_wall_seconds':600,'minimum_interval_seconds':86400}
+        owner.validate_policy(document)
+        document['archive_refresh']['max_wall_seconds']=10800
+        owner.validate_policy(document)
+        for invalid in (10801,float('nan'),float('inf'),0):
+            with self.subTest(invalid=invalid):
+                document['archive_refresh']['max_wall_seconds']=invalid
+                with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,'ARCHIVE_REFRESH_BUDGET_INVALID'):
+                    owner.validate_policy(document)
+
+    def test_shared_request_started_attempt_does_not_pin_another_completed_occurrence(self):
+        request=add_call(self.store)
+        self.store.start_call(request_sha256=request,call_occurrence_id='UNKNOWN-OTHER',
+            attempt_id='UNKNOWN-ATT',primitive_id='PRIM',payload={'unresolved':True},clock=OLD)
+        unknown=self.store.call_payload('UNKNOWN-OTHER')
+        document=self.commission()
+        plan=self.plan(document)
+        self.assertEqual([c['row']['call_occurrence_id'] for c in plan['candidates']],['OCC-1'])
+        self.assertEqual(self.apply(plan)['applied_call_compactions'],1)
+        self.assertEqual(self.store.call_state('UNKNOWN-OTHER'),'STARTED')
+        self.assertEqual(self.store.call_payload('UNKNOWN-OTHER'),unknown)
+
+    def test_native_discovery_pointer_owns_ledger_and_cache_but_ambiguous_cache_is_protected(self):
+        from solana_alpha_lab.factory.observation_primitives import call_occurrence_id
+        from solana_alpha_lab.factory.observation_scheduler import DISCOVERY,poll_slot_id
+        slot=poll_slot_id(primitive_id=DISCOVERY,query_profile_id='RECENT',period_seconds=60,
+            now=OLD,schedule_sha256='a'*64,activation_id='LEGACY')
+        request='b'*64
+        occurrence=call_occurrence_id(schedule_sha256='a'*64,activation_id='LEGACY',primitive_id=DISCOVERY,
+            point_id='DISCOVERY',due_at=slot,claim_identity_set=(),request_digest=request)
+        payload={'rows':[{'body':'x'*10000}],'response_sha256':'c'*64,'call_occurrence_id':occurrence}
+        self.store.start_call(request_sha256=request,call_occurrence_id=occurrence,attempt_id='A',
+            primitive_id=DISCOVERY,payload={'poll_slot_id':slot},clock=OLD)
+        self.store.complete_call(request_sha256=request,call_occurrence_id=occurrence,attempt_id='A',payload=payload,clock=OLD)
+        self.store.save_poll_slot(poll_slot_id=slot,request_sha256=request,payload=payload,clock=OLD)
+        self.store.start_call(request_sha256=request,call_occurrence_id='UNRESOLVED',attempt_id='B',
+            primitive_id=DISCOVERY,payload={'poll_slot_id':'other-slot'},clock=OLD)
+        self.store.save_poll_slot(poll_slot_id='request-only',request_sha256=request,
+            payload={'rows':[1],'response_sha256':'c'*64},clock=OLD)
+        document=self.commission()
+        pinned={**document,'revision':2,'protected_occurrence_ids':[occurrence]}
+        owner.install_maintenance_policy(self.store,policy=pinned,approved_sha256=owner.policy_sha256(pinned),now=NOW)
+        protected=self.plan(pinned)
+        self.assertFalse(protected['candidates'])
+        self.assertEqual(protected['exclusions']['FROZEN_EXPORT_CAPTURE_PIN'],2)
+        document={**document,'revision':3}
+        owner.install_maintenance_policy(self.store,policy=document,approved_sha256=owner.policy_sha256(document),now=NOW)
+        plan=self.plan(document)
+        self.assertEqual(len(plan['candidates']),2,plan['exclusions'])
+        self.assertIn('POLL_SOURCE_IDENTITY_UNPROVEN',plan['exclusions'])
+        result=self.apply(plan)
+        self.assertEqual(result['applied_call_compactions'],1)
+        self.assertEqual(result['applied_poll_slot_compactions'],1)
+        self.assertEqual(self.store.load_poll_slot('request-only')['payload']['rows'],[1])
+        self.assertEqual(self.store.call_state('UNRESOLVED'),'STARTED')
+
+    def test_request_only_active_due_still_protects_completed_body(self):
+        request=add_call(self.store)
+        add_scope(self.store,'LIVE','ACTIVE',schedule='b'*64)
+        self.store.insert_due({'schedule_sha256':'b'*64,'activation_id':'LIVE','entity_id':'M',
+            'point_id':'P','primitive_id':'PRIM','state':'PENDING','due_at':render_utc(NOW),
+            'deadline_at':render_utc(NOW+timedelta(minutes=1)),'request_sha256':request,'payload':{}},clock=NOW)
+        document=self.commission()
+        plan=self.plan(document)
+        self.assertFalse(plan['candidates'])
+        self.assertIn('SCOPE_NOT_ALLOWED',plan['exclusions'])
+
     def discovery_policy(self):
         document=policy(scope='TARGET',enabled=True)
         document.update(max_rows=2,auto_retire_terminal=True,allowed_classes=['call_ledger'],
@@ -1669,7 +1814,11 @@ class NativeRetentionTests(NativeFixture):
         inode=rdp.stat().st_ino
         final_proof=owner.create_cold_archive(self.store,archive_path=self.base/'final-current.sqlite',
             restored_path=self.base/'final-current-restored.sqlite',routine_roots=[self.hot])
-        plan=owner.build_reclaim_plan(self.store,data_root=rdp)
+        for invalid in (True, float('nan'), 1801):
+            with self.assertRaisesRegex(owner.ObservationScheduleRetentionError,'RECLAIM_WINDOW_INVALID'):
+                owner.build_reclaim_plan(self.store,data_root=rdp,max_wall_seconds=invalid)
+        plan=owner.build_reclaim_plan(self.store,data_root=rdp,max_wall_seconds=900)
+        self.assertEqual(plan['max_wall_seconds'],900)
         fingerprint=plan['fingerprint']
         result=owner.apply_physical_reclaim(self.store,plan=plan,approved_plan_sha256=plan['plan_id'],
             data_root=rdp,writers_quiesced=True,independent_recovery_proof=final_proof,now=NOW)

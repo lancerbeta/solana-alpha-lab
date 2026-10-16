@@ -186,6 +186,14 @@ checkpoint closure в новый явно выделенный isolated root. Re
 remote identity. Удаление требует dedicated explicit permission. Для prune
 учитывать дополнительную временную raw copy внутри owned `.prune-verify`.
 
+Полная reclaim pause включает final-current full/upload/independent restore/
+registration, plan fingerprints, rebuild/switch, native resume/disposition и
+возврат writer/triggers. Она не равна rename. Default plan budget остаётся60s;
+явный approved plan допускает measured budget до1800s, отдельно от полной pause.
+Длинный budget не даёт production authority и не отменяет quiescence/final-current
+oracle, due/activation/rollover или запрет потерь наблюдений. Обычная maintenance
+никогда не включает physical reclaim автоматически.
+
 Reclaim пишет durable ALLOCATING intent до new DB; ordinary native writable
 opens/ticks и уже открытые writers отказывают при unfinished recovery до записи
 или bootstrap исчезнувшего main. Exact `reclaim-resume`/`reclaim-rollback`

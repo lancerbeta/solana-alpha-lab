@@ -2005,9 +2005,11 @@ def run_checkpoint_maintenance(
     from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore, ObservationScheduleStoreError
 
     expected: dict[str, Any] = {}
+    run_context: dict[str, Any] = {}
     transient_types = (ObservationScheduleRetentionError, ObservationScheduleStoreError, RemoteOpsError)
     try:
-        result = maintenance_after_checkpoint(root, now=now, expected_context=expected)
+        result = maintenance_after_checkpoint(root, now=now, expected_context=expected,
+            _run_context=run_context)
     except transient_types as exc:
         if str(exc) in CHECKPOINT_MAINTENANCE_YIELD_REASONS:
             return {"status": "YIELD", "reason": str(exc), "backup_unchanged": True}
@@ -2022,7 +2024,10 @@ def run_checkpoint_maintenance(
         refresh = refresh_checkpoint_archive(root, checkpoint_receipt, now=now, runner=runner,
             expected_context=expected)
         if refresh.get("status") == "REGISTERED":
-            result = maintenance_after_checkpoint(root, now=now, expected_context=expected)
+            admitted = (result.get("run") or {}).get("admitted_policy_sha256")
+            continuation = {"_continuation_policy_sha256": admitted} if admitted else {}
+            result = maintenance_after_checkpoint(root, now=now, expected_context=expected,
+                _run_context=run_context, **continuation)
             released = release_checkpoint_archive_cache(root, now=now, expected_context=expected)
         runtime = load_runtime_config(root, "configs/observation_schedule_runtime_v1.yaml")
         store = ObservationScheduleStore(root / runtime["ops_store_relative"])
@@ -2359,6 +2364,52 @@ def run_offhost_checkpoint(
         raise OffhostBackupError("OFFHOST_TRANSPORT_OUTCOME_UNKNOWN") from exc
 
 
+def _retry_scheduled_contention(operation: Callable[[], dict[str, Any]], *, budget: float, interval: float,
+        monotonic_clock: Callable[[], float], sleeper: Callable[[float], None]) -> tuple[dict[str, Any], dict[str, Any]]:
+    if not (0 < budget <= SCHEDULED_BUSY_RETRY_BUDGET_SECONDS
+            and 0 < interval <= SCHEDULED_BUSY_RETRY_INTERVAL_SECONDS):
+        raise OffhostBackupError("OFFHOST_BUSY_RETRY_BUDGET_INVALID")
+    started = monotonic_clock()
+    deferred = 0
+    waited = 0.0
+    while True:
+        attempt = monotonic_clock()
+        result = operation()
+        if result.get("terminal") != "DEFERRED" or result.get("reason") != "WRITER_BUSY":
+            break
+        deferred += 1
+        waited += max(0.0, monotonic_clock() - attempt)
+        remaining = budget - (monotonic_clock() - started)
+        if remaining <= 0:
+            break
+        before_sleep = monotonic_clock()
+        sleeper(min(interval, remaining))
+        waited += max(0.0, monotonic_clock() - before_sleep)
+    return result, {"deferred_attempts": deferred, "busy_wait_seconds": waited,
+                    "busy_retry_budget_seconds": budget}
+
+
+def run_scheduled_local_backup(root: Path, *, config: Mapping[str, Any] | None = None,
+        monotonic_clock=time.monotonic, sleeper=time.sleep,
+        busy_retry_budget_seconds: float = SCHEDULED_BUSY_RETRY_BUDGET_SECONDS,
+        busy_retry_interval_seconds: float = SCHEDULED_BUSY_RETRY_INTERVAL_SECONDS) -> dict[str, Any]:
+    """Preserve the 12h local recovery point using the existing busy policy."""
+    def attempt():
+        try:
+            return package_backup(root, config=config)
+        except RemoteOpsError as exc:
+            if str(exc) != "WRITER_BUSY":
+                raise
+            return {"terminal": "DEFERRED", "reason": "WRITER_BUSY"}
+    result, retry = _retry_scheduled_contention(attempt, budget=busy_retry_budget_seconds,
+        interval=busy_retry_interval_seconds, monotonic_clock=monotonic_clock, sleeper=sleeper)
+    if result.get("terminal") == "DEFERRED":
+        # The existing systemd failed-unit watch owns prolonged local failure.
+        # No offhost receipt/last-good/pending bytes are overwritten here.
+        raise RemoteOpsError("LOCAL_BACKUP_BUSY_RETRY_EXHAUSTED")
+    return {**result, "scheduled_retry": retry}
+
+
 def run_scheduled_offhost_checkpoint(
     root: Path, *, mode: str, deploy_git_sha: str | None = None,
     config: OffhostConfig | None = None, environ: Mapping[str, str] | None = None,
@@ -2383,26 +2434,15 @@ def run_scheduled_offhost_checkpoint(
         raise OffhostBackupError("OFFHOST_NOT_CONFIGURED")
     previous = read_offhost_receipt(root, offhost) or {}
     previously_seen = previous.get("checkpoint_filename")
-    started = monotonic_clock()
-    deferred = 0
-    waited = 0.0
-    while True:
-        attempt = monotonic_clock()
-        result = run_offhost_checkpoint(root, mode=mode, deploy_git_sha=deploy_git_sha,
+    def attempt():
+        return run_offhost_checkpoint(root, mode=mode, deploy_git_sha=deploy_git_sha,
             config=offhost, environ=environ, runner=runner, wall_clock=actual_clock,
             monotonic_clock=monotonic_clock, scheduled_requested_at=requested_at,
             scheduled_previously_seen=previously_seen)
-        if result.get("terminal") != "DEFERRED" or result.get("reason") != "WRITER_BUSY":
-            return {**result, "scheduled_retry": {"deferred_attempts": deferred,
-                "busy_wait_seconds": waited, "busy_retry_budget_seconds": budget}}
-        deferred += 1
-        waited += max(0.0, monotonic_clock() - attempt)
-        remaining = budget - (monotonic_clock() - started)
-        if remaining <= 0:
-            break
-        before_sleep = monotonic_clock()
-        sleeper(min(interval, remaining))
-        waited += max(0.0, monotonic_clock() - before_sleep)
+    result, retry = _retry_scheduled_contention(attempt, budget=budget, interval=interval,
+        monotonic_clock=monotonic_clock, sleeper=sleeper)
+    if result.get("terminal") != "DEFERRED" or result.get("reason") != "WRITER_BUSY":
+        return {**result, "scheduled_retry": retry}
     try:
         operation = _read_pending(root, offhost)
     except OffhostBackupError:
@@ -2416,8 +2456,7 @@ def run_scheduled_offhost_checkpoint(
         "terminal": "COPY_FAILED", "failure_code": "OFFHOST_BUSY_RETRY_EXHAUSTED",
         "reason": "WRITER_BUSY", "failed_at": _stamp(actual_clock()),
         "scheduled_requested_at": _stamp(requested_at), "mode": mode,
-        "deploy_git_sha": deploy_git_sha, "deferred_attempts": deferred,
-        "busy_wait_seconds": waited, "busy_retry_budget_seconds": budget,
+        "deploy_git_sha": deploy_git_sha, **retry,
         "snapshot_data_as_of": operation.get("snapshot_data_as_of") if operation else None,
         "checkpoint_filename": operation["checkpoint"]["filename"] if operation else None,
         "resume": {
