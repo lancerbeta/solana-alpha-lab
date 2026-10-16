@@ -1,12 +1,12 @@
 [
   {
-    "claim_id": "I2_CAPTURED_REQUIRED_RECOVERY_CLOSURE",
-    "claim": "Actual captured ACTIVE/DRAINING OPS and open publication stages select native exact transactions, captured activation state prefix and dataset dependencies. Existing VALID lookup and hash-bound validation receipts avoid global historical traversal; absent lookup/receipt uses measured streaming metadata fallback outside writer fences under unchanged total deadline. Native required identity, bytes/hash/fingerprint and namespace consistency failures refuse; inventory and ZIP consume the same staged set.",
-    "scope": "Isolated production-shaped namespace and native restoration; code capability only, production acceptance pending."
+    "claim_id": "I2_RAW_RECOVERY_SET_BUDGET",
+    "claim": "Captured OPS recovery JSON is scanned under the existing monotonic deadline; only actual raw pointers consume raw_ref cap. Native due terminal semantics plus conservative escaped/raw-key text prefilter retain terminal raw bytes without a proven other owner. Immutable staged content-address hashes and inventory/ZIP are one source. Ordinary due rows do not consume material cap.",
+    "scope": "Bounded capture patch, not historical scientific integrity or production acceptance."
   },
   {
-    "claim_id": "I2_RUNTIME_AUTHORITY_AND_PRODUCT_OUTCOME",
-    "claim": "No new live capture/deploy/upload, lookup commissioning, destructive operation or settings change. Original I2 finite legacy retirement/physical reclaim and one sustainable policy remain required after authorized PACKAGING_LIVE_PROVEN, with existing owners and separate exact runtime authorities.",
-    "scope": "Current recovery patch plus single existing OPERATE packet; no scientific truth or I3 grant changes."
+    "claim_id": "I2_RUNTIME_AND_PRODUCT_BOUNDARY",
+    "claim": "Existing SQLite/ResearchStore, grants, budgets, A/B, shared accounting and science owners remain. One new exact StageB approval follows actual merge/readback. StageC finite native cleanup/reclaim/policy remains mandatory after live verified copy. DEGRADED/source-clock UNKNOWN and B warning remain honest.",
+    "scope": "Same task/OPERATE; no new service, scheduler, index commissioning, production writes or scientific promotion."
   }
 ]

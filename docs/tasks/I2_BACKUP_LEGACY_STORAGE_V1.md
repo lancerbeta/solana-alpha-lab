@@ -1,6 +1,6 @@
 ---
 task_id: I2_BACKUP_LEGACY_STORAGE_V1
-task_version: '1.5'
+task_version: '1.6'
 status: IN_PROGRESS
 as_of: '2026-10-16'
 owner: GOAL_OWNER
@@ -8,10 +8,10 @@ allowed_routes: [DIRECT_CODEX_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 2c39e5e47f2edb60a7720ef6621c2203b5d0561b
+  expected_base: 5a68d602d5135038e7dd49c8fe14f69cb893fa8a
   expected_upstream: origin/main
-  expected_upstream_oid: 2c39e5e47f2edb60a7720ef6621c2203b5d0561b
-  expected_branch: codex/i2-recovery-closure-p1
+  expected_upstream_oid: 5a68d602d5135038e7dd49c8fe14f69cb893fa8a
+  expected_branch: codex/i2-raw-dependency-selection-p1
   dirty_mode: ALLOW_REPORTED
 objective: Implement the complete I2 backup, legacy retirement, physical reclaim and bounded maintenance capability on existing owners; prove it on isolated stores, deliver reviewed exact-head CI and machine merge-readiness, and prepare one staged OPERATE packet without production mutations.
 managed_write_set:
@@ -85,6 +85,45 @@ context_requirements:
 ---
 
 # I2_BACKUP_LEGACY_STORAGE_V1
+
+## Raw dependency selection P1 — 2026-10-16
+
+Same I2, owner-authorized bounded repair after installed5a68d602 refused its
+one approved full with BACKUP_RECOVERY_DEPENDENCY_BUDGET_EXCEEDED. Before code,
+one COMPLETE read-only census measures all recovery-row JSON, actual raw refs,
+terminal ownership and multiple ACTIVE/DRAINING cohorts. No live retry.
+
+Repair only remote_ops capture selection/accounting and direct regression/
+durable consumers: count actual raw references/materialized objects, keep all
+node visits under the existing total-wall deadline and per-payload bounds.
+Use canonical due states; terminal raw bytes remain required unless a source/
+cold owner proves otherwise. Ordinary due rows must not consume a different
+global dependency count. No caps, science, ROWIDs, missed outcomes, grants,
+timers, existing lookup or SQLite-copy mechanism change.
+
+One existing vertical fixture uses >=12373 PENDING +4781 terminal rows and
+future concurrent cohorts, zero refs / mandatory late nested ref, missing/
+corrupt bytes, interruption/retry and unchanged last-good. Native capture,
+compressed checkpoint, independent restore, actual raw-byte/control oracle;
+measure wall/fence/RSS. Reuse #408 scale and #409 closure evidence without
+repeating their suites. Four isolated reviews remain P0/P1 and delta-scoped.
+
+DECISION_DELTA: bound required raw dependencies rather than unrelated JSON.
+UNCERTAINTY_REMOVED: full population cost, terminal ownership and late-ref
+completeness at growth beyond65536 ordinary due rows.
+CAPABILITY_OR_EVIDENCE: native end-to-end disposable checkpoint/restore proof;
+local PASS is not runtime acceptance. SPEC_ROUTE=NONE (existing I2 contract).
+STOP: exact-head CI + machine readiness for one owner merge phrase, or one
+material blocker. NEXT: guarded merge/readback, one NEW exact StageB approval
+for deploy/full/Drive/independent restore/next tick, PACKAGING_LIVE_PROVEN then
+safe StageC preparation on the same verified copy. Another historical limit
+requires bounded operational-recovery replan, no automatic suffix PR.
+
+WATCH: B2026-10-17T00:20:30Z; last-good source clock absent, backup DEGRADED.
+Next scheduled offhost00:45Z is after B. Do not substitute LOCAL_BUNDLE,
+manufacture CURRENT, change grant/timers or silently retry/clear failed state.
+StageC finite retirement/reclaim/policy obligations remain unchanged below;
+destructive APPLY/enable needs its separate exact approval.
 
 ## Recovery closure P1 — 2026-10-16
 

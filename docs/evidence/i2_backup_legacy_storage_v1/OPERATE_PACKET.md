@@ -1,4 +1,58 @@
-# I2 — recovery closure P1 / актуальный Stage B
+# I2 — raw dependency selection P1 / актуальный OPERATE
+
+Installed `5a68d602d5135038e7dd49c8fe14f69cb893fa8a`, read back16Oct10:08Z.
+StageB scopef52baf8448f76417ef2974be53172acc6ce59da2864fc3e724d363189417ca8e
+consumed: one09:26Z full → COPY_FAILED09:27:24Z /
+BACKUP_RECOVERY_DEPENDENCY_BUDGET_EXCEEDED. No ZIP/upload/restore, last-good
+unchanged. Fence0.627505s, total capture54.920809s; no blind retry.
+
+This bounded repair counts actual raw pointers, not JSON nodes or ordinary due
+rows. Native terminal states control scheduling recovery; a possible terminal
+raw pointer (including escaped JSON keys) stays in closure without a proven
+source/cold owner. Native body/witness content-address hashes are checked on
+staged bytes. Every visited node/SQL row remains under the existing monotonic
+total deadline, payload<=2MiB and unchanged caps. No index commissioning,
+SQLite redesign, scientific/history deletion, grant/timer/limit changes.
+Complete production census and end-to-end proof: raw-dependency-proof.json.
+
+Current result: LOCAL_REPAIR_PROVEN / production PACKAGING_BLOCKED.
+New target UNBOUND until guarded merge and exact green post-merge readback;
+old approval does not authorize another capture or the repaired binary.
+One future exact StageB signature covers canonical-forward deploy → fresh
+compressed standalone full/checkpoint via existing caller → existing Drive
+sink → independent remote restore → ordinary next native tick. Existing window
+adapter/measurements/native gates/resources/pending lock owner are reused;
+fresh read-only preflight binds installed SHA, A/B/APPLIED/shared counters/B
+timer, pending/locks/jobs/last-good/source clocks, due and storage peak. Do not
+duplicate a scheduled run, clear failed/pending state, or create provider calls.
+
+Acceptance needs actual ZIP method/bytes, capture wall/fence, transfer/restore
+bytes/time, inventory/raw/control/publication closure, source clocks, WAL/temp/
+free and zero backup-caused missed due/lock failure, preserved A/B/profile,
+monotonic shared counters and armed B timer. Local proof is not OFFHOST_VERIFIED.
+If another historical limit refuses, preserve trace/last-good; bounded replan
+of the minimal operational recovery set, no automatic suffix PR/retry series.
+
+WATCH readback16Oct10:08:02Z: snapshot_data_as_of NULL, native DEGRADED,
+legacy lower-bound age120181.8s versus CURRENT86400s. B17Oct00:20:30Z is armed;
+without a new verified backup its lower-bound age171329s remains DEGRADED.
+Next offhost daily17Oct00:45Z is after B. Supported resolution is authorized
+merged repair/full/independent restore before the gate. No CURRENT fiction,
+LOCAL_BUNDLE substitution, grant extension or timer changes. Success by B is
+not promised. Activation is not yet ACTIVE and its other gates remain native.
+
+After PACKAGING_LIVE_PROVEN, immediately reuse that same verified copy for safe
+StageC preparation: eligible bodies/protected accounting/science/dependencies/
+residual bytes and named consumers, finite native archive-bound retirement in
+bounded resumable chunks, physical reclaim gain and remaining HOT footprint,
+new compact full/restore, one sustainable recurring policy (throughput>inflow).
+Measure the WHOLE pause: quiesce → final-current upload/restore/register →
+rebuild/switch/checks → writer return. If it cannot fit between obligations,
+return one measured maintenance-window tradeoff. Destructive APPLY/enable needs
+one separate exact approval for the finite scope, not per chunk. No gaps,
+remote deletion, RPO/retention or scientific changes are authorized here.
+
+## Historical recovery closure #409 packet (superseded runtime identity)
 
 Installed `2c39e5e47f2edb60a7720ef6621c2203b5d0561b`.
 Approved scope44c315f47c859032fe855c79d3770c1fce73d5aa817f5101ce6166db4927c8d6

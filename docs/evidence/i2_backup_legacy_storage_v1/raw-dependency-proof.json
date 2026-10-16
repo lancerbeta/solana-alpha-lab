@@ -1,0 +1,487 @@
+{
+  "schema": "smial.i2-raw-dependency-selection-proof",
+  "schema_version": "1.0",
+  "as_of": "2026-10-16",
+  "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
+  "base_main": "5a68d602d5135038e7dd49c8fe14f69cb893fa8a",
+  "outcome": "LOCAL_REPAIR_PROVEN_PRODUCTION_BLOCKED",
+  "source_sha256": "b3444324352204055104a730f72b56057456e29fa6ca489805a278872f8a105f",
+  "tests_sha256": "9dad2c97002e9cb1ae0181512e53bbebb3311dddda115b73ef59962e5c3c3e2d",
+  "root_cause": {
+    "production_failure": "BACKUP_RECOVERY_DEPENDENCY_BUDGET_EXCEEDED",
+    "raw_ref_budget_charged": "every popped JSON node plus dict/list member, even without raw pointer",
+    "adjacent_failure": "material count charged ordinary recovery rows; six-cohort ordinary population exceeds65536",
+    "due_selection": "hardcoded states omitted native MISSING_TYPED/CENSORED_LATE and other terminal outcomes"
+  },
+  "complete_read_only_falsifier": {
+    "activation_states": {
+      "ABORTED_SAFETY": 3,
+      "ACTIVE": 1,
+      "COMPLETE": 5,
+      "PAUSED_OPERATOR": 2
+    },
+    "all_scanned": {
+      "json_nodes": 1057256,
+      "old_raw_ref_charges": 2034046,
+      "payload_bytes": 47345395,
+      "raw_references": 0,
+      "rows": 80466,
+      "rows_with_raw_refs": 0
+    },
+    "capture_requested": false,
+    "complete": true,
+    "groups": {
+      "call_ledger|STARTED|NO_ACTIVATION": {
+        "activation_state": "NO_ACTIVATION",
+        "json_nodes": 1938,
+        "native_state": "STARTED",
+        "native_terminal": false,
+        "old_eligible": true,
+        "old_raw_ref_charges": 3230,
+        "payload_bytes": 83980,
+        "raw_references": 0,
+        "rows": 646,
+        "rows_with_raw_refs": 0,
+        "table": "call_ledger"
+      },
+      "due_observations|CENSORED_LATE|ABORTED_SAFETY": {
+        "activation_state": "ABORTED_SAFETY",
+        "json_nodes": 780,
+        "native_state": "CENSORED_LATE",
+        "native_terminal": true,
+        "old_eligible": true,
+        "old_raw_ref_charges": 1430,
+        "payload_bytes": 23010,
+        "raw_references": 0,
+        "rows": 130,
+        "rows_with_raw_refs": 0,
+        "table": "due_observations"
+      },
+      "due_observations|CENSORED_LATE|COMPLETE": {
+        "activation_state": "COMPLETE",
+        "json_nodes": 23981,
+        "native_state": "CENSORED_LATE",
+        "native_terminal": true,
+        "old_eligible": true,
+        "old_raw_ref_charges": 44016,
+        "payload_bytes": 680763,
+        "raw_references": 0,
+        "rows": 3946,
+        "rows_with_raw_refs": 0,
+        "table": "due_observations"
+      },
+      "due_observations|CENSORED_LATE|PAUSED_OPERATOR": {
+        "activation_state": "PAUSED_OPERATOR",
+        "json_nodes": 1244,
+        "native_state": "CENSORED_LATE",
+        "native_terminal": true,
+        "old_eligible": true,
+        "old_raw_ref_charges": 2291,
+        "payload_bytes": 35191,
+        "raw_references": 0,
+        "rows": 197,
+        "rows_with_raw_refs": 0,
+        "table": "due_observations"
+      },
+      "due_observations|CENSORED|COMPLETE": {
+        "activation_state": "COMPLETE",
+        "json_nodes": 25410,
+        "native_state": "CENSORED",
+        "native_terminal": true,
+        "old_eligible": false,
+        "old_raw_ref_charges": 47191,
+        "payload_bytes": 815985,
+        "raw_references": 0,
+        "rows": 3629,
+        "rows_with_raw_refs": 0,
+        "table": "due_observations"
+      },
+      "due_observations|CENSORED|PAUSED_OPERATOR": {
+        "activation_state": "PAUSED_OPERATOR",
+        "json_nodes": 3465,
+        "native_state": "CENSORED",
+        "native_terminal": true,
+        "old_eligible": false,
+        "old_raw_ref_charges": 6435,
+        "payload_bytes": 110880,
+        "raw_references": 0,
+        "rows": 495,
+        "rows_with_raw_refs": 0,
+        "table": "due_observations"
+      },
+      "due_observations|MISSING_TYPED|COMPLETE": {
+        "activation_state": "COMPLETE",
+        "json_nodes": 5971,
+        "native_state": "MISSING_TYPED",
+        "native_terminal": true,
+        "old_eligible": true,
+        "old_raw_ref_charges": 11482,
+        "payload_bytes": 194471,
+        "raw_references": 0,
+        "rows": 460,
+        "rows_with_raw_refs": 0,
+        "table": "due_observations"
+      },
+      "due_observations|MISSING_TYPED|PAUSED_OPERATOR": {
+        "activation_state": "PAUSED_OPERATOR",
+        "json_nodes": 624,
+        "native_state": "MISSING_TYPED",
+        "native_terminal": true,
+        "old_eligible": true,
+        "old_raw_ref_charges": 1200,
+        "payload_bytes": 20304,
+        "raw_references": 0,
+        "rows": 48,
+        "rows_with_raw_refs": 0,
+        "table": "due_observations"
+      },
+      "due_observations|OBSERVED|ACTIVE": {
+        "activation_state": "ACTIVE",
+        "json_nodes": 569806,
+        "native_state": "OBSERVED",
+        "native_terminal": true,
+        "old_eligible": false,
+        "old_raw_ref_charges": 1106094,
+        "payload_bytes": 27112576,
+        "raw_references": 0,
+        "rows": 33518,
+        "rows_with_raw_refs": 0,
+        "table": "due_observations"
+      },
+      "due_observations|OBSERVED|COMPLETE": {
+        "activation_state": "COMPLETE",
+        "json_nodes": 281347,
+        "native_state": "OBSERVED",
+        "native_terminal": true,
+        "old_eligible": false,
+        "old_raw_ref_charges": 539687,
+        "payload_bytes": 12250151,
+        "raw_references": 0,
+        "rows": 23007,
+        "rows_with_raw_refs": 0,
+        "table": "due_observations"
+      },
+      "due_observations|OBSERVED|PAUSED_OPERATOR": {
+        "activation_state": "PAUSED_OPERATOR",
+        "json_nodes": 21835,
+        "native_state": "OBSERVED",
+        "native_terminal": true,
+        "old_eligible": false,
+        "old_raw_ref_charges": 41653,
+        "payload_bytes": 878087,
+        "raw_references": 0,
+        "rows": 2017,
+        "rows_with_raw_refs": 0,
+        "table": "due_observations"
+      },
+      "due_observations|PENDING|ABORTED_SAFETY": {
+        "activation_state": "ABORTED_SAFETY",
+        "json_nodes": 1760,
+        "native_state": "PENDING",
+        "native_terminal": false,
+        "old_eligible": true,
+        "old_raw_ref_charges": 3082,
+        "payload_bytes": 48436,
+        "raw_references": 0,
+        "rows": 438,
+        "rows_with_raw_refs": 0,
+        "table": "due_observations"
+      },
+      "due_observations|PENDING|ACTIVE": {
+        "activation_state": "ACTIVE",
+        "json_nodes": 118840,
+        "native_state": "PENDING",
+        "native_terminal": false,
+        "old_eligible": true,
+        "old_raw_ref_charges": 225796,
+        "payload_bytes": 5084778,
+        "raw_references": 0,
+        "rows": 11884,
+        "rows_with_raw_refs": 0,
+        "table": "due_observations"
+      },
+      "due_observations|PENDING|PAUSED_OPERATOR": {
+        "activation_state": "PAUSED_OPERATOR",
+        "json_nodes": 255,
+        "native_state": "PENDING",
+        "native_terminal": false,
+        "old_eligible": true,
+        "old_raw_ref_charges": 459,
+        "payload_bytes": 6783,
+        "raw_references": 0,
+        "rows": 51,
+        "rows_with_raw_refs": 0,
+        "table": "due_observations"
+      }
+    },
+    "installed_sha": "5a68d602d5135038e7dd49c8fe14f69cb893fa8a",
+    "max_payload_bytes": 810,
+    "native_terminal_states": [
+      "BLOCKED_BUDGET",
+      "CENSORED",
+      "CENSORED_LATE",
+      "DEPENDENCY_MISSING",
+      "DISAPPEARED",
+      "IN_FLIGHT_CALL_INDETERMINATE",
+      "MISSING_TYPED",
+      "OBSERVED",
+      "X_POPULATION_INELIGIBLE"
+    ],
+    "nonterminal_due": {
+      "json_nodes": 120855,
+      "old_raw_ref_charges": 229337,
+      "payload_bytes": 5139997,
+      "raw_references": 0,
+      "rows": 12373,
+      "rows_with_raw_refs": 0
+    },
+    "observed_at": "2026-10-16T09:55:42.038588+00:00",
+    "old_eligible": {
+      "json_nodes": 155393,
+      "old_raw_ref_charges": 292986,
+      "payload_bytes": 6177716,
+      "raw_references": 0,
+      "rows": 17800,
+      "rows_with_raw_refs": 0
+    },
+    "oversize_payloads": [],
+    "projections": [
+      {
+        "actual_raw_refs_upper": 0,
+        "assumption": "conservative linear duplication of observed recovery-row population; shared raw paths can deduplicate",
+        "cohorts": 1,
+        "nonterminal_due_rows_upper": 12373,
+        "old_eligible_rows_upper": 17800,
+        "old_raw_ref_charges_upper": 292986
+      },
+      {
+        "actual_raw_refs_upper": 0,
+        "assumption": "conservative linear duplication of observed recovery-row population; shared raw paths can deduplicate",
+        "cohorts": 3,
+        "nonterminal_due_rows_upper": 37119,
+        "old_eligible_rows_upper": 53400,
+        "old_raw_ref_charges_upper": 878958
+      },
+      {
+        "actual_raw_refs_upper": 0,
+        "assumption": "conservative linear duplication of observed recovery-row population; shared raw paths can deduplicate",
+        "cohorts": 6,
+        "nonterminal_due_rows_upper": 74238,
+        "old_eligible_rows_upper": 106800,
+        "old_raw_ref_charges_upper": 1757916
+      }
+    ],
+    "raw_logical_bytes": 0,
+    "raw_paths": {},
+    "schema": "smial.i2-raw-recovery-population-read-only",
+    "source_data_as_of": "2026-10-16T09:55:42.038588+00:00",
+    "terminal_due": {
+      "json_nodes": 934463,
+      "old_raw_ref_charges": 1801479,
+      "payload_bytes": 42121418,
+      "raw_references": 0,
+      "rows": 67447,
+      "rows_with_raw_refs": 0
+    },
+    "unique_raw_paths": 0,
+    "wall_seconds": 4.468812978826463,
+    "writer_fence_acquired": false
+  },
+  "falsifier_receipt": {
+    "output_sha256": "41e6570d023f6e5a0d008019afc48fa391f44578c53a29bfa76665aa9c939b0d",
+    "probe_source_sha256": "628bdcbe2fbf9508deba9004252f6450c613c04607bc29928f320d8709990cfd",
+    "transport": {
+      "observed_at": "2026-10-16T09:55:47.402647+00:00",
+      "exit_code": 0,
+      "wall_seconds": 6.334303999999975,
+      "source_sha256": "628bdcbe2fbf9508deba9004252f6450c613c04607bc29928f320d8709990cfd",
+      "stdout_sha256": "41e6570d023f6e5a0d008019afc48fa391f44578c53a29bfa76665aa9c939b0d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "writes": 0,
+    "writer_fence": false,
+    "capture_requested": false
+  },
+  "terminal_dependency_ownership": {
+    "native_owner": "ObservationScheduleStore._TERMINAL_DUE_STATES and atomic terminalize_episode_slot + episode_outbox; open publication jobs then native published science/archive owner",
+    "observation": "All67447 current terminal payloads have zero raw references; not proof future terminal references can be omitted.",
+    "selection": "Native nonterminal states OR payload possibly names raw_body_rel/witness_raw_body_rel OR contains JSON escapes. Escaped keys conservatively selected. Required terminal bytes retained without assuming published/cold coverage.",
+    "science": "Complete captured OPS is preserved. No terminal/missed/frozen/scientific row mutation, no global history scientific integrity claim."
+  },
+  "repair": {
+    "owner": "src/solana_alpha_lab/factory/remote_ops.py",
+    "raw_budget": "actual raw pointers, including repeated actual references; staged files deduplicate normally",
+    "row_node_budget": "monotonic existing total-wall deadline, no unrelated dependency count",
+    "bounds": "unchanged2MiB selected payload; existing references/path/materialized closure/total time, streaming copies, content hashes and native resource gates",
+    "integrity": "native content-addressed body/witness filename hash must equal frozen captured bytes; missing/invalid/hash mismatch typed refusal",
+    "no_code_disposition": "Installed owner deterministically exhausts counter before full eligible scan; no supported same-semantics fresh OFFHOST_VERIFIED no-code path. No monkeypatch/bypass."
+  },
+  "vertical_oracle": {
+    "transport": "existing FakeRcloneRunner plus independent download view, no network",
+    "source": "Existing native ManagedScenario ACTIVE+multiple DRAINING and3 managed children; full current terminal67447 and12373 pending then6x74238 pending; zero refs and mandatory final-row nested raw + escaped terminal witness.",
+    "chain": "existing native capture -> compressed standalone full/checkpoint -> synthetic remote verification -> independent native restore with original source directory unavailable -> exact SQL/ROWID, raw-byte and native control oracle",
+    "samples": [
+      {
+        "actual_raw_refs": 0,
+        "checkpoint_wall_seconds": 1.6723855999998705,
+        "label": "current-zero",
+        "material_count": 244,
+        "pending_rows": 12373,
+        "process_peak_rss_bytes": 284823552,
+        "recovery_control": {
+          "authorities": 3,
+          "transitions": 3
+        },
+        "restore_wall_seconds": 1.7071896000006745,
+        "restored_raw_bytes": 0,
+        "selected_due_rows": 12373,
+        "terminal_rows": 67447,
+        "writer_blocked": 0,
+        "writer_hold_seconds": 0.030706399999871792,
+        "writer_probes": 1,
+        "zip_bytes": 3914310
+      },
+      {
+        "actual_raw_refs": 0,
+        "checkpoint_wall_seconds": 2.816797499999666,
+        "label": "six-cohorts-zero",
+        "material_count": 244,
+        "pending_rows": 74238,
+        "process_peak_rss_bytes": 432001024,
+        "recovery_control": {
+          "authorities": 3,
+          "transitions": 3
+        },
+        "restore_wall_seconds": 3.079555600000276,
+        "restored_raw_bytes": 0,
+        "selected_due_rows": 74238,
+        "terminal_rows": 67447,
+        "writer_blocked": 0,
+        "writer_hold_seconds": 0.033767599999919184,
+        "writer_probes": 1,
+        "zip_bytes": 6977042
+      },
+      {
+        "actual_raw_refs": 2,
+        "checkpoint_wall_seconds": 3.0072141999999076,
+        "label": "late-and-terminal",
+        "material_count": 244,
+        "pending_rows": 74239,
+        "process_peak_rss_bytes": 439656448,
+        "recovery_control": {
+          "authorities": 3,
+          "transitions": 3
+        },
+        "restore_wall_seconds": 2.9004039000001285,
+        "restored_raw_bytes": 110,
+        "selected_due_rows": 74240,
+        "terminal_rows": 67447,
+        "writer_blocked": 0,
+        "writer_hold_seconds": 0.05003740000029211,
+        "writer_probes": 2,
+        "zip_bytes": 6978296
+      },
+      {
+        "actual_raw_refs": 2,
+        "checkpoint_wall_seconds": 1.9437435999998343,
+        "label": "retry",
+        "material_count": 244,
+        "pending_rows": 74239,
+        "process_peak_rss_bytes": 439873536,
+        "recovery_control": {
+          "authorities": 3,
+          "transitions": 3
+        },
+        "restore_wall_seconds": 3.155038400000194,
+        "restored_raw_bytes": 110,
+        "selected_due_rows": 74240,
+        "terminal_rows": 67447,
+        "writer_blocked": 0,
+        "writer_hold_seconds": 0.03437800000028801,
+        "writer_probes": 2,
+        "zip_bytes": 6978296
+      }
+    ],
+    "checks": [
+      "DEFLATE8",
+      "zero refs count0",
+      "two refs count2",
+      "material244 constant across growth",
+      "3 authorities and3 transitions restored",
+      "all110 required raw bytes independently restored",
+      "missing reference refuses BACKUP_RECOVERY_DEPENDENCY_MISSING",
+      "corrupt native raw refuses BACKUP_RECOVERY_DEPENDENCY_HASH_MISMATCH",
+      "injected InterruptedError maps native OFFHOST_TRANSPORT_OUTCOME_UNKNOWN",
+      "failed captures preserve last-good/chain/remote objects, no pending to hand-edit, own staging cleaned, native writer BEGIN IMMEDIATE succeeds",
+      "native retry succeeds without state repair",
+      "no write_lookup commissioning",
+      "existing managed revoke/shared accounting/open-publication repair regression PASS"
+    ],
+    "targeted_result": "PASS_Ran3tests_in38.973s",
+    "output_sha256": "295a1b209ec9fcef489504fa0d6bc946a144e1f2513fd9ec0860e9314dd26ba4",
+    "reproduce": "uv run --locked --managed-python python -X utf8 -B -m unittest tests.test_i2_backup_legacy_storage_v1.I2BackupLegacyStorageTests.test_raw_recovery_population_checkpoint_restore_and_retry tests.test_i2_backup_legacy_storage_v1.I2BackupLegacyStorageTests.test_raw_walk_real_reference_budget_and_node_deadline tests.test_i2_backup_legacy_storage_v1.I2BackupLegacyStorageTests.test_managed_revocation_shared_debits_child_and_open_publication_recovery_without_source -v",
+    "fixture_repairs_before_pass": [
+      "ManagedScenario uses nested OPS binding; fixture admitted it through native configurable mutable-only source list.",
+      "Native DURABILITY_CUTOVER fixture required to exclude broad historical RDP capture; oracle rejected raw bytes entering through full-RDP path.",
+      "Removed arbitrary material<100 expectation; constant244 across actual native control closure is the independent growth oracle.",
+      "InterruptedError is OSError: existing offhost maps it to OFFHOST_TRANSPORT_OUTCOME_UNKNOWN; no product mapping change."
+    ],
+    "measurement_limits": [
+      "RSS is whole Windows test process peak including authored141686-row fixture and raw-SQL oracle, not production backup RSS.",
+      "writer probes6/6 unblocked during recovery selection; full concurrent writer/copy scale proof remains #408, not rerun.",
+      "Synthetic transport timings do not estimate real Drive throughput or production full size; code PASS is not production acceptance.",
+      "Terminal metadata SQL prefilter still reads captured terminal payload text outside fence under existing deadline; no permanent index or perpetual O(1) history claim.",
+      "No new5.5GB SQLite or100k manifest suite; existing accepted byte/copy/lookup paths reused unchanged."
+    ]
+  },
+  "B_watch": {
+    "observed_at": "2026-10-16T10:08:02.838159+00:00",
+    "installed_sha": "5a68d602d5135038e7dd49c8fe14f69cb893fa8a",
+    "snapshot_data_as_of": null,
+    "verified_at": "2026-10-15T00:45:01Z",
+    "clock_semantics": "LEGACY_START_CLOCK_LOWER_BOUND",
+    "current_max_age_seconds": 86400,
+    "current": {
+      "age_seconds": 120181.838159,
+      "native_state": "DEGRADED"
+    },
+    "at_B_without_new_backup": {
+      "age_seconds": 171329.0,
+      "native_state": "DEGRADED"
+    },
+    "B_activation": "2026-10-17T00:20:30+00:00",
+    "seconds_until_B": 51147.161841,
+    "last_attempt": {
+      "failed_at": "2026-10-16T09:27:24Z",
+      "failure_code": "BACKUP_RECOVERY_DEPENDENCY_BUDGET_EXCEEDED",
+      "terminal": "COPY_FAILED"
+    },
+    "pending_present": false,
+    "wall_seconds": 0.08692423393949866
+  },
+  "B_timer": {
+    "activates": "factory-i3-b-activate.service",
+    "last": 0,
+    "left": 1792196430000000,
+    "next": 1792196430000000,
+    "passed": 0,
+    "unit": "factory-i3-b-activate.timer"
+  },
+  "B_watch_transport": {
+    "observed_at": "2026-10-16T10:08:03.844120+00:00",
+    "exit_code": 0,
+    "wall_seconds": 2.026836199999707,
+    "source_sha256": "fd7afe3e1cad6ea94587d5206a6272bd5346d3a27db99468d6a2f4cabdb16450",
+    "stdout_sha256": "ad503c01bf4c7b14f19bf1abf070ebda01cfb0afb1363f8768898e7f7e37784e",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "production_authority": {
+    "new_capture_or_retry": false,
+    "deploy_upload_restore": false,
+    "prior_stage_b_scope": "f52baf8448f76417ef2974be53172acc6ce59da2864fc3e724d363189417ca8e_CONSUMED",
+    "next": "exact-head CI/readiness -> owner merge phrase -> guarded merge/post-merge readback -> one new exact merged deploy/full/Drive/independent restore/tick scope",
+    "last_good_source_clock": "UNKNOWN",
+    "timer_or_grant_change": false
+  },
+  "stage_c": "Still required: safe preparation on live verified copy immediately after PACKAGING_LIVE_PROVEN; finite native retirement/reclaim, full measured pause, compact baseline and sustainable recurring policy. One separate exact destructive authority; no science deletion or per-chunk approvals."
+}

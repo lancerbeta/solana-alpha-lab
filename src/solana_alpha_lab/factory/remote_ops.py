@@ -1236,21 +1236,29 @@ def _capture_recovery_raw_refs(root: Path, data_root: Path, staging: Path,
                                captured: dict[str, dict[str, Any]], value: Any) -> None:
     pending = [value]
     while pending:
-        _capture_closure_step("raw_ref")
+        _capture_closure_step()
         current = pending.pop()
         if isinstance(current, dict):
             for key, nested in current.items():
-                _capture_closure_step("raw_ref")
+                _capture_closure_step()
                 if key in {"raw_body_rel", "witness_raw_body_rel"} and nested:
-                    source = _safe_relative(data_root, str(nested))
+                    _capture_closure_step("raw_ref")
+                    if not isinstance(nested, str):
+                        raise RemoteOpsError("BACKUP_RECOVERY_DEPENDENCY_INVALID")
+                    source = _safe_relative(data_root, nested)
                     if not source.is_file():
                         raise RemoteOpsError("BACKUP_RECOVERY_DEPENDENCY_MISSING")
-                    _capture_source(captured, staging, source.relative_to(root).as_posix(), source, False)
+                    relative = source.relative_to(root).as_posix()
+                    _capture_source(captured, staging, relative, source, False)
+                    # Native bodies/witness extracts are content-addressed.
+                    # Check the frozen bytes, never re-read the live source.
+                    if re.fullmatch(r"[0-9a-f]{64}", source.stem) and captured[relative]["sha256"] != source.stem:
+                        raise RemoteOpsError("BACKUP_RECOVERY_DEPENDENCY_HASH_MISMATCH")
                 else:
                     pending.append(nested)
         elif isinstance(current, list):
             for nested in current:
-                _capture_closure_step("raw_ref")
+                _capture_closure_step()
                 pending.append(nested)
 
 
@@ -1622,7 +1630,14 @@ def _capture_recovery_dependencies(root: Path, staging: Path, captured: dict[str
                                                  f"datasets/manifests/{manifest_id}.json")
         ops_item = captured.get(ops_by_data_root.get(data_relative, ""))
         if ops_item and ops_item.get("kind") == "SQLITE_BACKUP_API":
-            # Only unresolved recovery rows; never parse historical call bodies.
+            # Native terminal states need no scheduling recovery. A terminal raw
+            # pointer still needs bytes unless another owner proves preservation;
+            # conservatively retain it, including JSON-escaped keys. This SQL
+            # prefilter may overselect, never silently discard a raw dependency.
+            from solana_alpha_lab.factory.observation_schedule_store import _TERMINAL_DUE_STATES
+            terminal_states = ",".join("'" + state + "'" for state in sorted(_TERMINAL_DUE_STATES))
+            due_predicate = (f"state NOT IN ({terminal_states}) OR "
+                             "instr(payload_json,'raw_body_rel')>0 OR instr(payload_json,char(92))>0")
             reader = (sqlite_readers or {}).get(ops_by_data_root[data_relative])
             owned = (nullcontext(reader) if reader is not None else closing(sqlite3.connect(
                 ops_item["staged"].as_uri() + "?mode=ro&immutable=1", uri=True)))
@@ -1631,7 +1646,7 @@ def _capture_recovery_dependencies(root: Path, staging: Path, captured: dict[str
                 for table, column, predicate in (
                     ("episode_outbox", "row_json", "1=1"),
                     ("publication_jobs", "payload_json", "stage != 'COMPLETE'"),
-                    ("due_observations", "payload_json", "state NOT IN ('OBSERVED','CENSORED','COMPLETE','RETIRED')"),
+                    ("due_observations", "payload_json", due_predicate),
                     ("call_ledger", "payload_json", "state IN ('STARTED','UNKNOWN')"),
                 ):
                     _capture_closure_step()
@@ -1639,11 +1654,14 @@ def _capture_recovery_dependencies(root: Path, staging: Path, captured: dict[str
                         continue
                     cursor = conn.execute(f"SELECT rowid,length(CAST({column} AS BLOB)) FROM {table} WHERE {predicate}")
                     for rowid, size in cursor:
-                        _capture_closure_step("material")
+                        _capture_closure_step()
                         if int(size) > 2 * 1024 * 1024:
                             raise RemoteOpsError("BACKUP_RECOVERY_DEPENDENCY_BUDGET_EXCEEDED")
                         encoded = conn.execute(f"SELECT {column} FROM {table} WHERE rowid=?", (rowid,)).fetchone()[0]
-                        document = json.loads(encoded)
+                        try:
+                            document = json.loads(encoded)
+                        except (ValueError, UnicodeDecodeError, RecursionError) as exc:
+                            raise RemoteOpsError("BACKUP_RECOVERY_DEPENDENCY_INVALID") from exc
 
                         _capture_recovery_raw_refs(root, data_root, staging, captured, document)
 

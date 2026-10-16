@@ -770,6 +770,207 @@ print(json.dumps(remote.package_backup(root,config=config,sink_override=sink,pru
             print("I2_CLOSURE_SAMPLE "+json.dumps(measurements[-1],sort_keys=True),flush=True)
         print("I2_CLOSURE_GROWTH "+json.dumps(measurements,sort_keys=True))
 
+    def test_raw_recovery_population_checkpoint_restore_and_retry(self) -> None:
+        from tests.test_factory_offhost_backup import FakeRcloneRunner, _seed_tree
+        from tests.test_managed_collection_continuity_v1 import D0,D1,D2,D3,ManagedScenario
+        from solana_alpha_lab.factory import offhost_backup as offhost
+        from solana_alpha_lab.factory.observation_schedule import canonical_json_bytes
+
+        sc=ManagedScenario(self.root/RDP)
+        with patch.dict(os.environ,{remote.BACKUP_SINK_ENV:str(sc.sink)}):
+            sc.commission_account()
+            self.assertEqual(sc.apply(D0+timedelta(hours=1))["terminal"],"MANAGED_APPLIED")
+            for day in (D1,D2,D3):
+                sc.backup(day-timedelta(hours=1))
+                sc.nominate_round(day,day.isoformat(),count=1)
+                self.assertEqual(sc.tick(day+timedelta(seconds=5))["managed"]["terminal"],"RECONCILE_CHILD_ACTIVATED")
+        ops=sc.ops_path.relative_to(self.root).as_posix()
+        _seed_tree(self.root)
+        # ManagedScenario keeps OPS beside its RDP; use the same native
+        # configurable source binding as the earlier managed restore oracle.
+        import yaml
+        config_path=self.root/"configs/factory_remote_operations_v1_1.yaml"
+        fixture_config=yaml.safe_load(config_path.read_text(encoding="utf-8"))
+        fixture_config["backup"]["mutable_only_source_relative_paths"].append(ops)
+        config_path.write_text(yaml.safe_dump(fixture_config),encoding="utf-8")
+        from solana_alpha_lab.factory.hot90_activation import write_hot90_runtime_state
+        write_hot90_runtime_state(self.root,{"activation_stage":"DURABILITY_CUTOVER",
+            "production_compaction_enabled":False,"production_eviction_enabled":False,"drive_writes_enabled":True})
+        credentials=self.root/"fixture-rclone.conf"
+        credentials.write_text("[fixture]\ntype = drive\n",encoding="utf-8")
+        credentials.chmod(0o600)
+        config=replace(offhost.load_offhost_config(self.root),rclone_config_absolute=credentials)
+        runner=FakeRcloneRunner()
+        clock=D3+timedelta(hours=1)
+        with closing(sqlite3.connect(sc.ops_path)) as conn:
+            activations=list(conn.execute("SELECT schedule_sha256,activation_id,state FROM schedule_activations"))
+            self.assertIn("ACTIVE",[row[2] for row in activations])
+            self.assertGreaterEqual(sum(row[2]=="DRAINING" for row in activations),2)
+            conn.execute("DELETE FROM due_observations")
+            conn.execute("DELETE FROM call_ledger")
+            conn.commit()
+        stamp="2026-10-20T00:00:00Z"
+        # Complete observed population shape, including all terminal history;
+        # no source payload/market values are copied into this authored fixture.
+        def add_rows(start,count,state):
+            for number in range(start,start+count):
+                sha,activation,_=activations[number%len(activations)]
+                payload={"fixture_due":number,"state":state,"point_id":"E300","primitive_id":"PRICE",
+                    "metadata":{"eligible":True,"recovery":["native",{"clock":stamp}]},
+                    "target":"authored","attempt":None,"source_clock":stamp,"missed_reason":None}
+                yield (sha,activation,f"FIXTURE-{number}","E300","PRICE",state,stamp,stamp,None,None,
+                       json.dumps(payload,separators=(",",":")),stamp,stamp)
+        def insert_rows(rows):
+            with closing(sqlite3.connect(sc.ops_path)) as conn:
+                conn.executemany("INSERT INTO due_observations VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",rows)
+                conn.commit()
+        insert_rows(add_rows(0,12373,"PENDING"))
+        insert_rows(add_rows(100000,4273,"CENSORED_LATE"))
+        insert_rows(add_rows(110000,508,"MISSING_TYPED"))
+        insert_rows(add_rows(120000,62666,"OBSERVED"))
+        body=canonical_json_bytes({"required":"late native raw bytes","clock":stamp})
+        digest=hashlib.sha256(body).hexdigest()
+        raw_rel=f"datasets/raw_evidence/20261020/bodies/{digest}.bin"
+        raw_path=sc.data_root/raw_rel
+        raw_path.parent.mkdir(parents=True,exist_ok=True)
+        raw_path.write_bytes(body)
+        terminal_body=b'{"required":"unpublished terminal witness"}'
+        terminal_digest=hashlib.sha256(terminal_body).hexdigest()
+        terminal_rel=f"datasets/raw_evidence/20261020/witness/{terminal_digest}.json"
+        terminal_path=sc.data_root/terminal_rel
+        terminal_path.parent.mkdir(parents=True,exist_ok=True)
+        terminal_path.write_bytes(terminal_body)
+        measurements=[]
+        original_walk=remote._capture_recovery_raw_refs
+        original_fence=remote._capture_writer_fences
+        selected=[];fences=[];blocked=[];budget_counts={}
+        def observed_walk(*args):
+            value=args[-1]
+            if isinstance(value,dict) and "fixture_due" in value:
+                selected.append(value["fixture_due"])
+                if len(selected)==1 or value["fixture_due"]==999999:
+                    with closing(sqlite3.connect(sc.ops_path,timeout=0)) as peer:
+                        try:peer.execute("BEGIN IMMEDIATE")
+                        except sqlite3.OperationalError:blocked.append(True)
+                        else:peer.rollback();blocked.append(False)
+            original_walk(*args)
+            budget_counts.update(remote._CAPTURE_CLOSURE_BUDGET.get()["counts"])
+        @contextmanager
+        def observed_fence(sources):
+            began=time.monotonic()
+            with original_fence(sources):yield
+            fences.append(time.monotonic()-began)
+        def checkpoint():
+            return offhost.run_offhost_checkpoint(self.root,mode="weekly",config=config,runner=runner,
+                environ={remote.BACKUP_SINK_ENV:str(self.sink)},now=clock)
+        def independent_transport(argv):
+            if runner._subcommand(argv)=="copyto" and argv[-2].startswith(config.remote_prefix):
+                Path(argv[-1]).write_bytes(runner.payloads[argv[-2]])
+                return subprocess.CompletedProcess(argv,0,"","")
+            return runner(argv)
+        def prove(label,pending,required):
+            nonlocal clock
+            clock+=timedelta(minutes=1)
+            selected.clear();fences.clear();blocked.clear();budget_counts.clear()
+            expected=_raw_sql_readback(sc.ops_path)
+            began=time.monotonic()
+            with patch.object(remote,"_capture_recovery_raw_refs",observed_walk),patch.object(
+                    remote,"_capture_writer_fences",observed_fence):
+                receipt=checkpoint()
+            checkpoint_wall=time.monotonic()-began
+            chain=offhost.read_chain_state(self.root,config)
+            self.assertEqual(chain["ordered_deltas"],[])
+            with zipfile.ZipFile(self.sink/receipt["source_backup_filename"]) as archive:
+                self.assertEqual({info.compress_type for info in archive.infolist()},{zipfile.ZIP_DEFLATED})
+                for rel,raw in required.items():self.assertEqual(archive.read(f"{RDP}/{rel}"),raw)
+                if not required:self.assertNotIn(f"{RDP}/{raw_rel}",archive.namelist())
+            restored=Path(self.temp.name)/f"raw-restored-{label}"
+            began=time.monotonic()
+            unavailable=sc.data_root.with_name("source-unavailable")
+            sc.data_root.rename(unavailable)
+            try:
+                proof=offhost.verify_remote_checkpoint_restore(checkpoint_path=self.sink/receipt["checkpoint_filename"],
+                    isolated_root=restored,config=config,runner=independent_transport)
+            finally:unavailable.rename(sc.data_root)
+            restore_wall=time.monotonic()-began
+            self.assertEqual(proof["terminal"],"REMOTE_CHECKPOINT_RESTORE_VERIFIED")
+            self.assertGreaterEqual(proof["restore"]["recovery_control"]["transitions"],3)
+            self.assertEqual(_raw_sql_readback(restored/"restored"/ops,isolated=True),expected)
+            for rel,raw in required.items():self.assertEqual((restored/"restored"/RDP/rel).read_bytes(),raw)
+            self.assertEqual(len(selected),pending+(1 if required else 0))
+            self.assertEqual(budget_counts.get("raw_ref",0),len(required))
+            if measurements:self.assertEqual(budget_counts.get("material",0),measurements[0]["material_count"])
+            self.assertFalse(any(blocked))
+            self.assertFalse((sc.data_root/"research/write_lookup_v1").exists())
+            measurements.append({"label":label,"pending_rows":pending,"terminal_rows":67447,
+                "selected_due_rows":len(selected),"actual_raw_refs":budget_counts.get("raw_ref",0),
+                "material_count":budget_counts.get("material",0),"checkpoint_wall_seconds":checkpoint_wall,
+                "restore_wall_seconds":restore_wall,"writer_hold_seconds":fences[0],
+                "writer_probes":len(blocked),"writer_blocked":sum(blocked),"process_peak_rss_bytes":_peak_rss_bytes(),
+                "zip_bytes":(self.sink/receipt["source_backup_filename"]).stat().st_size,
+                "restored_raw_bytes":sum(map(len,required.values())),"recovery_control":proof["restore"]["recovery_control"]})
+            print("I2_RAW_POPULATION "+json.dumps(measurements[-1],sort_keys=True),flush=True)
+        prove("current-zero",12373,{})
+        insert_rows(add_rows(12373,12373*5,"PENDING"))
+        prove("six-cohorts-zero",74238,{})
+        # Last row in the native cursor: no first-N sample can find this pointer.
+        late=list(add_rows(999999,1,"PENDING"))[0]
+        late=list(late);late[10]=json.dumps({"fixture_due":999999,"nested":[{"raw_body_rel":raw_rel}]})
+        insert_rows([late])
+        # No outbox/job/cold pin proves ownership of this terminal dependency.
+        # Escape the key as valid JSON to falsify a naive text-only prefilter.
+        with closing(sqlite3.connect(sc.ops_path)) as conn:
+            conn.execute("UPDATE due_observations SET payload_json=? WHERE entity_id='FIXTURE-100000'",
+                ('{"fixture_due":100000,"nested":[{"witness_\\u0072aw_body_rel":"'+terminal_rel+'"}]}',))
+            conn.commit()
+        required={raw_rel:body,terminal_rel:terminal_body}
+        prove("late-and-terminal",74239,required)
+        last_good=(self.root/config.receipt_relative).read_bytes()
+        chain_before=(self.root/config.chain_relative).read_bytes()
+        remote_before=dict(runner.payloads)
+        for failure in ("missing","corrupt","interrupted"):
+            with self.subTest(failure=failure):
+                clock+=timedelta(minutes=1)
+                if failure=="missing":raw_path.unlink()
+                if failure=="corrupt":raw_path.write_bytes(b"corrupt frozen native raw")
+                def interrupt(*args):
+                    if isinstance(args[-1],dict) and args[-1].get("fixture_due")==999999:
+                        raise InterruptedError("AUTHORED_CAPTURE_INTERRUPTION")
+                    return original_walk(*args)
+                try:
+                    with patch.object(remote,"_capture_recovery_raw_refs",interrupt if failure=="interrupted" else original_walk):
+                        expected_error=offhost.OffhostBackupError if failure=="interrupted" else remote.RemoteOpsError
+                        code="OFFHOST_TRANSPORT_OUTCOME_UNKNOWN" if failure=="interrupted" else (
+                            "BACKUP_RECOVERY_DEPENDENCY_MISSING" if failure=="missing" else "BACKUP_RECOVERY_DEPENDENCY_HASH_MISMATCH")
+                        with self.assertRaisesRegex(expected_error,code):checkpoint()
+                    self.assertEqual((self.root/config.receipt_relative).read_bytes(),last_good)
+                    self.assertEqual((self.root/config.chain_relative).read_bytes(),chain_before)
+                    self.assertEqual(runner.payloads,remote_before)
+                    self.assertFalse((self.root/config.pending_relative).exists())
+                    self.assertEqual(list((self.root/remote.BACKUP_SNAPSHOT_STAGING_RELATIVE).glob("capture-*")),[])
+                    with closing(sqlite3.connect(sc.ops_path,timeout=0)) as conn:
+                        conn.execute("BEGIN IMMEDIATE");conn.rollback()
+                finally:raw_path.write_bytes(body)
+        # Normal native retry, with no hand editing of pending/receipt/chain.
+        prove("retry",74239,required)
+
+    def test_raw_walk_real_reference_budget_and_node_deadline(self) -> None:
+        budget={"deadline":time.monotonic()+5,"counts":{},"bytes":0}
+        token=remote._CAPTURE_CLOSURE_BUDGET.set(budget)
+        try:
+            with patch.object(remote,"BACKUP_SOURCE_SCAN_MAX_PATHS",1):
+                remote._capture_recovery_raw_refs(self.root,self.root/RDP,self.root/"staging",{},
+                    {"ordinary":[{"nested":index} for index in range(70000)]})
+                self.assertEqual(budget["counts"],{})
+                path=self.root/RDP/"body.bin";path.write_bytes(b"required")
+                with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_RECOVERY_DEPENDENCY_BUDGET_EXCEEDED"):
+                    remote._capture_recovery_raw_refs(self.root,self.root/RDP,self.root/"staging",{},
+                        [{"raw_body_rel":"body.bin"},{"raw_body_rel":"body.bin"}])
+            budget["deadline"]=time.monotonic()-1
+            with self.assertRaisesRegex(remote.RemoteOpsError,"BACKUP_CAPTURE_FENCE_BUDGET_EXCEEDED"):
+                remote._capture_recovery_raw_refs(self.root,self.root/RDP,self.root/"staging",{},["ordinary"])
+        finally:remote._CAPTURE_CLOSURE_BUDGET.reset(token)
+
     def test_exact_lookup_and_namespace_or_pointer_refusal(self) -> None:
         from solana_alpha_lab.factory.research_store import ResearchStore
         self._seed_real_control_activation()
