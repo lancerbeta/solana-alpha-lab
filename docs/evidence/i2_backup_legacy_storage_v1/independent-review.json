@@ -1,11 +1,11 @@
 {
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
-  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-RECOVERY-CLOSURE-P1",
+  "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-RAW-DEPENDENCY-SELECTION-P1",
   "as_of": "2026-10-16",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "db1bb3d364520fa1b1e6bf56449aaca3a8524770aca5701a769519c6dc7f9663",
-  "reviewed_inventory_sha256": "bc3aecdad8a5f32ddd9059e4b49f8c4069b829e6749bc3d2c2ac0d9053a588bf",
+  "reviewed_bindings_sha256": "UNBOUND_PENDING_ISOLATED_REVIEW",
+  "reviewed_inventory_sha256": "UNBOUND_PENDING_ISOLATED_REVIEW",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -15,40 +15,34 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "Isolated read-only P0/P1 review PASS on frozen content head 8d89ef969407187481c30a4feb6463a9f23be8b9; inventory bc3aecdad8a5f32ddd9059e4b49f8c4069b829e6749bc3d2c2ac0d9053a588bf. Final source393a237ce274d57b02fe5a295ad248494deaaf070027cd908992854c18e912ff and tests51750d481534649008c76e1b62b0ad0f2333e076d6c5aadd8ddd2fe9dd0978c6 matched. No open P0/P1; four frozen review roles cover canonical triggers.",
-        "Prior ACTIVE prefix required by future DRAINING retained and native-verified. Namespace guard scopes only to actual fallback; exact immutable pointers tolerate later publication while selected/staged identities and hashes remain checked. Bounded header reads and malformed job JSON typed refusal verified. No test reruns or edits by critic."
+        "Frozen content pending isolated P0/P1 review; prior #409 verdict does not cover this diff."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "Isolated read-only P0/P1 review PASS on frozen content head 8d89ef969407187481c30a4feb6463a9f23be8b9; inventory bc3aecdad8a5f32ddd9059e4b49f8c4069b829e6749bc3d2c2ac0d9053a588bf, bindings matched. No open P0/P1.",
-        "Found P1 blanket namespace invalidation resolved: exact pointers permit later native append; actual ZIP/independent restore preserves captured OPS, focused PASS1.089s. Fallback mutation refusal retained. 45-test namespace profile source d55 and final393a source are explicitly separate. Original I2 Stage B/C and runtime authority/acceptance remain mandatory."
+        "Frozen content pending isolated P0/P1 review; prior #409 verdict does not cover this diff."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "Isolated packet+diff-only P0/P1 SEMANTIC_PREMISE review PASS on frozen content head 8d89ef969407187481c30a4feb6463a9f23be8b9; inventory bc3aecdad8a5f32ddd9059e4b49f8c4069b829e6749bc3d2c2ac0d9053a588bf. No open P0/P1.",
-        "Captured OPS/lifecycle/native ResearchStore and publication owners retain research truth; no permanent index commissioning, new scheduler/service or scientific acceptance. Exact immutable pointer path avoids historical census; no-lookup fallback is measured outside fence under existing total deadline and typed namespace refusal.",
-        "Operational restore can pass while an independent historical science archive or PIT/availability lineage is missing; operational backup must not be treated as complete scientific restore. Historical science remains at its immutable archive owner. Missing prior ACTIVE is the explicit native lifecycle falsifier despite successful SQL restore. Local proof cannot establish production source freshness, due safety or runtime acceptance.",
-        "packet_fingerprint_sha256=2c8aee155c889e7ff1fd570df9577c257e380af44f369559d4cb289fd508321a; independence=PACKET_INFORMATION_PATH; launch_isolation=PROCESS_OBLIGATION; model_diversity=UNPROVEN."
+        "Frozen content pending isolated P0/P1 review; prior #409 verdict does not cover this diff."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "Isolated read-only P0/P1 owner-scope review PASS on frozen content head 8d89ef969407187481c30a4feb6463a9f23be8b9; inventory bc3aecdad8a5f32ddd9059e4b49f8c4069b829e6749bc3d2c2ac0d9053a588bf. No open P0/P1.",
-        "Current header pins installed2c39, old Stage B approval consumed, exact merge then one newly authorized deploy/standalone full/Drive independent restore scope. Proof distinguishes measured and final source, local proof from runtime acceptance. Finite native Stage C retirement/reclaim/full/policy remains required with separate destructive authority; no daily manual IDs, timer/grant/freshness bypass or blind retry."
+        "Frozen content pending isolated P0/P1 review; prior #409 verdict does not cover this diff."
       ]
     }
   ],
-  "verdict": "PASS",
+  "verdict": "NOT_READY",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "NO_REVIEW_MODEL_DIVERSITY_PROOF",
