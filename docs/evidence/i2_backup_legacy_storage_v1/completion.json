@@ -15,21 +15,21 @@
   },
   "capability_radar_now": "NONE: existing native retention, checkpoint, retry, Git/gh and locked runtime suffice; no new service/scheduler/framework/dependency.",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "06cf390612b8ba40313277b0d5b0b5ccd67e9bdb3f6815dbe8d2947a3e4845a9",
+    "catalog/assets/core.yaml": "a3a20fe4a615419911b63c383e894fe8dfd8ebaef968b23eb981044b3b259233",
     "docs/evidence/i2_backup_legacy_storage_v1/OPERATE_PACKET.md": "ff124b9cb0a9a287fba8992e8b01155f6926c2d9f096a9b12d1184021f8258ff",
     "docs/evidence/i2_backup_legacy_storage_v1/OWNER_READOUT.md": "b60c5eb434525e4b948a11584801170e9365aed691f266e6d6b4034b4e7ac38d",
     "docs/evidence/i2_backup_legacy_storage_v1/remaining-outcome-proof.json": "43f3e3cedbc59cdb4ab53e4630ef9430ecb77c27201960f334232315e9e8df7c",
     "docs/evidence/i2_backup_legacy_storage_v1/semantic-claims.json": "29347ec3253292ba71cc2ae685ba52b51161ccd4ef4d05d8cd0a82d3002fd10f",
     "docs/evidence/i2_backup_legacy_storage_v1/semantic-classification.json": "d6e78d224b4c62384b30929f3426ae9c59bf62adb609e9a701343e7525c7091a",
-    "docs/evidence/i2_backup_legacy_storage_v1/semantic-evidence.json": "6f607b54c0e6a3ba2773219b9a45189bbc0c522a9ceecdac4c271cae362d4d84",
+    "docs/evidence/i2_backup_legacy_storage_v1/semantic-evidence.json": "98537b4a4291691e1f17d282e1aa6e901b45c0bd812eeab269cc239a7e0415b2",
     "docs/evidence/i2_backup_legacy_storage_v1/semantic-non-claims.json": "0e1a99d7d8d9a8cff59559e200a24fb687eddcca42463a4054de86a25e829ffa",
     "docs/operator/FACTORY_REMOTE_HOST.md": "c9e4fd42c4373ffc8ac38c67037b33a408a708a44b792d0bfc1e32bdf0292be1",
     "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "39c4c5b8f2d16023f1467fe00ff457ed9f5448a7fe2c9505b83cff6e908a3752",
     "docs/tasks/I2_BACKUP_LEGACY_STORAGE_V1.md": "8e05b826ea4051f8fbf5073d5abb2831a3ab0929d33ce84c18d490c263651356",
-    "scripts/factory_remote_doctor.py": "206a59b7a57049512a5732f47b2d42601c948b2c6363c9e00fb2c384baac3ae1",
+    "scripts/factory_remote_doctor.py": "87ddf363f57838f3d02529191ee7aac75048b80a641bcb6b8566c415a7e3e7f2",
     "src/solana_alpha_lab/factory/observation_schedule_retention.py": "e9f2f636d63286bdb4ffb04f4867118243c909c7ff6e30e6539f026cc1158431",
-    "src/solana_alpha_lab/factory/offhost_backup.py": "08a7f6c63f89cd3dfb063e4d723874b94964e1d35787a79bda7844f8672d9514",
-    "tests/test_i2_offhost_checkpoint_v1.py": "5cc52169731b78b1a0474074b14dbe5b14e28690cc0c36f5434ee7eef8b767ea",
+    "src/solana_alpha_lab/factory/offhost_backup.py": "dc730f68e4bfec24b9fca8ce18b6bcf5f97d8930260be7cd329f2de772e2432f",
+    "tests/test_i2_offhost_checkpoint_v1.py": "be58f3c0660c029a0048de56e1bfcd75c6fa179ba0247ab1f38922dc1c3de9fd",
     "tests/test_i2_retention_maintenance_v1.py": "2ad4cf273b8d0f4447ed9185375705dfa22636582936a354e3e7c5f58cfd3f21"
   },
   "active_stop_conditions": [],
@@ -42,14 +42,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/i2_backup_legacy_storage_v1/factory-fit.json",
-    "sha256": "095f5056807e784123849acecdbb1e7fa13745b6418d004bc25bd5d5fffbab7b",
+    "sha256": "f7b8209dfa4e763595e13adf1026ad741394addf954a9f2b79ff157885b12b88",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_97_AFFECTED_78.257s_PLUS_38_OFFHOST_AND_READER_BOUNDARY_SAME_VERIFIED_5.3GB_COPY_NATIVE_RETIRE_RESUME_RECLAIM_AGING_FULL_RESTORE_WRITER; PASS_10_DOCTOR_DISPATCH_AND_LOCAL_RETRY_CONFIG_FORWARDING_0.658s_AFTER_CI_CONSUMER_FINDING",
     "independent_review": {
       "path": "docs/evidence/i2_backup_legacy_storage_v1/independent-review.json",
-      "sha256": "71ead2f91b04b4ac7caaa84dc4c8fd6e9d802b2ebbf93f6c626ee8f79df4f61b",
+      "sha256": "667e88fdf04f5eae86f59d87e9b01828198dc9a78d0c76e2e6bd84bd207461f9",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

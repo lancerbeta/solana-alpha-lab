@@ -4,8 +4,8 @@
   "review_id": "I2_BACKUP_LEGACY_STORAGE_V1-REMAINING-OUTCOME",
   "as_of": "2026-10-16",
   "task_id": "I2_BACKUP_LEGACY_STORAGE_V1",
-  "reviewed_bindings_sha256": "666f3702b606fc27498a4bf23aa2a28c348253d8e141d5ecff598c69086a5770",
-  "reviewed_inventory_sha256": "68bbb8d9a84cf75a7c6e75f84a72aabba1c51d4b984ecb1280b124a1c259464d",
+  "reviewed_bindings_sha256": "f24b709af0a26faa0e27395741b2825d1edb453d137a9175f91047a9189eff44",
+  "reviewed_inventory_sha256": "1b53c24a386c957c4fac4fa99181b2787f209085e9f4ac37bfea68eafe4cf89a",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
