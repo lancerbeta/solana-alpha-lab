@@ -346,7 +346,7 @@ class SharedAccountBudgetStoreTests(unittest.TestCase):
             self.assertEqual(prepare_account_budget(self.fx.store, account_scope_id=SCOPE, limits=LIMITS,
                              credential_locator="JUPITER_FREE_API_KEY", now=T0)["terminal"],
                              "RESTORE_MARKER_UNRESOLVED")
-        lease = self.fx.store.acquire_lease("resolve", clock=T0)
+        lease = self.fx.store.acquire_lease("resolve")  # resolve_restore_marker uses the wall clock
         self.fx.store.resolve_restore_marker()
         self.fx.store.release_lease(lease)
         _, applied = self.fx.commission()
