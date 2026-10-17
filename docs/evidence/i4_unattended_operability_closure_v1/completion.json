@@ -1,0 +1,72 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "I4_UNATTENDED_OPERABILITY_CLOSURE_V1-SOFTWARE-CANDIDATE",
+  "as_of": "2026-10-17",
+  "task_id": "I4_UNATTENDED_OPERABILITY_CLOSURE_V1",
+  "state_change": "The closed-day run protects each future mature episode cohort as one offhost closure a late consumer can import without the producer; the operability packet reads the exact managed bridge as continuation and reports a missing bootstrap or closure failure through existing incidents.",
+  "base_main": "33b19d9cafde0039233e1f1d25de8d36d17e3687",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Git is the working context and evidence owner; no cloud export requested."
+  },
+  "capability_radar_now": "Healthchecks.io free single check for the external receiver (owner account); no package, connector or service in Git.",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "bb56f09ff9594ed6acc9e892c1cc2c19c7cb6316e4357ab9bbef68d28aa9d24a",
+    "docs/evidence/i4_unattended_operability_closure_v1/proof.json": "57b422517135a3af8c25d8dcbeb4d89004451712948312d1ec6be7c90ec86b63",
+    "docs/evidence/i4_unattended_operability_closure_v1/semantic-claims.json": "e89b1a60f56b8725623f3e13800cfac5ef8f89978787ed25cb8db2bff18e1592",
+    "docs/evidence/i4_unattended_operability_closure_v1/semantic-classification.json": "9566f1ef192b803006d3cd8073b084b0053815ba6dc7a9d39dea1f4098b12592",
+    "docs/evidence/i4_unattended_operability_closure_v1/semantic-evidence.json": "8979d3e0819543b09a1e204d0274001ae9517f4cd8bb32e95407e77a567575c3",
+    "docs/evidence/i4_unattended_operability_closure_v1/semantic-non-claims.json": "01fbc0979b9fdbd3030ad1f4ff3b4ea9c0ed68edb18326db6e767086dfde0cee",
+    "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "7397b2db3e33742622b352463e901cd852a896ee118805b73db1fb86febba1ae",
+    "docs/tasks/I4_UNATTENDED_OPERABILITY_CLOSURE_V1.md": "f07cda0254eb50c4f2cf48210c0e3442343b60d0c8c3a113e3e321bff18ea3b9",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "13f03341eec5bec7129c6d91546530c7852aa2a1dff9ff8363f79c1a9f7e081c",
+    "src/solana_alpha_lab/factory/hot90_closed_day_loop.py": "6848fec95c0fff2639a3d21f45d2b02b9d25fc3a205110e4898c70feac48956c",
+    "tests/test_factory_unattended_operability_closure_v1.py": "7c59421a2cbbef72a75b77a10e6235390897f136c6cbfd77b1d048aa24936af0",
+    "tests/test_managed_collection_release_seam_v1.py": "bcb2f0610b41025254c8cd7a410fa335a5a62b88a048c7c9ea8dc300451a3ee2"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/i4_unattended_operability_closure_v1/factory-fit.json",
+    "sha256": "f1fb8d0216b26756915ed805d81b8400cf1dcef5b8dc40bb15d80510d7216520",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_RELEASE_SEAM_COLD_CONSUMER_5_COHORTS_CLOSURE_FAILURE_TESTS_17_MODULE_DIRECT_CONSUMER_REGRESSION_AND_REAL_PRODUCER_WORKING_PATH_PROBE",
+    "independent_review": {
+      "path": "docs/evidence/i4_unattended_operability_closure_v1/independent-review.json",
+      "sha256": "10bc704eff14e6f0cc33f0953c524a304757b7657d2c62f937aa13fbd48e11db",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_CONTEXT",
+      "PASS_CATALOG_PROPAGATION",
+      "PASS_ORIGINAL_FALSIFIER_AND_TARGETED_MUTATION"
+    ]
+  },
+  "non_claims": [
+    "NO_HOST_LOSS_DETECTION_CLAIM_RECEIVER_NOT_CONFIGURED",
+    "NO_LIVE_MANAGED_TRANSITION_CLAIM_BEFORE_18_19_OCT",
+    "NO_SCIENCE_QUOTA_RETENTION_OR_RECLAIM_CHANGE",
+    "NO_HISTORICAL_SHARED_CALL_PROOF_CLAIM",
+    "NO_30_DAY_MEASURED_RUNWAY_CLAIM_MODEL_ONLY",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_LOCAL_EVIDENCE"
+  ],
+  "side_effects": {
+    "repository": "two owners, one runbook, tests, task contract, evidence, Catalog hashes",
+    "local": "temporary day-archive downloads (449,675,321 B) deleted after comparison",
+    "external": "read-only producer probes; one write-once native C3 capture under the earlier I4 scope; no Drive upload, deploy or provider call; receiver activation, canary and deploy are a separate staged OPERATE approval, not part of this merge"
+  }
+}

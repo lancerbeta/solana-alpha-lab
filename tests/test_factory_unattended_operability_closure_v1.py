@@ -1045,5 +1045,145 @@ class PublicationExpectationAwareTests(unittest.TestCase):
                 store.close()
 
 
+class CohortClosureFailureTests(unittest.TestCase):
+    """Failure paths of the producer cohort closure; the happy path is the release seam.
+
+    Oracle: failure -> persisted receipt/run state -> real packet fields -> health
+    classes -> recovery; never the function's return value alone.
+    """
+
+    A = "REL-20261014T000000Z-20261015T000000Z"
+    B = "REL-20261015T000000Z-20261016T000000Z"
+
+    def setUp(self) -> None:
+        from solana_alpha_lab.factory import hot90_closed_day_loop as loop
+
+        self.loop = loop
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = _ops_root(self.tmp.name)
+        self.rdp = self.root / "local/factory_v1/observation_rdp"
+        (self.root / loop.OPS_RELATIVE).write_bytes(b"")
+        (self.rdp / "exports").mkdir(parents=True)
+        self.captures: list[str] = []
+        self.broken: set[str] = set()
+        self.selection_error: str | None = None
+        for cohort in (self.A, self.B):
+            (self.rdp / f"exports/{cohort}.json").write_bytes(cohort.encode())
+
+        def select(**kw):
+            if self.selection_error:
+                raise ValueError(self.selection_error)
+            for cohort in (self.A, self.B):
+                if cohort not in kw["imported"]:
+                    return {"terminal": "MATURE", "cohort_id": cohort, "schedule_sha256": "a" * 64, "activation_id": "ACT-1"}
+            return None
+
+        def capture(**kw):
+            cohort = select(imported=kw["imported_cohort_ids"])["cohort_id"]
+            self.captures.append(cohort)
+            body = (self.rdp / f"exports/{cohort}.json").read_bytes()
+            digest = "0" * 64 if cohort in self.broken else hashlib.sha256(body).hexdigest()
+            return {"collection": "OPPORTUNITY_EPISODES", "cohort_id": cohort,
+                    "closure_receipt": {"closure_receipt_sha256": "c" * 64},
+                    "transfer_manifest": {"manifest_sha256": "d" * 64, "entries": [
+                        {"path": f"exports/{cohort}.json", "bytes": len(body), "sha256": digest,
+                         "source_class": "episode_export"}]}}
+
+        for item in (
+            patch("solana_alpha_lab.factory.opportunity_episode_release.select_next_mature_episode_cohort", side_effect=select),
+            patch("solana_alpha_lab.factory.opportunity_episode_release.capture_freeze_export_episodes", side_effect=capture),
+            patch("solana_alpha_lab.factory.live_cohort_vanilla_path.validate_episode_transfer_manifest"),
+        ):
+            item.start()
+            self.addCleanup(item.stop)
+
+    def run_closures(self, drive: FakeDrive, now: datetime = NOW) -> list[dict]:
+        return self.loop.run_cohort_closures(self.root, now=now, rclone_runner=drive.runner, allow_drive=True,
+                                             within_budget=lambda: True)
+
+    def health(self, now: datetime) -> list[str]:
+        fields = self.loop.cohort_closure_packet_fields(self.root, now=now)  # the builder's own mapping
+        return [flag for flag in compose_health_classes(fields) if flag.startswith("IMMUTABLE_ARCHIVE_")]
+
+    def staging(self) -> list[str]:
+        directory = self.root / self.loop.COHORT_STAGING_RELATIVE
+        return sorted(p.name for p in directory.iterdir()) if directory.is_dir() else []
+
+    def test_local_failure_does_not_block_the_queue_and_ages_into_an_incident(self) -> None:
+        self.broken.add(self.A)  # A's source no longer matches its frozen manifest
+        first = self.run_closures(FakeDrive())
+        self.assertEqual([(o.get("cohort_id"), o["terminal"]) for o in first],
+                         [(self.A, "COHORT_CLOSURE_BUILD_FAILED"), (self.B, "REMOTE_CONTENT_SHA256_VERIFIED")])
+        self.assertEqual(self.loop.protected_cohort_ids(self.root), {self.B})  # failed is never protected
+        self.assertEqual(self.health(NOW + timedelta(hours=1)), [])
+        self.run_closures(FakeDrive(), NOW + timedelta(hours=6))  # still failing, first failure time kept
+        self.assertIn("IMMUTABLE_ARCHIVE_STALE", self.health(NOW + timedelta(hours=25)))
+        self.broken.clear()
+        self.assertEqual(self.run_closures(FakeDrive(), NOW + timedelta(hours=26))[0]["terminal"],
+                         "REMOTE_CONTENT_SHA256_VERIFIED")
+        self.assertEqual(self.health(NOW + timedelta(hours=27)), [])
+
+    def test_drive_outage_stops_network_and_resumes_the_same_frozen_archive(self) -> None:
+        down = FakeDrive(fail_copy=True)
+        out = self.run_closures(down)
+        self.assertEqual([o["terminal"] for o in out], ["DRIVE_WRITE_FAILED"])  # B is not attempted
+        resume = json.loads(self.loop.cohort_receipt_path(self.root, self.A).read_text())["resume"]
+        self.assertEqual(self.staging(), [resume["archive_filename"]])  # minimal resume kept
+        up = FakeDrive()
+        out = self.run_closures(up, NOW + timedelta(hours=1))
+        self.assertEqual([o["terminal"] for o in out], ["REMOTE_CONTENT_SHA256_VERIFIED"] * 2)
+        self.assertEqual(self.captures, [self.A, self.B])  # A was not re-captured for the retry
+        self.assertEqual(out[0]["archive_sha256"], resume["archive_sha256"])
+        self.assertEqual(self.staging(), [])  # disposable payload released after verification
+        self.assertEqual(self.health(NOW + timedelta(days=3)), [])
+        # A different remote object under the same name is never overwritten.
+        self.loop.cohort_receipt_path(self.root, self.B).unlink()
+        bad = FakeDrive(mismatch=True)
+        bad.objects = dict(up.objects)
+        self.assertEqual(self.run_closures(bad)[0]["terminal"], "HASH_MISMATCH")
+        self.assertEqual(bad.copy_count, 0)
+        self.assertIn("IMMUTABLE_ARCHIVE_HASH_MISMATCH", self.health(NOW))
+
+    def test_selection_failure_exception_and_bad_receipts_are_visible_then_recover(self) -> None:
+        self.selection_error = "EPISODE_COHORT_FRAGMENTED_UNSUPPORTED"
+        self.assertEqual(self.run_closures(FakeDrive())[0]["terminal"], "COHORT_SELECTION_FAILED")
+        self.assertIn("IMMUTABLE_ARCHIVE_STALE", self.health(NOW + timedelta(hours=25)))
+        self.selection_error = None
+        with patch.object(self.loop, "process_next_cohort_closure", side_effect=RuntimeError("boom")):
+            summary = run_closed_day_durability(self.root, now=NOW + timedelta(hours=1),
+                                                rclone_runner=FakeDrive().runner, allow_drive=True)
+        self.assertEqual(summary["cohort_closures"][0]["terminal"], "COHORT_CLOSURE_ERROR")
+        self.assertIn("operational_cache_prune", summary)
+        self.assertIn("IMMUTABLE_ARCHIVE_STALE", self.health(NOW + timedelta(hours=25)))  # same first failure
+        self.run_closures(FakeDrive(), NOW + timedelta(hours=26))  # selection works again
+        self.assertEqual(self.health(NOW + timedelta(hours=27)), [])
+        receipts = self.root / self.loop.COHORT_RECEIPTS_RELATIVE
+        bad = receipts / "REL-20261016T000000Z-20261017T000000Z.json"
+        bad.write_text("[1]", encoding="utf-8")
+        old = (NOW - timedelta(days=2)).timestamp()
+        os.utime(bad, (old, old))
+        forged = receipts / "REL-20261017T000000Z-20261018T000000Z.json"
+        forged.write_text(json.dumps({"cohort_id": forged.stem, "terminal": "REMOTE_CONTENT_SHA256_VERIFIED",
+                                      "archive_sha256": None, "remote_content_sha256": None}), encoding="utf-8")
+        self.assertNotIn(forged.stem, self.loop.protected_cohort_ids(self.root))
+        self.assertIn("IMMUTABLE_ARCHIVE_STALE", self.health(NOW))  # unreadable ages by file time
+
+    def test_unproven_shared_call_provenance_is_visible(self) -> None:
+        self.assertEqual([o["terminal"] for o in self.run_closures(FakeDrive())], ["REMOTE_CONTENT_SHA256_VERIFIED"] * 2)
+        path = self.loop.cohort_receipt_path(self.root, self.A)
+        receipt = json.loads(path.read_text())
+        receipt["shared_call_proof"] = {"calls": 1, "complete": 0, "incomplete_refs": ["e" * 64], "unverifiable_refs": []}
+        path.write_text(json.dumps(receipt), encoding="utf-8")
+        self.assertIn(self.A, self.loop.protected_cohort_ids(self.root))  # bytes stay protected
+        self.assertIn("IMMUTABLE_ARCHIVE_STALE", self.health(NOW + timedelta(hours=25)))  # provenance gap is not silent
+
+    def test_gates_are_typed_no_ops(self) -> None:
+        write_hot90_runtime_state(self.root, {"activation_stage": STAGE_DURABILITY_CUTOVER,
+                                              "production_compaction_enabled": False,
+                                              "production_eviction_enabled": False, "drive_writes_enabled": False})
+        self.assertEqual(self.run_closures(FakeDrive())[0]["terminal"], "HOT90_DRIVE_WRITES_DISABLED")
+
+
 if __name__ == "__main__":
     unittest.main()

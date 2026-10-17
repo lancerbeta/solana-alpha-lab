@@ -237,6 +237,8 @@ Preserved under `local/factory_v1` (and the independent backup sink):
 - `hot90_activation_runtime.yaml`
 - closed-day archive receipts `hot90_archive_receipts/{YYYYMMDD}.json`
 - derived archive staging `hot90_archives/` (automation-owned ZIPs only)
+- cohort closure receipts `hot90_cohort_closure_receipts/{cohort_id}.json`
+  (staging `hot90_cohort_closures/` is empty after every run)
 - operability incident/dedup state
 - collector SQLite / Observation RDP
 - systemd enablement and timer last-run
@@ -326,6 +328,64 @@ Exact remote content SHA256 must equal the local archive SHA256. A verified
 receipt records both hashes, the remote object identity, and
 `REMOTE_CONTENT_SHA256_VERIFIED`. A receipt cannot substitute for the
 content hash.
+
+## HOW IS A FUTURE EPISODE COHORT PROTECTED WITHOUT THE WORKSTATION?
+
+A day ZIP does not hold the cohort export (closure receipt, frames, schedule,
+protection, exporter-frozen `capture_metadata`) nor completed publication jobs.
+After the days, the same closed-day run protects up to two mature, not yet
+protected `OPPORTUNITY_EPISODES` cohorts (from
+`REL-20261013T000000Z-20261014T000000Z`; earlier cohorts were captured by the
+workstation route). It calls the native `capture_freeze_export` the workstation
+used over SSH, then uploads one content-addressed
+`COHORT_CLOSURE_<sha256>.zip` = `packet.json` + `source/<transfer_path>` for
+every manifest entry (each byte hash-checked, ≤2 GiB, `copyto` only), verifies
+the exact remote SHA and writes
+`hot90_cohort_closure_receipts/<cohort_id>.json`. Local staging is deleted in
+every outcome (leftovers of a killed run are swept at the next run); a failed
+cohort is retried next run. A failure stays visible: HASH_MISMATCH raises
+`IMMUTABLE_ARCHIVE_HASH_MISMATCH`, any other failure older than 24 h raises
+`IMMUTABLE_ARCHIVE_STALE` (existing watch incidents). Maturity stays the native
+closed obligations/publications/integrity rule. "Protected" means an offhost
+closure exists; it does not mean imported. The object name addresses one
+capture (its packet); a Drive outage keeps that exact archive and the next run
+resumes it without a new capture, while a cohort-local failure is recorded and the
+next cohort proceeds. Each receipt carries `shared_call_proof` (from the closure
+bytes: every response-body call the cohort claims, with all claiming cohorts);
+an incomplete or unverifiable proof keeps the bytes protected but raises the same
+archive health class instead of passing silently.
+
+Late consumer, with only the Drive object and Git (no VPS access). Download
+`COHORT_CLOSURE_<sha256>.zip` from Drive folder `solana-alpha-lab/factory-backups`
+into `local/cold_consume/`, then (PowerShell):
+
+```text
+$z = "local/cold_consume/COHORT_CLOSURE_<sha256>.zip"
+(Get-FileHash $z -Algorithm SHA256).Hash.ToLower()   # must equal <sha256> in the name
+Expand-Archive $z -DestinationPath local/cold_consume/<sha256>
+# rehearsal into a separate restore root first
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py unpack-next-live-cohort --collection OPPORTUNITY_EPISODES --max-cohorts 1 --capture-packet local/cold_consume/<sha256>/packet.json --source-rdp local/cold_consume/<sha256>/source --mirror-rdp local/cold_consume/rehearsal/mirror --data-root local/cold_consume/rehearsal/data_plane
+# then the same command with --mirror-rdp local/factory_mirror/observation_rdp --data-root local/factory_v1/data_plane
+```
+
+Several cohorts: one extraction directory and one run each, oldest first.
+Repeating an import of the same release returns `PASS_ALREADY_PRESENT_EXACT`.
+After a verified import delete exactly `local/cold_consume/` (it holds only the
+downloads, extractions and the rehearsal root); the sealed release, mirror
+capture view and corpus are the retained consumers.
+
+Check collection or stop new admissions while tails finish: see
+`docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md` → `collection-status`
+(read-only; shows `revision`) and `collection-stop-intake --expected-revision <revision>`.
+
+## WHAT DOES A DELIVERY LEAVE BEHIND?
+
+Each operation records its heavy outputs as `disposable`, `resume` or
+`canonical` in its own operation receipt and deletes disposable outputs once
+their consumer has verified them (exact files, containment checked, no links,
+no recursive wildcard over canonical roots). A development worktree is removed
+with `git worktree remove` once nothing scheduled or readback-bound points into
+it; resume material moves to a stable operation root first.
 
 ## HOW DO I ROLLBACK THE NEW AUTOMATION?
 

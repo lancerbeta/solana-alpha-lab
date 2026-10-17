@@ -100,7 +100,7 @@ HEALTH_CLASSES = (
 
 
 def _managed_continuation_state(
-    store: ObservationScheduleStore, activation: Mapping[str, Any]
+    store: ObservationScheduleStore, activation: Mapping[str, Any], now: datetime | None = None
 ) -> str | None:
     """MANAGED_* when this activation is a child of a managed grant; else None."""
 
@@ -112,7 +112,7 @@ def _managed_continuation_state(
             return None
     binding = payload.get("managed_collection") if isinstance(payload, Mapping) else None
     if not isinstance(binding, Mapping):
-        return None
+        return _managed_bridge_state(store, activation, now)
     reader = getattr(store, "managed_control", None)
     control = reader(str(binding.get("collection_lineage_id") or "")) if callable(reader) else None
     if control is None:
@@ -120,6 +120,56 @@ def _managed_continuation_state(
     return (
         "MANAGED_CONTINUATION" if str(control.get("desired_state")) == "RUN" else "MANAGED_INTAKE_STOPPED"
     )
+
+
+MANAGED_BOOTSTRAP_GRACE_SECONDS = 900
+
+
+def _managed_bridge_state(
+    store: ObservationScheduleStore, activation: Mapping[str, Any], now: datetime | None = None
+) -> str | None:
+    """MANAGED_* when this legacy activation is the exact protected bridge of a
+    verified managed profile whose bootstrap starts no later than its boundary.
+
+    After the boundary (plus one tick grace) a live child for the current UTC
+    day must exist; otherwise the ordinary successor assessment reports the gap.
+    Two lineages claiming one bridge are ambiguous and prove nothing.
+    """
+
+    lineages = getattr(store, "managed_lineages", None)
+    if not callable(lineages):
+        return None
+    from solana_alpha_lab.factory.managed_collection import ManagedCollectionError, verified_profile
+
+    exact = {
+        "schedule_sha256": str(activation.get("schedule_sha256") or ""),
+        "activation_id": str(activation.get("activation_id") or ""),
+    }
+    found: list[str] = []
+    for lineage in lineages():
+        control = store.managed_control(lineage)
+        if control is None:
+            continue
+        try:
+            body = verified_profile(store, lineage, int(control["current_revision"]))
+            continuation = body.get("continuation") or {}
+            bridge = continuation.get("protected_bridge") or {}
+            not_before = continuation.get("bootstrap_not_before")
+            if {key: str(bridge.get(key) or "") for key in exact} != exact or not not_before:
+                continue
+            if parse_utc(str(not_before)) > parse_utc(str(activation.get("stops_admitting_at") or "")):
+                continue  # a gap after the bridge is not continuity
+            stops = parse_utc(str(activation.get("stops_admitting_at") or ""))
+            if now is not None and now >= stops + timedelta(seconds=MANAGED_BOOTSTRAP_GRACE_SECONDS):
+                child = store.managed_child(lineage, now.astimezone(UTC).strftime("%Y-%m-%d"))
+                if child is None or str(child.get("state")) in {"CANCELLED", "EXPIRED_BEFORE_ACTIVATION"}:
+                    continue  # bootstrap did not produce today's owner: a real gap
+        except (ManagedCollectionError, KeyError, TypeError, ValueError):
+            continue  # unverifiable grant: keep the ordinary successor assessment
+        found.append(
+            "MANAGED_CONTINUATION" if str(control.get("desired_state")) == "RUN" else "MANAGED_INTAKE_STOPPED"
+        )
+    return found[0] if len(found) == 1 else None
 
 
 def assess_campaign_successor_continuity(
@@ -154,7 +204,7 @@ def assess_campaign_successor_continuity(
             **empty,
             "stops_admitting_at": str(activation.get("stops_admitting_at") or UNKNOWN),
         }
-    managed_state = _managed_continuation_state(store, activation)
+    managed_state = _managed_continuation_state(store, activation, now)
     if managed_state is not None:
         # The controller owns the next UTC-day child; a missing child is a managed incident
         # (INTAKE_OWNER_MISSING), not an owner-registered successor.
@@ -1011,8 +1061,13 @@ def compose_health_classes(packet: Mapping[str, Any]) -> list[str]:
         age = packet.get("immutable_archive_oldest_backlog_age_seconds")
         if isinstance(age, int) and age > 86400:
             flags.append("IMMUTABLE_ARCHIVE_STALE")
-    if str(packet.get("immutable_archive_last_terminal") or "") == "HASH_MISMATCH":
+    if str(packet.get("immutable_archive_last_terminal") or "") == "HASH_MISMATCH" or packet.get(
+        "cohort_closure_hash_mismatch"
+    ) is True:
         flags.append("IMMUTABLE_ARCHIVE_HASH_MISMATCH")
+    closure_age = packet.get("cohort_closure_oldest_failure_age_seconds")
+    if isinstance(closure_age, int) and closure_age > 86400 and "IMMUTABLE_ARCHIVE_STALE" not in flags:
+        flags.append("IMMUTABLE_ARCHIVE_STALE")
     if packet.get("mutable_backup_includes_full_observation_rdp") is True and str(
         packet.get("hot90_activation_stage") or ""
     ) in {"DURABILITY_CUTOVER", "RETENTION_ACTIVE"}:
@@ -1599,6 +1654,9 @@ def build_collector_operational_packet(
         if receipt:
             last_terminal = receipt.get("terminal")
     packet["immutable_archive_last_terminal"] = last_terminal
+    from solana_alpha_lab.factory.hot90_closed_day_loop import cohort_closure_packet_fields
+
+    packet.update(cohort_closure_packet_fields(root, now=clock))
     from solana_alpha_lab.factory.managed_collection import measure_whole_factory
 
     topology = measure_whole_factory(

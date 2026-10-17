@@ -17,8 +17,6 @@ from pathlib import Path
 from unittest.mock import patch
 
 import tests.test_opportunity_episodes_vertical_v1 as vertical
-from solana_alpha_lab.factory.live_cohort_vanilla_path import capture_freeze_export
-from solana_alpha_lab.factory.live_cohort_discovery_release import LiveCohortReleaseError
 from solana_alpha_lab.factory.observation_scheduler import ObservationSchedulerError
 from solana_alpha_lab.factory.research_store import ResearchStore
 from tests.test_managed_collection_continuity_v1 import ManagedScenario, SCOPE, sql
@@ -49,6 +47,7 @@ class ManagedReleaseSeamTests(unittest.TestCase):
                              "--expected-proposal-sha256", plan["proposal_sha256"],
                              "--phrase", plan["exact_owner_phrase"])
             self.assertEqual(applied["terminal"], "MANAGED_APPLIED", applied)
+            self.assert_bridge_continuity(sc)
             known: set[str] = {sc.activation_id}
             failed_once = {"done": False}
             import scripts.observation_schedule as cli
@@ -86,6 +85,32 @@ class ManagedReleaseSeamTests(unittest.TestCase):
             self.assert_corpus_truth(sc)
             self.release_import_preflight(sc, tmp)
 
+    def assert_bridge_continuity(self, sc: ManagedScenario) -> None:
+        """Before the bootstrap the exact protected bridge is managed waiting, not a manual successor."""
+
+        from solana_alpha_lab.factory.collector_operational_packet import assess_campaign_successor_continuity
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+
+        store = ObservationScheduleStore(sc.ops_path)
+        try:
+            bridge = next(a for a in store.list_activations() if a["activation_id"] == sc.activation_id)
+            now = DAYS[1] - timedelta(hours=2)
+
+            def state(activation) -> tuple[str, bool]:
+                found = assess_campaign_successor_continuity(store, now=now, activation=activation)
+                return found["campaign_successor_state"], found["campaign_successor_required"]
+
+            self.assertEqual(bridge["stops_admitting_at"], "2026-10-11T00:00:00Z")
+            self.assertEqual(state(bridge), ("MANAGED_CONTINUATION", False))
+            # Another lineage's activation, or a bridge ending before the bootstrap, is no proof.
+            self.assertNotEqual(state({**bridge, "activation_id": "ACT-NOT-THE-BRIDGE"})[0], "MANAGED_CONTINUATION")
+            self.assertNotEqual(state({**bridge, "stops_admitting_at": "2026-10-10T23:00:00Z"})[0], "MANAGED_CONTINUATION")
+            # After the boundary a missing bootstrap child is a gap, not managed waiting.
+            late = assess_campaign_successor_continuity(store, now=DAYS[1] + timedelta(hours=1), activation=bridge)
+            self.assertNotEqual(late["campaign_successor_state"], "MANAGED_CONTINUATION")
+        finally:
+            store.close()
+
     def assert_corpus_truth(self, sc: ManagedScenario) -> None:
         rows = sc.children()
         self.assertEqual([row[0] for row in rows][:4], ["2026-10-11", "2026-10-12", "2026-10-13", "2026-10-14"])
@@ -116,26 +141,81 @@ class ManagedReleaseSeamTests(unittest.TestCase):
         self.assertGreater(sum(count for state, count in states.items() if state != "OBSERVED"), 0)
 
     def release_import_preflight(self, sc: ManagedScenario, tmp: Path) -> None:
-        packets, imported = [], set()
-        for _ in range(8):
-            try:
-                packet = capture_freeze_export(observation_rdp=sc.data_root, ops_store=sc.ops_path,
-                                               imported_cohort_ids=set(imported), as_of=END,
-                                               collection="OPPORTUNITY_EPISODES")
-            except LiveCohortReleaseError as exc:
-                self.assertEqual(str(exc), "NO_MATURE_UNIMPORTED_COHORT")
-                break
-            path = tmp / f"packet-{packet['cohort_id']}.json"
-            path.write_text(json.dumps(packet, default=str), encoding="utf-8")
-            packets.append(str(path))
-            imported.add(str(packet["cohort_id"]))
-        self.assertEqual(len(packets), 5, imported)
+        # Producer: the ordinary closed-day loop protects each mature cohort offhost.
+        import zipfile
+
+        from solana_alpha_lab.factory import hot90_closed_day_loop as loop
+        from tests.test_factory_unattended_operability_closure_v1 import FakeDrive, _ops_root
+
+        (tmp / "ops").mkdir()
+        ops_root, drive = _ops_root(str(tmp / "ops")), FakeDrive()
+
+        def protect() -> list[dict]:
+            out = []
+            for _ in range(8):
+                item = loop.process_next_cohort_closure(ops_root, now=END, rclone_runner=drive.runner, allow_drive=True,
+                                                        observation_rdp=sc.data_root, ops_store=sc.ops_path)
+                out.append(item)
+                if item["terminal"] != "REMOTE_CONTENT_SHA256_VERIFIED":
+                    break
+            return out
+
+        first = protect()  # the default boundary leaves workstation-era cohorts alone
+        self.assertEqual([i.get("cohort_id") for i in first[:-1]],
+                         ["REL-20261013T000000Z-20261014T000000Z", "REL-20261014T000000Z-20261015T000000Z"], first)
+        with patch.object(loop, "COHORT_CLOSURE_FROM_COHORT_ID", "REL-"):
+            self.assertEqual(len([i for i in protect() if i.get("uploaded")]), 3)
+            copies = drive.copy_count
+            self.assertEqual(protect()[0]["terminal"], "NO_MATURE_UNPROTECTED_COHORT")  # idempotent
+        self.assertEqual(drive.copy_count, copies)
+        self.assertEqual(len(drive.objects), 5)
+        self.assertFalse(list((ops_root / loop.COHORT_STAGING_RELATIVE).glob("*.zip")))  # no local leftovers
+        # Consumer: only the offhost objects, never the producer roots.
+        packets, cold = [], tmp / "cold-source"
+        for index, payload in enumerate(sorted(drive.objects.values())):
+            archive_file = tmp / f"cold-{index}.zip"
+            archive_file.write_bytes(payload)
+            with zipfile.ZipFile(archive_file) as archive:
+                for name in archive.namelist():
+                    data = archive.read(name)
+                    if name == "packet.json":
+                        packet = json.loads(data)
+                        path = tmp / f"packet-{packet['cohort_id']}.json"
+                        path.write_bytes(data)
+                        packets.append(str(path))
+                        continue
+                    target = cold / name.removeprefix("source/")
+                    if target.exists():
+                        self.assertEqual(target.read_bytes(), data, name)  # shared bytes agree
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    target.write_bytes(data)
+        packets.sort()
+        self.assertEqual(len(packets), 5)
+        # Shared provider calls cross cohorts: each claim set is proven from cold bytes alone.
+        proofs = {}
+        for path in packets:
+            packet = json.loads(Path(path).read_text(encoding="utf-8"))
+            entries = list(packet["transfer_manifest"]["entries"])
+            proofs[packet["cohort_id"]] = (loop.verify_shared_call_claims(cold, entries, packet["cohort_id"]), entries)
+            receipt = json.loads(loop.cohort_receipt_path(ops_root, packet["cohort_id"]).read_text(encoding="utf-8"))
+            self.assertEqual(receipt["shared_call_proof"]["incomplete_refs"], [])
+        self.assertTrue(all(not proof["incomplete_refs"] for proof, _ in proofs.values()), proofs)
+        # Managed children are one-day activations, so their calls never span cohorts; the
+        # cross-cohort case (multi-day activation) is proven on real C3 bytes in the evidence.
+        self.assertGreater(sum(proof["calls"] for proof, _ in proofs.values()), 0)
+        cohort, (proof, entries) = next((c, v) for c, v in proofs.items() if v[0]["calls"])
+        body = next(e for e in entries if e.get("source_class") == "raw_body")
+        target = cold / str(body.get("transfer_path") or body["path"])
+        original = target.read_bytes()
+        target.write_bytes(original + b" ")
+        self.assertTrue(loop.verify_shared_call_claims(cold, entries, cohort)["incomplete_refs"])  # tamper seen
+        target.write_bytes(original)
         plane, mirror = tmp / "plane", tmp / "mirror"
         plane.mkdir()
         ResearchStore(plane).prepare_write_lookup()
         with patch.object(vertical, "AS_OF", END + timedelta(hours=1)):
             vertical._import_legacy(plane, tmp)
-            consumed = vertical._consume(packets, source=sc.data_root, mirror=mirror, plane=plane)
+            consumed = vertical._consume(packets, source=cold, mirror=mirror, plane=plane)
         self.assertEqual(consumed["_exit_code"], 0, consumed)
         statuses = [item.get("import_status") for item in consumed["result"]["cohorts"]]
         self.assertEqual(len(statuses), 5, consumed)

@@ -1,0 +1,23 @@
+{
+  "authority_granted": false,
+  "matched_paths": [
+    "src/solana_alpha_lab/factory/collector_operational_packet.py",
+    "src/solana_alpha_lab/factory/hot90_closed_day_loop.py"
+  ],
+  "profile": "SEMANTIC_PREMISE",
+  "reason": "PATH_PREFIX",
+  "risk_dimensions": [
+    "SCIENTIFIC_ESTIMAND",
+    "FALSIFIER_OR_ENDPOINT",
+    "EVIDENCE_ADMISSIBILITY",
+    "PIT_OR_AVAILABILITY_SEMANTICS",
+    "RESEARCH_TRUTH_OWNERSHIP",
+    "HYPOTHESIS_OR_FAMILY_CLOSURE",
+    "PROMOTION_OR_SUPPRESSION_AUTHORITY",
+    "UNKNOWN_VS_NEGATIVE_EVIDENCE",
+    "EXECUTION_TRUTH_SEMANTICS",
+    "DURABLE_SCIENCE_SCHEMA",
+    "OWNER_AUTHORITY_SEMANTICS",
+    "HARNESS_PREMISE_OR_MERGE_AUTHORITY"
+  ]
+}
