@@ -191,6 +191,25 @@ class ManagedReleaseSeamTests(unittest.TestCase):
                     target.write_bytes(data)
         packets.sort()
         self.assertEqual(len(packets), 5)
+        # Shared provider calls cross cohorts: each claim set is proven from cold bytes alone.
+        proofs = {}
+        for path in packets:
+            packet = json.loads(Path(path).read_text(encoding="utf-8"))
+            entries = list(packet["transfer_manifest"]["entries"])
+            proofs[packet["cohort_id"]] = (loop.verify_shared_call_claims(cold, entries, packet["cohort_id"]), entries)
+            receipt = json.loads(loop.cohort_receipt_path(ops_root, packet["cohort_id"]).read_text(encoding="utf-8"))
+            self.assertEqual(receipt["shared_call_proof"]["incomplete_refs"], [])
+        self.assertTrue(all(not proof["incomplete_refs"] for proof, _ in proofs.values()), proofs)
+        # Managed children are one-day activations, so their calls never span cohorts; the
+        # cross-cohort case (multi-day activation) is proven on real C3 bytes in the evidence.
+        self.assertGreater(sum(proof["calls"] for proof, _ in proofs.values()), 0)
+        cohort, (proof, entries) = next((c, v) for c, v in proofs.items() if v[0]["calls"])
+        body = next(e for e in entries if e.get("source_class") == "raw_body")
+        target = cold / str(body.get("transfer_path") or body["path"])
+        original = target.read_bytes()
+        target.write_bytes(original + b" ")
+        self.assertTrue(loop.verify_shared_call_claims(cold, entries, cohort)["incomplete_refs"])  # tamper seen
+        target.write_bytes(original)
         plane, mirror = tmp / "plane", tmp / "mirror"
         plane.mkdir()
         ResearchStore(plane).prepare_write_lookup()

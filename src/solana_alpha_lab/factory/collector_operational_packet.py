@@ -1654,16 +1654,9 @@ def build_collector_operational_packet(
         if receipt:
             last_terminal = receipt.get("terminal")
     packet["immutable_archive_last_terminal"] = last_terminal
-    from solana_alpha_lab.factory.hot90_closed_day_loop import cohort_closure_failures
+    from solana_alpha_lab.factory.hot90_closed_day_loop import cohort_closure_packet_fields
 
-    try:
-        failures = cohort_closure_failures(root, now=clock)
-    except Exception:  # an unreadable ledger is not health proof
-        failures = [{"cohort_id": UNKNOWN, "terminal": "RECEIPTS_UNREADABLE", "age_seconds": UNKNOWN}]
-    packet["cohort_closure_failures"] = failures
-    ages = [item["age_seconds"] for item in failures if isinstance(item.get("age_seconds"), int)]
-    packet["cohort_closure_oldest_failure_age_seconds"] = max(ages) if ages else None
-    packet["cohort_closure_hash_mismatch"] = any(item.get("terminal") == "HASH_MISMATCH" for item in failures)
+    packet.update(cohort_closure_packet_fields(root, now=clock))
     from solana_alpha_lab.factory.managed_collection import measure_whole_factory
 
     topology = measure_whole_factory(

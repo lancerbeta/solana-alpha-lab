@@ -6,24 +6,44 @@
   "runtime_readback_2026-10-17T11:14Z": {
     "installed": "13fb33812361c5f8ea1378dbf0251844938a8cd6",
     "managed_lineage": "0849fa8340fbeb3e44419258ea15583cbf3952919bc2859024f12bba8c36361c",
-    "desired_state": "RUN", "grant": "VALID", "backup": "FRESH OFFHOST_VERIFIED_CHECKPOINT 00:45:34Z",
-    "protected_bridge": "ACT-A26CF9B0815A36F2", "bootstrap_not_before": "2026-10-18T00:00:00Z",
+    "desired_state": "RUN",
+    "grant": "VALID",
+    "backup": "FRESH OFFHOST_VERIFIED_CHECKPOINT 00:45:34Z",
+    "protected_bridge": "ACT-A26CF9B0815A36F2",
+    "bootstrap_not_before": "2026-10-18T00:00:00Z",
     "bridge_stops_admitting_at": "2026-10-18T00:00:00Z",
     "packet_flag_before": "CAMPAIGN_SUCCESSOR_REQUIRED (collector_verdict DEGRADED, PROCESS_OK)",
-    "patched_reader_on_live_ops": {"ACT-A26CF9B0815A36F2": "MANAGED_CONTINUATION required=false"}
+    "patched_reader_on_live_ops": {
+      "ACT-A26CF9B0815A36F2": "MANAGED_CONTINUATION required=false"
+    }
   },
   "closure_coverage_falsifier": {
     "cohort": "REL-20261013T000000Z-20261014T000000Z",
-    "day_archives_checked": {"20261013": "744edc7e", "20261014": "b27e2a52", "20261015": "0d8b555b", "20261016": "d2535412"},
-    "manifest_entries": 7414, "found_in_day_archives": 6913, "sha256_mismatches": 0,
-    "missing": {"publication_jobs_completed": 488, "episode_export": 4, "frozen_capture_metadata_unit": 1, "open_day_20261017_objects": 8},
+    "day_archives_checked": {
+      "20261013": "744edc7e",
+      "20261014": "b27e2a52",
+      "20261015": "0d8b555b",
+      "20261016": "d2535412"
+    },
+    "manifest_entries": 7414,
+    "found_in_day_archives": 6913,
+    "sha256_mismatches": 0,
+    "missing": {
+      "publication_jobs_completed": 488,
+      "episode_export": 4,
+      "frozen_capture_metadata_unit": 1,
+      "open_day_20261017_objects": 8
+    },
     "conclusion": "ordinary day archives do not close a cohort; the export exists only after a capture run"
   },
   "producer_working_path_probe": {
     "mode": "temp root, real OPS/RDP, Drive copy refused",
     "selected": "REL-20261013T000000Z-20261014T000000Z",
-    "packaged_files": 7414, "packaged_source_bytes": 107460288, "seconds": 33.4,
-    "terminal": "DRIVE_WRITE_FAILED (expected: refused runner)", "staging_left": 0,
+    "packaged_files": 7414,
+    "packaged_source_bytes": 107460288,
+    "seconds": 33.4,
+    "terminal": "DRIVE_WRITE_FAILED (expected: refused runner)",
+    "staging_left": 0,
     "producer_side_effect": "native write-once capture of the C3 export prefix (identical bytes are not rewritten)"
   },
   "synthetic_production_path": {
@@ -32,14 +52,53 @@
   },
   "runway_30d": {
     "free_bytes_now": 70349512704,
-    "measured_growth_per_day": {"observation_rdp": "130-150 MB", "ops_sqlite": "50-70 MB after 1.22 GB reusable freelist"},
-    "retained_classes_bytes": {"backup_sink": 3375810200, "retirement_cold": 6413952219, "journal": 5385486336},
-    "lower_bound_free_after_30d": {"base": "about 61 GB", "stress": "about 49 GB (2x growth, journal +4 GB, archive 7 days late)"},
-    "floor": "16 GB minimum_free", "basis": "MODEL from 3 measured full A+B days; not 30 measured days"
+    "measured_growth_per_day": {
+      "observation_rdp": "130-150 MB",
+      "ops_sqlite": "50-70 MB after 1.22 GB reusable freelist"
+    },
+    "retained_classes_bytes": {
+      "backup_sink": 3375810200,
+      "retirement_cold": 6413952219,
+      "journal": 5385486336
+    },
+    "lower_bound_free_after_30d": {
+      "base": "about 61 GB",
+      "stress": "about 49 GB (2x growth, journal +4 GB, archive 7 days late)"
+    },
+    "floor": "16 GB minimum_free",
+    "basis": "MODEL from 3 measured full A+B days; not 30 measured days"
   },
   "not_done_here": [
-    "external receiver: no FACTORY_EXTERNAL_HEARTBEAT_URL, timer disabled -> owner access step in OPERATE",
-    "three shared-call proof gaps: review ZIP and verifier not available in repo; future neighbouring cohort closures carry their own claims",
-    "first MAIN disposition-record: exact result ref not available to this executor"
-  ]
+    "external receiver: no FACTORY_EXTERNAL_HEARTBEAT_URL, timer disabled -> owner access step in OPERATE"
+  ],
+  "shared_call_provenance": {
+    "verifier": "hot90_closed_day_loop.verify_shared_call_claims (closure bytes only; neighbour outcomes not imported)",
+    "real_c3_frozen_capture_view": {
+      "cohort": "REL-20261013T000000Z-20261014T000000Z",
+      "response_calls": 513,
+      "cross_cohort_calls": 249,
+      "complete": 513,
+      "incomplete": 0,
+      "nomination_witness_calls": 91
+    },
+    "historical_gap_refs": {
+      "19b82219b77e54e8d94a3fd6076be61748e172c31607d0f586a4b0dd111b4c2f": "25/25 claims (C3 23 + C4 2), request_sha256 matches review gap file",
+      "3e73c58dabb7f3deb427a1bc909e99a0f9755311cc00603b7decc79d091707c9": "25/25 claims (C3 24 + C4 1), request_sha256 matches",
+      "4b8ad5fd506f49004febb0958daf9fc30c2209750ba1f4f4ee291e47bdedf62d": "25/25 claims (C3 22 + C4 3), request_sha256 matches"
+    },
+    "historical_conclusion": "proof available from the frozen C3 capture closure (day publication datasets carry neighbour claim rows); the gap came from reading the imported per-cohort corpus. MAIN result/recipe/disposition unchanged.",
+    "future_managed_path": "managed children are one-UTC-day activations, so their calls do not span cohorts; each closure receipt records shared_call_proof"
+  },
+  "queue_and_resume": {
+    "local_failure": "recorded, next cohort processed in the same run",
+    "drive_outage": "network part stops; ZIP + receipt resume kept; retry reuses the same frozen archive without re-capture",
+    "visibility": "cohort, invalid receipt and run-level failures (selection, unexpected error) feed IMMUTABLE_ARCHIVE_STALE/HASH_MISMATCH; unreadable records age by file time"
+  },
+  "first_main_disposition": {
+    "head_ref": "HFIC-ART-DISP-D8BE45912647C0B432DD01222B159481F3439D73",
+    "verdict": "INSUFFICIENT_EVIDENCE",
+    "recommendation": "STOP_THIS_QUESTION",
+    "status": "CURRENT_FOR_BOUND_BASIS",
+    "action": "verify only"
+  }
 }

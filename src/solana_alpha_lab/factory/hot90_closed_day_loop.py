@@ -525,23 +525,143 @@ def protected_cohort_ids(root: Path) -> set[str]:
     return {cohort for cohort, payload in _cohort_receipts(root) if _closure_verified(payload)}
 
 
-def cohort_closure_failures(root: Path, *, now: datetime) -> list[dict[str, Any]]:
-    """Unprotected cohorts with a recorded failure; read by the operability packet."""
+RUN_STATE_NAME = "RUN-STATE.json"
+# Drive/route outages stop the network part of a run; a cohort-local failure does not.
+NETWORK_FAILURES = frozenset({"DRIVE_ROUTE_UNCONFIGURED", "DRIVE_WRITE_FAILED", "REMOTE_VERIFY_FAILED"})
+_RUN_LEVEL_FAILURES = frozenset({"COHORT_SELECTION_FAILED", "COHORT_CLOSURE_ERROR"})
+_IDLE = frozenset({"NO_MATURE_UNPROTECTED_COHORT", "STAGE_NOT_CUTOVER", "HOT90_DRIVE_WRITES_DISABLED", "NO_EPISODE_OPS_STORE"})
+
+
+def _age_seconds(now: datetime, stamp: object, path: Path | None) -> int:
+    """Age of a failure; an unreadable record ages from its file time, never UNKNOWN."""
 
     from solana_alpha_lab.factory.observation_schedule import parse_utc
 
+    try:
+        return max(0, int((now - parse_utc(str(stamp))).total_seconds()))
+    except (TypeError, ValueError):
+        pass
+    try:
+        mtime = datetime.fromtimestamp(path.stat().st_mtime, tz=UTC) if path is not None else now
+    except OSError:
+        mtime = now
+    return max(0, int((now - mtime).total_seconds()))
+
+
+def _run_state_path(root: Path) -> Path:
+    return root / COHORT_RECEIPTS_RELATIVE / RUN_STATE_NAME
+
+
+def _write_run_state(root: Path, terminal: str, code: str, *, now: datetime) -> None:
+    path = _run_state_path(root)
+    try:
+        previous = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        previous = {}
+    first = previous.get("failed_at") if isinstance(previous, dict) else None
+    _atomic_write_json(path, {"kind": COHORT_RECEIPT_KIND, "scope": "RUN", "terminal": terminal,
+                              "code": code[:80], "failed_at": first or render_utc(now), "last_at": render_utc(now)})
+
+
+def _clear_run_state(root: Path) -> None:
+    _run_state_path(root).unlink(missing_ok=True)
+
+
+def cohort_closure_failures(root: Path, *, now: datetime) -> list[dict[str, Any]]:
+    """Every unresolved closure failure (cohort, invalid receipt or run level) with an age."""
+
+    directory = root / COHORT_RECEIPTS_RELATIVE
     out = []
     for cohort, payload in _cohort_receipts(root):
         if _closure_verified(payload):
             continue
-        failed_at = (payload or {}).get("failed_at")
-        try:
-            age: int | str = int((now - parse_utc(str(failed_at))).total_seconds())
-        except (TypeError, ValueError):
-            age = "UNKNOWN"
         out.append({"cohort_id": cohort, "terminal": str((payload or {}).get("terminal") or "RECEIPT_INVALID"),
-                    "age_seconds": age})
+                    "age_seconds": _age_seconds(now, (payload or {}).get("failed_at"), directory / f"{cohort}.json")})
+    run = _run_state_path(root)
+    if run.exists():
+        try:
+            state = json.loads(run.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            state = None
+        state = state if isinstance(state, dict) else {}
+        out.append({"cohort_id": "RUN", "terminal": str(state.get("terminal") or "RUN_STATE_INVALID"),
+                    "age_seconds": _age_seconds(now, state.get("failed_at"), run)})
     return out
+
+
+def cohort_closure_packet_fields(root: Path, *, now: datetime) -> dict[str, Any]:
+    """Operability packet fields; an unreadable ledger is a visible failure, not health."""
+
+    try:
+        failures = cohort_closure_failures(root, now=now)
+    except Exception:
+        failures = [{"cohort_id": "RUN", "terminal": "RECEIPTS_UNREADABLE", "age_seconds": 86401}]
+    ages = [item["age_seconds"] for item in failures if isinstance(item.get("age_seconds"), int)]
+    return {
+        "cohort_closure_failures": failures,
+        "cohort_closure_oldest_failure_age_seconds": max(ages) if ages else None,
+        "cohort_closure_hash_mismatch": any(item.get("terminal") == "HASH_MISMATCH" for item in failures),
+    }
+
+
+def verify_shared_call_claims(
+    source_root: Path, entries: list[Mapping[str, Any]], cohort_id: str
+) -> dict[str, Any]:
+    """Each response-body call this cohort claims: one request/response, its raw body
+    inside the closure hashing to the response, and the mints claimed by every cohort
+    equal to the ids in that response. Closure bytes only; no neighbour is imported.
+    Nomination witness rows (per-mint excerpts, not response bodies) are counted apart."""
+
+    import hashlib
+
+    import duckdb
+
+    from solana_alpha_lab.factory.opportunity_episode_release import _contained
+
+    located = {str(e["path"]): str(e.get("transfer_path") or e["path"]) for e in entries}
+    parquets = [_contained(source_root, located[str(e["path"])]).as_posix()
+                for e in entries if e.get("source_class") == "observation_parquet"]
+    result = {"calls": 0, "shared_calls": 0, "complete": 0, "witness_calls": 0,
+              "incomplete_refs": [], "unverifiable_refs": []}
+    if not parquets:
+        return result
+    files = "[" + ",".join("'" + p.replace("'", "''") + "'" for p in parquets) + "]"
+    connection = duckdb.connect()
+    base = f"FROM read_parquet({files}, union_by_name=true) WHERE call_occurrence_id IS NOT NULL"
+    result["witness_calls"] = int(connection.execute(
+        f"SELECT COUNT(DISTINCT call_occurrence_id) {base} AND raw_body_rel LIKE '%/witness/%' AND cohort_id = ?",
+        [cohort_id]).fetchone()[0])
+    rows = connection.execute(
+        "SELECT call_occurrence_id, list(DISTINCT mint), list(DISTINCT request_sha256), "
+        "list(DISTINCT response_sha256), list(DISTINCT raw_body_rel), COUNT(DISTINCT cohort_id) "
+        f"{base} AND COALESCE(raw_body_rel, '') NOT LIKE '%/witness/%' AND call_occurrence_id IN "
+        f"(SELECT call_occurrence_id {base} AND cohort_id = ?) GROUP BY 1 ORDER BY 1",
+        [cohort_id],
+    ).fetchall()
+    for ref, mints, requests, responses, raws, cohorts in rows:
+        result["calls"] += 1
+        result["shared_calls"] += int(int(cohorts) > 1)
+        bodies = [r for r in raws if r]
+        if len(requests) != 1 or len(responses) != 1 or len(bodies) != 1 or bodies[0] not in located:
+            result["incomplete_refs"].append(ref)
+            continue
+        raw = _contained(source_root, located[bodies[0]]).read_bytes()
+        if hashlib.sha256(raw).hexdigest() != responses[0]:
+            result["incomplete_refs"].append(ref)
+            continue
+        try:
+            payload = json.loads(raw)
+        except ValueError:
+            payload = None
+        if not isinstance(payload, list) or not all(isinstance(item, Mapping) for item in payload):
+            result["unverifiable_refs"].append(ref)  # not a batch list: nothing to compare
+            continue
+        ids = {str(item.get("id") or item.get("mint") or "") for item in payload}
+        if ids == {str(m) for m in mints if m}:
+            result["complete"] += 1
+        else:
+            result["incomplete_refs"].append(ref)
+    return result
 
 
 def package_cohort_closure(rdp: Path, packet: Mapping[str, Any], dest_dir: Path) -> dict[str, Any]:
@@ -591,35 +711,68 @@ def package_cohort_closure(rdp: Path, packet: Mapping[str, Any], dest_dir: Path)
     return {"path": str(final), "sha256": sha.hexdigest(), "files": len(entries), "source_bytes": total}
 
 
+def _cohort_receipts_by_id(root: Path) -> dict[str, dict[str, Any] | None]:
+    return dict(_cohort_receipts(root))
+
+
 def _cohort_failure(
-    root: Path, cohort_id: str, code: str, extra: Mapping[str, Any] | None = None, *, now: datetime
+    root: Path, cohort_id: str, code: str, extra: Mapping[str, Any] | None = None, *, now: datetime,
+    resume: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     previous = dict(_cohort_receipts_by_id(root).get(cohort_id) or {})
     payload = {"kind": COHORT_RECEIPT_KIND, "cohort_id": cohort_id, "terminal": code,
                # first failure time is kept so a persistent failure ages into an incident
                "failed_at": previous.get("failed_at") or render_utc(now),
                "last_failure": {"code": code, "at": render_utc(now), **dict(extra or {})}}
+    if resume is not None:
+        payload["resume"] = dict(resume)  # same frozen packet and archive identity on retry
     _atomic_write_json(cohort_receipt_path(root, cohort_id), payload)
     return {"cohort_id": cohort_id, "terminal": code, "uploaded": False}
 
 
-def _cohort_receipts_by_id(root: Path) -> dict[str, dict[str, Any] | None]:
-    return dict(_cohort_receipts(root))
+def _resume_archives(root: Path) -> set[str]:
+    out = set()
+    for _cohort, payload in _cohort_receipts(root):
+        resume = (payload or {}).get("resume")
+        if not _closure_verified(payload) and isinstance(resume, Mapping):
+            out.add(str(resume.get("archive_filename") or ""))
+    return out
 
 
 def _sweep_cohort_staging(root: Path, *, now: datetime) -> list[str]:
-    """Remove owned leftovers of a killed run (oneshot unit: no concurrent writer)."""
+    """Remove owned leftovers (oneshot unit: no concurrent writer); keep resumable uploads."""
 
     staging = root / COHORT_STAGING_RELATIVE
     removed: list[str] = []
     if not staging.is_dir():
         return removed
+    keep = _resume_archives(root)
     for stale in staging.glob("*.zip"):
-        if stale.is_symlink() or not (stale.name.startswith(".building-") or stale.name.startswith("COHORT_CLOSURE_")):
+        if stale.is_symlink() or stale.name in keep:
+            continue
+        if not (stale.name.startswith(".building-") or stale.name.startswith("COHORT_CLOSURE_")):
             continue
         stale.unlink(missing_ok=True)
         removed.append(stale.name)
     return removed
+
+
+def _resume_from(root: Path, cohort_id: str) -> dict[str, Any] | None:
+    import hashlib
+
+    resume = (_cohort_receipts_by_id(root).get(cohort_id) or {}).get("resume")
+    if not isinstance(resume, Mapping):
+        return None
+    path = root / COHORT_STAGING_RELATIVE / str(resume.get("archive_filename") or "")
+    if path.is_symlink() or not path.is_file():
+        return None
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1 << 20), b""):
+            digest.update(chunk)
+    if digest.hexdigest() != resume.get("archive_sha256"):
+        return None
+    return {**dict(resume), "path": str(path)}
 
 
 def process_next_cohort_closure(
@@ -630,8 +783,9 @@ def process_next_cohort_closure(
     allow_drive: bool = False,
     observation_rdp: Path | None = None,
     ops_store: Path | None = None,
+    skip_cohorts: set[str] | None = None,
 ) -> dict[str, Any]:
-    """Protect the oldest mature unprotected episode cohort. Idempotent per cohort."""
+    """Protect the oldest mature unprotected episode cohort not in ``skip_cohorts``."""
 
     from solana_alpha_lab.factory.opportunity_episode_release import (
         capture_freeze_export_episodes,
@@ -650,7 +804,7 @@ def process_next_cohort_closure(
     _sweep_cohort_staging(root, now=now)
     if not ops.is_file():
         return {"terminal": "NO_EPISODE_OPS_STORE", "uploaded": False}
-    skip = protected_cohort_ids(root)
+    skip = protected_cohort_ids(root) | set(skip_cohorts or ())
     try:
         for _ in range(256):
             chosen = select_next_mature_episode_cohort(ops_store=ops, observation_rdp=rdp, imported=skip, as_of=now)
@@ -662,51 +816,69 @@ def process_next_cohort_closure(
         else:
             return {"terminal": "NO_MATURE_UNPROTECTED_COHORT", "uploaded": False}
     except ValueError as exc:  # typed release errors are ValueError subclasses
+        _write_run_state(root, "COHORT_SELECTION_FAILED", str(exc), now=now)
         return {"terminal": "COHORT_SELECTION_FAILED", "code": str(exc)[:80], "uploaded": False}
     cohort_id = str(chosen["cohort_id"])
     staging = root / COHORT_STAGING_RELATIVE
-    packed: dict[str, Any] | None = None
+    resume = _resume_from(root, cohort_id)
+    keep_archive = False
+    archive_path: Path | None = None
     try:
-        try:
-            packet = capture_freeze_export_episodes(observation_rdp=rdp, ops_store=ops, imported_cohort_ids=skip, as_of=now)
-            if str(packet["cohort_id"]) != cohort_id:
-                return _cohort_failure(root, cohort_id, "COHORT_SELECTION_DRIFT", {}, now=now)
-            packed = package_cohort_closure(rdp, packet, staging)
-        except (OSError, ValueError, RuntimeError, KeyError, TypeError) as exc:
-            return _cohort_failure(root, cohort_id, "COHORT_CLOSURE_BUILD_FAILED", now=now, extra={"error": str(exc)[:80]})
+        if resume is None:
+            try:
+                packet = capture_freeze_export_episodes(observation_rdp=rdp, ops_store=ops, imported_cohort_ids=skip, as_of=now)
+                if str(packet["cohort_id"]) != cohort_id:
+                    return _cohort_failure(root, cohort_id, "COHORT_SELECTION_DRIFT", now=now)
+                manifest = packet["transfer_manifest"]
+                proof = verify_shared_call_claims(rdp, list(manifest["entries"]), cohort_id)
+                packed = package_cohort_closure(rdp, packet, staging)
+            except (OSError, ValueError, RuntimeError, KeyError, TypeError) as exc:
+                return _cohort_failure(root, cohort_id, "COHORT_CLOSURE_BUILD_FAILED", now=now, extra={"error": str(exc)[:80]})
+            archive_path = Path(packed["path"])
+            resume = {
+                "archive_filename": archive_path.name, "archive_sha256": packed["sha256"],
+                "files": packed["files"], "source_bytes": packed["source_bytes"],
+                "schedule_sha256": str(chosen["schedule_sha256"]), "activation_id": str(chosen["activation_id"]),
+                "closure_receipt_sha256": packet["closure_receipt"].get("closure_receipt_sha256"),
+                "transfer_manifest_sha256": manifest.get("manifest_sha256"),
+                "shared_call_proof": proof,
+            }
+        else:
+            archive_path = Path(resume.pop("path"))
+        sha = str(resume["archive_sha256"])
         offhost = load_offhost_config(root)
         if offhost is None:
-            return _cohort_failure(root, cohort_id, "DRIVE_ROUTE_UNCONFIGURED", now=now, extra={"archive_sha256": packed["sha256"]})
+            keep_archive = True
+            return _cohort_failure(root, cohort_id, "DRIVE_ROUTE_UNCONFIGURED", now=now, resume=resume)
         runner = rclone_runner or default_rclone_runner
-        archive_path = Path(packed["path"])
         remote_object = offhost.remote_object(archive_path.name)
-        common = {"archive_sha256": packed["sha256"], "remote_object": remote_object}
+        common = {"archive_sha256": sha, "remote_object": remote_object}
         native = probe_remote_sha256(config=offhost, remote_object=remote_object, runner=runner)
-        if native is not None and native != packed["sha256"]:
+        if native is not None and native != sha:
             return _cohort_failure(root, cohort_id, "HASH_MISMATCH", now=now, extra={**common, "remote_content_sha256": native})
         uploaded = False
         if native is None:
             copied = runner(build_rclone_argv(offhost, "copyto", str(archive_path), remote_object))
             if getattr(copied, "returncode", 1) != 0:
-                return _cohort_failure(root, cohort_id, "DRIVE_WRITE_FAILED", common, now=now)
+                keep_archive = True
+                return _cohort_failure(root, cohort_id, "DRIVE_WRITE_FAILED", common, now=now, resume=resume)
             uploaded = True
             try:
                 verified = verify_remote_content_sha256(config=offhost, remote_object=remote_object,
-                                                        local_sha256=packed["sha256"], runner=runner,
+                                                        local_sha256=sha, runner=runner,
                                                         root=root, allow_drive=allow_drive)
             except OffhostBackupError as exc:
-                return _cohort_failure(root, cohort_id, "REMOTE_VERIFY_FAILED", now=now, extra={**common, "error": str(exc)[:80]})
+                keep_archive = True
+                return _cohort_failure(root, cohort_id, "REMOTE_VERIFY_FAILED", now=now,
+                                       extra={**common, "error": str(exc)[:80]}, resume=resume)
             native = str(verified.get("sha256") or "")
-            if native != packed["sha256"]:
+            if native != sha:
                 return _cohort_failure(root, cohort_id, "HASH_MISMATCH", now=now, extra={**common, "remote_content_sha256": native})
-        manifest = packet["transfer_manifest"]
         receipt = {
             "kind": COHORT_RECEIPT_KIND, "cohort_id": cohort_id, "collection": "OPPORTUNITY_EPISODES",
-            "schedule_sha256": str(chosen["schedule_sha256"]), "activation_id": str(chosen["activation_id"]),
-            "closure_receipt_sha256": packet["closure_receipt"].get("closure_receipt_sha256"),
-            "transfer_manifest_sha256": manifest.get("manifest_sha256"),
-            "files": packed["files"], "source_bytes": packed["source_bytes"],
-            "archive_filename": archive_path.name, "archive_sha256": packed["sha256"],
+            **{key: resume.get(key) for key in ("schedule_sha256", "activation_id", "closure_receipt_sha256",
+                                                "transfer_manifest_sha256", "files", "source_bytes", "shared_call_proof")},
+            "archive_filename": archive_path.name, "archive_sha256": sha,
             "remote_object": remote_object, "remote_content_sha256": native,
             "terminal": REMOTE_CONTENT_SHA256_VERIFIED, "verified_at": render_utc(now), "last_failure": None,
             "consumer": "unzip; unpack-next-live-cohort --collection OPPORTUNITY_EPISODES "
@@ -714,11 +886,48 @@ def process_next_cohort_closure(
         }
         _atomic_write_json(cohort_receipt_path(root, cohort_id), receipt)
         return {"cohort_id": cohort_id, "terminal": REMOTE_CONTENT_SHA256_VERIFIED, "uploaded": uploaded,
-                "archive_sha256": packed["sha256"], "files": packed["files"]}
+                "archive_sha256": sha, "files": resume.get("files"), "shared_call_proof": resume.get("shared_call_proof")}
     finally:
-        # A verified object lives offhost; a failed build is rebuilt from source next run.
-        if packed is not None:
-            Path(packed["path"]).unlink(missing_ok=True)
+        # Verified objects live offhost; a resumable upload keeps exactly its archive.
+        if archive_path is not None and not keep_archive:
+            archive_path.unlink(missing_ok=True)
+
+
+def run_cohort_closures(
+    root: Path,
+    *,
+    now: datetime,
+    rclone_runner: RcloneRunner | None,
+    allow_drive: bool,
+    within_budget: Callable[[], bool],
+    max_cohorts: int = DEFAULT_MAX_COHORTS_PER_RUN,
+) -> list[dict[str, Any]]:
+    """Bounded queue: a cohort-local failure moves on, a Drive outage stops the network part."""
+
+    attempted: set[str] = set()
+    outcomes: list[dict[str, Any]] = []
+    run_failed = False
+    for _ in range(max_cohorts):
+        if not within_budget():
+            break
+        try:
+            outcome = process_next_cohort_closure(root, now=now, rclone_runner=rclone_runner,
+                                                  allow_drive=allow_drive, skip_cohorts=attempted)
+        except Exception as exc:  # the day archive summary and cache prune must still complete
+            outcome = {"terminal": "COHORT_CLOSURE_ERROR", "code": type(exc).__name__, "uploaded": False}
+            _write_run_state(root, "COHORT_CLOSURE_ERROR", type(exc).__name__, now=now)
+        outcomes.append(outcome)
+        terminal = str(outcome["terminal"])
+        if outcome.get("cohort_id"):
+            attempted.add(str(outcome["cohort_id"]))
+        if terminal in _RUN_LEVEL_FAILURES:
+            run_failed = True
+            break
+        if terminal in NETWORK_FAILURES or terminal in _IDLE:
+            break
+    if outcomes and not run_failed and str(outcomes[-1]["terminal"]) not in {"STAGE_NOT_CUTOVER", "HOT90_DRIVE_WRITES_DISABLED"}:
+        _clear_run_state(root)  # selection worked this run
+    return outcomes
 
 
 def run_closed_day_durability(
@@ -767,17 +976,11 @@ def run_closed_day_durability(
             )
         )
         wall = datetime.now(UTC)
-    cohorts = []
-    for _index in range(0 if out_of_time else DEFAULT_MAX_COHORTS_PER_RUN):
-        if (deadline is not None and datetime.now(UTC) > deadline) or tick() - started > max_runtime:
-            break
-        try:
-            outcome = process_next_cohort_closure(root, now=clock, rclone_runner=rclone_runner, allow_drive=allow_drive)
-        except Exception as exc:  # the day archive summary and cache prune must still complete
-            outcome = {"terminal": "COHORT_CLOSURE_ERROR", "code": type(exc).__name__, "uploaded": False}
-        cohorts.append(outcome)
-        if outcome["terminal"] != REMOTE_CONTENT_SHA256_VERIFIED:
-            break
+    cohorts = [] if out_of_time else run_cohort_closures(
+        root, now=clock, rclone_runner=rclone_runner, allow_drive=allow_drive,
+        within_budget=lambda: not ((deadline is not None and datetime.now(UTC) > deadline)
+                                   or tick() - started > max_runtime),
+    )
     remaining = archive_backlog(root, now=clock)
     cache_prune = prune_stale_operational_caches(root, today=current_utc_day(clock))
     return {
