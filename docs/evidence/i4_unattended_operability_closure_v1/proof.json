@@ -87,7 +87,15 @@
       "4b8ad5fd506f49004febb0958daf9fc30c2209750ba1f4f4ee291e47bdedf62d": "25/25 claims (C3 22 + C4 3), request_sha256 matches"
     },
     "historical_conclusion": "proof available from the frozen C3 capture closure (day publication datasets carry neighbour claim rows); the gap came from reading the imported per-cohort corpus. MAIN result/recipe/disposition unchanged.",
-    "future_managed_path": "managed children are one-UTC-day activations, so their calls do not span cohorts; each closure receipt records shared_call_proof"
+    "future_managed_path": "managed children are one-UTC-day activations, so their calls do not span cohorts; each closure receipt records shared_call_proof",
+    "reproduce": {
+      "inputs": {
+        "capture_packet_sha256": "8922804593a515f95754f5e9ceaf7b5c46e44b34cf244f63de7f6ec598008c53",
+        "transfer_manifest_sha256": "2fb98411009b3a99c7c0021ea5b6baff4ff1a119b7ee942adb95b64d611d9ab2",
+        "review_gap_file": "smial-main-980bd06c-review-20261017.zip:occurrence-proof-gaps.json"
+      },
+      "command": "python -c \"from solana_alpha_lab.factory.hot90_closed_day_loop import verify_shared_call_claims as v; ...\" over local/factory_mirror/observation_rdp/captures/<transfer_manifest_sha256>/source with the packet's manifest entries (path layout) and cohort REL-20261013T000000Z-20261014T000000Z; equivalently the C3 recovery archive ARCHIVE_12031a4b89bcacc72e151adf869ed571bcd01de62da7a1ce79bd40c88f764b9e.zip"
+    }
   },
   "queue_and_resume": {
     "local_failure": "recorded, next cohort processed in the same run",

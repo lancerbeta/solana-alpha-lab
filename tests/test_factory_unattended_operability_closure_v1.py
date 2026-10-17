@@ -1169,6 +1169,15 @@ class CohortClosureFailureTests(unittest.TestCase):
         self.assertNotIn(forged.stem, self.loop.protected_cohort_ids(self.root))
         self.assertIn("IMMUTABLE_ARCHIVE_STALE", self.health(NOW))  # unreadable ages by file time
 
+    def test_unproven_shared_call_provenance_is_visible(self) -> None:
+        self.assertEqual([o["terminal"] for o in self.run_closures(FakeDrive())], ["REMOTE_CONTENT_SHA256_VERIFIED"] * 2)
+        path = self.loop.cohort_receipt_path(self.root, self.A)
+        receipt = json.loads(path.read_text())
+        receipt["shared_call_proof"] = {"calls": 1, "complete": 0, "incomplete_refs": ["e" * 64], "unverifiable_refs": []}
+        path.write_text(json.dumps(receipt), encoding="utf-8")
+        self.assertIn(self.A, self.loop.protected_cohort_ids(self.root))  # bytes stay protected
+        self.assertIn("IMMUTABLE_ARCHIVE_STALE", self.health(NOW + timedelta(hours=25)))  # provenance gap is not silent
+
     def test_gates_are_typed_no_ops(self) -> None:
         write_hot90_runtime_state(self.root, {"activation_stage": STAGE_DURABILITY_CUTOVER,
                                               "production_compaction_enabled": False,

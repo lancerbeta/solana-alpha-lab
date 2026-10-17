@@ -574,6 +574,11 @@ def cohort_closure_failures(root: Path, *, now: datetime) -> list[dict[str, Any]
     out = []
     for cohort, payload in _cohort_receipts(root):
         if _closure_verified(payload):
+            proof = (payload or {}).get("shared_call_proof") or {}
+            if proof.get("incomplete_refs") or proof.get("unverifiable_refs") or proof.get("error"):
+                # bytes are protected; their claim provenance is not proven: visible, not hidden
+                out.append({"cohort_id": cohort, "terminal": "SHARED_CALL_PROOF_INCOMPLETE",
+                            "age_seconds": _age_seconds(now, (payload or {}).get("verified_at"), directory / f"{cohort}.json")})
             continue
         out.append({"cohort_id": cohort, "terminal": str((payload or {}).get("terminal") or "RECEIPT_INVALID"),
                     "age_seconds": _age_seconds(now, (payload or {}).get("failed_at"), directory / f"{cohort}.json")})
@@ -627,6 +632,18 @@ def verify_shared_call_claims(
         return result
     files = "[" + ",".join("'" + p.replace("'", "''") + "'" for p in parquets) + "]"
     connection = duckdb.connect()
+    try:
+        return _claims_from(connection, files, located, source_root, cohort_id, result)
+    finally:
+        connection.close()
+
+
+def _claims_from(connection: Any, files: str, located: Mapping[str, str], source_root: Path,
+                 cohort_id: str, result: dict[str, Any]) -> dict[str, Any]:
+    import hashlib
+
+    from solana_alpha_lab.factory.opportunity_episode_release import _contained
+
     base = f"FROM read_parquet({files}, union_by_name=true) WHERE call_occurrence_id IS NOT NULL"
     result["witness_calls"] = int(connection.execute(
         f"SELECT COUNT(DISTINCT call_occurrence_id) {base} AND raw_body_rel LIKE '%/witness/%' AND cohort_id = ?",
@@ -830,7 +847,10 @@ def process_next_cohort_closure(
                 if str(packet["cohort_id"]) != cohort_id:
                     return _cohort_failure(root, cohort_id, "COHORT_SELECTION_DRIFT", now=now)
                 manifest = packet["transfer_manifest"]
-                proof = verify_shared_call_claims(rdp, list(manifest["entries"]), cohort_id)
+                try:
+                    proof = verify_shared_call_claims(rdp, list(manifest["entries"]), cohort_id)
+                except Exception as exc:  # provenance unproven is recorded and surfaced, bytes still protected
+                    proof = {"error": type(exc).__name__}
                 packed = package_cohort_closure(rdp, packet, staging)
             except (OSError, ValueError, RuntimeError, KeyError, TypeError) as exc:
                 return _cohort_failure(root, cohort_id, "COHORT_CLOSURE_BUILD_FAILED", now=now, extra={"error": str(exc)[:80]})
@@ -925,7 +945,8 @@ def run_cohort_closures(
             break
         if terminal in NETWORK_FAILURES or terminal in _IDLE:
             break
-    if outcomes and not run_failed and str(outcomes[-1]["terminal"]) not in {"STAGE_NOT_CUTOVER", "HOT90_DRIVE_WRITES_DISABLED"}:
+    if outcomes and not run_failed and str(outcomes[-1]["terminal"]) not in {
+        "STAGE_NOT_CUTOVER", "HOT90_DRIVE_WRITES_DISABLED", "NO_EPISODE_OPS_STORE"}:
         _clear_run_state(root)  # selection worked this run
     return outcomes
 

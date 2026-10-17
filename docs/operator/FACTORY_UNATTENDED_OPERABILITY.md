@@ -348,8 +348,12 @@ cohort is retried next run. A failure stays visible: HASH_MISMATCH raises
 `IMMUTABLE_ARCHIVE_STALE` (existing watch incidents). Maturity stays the native
 closed obligations/publications/integrity rule. "Protected" means an offhost
 closure exists; it does not mean imported. The object name addresses one
-capture (its packet), so a retried capture may add a second object for the same
-cohort; both import to the same release.
+capture (its packet); a Drive outage keeps that exact archive and the next run
+resumes it without a new capture, while a cohort-local failure is recorded and the
+next cohort proceeds. Each receipt carries `shared_call_proof` (from the closure
+bytes: every response-body call the cohort claims, with all claiming cohorts);
+an incomplete or unverifiable proof keeps the bytes protected but raises the same
+archive health class instead of passing silently.
 
 Late consumer, with only the Drive object and Git (no VPS access). Download
 `COHORT_CLOSURE_<sha256>.zip` from Drive folder `solana-alpha-lab/factory-backups`
