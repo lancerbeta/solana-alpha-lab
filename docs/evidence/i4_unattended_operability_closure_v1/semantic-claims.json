@@ -1,0 +1,5 @@
+[
+  {"claim_id": "BRIDGE_IS_MANAGED_CONTINUATION", "claim": "An active legacy activation is reported as managed continuation only when it is the exact protected bridge of a verified managed profile whose bootstrap starts no later than the bridge boundary; anything else keeps the ordinary successor assessment.", "scope": "collector_operational_packet._managed_bridge_state; read-only."},
+  {"claim_id": "COHORT_CLOSURE_OFFHOST", "claim": "The closed-day run protects each mature unprotected episode cohort from 13 Oct as one content-addressed closure object holding the frozen capture packet and every manifest byte at its transfer_path, hash-checked, uploaded copyto-only with exact remote SHA verification.", "scope": "hot90_closed_day_loop; native capture_freeze_export; no new store or scheduler."},
+  {"claim_id": "LATE_CONSUMER_WITHOUT_PRODUCER", "claim": "A consumer holding only those objects seals and imports the cohorts with the existing unpack-next-live-cohort; maturity is still the native obligations/publications/integrity rule.", "scope": "Synthetic production path; live proof is an OPERATE stage."}
+]
