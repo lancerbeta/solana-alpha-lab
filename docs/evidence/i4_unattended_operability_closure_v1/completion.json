@@ -32,8 +32,8 @@
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "material_owner_decision": false,
-    "user_only_activation": true,
-    "external_material_action": true,
+    "user_only_activation": false,
+    "external_material_action": false,
     "unresolved_safety_or_truth_conflict": false
   },
   "factory_fit": {
@@ -67,6 +67,6 @@
   "side_effects": {
     "repository": "two owners, one runbook, tests, task contract, evidence, Catalog hashes",
     "local": "temporary day-archive downloads (449,675,321 B) deleted after comparison",
-    "external": "read-only producer probes; one write-once native C3 capture under the earlier I4 scope; no Drive upload, deploy or provider call"
+    "external": "read-only producer probes; one write-once native C3 capture under the earlier I4 scope; no Drive upload, deploy or provider call; receiver activation, canary and deploy are a separate staged OPERATE approval, not part of this merge"
   }
 }
