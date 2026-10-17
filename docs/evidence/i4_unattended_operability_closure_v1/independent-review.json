@@ -4,8 +4,8 @@
   "review_id": "I4_UNATTENDED_OPERABILITY_CLOSURE_V1-FINAL",
   "as_of": "2026-10-17",
   "task_id": "I4_UNATTENDED_OPERABILITY_CLOSURE_V1",
-  "reviewed_bindings_sha256": "00714032887f507bf5b0b474d08e0f846af04c9bdff99ca37c81798c2bb05770",
-  "reviewed_inventory_sha256": "4b7b0072687c2b18a7c5d094ce50003a485a5263947e46853dda0e41fcf7adf6",
+  "reviewed_bindings_sha256": "83e0a9457ced6249b983ffa06319c33dd1f09946276bede13d0dbc32acb51692",
+  "reviewed_inventory_sha256": "021d49e51d1d702b6cd5fdf37baeb02d3b803479629046de4fa97d6d9a976e72",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",

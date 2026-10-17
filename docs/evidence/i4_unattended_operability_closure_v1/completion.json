@@ -15,18 +15,18 @@
   },
   "capability_radar_now": "Healthchecks.io free single check for the external receiver (owner account); no package, connector or service in Git.",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "d91fe4314a9746f9a9e63b7b3176bee6cdcb1de7ae1c775698af50b0f10ce858",
-    "docs/evidence/i4_unattended_operability_closure_v1/proof.json": "72e6b8ecba3b715c43014c93c3a01d27b862239eb14704b02447a797558021e5",
+    "catalog/assets/core.yaml": "bb56f09ff9594ed6acc9e892c1cc2c19c7cb6316e4357ab9bbef68d28aa9d24a",
+    "docs/evidence/i4_unattended_operability_closure_v1/proof.json": "57b422517135a3af8c25d8dcbeb4d89004451712948312d1ec6be7c90ec86b63",
     "docs/evidence/i4_unattended_operability_closure_v1/semantic-claims.json": "e89b1a60f56b8725623f3e13800cfac5ef8f89978787ed25cb8db2bff18e1592",
     "docs/evidence/i4_unattended_operability_closure_v1/semantic-classification.json": "9566f1ef192b803006d3cd8073b084b0053815ba6dc7a9d39dea1f4098b12592",
-    "docs/evidence/i4_unattended_operability_closure_v1/semantic-evidence.json": "cf574d98ac08a4fc3c4748adce7546d57ed51482332e58de2194bee535a87bc4",
+    "docs/evidence/i4_unattended_operability_closure_v1/semantic-evidence.json": "8979d3e0819543b09a1e204d0274001ae9517f4cd8bb32e95407e77a567575c3",
     "docs/evidence/i4_unattended_operability_closure_v1/semantic-non-claims.json": "01fbc0979b9fdbd3030ad1f4ff3b4ea9c0ed68edb18326db6e767086dfde0cee",
-    "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "abc9ae5114b58a0dca131e11732fc7cf2e9a4f4d09d13b12e08f3dc87894cf3e",
+    "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "7397b2db3e33742622b352463e901cd852a896ee118805b73db1fb86febba1ae",
     "docs/tasks/I4_UNATTENDED_OPERABILITY_CLOSURE_V1.md": "f07cda0254eb50c4f2cf48210c0e3442343b60d0c8c3a113e3e321bff18ea3b9",
-    "src/solana_alpha_lab/factory/collector_operational_packet.py": "11c64d49e8a00c7697050a3efbff465686c88c968007a6746d3cc19b1a1d9a9f",
-    "src/solana_alpha_lab/factory/hot90_closed_day_loop.py": "5edaac8f4dd5d35fed797c8a30ce6bb2a97ec864d424f2a11f75adfd2c20e1ea",
-    "tests/test_factory_unattended_operability_closure_v1.py": "244c4c7c6ba90e83b2d400817e7b245f384029adbc0f3e58114d98280452977b",
-    "tests/test_managed_collection_release_seam_v1.py": "58a86d1baad563962c718a99bd41811366868ff246ba8cf2b84eb005b49ac2da"
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "13f03341eec5bec7129c6d91546530c7852aa2a1dff9ff8363f79c1a9f7e081c",
+    "src/solana_alpha_lab/factory/hot90_closed_day_loop.py": "6848fec95c0fff2639a3d21f45d2b02b9d25fc3a205110e4898c70feac48956c",
+    "tests/test_factory_unattended_operability_closure_v1.py": "7c59421a2cbbef72a75b77a10e6235390897f136c6cbfd77b1d048aa24936af0",
+    "tests/test_managed_collection_release_seam_v1.py": "bcb2f0610b41025254c8cd7a410fa335a5a62b88a048c7c9ea8dc300451a3ee2"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -38,14 +38,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/i4_unattended_operability_closure_v1/factory-fit.json",
-    "sha256": "a44607c3a2493402dd4f3165b4b995e350978dd397114b9ca0989efab7fb8a08",
+    "sha256": "f1fb8d0216b26756915ed805d81b8400cf1dcef5b8dc40bb15d80510d7216520",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_RELEASE_SEAM_COLD_CONSUMER_5_COHORTS_CLOSURE_FAILURE_TESTS_17_MODULE_DIRECT_CONSUMER_REGRESSION_AND_REAL_PRODUCER_WORKING_PATH_PROBE",
     "independent_review": {
       "path": "docs/evidence/i4_unattended_operability_closure_v1/independent-review.json",
-      "sha256": "bb90dc185810b31da323d4f7b717668f8501e4f45b4939c49fdd5de12544508e",
+      "sha256": "10bc704eff14e6f0cc33f0953c524a304757b7657d2c62f937aa13fbd48e11db",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
