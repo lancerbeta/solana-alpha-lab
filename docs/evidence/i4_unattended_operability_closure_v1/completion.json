@@ -14,7 +14,20 @@
     "reason": "Git is the working context and evidence owner; no cloud export requested."
   },
   "capability_radar_now": "Healthchecks.io free single check for the external receiver (owner account); no package, connector or service in Git.",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "d91fe4314a9746f9a9e63b7b3176bee6cdcb1de7ae1c775698af50b0f10ce858",
+    "docs/evidence/i4_unattended_operability_closure_v1/proof.json": "72e6b8ecba3b715c43014c93c3a01d27b862239eb14704b02447a797558021e5",
+    "docs/evidence/i4_unattended_operability_closure_v1/semantic-claims.json": "e89b1a60f56b8725623f3e13800cfac5ef8f89978787ed25cb8db2bff18e1592",
+    "docs/evidence/i4_unattended_operability_closure_v1/semantic-classification.json": "9566f1ef192b803006d3cd8073b084b0053815ba6dc7a9d39dea1f4098b12592",
+    "docs/evidence/i4_unattended_operability_closure_v1/semantic-evidence.json": "cf574d98ac08a4fc3c4748adce7546d57ed51482332e58de2194bee535a87bc4",
+    "docs/evidence/i4_unattended_operability_closure_v1/semantic-non-claims.json": "01fbc0979b9fdbd3030ad1f4ff3b4ea9c0ed68edb18326db6e767086dfde0cee",
+    "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "abc9ae5114b58a0dca131e11732fc7cf2e9a4f4d09d13b12e08f3dc87894cf3e",
+    "docs/tasks/I4_UNATTENDED_OPERABILITY_CLOSURE_V1.md": "f07cda0254eb50c4f2cf48210c0e3442343b60d0c8c3a113e3e321bff18ea3b9",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "11c64d49e8a00c7697050a3efbff465686c88c968007a6746d3cc19b1a1d9a9f",
+    "src/solana_alpha_lab/factory/hot90_closed_day_loop.py": "5edaac8f4dd5d35fed797c8a30ce6bb2a97ec864d424f2a11f75adfd2c20e1ea",
+    "tests/test_factory_unattended_operability_closure_v1.py": "244c4c7c6ba90e83b2d400817e7b245f384029adbc0f3e58114d98280452977b",
+    "tests/test_managed_collection_release_seam_v1.py": "58a86d1baad563962c718a99bd41811366868ff246ba8cf2b84eb005b49ac2da"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -25,14 +38,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/i4_unattended_operability_closure_v1/factory-fit.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "a44607c3a2493402dd4f3165b4b995e350978dd397114b9ca0989efab7fb8a08",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_RELEASE_SEAM_COLD_CONSUMER_5_COHORTS_CLOSURE_FAILURE_TESTS_17_MODULE_DIRECT_CONSUMER_REGRESSION_AND_REAL_PRODUCER_WORKING_PATH_PROBE",
     "independent_review": {
       "path": "docs/evidence/i4_unattended_operability_closure_v1/independent-review.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "bb90dc185810b31da323d4f7b717668f8501e4f45b4939c49fdd5de12544508e",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
