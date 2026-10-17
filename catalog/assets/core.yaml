@@ -34456,7 +34456,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: 1c92565a6ccfce445cba038d6d327e2c0a545471ac0fcd7acb3dc3cd6c08c01f}
+  integrity: {kind: sha256, sha256: 11c64d49e8a00c7697050a3efbff465686c88c968007a6746d3cc19b1a1d9a9f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -36565,7 +36565,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_UNATTENDED_OPERABILITY.md', repository_path: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md}
-  integrity: {kind: sha256, sha256: 93ab3e0c53517d0168894cf909e1fc08becf1445d341c57b54505a4804eecb01}
+  integrity: {kind: sha256, sha256: abc9ae5114b58a0dca131e11732fc7cf2e9a4f4d09d13b12e08f3dc87894cf3e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -36585,7 +36585,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_unattended_operability_closure_v1.py', repository_path: tests/test_factory_unattended_operability_closure_v1.py}
-  integrity: {kind: sha256, sha256: d2d86238f12b106e1791408ffaccb3c6e45aafe829b8c3e70ca6e7e24f8d3240}
+  integrity: {kind: sha256, sha256: 244c4c7c6ba90e83b2d400817e7b245f384029adbc0f3e58114d98280452977b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001}

@@ -1045,5 +1045,109 @@ class PublicationExpectationAwareTests(unittest.TestCase):
                 store.close()
 
 
+class CohortClosureFailureTests(unittest.TestCase):
+    """Failure paths of the producer cohort closure; the happy path is the release seam."""
+
+    COHORT = "REL-20261014T000000Z-20261015T000000Z"
+
+    def setUp(self) -> None:
+        from solana_alpha_lab.factory import hot90_closed_day_loop as loop
+
+        self.loop = loop
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = _ops_root(self.tmp.name)
+        self.rdp = self.root / "local/factory_v1/observation_rdp"
+        (self.root / loop.OPS_RELATIVE).write_bytes(b"")
+        body = b"frames"
+        (self.rdp / "exports").mkdir(parents=True)
+        (self.rdp / "exports/frames.json").write_bytes(body)
+        self.packet = {
+            "collection": "OPPORTUNITY_EPISODES", "cohort_id": self.COHORT,
+            "closure_receipt": {"closure_receipt_sha256": "c" * 64},
+            "transfer_manifest": {"manifest_sha256": "d" * 64, "entries": [
+                {"path": "exports/frames.json", "bytes": len(body), "sha256": hashlib.sha256(body).hexdigest(),
+                 "source_class": "episode_export"}]},
+        }
+        mature = {"terminal": "MATURE", "cohort_id": self.COHORT, "schedule_sha256": "a" * 64, "activation_id": "ACT-1"}
+        patches = [
+            patch("solana_alpha_lab.factory.opportunity_episode_release.select_next_mature_episode_cohort",
+                  side_effect=lambda **kw: None if self.COHORT in kw["imported"] else dict(mature)),
+            patch("solana_alpha_lab.factory.opportunity_episode_release.capture_freeze_export_episodes",
+                  side_effect=lambda **kw: json.loads(json.dumps(self.packet))),
+            patch("solana_alpha_lab.factory.live_cohort_vanilla_path.validate_episode_transfer_manifest"),
+        ]
+        for item in patches:
+            item.start()
+            self.addCleanup(item.stop)
+
+    def run_once(self, drive: FakeDrive, now: datetime = NOW) -> dict:
+        return self.loop.process_next_cohort_closure(self.root, now=now, rclone_runner=drive.runner, allow_drive=True)
+
+    def health(self, now: datetime) -> list[str]:
+        from solana_alpha_lab.factory.hot90_closed_day_loop import cohort_closure_failures
+
+        failures = cohort_closure_failures(self.root, now=now)
+        ages = [f["age_seconds"] for f in failures if isinstance(f["age_seconds"], int)]
+        return [flag for flag in compose_health_classes({
+            "cohort_closure_failures": failures,
+            "cohort_closure_oldest_failure_age_seconds": max(ages) if ages else None,
+            "cohort_closure_hash_mismatch": any(f["terminal"] == "HASH_MISMATCH" for f in failures),
+        }) if flag.startswith("IMMUTABLE_ARCHIVE_")]
+
+    def test_failures_are_retried_visible_and_never_overwrite(self) -> None:
+        staging = self.root / self.loop.COHORT_STAGING_RELATIVE
+        staging.mkdir(parents=True)
+        for name in (".building-99.zip", "COHORT_CLOSURE_" + "e" * 64 + ".zip"):
+            (staging / name).write_bytes(b"killed run")
+        down = FakeDrive(fail_copy=True)
+        self.assertEqual(self.run_once(down)["terminal"], "DRIVE_WRITE_FAILED")
+        self.assertEqual(list(staging.iterdir()), [])  # killed-run leftovers and this run's ZIP are gone
+        self.assertNotIn(self.COHORT, self.loop.protected_cohort_ids(self.root))
+        self.assertNotIn("IMMUTABLE_ARCHIVE_STALE", self.health(NOW + timedelta(hours=1)))
+        self.assertEqual(self.run_once(down, NOW + timedelta(hours=6))["terminal"], "DRIVE_WRITE_FAILED")
+        # The first failure time is kept, so a persistent failure ages into the existing RPO incident.
+        self.assertIn("IMMUTABLE_ARCHIVE_STALE", self.health(NOW + timedelta(hours=25)))
+        up = FakeDrive()
+        self.assertEqual(self.run_once(up, NOW + timedelta(hours=26))["terminal"], "REMOTE_CONTENT_SHA256_VERIFIED")
+        self.assertIn(self.COHORT, self.loop.protected_cohort_ids(self.root))
+        self.assertEqual(self.health(NOW + timedelta(hours=27)), [])
+        self.assertEqual(self.run_once(up)["terminal"], "NO_MATURE_UNPROTECTED_COHORT")
+        self.assertEqual(up.copy_count, 1)
+        # A different remote object under the same name is never overwritten.
+        receipt = self.loop.cohort_receipt_path(self.root, self.COHORT)
+        receipt.unlink()
+        bad = FakeDrive(mismatch=True)
+        bad.objects = dict(up.objects)
+        self.assertEqual(self.run_once(bad)["terminal"], "HASH_MISMATCH")
+        self.assertEqual(bad.copy_count, 0)
+        self.assertIn("IMMUTABLE_ARCHIVE_HASH_MISMATCH", self.health(NOW))
+
+    def test_changed_source_and_forged_receipts_are_not_protection(self) -> None:
+        (self.rdp / "exports/frames.json").write_bytes(b"frameZ")  # same size, other bytes
+        result = self.run_once(FakeDrive())
+        self.assertEqual(result["terminal"], "COHORT_CLOSURE_BUILD_FAILED")
+        receipts = self.root / self.loop.COHORT_RECEIPTS_RELATIVE
+        forged = {"kind": "x", "cohort_id": self.COHORT, "terminal": "REMOTE_CONTENT_SHA256_VERIFIED",
+                  "archive_sha256": None, "remote_content_sha256": None}
+        (receipts / f"{self.COHORT}.json").write_text(json.dumps(forged), encoding="utf-8")
+        (receipts / "REL-20261015T000000Z-20261016T000000Z.json").write_text(json.dumps([1]), encoding="utf-8")
+        self.assertEqual(self.loop.protected_cohort_ids(self.root), set())
+        self.assertEqual(len(self.loop.cohort_closure_failures(self.root, now=NOW)), 2)
+
+    def test_unexpected_error_keeps_the_day_summary(self) -> None:
+        with patch.object(self.loop, "process_next_cohort_closure", side_effect=RuntimeError("boom")):
+            summary = run_closed_day_durability(self.root, now=NOW, rclone_runner=FakeDrive().runner, allow_drive=True)
+        self.assertEqual(summary["cohort_closures"], [{"terminal": "COHORT_CLOSURE_ERROR", "code": "RuntimeError",
+                                                       "uploaded": False}])
+        self.assertIn("operational_cache_prune", summary)
+
+    def test_gates_are_typed_no_ops(self) -> None:
+        write_hot90_runtime_state(self.root, {"activation_stage": STAGE_DURABILITY_CUTOVER,
+                                              "production_compaction_enabled": False,
+                                              "production_eviction_enabled": False, "drive_writes_enabled": False})
+        self.assertEqual(self.run_once(FakeDrive())["terminal"], "HOT90_DRIVE_WRITES_DISABLED")
+
+
 if __name__ == "__main__":
     unittest.main()

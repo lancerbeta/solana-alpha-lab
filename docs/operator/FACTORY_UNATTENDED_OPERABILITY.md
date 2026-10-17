@@ -342,22 +342,37 @@ used over SSH, then uploads one content-addressed
 every manifest entry (each byte hash-checked, ≤2 GiB, `copyto` only), verifies
 the exact remote SHA and writes
 `hot90_cohort_closure_receipts/<cohort_id>.json`. Local staging is deleted in
-every outcome; a failed cohort is rebuilt next run. Maturity stays the native
-closed obligations/publications/integrity rule.
+every outcome (leftovers of a killed run are swept at the next run); a failed
+cohort is retried next run. A failure stays visible: HASH_MISMATCH raises
+`IMMUTABLE_ARCHIVE_HASH_MISMATCH`, any other failure older than 24 h raises
+`IMMUTABLE_ARCHIVE_STALE` (existing watch incidents). Maturity stays the native
+closed obligations/publications/integrity rule. "Protected" means an offhost
+closure exists; it does not mean imported. The object name addresses one
+capture (its packet), so a retried capture may add a second object for the same
+cohort; both import to the same release.
 
-Late consumer, with only the Drive object and Git (no VPS access):
+Late consumer, with only the Drive object and Git (no VPS access). Download
+`COHORT_CLOSURE_<sha256>.zip` from Drive folder `solana-alpha-lab/factory-backups`
+into `local/cold_consume/`, then (PowerShell):
 
 ```text
-download COHORT_CLOSURE_<sha256>.zip from solana-alpha-lab/factory-backups
-unzip into <dir>   # packet.json + source/
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py unpack-next-live-cohort --collection OPPORTUNITY_EPISODES --max-cohorts 1 --capture-packet <dir>/packet.json --source-rdp <dir>/source --mirror-rdp local/factory_mirror/observation_rdp --data-root local/factory_v1/data_plane
+$z = "local/cold_consume/COHORT_CLOSURE_<sha256>.zip"
+(Get-FileHash $z -Algorithm SHA256).Hash.ToLower()   # must equal <sha256> in the name
+Expand-Archive $z -DestinationPath local/cold_consume/<sha256>
+# rehearsal into a separate restore root first
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py unpack-next-live-cohort --collection OPPORTUNITY_EPISODES --max-cohorts 1 --capture-packet local/cold_consume/<sha256>/packet.json --source-rdp local/cold_consume/<sha256>/source --mirror-rdp local/cold_consume/rehearsal/mirror --data-root local/cold_consume/rehearsal/data_plane
+# then the same command with --mirror-rdp local/factory_mirror/observation_rdp --data-root local/factory_v1/data_plane
 ```
 
-Several cohorts: unzip each into its own directory and pass one
-`--capture-packet`/`--source-rdp` per run, oldest first. Repeating an import of
-the same release returns `PASS_ALREADY_PRESENT_EXACT`. After a verified import
-delete the downloaded ZIP and extraction directory; the sealed release, mirror
+Several cohorts: one extraction directory and one run each, oldest first.
+Repeating an import of the same release returns `PASS_ALREADY_PRESENT_EXACT`.
+After a verified import delete exactly `local/cold_consume/` (it holds only the
+downloads, extractions and the rehearsal root); the sealed release, mirror
 capture view and corpus are the retained consumers.
+
+Check collection or stop new admissions while tails finish: see
+`docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md` → `collection-status`
+(read-only; shows `revision`) and `collection-stop-intake --expected-revision <revision>`.
 
 ## WHAT DOES A DELIVERY LEAVE BEHIND?
 

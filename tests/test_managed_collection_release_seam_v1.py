@@ -105,6 +105,9 @@ class ManagedReleaseSeamTests(unittest.TestCase):
             # Another lineage's activation, or a bridge ending before the bootstrap, is no proof.
             self.assertNotEqual(state({**bridge, "activation_id": "ACT-NOT-THE-BRIDGE"})[0], "MANAGED_CONTINUATION")
             self.assertNotEqual(state({**bridge, "stops_admitting_at": "2026-10-10T23:00:00Z"})[0], "MANAGED_CONTINUATION")
+            # After the boundary a missing bootstrap child is a gap, not managed waiting.
+            late = assess_campaign_successor_continuity(store, now=DAYS[1] + timedelta(hours=1), activation=bridge)
+            self.assertNotEqual(late["campaign_successor_state"], "MANAGED_CONTINUATION")
         finally:
             store.close()
 
