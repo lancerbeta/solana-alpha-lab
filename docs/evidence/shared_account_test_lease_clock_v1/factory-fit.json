@@ -1,0 +1,33 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "SHARED_ACCOUNT_TEST_LEASE_CLOCK_V1-FIT",
+  "as_of": "2026-10-17",
+  "task_id": "SHARED_ACCOUNT_TEST_LEASE_CLOCK_V1",
+  "reviewed_bindings_sha256": "c020128b1d3153269be95483ebe008806c789c07a1a948878478351a0fc07dee",
+  "reviewed_inventory_sha256": "28ae584dff454d2095e5cd1d41770e2395b22fe37bf8b2a9e7525663e89e5ffe",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "Main CI stops failing by calendar date.",
+    "flexibility_and_history": "One test line; no product or history change.",
+    "context_efficiency": "Single-line fix, one module run, one reviewer.",
+    "research_truth": "No scientific surface touched.",
+    "owner_operability": "Main CI green again for every PR.",
+    "execution_to_cashflow": "None.",
+    "monitoring_and_recovery": "Revert the line.",
+    "build_vs_buy": "No new tooling.",
+    "security": "No credentials or external actions.",
+    "red_team": "Original test fails after 00:32Z today; fixed test passes."
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Other fixed-clock tests that mix wall-clock fences."
+  },
+  "recovery": "Ordinary Git revert of the test line.",
+  "limits": [
+    "NO_PRODUCT_CODE_CHANGE",
+    "NO_DEPLOY_OR_PROVIDER_CALL",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_LOCAL_EVIDENCE"
+  ]
+}

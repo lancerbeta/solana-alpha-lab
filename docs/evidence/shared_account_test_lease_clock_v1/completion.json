@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "SHARED_ACCOUNT_TEST_LEASE_CLOCK_V1-SOFTWARE-CANDIDATE",
+  "as_of": "2026-10-17",
+  "task_id": "SHARED_ACCOUNT_TEST_LEASE_CLOCK_V1",
+  "state_change": "The shared-account commissioning test takes its resolve lease on the wall clock that resolve_restore_marker fences against, removing a 2026-10-17T00:32Z time bomb in main CI.",
+  "base_main": "15dbebd998697996a75cb07ed21fccde94832ff6",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Git is the working context and evidence owner; no cloud export requested."
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/SHARED_ACCOUNT_TEST_LEASE_CLOCK_V1.md": "541c94f0a8857004099e64c6c244b405dccb5baadc50f51c4067ac1f4ff48757",
+    "tests/test_observation_shared_account_budget_v1.py": "22765044159dfb30b24af43d39e49a817612e49dd76920fdfa42149f05322c89"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/shared_account_test_lease_clock_v1/factory-fit.json",
+    "sha256": "ee65135d544b5c39e6193014dcbe15fda7b7916c4efcd4eb8ad279d6a6c05fd3",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_MODULE_19_TESTS_ORIGINAL_FAILS_AFTER_TIMEBOMB",
+    "independent_review": {
+      "path": "docs/evidence/shared_account_test_lease_clock_v1/independent-review.json",
+      "sha256": "fb0709eff4fcf33489496d19eb1a6bf996dfbffefc7e508b2e4f823f0d42dbdb",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_CONTEXT",
+      "PASS_CATALOG_PROPAGATION",
+      "PASS_ORIGINAL_FALSIFIER_AND_TARGETED_MUTATION"
+    ]
+  },
+  "non_claims": [
+    "NO_PRODUCT_CODE_CHANGE",
+    "NO_DEPLOY_OR_PROVIDER_CALL",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_LOCAL_EVIDENCE"
+  ],
+  "side_effects": {
+    "repository": "one test line, task contract, evidence, Catalog hashes",
+    "local": "none",
+    "external": "none"
+  }
+}
