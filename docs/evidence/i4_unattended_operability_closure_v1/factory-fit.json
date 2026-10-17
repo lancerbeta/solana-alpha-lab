@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "I4_UNATTENDED_OPERABILITY_CLOSURE_V1-FIT",
+  "as_of": "2026-10-17",
+  "task_id": "I4_UNATTENDED_OPERABILITY_CLOSURE_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "Collection keeps running and future cohorts are protected offhost without the workstation; the managed bridge no longer asks for a false manual successor.",
+    "flexibility_and_history": "Append-only receipts and content-addressed Drive objects; no historical result, release or receipt changed.",
+    "context_efficiency": "Two existing owners extended, one runbook section, tests in existing seam and closure modules; one PR.",
+    "research_truth": "Maturity stays native; no science, quota or retention change; unknown continuity or missing bootstrap stays a visible gap.",
+    "owner_operability": "One owner action box (receiver), executor-computed phrases, real late-consumer commands, cross-links to status/stop.",
+    "execution_to_cashflow": "Operability only; enables the next ordinary Forge run.",
+    "monitoring_and_recovery": "Closure failures raise existing archive incidents; staging swept every run; retries use the same owner path.",
+    "build_vs_buy": "Healthchecks.io hosted receiver (free, one check) instead of a self-hosted monitor; existing transport and importer reused.",
+    "security": "No secret in Git/chat; receiver URL via non-echoing remote append; HTTPS-only sender.",
+    "red_team": "Mutation-checked failure aging; forged receipts refused; HASH_MISMATCH never overwrites."
+  },
+  "capability_radar": {
+    "now": "Healthchecks.io one free check for host-loss (owner account).",
+    "watch": "Closure failures without receipts; receiver cadence vs watch freshness gate."
+  },
+  "recovery": "Revert the reader/loop change; receipts and Drive objects remain valid; canonical-forward to the previous SHA.",
+  "limits": [
+    "NO_HOST_LOSS_DETECTION_CLAIM_RECEIVER_NOT_CONFIGURED",
+    "NO_LIVE_MANAGED_TRANSITION_CLAIM_BEFORE_18_19_OCT",
+    "NO_SCIENCE_QUOTA_RETENTION_OR_RECLAIM_CHANGE",
+    "NO_HISTORICAL_SHARED_CALL_PROOF_CLAIM",
+    "NO_30_DAY_MEASURED_RUNWAY_CLAIM_MODEL_ONLY",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_LOCAL_EVIDENCE"
+  ]
+}

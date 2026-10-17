@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "I4_UNATTENDED_OPERABILITY_CLOSURE_V1-SOFTWARE-CANDIDATE",
+  "as_of": "2026-10-17",
+  "task_id": "I4_UNATTENDED_OPERABILITY_CLOSURE_V1",
+  "state_change": "The closed-day run protects each future mature episode cohort as one offhost closure a late consumer can import without the producer; the operability packet reads the exact managed bridge as continuation and reports a missing bootstrap or closure failure through existing incidents.",
+  "base_main": "33b19d9cafde0039233e1f1d25de8d36d17e3687",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Git is the working context and evidence owner; no cloud export requested."
+  },
+  "capability_radar_now": "Healthchecks.io free single check for the external receiver (owner account); no package, connector or service in Git.",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": true,
+    "external_material_action": true,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/i4_unattended_operability_closure_v1/factory-fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_RELEASE_SEAM_COLD_CONSUMER_5_COHORTS_CLOSURE_FAILURE_TESTS_17_MODULE_DIRECT_CONSUMER_REGRESSION_AND_REAL_PRODUCER_WORKING_PATH_PROBE",
+    "independent_review": {
+      "path": "docs/evidence/i4_unattended_operability_closure_v1/independent-review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_CONTEXT",
+      "PASS_CATALOG_PROPAGATION",
+      "PASS_ORIGINAL_FALSIFIER_AND_TARGETED_MUTATION"
+    ]
+  },
+  "non_claims": [
+    "NO_HOST_LOSS_DETECTION_CLAIM_RECEIVER_NOT_CONFIGURED",
+    "NO_LIVE_MANAGED_TRANSITION_CLAIM_BEFORE_18_19_OCT",
+    "NO_SCIENCE_QUOTA_RETENTION_OR_RECLAIM_CHANGE",
+    "NO_HISTORICAL_SHARED_CALL_PROOF_CLAIM",
+    "NO_30_DAY_MEASURED_RUNWAY_CLAIM_MODEL_ONLY",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_LOCAL_EVIDENCE"
+  ],
+  "side_effects": {
+    "repository": "two owners, one runbook, tests, task contract, evidence, Catalog hashes",
+    "local": "temporary day-archive downloads (449,675,321 B) deleted after comparison",
+    "external": "read-only producer probes; one write-once native C3 capture under the earlier I4 scope; no Drive upload, deploy or provider call"
+  }
+}
