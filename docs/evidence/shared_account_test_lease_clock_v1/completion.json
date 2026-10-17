@@ -14,7 +14,10 @@
     "reason": "Git is the working context and evidence owner; no cloud export requested."
   },
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "docs/tasks/SHARED_ACCOUNT_TEST_LEASE_CLOCK_V1.md": "541c94f0a8857004099e64c6c244b405dccb5baadc50f51c4067ac1f4ff48757",
+    "tests/test_observation_shared_account_budget_v1.py": "22765044159dfb30b24af43d39e49a817612e49dd76920fdfa42149f05322c89"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -25,14 +28,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/shared_account_test_lease_clock_v1/factory-fit.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "ee65135d544b5c39e6193014dcbe15fda7b7916c4efcd4eb8ad279d6a6c05fd3",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_MODULE_19_TESTS_ORIGINAL_FAILS_AFTER_TIMEBOMB",
     "independent_review": {
       "path": "docs/evidence/shared_account_test_lease_clock_v1/independent-review.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "fb0709eff4fcf33489496d19eb1a6bf996dfbffefc7e508b2e4f823f0d42dbdb",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
