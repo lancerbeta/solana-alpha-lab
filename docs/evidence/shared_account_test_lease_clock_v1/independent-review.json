@@ -1,0 +1,28 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "SHARED_ACCOUNT_TEST_LEASE_CLOCK_V1-FINAL",
+  "as_of": "2026-10-17",
+  "task_id": "SHARED_ACCOUNT_TEST_LEASE_CLOCK_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "CODE_REVIEWER"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only review: diagnosis confirmed (resolve_restore_marker fences on the wall clock; a T0 lease expires 00:32Z); test intent preserved (stale plan refused, marker blocks apply/prepare, resolve re-enables commission at T0); earlier T0 leases are released so the wall-clock acquire cannot hit WRITER_BUSY; no other wall-clock time bomb in the file; module 19/19 OK. Optional: assert the resolve lease is not None."
+      ]
+    }
+  ],
+  "remediation_history": [],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_REVIEW_MODEL_DIVERSITY_PROOF",
+    "NO_OWNER_MERGE_AUTHORITY_FROM_REVIEW"
+  ]
+}
