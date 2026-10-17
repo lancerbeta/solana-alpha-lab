@@ -208,6 +208,83 @@ class ScientificMarketV2Tests(unittest.TestCase):
         self.assertEqual(admission["action"], "START_NEW_SESSION")
         self.assertEqual(reservation, history)
 
+    def test_orphan_reservation_borrows_only_a_verified_market_description(self):
+        def admit(sessions, reservations, epoch, basis):
+            return resolve_scientific_admission(sessions, reservations=reservations, market_evidence_epoch=epoch, market_evidence_basis=basis, representation_id="BASE", representation_semantic_version="HFIC-V1.2", owner_focus="AUTO", repo_root=ROOT)
+
+        def orphan_of(session):
+            # Production reservation records never carry the basis field.
+            item = {**session, "session_id": "HFIC-SESS-ORPHAN", "admission_state": "RESERVED"}
+            item.pop("market_evidence_basis")
+            return item
+
+        old_epoch, old_basis = self.current()
+        donor = self.session(old_epoch, old_basis)
+        orphan = orphan_of(donor)
+        history = copy.deepcopy(orphan)
+        self.import_week(3)
+        self.import_week(4)
+        epoch, basis = self.current()
+        self.assertEqual(self.import_week(4)["status"], "IDEMPOTENT_REIMPORT")
+        self.assertEqual(self.current(), (epoch, basis))
+        self.assertNotEqual(old_epoch, epoch)
+        usage = epoch_search_budget_usage([donor], reservations=[orphan], evidence_epoch=epoch, market_evidence_basis=basis)
+        self.assertEqual(usage["auto_sessions_used"], 0)
+        self.assertEqual(usage["reservation_market_basis_proofs"], [{"session_id": "HFIC-SESS-ORPHAN", "market_evidence_epoch_sha256": old_epoch, "proof_session_ids": ["SCRATCH_CONSUMED_AUTO"]}])
+        self.assertEqual(admit([donor], [orphan], epoch, basis)["action"], "START_NEW_SESSION")
+        self.assertEqual(orphan, history)
+
+        # Each donor would satisfy a "first similar session" lookup.
+        other_slot = self.session(old_epoch, old_basis) | {
+            "session_id": "HFIC-SESS-ORPHAN", "owner_focus": "FOCUS", "focus_key_sha256": focus_key_sha256("FOCUS"),
+            "scientific_slot_sha256": scientific_slot_sha256(market_evidence_epoch_sha256=old_epoch, representation_id="BASE", representation_semantic_version="HFIC-V1.2", owner_focus="FOCUS"),
+        }
+        refusals = {
+            "missing_proof": ([], orphan),
+            "unknown_stamp": ([donor], orphan_of(self.session("c" * 64, old_basis))),
+            "own_history_conflict": ([donor, {**donor, "session_id": "HFIC-SESS-ORPHAN", "identity_binding_status": "CONFLICT"}], orphan),
+            "own_history_other_slot": ([donor, other_slot], orphan),
+        }
+        for name, (sessions, reservation) in refusals.items():
+            with self.subTest(refusal=name):
+                with self.assertRaisesRegex(EvidenceIdentityError, "MARKET_EPOCH_CONTINUITY_UNRESOLVED"):
+                    epoch_search_budget_usage(sessions, reservations=[reservation], evidence_epoch=epoch, market_evidence_basis=basis)
+                refused = admit(sessions, [reservation], epoch, basis)
+                self.assertEqual((refused["action"], refused["reason_code"]), ("STOP", "MARKET_EPOCH_CONTINUITY_UNRESOLVED"))
+
+        # Same stamp is not proof: the saved basis itself must recompute to it.
+        from solana_alpha_lab.factory import hfic_evidence_identity as identity
+        tampered = copy.deepcopy(donor)
+        tampered["market_evidence_basis"]["scientific_projection"]["datasets"][0]["partitions"][0]["row_count"] += 1
+        unreadable = copy.deepcopy(donor)
+        del unreadable["market_evidence_basis"]["scientific_projection"]
+        legacy = {**donor, "session_id": "HFIC-SESS-V1", "market_evidence_basis": _v1_publication_basis(old_basis)}
+        for name, sessions in {"wrong_hash": [tampered], "invalid_basis": [unreadable]}.items():
+            with self.subTest(refusal=name):
+                self.assertIs(identity._reservation_with_market_basis(orphan, sessions), orphan)
+        with self.subTest(refusal="disagreeing_versions"), patch.object(identity, "market_evidence_epoch_sha256", return_value=old_epoch):
+            self.assertIs(identity._reservation_with_market_basis(orphan, [donor, legacy]), orphan)
+        republished = copy.deepcopy(donor)
+        republished["market_evidence_basis"]["datasets"][0]["dataset_fingerprint"] = "f" * 64
+        self.assertEqual(market_evidence_epoch_sha256(republished["market_evidence_basis"]), old_epoch)
+        forward = identity._reservation_with_market_basis(orphan, [donor, republished])
+        backward = identity._reservation_with_market_basis(orphan, [republished, donor])
+        self.assertEqual(forward, backward)
+        self.assertEqual(forward["market_evidence_basis_proof_session_ids"], ["SCRATCH_CONSUMED_AUTO"])
+
+        # A same-market orphan keeps its slot, also after a publication-only republish.
+        current = orphan_of(self.session(epoch, basis))
+        sessions = [self.session(epoch, basis) | {"session_id": "HFIC-SESS-DONOR", "owner_focus": "FOCUS", "focus_key_sha256": focus_key_sha256("FOCUS")}]
+        self.assertEqual(epoch_search_budget_usage(sessions, reservations=[current], evidence_epoch=epoch, market_evidence_basis=basis)["auto_sessions_used"], 1)
+        path = self.labels_path()
+        labels = json.loads(path.read_bytes())
+        labels["imported_at"] = "2099-01-01T00:00:00Z"
+        path.write_text(json.dumps(labels), encoding="utf-8")
+        same_epoch, republished = self.current()
+        self.assertEqual(same_epoch, epoch)
+        self.assertEqual(epoch_search_budget_usage(sessions, reservations=[current], evidence_epoch=epoch, market_evidence_basis=republished)["auto_sessions_used"], 1)
+        self.assertNotEqual(admit(sessions, [current], epoch, republished)["action"], "START_NEW_SESSION")
+
     def test_empty_history_cannot_admit_mismatched_basis(self):
         _, basis = self.current()
         admission = resolve_scientific_admission([], market_evidence_epoch="f" * 64, market_evidence_basis=basis, representation_id="BASE", representation_semantic_version="HFIC-V1.2", owner_focus="AUTO", repo_root=ROOT)

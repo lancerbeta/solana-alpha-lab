@@ -2025,22 +2025,63 @@ def _slot_for_current_market(session: Mapping[str, Any], epoch: str) -> str | No
 def _reservation_with_market_basis(
     reservation: Mapping[str, Any], sessions: Sequence[Mapping[str, Any]],
 ) -> Mapping[str, Any]:
-    """Read-only proof from the same durable lifecycle; never rewrite reservation."""
+    """Read-only proof from the same durable lifecycle; never rewrite reservation.
+
+    A historical reservation that lacks the basis field and has no own
+    lifecycle rows may borrow only the market description from saved sessions
+    whose frozen basis recomputes exactly to this reservation's stamp.  Every
+    other reservation field stays its own.  Explicit null, own-history
+    conflict, an unverified stamp or disagreeing proofs keep the refusal.
+    """
     if not isinstance(reservation, Mapping) or "market_evidence_basis" in reservation:
         return reservation
     slot = session_scientific_slot_sha256(reservation)
     if slot is None:
         return reservation
+    own = [row for row in sessions if row.get("session_id") == reservation.get("session_id")]
     candidates = [
-        row.get("market_evidence_basis") for row in sessions
-        if row.get("session_id") == reservation.get("session_id")
-        and not _session_identity_is_invalid(row)
+        row.get("market_evidence_basis") for row in own
+        if not _session_identity_is_invalid(row)
         and session_scientific_slot_sha256(row) == slot
         and isinstance(row.get("market_evidence_basis"), Mapping)
     ]
-    if not candidates or any(item != candidates[0] for item in candidates[1:]):
+    if candidates:
+        if any(item != candidates[0] for item in candidates[1:]):
+            return reservation
+        return {**reservation, "market_evidence_basis": candidates[0]}
+    stamped = reservation.get("market_evidence_epoch_sha256")
+    if own or not isinstance(stamped, str) or re.fullmatch(r"[0-9a-f]{64}", stamped) is None:
         return reservation
-    return {**reservation, "market_evidence_basis": candidates[0]}
+    donors: list[tuple[str, str, Mapping[str, Any]]] = []
+    for row in sessions:
+        frozen = row.get("market_evidence_basis")
+        donor_id = row.get("session_id")
+        if (
+            not isinstance(frozen, Mapping)
+            or not isinstance(donor_id, str)
+            or not donor_id
+            or row.get("market_evidence_epoch_sha256") != stamped
+            or _session_identity_is_invalid(row)
+        ):
+            continue
+        try:
+            # V1 recomputes its canonical identity, V2 its scientific
+            # projection; publication-only V2 differences still agree.
+            if market_evidence_epoch_sha256(frozen) != stamped:
+                continue
+        except EvidenceIdentityError:
+            continue
+        donors.append((donor_id, canonical_sha256(dict(frozen)), frozen))
+    if not donors or len({item[2].get("basis_version") for item in donors}) != 1:
+        return reservation
+    # Deterministic choice, independent of history order; all candidates
+    # already share the stamped scientific identity.
+    donors.sort(key=lambda item: (item[0], item[1]))
+    return {
+        **reservation,
+        "market_evidence_basis": donors[0][2],
+        "market_evidence_basis_proof_session_ids": sorted({item[0] for item in donors}),
+    }
 
 
 def sessions_for_market_budget(

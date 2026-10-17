@@ -663,7 +663,10 @@ def _preflight_owner_readout(body: Mapping[str, Any]) -> str:
             "next: STOP_TYPED_PREFLIGHT_BLOCK — не повторяйте вход, "
             "не сбрасывайте budget и не создавайте новый trial"
         )
-    elif selection_router == "BLOCK_FORGE_SELECTION_RISK" or selection_caveat:
+    elif terminal == "PREFLIGHT_BLOCKED" and (
+        selection_router == "BLOCK_FORGE_SELECTION_RISK" or selection_caveat
+    ):
+        # Only a STOP without its own upstream reason belongs to the gate.
         next_line = (
             "next: RESOLVE_SELECTION_GATE — normal entry остаётся "
             "заблокированным до разрешения selection gate; не запускайте "
@@ -680,9 +683,16 @@ def _preflight_owner_readout(body: Mapping[str, Any]) -> str:
             "next: RESOLVE_TYPED_PREFLIGHT_BLOCK — восстановите указанный "
             "input/readback и повторите normal entry"
         )
+    caveat_note = (
+        " — историческое предупреждение, не причина этого STOP"
+        if selection_caveat
+        and not next_line.startswith("next: RESOLVE_SELECTION_GATE")
+        and not selection_gate.get("integrity_invalid")
+        else ""
+    )
     selection_line = (
         f"selection_router: {selection_router}\n"
-        f"selection_caveat: {str(selection_caveat).lower()}\n"
+        f"selection_caveat: {str(selection_caveat).lower()}{caveat_note}\n"
         if selection_router or selection_caveat
         else ""
     )

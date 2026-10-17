@@ -1,0 +1,71 @@
+{
+  "schema": "smial.hfic-historical-reservation-market-basis-proof",
+  "schema_version": "1.0",
+  "task_id": "HFIC_HISTORICAL_RESERVATION_MARKET_BASIS_V1",
+  "as_of": "2026-10-16",
+  "reproducer": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root local/factory_v1/data_plane preflight --no-auto-commission --collection OPPORTUNITY_EPISODES --owner-focus AUTO --format json",
+  "real_corpus_read_only": {
+    "data_root": "LOCAL_WORKSTATION_FACTORY_DATA_PLANE (unchanged history, read-only)",
+    "store_inventory_digest_before": "18d1ff2edd76d13a3fed71b5d558a35f7cc67c25fd6b649a1c65855b077fd6b5",
+    "store_inventory_digest_after": "18d1ff2edd76d13a3fed71b5d558a35f7cc67c25fd6b649a1c65855b077fd6b5",
+    "current_market_evidence_epoch_sha256": "52fc39336816fd00a48b01379f27296b00e44af005befe2f15d10424d760061d",
+    "reservations": 5,
+    "orphan_reservation": {
+      "session_id": "HFIC-SESS-94671572F727012E",
+      "market_evidence_epoch_sha256": "9343fc57b0c5059f73c71e66aa8867fa63c970c0e94260fe1c1ad9fd07361437",
+      "basis_field_present": false,
+      "own_lifecycle_rows": 0,
+      "proof_session_ids": [
+        "HFIC-SESS-72BDEC113DBFD18A"
+      ],
+      "proof_basis_version": "MARKET_EVIDENCE_BASIS_V2",
+      "classified": "DIFFERENT_MARKET"
+    },
+    "before_13fb3381": {
+      "preflight_receipt_sha256": "0db0d7646b4c7506aa7fa2fedd375f13e56641da27efd42167c50015af890ae3",
+      "action": "STOP",
+      "terminal": null,
+      "router_decision": "BLOCK_FORGE_SELECTION_RISK",
+      "next": "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
+      "masked_upstream_reason": "MARKET_EPOCH_CONTINUITY_UNRESOLVED",
+      "search_budget": "UNRESOLVED (not shown)",
+      "writes": {
+        "research_store": 0,
+        "forge_context": 0,
+        "session": 0
+      }
+    },
+    "after_candidate": {
+      "preflight_receipt_sha256": "a4ab3b376b769e81cb8a0eedd8cf1c3f51c542d91c17055080957349c0d603e3",
+      "action": "START_NEW_SESSION",
+      "terminal": "NO_GIT_FAST_LANE_PROVEN",
+      "router_decision": "BLOCK_FORGE_SELECTION_RISK",
+      "owner_next": "CONTINUE_WITH_SCOPED_SELECTION_CAVEAT",
+      "search_budget": {
+        "auto_sessions_used": 0,
+        "auto_sessions_per_evidence_epoch": 1,
+        "distinct_focus_used": 0,
+        "distinct_focus_remaining": 3
+      },
+      "writes": {
+        "research_store": 0,
+        "forge_context": 0,
+        "session": 0
+      }
+    },
+    "note": "Receipt SHA values differ also by capability epoch (code change). Sessions, reservations, looks, MAIN/PREVIEW/ADAPTIVE: none created."
+  },
+  "synthetic_vertical": {
+    "test": "tests/test_forge_evidence_identity_and_owner_gold_v1.py::OwnerGoldSequentialTests::test_g9_orphan_old_market_reservation_admits_new_cohorts_once",
+    "pre_fix_result_on_same_fixture": "STOP MARKET_EPOCH_CONTINUITY_UNRESOLVED, search_budget UNRESOLVED",
+    "post_fix": "START_NEW_SESSION, AUTO 0/1 -> ordinary persist_generated_draft (saved generator draft + atomic slot reservation) -> fresh-process exact replay returns the same draft payload; durable reservations 3 before and after replay; exactly one stamped with the current market; fresh preflight RESUME_EXISTING_SESSION / RESUME_GENERATED_DRAFT with the same draft sha and AUTO 1/1"
+  },
+  "mutation_controls": [
+    "Pre-fix identity owner fails the positive orphan case (MARKET_EPOCH_CONTINUITY_UNRESOLVED).",
+    "Dropping the own-history guard makes own_history_conflict and own_history_other_slot PASS (test fails).",
+    "Dropping the exact recompute guard makes wrong_hash and invalid_basis donors PASS (test fails).",
+    "Dropping the single-basis-version check makes disagreeing_versions PASS (test fails).",
+    "Pre-fix preflight/CLI renders upstream SEARCH_BUDGET_EXHAUSTED and MARKET_EPOCH_CONTINUITY_UNRESOLVED as terminal null under the selection gate (test fails)."
+  ],
+  "known_unrelated_local_failure": "tests.test_forge_input_truth_and_visibility_v1::test_packet_bound_capacity_blocks_without_preview_mock fails identically on base 13fb3381 against the local canonical data plane (FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED); it skips in CI without that plane."
+}

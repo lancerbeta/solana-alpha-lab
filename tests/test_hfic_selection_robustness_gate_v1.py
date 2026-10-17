@@ -15,6 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
+if str(ROOT / "scripts") not in sys.path:
+    sys.path.insert(0, str(ROOT / "scripts"))
 
 from solana_alpha_lab.factory.capabilities import (
     CAPABILITY_ROUTER,
@@ -897,6 +899,44 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                     **_identity_fields(installed),
                 ),
             )
+            # An upstream STOP keeps its reason; the historical gate stays a
+            # warning in both the receipt and the owner readout.
+            from hypothesis_forge import _preflight_owner_readout
+
+            upstream = {
+                "SEARCH_BUDGET_EXHAUSTED": (
+                    "solana_alpha_lab.factory.hfic_preflight.decide_preflight_action",
+                    {"return_value": ("STOP", "SEARCH_BUDGET_EXHAUSTED")},
+                    "next: BUDGET_EXHAUSTED",
+                ),
+                "MARKET_EPOCH_CONTINUITY_UNRESOLVED": (
+                    "solana_alpha_lab.factory.hfic_preflight.epoch_search_budget_usage",
+                    {"side_effect": ValueError("MARKET_EPOCH_CONTINUITY_UNRESOLVED")},
+                    "next: PROVE_MARKET_CONTINUITY",
+                ),
+            }
+            for terminal, (target, effect, expected_next) in upstream.items():
+                with self.subTest(upstream=terminal), _bind_installed(installed), patch(
+                    target, **effect
+                ):
+                    stopped = run_preflight(
+                        ROOT,
+                        data_root,
+                        owner_focus="AUTO",
+                        auto_commission=False,
+                        git_snapshot=_git_snapshot(),
+                        clock=_CLOCK,
+                    )
+                    self.assertEqual((stopped["action"], stopped["terminal"]), ("STOP", terminal))
+                    self.assertNotIn("next", stopped)
+                    self.assertNotIn("owner_next", stopped)
+                    self.assertEqual(stopped["router_decision"], BLOCK_FORGE_SELECTION_RISK)
+                    self.assertTrue(stopped["selection_gate"]["caveat"])
+                    self.assertNotIn("owner_next", stopped["selection_gate"])
+                    readout = _preflight_owner_readout(stopped)
+                    self.assertIn(expected_next, readout)
+                    self.assertIn("не причина этого STOP", readout)
+                    self.assertNotIn("RESOLVE_SELECTION_GATE", readout)
             with _bind_installed(installed), patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 return_value=([_control_corpus(MIN_USABLE_YIELD_ELIGIBLE)], []),

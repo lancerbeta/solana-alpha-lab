@@ -170,7 +170,14 @@ Read-only owner path:
    current scientific market cannot be proven. Compare the saved frozen basis
    with verified current cohort/release/content bindings. Keep the spent
    budget blocked until proof is available; no receipt rewrite, quarantine,
-   memory reset or new session is authorized by this error.
+   memory reset or new session is authorized by this error. A historical
+   reservation without any basis field and without own lifecycle rows is
+   read with the frozen basis of saved sessions whose basis recomputes exactly
+   to that reservation's stamp (V1 canonical identity, V2 scientific
+   projection). Only the market description is borrowed; the proof session ids
+   appear in `search_budget.reservation_market_basis_proofs`. Explicit null,
+   own-history conflict, no exact proof or disagreeing proof versions keep
+   this STOP.
 4. A genuinely new verified cohort or decision-bearing content/PIT/eligibility
    change creates new market evidence. It still requires ordinary scientific
    admission and separate owner look authority.
@@ -180,7 +187,14 @@ not fields of `forge-run --no-write`. With an already resolved current root,
 `preflight --no-auto-commission --owner-focus AUTO --format json` computes this
 readback without persisting or commissioning; it does not create a session/look.
 If continuity is unresolved, its budget status is UNRESOLVED rather than zero.
-Do not omit `--no-auto-commission` for this read-only path.
+Do not omit `--no-auto-commission` for this read-only path. A historical
+selection-gate caveat never replaces an upstream STOP reason: the receipt keeps
+its `terminal` and the readout marks `selection_caveat` as a warning. An
+integrity-invalid gate receipt is a real restriction: the readout routes to
+`RESTORE_SELECTION_GATE` first, also behind an upstream STOP, whose reason stays
+in `reason:` and must be handled after the restore.
+`search_budget.reservation_market_basis_proofs` is optional read-only provenance;
+it grants no admission or budget authority.
 
 This delivery performs no LIVE repair or C4 import. See
 `docs/reports/hfic_market_evidence_epoch_decision_basis_v2/a1_owner_readout_v1.md`
