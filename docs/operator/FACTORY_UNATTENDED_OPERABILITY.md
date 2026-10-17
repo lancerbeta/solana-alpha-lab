@@ -237,6 +237,8 @@ Preserved under `local/factory_v1` (and the independent backup sink):
 - `hot90_activation_runtime.yaml`
 - closed-day archive receipts `hot90_archive_receipts/{YYYYMMDD}.json`
 - derived archive staging `hot90_archives/` (automation-owned ZIPs only)
+- cohort closure receipts `hot90_cohort_closure_receipts/{cohort_id}.json`
+  (staging `hot90_cohort_closures/` is empty after every run)
 - operability incident/dedup state
 - collector SQLite / Observation RDP
 - systemd enablement and timer last-run
@@ -326,6 +328,45 @@ Exact remote content SHA256 must equal the local archive SHA256. A verified
 receipt records both hashes, the remote object identity, and
 `REMOTE_CONTENT_SHA256_VERIFIED`. A receipt cannot substitute for the
 content hash.
+
+## HOW IS A FUTURE EPISODE COHORT PROTECTED WITHOUT THE WORKSTATION?
+
+A day ZIP does not hold the cohort export (closure receipt, frames, schedule,
+protection, exporter-frozen `capture_metadata`) nor completed publication jobs.
+After the days, the same closed-day run protects up to two mature, not yet
+protected `OPPORTUNITY_EPISODES` cohorts (from
+`REL-20261013T000000Z-20261014T000000Z`; earlier cohorts were captured by the
+workstation route). It calls the native `capture_freeze_export` the workstation
+used over SSH, then uploads one content-addressed
+`COHORT_CLOSURE_<sha256>.zip` = `packet.json` + `source/<transfer_path>` for
+every manifest entry (each byte hash-checked, ≤2 GiB, `copyto` only), verifies
+the exact remote SHA and writes
+`hot90_cohort_closure_receipts/<cohort_id>.json`. Local staging is deleted in
+every outcome; a failed cohort is rebuilt next run. Maturity stays the native
+closed obligations/publications/integrity rule.
+
+Late consumer, with only the Drive object and Git (no VPS access):
+
+```text
+download COHORT_CLOSURE_<sha256>.zip from solana-alpha-lab/factory-backups
+unzip into <dir>   # packet.json + source/
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py unpack-next-live-cohort --collection OPPORTUNITY_EPISODES --max-cohorts 1 --capture-packet <dir>/packet.json --source-rdp <dir>/source --mirror-rdp local/factory_mirror/observation_rdp --data-root local/factory_v1/data_plane
+```
+
+Several cohorts: unzip each into its own directory and pass one
+`--capture-packet`/`--source-rdp` per run, oldest first. Repeating an import of
+the same release returns `PASS_ALREADY_PRESENT_EXACT`. After a verified import
+delete the downloaded ZIP and extraction directory; the sealed release, mirror
+capture view and corpus are the retained consumers.
+
+## WHAT DOES A DELIVERY LEAVE BEHIND?
+
+Each operation records its heavy outputs as `disposable`, `resume` or
+`canonical` in its own operation receipt and deletes disposable outputs once
+their consumer has verified them (exact files, containment checked, no links,
+no recursive wildcard over canonical roots). A development worktree is removed
+with `git worktree remove` once nothing scheduled or readback-bound points into
+it; resume material moves to a stable operation root first.
 
 ## HOW DO I ROLLBACK THE NEW AUTOMATION?
 

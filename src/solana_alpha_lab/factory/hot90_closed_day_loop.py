@@ -473,6 +473,195 @@ def process_one_day(
     }
 
 
+# Mature episode cohorts get one self-contained, content-addressed closure object
+# (frozen capture packet + every manifest source byte at its transfer_path), so a
+# consumer can seal/import later from offhost bytes only, without this host.
+COHORT_RECEIPT_KIND = "FACTORY_EPISODE_COHORT_CLOSURE_RECEIPT"
+COHORT_RECEIPTS_RELATIVE = "local/factory_v1/hot90_cohort_closure_receipts"
+COHORT_STAGING_RELATIVE = "local/factory_v1/hot90_cohort_closures"
+OPS_RELATIVE = "local/factory_v1/observation_schedule_state.sqlite"
+# Earlier cohorts were captured and protected by the workstation route.
+COHORT_CLOSURE_FROM_COHORT_ID = "REL-20261013T000000Z-20261014T000000Z"
+DEFAULT_MAX_COHORTS_PER_RUN = 2
+MAX_COHORT_CLOSURE_BYTES = 2 * 1024**3
+
+
+def cohort_receipt_path(root: Path, cohort_id: str) -> Path:
+    if not cohort_id.startswith("REL-") or "/" in cohort_id or ".." in cohort_id:
+        raise ClosedDayLoopError("COHORT_ID_INVALID")
+    return root / COHORT_RECEIPTS_RELATIVE / f"{cohort_id}.json"
+
+
+def protected_cohort_ids(root: Path) -> set[str]:
+    directory = root / COHORT_RECEIPTS_RELATIVE
+    if not directory.is_dir():
+        return set()
+    out: set[str] = set()
+    for path in directory.glob("REL-*.json"):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if payload.get("terminal") == REMOTE_CONTENT_SHA256_VERIFIED and payload.get("remote_content_sha256") == payload.get("archive_sha256"):
+            out.add(str(payload.get("cohort_id")))
+    return out
+
+
+def package_cohort_closure(rdp: Path, packet: Mapping[str, Any], dest_dir: Path) -> dict[str, Any]:
+    """Deterministic ZIP: packet.json + source/<transfer_path>; every byte hash-checked."""
+
+    import hashlib
+    import zipfile
+
+    from solana_alpha_lab.factory.live_cohort_vanilla_path import validate_episode_transfer_manifest
+    from solana_alpha_lab.factory.opportunity_episode_release import _contained
+
+    manifest = packet["transfer_manifest"]
+    validate_episode_transfer_manifest(manifest, packet["closure_receipt"])
+    entries = sorted(manifest["entries"], key=lambda e: str(e.get("transfer_path") or e["path"]))
+    total = sum(int(e["bytes"]) for e in entries)
+    if total > MAX_COHORT_CLOSURE_BYTES:
+        raise ClosedDayLoopError("COHORT_CLOSURE_TOO_LARGE")
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    tmp = dest_dir / f".building-{os.getpid()}.zip"
+    stamp = (2026, 1, 1, 0, 0, 0)
+    try:
+        with zipfile.ZipFile(tmp, "w", compression=zipfile.ZIP_STORED) as archive:
+            for entry in entries:
+                relative = str(entry.get("transfer_path") or entry["path"])
+                source = _contained(rdp, relative)
+                if source.is_symlink() or not source.is_file() or source.stat().st_size != int(entry["bytes"]):
+                    raise ClosedDayLoopError("COHORT_SOURCE_MISSING")
+                digest = hashlib.sha256()
+                with source.open("rb") as stream, archive.open(zipfile.ZipInfo("source/" + relative, stamp), "w") as out:
+                    for chunk in iter(lambda: stream.read(1 << 20), b""):
+                        digest.update(chunk)
+                        out.write(chunk)
+                if digest.hexdigest() != entry["sha256"]:
+                    raise ClosedDayLoopError("COHORT_SOURCE_HASH_MISMATCH")
+            archive.writestr(zipfile.ZipInfo("packet.json", stamp),
+                             json.dumps(packet, sort_keys=True, default=str).encode("utf-8"))
+        sha = hashlib.sha256()
+        with tmp.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1 << 20), b""):
+                sha.update(chunk)
+        final = dest_dir / f"COHORT_CLOSURE_{sha.hexdigest()}.zip"
+        os.replace(tmp, final)
+    finally:
+        tmp.unlink(missing_ok=True)
+    return {"path": str(final), "sha256": sha.hexdigest(), "files": len(entries), "source_bytes": total}
+
+
+def _cohort_failure(root: Path, cohort_id: str, code: str, extra: Mapping[str, Any]) -> dict[str, Any]:
+    payload = {"kind": COHORT_RECEIPT_KIND, "cohort_id": cohort_id, "terminal": code,
+               "last_failure": {"code": code, **dict(extra)}}
+    _atomic_write_json(cohort_receipt_path(root, cohort_id), payload)
+    return {"cohort_id": cohort_id, "terminal": code, "uploaded": False}
+
+
+def process_next_cohort_closure(
+    root: Path,
+    *,
+    now: datetime,
+    rclone_runner: RcloneRunner | None = None,
+    allow_drive: bool = False,
+    observation_rdp: Path | None = None,
+    ops_store: Path | None = None,
+) -> dict[str, Any]:
+    """Protect the oldest mature unprotected episode cohort. Idempotent per cohort."""
+
+    from solana_alpha_lab.factory.opportunity_episode_release import (
+        capture_freeze_export_episodes,
+        select_next_mature_episode_cohort,
+    )
+
+    activation = load_hot90_activation(root)
+    if activation.get("activation_stage") not in {"DURABILITY_CUTOVER", "RETENTION_ACTIVE"}:
+        return {"terminal": "STAGE_NOT_CUTOVER", "uploaded": False}
+    try:
+        require_drive_writes_enabled(activation)
+    except Hot90ActivationError:
+        return {"terminal": "HOT90_DRIVE_WRITES_DISABLED", "uploaded": False}
+    rdp = Path(observation_rdp or root / RDP_RELATIVE)
+    ops = Path(ops_store or root / OPS_RELATIVE)
+    if not ops.is_file():
+        return {"terminal": "NO_EPISODE_OPS_STORE", "uploaded": False}
+    skip = protected_cohort_ids(root)
+    try:
+        for _ in range(256):
+            chosen = select_next_mature_episode_cohort(ops_store=ops, observation_rdp=rdp, imported=skip, as_of=now)
+            if not chosen or chosen.get("terminal") != "MATURE":
+                return {"terminal": "NO_MATURE_UNPROTECTED_COHORT", "uploaded": False}
+            if str(chosen["cohort_id"]) >= COHORT_CLOSURE_FROM_COHORT_ID:
+                break
+            skip.add(str(chosen["cohort_id"]))
+        else:
+            return {"terminal": "NO_MATURE_UNPROTECTED_COHORT", "uploaded": False}
+    except ValueError as exc:  # typed release errors are ValueError subclasses
+        return {"terminal": "COHORT_SELECTION_FAILED", "code": str(exc)[:80], "uploaded": False}
+    cohort_id = str(chosen["cohort_id"])
+    staging = root / COHORT_STAGING_RELATIVE
+    if staging.is_dir():
+        # A run killed by the unit timeout leaves only owned, never-published objects here.
+        for stale in staging.glob("*.zip"):
+            if not stale.is_symlink() and (stale.name.startswith(".building-") or stale.name.startswith("COHORT_CLOSURE_")):
+                stale.unlink(missing_ok=True)
+    packed: dict[str, Any] | None = None
+    try:
+        try:
+            packet = capture_freeze_export_episodes(observation_rdp=rdp, ops_store=ops, imported_cohort_ids=skip, as_of=now)
+            if str(packet["cohort_id"]) != cohort_id:
+                return _cohort_failure(root, cohort_id, "COHORT_SELECTION_DRIFT", {})
+            packed = package_cohort_closure(rdp, packet, staging)
+        except (OSError, ValueError) as exc:
+            return _cohort_failure(root, cohort_id, "COHORT_CLOSURE_BUILD_FAILED", {"error": str(exc)[:80]})
+        offhost = load_offhost_config(root)
+        if offhost is None:
+            return _cohort_failure(root, cohort_id, "DRIVE_ROUTE_UNCONFIGURED", {"archive_sha256": packed["sha256"]})
+        runner = rclone_runner or default_rclone_runner
+        archive_path = Path(packed["path"])
+        remote_object = offhost.remote_object(archive_path.name)
+        common = {"archive_sha256": packed["sha256"], "remote_object": remote_object}
+        native = probe_remote_sha256(config=offhost, remote_object=remote_object, runner=runner)
+        if native is not None and native != packed["sha256"]:
+            return _cohort_failure(root, cohort_id, "HASH_MISMATCH", {**common, "remote_content_sha256": native})
+        uploaded = False
+        if native is None:
+            copied = runner(build_rclone_argv(offhost, "copyto", str(archive_path), remote_object))
+            if getattr(copied, "returncode", 1) != 0:
+                return _cohort_failure(root, cohort_id, "DRIVE_WRITE_FAILED", common)
+            uploaded = True
+            try:
+                verified = verify_remote_content_sha256(config=offhost, remote_object=remote_object,
+                                                        local_sha256=packed["sha256"], runner=runner,
+                                                        root=root, allow_drive=allow_drive)
+            except OffhostBackupError as exc:
+                return _cohort_failure(root, cohort_id, "REMOTE_VERIFY_FAILED", {**common, "error": str(exc)[:80]})
+            native = str(verified.get("sha256") or "")
+            if native != packed["sha256"]:
+                return _cohort_failure(root, cohort_id, "HASH_MISMATCH", {**common, "remote_content_sha256": native})
+        manifest = packet["transfer_manifest"]
+        receipt = {
+            "kind": COHORT_RECEIPT_KIND, "cohort_id": cohort_id, "collection": "OPPORTUNITY_EPISODES",
+            "schedule_sha256": str(chosen["schedule_sha256"]), "activation_id": str(chosen["activation_id"]),
+            "closure_receipt_sha256": packet["closure_receipt"].get("closure_receipt_sha256"),
+            "transfer_manifest_sha256": manifest.get("manifest_sha256"),
+            "files": packed["files"], "source_bytes": packed["source_bytes"],
+            "archive_filename": archive_path.name, "archive_sha256": packed["sha256"],
+            "remote_object": remote_object, "remote_content_sha256": native,
+            "terminal": REMOTE_CONTENT_SHA256_VERIFIED, "verified_at": render_utc(now), "last_failure": None,
+            "consumer": "unzip; unpack-next-live-cohort --collection OPPORTUNITY_EPISODES "
+                        "--capture-packet packet.json --source-rdp source --mirror-rdp <mirror> --data-root <data-root>",
+        }
+        _atomic_write_json(cohort_receipt_path(root, cohort_id), receipt)
+        return {"cohort_id": cohort_id, "terminal": REMOTE_CONTENT_SHA256_VERIFIED, "uploaded": uploaded,
+                "archive_sha256": packed["sha256"], "files": packed["files"]}
+    finally:
+        # A verified object lives offhost; a failed build is rebuilt from source next run.
+        if packed is not None:
+            Path(packed["path"]).unlink(missing_ok=True)
+
+
 def run_closed_day_durability(
     root: Path,
     *,
@@ -504,10 +693,10 @@ def run_closed_day_durability(
     wall = datetime.now(UTC)
     backlog = archive_backlog(root, now=clock)
     processed = []
+    out_of_time = False
     for day in backlog["eligible_unverified_days"][:loaded_max]:
-        if deadline is not None and wall > deadline:
-            break
-        if tick() - started > max_runtime:
+        if (deadline is not None and wall > deadline) or tick() - started > max_runtime:
+            out_of_time = True
             break
         processed.append(
             process_one_day(
@@ -519,6 +708,14 @@ def run_closed_day_durability(
             )
         )
         wall = datetime.now(UTC)
+    cohorts = []
+    for index in range(0 if out_of_time else DEFAULT_MAX_COHORTS_PER_RUN):
+        if index and ((deadline is not None and datetime.now(UTC) > deadline) or tick() - started > max_runtime):
+            break
+        outcome = process_next_cohort_closure(root, now=clock, rclone_runner=rclone_runner, allow_drive=allow_drive)
+        cohorts.append(outcome)
+        if outcome["terminal"] != REMOTE_CONTENT_SHA256_VERIFIED:
+            break
     remaining = archive_backlog(root, now=clock)
     cache_prune = prune_stale_operational_caches(root, today=current_utc_day(clock))
     return {
@@ -530,4 +727,5 @@ def run_closed_day_durability(
         "on_calendar_utc": ARCHIVE_ON_CALENDAR,
         "max_days_per_run": loaded_max,
         "operational_cache_prune": cache_prune,
+        "cohort_closures": cohorts,
     }
