@@ -58,12 +58,12 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertEqual(config["candidate_policy"]["min_candidates"], 0)
         self.assertEqual(config["candidate_policy"]["max_candidates"], 6)
         prior_memory = config["prior_memory"]
-        self.assertEqual(prior_memory["max_records"], 64)
-        self.assertEqual(prior_memory["max_bytes"], 65536)
+        from solana_alpha_lab.factory.hfic_packet_capacity import DEFAULT_CAPACITY
+        self.assertEqual(config["packet_capacity"], {k:v for k,v in DEFAULT_CAPACITY.snapshot().items() if k != "version"})
         self.assertFalse(prior_memory["silent_truncation"])
         self.assertEqual(
             prior_memory["capacity_exceeded"],
-            "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
+            "HFIC_MEMORY_RESOURCE_LIMIT_EXCEEDED",
         )
         self.assertFalse(prior_memory["include_ranked_shortlist_only"])
         self.assertEqual(prior_memory["packet_versions"], ["1.3", "1.4"])
@@ -180,7 +180,7 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertIn("HFIC-UNBOUND", operator)
         self.assertIn("INCOMPLETE_CRITIC_INPUT_PACKET", operator)
         self.assertIn("CRITIC_SESSION_MISMATCH", operator)
-        self.assertIn("PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED", operator)
+        self.assertIn("HFIC_*_RESOURCE_LIMIT_EXCEEDED", operator)
         self.assertIn("PRIOR_MEMORY_RECORD_UNIDENTIFIED", operator)
         self.assertIn("RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_PRIOR_MEMORY", operator)
         self.assertIn("STOP_DO_NOT_LAUNCH_CRITIC", operator)

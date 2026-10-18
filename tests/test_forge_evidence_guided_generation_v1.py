@@ -24,6 +24,7 @@ from solana_alpha_lab.factory.hfic_generation_context import (
     select_working_snapshot,
 )
 from solana_alpha_lab.factory.run_passport import canonical_json_bytes
+from solana_alpha_lab.factory.hfic_packet_capacity import PacketCapacity, PacketCapacityError
 
 
 class SelectionSafetyTests(unittest.TestCase):
@@ -46,46 +47,63 @@ class SelectionSafetyTests(unittest.TestCase):
         self.assertEqual(view['bytes'],len(canonical_json_bytes(view)))
         self.assertNotIn('complete',view)
 
-    def test_mandatory_overflow_fails_without_history_write(self):
-        store,archive=self.inventory(9)
+
+    def test_mandatory_growth_exceeds_old_byte_and_count_recommendations(self):
+        store,archive=self.inventory(80)
+        for capsule in archive["capsules"]:
+            capsule["claim"] += " retained material " * 80
         before=store.diagnostics().committed_inventory_sha256
-        with self.assertRaises(GenerationContextError) as caught:
-            select_working_snapshot(archive,query={},inventory_digest=before,max_records=8,mandatory_ids=[c['hypothesis_version_id'] for c in archive['capsules']])
-        self.assertEqual(caught.exception.code,'GENERATION_MANDATORY_CONTEXT_EXCEEDS_BOUND')
+        required=[c["hypothesis_version_id"] for c in archive["capsules"][:70]]
+        view=select_working_snapshot(archive,query={},inventory_digest=before,
+                                    max_records=8,mandatory_ids=required)
+        self.assertEqual(view["emitted_count"],70)
+        self.assertEqual(view["mandatory_count"],70)
+        self.assertEqual(view["omitted_count"],10)
+        self.assertGreater(view["bytes"],65536)
+        self.assertTrue(all(c["selection_reason"]=="MANDATORY_SOURCE_REF" for c in view["capsules"]))
+        with self.assertRaises(PacketCapacityError) as caught:
+            select_working_snapshot(archive,query={},inventory_digest=before,
+                mandatory_ids=required,capacity=PacketCapacity(resource_records=69))
+        self.assertEqual(caught.exception.code,"HFIC_MEMORY_RESOURCE_LIMIT_EXCEEDED")
+        with self.assertRaises(GenerationContextError):
+            select_working_snapshot(archive,query={},inventory_digest=before,
+                                    mandatory_ids=["HYP-MISSING"])
         self.assertEqual(before,store.diagnostics().committed_inventory_sha256)
 
-    def test_parent_metadata_bytes_are_part_of_bound(self):
+
+    def test_complete_parent_is_measured_after_mandatory_closure(self):
+        from solana_alpha_lab.factory.hfic_generation_context import fit_working_packet, generation_brief
         store,archive=self.inventory(8)
-        with self.assertRaises(GenerationContextError):
-            select_working_snapshot(archive,query={},inventory_digest='f'*64,parent_budget_bytes=200,mandatory_ids=['HYP-EGG-00000'])
+        memory=select_working_snapshot(archive,query={},inventory_digest="f"*64,
+                                      mandatory_ids=["HYP-EGG-00000"])
+        parent={"prior_memory":memory,"generation_context":generation_brief(memory=memory),"metadata":"x"*70000}
+        self.assertGreater(len(canonical_json_bytes(fit_working_packet(parent))),65536)
+        with self.assertRaises(PacketCapacityError) as caught:
+            fit_working_packet(parent,max_bytes=200)
+        self.assertEqual(caught.exception.code,"HFIC_PACKET_RESOURCE_LIMIT_EXCEEDED")
+
 
     def test_revision_keeps_optional_tail_removable_near_parent_byte_bound(self):
         from unittest.mock import patch
         from solana_alpha_lab.factory import hfic_generation_context as context
-        store, archive = self.inventory(50)
-        required = [f'HYP-EGG-{i:05d}' for i in range(8)]
-        memory = select_working_snapshot(archive, query={}, inventory_digest='f'*64,
-                                        mandatory_ids=required)
-        parent = context.fit_working_packet({'prior_memory':memory,
-            'generation_context':context.generation_brief(memory=memory), 'metadata':'x'*4000})
-        frozen = copy.deepcopy(parent)
-        with patch.object(context, 'collect_verified_priors', return_value=archive), \
-             patch.object(context, 'check_full_prior_scope', return_value=({}, {})):
-            _, revised, brief = context.candidate_working_view(store,
-                preflight={'forge_context_packet':{'prior_memory_working_view':parent['prior_memory']}},
-                card={}, evidence={}, cutoff=memory['research_log_cutoff'],
-                inventory_digest='f'*64, repo_root=ROOT,
-                preserve_selected_as_mandatory=False)
-        self.assertEqual(revised['mandatory_count'],8)
-        trial = {'prior_memory':revised, 'generation_context':brief, 'metadata':'x'*4000}
-        trial = context.fit_working_packet(trial)
-        before = trial['prior_memory']['emitted_count']
-        trial['metadata'] += 'x'*(65537-len(canonical_json_bytes(trial)))
-        fitted = context.fit_working_packet(trial)
-        self.assertLess(fitted['prior_memory']['emitted_count'],before)
-        self.assertLessEqual(len(canonical_json_bytes(fitted)),65536)
-        self.assertEqual(fitted['prior_memory']['mandatory_count'],8)
-        self.assertTrue(set(required).issubset({c['hypothesis_version_id'] for c in fitted['prior_memory']['capsules']}))
+        store,archive=self.inventory(50)
+        required=[f"HYP-EGG-{i:05d}" for i in range(8)]
+        memory=select_working_snapshot(archive,query={},inventory_digest="f"*64,
+            mandatory_ids=required,capacity=PacketCapacity(working_records=16))
+        parent=context.fit_working_packet({"prior_memory":memory,
+            "generation_context":context.generation_brief(memory=memory),"metadata":"x"*4000})
+        frozen=copy.deepcopy(parent)
+        with patch.object(context,"collect_verified_priors",return_value=archive), patch.object(context,"check_full_prior_scope",return_value=({},{})):
+            _,revised,brief=context.candidate_working_view(store,
+                preflight={"forge_context_packet":{"prior_memory_working_view":parent["prior_memory"]}},
+                card={},evidence={},cutoff=memory["research_log_cutoff"],
+                inventory_digest="f"*64,repo_root=ROOT,preserve_selected_as_mandatory=False)
+        trial=context.fit_working_packet({"prior_memory":revised,"generation_context":brief,"metadata":"x"*4000})
+        before=trial["prior_memory"]["emitted_count"]
+        fitted=context.fit_working_packet(trial,max_bytes=len(canonical_json_bytes(trial))-1500)
+        self.assertLess(fitted["prior_memory"]["emitted_count"],before)
+        self.assertEqual(fitted["prior_memory"]["mandatory_count"],8)
+        self.assertTrue(set(required).issubset({c["hypothesis_version_id"] for c in fitted["prior_memory"]["capsules"]}))
         self.assertEqual(parent,frozen)
 
     def test_structural_relevance_precedes_narrative_and_outcome_sign(self):
@@ -119,7 +137,7 @@ class SelectionSafetyTests(unittest.TestCase):
         self.assertIsNone(archive['capsules'][0]['reason_code'])
 
 
-def seed_history(store: ResearchStore, count: int, *, exact: dict | None = None) -> list:
+def seed_history(store: ResearchStore, count: int, *, exact: dict | None = None, padding: str = "") -> list:
     """Author historical external source events; no production guard is patched."""
     created = datetime(2026, 10, 8, tzinfo=UTC)
     transaction = "RESEARCH-TXN-EGG-HISTORY"
@@ -129,7 +147,7 @@ def seed_history(store: ResearchStore, count: int, *, exact: dict | None = None)
         payload = {
             "hypothesis_version_id": hyp_id,
             "definition_sha256": f"{index + 1:064x}",
-            "claim": f"Historical observable {index}",
+            "claim": f"Historical observable {index}" + padding,
             "population": "HISTORICAL_DISTINCT_POPULATION",
             "decision_timestamp": "H900",
             "primary_x_family": f"FIELD-DISTINCT-{index % 11}",
@@ -154,6 +172,73 @@ def seed_history(store: ResearchStore, count: int, *, exact: dict | None = None)
 
 
 class OrdinaryWorkingMemoryTests(unittest.TestCase):
+
+    def test_large_six_prior_packet_survives_file_handoff_revision_and_runner_up(self):
+        from unittest.mock import patch
+        from scripts.hypothesis_forge import _load_json_file
+        from tests.test_hfic_cli import critic_result_from_packet_only
+        from tests.test_hfic_list_aware_vertical_v1 import draft
+        from solana_alpha_lab.factory.hfic_ordinary_operation import journal_occupancy
+        store=ResearchStore(self.plane)
+        seed_history(store,6,padding=" retained material finding "*70)
+        query=draft("NUMERIC_IN_SCOPE",
+            features=[{"name":"price","op":"return_ratio","field_id":"FIELD-USD-PRICE-001","start":"E300","end":"E1800"},
+                      {"name":"liquidity","op":"return_ratio","field_id":"FIELD-LIQUIDITY-USD-001","start":"E300","end":"E1800"}],
+            all=[{"feature":"price","op":"lt","value":0},{"feature":"liquidity","op":"gte","value":0}])
+        evidence,scope,_query,initial=self.look("EGG_LARGE_PACKET_PATH",query=query)
+        body,pre=self.authored_draft(evidence,scope,initial["owner_focus"],n=2)
+        for card in body["candidates"]:
+            card["claim"]="Synthetic price decline with liquidity preservation, fixed proxy downside; wording "+card["label"]
+            card["proposed_method"]='Сохранить "приоры" и обратный слеш ' + chr(92) + " "
+            card["proposed_method"] *= 5000
+            card["confounders"]="Previously consumed adaptive Scout discovery; not independent OOS."
+        before=journal_occupancy(store,pre["search_key_sha256"])
+        with patch.dict(os.environ,{"SMIAL_HFIC_PACKET_BYTES":"80000"}):
+            refused=self.cli("persist-draft","--draft",self.write("large-draft.json",body),
+                "--preflight-receipt",self.write("large-pre.json",pre),ok=False)
+        self.assertEqual(refused["reason_code"],"HFIC_PACKET_RESOURCE_LIMIT_EXCEEDED")
+        self.assertFalse(refused["scientific_negative"])
+        self.assertIsNone(refused["writes"])
+        self.assertTrue(refused["effects_readback_required"])
+        self.assertEqual(journal_occupancy(ResearchStore(self.plane),pre["search_key_sha256"]),before)
+        with patch.dict(os.environ,{"SMIAL_HFIC_RESOURCE_RECORDS":"1"}):
+            limited=self.cli("preflight","--owner-focus",pre["owner_focus"],"--discovery-contract",
+                             "--no-auto-commission","--format","json",ok=False)
+        self.assertEqual(limited["reason_code"],"HFIC_MEMORY_RESOURCE_LIMIT_EXCEEDED")
+        _generated,frozen=self.persist_and_freeze(body,pre)
+        expected={c["hypothesis_version_id"] for c in pre["forge_context_packet"]["prior_memory_working_view"]["capsules"]}
+        self.assertTrue({f"HYP-EGG-{i:05d}" for i in range(6)}.issubset(expected))
+        for packet in (frozen["critic_input_packet"],frozen["runner_up_critic_input_packet"]):
+            self.assertGreater(len(canonical_json_bytes(packet)),65536)
+            self.assertEqual(expected,{c["hypothesis_version_id"] for c in packet["prior_memory"]["capsules"]})
+        outer=self.work/"escaped-frozen-envelope.json"
+        outer.write_text(json.dumps(frozen,ensure_ascii=True),encoding="utf-8")
+        self.assertGreater(outer.stat().st_size,262144)
+        transported=_load_json_file(outer)
+        self.assertEqual(transported["critic_input_packet"],frozen["critic_input_packet"])
+        first=critic_result_from_packet_only(transported["critic_input_packet"],"REVISE_ONCE")
+        first["revision_receipt"]={"scope":"claim_wording","attempt":1}
+        waiting=self.cli("finalize","--session-id",frozen["session_id"],"--critic-result",self.write("revise-result.json",first))
+        self.assertEqual(waiting["session_state"],"REVISION_REQUIRED")
+        revised=copy.deepcopy(body)
+        revised["candidates"][0]["claim"] += "; wording clarified."
+        changed=self.cli("revise","--session-id",frozen["session_id"],"--draft",self.write("revised-draft.json",revised))
+        self.assertEqual(expected,{c["hypothesis_version_id"] for c in changed["critic_input_packet"]["prior_memory"]["capsules"]})
+        kill=critic_result_from_packet_only(changed["critic_input_packet"],"KILL_MECHANISM")
+        failover=self.cli("finalize","--session-id",frozen["session_id"],"--critic-result",self.write("primary-kill.json",kill))
+        self.assertEqual(failover["session_state"],"RUNNER_UP_AWAITING_CRITIC")
+        resumed=self.cli("show-session","--session-id",frozen["session_id"])
+        c2=resumed["critic_input_packet"]
+        self.assertEqual(expected,{c["hypothesis_version_id"] for c in c2["prior_memory"]["capsules"]})
+        terminal=critic_result_from_packet_only(c2,"KILL_LOW_INFORMATION_VALUE")
+        done=self.cli("finalize","--session-id",frozen["session_id"],"--critic-result",self.write("runner-kill.json",terminal))
+        self.assertEqual(done["session_state"],"SYNTHESIS_COMPLETE")
+        terminal_readback=self.cli("show-session","--session-id",frozen["session_id"])
+        with patch.dict(os.environ,{"SMIAL_HFIC_WORKING_RECORDS":"1","SMIAL_HFIC_WORKING_BYTES":"1000"}):
+            cold=self.cli("show-session","--session-id",frozen["session_id"])
+        self.assertEqual(cold["critic_input_packet_sha256"],terminal_readback["critic_input_packet_sha256"])
+        self.assertEqual(journal_occupancy(ResearchStore(self.plane),pre["search_key_sha256"]),before)
+
     setUpClass = classmethod(flow.EpisodeFlowTests.setUpClass.__func__)
     tearDownClass = classmethod(flow.EpisodeFlowTests.tearDownClass.__func__)
     setUp = flow.EpisodeFlowTests.setUp
@@ -182,21 +267,26 @@ class OrdinaryWorkingMemoryTests(unittest.TestCase):
         self.assertFalse(denied['writes'])
         self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
 
-    def test_mandatory_overflow_refuses_before_generated_draft_or_slot_write(self):
-        store=ResearchStore(self.plane);seed_history(store,65)
-        evidence,scope,_query,initial=self.look('EGG_MANDATORY_OVERFLOW')
-        body,pre=self.authored_draft(evidence,scope,initial['owner_focus'])
-        body['candidates'][0]['prior_work_refs']=[f'HYP-EGG-{i:05d}' for i in range(65)]
-        before=store.diagnostics().committed_inventory_sha256
-        denied=self.cli('persist-draft','--draft',self.write('overflow.json',body),
-                        '--preflight-receipt',self.write('overflow-pre.json',pre),ok=False)
-        self.assertEqual(denied['reason_code'],'GENERATION_MANDATORY_CONTEXT_EXCEEDS_BOUND',denied)
-        self.assertGreaterEqual(denied['detail']['mandatory_count'], 65)
-        self.assertEqual(len(denied['detail']['mandatory_hypothesis_version_ids']), denied['detail']['mandatory_count'])
-        self.assertTrue(set(body['candidates'][0]['prior_work_refs']).issubset(denied['detail']['mandatory_hypothesis_version_ids']))
-        self.assertEqual(denied['next_action'], 'INSPECT_MANDATORY_SOURCES_REFINE_WITH_EXISTING_AUTHORITY')
-        self.assertFalse(denied['new_look'])
-        self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
+
+    def test_mandatory_growth_crosses_old_count_cap_and_cold_resume(self):
+        from solana_alpha_lab.factory.hfic_ordinary_operation import journal_occupancy
+        store=ResearchStore(self.plane)
+        seed_history(store,65,padding=" retained source "*70)
+        evidence,scope,_query,initial=self.look("EGG_MANDATORY_GROWTH")
+        body,pre=self.authored_draft(evidence,scope,initial["owner_focus"])
+        required={f"HYP-EGG-{i:05d}" for i in range(65)}
+        body["candidates"][0]["prior_work_refs"]=sorted(required)
+        before=journal_occupancy(store,pre["search_key_sha256"])
+        _generated,frozen=self.persist_and_freeze(body,pre)
+        memory=frozen["critic_input_packet"]["prior_memory"]
+        self.assertTrue(required.issubset({c["hypothesis_version_id"] for c in memory["capsules"]}))
+        expected=required | {c["hypothesis_version_id"] for c in pre["forge_context_packet"]["prior_memory_working_view"]["capsules"]}
+        self.assertEqual(memory["mandatory_count"],len(expected))
+        self.assertGreater(len(canonical_json_bytes(frozen["critic_input_packet"])),65536)
+        for _ in range(2):
+            resumed=self.cli("show-session","--session-id",frozen["session_id"])
+            self.assertEqual(resumed["critic_input_packet_sha256"],frozen["critic_input_packet_sha256"])
+        self.assertEqual(journal_occupancy(ResearchStore(self.plane),pre["search_key_sha256"]),before)
 
     def test_episode_preview_reads_prefix_only_and_replay_spends_no_second_look(self):
         from tests.test_hfic_list_aware_vertical_v1 import draft
@@ -229,8 +319,7 @@ class OrdinaryWorkingMemoryTests(unittest.TestCase):
         eligible = len(list(iter_search_memory_hypothesis_payloads(store)))
         self.assertGreaterEqual(eligible, 65)
         self.assertLessEqual(len(pre["forge_context_packet"]["ranked_prior_entries"]), 8)
-        with self.assertRaises(PriorMemoryCapacityError):
-            build_prior_memory_snapshot(
+        complete = build_prior_memory_snapshot(
                 store, store_inventory_digest=store.diagnostics().committed_inventory_sha256,
                 repo_root=ROOT,
             )

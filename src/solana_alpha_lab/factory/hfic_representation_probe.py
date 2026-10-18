@@ -33,6 +33,7 @@ from solana_alpha_lab.factory.hfic_control_integrity import (
     effective_control_terminal,
 )
 from solana_alpha_lab.factory.hfic_preflight import FORGE_OPERATIONAL_PACKET_MAX_BYTES
+from solana_alpha_lab.factory.hfic_packet_capacity import resolve_packet_capacity, check_packet_resource
 from solana_alpha_lab.factory.hfic_session import PROMPT_VERSION
 from solana_alpha_lab.factory.live_cohort_discovery_release import (
     LIVE_EVIDENCE_ROLE,
@@ -1269,7 +1270,7 @@ def build_challenger_packet(
         "probe_identity_sha256": probe_identity,
         "ordinary_search_budget_unchanged": True,
         "max_challenger_runs_per_representation_control_epoch": MAX_CHALLENGER_RUNS_PER_CONTROL_EPOCH,
-        "max_packet_bytes": FORGE_OPERATIONAL_PACKET_MAX_BYTES,
+        "max_packet_bytes": resolve_packet_capacity().packet_bytes,
         "control_context_kind": baseline.context_kind,
         PACKET_KEY: payload,
         "non_claims": [
@@ -1282,16 +1283,15 @@ def build_challenger_packet(
         challenger["control_context"] = deepcopy(dict(baseline.packet))
     else:
         challenger["critic_input_packet"] = deepcopy(dict(baseline.packet))
+    check_packet_resource(baseline.packet, stage="CHALLENGER_FROZEN_CONTROL")
     challenger["packet_bytes"] = 0
     for _ in range(4):
         packet_size = len(canonical_json_bytes(challenger))
-        if packet_size > FORGE_OPERATIONAL_PACKET_MAX_BYTES:
-            raise RepresentationProbeError(INVALID_PACKET_BUDGET)
+        check_packet_resource(challenger, stage="CHALLENGER_BUILD")
         if challenger["packet_bytes"] == packet_size:
             break
         challenger["packet_bytes"] = packet_size
-    if len(canonical_json_bytes(challenger)) > FORGE_OPERATIONAL_PACKET_MAX_BYTES:
-        raise RepresentationProbeError(INVALID_PACKET_BUDGET)
+    check_packet_resource(challenger, stage="CHALLENGER_BUILD")
     if challenger["packet_bytes"] != len(canonical_json_bytes(challenger)):
         raise RepresentationProbeError(INVALID_PACKET_BUDGET)
     return challenger
@@ -1347,7 +1347,9 @@ def _validate_challenger_packet(
         or packet["ordinary_search_budget_unchanged"] is not True
         or packet["max_challenger_runs_per_representation_control_epoch"]
         != MAX_CHALLENGER_RUNS_PER_CONTROL_EPOCH
-        or packet["max_packet_bytes"] != FORGE_OPERATIONAL_PACKET_MAX_BYTES
+        or isinstance(packet["max_packet_bytes"], bool)
+        or not isinstance(packet["max_packet_bytes"], int)
+        or packet["max_packet_bytes"] < 1
         or packet["non_claims"]
         != ["NO_PROBE_EXECUTION", "NO_ALPHA", "NO_CURRENT_COHORT_SCIENTIFIC_READ"]
     ):
@@ -1412,8 +1414,10 @@ def _validate_challenger_packet(
         raise RepresentationProbeError(INVALID_PROBE_IDENTITY)
     if packet["packet_bytes"] != len(canonical_json_bytes(packet)):
         raise RepresentationProbeError(INVALID_PACKET_BUDGET)
-    if packet["packet_bytes"] > FORGE_OPERATIONAL_PACKET_MAX_BYTES:
+    if packet["packet_bytes"] > packet["max_packet_bytes"]:
         raise RepresentationProbeError(INVALID_PACKET_BUDGET)
+    check_packet_resource(packet, stage="CHALLENGER_READ")
+    check_packet_resource(control_packet, stage="CHALLENGER_FROZEN_CONTROL_READ")
     return packet, representation
 
 

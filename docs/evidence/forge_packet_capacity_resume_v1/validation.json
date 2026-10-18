@@ -1,0 +1,107 @@
+{
+  "A": {
+    "external_json_bytes_lower_bound": 262145,
+    "independent_scientific_critic": false,
+    "packet_bytes_lower_bound": 65537,
+    "path": [
+      "persist-draft",
+      "freeze",
+      "serialize-file-read",
+      "mechanical REVISE_ONCE fixture",
+      "revise",
+      "mechanical primary KILL fixture",
+      "runner-up cold read",
+      "mechanical runner-up KILL fixture",
+      "finalize",
+      "cold resume"
+    ],
+    "shape": "two-feature price/liquidity return query, six seeded material priors plus existing commissioned source, Unicode/escaping/duplicate outer representations",
+    "status": "PASS_SYNTHETIC_NATIVE"
+  },
+  "B": {
+    "cold_preflight_count_override": "REFUSED_WITHOUT_DROPPING_SAVED_SOURCES",
+    "compact_selection_mandatory_sources": 70,
+    "historical_challenger_saved_cap": 65536,
+    "missing_source_and_corrupt_bindings": "REFUSED_EXISTING_GUARDS",
+    "native_mandatory_sources": 66,
+    "optional_archive_expansion": false,
+    "reader_actual_io": "read(limit+1), observed1001 for1000 allowance",
+    "real_resource_refusal": "SMALL_LOCAL_ENV_OVERRIDE_NO_GIGABYTE_FIXTURE",
+    "status": "PASS"
+  },
+  "C": {
+    "frozen_working_settings_ignore_today_defaults": true,
+    "local_override_without_code_change": true,
+    "new_helper_in_execution_code_binding": true,
+    "new_real_main_during_repair": 0,
+    "real_candidate_session_created": false,
+    "real_main_before": 1,
+    "real_store_reset": false,
+    "restart_journal_occupancy_unchanged": true,
+    "saved_packet_hash_unchanged_on_cold_read": true,
+    "status": "PASS_SYNTHETIC_NATIVE_REAL_CONTINUATION_PENDING_MERGE"
+  },
+  "checks": [
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_evidence_guided_generation_v1 tests.test_hfic_cli tests.test_hfic_session tests.test_hfic_critic_prior_memory_closure_v1 tests.test_hfic_forge_prior_context_capacity_repair_v1 tests.test_hfic_operational_packet_guard_simplification_v1",
+      "phase": "before review delta",
+      "ran": 104,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_hfic_preflight tests.test_hypothesis_forge_independent_critic_v1",
+      "ran": 43,
+      "skipped": 1,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_hfic_cli.HficPacketCapacityReaderTests tests.test_hfic_operational_closure_v1 tests.test_hfic_reopened_prior_search_routing_v1.PromptABodyTests tests.test_hfic_representation_probe tests.test_hfic_scientific_disposition_continuity_v1.V4OperabilityTests.test_bounded_context_reports_omitted_and_pages_detail tests.test_hfic_scientific_disposition_continuity_v1.ReviewRegressionTests.test_capsule_shrinks_first_under_packet_budget tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_large_six_prior_packet_survives_file_handoff_revision_and_runner_up",
+      "error": "obsolete RepresentationProbeError expectation; corrected to typed resource refusal using small fixture; targeted rerun PASS",
+      "errors": 1,
+      "passed": 43,
+      "ran": 44
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_hfic_representation_probe.HficRepresentationProbeTests.test_packet_budget_fails_without_dropping_control_context tests.test_forge_evidence_identity_and_owner_gold_v1.IdentityUnitTests tests.test_hfic_cli.HficPacketCapacityReaderTests",
+      "ran": 30,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_hfic_representation_probe.HficRepresentationProbeTests.test_exact_control_clone_and_existing_hfic_fixture tests.test_hfic_representation_probe.HficRepresentationProbeTests.test_packet_budget_fails_without_dropping_control_context",
+      "phase": "final nested-control guard delta",
+      "ran": 2,
+      "status": "PASS"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_hfic_scientific_disposition_continuity_v1.V4OperabilityTests.test_bounded_context_reports_omitted_and_pages_detail tests.test_hfic_scientific_disposition_continuity_v1.ReviewRegressionTests.test_capsule_shrinks_first_under_packet_budget",
+      "ran": 2,
+      "status": "PASS"
+    }
+  ],
+  "defaults": {
+    "json_bytes": 67108864,
+    "packet_bytes": 8388608,
+    "resource_records": 10000,
+    "working_bytes": 65536,
+    "working_records": 8
+  },
+  "failure_history": "Intermediate runs exposed obsolete default/error assertions and a cold-read assertion comparing terminal primary to active runner-up; corrected. One development run was invalidated by concurrent checkout edits; no scientific conclusion drawn.",
+  "non_claims": [
+    "NO_REAL_CRITIC_YET",
+    "NO_OOS",
+    "NO_ALPHA",
+    "NO_NEW_MAIN",
+    "NO_BUDGET_REFUND",
+    "NO_PRODUCTION_ACTION"
+  ],
+  "real_resume": {
+    "next": "accepted merge, resolver/readback, original result persist-draft/freeze, isolated packet-only scientific Critic; no new MAIN",
+    "result_ref": "HFIC-ART-DISCOVERY-7805D0BDB4432682C450578B66F060F31E21C578",
+    "result_sha256": "39028f4afacd8c0af9575ee37bf0447be10c19f147fda56bcb62ce9114d68c87",
+    "run_id": "FORGE-RUN-245CEE89F63CE453",
+    "scope": "OPPORTUNITY_EPISODES:AUTO"
+  },
+  "schema": "smial.forge-packet-capacity-validation",
+  "schema_version": "1.0",
+  "task_id": "FORGE_PACKET_CAPACITY_RESUME_V1"
+}

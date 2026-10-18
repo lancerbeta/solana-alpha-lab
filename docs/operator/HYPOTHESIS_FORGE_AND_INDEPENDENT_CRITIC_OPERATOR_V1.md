@@ -122,8 +122,8 @@ provenance is `CORRECTED_ORIGINAL_UNKNOWN`.
 **Search-memory policy (не часть `/hypothesis-forge`).** Completed HFIC sessions
 can be excluded from *future HFIC search memory* by an append-only ResearchStore
 policy. Historical records stay immutable. Quarantine is not scientific
-rejection, deletion, supersession, CLOSE/PARK change, or a raise of
-`prior_memory.max_records=64`. Non-HFIC hypothesis versions stay eligible.
+rejection, deletion, supersession, CLOSE/PARK change, or a technical capacity
+adjustment. Non-HFIC hypothesis versions stay eligible.
 The policy does not change `evidence_epoch_sha256` / market evidence epoch.
 After this capability is merged once, later quarantine/restore must not
 require Git mutation. Memory eligibility remains in search-key / exact
@@ -402,21 +402,19 @@ returns `ALREADY_APPLIED`. Contract:
    `forge-run` so the aggregate reads the real V1 artifacts. That is not the
    scientific V1 probe.
    `RESUME_V1` reuses `--saved-draft-sha256`, not a new START envelope.
-   Если `freeze` вернул `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` или
-   `PRIOR_MEMORY_RECORD_UNIDENTIFIED`: это BLOCKED, не crash. Session не
-   записан. Critic не запускать, packet не вставлять, тот же slash не ретраить
-   в ожидании success. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`. After the
-   slash ends, use the Search-memory policy CLI above for a calibration reset.
-   Do not run `memory-policy-apply` inside the slash.
-   Bound: `prior_memory.max_records=64`, `max_bytes=65536` в
-   `configs/hypothesis_forge_independent_critic_v1.yaml`.
+   При `HFIC_*_RESOURCE_LIMIT_EXCEEDED` сохраните входы и увеличьте указанную
+   локальную техническую настройку, затем продолжите persist/freeze с тем же
+   результатом. Это технический BLOCKED, без нового MAIN или возврата бюджета.
+   Не удаляйте mandatory priors и не используйте quarantine/reset как ремонт
+   ёмкости. `PRIOR_MEMORY_RECORD_UNIDENTIFIED` означает дефект источника:
+   Critic нельзя запускать с неполным packet. Старые capacity-коды читаются
+   как исторические технические отказы, а не научные отрицания.
 3. Вечерний цикл **не завершён**, пока bounded `forge-run` не дал owner-final.
    HFIC session `NO_WORTHY_HYPOTHESIS` пропускает Critic и complete на freeze
    **как сессия**; если `forge-run` next is `START_V1`, вечерний **run**
    продолжается. Не объявляйте evening-complete на Prompt C WAIT.
-   - `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` / `PRIOR_MEMORY_RECORD_UNIDENTIFIED`
-     (BLOCKED; session не записан; Critic не запускать; цикл останавливается на
-     typed STOP, не на Critic).
+   - Неразрешённый resource/source block не является owner-final или Critic
+     verdict; для него указываются точный дефект и операция продолжения.
    Primary `KILL_*` с `session_state=RUNNER_UP_AWAITING_CRITIC` — **не** complete:
    сначала Critic #2. `REVISE_ONCE` (только C1) и `PASS_TO_CLASSIFICATION` —
    intermediate states, не complete. Команды `revise` и `classify` — тот же CLI,
@@ -780,8 +778,8 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge_representati
 
 The adapter requires the effective CONTROL terminal, the same evidence epoch,
 the same pre-CONTROL memory baseline, the existing `HFIC-V1.2` prompt, and the
-shared operational packet envelope (`FORGE_OPERATIONAL_PACKET_MAX_BYTES=65536`,
-growth warning at `FORGE_PACKET_GROWTH_WARNING_BYTES=20480`). Comparability is
+shared operational packet capacity resolver (default8MiB, growth warning at
+`FORGE_PACKET_GROWTH_WARNING_BYTES=20480`). Comparability is
 same admissible-information rules, same selection/truncation semantics, and
 exact CONTROL packet/hash binding — not equal unused 16KiB headroom. A
 `PASS_*` CONTROL result means
@@ -803,16 +801,25 @@ deployment, or product DONE.
 
 ### Forge packet capacity (operational envelope)
 
-Ordinary `/hypothesis-forge`, `CURRENT_REPRESENTATION_CONTROL_V1`, and the
-representation challenger share one operational hard cap of **65536** bytes
-(`FORGE_OPERATIONAL_PACKET_MAX_BYTES`) and one growth-warning threshold of
-**20480** bytes (`FORGE_PACKET_GROWTH_WARNING_BYTES`). Crossing the warning
-threshold emits telemetry and does **not** truncate required scientific
-fields. The hard cap is a runtime safety envelope, not estimand/PIT/missingness and
-not a model context-window claim. It amends the previous 16384 CONTROL
-byte identity; it does not deny that identity existed. Resolve via
-`forge_context_packet_max_bytes(evidence_surface_mode)` — the mode no longer
-selects a different byte ceiling; never infer from `owner_focus` text.
+One common resolver owns technical capacity across preflight, generation,
+Critic freeze, revision/runner-up and file handoff. Recommendations are8 records
+and64KiB; mandatory closure automatically exceeds them when needed. Resource
+defaults are8MiB for the actual complete packet,64MiB for outer JSON, and10000
+memory records. The20480-byte warning is telemetry, not truncation authority.
+Optional recall stays bounded even when technical headroom increases.
+
+Defaults live in `packet_capacity` in
+`configs/hypothesis_forge_independent_critic_v1.yaml`. An operator may set
+`SMIAL_HFIC_PACKET_BYTES`, `SMIAL_HFIC_JSON_BYTES` or
+`SMIAL_HFIC_RESOURCE_RECORDS` locally without a PR. Resource errors identify
+actual usage, limit and setting; adjust it and resume the same saved input.
+The JSON reader reads no more than its allowance plus one byte. Unicode,
+escaping and duplicated outer representations are measured through actual
+serialization/file reads. Working recommendations can be set with
+`SMIAL_HFIC_WORKING_RECORDS` / `SMIAL_HFIC_WORKING_BYTES` for fresh views.
+Frozen/replay memory retains saved selection, sources and cutoff. Historical
+bytes/bindings stay unchanged; operational overrides never refund research
+budget or make consumed history independent OOS.
 
 `RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE` is reserved for ranked IDs whose
 decision-useful body cannot be resolved one-to-one.
@@ -822,8 +829,10 @@ semantic/feature-grounding compaction under the **operational hard cap**.
 `MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND` is the typed STOP when typed close/PARK or known candidate review rejection
 Forge priors already carry disposition-gated scope axes and fitting would
 require stripping material feature grounding under that same operational cap.
-Do not quarantine valid HFIC
-memory or drop ranked priors to paper over capacity. Prompt A uses
+These legacy codes are technical blocks; new resource refusals use
+`HFIC_*_RESOURCE_LIMIT_EXCEEDED`, never a scientific STOP or generic protocol
+invalidity. Do not quarantine valid HFIC memory or drop ranked priors to repair
+capacity. Prompt A uses
 `compact_forge_prior_entry`; Critic `prior_memory` keeps the fuller capsule.
 
 External public research не даёт market/provider authority. Приоритет источников: исполнимая собственная реальность → официальные спецификации → воспроизводимые papers/code/data → прозрачная аналитика → агрегаторы → social/KOL только как источник идеи.

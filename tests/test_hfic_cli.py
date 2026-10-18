@@ -247,6 +247,62 @@ def run_cli(*args: str, data_root: Path, env: dict[str, str] | None = None) -> s
     return historical_preflight_view(args, completed)
 
 
+class HficPacketCapacityReaderTests(unittest.TestCase):
+    def test_reader_bounds_actual_io_and_accepts_large_unicode_outer_json(self):
+        from scripts.hypothesis_forge import _load_json_file
+        from scripts.hypothesis_fast_lane import load_packet
+        from solana_alpha_lab.factory.hfic_preflight import verify_forge_context_packet, FORGE_CONTEXT_ARTIFACT_DIR
+        from solana_alpha_lab.factory.hfic_packet_capacity import PacketCapacityError, resolve_packet_capacity
+        with tempfile.TemporaryDirectory() as raw:
+            path=Path(raw)/"outer.json"
+            value={"packet":{"material":'Юникод "quoted" '+chr(92)},"duplicate":'Ж'*50000}
+            path.write_text(json.dumps(value,ensure_ascii=True),encoding="utf-8")
+            self.assertGreater(path.stat().st_size,262144)
+            self.assertEqual(_load_json_file(path),value)
+            self.assertEqual(load_packet(path),value)
+            yaml_path=Path(raw)/"input.yaml"
+            yaml_path.write_text("packet: retained\n",encoding="utf-8")
+            self.assertEqual(load_packet(yaml_path),{"packet":"retained"})
+            opened=Path.open
+            read_sizes=[]
+            class BoundedReader:
+                def __enter__(self): return self
+                def __exit__(self,*args): return False
+                def read(self,size):
+                    read_sizes.append(size)
+                    return b"x"*size
+            def controlled_open(target,*args,**kwargs):
+                return BoundedReader() if target==path else opened(target,*args,**kwargs)
+            with patch.dict(os.environ,{"SMIAL_HFIC_JSON_BYTES":"1000"}), patch.object(Path,"open",controlled_open):
+                with self.assertRaises(PacketCapacityError) as caught:
+                    _load_json_file(path)
+            self.assertEqual(read_sizes,[1001])
+            self.assertEqual(caught.exception.code,"HFIC_JSON_RESOURCE_LIMIT_EXCEEDED")
+            import hashlib
+            digest=hashlib.sha256(path.read_bytes()).hexdigest()
+            blob=Path(raw)/FORGE_CONTEXT_ARTIFACT_DIR/(digest+".json")
+            blob.parent.mkdir(parents=True)
+            blob.write_bytes(path.read_bytes())
+            with patch.dict(os.environ,{"SMIAL_HFIC_JSON_BYTES":"1000"}):
+                with self.assertRaisesRegex(PacketCapacityError,"HFIC_JSON_RESOURCE_LIMIT_EXCEEDED"):
+                    verify_forge_context_packet(Path(raw),digest)
+                with self.assertRaisesRegex(PacketCapacityError,"HFIC_JSON_RESOURCE_LIMIT_EXCEEDED"):
+                    load_packet(path)
+            with patch.dict(os.environ,{"SMIAL_HFIC_JSON_BYTES":"1000000"}):
+                self.assertEqual(_load_json_file(path),value)
+            path.write_bytes(b"{bad binding")
+            with self.assertRaisesRegex(PacketCapacityError,"HFIC_JSON_INPUT_INVALID"):
+                _load_json_file(path)
+        frozen=resolve_packet_capacity().snapshot()
+        with patch.dict(os.environ,{"SMIAL_HFIC_WORKING_RECORDS":"1000"}):
+            self.assertEqual(resolve_packet_capacity(frozen=frozen).working_records,frozen["working_records"])
+            from solana_alpha_lab.factory.hfic_packet_capacity import packet_capacity
+            legacy={"prior_memory":{"schema_version":"1.1","max_records":64,"max_bytes":65536}}
+            self.assertEqual(packet_capacity(legacy).working_records,64)
+        with patch.dict(os.environ,{"SMIAL_HFIC_JSON_BYTES":str(1 << 100)}):
+            with self.assertRaisesRegex(PacketCapacityError,"HFIC_CAPACITY_CONFIG_INVALID"):
+                resolve_packet_capacity()
+
 class HficCliContractTests(unittest.TestCase):
     def test_cli_exposes_required_commands(self) -> None:
         completed = run_cli("--help", data_root=Path(tempfile.gettempdir()))

@@ -1,0 +1,34 @@
+{
+  "as_of": "2026-10-18",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Only measured real resource refusal after full mandatory closure; adjust local technical capacity, no new subsystem inferred."
+  },
+  "dimensions": {
+    "build_vs_buy": "WRAP_EXISTING_JSON_YAML_NATIVE_PACKET_NO_NEW_DEPENDENCY_SERVICE_MEMORY_SUBSYSTEM",
+    "context_efficiency": "8_RECORD_64K_RECOMMENDATION_COMPLETE_MANDATORY_CLOSURE_SEPARATE_RESOURCE_GUARD",
+    "execution_to_cashflow": "NO_EXECUTION_ECONOMICS_OR_TRADE_CLAIM",
+    "flexibility_and_history": "SAVED_SETTINGS_AND_BYTES_RETAINED_NEW_PACKAGES_HONEST_BINDINGS",
+    "mission": "REMOVE_TECHNICAL_BLOCK_PRESERVE_SCIENCE",
+    "monitoring_and_recovery": "NINE_NAMED_RECOVERY_FILES_ONLY_COLD_RESUME_NO_SECOND_MAIN",
+    "owner_operability": "LOCAL_ENV_OVERRIDE_TYPED_ACTIONABLE_REFUSAL_EFFECTS_UNKNOWN_REQUIRE_READBACK",
+    "red_team": "MISSING_CORRUPT_MANDATORY_RESOURCE_LIMIT_AND_LEGACY_CONTRACT_CASES",
+    "research_truth": "NO_CUTOFF_RESULT_QUERY_ELIGIBILITY_BUDGET_CHANGE_NO_FAKE_CRITIC",
+    "security": "BOUNDED_BYTE_READ_SYMLINK_REFUSAL_SOURCE_BINDING_GUARDS"
+  },
+  "limits": [
+    "REAL_SCIENTIFIC_CRITIC_PENDING_ACCEPTED_MERGE",
+    "SCOUT_ADAPTIVE_EXPOSURE_RETAINED_NOT_OOS",
+    "SOURCE_REFERENCE_EXIT_EVENT_TIMES_UNKNOWN",
+    "EXACT_HEAD_OWNER_MERGE_PHRASE_REQUIRED"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "Ordinary code revert if needed; preserve recovery files, all append-only research artifacts, saved policy and scientific charges. No production rollback.",
+  "review_id": "FORGE_PACKET_CAPACITY_RESUME_V1-FIT",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FORGE_PACKET_CAPACITY_RESUME_V1",
+  "verdict": "PASS"
+}

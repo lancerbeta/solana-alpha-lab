@@ -426,6 +426,18 @@ class HficRepresentationProbeTests(unittest.TestCase):
         self.assertEqual(challenger["control_packet_sha256"], baseline.packet_sha256)
         self.assertEqual(challenger["memory_baseline_sha256"], baseline.memory_baseline_sha256)
         self.assertEqual(challenger["critic_input_packet"], baseline.packet)
+        # Historical technical contract remains readable after today's default changes.
+        from unittest.mock import patch
+        import os
+        from solana_alpha_lab.factory.hfic_packet_capacity import PacketCapacityError
+        historical=json.loads(json.dumps(challenger))
+        historical["max_packet_bytes"]=65536
+        for _ in range(4):
+            historical["packet_bytes"]=len(canonical_json_bytes(historical))
+        self.assertEqual(existing_hfic_packet(historical,cohort_readiness_receipt=readiness),baseline.packet)
+        with patch.dict(os.environ,{"SMIAL_HFIC_PACKET_BYTES":"64"}):
+            with self.assertRaises(PacketCapacityError):
+                existing_hfic_packet(historical,cohort_readiness_receipt=readiness)
         lifecycle_input = existing_hfic_lifecycle_fixture_input(
             challenger,
             control_receipt=receipt,
@@ -918,7 +930,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
         receipt = _control_receipt()
         baseline = control_baseline_from_receipt(receipt)
         huge = dict(baseline.packet)
-        huge["known_unknowns"] = ["x" * (MAX_PACKET_BYTES * 2)]
+        huge["known_unknowns"] = ["x" * 2000]
         huge_hash = canonical_sha256(huge)
         oversized_receipt = dict(_control_receipt())
         oversized_receipt["critic_input_packet"] = huge
@@ -928,13 +940,17 @@ class HficRepresentationProbeTests(unittest.TestCase):
         oversized_receipt["memory_baseline_sha256"] = control_memory_baseline_sha256(
             oversized_receipt
         )
-        with self.assertRaises(RepresentationProbeError) as raised:
-            build_challenger_packet(
-                oversized_receipt,
-                _representation_fixture(),
-                cohort_readiness_receipt=_cohort_readiness_receipt(),
-            )
-        self.assertEqual(str(raised.exception), INVALID_PACKET_BUDGET)
+        import os
+        from unittest.mock import patch
+        from solana_alpha_lab.factory.hfic_packet_capacity import PacketCapacityError
+        with patch.dict(os.environ,{"SMIAL_HFIC_PACKET_BYTES":"1000"}):
+            with self.assertRaises(PacketCapacityError) as raised:
+                build_challenger_packet(
+                    oversized_receipt,
+                    _representation_fixture(),
+                    cohort_readiness_receipt=_cohort_readiness_receipt(),
+                )
+        self.assertEqual(str(raised.exception), "HFIC_PACKET_RESOURCE_LIMIT_EXCEEDED")
 
 
 class RepresentationStatusTests(unittest.TestCase):

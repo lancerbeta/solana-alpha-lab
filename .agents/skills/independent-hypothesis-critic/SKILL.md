@@ -26,6 +26,11 @@ close confer different authority. Unknown or unrelated outcome text cannot close
 a family. Do not retrieve stores, raw results or a newer context yourself.
 Historical packets and snapshot 1.0 retain their original meanings.
 
+Mandatory memory may exceed64 records or64KiB. This is not a scientific flaw.
+Read the complete frozen packet under its saved selection contract; do not
+truncate it or retrieve newer memory. An actual resource refusal is technical:
+report its setting and resume the same packet after local capacity adjustment.
+
 Read `configs/hypothesis_forge_independent_critic_v1.yaml` and **PROMPT B** in
 `docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md`.
 

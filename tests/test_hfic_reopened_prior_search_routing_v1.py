@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -484,11 +485,9 @@ class PromptABodyTests(unittest.TestCase):
             self.assertNotIn("trajectory", packet)
             self.assertNotIn("normalized_trajectory_v1", packet)
 
-            with patch(
-                "solana_alpha_lab.factory.hfic_preflight.FORGE_OPERATIONAL_PACKET_MAX_BYTES",
-                64,
-            ):
-                with self.assertRaises(HficPreflightError) as raised:
+            from solana_alpha_lab.factory.hfic_packet_capacity import PacketCapacityError
+            with patch.dict(os.environ, {"SMIAL_HFIC_PACKET_BYTES":"64"}):
+                with self.assertRaises(PacketCapacityError) as raised:
                     build_forge_context_packet(
                         ROOT,
                         data_root,
@@ -504,7 +503,7 @@ class PromptABodyTests(unittest.TestCase):
                     )
                 self.assertEqual(
                     str(raised.exception),
-                    "FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED",
+                    "HFIC_PACKET_RESOURCE_LIMIT_EXCEEDED",
                 )
 
     def test_ordinary_ranker_unchanged_except_bodies(self) -> None:

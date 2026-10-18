@@ -16,11 +16,23 @@ The selector in hfic_generation_context owns projection only.
 | Research memory |1.1 BOUNDED_WORKING_SET|1.0 complete full snapshot|
 | Generation context |1.0, this policy revision|Absent where historical|
 
-The initial view contains at most8 capsules. Critic memory contains at most64.
-The complete serialized Critic parent, including all metadata, is at most65536
-bytes. Mandatory source overflow refuses before durable session publication;
-optional tails may be omitted with exact counts and source locators. Selection
-completeness never asserts archive completeness.
+Working-view recommendations are8 capsules and64KiB; mandatory source closure
+may exceed both automatically. Optional tails stay within those recommendations,
+with exact omission counts and source locators. One common operational resolver
+owns resource safeguards: default8MiB for the complete serialized packet,
+64MiB for external JSON reads, and10000 memory records. It measures the fully
+assembled parent, without estimated leftover budgets. Selection completeness
+never asserts archive completeness.
+
+`packet_capacity` in the HFIC config sets technical defaults. Local environment
+overrides `SMIAL_HFIC_WORKING_RECORDS`, `SMIAL_HFIC_WORKING_BYTES`,
+`SMIAL_HFIC_PACKET_BYTES`, `SMIAL_HFIC_JSON_BYTES` and
+`SMIAL_HFIC_RESOURCE_RECORDS` need no code change. New packets freeze their
+selection settings; cold replay retains saved sources/cutoff instead of
+reselecting under today's defaults. Explicit resource overrides can resume the
+same saved input after a typed `HFIC_*_RESOURCE_LIMIT_EXCEEDED` refusal. File
+readers consume at most the JSON allowance plus one sentinel byte. Capacity
+changes grant no scientific budget, exposure, eligibility or authority.
 
 Existing eligibility owns own-session outcomes, quarantine, lineage and both
 research clocks: effective_at and first_reliable_available_at. The first saved

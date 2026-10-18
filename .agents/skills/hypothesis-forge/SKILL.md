@@ -635,9 +635,9 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
    cutoff stays bound to the first saved preflight; same-run results are
    explicit accounted evidence, never a silent memory refresh. Do not emit
    HFIC-V1.3 Prompt A. If freeze returns
-   `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED`: BLOCKED, not a crash; session was
-   not written; do not launch Critic; do not paste a packet; do not retry the
-   same slash expecting success. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`.
+   a legacy capacity code or `HFIC_*_RESOURCE_LIMIT_EXCEEDED`: technical BLOCKED;
+   do not launch Critic on a partial packet. Adjust the reported local resource
+   setting and resume the same saved input, without a new MAIN or budget refund.
    If freeze returns `PRIOR_MEMORY_RECORD_UNIDENTIFIED`: BLOCKED; session was
    not written; do not launch Critic. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`.
 7. **Mandatory auto-handoff (selected path only):** launch Independent Critic in a new isolated context
@@ -788,14 +788,21 @@ Ordinary Prompt A packets now carry `ranked_prior_entries` one-to-one with
 
 ## Packet capacity vs missing prior body
 
-Ordinary Forge, representation CONTROL, and the challenger share one
-operational hard cap of **65536** bytes (`FORGE_OPERATIONAL_PACKET_MAX_BYTES`)
-and one growth-warning threshold of **20480** bytes
-(`FORGE_PACKET_GROWTH_WARNING_BYTES`). Resolve via
-`forge_context_packet_max_bytes(evidence_surface_mode)` — never from focus
-text, and no longer as a mode-split byte identity. This amends the previous
-16384 CONTROL freeze; it does not deny that freeze existed. Crossing 20480 warns;
-it does not drop required scientific information.
+Ordinary Forge, representation CONTROL, challenger and Critic consumers use
+the common `hfic_packet_capacity` resolver. Working recommendations are8 records
+and64KiB; mandatory closure may exceed both. Defaults protect actual complete
+packets at8MiB, external JSON at64MiB, and memory at10000 records. The20480-byte
+growth warning remains telemetry. Extra resource headroom does not expand
+optional recall. Historical packets retain their bytes and saved contracts.
+
+Use local `SMIAL_HFIC_PACKET_BYTES`, `SMIAL_HFIC_JSON_BYTES` or
+`SMIAL_HFIC_RESOURCE_RECORDS` to adjust technical capacity and resume the exact
+saved input without a PR or new owner choice. Fresh view recommendations use
+`SMIAL_HFIC_WORKING_RECORDS` / `SMIAL_HFIC_WORKING_BYTES`; frozen selections
+ignore today's recommendations. Do not drop mandatory/material evidence,
+quarantine valid history, reset budgets or rerun MAIN to repair capacity.
+`HFIC_*_RESOURCE_LIMIT_EXCEEDED` is a technical block with actual size/limit
+and setting, not `HFIC_PROTOCOL_INVALID` or a scientific negative.
 
 `RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE` means a ranked prior identity has no
 decision-useful resolvable body (one-to-one Prompt A body closure failed).
@@ -809,8 +816,9 @@ compaction.
 disposition-gated scientific minimum (typed close/PARK and known candidate review
 rejections with scope axes from
 shared `latest_hypothesis_decisions`) and the packet still cannot fit without
-stripping material feature grounding. Do not quarantine, drop ranked priors,
-or raise the packet limit inside a slash — return to owner.
+stripping material feature grounding. These legacy capacity codes do not grant
+scientific STOP authority. Preserve the saved input and use the common resource
+settings; unresolved missing bodies or invalid bindings still fail closed.
 
 Prompt A `ranked_prior_entries` use a Forge-specific projection
 (`compact_forge_prior_entry`) wired to the same DECISION_EVENT resolver as

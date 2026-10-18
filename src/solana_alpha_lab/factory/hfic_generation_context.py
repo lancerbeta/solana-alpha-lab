@@ -18,10 +18,14 @@ from solana_alpha_lab.factory.hfic_memory_policy import (
 )
 from solana_alpha_lab.factory.hfic_prior_memory import (
     _capsule_from_payload, _fill_scope_from_session, _session_scope_index,
-    latest_hypothesis_decisions, prior_memory_bounds, session_identity,
+    latest_hypothesis_decisions, session_identity,
 )
 from solana_alpha_lab.factory.research_store import reuse_lifecycle_reads_within_packet
 from solana_alpha_lab.factory.run_passport import canonical_json_bytes, canonical_sha256
+from solana_alpha_lab.factory.hfic_packet_capacity import (
+    PacketCapacity, PacketCapacityError, packet_capacity,
+    resolve_packet_capacity,
+)
 
 CONTRACT = "FORGE_EVIDENCE_GUIDED_GENERATION_V1"
 REVISION = CONTRACT
@@ -313,22 +317,15 @@ def _consulted_hypothesis_ids(by_id: Mapping[str, Mapping[str, Any]],
     return required
 
 
-def _mandatory_bound_error(required: set[str], *, consulted_refs: Sequence[str],
-                           max_records: int, max_bytes: int, **detail: Any) -> GenerationContextError:
-    return GenerationContextError(
-        "GENERATION_MANDATORY_CONTEXT_EXCEEDS_BOUND", mandatory_count=len(required),
-        mandatory_hypothesis_version_ids=sorted(required),
-        consulted_source_refs=sorted(set(consulted_refs)), max_records=max_records,
-        max_bytes=max_bytes, **detail,
-    )
-
-
 def select_working_snapshot(inventory: Mapping[str, Any], *, query: Mapping[str, Any],
                             inventory_digest: str, focus: str = "",
                             consulted_refs: Sequence[str] = (), mandatory_ids: Sequence[str] = (),
                             safety_receipt: Mapping[str, Any] | None = None,
-                            max_records: int = 64, max_bytes: int = 65536,
-                            parent_budget_bytes: int | None = None) -> dict[str, Any]:
+                            max_records: int | None = None, max_bytes: int | None = None,
+                            capacity: PacketCapacity | None = None) -> dict[str, Any]:
+    capacity = capacity or resolve_packet_capacity()
+    max_records = capacity.working_records if max_records is None else max_records
+    max_bytes = capacity.working_bytes if max_bytes is None else max_bytes
     payloads = inventory.get("selection_payloads", inventory["payloads"])
     eligible_sha = archive_fingerprint(inventory)
     by_id = {c["hypothesis_version_id"]: c for c in inventory["capsules"]}
@@ -336,9 +333,15 @@ def select_working_snapshot(inventory: Mapping[str, Any], *, query: Mapping[str,
     missing = required.difference(by_id)
     if missing:
         raise GenerationContextError("GENERATION_CONSULTED_SOURCE_UNAVAILABLE", hypothesis_version_ids=sorted(missing))
-    order = sorted(required) + [hyp for hyp in rank_structural_priors(payloads, query=query, focus=focus) if hyp not in required]
-    selected: list[dict[str, Any]] = []
-    bound = min(max_bytes, parent_budget_bytes) if parent_budget_bytes is not None else max_bytes
+    order = [hyp for hyp in rank_structural_priors(payloads, query=query, focus=focus) if hyp not in required]
+    # Recommendations bound optional output; every mandatory source comes first.
+    bound = min(max_bytes, capacity.packet_bytes)
+    record_target = min(max(max_records, len(required)), capacity.resource_records)
+    if len(required) > capacity.resource_records:
+        raise PacketCapacityError("HFIC_MEMORY_RESOURCE_LIMIT_EXCEEDED", stage="MANDATORY_CLOSURE",
+                                  actual_records=len(required), limit_records=capacity.resource_records,
+                                  setting="SMIAL_HFIC_RESOURCE_RECORDS")
+    selected = [{**by_id[hyp], "selection_reason": "MANDATORY_SOURCE_REF"} for hyp in sorted(required)]
     def envelope():
         count = len(selected)
         body = {
@@ -361,27 +364,32 @@ def select_working_snapshot(inventory: Mapping[str, Any], *, query: Mapping[str,
             "omission_summary": {"reason": "OPTIONAL_WORKING_SET_BOUND", "count": len(by_id)-count},
             "exact_detail_locator": {"command": "prior", "mode": "context-view", "selection_query_sha256": canonical_sha256({"query": query, "focus": focus, "consulted_refs": sorted(consulted_refs)})},
             "capsules": selected, "max_records": max_records, "max_bytes": max_bytes,
+            "operational_capacity": capacity.snapshot(),
         }
         return _seal(body)
     current = envelope()
-    if len(required) > max_records or current["bytes"] > bound:
-        raise _mandatory_bound_error(required, consulted_refs=consulted_refs, max_records=max_records, max_bytes=bound)
+    if current["bytes"] > capacity.packet_bytes:
+        raise PacketCapacityError("HFIC_MEMORY_RESOURCE_LIMIT_EXCEEDED", stage="MANDATORY_CLOSURE",
+                                  actual_bytes=current["bytes"], limit_bytes=capacity.packet_bytes,
+                                  setting="SMIAL_HFIC_PACKET_BYTES")
     for hyp in order:
-        if len(selected) == max_records:
+        if len(selected) >= record_target:
             break
-        item = {**by_id[hyp], "selection_reason": "MANDATORY_SOURCE_REF" if hyp in required else "STRUCTURAL_DIVERSITY_THEN_TEXT"}
+        item = {**by_id[hyp], "selection_reason": "STRUCTURAL_DIVERSITY_THEN_TEXT"}
         # Reject clearly oversized optional entries without repeatedly encoding
         # the already full working set for every archive entry.
-        if hyp not in required and selected and current["bytes"] + len(canonical_json_bytes(item)) > bound + 32:
+        if selected and current["bytes"] + len(canonical_json_bytes(item)) > bound + 32:
             continue
         selected.append(item)
         trial = envelope()
-        if len(selected) > max_records or trial["bytes"] > bound:
+        if trial["bytes"] > bound:
             selected.pop()
-            if hyp in required:
-                raise _mandatory_bound_error(required, consulted_refs=consulted_refs, max_records=max_records, max_bytes=bound)
         else:
             current = trial
+    if current["bytes"] > capacity.packet_bytes:
+        raise PacketCapacityError("HFIC_MEMORY_RESOURCE_LIMIT_EXCEEDED", stage="MEMORY_ENVELOPE",
+                                  actual_bytes=current["bytes"], limit_bytes=capacity.packet_bytes,
+                                  setting="SMIAL_HFIC_PACKET_BYTES")
     return current
 
 
@@ -409,7 +417,7 @@ def generation_brief(*, memory: Mapping[str, Any], safety: Mapping[str, Any] | N
 def candidate_working_view(store: Any, *, preflight: Mapping[str, Any] | None,
                            card: Mapping[str, Any], evidence: Mapping[str, Any],
                            cutoff: str | datetime | None, inventory_digest: str,
-                           repo_root: Any, parent_budget_bytes: int | None = None,
+                           repo_root: Any,
                            preserve_selected_as_mandatory: bool = True):
     """Full existing guard first; frozen mandatory material refs second."""
     from solana_alpha_lab.factory.hfic_grounded_discovery import card_claim_scope
@@ -446,11 +454,10 @@ def candidate_working_view(store: Any, *, preflight: Mapping[str, Any] | None,
     for ref in card.get("prior_work_refs") or []:
         if ref in known_refs or str(ref).startswith(("HYP-", "REC-", "HFIC-ART-")):
             material.add(ref)
-    records_bound, bytes_bound = prior_memory_bounds(repo_root)
+    capacity = packet_capacity(context, repo_root)
     view = select_working_snapshot(archive, query=scope, focus=str(card.get("claim") or ""),
                                   inventory_digest=inventory_digest, consulted_refs=sorted(material),
-                                  safety_receipt=safety, max_records=records_bound, max_bytes=bytes_bound,
-                                  parent_budget_bytes=parent_budget_bytes)
+                                  safety_receipt=safety, capacity=capacity)
     chosen = {c["hypothesis_version_id"] for c in view["capsules"]}
     guarded["prior_scope_relations"] = [r for r in guarded.get("prior_scope_relations") or [] if r.get("hypothesis_version_id") in chosen]
     brief = generation_brief(memory=view, safety=safety)
@@ -482,15 +489,17 @@ def read_context_view(store: Any, *, receipt: Mapping[str, Any], query_sha256: s
     if archive_fingerprint(archive) != memory.get("eligible_archive_sha256"):
         raise GenerationContextError("GENERATION_CONTEXT_MATERIAL_SOURCE_CHANGED")
     descriptor = memory["selection_query"]
-    detail_bound = 8
+    capacity = packet_capacity({"prior_memory": memory})
+    detail_bound = capacity.working_records
     if source_ref:
         # A saved result can be cited by several hypotheses. Keep its entire
         # mandatory source closure, without unrelated optional entries or a
         # higher global count/byte cap. Oversized closure still fails closed.
         by_id = {cap["hypothesis_version_id"]: cap for cap in archive["capsules"]}
-        detail_bound = min(64, len(_consulted_hypothesis_ids(by_id, [source_ref])))
+        detail_bound = len(_consulted_hypothesis_ids(by_id, [source_ref]))
     chosen = select_working_snapshot(archive, query=descriptor["query"], focus=descriptor["focus"], inventory_digest=digest,
-                                    consulted_refs=[source_ref] if source_ref else [], max_records=detail_bound)
+                                    consulted_refs=[source_ref] if source_ref else [], max_records=detail_bound,
+                                    capacity=capacity)
     return {"schema": "smial.generation-context-detail", "status": "READ_ONLY",
             "bound_selection_query_sha256": query_sha256,
             "source_preflight_receipt_sha256": receipt["preflight_receipt_sha256"],
@@ -499,18 +508,21 @@ def read_context_view(store: Any, *, receipt: Mapping[str, Any], query_sha256: s
             "view": chosen, "authority_granted": False}
 
 
-def fit_working_packet(packet: Mapping[str, Any], *, max_bytes: int = 65536) -> dict[str, Any]:
+def fit_working_packet(packet: Mapping[str, Any], *, max_bytes: int | None = None) -> dict[str, Any]:
     """Drop only optional tail entries against the complete serialized parent."""
     result = copy.deepcopy(dict(packet))
+    capacity = packet_capacity(result)
+    result["operational_capacity"] = capacity.snapshot()
+    max_bytes = capacity.packet_bytes if max_bytes is None else min(max_bytes, capacity.packet_bytes)
     while len(canonical_json_bytes(result)) > max_bytes:
         memory = result["prior_memory"]
         capsules = memory["capsules"]
         removable = [i for i,c in enumerate(capsules) if c["selection_reason"] != "MANDATORY_SOURCE_REF"]
         if not removable:
             required = {c["hypothesis_version_id"] for c in capsules if c["selection_reason"] == "MANDATORY_SOURCE_REF"}
-            raise _mandatory_bound_error(required, consulted_refs=memory.get("consulted_source_refs") or [],
-                                         max_records=memory["max_records"], max_bytes=max_bytes,
-                                         packet_bytes=len(canonical_json_bytes(result)))
+            raise PacketCapacityError("HFIC_PACKET_RESOURCE_LIMIT_EXCEEDED", stage="ASSEMBLED_PACKET",
+                                      mandatory_count=len(required), actual_bytes=len(canonical_json_bytes(result)),
+                                      limit_bytes=max_bytes, setting="SMIAL_HFIC_PACKET_BYTES")
         capsules.pop(removable[-1])
         memory.update(emitted_count=len(capsules), omitted_count=memory["archive_eligible_count"]-len(capsules), archive_complete_in_packet=False)
         memory["omission_summary"] = {"reason":"OPTIONAL_PARENT_PACKET_BOUND", "count":memory["omitted_count"]}

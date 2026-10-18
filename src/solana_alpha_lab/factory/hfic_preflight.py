@@ -35,6 +35,10 @@ from solana_alpha_lab.factory.hfic_clock import (
     render_canonical_utc,
 )
 from solana_alpha_lab.factory.hfic_provenance import is_hfic_record
+from solana_alpha_lab.factory.hfic_packet_capacity import (
+    DEFAULT_CAPACITY, PacketCapacityError, check_packet_resource, load_bounded_bytes,
+    packet_capacity, resolve_packet_capacity,
+)
 from solana_alpha_lab.factory.hfic_session import (
     PENDING_STATES,
     PROMPT_VERSION,
@@ -76,7 +80,7 @@ MAX_CLOSED_FAMILIES = 8
 MAX_CAPABILITIES = 16
 # One operational safety envelope for ordinary Forge, CONTROL, and challenger.
 # Not a scientific threshold and not a model context-window claim.
-FORGE_OPERATIONAL_PACKET_MAX_BYTES = 65536
+FORGE_OPERATIONAL_PACKET_MAX_BYTES = DEFAULT_CAPACITY.packet_bytes
 FORGE_PACKET_GROWTH_WARNING_BYTES = 20480
 # Compatibility aliases — same hard cap, not independent science gates.
 MAX_PACKET_BYTES = FORGE_OPERATIONAL_PACKET_MAX_BYTES
@@ -121,7 +125,7 @@ class HficPreflightError(ValueError):
         super().__init__(code)
 
 
-def forge_context_packet_max_bytes(evidence_surface_mode: str | None = None) -> int:
+def forge_context_packet_max_bytes(evidence_surface_mode: str | None = None, *, repo_root: Path | None = None) -> int:
     """Operational Forge context packet hard cap.
 
     Ordinary, CURRENT_REPRESENTATION_CONTROL, and the representation challenger
@@ -129,7 +133,7 @@ def forge_context_packet_max_bytes(evidence_surface_mode: str | None = None) -> 
     select a different byte ceiling. Do not infer from owner_focus text.
     """
     del evidence_surface_mode
-    return FORGE_OPERATIONAL_PACKET_MAX_BYTES
+    return resolve_packet_capacity(repo_root).packet_bytes
 
 
 def _stamp_packet_growth_warning(packet: dict[str, Any], encoded: bytes) -> None:
@@ -139,9 +143,7 @@ def _stamp_packet_growth_warning(packet: dict[str, Any], encoded: bytes) -> None
     receipt["packet_bytes"] = size
     receipt["growth_warning_bytes"] = FORGE_PACKET_GROWTH_WARNING_BYTES
     receipt["growth_warning"] = size > FORGE_PACKET_GROWTH_WARNING_BYTES
-    receipt["max_packet_bytes"] = forge_context_packet_max_bytes(
-        packet.get("evidence_surface_mode") if isinstance(packet, dict) else None
-    )
+    receipt["max_packet_bytes"] = packet_capacity(packet).packet_bytes
     packet["truncation_receipt"] = receipt
 
 
@@ -1742,7 +1744,7 @@ def verify_forge_context_packet(data_root: Path, digest: str) -> dict[str, Any]:
         raise HficPreflightError("FORGE_CONTEXT_ARTIFACT_INVALID")
     if not blob.is_file():
         raise HficPreflightError("FORGE_CONTEXT_ARTIFACT_MISSING")
-    body = blob.read_bytes()
+    body = load_bounded_bytes(blob)
     if hashlib.sha256(body).hexdigest() != digest:
         raise HficPreflightError("FORGE_CONTEXT_HASH_MISMATCH")
     try:
@@ -1753,6 +1755,7 @@ def verify_forge_context_packet(data_root: Path, digest: str) -> dict[str, Any]:
         raise HficPreflightError("FORGE_CONTEXT_ARTIFACT_INVALID")
     if canonical_sha256(loaded) != digest:
         raise HficPreflightError("FORGE_CONTEXT_HASH_MISMATCH")
+    check_packet_resource(loaded, stage="FROZEN_CONTEXT_READ")
     try:
         store = ResearchStore(Path(data_root))
         artifact = _lookup_forge_context_artifact(store, digest)
@@ -1971,7 +1974,9 @@ def build_forge_context_packet(
             raise HficPreflightError(exc.code, locator=exc.detail) from exc
         if original_memory is not None:
             prior_cutoff = original_memory["research_log_cutoff"]
-    packet_bound = forge_context_packet_max_bytes(evidence_surface_mode)
+    capacity = (packet_capacity({"prior_memory": original_memory}, repo_root)
+                if original_memory is not None else resolve_packet_capacity(repo_root))
+    packet_bound = capacity.packet_bytes
     datasets, warnings = enumerate_rdp_datasets(
         Path(data_root),
         live_corpus_current_only=True,
@@ -2422,6 +2427,7 @@ def build_forge_context_packet(
                         "state": "UNAVAILABLE",
                         "reason_code": exc.code,
                     }
+    packet["operational_capacity"] = capacity.snapshot()
     if evidence_surface_mode != "CURRENT_REPRESENTATION_CONTROL_V1" and collection_for_focus(owner_focus):
         from solana_alpha_lab.factory.hfic_generation_context import (
             GenerationContextError, collect_verified_priors, generation_brief,
@@ -2433,8 +2439,7 @@ def build_forge_context_packet(
             view = reissue_working_view(original_memory, archive, inventory_digest=store.diagnostics().committed_inventory_sha256) if original_memory is not None else select_working_snapshot(
                 archive, query=query, focus=owner_focus,
                 inventory_digest=store.diagnostics().committed_inventory_sha256,
-                max_records=MAX_RANKED_PRIORS,
-                parent_budget_bytes=packet_bound-len(canonical_json_bytes(packet))-4096,
+                capacity=capacity,
             )
         except GenerationContextError as exc:
             raise HficPreflightError(exc.code, locator=exc.detail) from exc
@@ -2502,7 +2507,7 @@ def build_forge_context_packet(
         # feature grounding to squeeze the packet — that would mislabel the
         # failure as FORGE_VISION_INTEGRITY_BLOCKED.
         if _ranked_priors_carry_minimal_scientific_scope(packet):
-            raise HficPreflightError(MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND)
+            check_packet_resource(packet, capacity=capacity, stage="PREFLIGHT_ENVELOPE")
         # Drop redundant per-feature grounding detail (already represented by
         # the compact availability index) while keeping the source digest.
         packet["feature_grounding_entries"] = []
@@ -2515,7 +2520,7 @@ def build_forge_context_packet(
         }
         encoded = canonical_json_bytes(packet)
     if len(encoded) > packet_bound:
-        raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)
+        check_packet_resource(packet, capacity=capacity, stage="PREFLIGHT_ENVELOPE")
     vision_verdict = evaluate_assembled_packet_vision(
         packet,
         all_grounding_entries=all_grounding_entries,
@@ -2540,9 +2545,7 @@ def build_forge_context_packet(
         }
         encoded = canonical_json_bytes(packet)
     if len(encoded) > packet_bound:
-        if _ranked_priors_carry_minimal_scientific_scope(packet):
-            raise HficPreflightError(MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND)
-        raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)
+        check_packet_resource(packet, capacity=capacity, stage="PREFLIGHT_ENVELOPE")
     if vision.get("status") != "PASS":
         raise HficPreflightError(FORGE_VISION_INTEGRITY_BLOCKED)
     stabilized = False
@@ -2554,11 +2557,10 @@ def build_forge_context_packet(
             break
         encoded = restamped
         if len(encoded) > packet_bound:
-            if _ranked_priors_carry_minimal_scientific_scope(packet):
-                raise HficPreflightError(MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND)
-            raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)
+            check_packet_resource(packet, capacity=capacity, stage="PREFLIGHT_ENVELOPE")
     if not stabilized:
-        raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)
+        raise HficPreflightError("FORGE_PACKET_TELEMETRY_UNSTABLE")
+    check_packet_resource(packet, capacity=capacity, stage="PREFLIGHT_FINAL_ENVELOPE")
     if persist:
         digest = persist_forge_context_packet(
             data_root,
@@ -2764,6 +2766,8 @@ def try_packet_bound_vision(
             selection_caveat=ident.get("selection_caveat"),
         )
     except (HficPreflightError, ResearchStoreError, OSError, ValueError) as exc:
+        if isinstance(exc, PacketCapacityError):
+            raise
         code = str(exc) or FORGE_VISION_INTEGRITY_BLOCKED
         if isinstance(exc, HficPreflightError) and code.startswith(("FORGE_CONTEXT_", "GENERATION_")):
             # Preserve exact immutable dependencies and source/cutoff failures.
