@@ -24,6 +24,7 @@ RESEARCH_CLASSES = frozenset({"RESEARCH", "EXPERIMENT", "EVIDENCE_DECISION"})
 RESEARCH_KINDS = frozenset(
     {
         "HYPOTHESIS_VERSION",
+        "RESEARCH_FRAGMENT",
         "TRIAL",
         "DECISION_EVENT",
         "DECISION",
@@ -36,6 +37,8 @@ KIND_FILTERS = frozenset(
     {
         "all",
         "hypotheses",
+        "fragments",
+        "RESEARCH_FRAGMENT",
         "experiments",
         "trials",
         "decisions",
@@ -123,6 +126,8 @@ def _matches_kind(entity: Mapping[str, Any], kind: str | None) -> bool:
     native = str(entity.get("native_kind") or "")
     if kind == "hypotheses":
         return native == "HYPOTHESIS_VERSION"
+    if kind == "fragments":
+        return native == "RESEARCH_FRAGMENT"
     if kind == "experiments":
         return native in {"EXPERIMENT_SPEC", "EXPERIMENT_RUN"}
     if kind == "trials":
@@ -334,6 +339,7 @@ def _row(entity: Mapping[str, Any]) -> dict[str, Any]:
         "locator": _locator_for(entity),
         "kind": entity.get("native_kind"),
         "title": title,
+        "fragment": (entity.get("source_owned_fields") or {}).get("research_fragment"),
         "native_state": entity.get("native_state"),
         "display_state": entity.get("display_state"),
         "truth_plane": entity.get("truth_plane"),

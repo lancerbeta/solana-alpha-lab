@@ -175,7 +175,7 @@ def _admit_episode_binding(cohorts: Sequence[Mapping[str, Any]]) -> dict[str, An
     }
 
 
-def resolve_published_episode_binding(data_root: Path) -> dict[str, Any]:
+def resolve_published_episode_binding(data_root: Path, *, cohort_ids: Sequence[str] | None = None) -> dict[str, Any]:
     """Episode corpus binding from metadata only; protection precedes values.
 
     Each run re-reads the frozen release protection sources and every current
@@ -229,6 +229,13 @@ def resolve_published_episode_binding(data_root: Path) -> dict[str, Any]:
         str(item) for item in labels.get("cohort_lineage") or []
     }:
         raise GroundedDiscoveryError("DISCOVERY_SCOPE_UNSUPPORTED")
+    if cohort_ids is not None:
+        # An explicit metadata-selected window never reads unrelated protected
+        # cohorts, nor silently drops a missing member of its denominator.
+        wanted = set(cohort_ids)
+        if not wanted or not wanted <= {str(item["cohort_id"]) for item in raw_cohorts}:
+            raise GroundedDiscoveryError("SCOPE_COHORT_NOT_IN_BINDING")
+        raw_cohorts = [item for item in raw_cohorts if str(item["cohort_id"]) in wanted]
     current_documents = []
     assignment_dir = root / ASSIGNMENT_DIR
     if assignment_dir.is_dir():

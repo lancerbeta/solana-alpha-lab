@@ -110,6 +110,14 @@ class _LineageMoved(Exception):
     """Internal: the representation line changed between planning and commit; plan again."""
 
 
+def _validate_fragment_operation(store: Any, operation: Mapping[str, Any], **kwargs: Any) -> None:
+    from solana_alpha_lab.factory.research_fragments import validate_operation
+    try:
+        validate_operation(store, operation, **kwargs)
+    except (ValueError, KeyError, TypeError, OSError) as exc:
+        raise OrdinaryOperationError(str(getattr(exc, "code", "FRAGMENT_OPERATION_INVALID"))) from exc
+
+
 def record_operation(
     store: Any, request: Mapping[str, Any], *, create_if_missing: bool = True, _attempt: int = 0
 ) -> dict[str, Any]:
@@ -205,6 +213,14 @@ def record_operation(
     }
     if representation is not None:
         identity_body["representation"] = representation
+    if request.get("fragment_check") is not None:
+        # A narrow source-owned ingress for an approved fixed-fragment check.
+        # It still uses the ordinary operation, policy snapshot and reservation.
+        if not isinstance(request["fragment_check"], Mapping) or set(request["fragment_check"]) != {
+            "fragment_version_id", "plan_sha256", "window", "window_key", "binding", "market_evidence_basis", "capability_epoch_sha256"
+        }:
+            raise OrdinaryOperationError("FRAGMENT_OPERATION_INVALID")
+        identity_body["fragment_check"] = dict(request["fragment_check"])
     if cycle_index:
         # Only an explicitly authorized additional AUTO cycle is marked; cycle 1 digests are unchanged.
         identity_body["cycle_index"] = cycle_index
@@ -237,6 +253,8 @@ def record_operation(
         "schema": "smial.hfic-ordinary-operation",
         "schema_version": "1.0",
     }
+    if stored.get("fragment_check"):
+        _validate_fragment_operation(store, stored)
     # The frozen accounting snapshot is stamped only on genuine creation. A
     # journal that already carries operations or looks pre-dates this runtime
     # and freezes at the shipped defaults, never at today's raised policy.
@@ -249,6 +267,8 @@ def record_operation(
         # in between, this commit does not happen (no orphan budget) and the request is planned again.
         if any(item.get("operation_sha256") == digest for item in list_operations(store)):
             raise _LineageMoved()
+        if stored.get("fragment_check"):
+            _validate_fragment_operation(store, stored)
         if cycle_index:
             _validated_lineage_link(store, request, journal=journal, focus=focus, market=market, cycle_index=int(cycle_index))
         if representation is not None and not cycle_index:
@@ -735,6 +755,10 @@ def _assert_preflight_journal(
 ) -> None:
     """Journal must be the preflight search key for this market and focus."""
 
+    if operation.get("fragment_check"):
+        _validate_fragment_operation(store, operation, data_root=data_root, repo_root=repo_root)
+        return
+
     from pathlib import Path
 
     from solana_alpha_lab.factory.hfic_evidence_identity import (
@@ -1001,7 +1025,7 @@ def _admit(store: Any, operation: Mapping[str, Any], *, repo_root: Any = None, d
     # AUTO and distinct-focus are a pool shared by the whole market epoch, so
     # their cap comes from the epoch's own frozen scope, never from one journal.
     pool = epoch_limits(store, str(operation.get("market_evidence_epoch_sha256") or ""))
-    market_basis = None
+    market_basis = (operation.get("fragment_check") or {}).get("market_evidence_basis")
     if repo_root is not None and data_root is not None:
         from pathlib import Path
         from solana_alpha_lab.factory.hfic_evidence_identity import (
@@ -1012,7 +1036,11 @@ def _admit(store: Any, operation: Mapping[str, Any], *, repo_root: Any = None, d
             _epoch, market_basis = compute_market_epoch_for_data_root(Path(repo_root), Path(data_root))
         except EvidenceIdentityError as exc:
             raise OrdinaryOperationError(exc.code) from exc
-        if _epoch != operation.get("market_evidence_epoch_sha256"):
+        if operation.get("fragment_check"):
+            # The exact published subset is reverified by its source owner.
+            # A later compatible import cannot replace a pending input set.
+            market_basis = operation["fragment_check"]["market_evidence_basis"]
+        elif _epoch != operation.get("market_evidence_epoch_sha256"):
             raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
     return resolve_scientific_admission(
         sessions,
@@ -1104,7 +1132,7 @@ def authorize_temporal_attempt(
             raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_UNVERIFIED")
         if verified_market != operation.get("market_evidence_epoch_sha256"):
             raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
-        if repo_root is not None and data_root is not None:
+        if operation.get("fragment_check") or (repo_root is not None and data_root is not None):
             _assert_preflight_journal(
                 store, operation, journal_scope, repo_root=repo_root, data_root=data_root
             )
@@ -1254,7 +1282,7 @@ def authorize_episode_view(
         raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_UNVERIFIED")
     if verified_market != operation.get("market_evidence_epoch_sha256"):
         raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
-    if repo_root is not None and data_root is not None:
+    if operation.get("fragment_check") or (repo_root is not None and data_root is not None):
         _assert_preflight_journal(store, operation, journal_scope, repo_root=repo_root, data_root=data_root)
     landed = {str(item.get("spec_sha256") or "") for item in _feature_previews(store, journal_scope)}
     if descriptor_sha256 in landed:
@@ -1353,7 +1381,7 @@ def gate_before_values(
     if verified_market != operation.get("market_evidence_epoch_sha256"):
         raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
     require_focus_population(operation.get("owner_focus"), spec)
-    if repo_root is not None and data_root is not None:
+    if operation.get("fragment_check") or (repo_root is not None and data_root is not None):
         _assert_preflight_journal(
             store, operation, journal_scope, repo_root=repo_root, data_root=data_root
         )
@@ -1703,6 +1731,8 @@ def _reserve(
 
     def _check() -> None:
         current = get_operation(store, digest)
+        if current.get("fragment_check"):
+            _validate_fragment_operation(store, current)
         if look_class in {"main", "adaptive"}:
             _assert_no_foreign_pending(store, current, spec_sha256)
             _assert_no_landed_result(store, current, spec_sha256, **row_context)

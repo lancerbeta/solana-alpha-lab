@@ -1,0 +1,117 @@
+{
+  "as_of": "2026-10-18",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_MERGE"
+  ],
+  "remediation_history": [
+    {
+      "finding": "Plan/accounting exception erased verified fragment evidence from ordinary prior.",
+      "observed_head": "f8d369f0f7c95d90eff28c2f65d0b48af9c70a83",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "cf9541db5c9d994a9b9cab5cd5fdc76ddfd7babc",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Future trigger masked current blocker and recovery guidance.",
+      "observed_head": "f8d369f0f7c95d90eff28c2f65d0b48af9c70a83",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "cf9541db5c9d994a9b9cab5cd5fdc76ddfd7babc",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Landed native result without CHECK falsely displayed COMPLETE before metadata recovery.",
+      "observed_head": "f8d369f0f7c95d90eff28c2f65d0b48af9c70a83",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "cf9541db5c9d994a9b9cab5cd5fdc76ddfd7babc",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Unfiltered PLAN lookup/order or invalid inner binding could erase trusted evidence or label untrusted rule basis AVAILABLE; corrupt PLAN could compete with its CARD.",
+      "observed_head": "97d0e9302c100fa416c0892c7b6b876b6bcb6ad9",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "4e536398b15eaeae4816605f3ef63d57d684a99a",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Unfiltered PLAN lookup/order or invalid inner binding could erase trusted evidence or label untrusted rule basis AVAILABLE; corrupt PLAN could compete with its CARD.",
+      "observed_head": "97d0e9302c100fa416c0892c7b6b876b6bcb6ad9",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "4e536398b15eaeae4816605f3ef63d57d684a99a",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Unfiltered PLAN lookup/order or invalid inner binding could erase trusted evidence or label untrusted rule basis AVAILABLE; corrupt PLAN could compete with its CARD.",
+      "observed_head": "97d0e9302c100fa416c0892c7b6b876b6bcb6ad9",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "4e536398b15eaeae4816605f3ef63d57d684a99a",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Post-merge registration scope copy conflicted between task stop and owner readback; aligned with latest direct owner authorization.",
+      "observed_head": "97d0e9302c100fa416c0892c7b6b876b6bcb6ad9",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "4e536398b15eaeae4816605f3ef63d57d684a99a",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
+    }
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "review_id": "SMIAL_RESEARCH_FRAGMENTS_V1-REVIEW",
+  "reviewed_bindings_sha256": "8291b71b8eda734aad9793623ac2583b3306a485dde45ff7d90ba27a18c9b3d4",
+  "reviewed_inventory_sha256": "c087af15160c7d54a4692427a5b735ee0a713b5e8610c256acd7e5c9e09d6ef8",
+  "reviews": [
+    {
+      "findings": [
+        "Isolated read-only; candidate 4e536398b15eaeae4816605f3ef63d57d684a99a; 31/31 committed/worktree bindings and canonical aggregates MATCH. No suites, real Store/market access or writes. Fresh exact-head CI required.",
+        "All4 consumers use exact PLAN-kind, inner canonical SHA and uniqueness. Missing/corrupt basis UNKNOWN; dependent BLOCKED; trusted results survive without a competing metadata error-card. Latest native operation owns pending recovery; explicit STOP preserves reservation and no CHECK/refund/verdict. No remaining correctness/security/regression findings."
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Isolated read-only; candidate 4e536398b15eaeae4816605f3ef63d57d684a99a; 31/31 committed/worktree bindings and canonical aggregates MATCH. No suites, real Store/market access or writes. Fresh exact-head CI required.",
+        "Two-window native vertical and nonzero matched readback satisfy bounded patch outcome. Original PLAN damage/order no longer removes shelf/prior evidence. Four acceptance levels remain separate; real seed/plan/new evidence unperformed. Post-merge exact seed registration is authorized; enable/new science requires current protection and exact plan scope."
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "packet_fingerprint_sha256=c17df1c6ecfa1deb9663428727182b3237e755be900e43a914d820a988d21918",
+        "Isolated read-only; candidate 4e536398b15eaeae4816605f3ef63d57d684a99a; 31/31 committed/worktree bindings and canonical aggregates MATCH. No suites, real Store/market access or writes. Fresh exact-head CI required.",
+        "SEMANTIC_PREMISE PASS. Six metadata probes: PLAN/CHECK order, missing/corrupt/stale-hash/duplicate PLAN preserve one card, two blocks and ordinary prior; unavailable basis UNKNOWN and execution BLOCKED. Native owners retained; no new compatibility framework, evaluator, accounting or scheduler.",
+        "Tests can pass while proxy and source-event-time UNKNOWN or shared/adaptive exposure are misread as independent OOS or executable return. Neither claim is made. Bounded4 day/cohort prefix explicitly reports truncation; full day pagination is not claimed.",
+        "PACKET_INFORMATION_PATH; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Isolated read-only; candidate 4e536398b15eaeae4816605f3ef63d57d684a99a; 31/31 committed/worktree bindings and canonical aggregates MATCH. No suites, real Store/market access or writes. Fresh exact-head CI required.",
+        "Exact no-result attempts/reservations/consequences visible despite pause/expiry, explicit native STOP path and no-refund meaning clear. Day/cohort/dependence and rule grounds shared by shelf/prior. Post-merge task stop and SEED_REGISTERED reason aligned with direct owner request. No remaining owner UX findings."
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "SMIAL_RESEARCH_FRAGMENTS_V1",
+  "verdict": "PASS"
+}

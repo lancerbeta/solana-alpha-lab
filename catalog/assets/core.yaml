@@ -25744,7 +25744,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: 3a59bcf2bd4951784b401bcbd250b4e99ee7f68be423964832760f1649f0218e}
+  integrity: {kind: sha256, sha256: 92cdc4e2902769bc8797b3c8f93d9a0adb10dd502380c61929711c2da17d29fa}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -27680,7 +27680,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 61b14f8d46171544b918d8b7788c47d337ec180d16ed1d403982807cb064afda}
+  integrity: {kind: sha256, sha256: 4b8d7ce813b6cbd2735ae56708bf88418eb91d502da7c3affa728df8572a9326}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -34732,7 +34732,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: 923cc07b9a687011720718ca73563c86cdb1b79e932c8b8447380d0367038876}
+  integrity: {kind: sha256, sha256: ffce0893cbb1820be708ddd594a94902706a18966ef79ed600f91d257e453958}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-NATIVE-LIFECYCLE-CLOSURE-001}
@@ -36153,7 +36153,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/owner_lifecycle_projection_v1.schema.json', repository_path: catalog/schemas/owner_lifecycle_projection_v1.schema.json}
-  integrity: {kind: sha256, sha256: d4cadc225fc20c7a0217099ffceac8d57786a94750d20acfe767ae947189532f}
+  integrity: {kind: sha256, sha256: b472f99a07ad536a8f8502535b5672b0b374a16d8d5afb575df01e06c336cf9f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -36170,7 +36170,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/owner_lifecycle_projection_spine_v1.md', repository_path: docs/contracts/owner_lifecycle_projection_spine_v1.md}
-  integrity: {kind: sha256, sha256: 03da9ac9f2253bc8db56f03a29fd8d56144cc98fdaedc4b8c6614a990bd13d12}
+  integrity: {kind: sha256, sha256: f4d9992d231c45d97a787d0c53b84733a3a915539eda612e4ddee0f9b3a64d3a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -36190,7 +36190,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lifecycle_projection.py', repository_path: src/solana_alpha_lab/factory/lifecycle_projection.py}
-  integrity: {kind: sha256, sha256: b5be044c88194c8ad3e5a984ca3170a28b0fda0ee4a704466a2e6d2cc4f97f04}
+  integrity: {kind: sha256, sha256: 4301062b94fa99df2975976c639b143795eff7ef8b95905a2ecce28ee1a93979}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -36263,7 +36263,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: RESEARCH_LIFECYCLE_WORKBENCH_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/research_lifecycle_workbench_v1.md', repository_path: docs/contracts/research_lifecycle_workbench_v1.md}
-  integrity: {kind: sha256, sha256: 4bf166e78a607f90f18009d47f10db317ba7bba679d6140568103f05b590f988}
+  integrity: {kind: sha256, sha256: 7e03de22fe1d19b83095eda8bee2f0d485f81e878df62cc1e111a94277f0bb7c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001}
@@ -36282,7 +36282,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: RESEARCH_LIFECYCLE_WORKBENCH_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_workbench.py', repository_path: src/solana_alpha_lab/factory/research_workbench.py}
-  integrity: {kind: sha256, sha256: acc9cb3b07e920b41187d300b33beda7e27987a9efaf09f212139227e836aeca}
+  integrity: {kind: sha256, sha256: 6122a064d038fd2e9ba501d774f6fad316bf57aff772b639e9dc013eb161383f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001}
@@ -36380,7 +36380,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_language.py', repository_path: src/solana_alpha_lab/factory/owner_language.py}
-  integrity: {kind: sha256, sha256: a65008f623f7cd1d8b3ce7176fa8548d321e1fb84b0d49226d2991e099f82771}
+  integrity: {kind: sha256, sha256: 36b2bbfe0f4ed58606f5d70814ab430d389d338ec31ba5c9759aea2d3ea98845}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -38607,7 +38607,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py', repository_path: src/solana_alpha_lab/factory/hfic_evidence_identity.py}
-  integrity: {kind: sha256, sha256: 52831722008aae2dda16681eed22acc528a9e502789bf006afa82c9835ff6f73}
+  integrity: {kind: sha256, sha256: c30224918bdf58e813f3af7e862f7c714ee4f557f2b95402cdc37507cc271cc1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
@@ -40222,7 +40222,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/opportunity_episode_release.py', repository_path: src/solana_alpha_lab/factory/opportunity_episode_release.py}
-  integrity: {kind: sha256, sha256: ba60fdc15c8838aa84362ce3b7cb1ad33033afe8bff4374088e3660cef744cf0}
+  integrity: {kind: sha256, sha256: d707da475deb7dfe390dc051da337099b8fb2fd2e711bf2eba28384ea6d46fab}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
@@ -40632,7 +40632,7 @@ records:
   as_of: '2026-10-09'
   truth_owner: FORGE_EVIDENCE_GUIDED_GENERATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_evidence_guided_generation_v1.md', repository_path: docs/contracts/forge_evidence_guided_generation_v1.md}
-  integrity: {kind: sha256, sha256: e365ea505ca19e4de863fe17c30ea08d6a89060f9aa46a8c059d9fcafdc30dfc}
+  integrity: {kind: sha256, sha256: b81508b748e6841c3bcf1bcb9b20311d9f75d2609050e47c5e5a10e3ee693567}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -40650,7 +40650,7 @@ records:
   as_of: '2026-10-09'
   truth_owner: FORGE_EVIDENCE_GUIDED_GENERATION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_generation_context.py', repository_path: src/solana_alpha_lab/factory/hfic_generation_context.py}
-  integrity: {kind: sha256, sha256: e3c858f0d798fafe80141db1697fd27c0f30fbeba7d7bcdf9e47b15815bbf0c4}
+  integrity: {kind: sha256, sha256: 7cab231d392f92c9286a69d3269bd0dcd8475f0814b98f23351be288aeb69cda}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001}
@@ -43310,4 +43310,89 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
   evidence: []
   search_terms: [FORGE_PACKET_CAPACITY_RESUME_V1, packet capacity, mandatory closure, frozen resume]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-RESEARCH-FRAGMENTS-V1-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Source-owned fragment registration, one snapshot, bounded native due and cold resume.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-18'
+  truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_fragments.py', repository_path: src/solana_alpha_lab/factory/research_fragments.py}
+  integrity: {kind: sha256, sha256: b1f62853834e5ec6fa83d512d3ee706a66fafa9885d4770379669e93ca19642d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [SMIAL_RESEARCH_FRAGMENTS_V1, research fragments, source snapshot, bounded due, cold resume]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-RESEARCH-FRAGMENTS-V1-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Explicit native fragment read/preview/apply and run-due operator ingress.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-18'
+  truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/research_fragments.py', repository_path: scripts/research_fragments.py}
+  integrity: {kind: sha256, sha256: 9f08f739141c72ff45a10e6a3dd5a97e4a5d7d3a20345ee88d84ceeb2c8a84cc}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [SMIAL_RESEARCH_FRAGMENTS_V1, research fragments, source snapshot, bounded due, cold resume]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-RESEARCH-FRAGMENTS-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Additive ResearchStore fragment, plan and check artifact envelopes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-18'
+  truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/research_fragment_v1.schema.json', repository_path: catalog/schemas/research_fragment_v1.schema.json}
+  integrity: {kind: sha256, sha256: 7c9d6324d784fd8864fe4889a77f18add844f65af0687cef59fd7621e5accefa}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [SMIAL_RESEARCH_FRAGMENTS_V1, research fragments, source snapshot, bounded due, cold resume]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: DOC-RESEARCH-FRAGMENTS-V1-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Native research fragment shelf, authorization, import follow-up and recovery contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-18'
+  truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/operator/RESEARCH_FRAGMENTS_V1.md', repository_path: docs/operator/RESEARCH_FRAGMENTS_V1.md}
+  integrity: {kind: sha256, sha256: 14c27b59506fa7674c167fbfd7642f32184bb073fc83d64ba841dd36ab25d660}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [SMIAL_RESEARCH_FRAGMENTS_V1, research fragments, source snapshot, bounded due, cold resume]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-RESEARCH-FRAGMENTS-V1-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Synthetic production registration/prior/freeze/import/reservation/result/cold-resume vertical.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-18'
+  truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_research_fragments_v1.py', repository_path: tests/test_research_fragments_v1.py}
+  integrity: {kind: sha256, sha256: b9029a68572d3253cea1843b7b2129ad4acfac74d9c9496a2d378a80e9308003}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [SMIAL_RESEARCH_FRAGMENTS_V1, research fragments, source snapshot, bounded due, cold resume]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

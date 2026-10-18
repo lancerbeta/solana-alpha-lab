@@ -44,6 +44,15 @@ their conjunction. Prefer a distinct observable prediction and a fixed test
 against the strongest mundane explanation. Abstain when no useful distinction
 is supported; do not require a causal story for a PREDICTIVE card.
 
+Registered `RESEARCH_FRAGMENT_V1` observations enter the same ordinary bounded
+prior capsule as their source candidate (`source_detail.research_fragments`).
+Cite the exact RFV/artifact/result ref in `prior_work_refs` when material; the
+normal context-view reader and frozen Critic closure retain that source at the
+original cutoff. A shelf card grants no MAIN, strategy or confirmation. Scout
+H/L is a distinct mechanism, not the price/liquidity-return fragment. Monitoring
+is explicitly exploratory unless source-owned end-to-end protection proves
+otherwise. Commands and the import/resume owner: `docs/operator/RESEARCH_FRAGMENTS_V1.md`.
+
 Use `episode_query_capabilities.query_authoring_contract` for fresh query 1.2;
 the old public 1.0 schema is a historical BASE_X reader. Resolve the authored
 query through `research-scope-resolve` before values. Operator, point, field and

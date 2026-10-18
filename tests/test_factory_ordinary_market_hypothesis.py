@@ -40,14 +40,15 @@ PRODUCT_TERMINAL = "ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE"
 # confirming producer registrations; this is a current engineering pin.
 # application.py moved only for PAPER_PLANE_READ_FRESHNESS_V1 readonly
 # request ownership, snapshots and materialized owner projections. Workbench
-# moved only for FORGE_TRUST_CLOSURE_V1 lineage-gap readout. The other three
+# moved for FORGE_TRUST_CLOSURE_V1 lineage-gap readout and the additive
+# SMIAL_RESEARCH_FRAGMENTS_V1 /research presentation. The other three
 # files retain the ordinary-hypothesis pin. Composition tests below remain
 # the behavioral regression; these hashes are not a scientific result.
 FACTORY_CORE = {
     "src/solana_alpha_lab/factory/runner.py": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
     "src/solana_alpha_lab/factory/capabilities.py": "3b6f0c00cec42fcc60ebbb56f3d56c9ceadf0c6c65e1a9ae545b79176c391065",
     "src/solana_alpha_lab/factory/read_model.py": "107e91ef8e9aef8e09e2733fd93407c873f80ddf8feeeaab07bf5d4a3684ed9a",
-    "src/solana_alpha_lab/factory/workbench.py": "3a59bcf2bd4951784b401bcbd250b4e99ee7f68be423964832760f1649f0218e",
+    "src/solana_alpha_lab/factory/workbench.py": "92cdc4e2902769bc8797b3c8f93d9a0adb10dd502380c61929711c2da17d29fa",
     "src/solana_alpha_lab/factory/market_feature_surface.py": "e6bbb655629da5582eaf30571a07ca37dac28aefdb93a4b808cf57ae45958e2b",
     "src/solana_alpha_lab/factory/application.py": "73e02402a8f6e0a294a9c580a64c623f3c6bb6fe4f1afd31557edc0cf3ea6fc3",
 }

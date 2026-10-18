@@ -1,0 +1,60 @@
+{
+  "axes_compared": [
+    "features",
+    "predicates",
+    "decision_point",
+    "target",
+    "entry_model",
+    "cost_profile",
+    "contrast",
+    "observation_clock_policy",
+    "population",
+    "anchor_kind",
+    "time_contract"
+  ],
+  "current_protection": {
+    "reason": "HOLDOUT_UNRESOLVED",
+    "sources": [],
+    "status": "UNRESOLVED_SCOPE"
+  },
+  "data_scope": "EXPLICIT_SAVED_COHORT_IDS_COMPILER_PROBE_ONLY",
+  "final_readback": {
+    "current_protection": {
+      "reason": "HOLDOUT_UNRESOLVED",
+      "sources": [],
+      "status": "UNRESOLVED_SCOPE"
+    },
+    "native_main": {
+      "completed": 1,
+      "deficit": 0,
+      "limit": 6,
+      "occupied": 1,
+      "pending": 0,
+      "remaining": 5
+    },
+    "new_look": false,
+    "operation_effective_state": "COMPLETED",
+    "real_fragment_count": 0,
+    "registration_fragment_id": "RFV-8228C9408D18DE5CC98C9C1EA924B1C8",
+    "research_store_unchanged": true,
+    "result_sha256": "39028f4afacd8c0af9575ee37bf0447be10c19f147fda56bcb62ce9114d68c87",
+    "values_loaded": false,
+    "writes": 0
+  },
+  "known_exposure": "SCOUT_ADAPTIVE_SAME_HISTORY_NOT_OOS",
+  "monitoring_ablations": "NONE",
+  "new_look": false,
+  "research_store_writes": 0,
+  "scientific_axes_unchanged": true,
+  "scout_access_boundary": "EXPOSED_OR_UNKNOWN",
+  "source_clock_boundary": "PRICE_RELATIVE_PROXY_REFERENCE_EXIT_EVENT_TIMES_UNKNOWN",
+  "source_definition_sha256": "297e8ef0f13ff93bacb39318dc57a6044c00e321a173ae6ecf763bd8d13f5b87",
+  "source_inventory_unchanged": true,
+  "source_result_sha256": "39028f4afacd8c0af9575ee37bf0447be10c19f147fda56bcb62ce9114d68c87",
+  "value_points": [
+    "E1800",
+    "E300",
+    "E5400"
+  ],
+  "values_loaded": false
+}

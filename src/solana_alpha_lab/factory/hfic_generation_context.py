@@ -224,6 +224,8 @@ def collect_verified_priors(store: Any, *, as_of: str | datetime | None) -> dict
                     selection_payload[key] = scientific[key]
         capsules.append(capsule)
         selection_payloads.append(selection_payload)
+    from solana_alpha_lab.factory.research_fragments import enrich_prior_capsules
+    enrich_prior_capsules(store, capsules, as_of=cutoff)
     return {"payloads": payloads, "capsules": capsules,
             "selection_payloads": selection_payloads,
             "research_log_cutoff": cutoff.isoformat() if cutoff else None}
@@ -302,12 +304,22 @@ def _seal(body: Mapping[str, Any]) -> dict[str, Any]:
     return snapshot
 
 
+def _capsule_source_refs(cap: Mapping[str, Any]) -> set[str]:
+    detail = cap["source_detail"]
+    refs = {r["record_id"] for r in detail["hypothesis_source_refs"]}
+    refs.update(detail.get("saved_result_refs") or [])
+    for fragment in detail.get("research_fragments") or []:
+        refs.update((fragment["fragment_version_id"], fragment["source_ref"]))
+        refs.update(b["result_ref"] for b in fragment["evidence_blocks"])
+        refs.update(b["source_ref"] for b in fragment["evidence_blocks"] if b.get("source_ref"))
+    return refs
+
+
 def _consulted_hypothesis_ids(by_id: Mapping[str, Mapping[str, Any]],
                               consulted_refs: Sequence[str]) -> set[str]:
     ref_to_ids: dict[str, set[str]] = {}
     for hyp, cap in by_id.items():
-        detail = cap["source_detail"]
-        for ref in [r["record_id"] for r in detail["hypothesis_source_refs"]] + list(detail.get("saved_result_refs") or []):
+        for ref in _capsule_source_refs(cap):
             ref_to_ids.setdefault(ref, set()).add(hyp)
     required: set[str] = set()
     for ref in consulted_refs:
@@ -449,10 +461,9 @@ def candidate_working_view(store: Any, *, preflight: Mapping[str, Any] | None,
         ):
             material.add(cap["hypothesis_version_id"])
     known_refs = {c["hypothesis_version_id"] for c in archive["capsules"]}
-    known_refs.update(r["record_id"] for c in archive["capsules"] for r in c["source_detail"]["hypothesis_source_refs"])
-    known_refs.update(r for c in archive["capsules"] for r in c["source_detail"].get("saved_result_refs") or [])
+    known_refs.update(r for c in archive["capsules"] for r in _capsule_source_refs(c))
     for ref in card.get("prior_work_refs") or []:
-        if ref in known_refs or str(ref).startswith(("HYP-", "REC-", "HFIC-ART-")):
+        if ref in known_refs or str(ref).startswith(("HYP-", "REC-", "HFIC-ART-", "RFV-", "RF-ART-")):
             material.add(ref)
     capacity = packet_capacity(context, repo_root)
     view = select_working_snapshot(archive, query=scope, focus=str(card.get("claim") or ""),

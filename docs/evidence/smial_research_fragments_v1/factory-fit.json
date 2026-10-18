@@ -1,0 +1,34 @@
+{
+  "as_of": "2026-10-18",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Source-owned current protection completeness before real enablement; native metadata operation, no new tool/service. Production recheck only on approved fixed window and complete imports."
+  },
+  "dimensions": {
+    "build_vs_buy": "ADOPT ResearchStore, projection, ordinary accounting and native evaluator; no dependency.",
+    "context_efficiency": "One task contract and one source snapshot; ordinary bounded capsule closure, no archive dump.",
+    "execution_to_cashflow": "Research advisory only; no trading, strategy composition, deploy or executable-return claim.",
+    "flexibility_and_history": "Prospective plan revision, stable native journal across epochs; no refund or retrospective schedule rewrite.",
+    "mission": "Useful saved observations become source-bound advisory fragments without strategy promotion.",
+    "monitoring_and_recovery": "Actual native two-window path, no-result pending visible while paused/expired; accepted code rebind retains guard; explicit existing STOP leaves charge and no scientific verdict, later allowed window proceeds with no OPEN. Cold landed-result recovery links CHECK without another evaluator. Original PLAN missing/corrupt/order/hash failure preserves saved evidence and UNKNOWN rule basis.",
+    "owner_operability": "Existing shelf/CLI, exact pending operation/reservation/native STOP consequences, bounded saved day/cohort/dependence support and explicit information-rule reasons. Accepted merge permits exact seed registration/readback; plan enablement remains separate.",
+    "red_team": "Missing protection, invalid source, resource bound, same-window ownership, cutoff and crash proof.",
+    "research_truth": "Original result, condition, target, negative findings and Scout adaptive exposure retained; monitoring exploratory.",
+    "security": "Exact root/source/code binding and current native protection before values."
+  },
+  "limits": [
+    "REAL_SEED_REGISTRATION_REQUIRES_ACCEPTED_MERGE_AND_EXACT_SOURCE_READBACK",
+    "CURRENT_PROTECTION_HOLDOUT_UNRESOLVED",
+    "SCOUT_ACCESS_EXPOSED_OR_UNKNOWN",
+    "NO_CONFIRMATION_NO_NEW_REAL_MAIN"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "Disable exact plan via native preview/apply; preserve every artifact and native charge. Ordinary code revert only; no canonical data removal.",
+  "review_id": "SMIAL_RESEARCH_FRAGMENTS_V1-FIT",
+  "reviewed_bindings_sha256": "8291b71b8eda734aad9793623ac2583b3306a485dde45ff7d90ba27a18c9b3d4",
+  "reviewed_inventory_sha256": "c087af15160c7d54a4692427a5b735ee0a713b5e8610c256acd7e5c9e09d6ef8",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "SMIAL_RESEARCH_FRAGMENTS_V1",
+  "verdict": "PASS"
+}

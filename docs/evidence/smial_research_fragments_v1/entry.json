@@ -1,0 +1,41 @@
+{
+  "task_id": "SMIAL_RESEARCH_FRAGMENTS_V1",
+  "entry_decision": "START_AS_WRITTEN",
+  "expected_base": "ab852a45e812984d14893e585b976707bf119aa1",
+  "authority": "DIRECT_OWNER_EXECUTE_2026_10_18",
+  "design_attachment_sha256": "90e1674e2f7914b8d9b2dc8554b3dca324e290a0a237d9a1aeb2e7dd28a4382f",
+  "semantic_routes": [
+    "SEM-OWNER-LIFECYCLE",
+    "SEM-PRIOR-WORK",
+    "SEM-LIVE-EVIDENCE-TO-FORGE"
+  ],
+  "seed_readback": {
+    "session_id": "HFIC-SESS-C8DA64F2899C2D8B",
+    "candidate_id": "HFIC-CAND-297E8EF0F13F",
+    "definition_sha256": "297e8ef0f13ff93bacb39318dc57a6044c00e321a173ae6ecf763bd8d13f5b87",
+    "result_ref": "HFIC-ART-DISCOVERY-7805D0BDB4432682C450578B66F060F31E21C578",
+    "result_sha256": "39028f4afacd8c0af9575ee37bf0447be10c19f147fda56bcb62ce9114d68c87",
+    "session_state": "SYNTHESIS_COMPLETE",
+    "terminal": "PASS_DATA_OPTION_REQUIRED",
+    "run_next_action": "RETURN_EXISTING_RUN",
+    "operation_effective_state": "COMPLETED",
+    "main_used": 1,
+    "values_loaded": false,
+    "research_store_writes": 0
+  },
+  "capability_radar_now": "NONE",
+  "reusable_owners": [
+    "ResearchStore",
+    "LifecycleProjectionV1",
+    "research_workbench",
+    "hfic_generation_context",
+    "hfic_ordinary_operation",
+    "run_recorded_discovery_query",
+    "import_episode_release"
+  ],
+  "non_claims": [
+    "NO_REAL_SCIENTIFIC_GRANT",
+    "NO_PROTECTION_OR_BUDGET_CHANGE",
+    "NO_IMPLEMENTATION_VALIDATION_YET"
+  ]
+}

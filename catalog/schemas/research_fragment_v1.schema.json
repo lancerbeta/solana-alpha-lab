@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/research_fragment_v1.schema.json",
+  "title": "Source-bound research fragment artifacts",
+  "type": "object",
+  "required": ["artifact_kind", "schema_version", "fragment_version_id"],
+  "properties": {
+    "artifact_kind": {"enum": ["RESEARCH_FRAGMENT_V1", "RESEARCH_FRAGMENT_PLAN_V1", "RESEARCH_FRAGMENT_CHECK_V1"]},
+    "schema_version": {"const": "1.0"},
+    "fragment_version_id": {"type": "string", "pattern": "^RFV-[A-F0-9]{32}$"}
+  },
+  "allOf": [
+    {"if": {"properties": {"artifact_kind": {"const": "RESEARCH_FRAGMENT_V1"}}},
+     "then": {"required": ["title", "role", "source", "supersedes", "allowed_use", "source_packet_sha256"],
+              "properties": {"role": {"enum": ["CONTEXT_FILTER", "ENTRY", "EXIT", "RISK_CONSTRAINT"]}, "allowed_use": {"const": "RESEARCH_ADVISORY"}}}},
+    {"if": {"properties": {"artifact_kind": {"const": "RESEARCH_FRAGMENT_PLAN_V1"}}},
+     "then": {"required": ["plan_sha256", "data_root_identity_sha256", "capability_epoch_sha256", "collection", "journal_scope", "enabled", "windows", "execution_deadline", "max_evaluations", "max_input_rows", "information_rule", "owner_scope_ref", "access_boundary", "scientific_use"],
+              "properties": {"collection": {"const": "OPPORTUNITY_EPISODES"}, "scientific_use": {"const": "EXPLORATORY_MONITORING"}}}},
+    {"if": {"properties": {"artifact_kind": {"const": "RESEARCH_FRAGMENT_CHECK_V1"}}},
+     "then": {"required": ["plan_sha256", "window", "window_key", "operation_sha256", "journal_scope", "result_ref", "result_sha256", "assessment", "attention", "scientific_use"]}}
+  ]
+}

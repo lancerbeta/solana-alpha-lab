@@ -27,6 +27,7 @@
       "type": "string",
       "enum": [
         "HYPOTHESIS_VERSION",
+        "RESEARCH_FRAGMENT",
         "TRIAL",
         "DECISION_EVENT",
         "DECISION",

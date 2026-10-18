@@ -1,0 +1,130 @@
+{
+  "ci_repair": {
+    "cause": "Current engineering workbench SHA pin predates authorized fragment presentation. Other core pins and all behavioral assertions unchanged; historical evidence untouched.",
+    "failed_job": "validate-tests (3)",
+    "failed_test": "test_factory_core_python_unchanged",
+    "new_real_market_look": false,
+    "product_code_changed": false,
+    "repair": "Update only current workbench pin/comment; exact test path added to task write set. Native Catalog sync and fresh exact-head CI required.",
+    "run_id": 39150097888
+  },
+  "content_review_patch": {
+    "budget_refund": false,
+    "control_reproducer": "Old reviewed plan_status chooses stopped window0; patched chooses window1. Metadata stub probe only, native evidence is the two-window vertical. Pause/expiry/rebind report exact next action without blind release.",
+    "first_attempt_verdict": null,
+    "local_final_delta": "After the native vertical, next-action metadata was made explicit for pause/expired-original-contract/rebind. Targeted metadata probe; full native vertical required again in exact-head CI.",
+    "native_open_after_tail": 0,
+    "no_result_check_count": 0,
+    "oracle_correction": "Initial synthetic assertion wrongly treated C member as B. Authored synthetic seed explicitly B union C; real seed unchanged.",
+    "post_merge_authority": "Direct owner PR416 request authorizes exact seed registration+shelf+ordinary prior readback after accepted merge; enable/new science separately requires current protection and exact approved plan.",
+    "reviewed_head": "722437d942ab559744510d108fdb10bd5801731d",
+    "scope": "Same PR416; no new task, subsystem, real market look or scientific state"
+  },
+  "full_gate": "Not run locally; exact-head project CI and guarded merge own full verification",
+  "non_claims": [
+    "NO_REAL_SEED_REGISTERED",
+    "NO_REAL_PLAN_ENABLED",
+    "NO_NEW_REAL_EVIDENCE",
+    "NO_UNTOUCHED_OOS",
+    "NO_AUTONOMOUS_PRODUCTION_LIFECYCLE",
+    "NO_ALPHA_OR_TRADE",
+    "NO_MERGE"
+  ],
+  "proof": {
+    "exposure": "Monitoring exploratory; original negative/restriction fields retained; historical archive fingerprint unchanged after future checks",
+    "integrity": "Wrong real/synthetic result binding refuses; damaged item isolated; unrelated generic scalar artifact ignored",
+    "native_measurement": "Native B-or-C synthetic condition: matched2/baseline2, ES10 -.40 on both sides; native day support1. min_matched2 MET, min_days2 BELOW_REQUIRED, hence INCONCLUSIVE with saved-source rule basis, not a technical stop.",
+    "ordinary_forge": "Native prior context-view, RF-ART material reference, persist and freeze; typed restrictions closure",
+    "production_caller": "Actual public consume CLI -> unpack/import and duplicate/replay; follow-up independent of parent import success",
+    "recovery": "Two ordered windows. First reserved under previous execution binding, paused and expired readback retains exact OPEN/reservation. Accepted new plan refuses original binding. Explicit existing public native STOP retains pending charge and emits no CHECK/verdict. Next fixed window executes under current binding. Compatible import, crash after result, paused cold CHECK recovery and exact duplicate retain no-double-look behavior. Final native main completed1/pending1/occupied2; OPEN empty.",
+    "resource_gate": "Native raw parquet row metadata cap refuses before reservation; native plan revision raises capacity without code change",
+    "shelf": "Actual HTTP shelf/detail and ordinary prior share bounded native day/cohort summaries, truncation, dependence/episode_counts and information-rule observed/required/met/reason. Saved evidence remains visible after malformed execution metadata."
+  },
+  "real_science": {
+    "current_protection": {
+      "reason": "HOLDOUT_UNRESOLVED",
+      "sources": [],
+      "status": "UNRESOLVED_SCOPE"
+    },
+    "main_after": 1,
+    "main_before": 1,
+    "native_pending": 0,
+    "new_market_looks": 0,
+    "operation_effective_state": "COMPLETED",
+    "real_fragment_count": 0,
+    "real_plan_enabled": false,
+    "store_inventory_unchanged": true,
+    "values_loaded": false
+  },
+  "review_regressions": {
+    "blocked_shelf": "Actual projection and shelf render current inventory reason in Russian before future trigger",
+    "exact_plan_source": {
+      "finding": "Unfiltered plan_sha lookup could choose CHECK and erase trusted blocks; corrupt PLAN could create competing error-card.",
+      "proof": "GOAL metadata source_snapshot/HTML/prior4of4 PASS, native two-window vertical extended original PLAN missing/corrupt and order cases PASS315.222. Final inner-hash predicate, duplicate/missing/corrupt/CHECK-first compact probe PASS; stale-inner-hash case added to same fixture for exact-head CI.",
+      "repair": "Shared exact PLAN-kind/inner-hash/unique resolver at all4 consumers; missing/corrupt rule basis UNKNOWN, dependent BLOCKED, one trusted card."
+    },
+    "execution_failure_preserves_verified_prior_evidence": "Native malformed PLAN appended; both evidence blocks retained in snapshot and ordinary capsule, exact BLOCKED reason",
+    "recovery_readback": "Landed native result with no CHECK reports DUE/FRAGMENT_RECOVER_LANDED_RESULT before cold recovery",
+    "transient_attempts": "Concurrent Catalog mutation invalidated one preflight composite; serialized sync/test. One final assertion used the wrong existing API key; corrected to capsules and complete current scenario rerun PASS.",
+    "unknown_plan_render": "PASS_METADATA_ONLY_UNKNOWN_PLAN_RENDER: unavailable enabled value is UNKNOWN, exact blocker retained; no Store or market access",
+    "verdict": "PASS"
+  },
+  "scope": "SYNTHETIC_VERTICAL_AND_READ_ONLY_REAL_SOURCE",
+  "targeted": [
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_research_fragments_v1 -v",
+      "elapsed_seconds": 201.467,
+      "log_sha256": "5b64705a1028ece3c748c2100592f3c81a05c30d79360964f3da9415820ec013",
+      "tests": 2,
+      "verdict": "PASS"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_owner_lifecycle_projection_spine_v1 tests.test_research_lifecycle_workbench_v1 tests.test_hfic_ordinary_operation_v1 tests.test_forge_evidence_guided_generation_v1.SelectionSafetyTests",
+      "initial_failures": [
+        "2 stale derived Catalog bindings",
+        "projection repeated native inventory read"
+      ],
+      "initial_passed": 56,
+      "resolution": "Native incremental sync; one inventory projection adapter; exact three failing tests rerun PASS",
+      "tests": 59
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_owner_lifecycle_projection_spine_v1.OwnerLifecycleProjectionSpineTests.test_catalog_binding_and_semantic_route tests.test_research_lifecycle_workbench_v1.ResearchLifecycleWorkbenchTests.test_semantic_discovery_and_anti_hijack tests.test_research_lifecycle_workbench_v1.ResearchLifecycleWorkbenchTests.test_evidence_detail_does_not_match_foreign_keys_or_rescan -v",
+      "elapsed_seconds": 12.029,
+      "log_sha256": "79e9e51329cb34c52b0026adbb97a59c24183b836aa0c3a1d4a4afb340ee5dec",
+      "tests": 3,
+      "verdict": "PASS"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_factory_ordinary_market_hypothesis -v",
+      "elapsed_seconds": 10.598,
+      "log_sha256": "f8923e8bdf0e248521595d89b83cf0ece637d1d75e5d5038c9206ed520025461",
+      "tests": 13,
+      "verdict": "PASS"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_research_fragments_v1 -v",
+      "elapsed_seconds": 297.154,
+      "log_sha256": "063e641301e58c88902863afbd34badba7301d882437bb28ceca63a8ef5759bb",
+      "scope": "Two-window native scenario; subsequent next-action-only metadata refinement covered by compact probe and exact-head CI",
+      "tests": 2,
+      "verdict": "PASS"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_factory_ordinary_market_hypothesis tests.test_owner_lifecycle_projection_spine_v1 tests.test_research_lifecycle_workbench_v1 -v",
+      "elapsed_seconds": 30.86,
+      "log_sha256": "bc28c3376af41dac72f07d1e56ee814cbc5e8d3e23029d50716389e36826af84",
+      "tests": 51,
+      "verdict": "PASS"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_research_fragments_v1 -v",
+      "elapsed_seconds": 315.222,
+      "log_sha256": "15f82816b0cf464f2bb2652cd6e385274c3aeac7f9963af7778b6d9aeee1a430",
+      "scope": "Native two-window vertical plus CHECK-first and missing/corrupt-original-PLAN preservation in shelf and prior; subsequent inner-hash-only predicate also covered by compact probe and required exact-head CI",
+      "tests": 2,
+      "verdict": "PASS"
+    }
+  ],
+  "task_id": "SMIAL_RESEARCH_FRAGMENTS_V1"
+}

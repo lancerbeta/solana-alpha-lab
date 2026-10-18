@@ -1,5 +1,14 @@
 # FORGE_EVIDENCE_GUIDED_GENERATION_V1
 
+Registered source-bound research fragments enrich their existing hypothesis
+capsule as typed `source_detail.research_fragments`. This adds no archive-wide
+mandatory output or new budget. RFV/artifact/check/result refs resolve to the
+same bounded hypothesis slot; consulted material sources retain full closure
+through normal context-view and freeze. Both evidence clocks and the saved
+cutoff apply; a later check cannot refresh an old frozen packet. Discovery and
+EXPLORATORY_MONITORING blocks remain distinct, including negative/inconclusive
+checks and original adaptive exposure. A fragment is research advisory only.
+
 Ordinary Forge provides a small, source-bound view of admissible research
 history. Full archive checks remain independent of that view. It helps a
 generator choose and express a discriminating question; it grants no new
