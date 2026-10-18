@@ -195,6 +195,25 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
                 discovery.load_admitted_partition_rows(**kwargs)
         loader.assert_not_called()
 
+    def test_relabelled_episode_bytes_cannot_use_legacy_value_entry(self):
+        from solana_alpha_lab.factory import hfic_grounded_discovery as discovery
+        original = discovery.resolve_published_episode_binding(self.plane)
+        item = original["cohorts"][0]
+        for strip_population in (False, True):
+            relabel = {**item, "dataset_id": discovery.LIVE_DATASET_ID}
+            if strip_population:
+                relabel.pop("population", None)
+            for explicit_pair in (False, True):
+                kwargs = dict(data_root=None, binding_doc={"cohorts": [relabel]},
+                    partitions=None if explicit_pair else [(item["cohort_id"], self.plane/item["census_rel"], self.plane/item["observations_rel"])],
+                    census_path=self.plane/item["census_rel"] if explicit_pair else None,
+                    observations_path=self.plane/item["observations_rel"] if explicit_pair else None)
+                with self.subTest(strip=strip_population, pair=explicit_pair), patch.object(
+                        discovery, "load_parquet_rows", side_effect=AssertionError("RELABELLED_VALUE_LOADER")) as loader:
+                    with self.assertRaisesRegex(GroundedDiscoveryError, "HOLDOUT_UNRESOLVED"):
+                        discovery.load_admitted_partition_rows(**kwargs)
+                loader.assert_not_called()
+
     def test_current_protection_denies_before_values(self):
         import pyarrow.parquet as pq
         item = self.spec["parameters"]["temporal_recipe"]["frozen_input"][0]

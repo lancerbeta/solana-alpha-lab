@@ -219,3 +219,16 @@ Old Scout pin 88763e400e5dac7462e70275b23b74e061410445 reads the new assignment
 Local integration attempts during edits correctly refused GIT_MUTATION_DETECTED /
 PREFLIGHT_GIT_COMPOSITE_MISMATCH. Freeze candidate content before the next native
 preflight/test run; no source/authority weakening or scientific retry follows.
+
+
+Bounded review replan, same outcome/write set: replace spelling-specific last-loader
+checks with one native artifact-kind boundary, and classify supported native
+ResearchEvent envelope owners/forms instead of ignoring opaque version-1 payloads.
+Contradictory identities and relabelled episode Parquet refuse before values;
+unknown producer/form/packet version returns typed UNRESOLVED. No generic recursive
+assignment evaluator, registry of new reservations or additional scientific scope.
+The c20bc537 committed vertical passed 9 tests in 506.806s; Spec 1.4 direct consumers
+passed, with two existing campaign-specific skips. Three-process restore's missing
+root-bound setup is repaired before its ordinary preflight (original oracles kept).
+New metadata/sentinel checks and exact-head CI must validate the strengthened final
+candidate. No full local gate; guarded merge remains its sole executor.

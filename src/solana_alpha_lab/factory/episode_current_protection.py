@@ -165,9 +165,31 @@ def _store_projection(root: Path, config: Mapping[str, Any]) -> list[dict[str, A
     for record in ResearchStore(root, create_if_missing=False).iter_committed_records(fresh=True):
         wrapper = json.loads(record.payload_json)
         _require(isinstance(wrapper, dict), "PROTECTION_DECLARATION_INVALID")
+        owners = config["native_envelope_owners"]
+        _require(record.producer_capability_id in owners, "PROTECTION_DECLARATION_OWNER_UNKNOWN")
+        forms = owners[record.producer_capability_id]
+        kind = str(record.record_kind)
+        _require(kind in forms, "PROTECTION_DECLARATION_FORM_UNKNOWN")
+        form = wrapper.get("artifact_kind") if kind == "RESEARCH_ARTIFACT" else "NATIVE_DIRECT"
+        _require(isinstance(form, str) and form in forms[kind], "PROTECTION_DECLARATION_FORM_UNKNOWN")
+        _require("payload_canonical" not in wrapper or isinstance(wrapper["payload_canonical"], str),
+                 "PROTECTION_DECLARATION_FORM_UNKNOWN")
         body = json.loads(wrapper["payload_canonical"]) if isinstance(wrapper.get("payload_canonical"), str) else wrapper
-        _require(isinstance(body, dict), "PROTECTION_DECLARATION_INVALID")
+        _require(isinstance(body, dict) and body, "PROTECTION_DECLARATION_INVALID")
+        marked = any(body.get(key) is not None for key in ("artifact_kind", "kind", "schema"))
+        identity = form if kind == "RESEARCH_ARTIFACT" else kind
+        if not marked:
+            required = config["unmarked_body_identity_fields"].get(identity)
+            _require(isinstance(required, list) and bool(required) and all(key in body for key in required),
+                     "PROTECTION_DECLARATION_FORM_UNKNOWN")
         _require(record.schema_version in config["store_record_versions"], "PROTECTION_RESEARCH_EVENT_VERSION_UNKNOWN")
+        if "packet_schema" in body or "packet_version" in body:
+            _require(body.get("packet_schema") in config["native_packet_versions"]
+                     and body.get("packet_version") in config["native_packet_versions"][body["packet_schema"]],
+                     "PROTECTION_DECLARATION_VERSION_UNKNOWN")
+        for field, versions in config["native_text_versions"].items():
+            if field in body:
+                _require(body[field] in versions, "PROTECTION_DECLARATION_VERSION_UNKNOWN")
         for marker_key in ("artifact_kind", "kind", "schema"):
             marker = body.get(marker_key)
             if marker is not None:

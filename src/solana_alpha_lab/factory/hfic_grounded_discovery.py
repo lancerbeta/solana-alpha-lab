@@ -310,6 +310,10 @@ def admit_discovery_binding(cohorts: Sequence[Mapping[str, Any]]) -> dict[str, A
 
     if not cohorts:
         raise GroundedDiscoveryError("DISCOVERY_BINDING_EMPTY")
+    if any(not isinstance(item, Mapping) for item in cohorts):
+        raise GroundedDiscoveryError("DISCOVERY_BINDING_INCOMPLETE")
+    if any(item.get("population") == EPISODE_POPULATION and item.get("dataset_id") != EPISODE_DATASET_ID for item in cohorts):
+        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED", {"reason": "EPISODE_BINDING_IDENTITY_CONFLICT"})
     episode_flags = {
         item.get("dataset_id") == EPISODE_DATASET_ID for item in cohorts if isinstance(item, Mapping)
     }
@@ -751,6 +755,17 @@ def collapse_exact_partition_duplicates(
     return unique, eliminated
 
 
+def _assert_legacy_file_kind(census: Path, observations: Path) -> None:
+    """Footer/schema only: native episode bytes cannot be relabelled as LIVE."""
+    import pyarrow.parquet as pq
+    try:
+        episode = any("episode_id" in pq.ParquetFile(path).schema_arrow.names for path in (census, observations))
+    except (OSError, ValueError) as exc:
+        raise GroundedDiscoveryError("DISCOVERY_INPUT_INVALID") from exc
+    if episode:
+        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED", {"reason": "EPISODE_ARTIFACT_RELABELED"})
+
+
 def load_admitted_partition_rows(
     *,
     data_root: Path | None,
@@ -892,6 +907,8 @@ def load_admitted_partition_rows(
             from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_frozen_input
             verify_frozen_episode_sources(next(iter(roots)), temporal_frozen_input(cohorts))
         for cohort_id, census_file, obs_file in unique:
+            if not episode_scope:
+                _assert_legacy_file_kind(Path(census_file), Path(obs_file))
             binding_row = by_cohort[cohort_id]
             for row in load_parquet_rows(census_file):
                 stamped = dict(row)
@@ -917,6 +934,8 @@ def load_admitted_partition_rows(
         observations_sha = sha256_file_streaming(observations_path)
         if distinct != {(census_sha, observations_sha)}:
             raise GroundedDiscoveryError("BINDING_HASH_MISMATCH")
+        if not episode_scope:
+            _assert_legacy_file_kind(Path(census_path), Path(observations_path))
         census = load_parquet_rows(census_path)
         observations = (load_parquet_rows(observations_path, filters=observation_filters) if observation_filters is not None else load_parquet_rows(observations_path))
     return {

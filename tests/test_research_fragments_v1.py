@@ -445,6 +445,42 @@ class CurrentProtectionTests(unittest.TestCase):
         self.assertEqual(status["owner"], "LOCAL_ASSIGNMENTS")
         self.assertIsNone(status["complete_empty"])
 
+    def test_unknown_native_owner_and_opaque_form_are_not_empty(self):
+        import hashlib
+        from solana_alpha_lab.factory.research_store import ResearchEvent, RecordKind
+        at = datetime.now(UTC)
+        for ordinal, producer in enumerate(("CAP-UNKNOWN-PROTECTION-OWNER", "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001")):
+            root = self.work / ("unknown" + str(ordinal)); store = ResearchStore(root)
+            payload = json.dumps({"protection_declaration": {"assignment_sources": ["UNRESOLVED"]}}, sort_keys=True, separators=(",", ":"))
+            event = ResearchEvent(record_id="UNKNOWN-DECLARATION", record_kind=RecordKind.RESEARCH_ARTIFACT,
+                entity_id="UNKNOWN-DECLARATION", hypothesis_version_id=None, run_id=None,
+                transaction_id="RESEARCH-TXN-UNKNOWN", effective_at=at, first_reliable_available_at=at,
+                supersedes_record_id=None, payload_json=payload, payload_sha256=hashlib.sha256(payload.encode()).hexdigest(),
+                schema_version="1.0", producer_capability_id=producer, producer_git_sha=GIT_SHA, created_at=at)
+            store.append([event], transaction_id=event.transaction_id)
+            status, _ = self.p.resolve_current_research_protection(root)
+            self.assertEqual(status["reason"], "PROTECTION_DECLARATION_OWNER_UNKNOWN" if ordinal == 0 else "PROTECTION_DECLARATION_FORM_UNKNOWN")
+            self.assertEqual(status["owner"], "CANONICAL_RESEARCHSTORE")
+            self.assertIsNone(status["complete_empty"])
+
+    def test_unknown_native_packet_version_is_unresolved(self):
+        import hashlib
+        from solana_alpha_lab.factory.research_store import ResearchEvent, RecordKind
+        body = {"packet_schema": "smial.hypothesis-forge-draft", "packet_version": "UNKNOWN",
+                "candidates": []}
+        payload = json.dumps({"artifact_kind": "FORGE_DRAFT", "payload_canonical": json.dumps(body, sort_keys=True, separators=(",", ":"))},
+                             sort_keys=True, separators=(",", ":"))
+        at = datetime.now(UTC)
+        event = ResearchEvent(record_id="UNKNOWN-VERSION", record_kind=RecordKind.RESEARCH_ARTIFACT,
+            entity_id="UNKNOWN-VERSION", hypothesis_version_id=None, run_id=None,
+            transaction_id="RESEARCH-TXN-UNKNOWN-VERSION", effective_at=at, first_reliable_available_at=at,
+            supersedes_record_id=None, payload_json=payload, payload_sha256=hashlib.sha256(payload.encode()).hexdigest(),
+            schema_version="1.0", producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001", producer_git_sha=GIT_SHA, created_at=at)
+        self.store.append([event], transaction_id=event.transaction_id)
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["reason"], "PROTECTION_DECLARATION_VERSION_UNKNOWN")
+        self.assertIsNone(status["complete_empty"])
+
     def test_task22_scope_requires_actual_time_nonintersection(self):
         from solana_alpha_lab.factory.opportunity_episodes import LOGICAL_DATASET_ID
         self.apply(self.preview())

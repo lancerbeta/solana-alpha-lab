@@ -860,13 +860,14 @@ def phase_p3(work: Path) -> dict[str, Any]:
         return {"exit": code, "owner_class": body.get("owner_class"), "owner_final": body.get("owner_final"),
                 "blocking_reason_codes": body.get("blocking_reason_codes"), "market_evidence_epoch_sha256": body.get("market_evidence_epoch_sha256")}
 
+    # Root-bound current metadata must be installed before native preflight
+    # or an explicit new synthetic replay; historical saved artifacts stay unchanged.
+    install_current_fixture(cold, reset_root_binding=True)
     # The first focus completed on the previous epoch: new evidence must not
     # carry that completion forward. The next focus reads its saved result.
     report["readback_superseded"] = saved_readback(p2["focus"])
     report["readback"] = saved_readback(p2["focus_next"])
     report["readback"]["store_unchanged"] = ResearchStore(cold).diagnostics().committed_inventory_sha256 == before
-    # Restored root requires its own real synthetic current proof before new values.
-    install_current_fixture(cold, reset_root_binding=True)
     calls = {"evaluator": 0}
     real = temporal.execute_temporal_discovery
 

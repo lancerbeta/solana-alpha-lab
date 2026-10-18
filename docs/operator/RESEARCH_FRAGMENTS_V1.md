@@ -169,3 +169,12 @@ Installation baseline refs и restrictions сохраняются при revalid
 resolver не ведёт историю transient источника, удалённого после installation;
 несанкционированная правка namespace не входит в гарантию completeness. Это не
 защита от потери истории или враждебного администратора; новый журнал не создаётся.
+
+Current source interpretation узнаёт native envelope по producer capability,
+record kind, wrapper/body form и поддержанной версии. Opaque/unknown owner или
+новый packet version даёт UNRESOLVED; observed record count не является whitelist.
+Таблица форм связана с существующими native owner modules. Обычные новые записи
+той же формы не требуют ручного обновления. Producer schedule records остаются
+frozen admission metadata, advisory packets не становятся assignment operations.
+Legacy LIVE loader проверяет только Parquet footer/schema до values: episode_id
+в native episode bytes нельзя скрыть переименованием dataset/population binding.
