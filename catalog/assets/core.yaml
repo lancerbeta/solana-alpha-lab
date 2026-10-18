@@ -25744,7 +25744,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: dd3f0d62e6fa515481436a02b9fc71f4128c69c1bb16c5e2426931af949698b8}
+  integrity: {kind: sha256, sha256: 6937104bb198dc285a23036d2f22702378aebec01d037fcbbfe3c4f8ca43b381}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -36190,7 +36190,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lifecycle_projection.py', repository_path: src/solana_alpha_lab/factory/lifecycle_projection.py}
-  integrity: {kind: sha256, sha256: 893a95863dbcc82489f65e4967c89bdba7d8933c653b2a1a008128b094af05cc}
+  integrity: {kind: sha256, sha256: 4301062b94fa99df2975976c639b143795eff7ef8b95905a2ecce28ee1a93979}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -36380,7 +36380,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_language.py', repository_path: src/solana_alpha_lab/factory/owner_language.py}
-  integrity: {kind: sha256, sha256: 57018e919b34ca7b000f07b16492395a189918e09daf931cd4ba7a53f595dafe}
+  integrity: {kind: sha256, sha256: b76e438349c5af4fdee68977d5c105f26fd49ba986bcd61c0dcce1dc53d88d0e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -43321,7 +43321,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_fragments.py', repository_path: src/solana_alpha_lab/factory/research_fragments.py}
-  integrity: {kind: sha256, sha256: b4baae603023df6bb002777e89790204b44109a868cdaa8b893f65480ef9edbe}
+  integrity: {kind: sha256, sha256: cf110a53f7e7a4684941da92f371d4a434af3e91b3662dc81f0689f5667e420a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43372,7 +43372,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/RESEARCH_FRAGMENTS_V1.md', repository_path: docs/operator/RESEARCH_FRAGMENTS_V1.md}
-  integrity: {kind: sha256, sha256: 6ebd306d819f1924cfd4563a8ce5091df21716398a930a98f38d0d0cc9ea45f3}
+  integrity: {kind: sha256, sha256: 18d7918ab5ab7acd24451cac1f1efa3819cd5b24704aae3bd2ffe338e7364a13}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43389,7 +43389,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_research_fragments_v1.py', repository_path: tests/test_research_fragments_v1.py}
-  integrity: {kind: sha256, sha256: 844012f3ae468d9af230ab25dfc5352753319a07a42fc48e82535cc1123bb0dd}
+  integrity: {kind: sha256, sha256: ddb827ad86fd80324dc57524b73cbfa1778f0822073dfa83e4610861dc6932ec}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]

@@ -35,12 +35,19 @@
     "store_inventory_unchanged": true,
     "values_loaded": false
   },
+  "review_regressions": {
+    "blocked_shelf": "Actual projection and shelf render current inventory reason in Russian before future trigger",
+    "execution_failure_preserves_verified_prior_evidence": "Native malformed PLAN appended; both evidence blocks retained in snapshot and ordinary capsule, exact BLOCKED reason",
+    "recovery_readback": "Landed native result with no CHECK reports DUE/FRAGMENT_RECOVER_LANDED_RESULT before cold recovery",
+    "transient_attempts": "Concurrent Catalog mutation invalidated one preflight composite; serialized sync/test. One final assertion used the wrong existing API key; corrected to capsules and complete current scenario rerun PASS.",
+    "verdict": "PASS"
+  },
   "scope": "SYNTHETIC_VERTICAL_AND_READ_ONLY_REAL_SOURCE",
   "targeted": [
     {
       "command": "uv run --locked --managed-python python -B -m unittest tests.test_research_fragments_v1 -v",
-      "elapsed_seconds": 187.969,
-      "log_sha256": "c1bcac1a5f46ee44139ec9e0f3efd54f907414ec27692a6b74ea96384b929214",
+      "elapsed_seconds": 201.467,
+      "log_sha256": "5b64705a1028ece3c748c2100592f3c81a05c30d79360964f3da9415820ec013",
       "tests": 2,
       "verdict": "PASS"
     },
@@ -56,8 +63,8 @@
     },
     {
       "command": "uv run --locked --managed-python python -B -m unittest tests.test_owner_lifecycle_projection_spine_v1.OwnerLifecycleProjectionSpineTests.test_catalog_binding_and_semantic_route tests.test_research_lifecycle_workbench_v1.ResearchLifecycleWorkbenchTests.test_semantic_discovery_and_anti_hijack tests.test_research_lifecycle_workbench_v1.ResearchLifecycleWorkbenchTests.test_evidence_detail_does_not_match_foreign_keys_or_rescan -v",
-      "elapsed_seconds": 10.85,
-      "log_sha256": "b3661d4e66ff9e90f4e440be785815705b8e19280d8b6728f0ec78c6b401db16",
+      "elapsed_seconds": 12.029,
+      "log_sha256": "79e9e51329cb34c52b0026adbb97a59c24183b836aa0c3a1d4a4afb340ee5dec",
       "tests": 3,
       "verdict": "PASS"
     }

@@ -184,6 +184,12 @@ HANDOFF_STATE_LABELS = {
 }
 
 BLOCKER_LABELS = {
+    "HOLDOUT_UNRESOLVED": "Нет актуального полного protection inventory; запросите его у владельца источника перед включением плана",
+    "FRAGMENT_RECOVER_LANDED_RESULT": "Результат уже сохранён; выполните run-due для восстановления ссылки без нового измерения",
+    "FRAGMENT_PLAN_INTEGRITY_INVALID": "План повреждён; проверьте сохранённую цепочку плана. Проверенное evidence остаётся доступным",
+    "FRAGMENT_PLAN_SHAPE_INVALID": "План повреждён; проверьте его обязательные поля. Проверенное evidence остаётся доступным",
+    "FRAGMENT_PLAN_HASH_MISMATCH": "Хеш плана не совпал; проверьте exact source плана. Проверенное evidence остаётся доступным",
+    "FRAGMENT_EXECUTION_BINDING_CHANGED": "Код выполнения изменился; перед новым измерением пересмотрите и утвердите привязку плана",
     "LEGACY_PROVENANCE_GAP": "Нет замороженного решения того момента",
     "HANDOFF_MANIFEST_INVALID": "Handoff-манифест недействителен",
     "EXPERIMENT_SPEC_BINDING_GAP": "Нет привязки ExperimentSpec на момент решения",

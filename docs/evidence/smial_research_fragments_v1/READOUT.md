@@ -40,6 +40,8 @@ Import сначала коммитится; отдельный `fragment_refresh
 operation/result без второго списания. Один вызов делает максимум одно новое
 измерение. GET ничего не запускает. Нового scheduler нет; выключенный workstation,
 отсутствующий импорт или blocked plan не образуют автономный lifecycle.
+Если result уже записан, но ссылка CHECK ещё нет, полка сообщает о metadata
+recovery через run-due. Отдельный отказ плана не скрывает проверенное evidence.
 
 Единый post-merge proposal: зарегистрировать exact seed и, **после получения
 source-owned текущего complete protection inventory и утверждения scope**, включить

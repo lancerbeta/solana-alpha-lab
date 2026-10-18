@@ -1327,7 +1327,7 @@ def _research_rows(rows: list[dict[str, Any]], *, start_ordinal: int = 1) -> str
             finding = "Есть adverse окно: требуется оценка" if fragment.get("attention") else "Предварительное наблюдение"
             title_cell = (f"<td>{linked}<p>{esc(role)} · {esc(finding)}</p>"
                           f"<p>{esc(check.get('status') or fragment.get('error') or 'UNKNOWN')} · "
-                          f"{esc(check.get('next_trigger') or check.get('reason') or 'Читать ограничения')}</p></td>")
+                          f"{esc(blocker_label(check['reason']) if check.get('reason') else check.get('next_trigger') or 'Читать ограничения')}</p></td>")
         marker = []
         if row.get("attention"):
             marker.append(counter_label("ATTENTION"))
@@ -1877,8 +1877,10 @@ def _fragment_detail_html(fragment: Mapping[str, Any]) -> str:
         "<th>Baseline ES10</th><th>Масса хвоста</th><th>Matched gaps</th><th>Baseline gaps</th><th>Оценка</th><th>Внимание</th><th>Result</th></tr>" + "".join(rows) + "</table>"
         "<p>Baseline может включать matched; окна не объединяются в один ES10. Discovery и monitoring — exploratory evidence. "
         "Scout adaptive exposure сохранён в исходной карточке; Scout H/L — другой механизм. Source event times могут быть UNKNOWN.</p>"
-        f"<h3>Следующая проверка</h3><p>{esc(check.get('status'))} · {esc(check.get('reason') or check.get('next_trigger') or 'UNKNOWN')}</p>"
-        f"<p>План включён: {'да' if plan.get('enabled') else 'нет'}. Максимум новых измерений: {esc(plan.get('max_evaluations', '—'))}; "
+        f"<h3>Следующая проверка</h3><p>{esc(check.get('status'))} · {esc(blocker_label(check['reason']) if check.get('reason') else check.get('next_trigger') or 'UNKNOWN')}</p>"
+        + (f"<p class=\"mono\">{esc(check['reason'])}</p>" if check.get('reason') else "")
+        + ("<p>Следующая проверка заблокирована. Сохранённые результаты доступны; уточните причину через read перед повторным запуском.</p>" if check.get('status') == 'BLOCKED' else "")
+        + f"<p>План включён: {'да' if plan.get('enabled') else 'нет'}. Максимум новых измерений: {esc(plan.get('max_evaluations', '—'))}; "
         f"крайний срок: {esc(plan.get('execution_deadline', '—'))}.</p>"
         "<p>Запуск: локальный завершённый import или явный run-due. При выключенном ПК проверки не выполняются. "
         "GET этой страницы не запускает измерение.</p>"

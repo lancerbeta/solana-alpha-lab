@@ -271,9 +271,15 @@ def source_snapshot(store: Any, *, as_of: datetime | str | None = None,
                 blocks.append({**{k: check[k] for k in ("window", "result_ref", "result_sha256", "assessment", "attention")},
                                "kind": "MONITORING", "summary": _summary(look["result"]),
                                "exposure": "EXPLORATORY_MONITORING", "source_ref": check["_record_id"]})
-            plan = current_plan(rows, str(fragment))
-            freshness = plan_status(store, card, plan, rows=rows, now=_time(as_of) if as_of else _now(now))
-            if not as_of and plan and plan.get("enabled") and freshness["status"] in {"DUE", "FUTURE_WAIT"}:
+            plan = None
+            try:
+                plan = current_plan(rows, str(fragment))
+                freshness = plan_status(store, card, plan, rows=rows, now=_time(as_of) if as_of else _now(now))
+            except (ValueError, KeyError, TypeError, OSError, ResearchStoreError) as exc:
+                # Execution metadata cannot erase already verified evidence.
+                freshness = {"status": "BLOCKED", "reason": getattr(exc, "code", "FRAGMENT_EXECUTION_UNAVAILABLE"), "new_look": False}
+            if (not as_of and plan and plan.get("enabled") and freshness["status"] in {"DUE", "FUTURE_WAIT"}
+                    and freshness.get("reason") != "FRAGMENT_RECOVER_LANDED_RESULT"):
                 protection = current_protection_status(store)
                 if protection["status"] != "ALLOW":
                     freshness = {**freshness, "status": "BLOCKED", "reason": "HOLDOUT_UNRESOLVED"}
@@ -306,12 +312,16 @@ def source_snapshot(store: Any, *, as_of: datetime | str | None = None,
 
 def plan_status(store: Any, card: Mapping[str, Any], plan: Mapping[str, Any] | None,
                 *, rows: list[dict[str, Any]], now: datetime) -> dict[str, Any]:
-    if plan is None or not plan.get("enabled"):
+    if plan is None:
         return {"status": "DISABLED", "reason": "NO_ENABLED_PLAN", "new_look": False}
     completed = {r.get("window_key") for r in rows if r["artifact_kind"] == CHECK
                  and r.get("fragment_version_id") == card["fragment_version_id"]}
     from solana_alpha_lab.factory.hfic_ordinary_operation import journal_occupancy
     spent = journal_occupancy(store, plan["journal_scope"])["main"]
+    if spent["completed"] > len(completed):
+        return {"status": "DUE", "reason": "FRAGMENT_RECOVER_LANDED_RESULT", "native_spend": spent, "new_look": False}
+    if not plan.get("enabled"):
+        return {"status": "DISABLED", "reason": "NO_ENABLED_PLAN", "new_look": False}
     if spent["completed"] >= min(plan["max_evaluations"], spent["limit"]):
         return {"status": "COMPLETE", "reason": "PLAN_CAP_SPENT" if plan["max_evaluations"] <= spent["limit"] else "NATIVE_CAP_SPENT",
                 "native_spend": spent, "new_look": False}

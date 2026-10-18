@@ -57,6 +57,10 @@ loader читает только native dependency points. Нет автомат
 тюнинга, generation/LLM или торговли. INCONCLUSIVE также расходует look.
 Pending input set сохраняется в native operation и не расширяется новым импортом.
 Потеря процесса после result восстанавливает CHECK-ссылку без evaluator/списания.
+До восстановления read/полка показывают DUE / FRAGMENT_RECOVER_LANDED_RESULT,
+а не COMPLETE; run-due связывает уже сохранённый результат даже при paused plan.
+Ошибка плана/accounting блокирует следующую проверку, но не скрывает уже
+проверенное evidence из карточки и Forge prior. Причина важнее будущей даты trigger.
 Pause/resume/revoke — новый preview/apply с `enabled`; cadence/lifetime меняются
 только prospectively, started windows и information rule не переписываются.
 Новые технические caps не возвращают уже занятый native budget.

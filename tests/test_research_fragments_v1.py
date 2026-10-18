@@ -125,6 +125,11 @@ class FragmentVerticalTests(unittest.TestCase):
         self.assertEqual(imported["_exit_code"], 0, imported)
         blocked = f.run_due(self.store, repo_root=ROOT, git_sha=GIT_SHA)
         self.assertEqual(blocked["fragments"][0]["reason"], "HOLDOUT_UNRESOLVED")
+        blocked_projection = build_lifecycle_projection(ROOT, research_store=self.store)
+        blocked_shelf = compose_research_overview(blocked_projection, kind="fragments")
+        self.assertIn("Нет актуального полного protection inventory", _research_overview_html(blocked_shelf))
+        blocked_view = f.source_snapshot(self.store)[0]
+        self.assertEqual(blocked_view["check"]["reason"], "HOLDOUT_UNRESOLVED")
         # Current source completeness is a real synthetic native inventory,
         # including a protected nomination, not a fabricated empty document.
         (self.work/"saved-protection").rename(self.plane/"protection")
@@ -157,6 +162,9 @@ class FragmentVerticalTests(unittest.TestCase):
         self.assertEqual(crashed["fragment_refresh"]["status"], "BLOCKED")
         occupancy = journal_occupancy(self.store, f.journal_for(self.card["fragment_version_id"]))
         self.assertEqual(occupancy["main"]["completed"], 1, imported)
+        recovery = f.source_snapshot(self.store)[0]["check"]
+        self.assertEqual(recovery["status"], "DUE")
+        self.assertEqual(recovery["reason"], "FRAGMENT_RECOVER_LANDED_RESULT")
         paused = {**plan_request, "enabled": False}
         f.apply_plan(self.store, f.plan_preview(self.store, paused), git_sha=GIT_SHA)
         completed = subprocess.run([sys.executable, "-B", str(ROOT/"scripts/research_fragments.py"), "run-due", "--data-root", str(self.plane), "--confirm-append-only"],
@@ -183,6 +191,18 @@ class FragmentVerticalTests(unittest.TestCase):
         self.assertEqual(journal_occupancy(cold, f.journal_for(self.card["fragment_version_id"]))["main"]["completed"], 1)
         historical = collect_verified_priors(cold, as_of=working["research_log_cutoff"])
         self.assertEqual(archive_fingerprint(historical), working["eligible_archive_sha256"])
+        # Corrupt execution metadata must not erase verified scientific evidence.
+        broken_plan = {k: v for k, v in f.current_plan(f.documents(cold), self.card["fragment_version_id"]).items()
+                       if not k.startswith("_") and k not in {"max_evaluations", "plan_sha256"}}
+        broken_plan["plan_sha256"] = canonical_sha256(broken_plan)
+        f._append(cold, broken_plan, git_sha=GIT_SHA, now=datetime.now(UTC))
+        saved_view = f.source_snapshot(cold)[0]
+        self.assertNotIn("error", saved_view)
+        self.assertEqual(saved_view["check"]["reason"], "FRAGMENT_PLAN_SHAPE_INVALID")
+        self.assertEqual(saved_view["evidence_blocks"], blocks)
+        remembered = collect_verified_priors(cold, as_of=None)
+        source_cap = next(c for c in remembered["capsules"] if c["hypothesis_version_id"] == self.card["source"]["candidate_id"])
+        self.assertEqual(source_cap["source_detail"]["research_fragments"][0]["evidence_blocks"], blocks)
 
 
 class FragmentDamagedItemTests(unittest.TestCase):

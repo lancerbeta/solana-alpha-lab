@@ -1664,7 +1664,7 @@ def _adapt_research_store(
             source_owner=source_id, source_ref=ref, truth_plane="EVIDENCE", contributing_source_ids=[source_id],
             as_of=fragment.get("first_reliable_available_at"), observed_at=observed_at,
             evidence_class="EXPLORATORY_REUSE", freshness_status="READBACK",
-            freshness_basis="approved_plan_and_native_evidence", blocker=error or ("ADVERSE_REVIEW_REQUIRED" if fragment.get("attention") else None),
+              freshness_basis="approved_plan_and_native_evidence", blocker=error or (check.get("reason") if check.get("status") == "BLOCKED" else None) or ("ADVERSE_REVIEW_REQUIRED" if fragment.get("attention") else None),
             next_safe_action=error or ("REVIEW_ADVERSE_EVIDENCE" if fragment.get("attention") else None) or check.get("reason") or check.get("next_trigger") or "READ_FRAGMENT_EVIDENCE",
             summary=fragment["title"], source_owned_fields={"research_fragment": fragment}))
         projected += 1
