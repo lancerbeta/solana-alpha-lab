@@ -35,7 +35,7 @@ class FragmentVerticalTests(unittest.TestCase):
     persist_and_freeze = flow.EpisodeFlowTests.persist_and_freeze
 
     def seed(self):
-        evidence, scope, query, initial = self.look("FRAGMENT_SYNTH_SEED")
+        evidence, scope, query, initial = self.look("FRAGMENT_SYNTH_SEED", lav.draft("LIST_CONTRAST", list_condition={"clauses": [{"all_of": ["B"]}, {"all_of": ["C"]}]}))
         body, pre = self.authored_draft(evidence, scope, initial["owner_focus"])
         _, frozen = self.persist_and_freeze(body, pre)
         critic = critic_result_from_packet_only(frozen["critic_input_packet"], terminal="KILL_STATISTICALLY_UNIDENTIFIABLE")
@@ -48,13 +48,13 @@ class FragmentVerticalTests(unittest.TestCase):
         return request, evidence
 
     def plan(self):
-        start = lav.DAY_B
+        start = lav.DAY_A
         request = {"fragment_version_id": self.card["fragment_version_id"],
             "data_root_identity_sha256": f.root_identity(self.store), "enabled": True,
-            "windows": [{"start": start.isoformat(), "end": (start+timedelta(days=1)).isoformat(),
-                         "input_closed_at": (start+timedelta(days=4, hours=1)).isoformat()}],
-            "execution_deadline": (start+timedelta(days=11)).isoformat(), "max_evaluations": 1, "max_input_rows": 100000,
-            "information_rule": {"min_matched": 2, "min_days": 1, "min_tail_mass": .2, "adverse_es10_delta": .1},
+            "windows": [{"start": day.isoformat(), "end": (day+timedelta(days=1)).isoformat(),
+                         "input_closed_at": (day+timedelta(days=4, hours=1)).isoformat()} for day in (lav.DAY_A, lav.DAY_B)],
+            "execution_deadline": (lav.DAY_B+timedelta(days=11)).isoformat(), "max_evaluations": 2, "max_input_rows": 100000,
+            "information_rule": {"min_matched": 2, "min_days": 2, "min_tail_mass": .2, "adverse_es10_delta": .1},
             "scientific_use": "EXPLORATORY_MONITORING", "source_roles": ["EXPLORATORY_REUSE"],
             "access_boundary": {"forge": "EXPOSED_OR_UNKNOWN", "scout": "EXPOSED_OR_UNKNOWN", "confirmatory_claims": False, "protected_holdouts": "EXCLUDE"},
             "owner_scope_ref": "SYNTHETIC_AUTHORIZED_FIXED_WINDOW"}
@@ -109,7 +109,7 @@ class FragmentVerticalTests(unittest.TestCase):
                           "--selection-query-sha256", working["selection_query_sha256"], "--source-ref", self.card["fragment_version_id"], "--format", "json")
         self.assertEqual(detail["view"]["mandatory_count"], 1)
         reader_evidence, reader_scope, _, reader_pre = self.look(reader_pre["owner_focus"],
-            lav.draft("LIST_CONTRAST", list_condition={"clauses": [{"all_of": ["B"]}]}), preflight_receipt=reader_pre)
+            lav.draft("LIST_CONTRAST", list_condition={"clauses": [{"all_of": ["A"]}]}), preflight_receipt=reader_pre)
         draft, _ = self.authored_draft(reader_evidence, reader_scope, reader_pre["owner_focus"], preflight_receipt=reader_pre)
         draft["candidates"][0]["claim"] += " Source-bound advisory construction, no independent confirmation."
         draft["candidates"][0]["prior_work_refs"] = [self.card["_record_id"]]
@@ -118,6 +118,47 @@ class FragmentVerticalTests(unittest.TestCase):
         self.assertEqual(frozen_source["source_ref"], self.card["_record_id"])
         critic = critic_result_from_packet_only(frozen["critic_input_packet"], terminal="KILL_STATISTICALLY_UNIDENTIFIABLE")
         self.cli("finalize", "--session-id", frozen["session_id"], "--critic-result", self.write("reader-critic.json", critic))
+        from solana_alpha_lab.factory import hfic_grounded_discovery as discovery
+        from solana_alpha_lab.factory import hfic_evidence_identity as identity
+        from solana_alpha_lab.factory.hfic_ordinary_operation import effective_open_operations
+        # First window: a real native reservation, no result. Pause retains it;
+        # expiry makes it visible, never refunds it or invents a CHECK.
+        with patch.object(identity, "compute_capability_epoch_for_repo", return_value=("0"*64, {})):
+            f.apply_plan(self.store, f.plan_preview(self.store, plan_request), git_sha=GIT_SHA)
+            with patch.object(discovery, "load_admitted_partition_rows", side_effect=RuntimeError("first window interrupted")):
+                with self.assertRaises(RuntimeError):
+                    f.run_due(self.store, repo_root=ROOT, git_sha=GIT_SHA)
+        paused = {**plan_request, "enabled": False}
+        f.apply_plan(self.store, f.plan_preview(self.store, paused), git_sha=GIT_SHA)
+        paused_read = f.source_snapshot(self.store)[0]["check"]
+        self.assertEqual(paused_read["status"], "DISABLED")
+        first = paused_read["attempts_without_result"][0]
+        self.assertEqual(first["effective_state"], "OPEN")
+        self.assertTrue(first["holds_universe_gate"])
+        self.assertEqual(len(first["unresolved_reservation_spec_sha256"]), 1)
+        f.apply_plan(self.store, f.plan_preview(self.store, plan_request), git_sha=GIT_SHA)
+        active = f.current_plan(f.documents(self.store), self.card["fragment_version_id"])
+        expired = f.plan_status(self.store, self.card, active, rows=f.documents(self.store),
+                                now=f._time(active["execution_deadline"])+timedelta(seconds=1))
+        self.assertEqual(expired["status"], "EXPIRED")
+        self.assertEqual(expired["attempts_without_result"][0]["operation_sha256"], first["operation_sha256"])
+        # Explicit accepted plan rebind does not make the original attempt
+        # compatible with a different executor. The existing native STOP is
+        # the supported no-result exit; its reservation remains charged.
+        rebound = f.run_due(self.store, repo_root=ROOT, git_sha=GIT_SHA)
+        self.assertEqual(rebound["fragments"][0]["reason"], "FRAGMENT_PENDING_NATIVE_STOP_REQUIRED")
+        self.assertFalse(rebound["fragments"][0]["attempts_without_result"][0]["execution_binding_matches_plan"])
+        stop = self.cli("operation-stop-preview", "--operation-sha256", first["operation_sha256"],
+                        "--owner-request-text", "Synthetic incompatible pending attempt; retain reservation, continue next fixed window")
+        self.assertFalse(stop["effect"]["quota_returned"])
+        self.cli("operation-stop", "--proposal", self.write("stop-first.json", stop["proposal"]), "--confirm-append-only")
+        self.assertEqual(effective_open_operations(self.store), [])
+        self.assertEqual([r for r in f.documents(self.store) if r["artifact_kind"] == f.CHECK], [])
+        f.apply_plan(self.store, f.plan_preview(self.store, plan_request), git_sha=GIT_SHA)
+        after_stop = f.source_snapshot(self.store)[0]["check"]
+        self.assertEqual(after_stop["window_index"], 1)
+        self.assertEqual(after_stop["native_spend"]["pending"], 1)
+        self.assertEqual(after_stop["attempts_without_result"][0]["effective_state"], "STOPPED")
         (self.plane/"protection").rename(self.work/"saved-protection")
         blocked = f.run_due(self.store, repo_root=ROOT, git_sha=GIT_SHA)
         self.assertEqual(blocked["fragments"][0]["reason"], "FRAGMENT_WINDOW_INPUTS_NOT_COMPLETE")
@@ -137,7 +178,7 @@ class FragmentVerticalTests(unittest.TestCase):
         f.apply_plan(self.store, f.plan_preview(self.store, tiny), git_sha=GIT_SHA)
         too_big = f.run_due(self.store, repo_root=ROOT, git_sha=GIT_SHA)
         self.assertEqual(too_big["fragments"][0]["reason"], "FRAGMENT_COMPUTE_ROW_CAP_EXCEEDED")
-        self.assertEqual(journal_occupancy(self.store, f.journal_for(self.card["fragment_version_id"]))["main"]["occupied"], 0)
+        self.assertEqual(journal_occupancy(self.store, f.journal_for(self.card["fragment_version_id"]))["main"]["occupied"], 1)
         f.apply_plan(self.store, f.plan_preview(self.store, plan_request), git_sha=GIT_SHA)
         from solana_alpha_lab.factory.opportunity_episode_release import load_episode_lineage, import_episode_release
         release = self.plane / load_episode_lineage(self.plane)["cohorts"][-1]["release_dir_rel"]
@@ -145,7 +186,7 @@ class FragmentVerticalTests(unittest.TestCase):
         with patch.object(discovery, "load_admitted_partition_rows", side_effect=RuntimeError("synthetic crash before values")):
             pending = import_episode_release(release_root=release, data_root=self.plane)
         self.assertEqual(pending["fragment_refresh"]["status"], "BLOCKED")
-        self.assertEqual(journal_occupancy(self.store, f.journal_for(self.card["fragment_version_id"]))["main"]["pending"], 1)
+        self.assertEqual(journal_occupancy(self.store, f.journal_for(self.card["fragment_version_id"]))["main"]["pending"], 2)
         from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
         old_epoch = compute_split_identity(ROOT, self.plane)["market_evidence_epoch_sha256"]
         from tests.test_opportunity_episodes_vertical_v1 import _import_legacy
@@ -155,7 +196,7 @@ class FragmentVerticalTests(unittest.TestCase):
         with patch.object(identity, "compute_capability_epoch_for_repo", return_value=("0"*64, {})):
             changed_code = f.run_due(self.store, repo_root=ROOT, git_sha=GIT_SHA)
         self.assertEqual(changed_code["fragments"][0]["reason"], "FRAGMENT_EXECUTION_BINDING_CHANGED")
-        self.assertEqual(journal_occupancy(self.store, f.journal_for(self.card["fragment_version_id"]))["main"]["pending"], 1)
+        self.assertEqual(journal_occupancy(self.store, f.journal_for(self.card["fragment_version_id"]))["main"]["pending"], 2)
         with patch.object(f, "_link_check", side_effect=RuntimeError("synthetic crash after native result")):
             crashed = import_episode_release(release_root=release, data_root=self.plane)
         self.assertEqual(crashed["status"], "PASS_ALREADY_PRESENT_EXACT")
@@ -180,12 +221,32 @@ class FragmentVerticalTests(unittest.TestCase):
         self.assertEqual(inventory, cold.diagnostics().committed_inventory_sha256)
         blocks = f.source_snapshot(cold)[0]["evidence_blocks"]
         self.assertEqual(len(blocks), 2)
-        # Independent literal oracle for the two authored B outcomes: -.40,+.05;
-        # no A members. A sparse/missing matched tail cannot become a pass.
-        self.assertEqual(blocks[1]["summary"]["matched"]["downside"]["observed_n"], 0)
+        # Independent literal oracle: the two B outcomes are -.40,+.05.
+        # A real nonzero matched check carries day support and rule grounds.
+        self.assertEqual(blocks[1]["summary"]["matched"]["downside"]["observed_n"], 2)
         self.assertEqual(blocks[1]["summary"]["baseline"]["downside"]["observed_n"], 2)
         self.assertAlmostEqual(blocks[1]["summary"]["baseline"]["downside"]["es10_return"], -.4)
         self.assertEqual(blocks[1]["assessment"], "INCONCLUSIVE")
+        self.assertAlmostEqual(blocks[1]["summary"]["matched"]["downside"]["es10_return"], -.4)
+        day_support = blocks[1]["summary"]["details"]["by_calendar_block"]
+        self.assertEqual(len(day_support), 1)
+        self.assertEqual(day_support[0]["downside"]["observed_n"], 2)
+        self.assertEqual(blocks[1]["information_basis"]["criteria"]["min_days"]["observed"], 1)
+        self.assertFalse(blocks[1]["information_basis"]["enough"])
+        self.assertEqual(blocks[1]["information_basis"]["criteria"]["min_matched"]["reason"], "MET")
+        self.assertEqual(blocks[1]["information_basis"]["criteria"]["min_days"]["reason"], "BELOW_REQUIRED")
+        self.assertFalse(blocks[1]["summary"]["dependence"]["mint_overlap_known"])
+        self.assertFalse(blocks[1]["summary"]["dependence"]["cohort_independent_replication"])
+        self.assertEqual(effective_open_operations(cold), [])
+        final_spend = journal_occupancy(cold, f.journal_for(self.card["fragment_version_id"]))["main"]
+        self.assertEqual((final_spend["completed"], final_spend["pending"], final_spend["occupied"]), (1, 1, 2))
+        final_view = f.source_snapshot(cold)[0]
+        self.assertEqual(final_view["source"]["result_sha256"], evidence["result_sha256"])
+        self.assertEqual(final_view["check"]["attempts_without_result"][0]["effective_state"], "STOPPED")
+        support_page = _research_detail_html(compose_research_detail(build_lifecycle_projection(ROOT, research_store=cold), locator, root=ROOT))
+        self.assertIn("Поддержка по дням", support_page)
+        self.assertIn("Основание information rule", support_page)
+        self.assertIn(first["operation_sha256"], support_page)
         self.assertEqual(blocks[1]["exposure"], "EXPLORATORY_MONITORING")
         self.assertNotEqual(blocks[0]["result_ref"], blocks[1]["result_ref"])
         self.assertEqual(journal_occupancy(cold, f.journal_for(self.card["fragment_version_id"]))["main"]["completed"], 1)

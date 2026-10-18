@@ -230,7 +230,39 @@ def current_plan(rows: list[dict[str, Any]], fragment: str) -> dict[str, Any] | 
 def _summary(result: Mapping[str, Any]) -> dict[str, Any]:
     from solana_alpha_lab.factory.hfic_grounded_discovery import descriptive_return_readout
     readout = descriptive_return_readout(result)
-    return {k: copy.deepcopy(readout.get(k)) for k in ("status", "matched", "baseline", "missingness", "tail_support", "baseline_may_include_matched")}
+    summary = {k: copy.deepcopy(readout.get(k)) for k in (
+        "status", "matched", "baseline", "missingness", "tail_support", "baseline_may_include_matched",
+        "details", "detail_truncation", "selection_policy")}
+    # Saved native dependency markers only. Absence is UNKNOWN, never a new
+    # mint-overlap calculation or a claim of independent calendar replication.
+    summary["dependence"] = {k: copy.deepcopy(result.get(k)) for k in (
+        "mint_overlap_known", "overlap_exposed_base_x", "overlap_is_not_independent_replication",
+        "calendar_overlap_is_not_independent_replication", "cohort_independent_replication",
+        "cohort_slices_are_descriptive", "independence", "independent_replication", "unique_mint_n", "unique_decision_n")}
+    summary["dependence"]["episode_counts"] = copy.deepcopy(result.get("episode_counts"))
+    return summary
+
+
+def _information_basis(result: Mapping[str, Any], rule: Mapping[str, Any]) -> dict[str, Any]:
+    """Explain the existing rule using saved native quantities, without new stats."""
+    matched = result.get("downside") or {}
+    blocks = result.get("by_calendar_block")
+    counts = [(b.get("downside") or {}).get("observed_n") for b in blocks] if isinstance(blocks, list) else None
+    days = sum(n > 0 for n in counts) if counts is not None and all(type(n) is int for n in counts) else None
+    observed = {"min_matched": matched.get("observed_n"), "min_days": days,
+                "min_tail_mass": matched.get("es10_tail_mass_n")}
+    criteria = {key: {"observed": value, "required": rule[key],
+                      "met": value >= rule[key] if value is not None else None,
+                      "reason": "SOURCE_UNAVAILABLE" if value is None else "MET" if value >= rule[key] else "BELOW_REQUIRED"}
+                for key, value in observed.items()}
+    return {"criteria": criteria, "enough": all(c["met"] is True for c in criteria.values()),
+            "adverse_es10_delta": rule["adverse_es10_delta"], "source": "SAVED_NATIVE_RESULT"}
+
+
+def _fragment_operations(store: Any, fragment: str) -> list[dict[str, Any]]:
+    from solana_alpha_lab.factory.hfic_ordinary_operation import list_operations, get_operation
+    return [get_operation(store, digest) for digest in sorted({o["operation_sha256"] for o in list_operations(store)
+            if (o.get("fragment_check") or {}).get("fragment_version_id") == fragment})]
 
 
 def source_snapshot(store: Any, *, as_of: datetime | str | None = None,
@@ -270,6 +302,8 @@ def source_snapshot(store: Any, *, as_of: datetime | str | None = None,
                 _require(result_sha256(look["result"]) == check["result_sha256"], "FRAGMENT_CHECK_RESULT_HASH_MISMATCH")
                 blocks.append({**{k: check[k] for k in ("window", "result_ref", "result_sha256", "assessment", "attention")},
                                "kind": "MONITORING", "summary": _summary(look["result"]),
+                               "information_basis": _information_basis(look["result"], next(
+                                   p["information_rule"] for p in rows if p.get("plan_sha256") == check["plan_sha256"])),
                                "exposure": "EXPLORATORY_MONITORING", "source_ref": check["_record_id"]})
             plan = None
             try:
@@ -316,23 +350,54 @@ def plan_status(store: Any, card: Mapping[str, Any], plan: Mapping[str, Any] | N
         return {"status": "DISABLED", "reason": "NO_ENABLED_PLAN", "new_look": False}
     completed = {r.get("window_key") for r in rows if r["artifact_kind"] == CHECK
                  and r.get("fragment_version_id") == card["fragment_version_id"]}
-    from solana_alpha_lab.factory.hfic_ordinary_operation import journal_occupancy
+    from solana_alpha_lab.factory.hfic_ordinary_operation import journal_occupancy, operation_lifecycle, _unresolved_reservations
+    from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
     spent = journal_occupancy(store, plan["journal_scope"])["main"]
+    looks = list_discovery_looks(store, plan["journal_scope"])
+    attempts = []
+    for operation in _fragment_operations(store, card["fragment_version_id"]):
+        if any(l.get("operation_sha256") == operation["operation_sha256"] for l in looks):
+            continue
+        state = operation_lifecycle(store, operation)["effective_state"]
+        context = operation["fragment_check"]
+        original = next((p for p in rows if p.get("plan_sha256") == context["plan_sha256"]), None)
+        matches = context["capability_epoch_sha256"] == plan["capability_epoch_sha256"]
+        contract_allows = (original is not None and matches and context["window"] in plan["windows"]
+                           and now <= min(_time(plan["execution_deadline"]), _time(original["execution_deadline"])))
+        next_action = ("CONTINUE_ALLOWED_WINDOWS" if state == "STOPPED" else
+                       "KEEP_PAUSED_OR_EXPLICIT_NATIVE_STOP" if not plan.get("enabled") else
+                       "EXPLICIT_NATIVE_STOP" if not contract_allows else "RESUME_OR_EXPLICIT_NATIVE_STOP")
+        attempts.append({"operation_sha256": operation["operation_sha256"], "record_id": operation["record_id"],
+            "window": operation["fragment_check"]["window"], "window_key": operation["fragment_check"]["window_key"],
+            "effective_state": state, "unresolved_reservation_spec_sha256": _unresolved_reservations(store, operation),
+            "holds_universe_gate": state == "OPEN", "scientific_verdict": None, "quota_returned": False,
+            "execution_binding_matches_plan": matches, "next_action": next_action,
+            "resume_contract_allows_now": bool(plan.get("enabled") and contract_allows and state == "OPEN"),
+            "stop_preview_args": ["operation-stop-preview", "--operation-sha256", operation["operation_sha256"],
+                                  "--owner-request-text", "<explicit reason for ending this attempt>"]})
+    common = {"native_spend": spent, "attempts_without_result": attempts, "new_look": False}
     if spent["completed"] > len(completed):
-        return {"status": "DUE", "reason": "FRAGMENT_RECOVER_LANDED_RESULT", "native_spend": spent, "new_look": False}
+        return {**common, "status": "DUE", "reason": "FRAGMENT_RECOVER_LANDED_RESULT"}
     if not plan.get("enabled"):
-        return {"status": "DISABLED", "reason": "NO_ENABLED_PLAN", "new_look": False}
-    if spent["completed"] >= min(plan["max_evaluations"], spent["limit"]):
-        return {"status": "COMPLETE", "reason": "PLAN_CAP_SPENT" if plan["max_evaluations"] <= spent["limit"] else "NATIVE_CAP_SPENT",
-                "native_spend": spent, "new_look": False}
+        return {**common, "status": "DISABLED", "reason": "NO_ENABLED_PLAN"}
     if now > _time(plan["execution_deadline"]):
-        return {"status": "EXPIRED", "reason": "PLAN_DEADLINE_PASSED", "new_look": False}
+        return {**common, "status": "EXPIRED", "reason": "PLAN_DEADLINE_PASSED"}
+    pending = [a for a in attempts if a["effective_state"] != "STOPPED"]
+    if pending:
+        attempt = pending[0]
+        if not attempt["resume_contract_allows_now"]:
+            return {**common, "status": "BLOCKED", "reason": "FRAGMENT_PENDING_NATIVE_STOP_REQUIRED"}
+        return {**common, "status": "DUE", "window": attempt["window"],
+                "window_index": plan["windows"].index(attempt["window"]), "reason": "FRAGMENT_RESUME_PENDING_ATTEMPT"}
+    if spent["occupied"] >= min(plan["max_evaluations"], spent["limit"]):
+        return {**common, "status": "COMPLETE", "reason": "PLAN_CAP_SPENT" if plan["max_evaluations"] <= spent["limit"] else "NATIVE_CAP_SPENT"}
+    stopped = {a["window_key"] for a in attempts if a["effective_state"] == "STOPPED"}
     for index, window in enumerate(plan["windows"]):
-        if canonical_sha256(window) not in completed:
+        if canonical_sha256(window) not in completed | stopped:
             due = _time(window["input_closed_at"])
-            return {"status": "DUE" if now >= due else "FUTURE_WAIT", "window_index": index,
-                    "window": window, "next_trigger": due.isoformat(), "new_look": False}
-    return {"status": "COMPLETE", "reason": "ALL_WINDOWS_RECORDED", "new_look": False}
+            return {**common, "status": "DUE" if now >= due else "FUTURE_WAIT", "window_index": index,
+                    "window": window, "next_trigger": due.isoformat()}
+    return {**common, "status": "COMPLETE", "reason": "ALL_WINDOWS_RECORDED_OR_EXPLICITLY_STOPPED"}
 
 
 def journal_for(fragment: str) -> str:
@@ -615,11 +680,7 @@ def _link_check(store: Any, operation: Mapping[str, Any], look: Mapping[str, Any
     baseline = (readout.get("baseline") or {}).get("downside") or {}
     rule = plan["information_rule"]
     # Native descriptive quantities, never a pooled estimate or a new verdict.
-    days = len([b for b in look["result"].get("by_calendar_block") or []
-                if (b.get("downside") or {}).get("observed_n", 0) > 0])
-    enough = (matched.get("observed_n", 0) >= rule["min_matched"]
-              and days >= rule["min_days"]
-              and (matched.get("es10_tail_mass_n") or 0) >= rule["min_tail_mass"])
+    enough = _information_basis(look["result"], rule)["enough"]
     delta = matched.get("es10_return")
     base = baseline.get("es10_return")
     adverse = enough and delta is not None and base is not None and delta - base < -rule["adverse_es10_delta"]
@@ -641,7 +702,7 @@ def run_due(store: Any, *, repo_root: Path, git_sha: str) -> dict[str, Any]:
     frozen inputs and native reservations retain spend across process crashes.
     """
     from solana_alpha_lab.factory.hfic_ordinary_operation import (
-        list_operations, record_operation, authorize_temporal_attempt, note_look_landed)
+        record_operation, authorize_temporal_attempt, note_look_landed)
     from solana_alpha_lab.factory.hfic_grounded_discovery import (
         list_discovery_looks, load_admitted_partition_rows, run_recorded_discovery_query)
     from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
@@ -650,9 +711,10 @@ def run_due(store: Any, *, repo_root: Path, git_sha: str) -> dict[str, Any]:
     for card in (r for r in rows if r["artifact_kind"] == CARD or r.get("_error")):
         fragment = card.get("fragment_version_id") or card["_record_id"]
         values_loaded = False
+        status = {}
         try:
             _require(not card.get("_error"), "FRAGMENT_ARTIFACT_INTEGRITY_INVALID")
-            operations = [o for o in list_operations(store) if (o.get("fragment_check") or {}).get("fragment_version_id") == fragment]
+            operations = _fragment_operations(store, fragment)
             for operation in operations:
                 look = next((l for l in list_discovery_looks(store, operation["journal_scope"])
                              if l.get("operation_sha256") == operation["operation_sha256"]), None)
@@ -705,7 +767,7 @@ def run_due(store: Any, *, repo_root: Path, git_sha: str) -> dict[str, Any]:
             return {"status": "CHECK_RECORDED", "fragment_version_id": fragment, "source_ref": saved["_record_id"],
                     "result_ref": look["record_id"], "new_look": evidence.get("new_look"), "values_loaded": True}
         except (ValueError, KeyError, TypeError, OSError, ResearchStoreError) as exc:
-            reports.append({"fragment_version_id": fragment, "status": "BLOCKED",
+            reports.append({**status, "fragment_version_id": fragment, "status": "BLOCKED",
                             "reason": getattr(exc, "code", "FRAGMENT_SOURCE_INVALID"),
                             "new_look": "UNKNOWN" if values_loaded else False, "values_loaded": values_loaded})
             if values_loaded:

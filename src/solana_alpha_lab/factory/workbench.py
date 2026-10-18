@@ -1325,9 +1325,12 @@ def _research_rows(rows: list[dict[str, Any]], *, start_ordinal: int = 1) -> str
             check = fragment.get("check") or {}
             role = {"CONTEXT_FILTER": "Контекстный фильтр", "ENTRY": "Вход", "EXIT": "Выход", "RISK_CONSTRAINT": "Ограничение риска"}.get(fragment.get("role"), "UNKNOWN")
             finding = "Есть adverse окно: требуется оценка" if fragment.get("attention") else "Предварительное наблюдение"
+            attempts = check.get("attempts_without_result") or []
+            attempt_note = "".join(f"<p>Без результата: {esc(a['effective_state'])} · {esc(a['operation_sha256'])}; "
+                                   f"universe gate: {esc(a['holds_universe_gate'])}</p>" for a in attempts)
             title_cell = (f"<td>{linked}<p>{esc(role)} · {esc(finding)}</p>"
                           f"<p>{esc(check.get('status') or fragment.get('error') or 'UNKNOWN')} · "
-                          f"{esc(blocker_label(check['reason']) if check.get('reason') else check.get('next_trigger') or 'Читать ограничения')}</p></td>")
+                          f"{esc(blocker_label(check['reason']) if check.get('reason') else check.get('next_trigger') or 'Читать ограничения')}</p>{attempt_note}</td>")
         marker = []
         if row.get("attention"):
             marker.append(counter_label("ATTENTION"))
@@ -1848,6 +1851,7 @@ def _fragment_detail_html(fragment: Mapping[str, Any]) -> str:
         return f'<p class="semantic-unknown">Источник недоступен: {esc(fragment["error"])}</p>'
     candidate = fragment.get("source_candidate") or {}
     rows = []
+    support = []
     for block in fragment.get("evidence_blocks") or []:
         summary = block.get("summary") or {}
         a = (summary.get("matched") or {}).get("downside") or {}
@@ -1860,8 +1864,27 @@ def _fragment_detail_html(fragment: Mapping[str, Any]) -> str:
             percent(a.get("es10_return")), percent(b.get("es10_return")),
             a.get("es10_tail_mass_n", "UNKNOWN"), a.get("missing_n", "UNKNOWN"), b.get("missing_n", "UNKNOWN"),
             block.get("assessment"), block.get("attention", "Исходный discovery"), block.get("result_ref"))) + "</tr>")
+        parts = []
+        for key, label in (("by_calendar_block", "Поддержка по дням"), ("by_cohort", "Поддержка по когортам")):
+            slices = (summary.get("details") or {}).get(key)
+            parts.append(f"<p>{label}: {esc(json.dumps(slices, ensure_ascii=False) if slices is not None else 'UNKNOWN')}. "
+                         f"Покрытие: {esc(json.dumps((summary.get('detail_truncation') or {}).get(key), ensure_ascii=False))}</p>")
+        parts.append(f"<p>Зависимость / повторные mint: {esc(json.dumps(summary.get('dependence'), ensure_ascii=False))}</p>")
+        if block.get("information_basis"):
+            parts.append(f"<p>Основание information rule: {esc(json.dumps(block['information_basis'], ensure_ascii=False))}</p>")
+        parts.append(f"<p>Полный сохранённый источник: {esc(block.get('result_ref'))}; "
+                     "bounded detail-read: discovery-show --result-ref с этим exact ref.</p>")
+        support.append("<details><summary>" + esc(block.get("kind")) + " · поддержка и ограничения</summary>" + "".join(parts) + "</details>")
     check = fragment.get("check") or {}
     plan = fragment.get("plan") or {}
+    pending = []
+    for attempt in check.get("attempts_without_result") or []:
+        pending.append(f"<p>Попытка без результата: {esc(attempt['operation_sha256'])} · {esc(attempt['effective_state'])}; "
+                       f"держит universe gate: {esc(attempt['holds_universe_gate'])}; "
+                       f"резервации: {esc(', '.join(attempt['unresolved_reservation_spec_sha256']) or 'нет')}. "
+                       "Пауза сохраняет попытку. Native STOP завершает только execution, без CHECK, научного вывода и возврата бюджета. "
+                       f"Следующее действие: {esc(attempt['next_action'])}. "
+                       f"Exact preview args: {esc(json.dumps(attempt['stop_preview_args'], ensure_ascii=False))}</p>")
     restrictions = []
     for key, label in {"confounders": "Зависимости и смешение", "pit_leakage_survivorship_risks": "PIT / exposure",
                        "execution_capacity_risks": "Исполнение", "missing_or_forward_only_data": "Неизвестные данные"}.items():
@@ -1875,10 +1898,12 @@ def _fragment_detail_html(fragment: Mapping[str, Any]) -> str:
         "FALSE означает отсутствие условия; UNKNOWN сохраняется. Повтор proxy не подтверждает исполнимую доходность.</p>"
         "<table><tr><th>Evidence</th><th>Окно до</th><th>Matched N</th><th>Baseline N</th><th>Matched ES10</th>"
         "<th>Baseline ES10</th><th>Масса хвоста</th><th>Matched gaps</th><th>Baseline gaps</th><th>Оценка</th><th>Внимание</th><th>Result</th></tr>" + "".join(rows) + "</table>"
-        "<p>Baseline может включать matched; окна не объединяются в один ES10. Discovery и monitoring — exploratory evidence. "
+        + "".join(support)
+        + "<p>Baseline может включать matched; окна не объединяются в один ES10. Discovery и monitoring — exploratory evidence. "
         "Scout adaptive exposure сохранён в исходной карточке; Scout H/L — другой механизм. Source event times могут быть UNKNOWN.</p>"
         f"<h3>Следующая проверка</h3><p>{esc(check.get('status'))} · {esc(blocker_label(check['reason']) if check.get('reason') else check.get('next_trigger') or 'UNKNOWN')}</p>"
         + (f"<p class=\"mono\">{esc(check['reason'])}</p>" if check.get('reason') else "")
+        + "".join(pending)
         + ("<p>Следующая проверка заблокирована. Сохранённые результаты доступны; уточните причину через read перед повторным запуском.</p>" if check.get('status') == 'BLOCKED' else "")
         + f"<p>План включён: {'UNKNOWN' if not plan and check.get('status') == 'BLOCKED' else 'да' if plan.get('enabled') else 'нет'}. Максимум новых измерений: {esc(plan.get('max_evaluations', '—'))}; "
         f"крайний срок: {esc(plan.get('execution_deadline', '—'))}.</p>"

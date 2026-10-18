@@ -43,6 +43,15 @@ operation/result без второго списания. Один вызов д�
 Если result уже записан, но ссылка CHECK ещё нет, полка сообщает о metadata
 recovery через run-due. Отдельный отказ плана не скрывает проверенное evidence.
 
+Исправления content review PR #416: readback показывает exact no-result attempt
+и удержание universe gate при pause/expiry; продолжение проверяет последнюю native
+версию operation. Непригодная попытка завершается существующим явным native STOP,
+без CHECK, научного verdict или возврата резервации; следующий run-due выбирает
+следующее разрешённое окно. Новый plan binding не делает старую попытку совместимой.
+Полка и Forge получают одинаковую bounded поддержку по дням/когортам, сохранённые
+признаки зависимости/repeated mint и observed/required/met/reason information rule.
+Полный источник остаётся по exact result_ref, через bounded discovery-show.
+
 Единый post-merge proposal: зарегистрировать exact seed и, **после получения
 source-owned текущего complete protection inventory и утверждения scope**, включить
 одно окно admissions **2026-10-20 00:00Z → 2026-11-17 00:00Z**. Input closure
@@ -63,8 +72,9 @@ prospectively. Точные local requests и hashes сохранены в
 `local/research_fragments_v1/post-merge-proposal.json`; native plan preview ещё
 невозможен до регистрации карточки. Одобрение плана не заменяет protection gate.
 
-Следующий шаг — exact-head PR readiness, затем одно решение владельца по merge
-и конкретному post-merge scope; нынешний protection gap должен быть закрыт его
+Следующий шаг — fresh exact-head PR readiness и решение владельца по merge.
+После merge разрешена регистрация exact seed, полка и ordinary prior readback;
+включение плана отдельно требует current protection и exact scope; нынешний protection gap должен быть закрыт его
 настоящим владельцем, без выдуманного complete-empty. Реальные registration,
 enablement и первое новое окно подтверждаются отдельным native readback.
 

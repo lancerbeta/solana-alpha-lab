@@ -56,6 +56,28 @@ native policy и plan выбирают более строгий cap. Строк
 loader читает только native dependency points. Нет автоматических абляций,
 тюнинга, generation/LLM или торговли. INCONCLUSIVE также расходует look.
 Pending input set сохраняется в native operation и не расширяется новым импортом.
+`read`, полка и Forge показывают exact `attempts_without_result`, native status,
+резервации и удержание universe gate даже при DISABLED / EXPIRED. Пауза и expiry
+сами не завершают OPEN и не освобождают бюджет. Для непригодной попытки используйте
+существующий `scripts/hypothesis_forge.py --data-root ABSOLUTE_ROOT
+operation-stop-preview --operation-sha256 EXACT_SHA --owner-request-text REASON`,
+затем `operation-stop --proposal PREVIEW_PROPOSAL_JSON --confirm-append-only`.
+Сохраняется именно поле `proposal` preview. Native STOP append-only закрывает
+execution без CHECK, INCONCLUSIVE или refund. Следующий run-due выбирает следующее
+разрешённое окно; остановленное окно не переоткрывается. Его pending reservation
+остаётся в native occupied и plan cap. После разрешения хвоста OPEN gate снят.
+Новый plan-apply с новым execution binding не делает прежнюю operation совместимой:
+либо запускайте исходный совместимый executor в пределах исходного контракта,
+либо явно завершайте попытку native STOP. Binding guard не ослабляется.
+Оба выбора остаются явными; sign результата не участвует в выборе окна.
+
+Общий snapshot сохраняет native bounded by_cohort / by_calendar_block (до четырёх
+каждого, с total/included/truncated), источник result_ref, native markers зависимости
+и episode_counts/repeated_mint_n, где они сохранены. UNKNOWN не достраивается.
+Для CHECK показаны observed/required/met/reason по каждому information_rule из
+исходного плана. Исторические CHECK не переписываются: основание читается из
+сохранённых native result и plan. `discovery-show --result-ref EXACT_REF --offset 0
+--limit 20` даёт существующий bounded detail-read; это чтение без нового look.
 Потеря процесса после result восстанавливает CHECK-ссылку без evaluator/списания.
 До восстановления read/полка показывают DUE / FRAGMENT_RECOVER_LANDED_RESULT,
 а не COMPLETE; run-due связывает уже сохранённый результат даже при paused plan.

@@ -186,6 +186,8 @@ HANDOFF_STATE_LABELS = {
 BLOCKER_LABELS = {
     "HOLDOUT_UNRESOLVED": "Нет актуального полного protection inventory; запросите его у владельца источника перед включением плана",
     "FRAGMENT_RECOVER_LANDED_RESULT": "Результат уже сохранён; выполните run-due для восстановления ссылки без нового измерения",
+    "FRAGMENT_PENDING_NATIVE_STOP_REQUIRED": "Незавершённая попытка несовместима с планом; завершите exact operation через native operation-stop-preview / operation-stop без возврата бюджета",
+    "FRAGMENT_RESUME_PENDING_ATTEMPT": "Продолжить сохранённую попытку с прежней резервацией либо явно завершить её через native STOP",
     "FRAGMENT_PLAN_INTEGRITY_INVALID": "План повреждён; проверьте сохранённую цепочку плана. Проверенное evidence остаётся доступным",
     "FRAGMENT_PLAN_SHAPE_INVALID": "План повреждён; проверьте его обязательные поля. Проверенное evidence остаётся доступным",
     "FRAGMENT_PLAN_HASH_MISMATCH": "Хеш плана не совпал; проверьте exact source плана. Проверенное evidence остаётся доступным",

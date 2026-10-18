@@ -160,6 +160,15 @@ remain visible and material attention follows declared information rules.
 
 ## Verification and handoff
 
+PR #416 content review PATCH_BEFORE_MERGE, reviewed head
+722437d942ab559744510d108fdb10bd5801731d: same atom closes unfinished-window
+recovery with the existing explicit native STOP (no result, CHECK, refund or
+binding bypass), then continues the next allowed window. Shared shelf/Forge
+snapshot retains bounded native day/cohort/dependence support and exact
+information-rule grounds. Extend the same synthetic vertical to two ordered
+windows: first reserved/paused/expired/rebound/stopped without result, second
+nonzero-matched native check and cold readback. No new real scientific action.
+
 Use one compact synthetic scenario and native evaluation plus a small independent
 arithmetic oracle. Prove actual registration/projection/GET/prior/freeze closure,
 actual run-due/import seam, duplicate/restart/no-double-charge, UNKNOWN/protection
