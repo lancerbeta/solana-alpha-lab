@@ -9,12 +9,12 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/smial_research_fragments_v1/factory-fit.json",
-    "sha256": "02be267b646a297f706eda7c1f7e994f5f56e0d7fb47694a0fa14f6c1b664399",
+    "sha256": "17d4eadb6bb9548a1d98e2466b2aabf8ca8580560b6dadac2db4e6109d3e07f6",
     "verdict": "PASS"
   },
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "ffce0893cbb1820be708ddd594a94902706a18966ef79ed600f91d257e453958",
-    "catalog/assets/core.yaml": "572d57e06887fbdaecacd31a9946267680b81ab3f633e4337cd2c613e333c4f6",
+    "catalog/assets/core.yaml": "48032889c36508fdc0819e038548f45ce7e81a889e776fcbeb64eb955978783a",
     "catalog/assets/lifecycle.yaml": "7da0553f11b87250ca779806d758ec54dad41736c81606facfa71f48284414a7",
     "catalog/catalog_manifest.yaml": "599c5fb476d1205fdbcfb2736b81f7105ec0cd16d23f3079c830462d014fc652",
     "catalog/generated/asset_edges.json": "fe41925999f6d5fe939460f6dd203ebd9bce494155226cd1c161667ab3e8b779",
@@ -25,12 +25,12 @@
     "docs/contracts/forge_evidence_guided_generation_v1.md": "b81508b748e6841c3bcf1bcb9b20311d9f75d2609050e47c5e5a10e3ee693567",
     "docs/contracts/owner_lifecycle_projection_spine_v1.md": "f4d9992d231c45d97a787d0c53b84733a3a915539eda612e4ddee0f9b3a64d3a",
     "docs/contracts/research_lifecycle_workbench_v1.md": "7e03de22fe1d19b83095eda8bee2f0d485f81e878df62cc1e111a94277f0bb7c",
-    "docs/evidence/smial_research_fragments_v1/READOUT.md": "5f230f5a88449f1bb81db3a1e1c3e4cd99d8545acebceaaaaf0030ace74e37d1",
+    "docs/evidence/smial_research_fragments_v1/READOUT.md": "14aa2cf74d530697bcc708483e04a3a34a5e2ce9982ea6ee8978ea74c9f8ff08",
     "docs/evidence/smial_research_fragments_v1/entry.json": "7af5f42124513539a8f509aef4f701d0909b0b0cde2dac68769e4bed0bf59939",
     "docs/evidence/smial_research_fragments_v1/source-readback.json": "88d9c439dce0b8c2d3c9c35b691541feb9294dfb11b47101795056f753ad5673",
-    "docs/evidence/smial_research_fragments_v1/validation.json": "438ee6f6b6823ae9be449d7af62971e69e5a423fec2292514eac892fb03ff0bf",
-    "docs/operator/RESEARCH_FRAGMENTS_V1.md": "18d7918ab5ab7acd24451cac1f1efa3819cd5b24704aae3bd2ffe338e7364a13",
-    "docs/tasks/SMIAL_RESEARCH_FRAGMENTS_V1.md": "03adfb94c449bad72ab2425289c5ab46c3905973f55588a83844fcc0b0169b12",
+    "docs/evidence/smial_research_fragments_v1/validation.json": "2b400a429bfb89e4a5f44336f59d300a5beb49d9d358df0919d7ababd78385be",
+    "docs/operator/RESEARCH_FRAGMENTS_V1.md": "14c27b59506fa7674c167fbfd7642f32184bb073fc83d64ba841dd36ab25d660",
+    "docs/tasks/SMIAL_RESEARCH_FRAGMENTS_V1.md": "f1434cc12dd92a92b87928299bbb14cebd3bc83f60dd0b18d6bb653ab353a6fb",
     "scripts/research_fragments.py": "9f08f739141c72ff45a10e6a3dd5a97e4a5d7d3a20345ee88d84ceeb2c8a84cc",
     "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "c30224918bdf58e813f3af7e862f7c714ee4f557f2b95402cdc37507cc271cc1",
     "src/solana_alpha_lab/factory/hfic_generation_context.py": "7cab231d392f92c9286a69d3269bd0dcd8475f0814b98f23351be288aeb69cda",
@@ -38,12 +38,12 @@
     "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "31714ac22776aa4f7b9b8284b6d88b108118aabfe660ff2fc01d60aa64b52d6b",
     "src/solana_alpha_lab/factory/lifecycle_projection.py": "4301062b94fa99df2975976c639b143795eff7ef8b95905a2ecce28ee1a93979",
     "src/solana_alpha_lab/factory/opportunity_episode_release.py": "d707da475deb7dfe390dc051da337099b8fb2fd2e711bf2eba28384ea6d46fab",
-    "src/solana_alpha_lab/factory/owner_language.py": "b76e438349c5af4fdee68977d5c105f26fd49ba986bcd61c0dcce1dc53d88d0e",
-    "src/solana_alpha_lab/factory/research_fragments.py": "cf110a53f7e7a4684941da92f371d4a434af3e91b3662dc81f0689f5667e420a",
+    "src/solana_alpha_lab/factory/owner_language.py": "36b2bbfe0f4ed58606f5d70814ab430d389d338ec31ba5c9759aea2d3ea98845",
+    "src/solana_alpha_lab/factory/research_fragments.py": "b1f62853834e5ec6fa83d512d3ee706a66fafa9885d4770379669e93ca19642d",
     "src/solana_alpha_lab/factory/research_workbench.py": "6122a064d038fd2e9ba501d774f6fad316bf57aff772b639e9dc013eb161383f",
-    "src/solana_alpha_lab/factory/workbench.py": "3d42a9b42b702d51080d8d03ab47214d8402be3d3bb7d2885ffd47aa2e13fcdd",
-    "tests/test_factory_ordinary_market_hypothesis.py": "27065e838dc87b4b8f096ae18e53e3a270b8777bbe235fa652ed7dd0eb781467",
-    "tests/test_research_fragments_v1.py": "ddb827ad86fd80324dc57524b73cbfa1778f0822073dfa83e4610861dc6932ec"
+    "src/solana_alpha_lab/factory/workbench.py": "92cdc4e2902769bc8797b3c8f93d9a0adb10dd502380c61929711c2da17d29fa",
+    "tests/test_factory_ordinary_market_hypothesis.py": "4b8d7ce813b6cbd2735ae56708bf88418eb91d502da7c3affa728df8572a9326",
+    "tests/test_research_fragments_v1.py": "b9029a68572d3253cea1843b7b2129ad4acfac74d9c9496a2d378a80e9308003"
   },
   "non_claims": [
     "NO_REAL_REGISTRATION_OR_PLAN_ACTIVATION",
@@ -75,7 +75,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/smial_research_fragments_v1/independent-review.json",
-      "sha256": "0d96d058516c41a42602f74a203b6a3b9a78d3c6b9805325bd4b3742e2124e6f",
+      "sha256": "9dcb61200c5b45c471bca8ac3fe2bd5981d0603a850df907e93daf483a2b2e27",
       "verdict": "PASS"
     },
     "project_checks": [
@@ -84,8 +84,11 @@
       "PASS_CURRENT_PROTECTION_RESOURCE_AND_CODE_GATES",
       "PASS_PRIOR_EVIDENCE_SURVIVES_PLAN_FAILURE",
       "PASS_CATALOG_NATIVE_INCREMENTAL_SYNC_AND_PRECOMMIT",
-      "PASS_ORDINARY_COMPOSITION_13_AND_CURRENT_ENGINEERING_PIN"
+      "PASS_ORDINARY_COMPOSITION_13_AND_CURRENT_ENGINEERING_PIN",
+      "PASS_PENDING_PAUSE_EXPIRY_REBIND_NATIVE_STOP_NEXT_WINDOW_NO_REFUND",
+      "PASS_BOUNDED_NATIVE_DAY_COHORT_DEPENDENCE_AND_RULE_BASIS",
+      "PASS_EXACT_PLAN_KIND_INNER_HASH_ORDER_AND_PRESERVED_SHELF_PRIOR"
     ],
-    "targeted": "PASS_NATIVE_VERTICAL_2_AND_TARGETED_CONSUMERS"
+    "targeted": "PASS_NATIVE_TWO_WINDOW_VERTICAL_AND_SOURCE_PLAN_RECOVERY_AND_TARGETED_CONSUMERS"
   }
 }
