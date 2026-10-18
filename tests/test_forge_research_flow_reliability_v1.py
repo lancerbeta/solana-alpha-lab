@@ -879,6 +879,8 @@ class EpisodeFlowTests(unittest.TestCase):
         shutil.copytree(self.template/'plane',self.plane)
         from solana_alpha_lab.factory.research_store import ResearchStore
         ResearchStore(self.plane).prepare_write_lookup()  # explicit verified preparation after a fixture copy
+        from tests.test_opportunity_episodes_vertical_v1 import install_current_fixture
+        install_current_fixture(self.plane, reset_root_binding=True)
         self.source=self.template/'capture'/'rdp'
         self.packets=[str(self.template/'capture'/p) for p in json.loads((self.template/'fixture.json').read_text())['packets']]
 

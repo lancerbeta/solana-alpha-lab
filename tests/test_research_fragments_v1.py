@@ -98,11 +98,18 @@ class FragmentVerticalTests(unittest.TestCase):
         self.assertEqual(before, self.store.diagnostics().committed_inventory_sha256)
         with self.assertRaisesRegex(f.FragmentError, "FRAGMENT_RESULT_HASH_MISMATCH"):
             f.register(self.store, {**request, "result_sha256": "0"*64}, git_sha=GIT_SHA)
+        shutil.rmtree(self.plane / "protection")  # controlled fixture: current authority missing
         with self.assertRaisesRegex(f.FragmentError, "HOLDOUT_UNRESOLVED"):
             self.plan()
         self.assertEqual(before, self.store.diagnostics().committed_inventory_sha256)
-        shutil.copytree(self.source/"protection", self.plane/"protection")
+        # No local assignments: all controlled native owners prove complete-empty.
+        # Frozen release dependencies remain byte-for-byte inside each release.
+        from tests.test_opportunity_episodes_vertical_v1 import install_current_fixture
+        install_current_fixture(self.plane)
+        self.assertTrue(f.current_protection_status(self.store)["complete_empty"])
         plan_request, _ = self.plan()
+        current_pointer_bytes = (self.plane / "protection/current_research.json").read_bytes()
+        current_versions = sorted(p.name for p in (self.plane / "protection/assignments").glob("CURRENT-RESEARCH-*.json"))
         reader_pre = self.preflight("FRAGMENT_ORDINARY_PRIOR_CONSUMER")
         working = reader_pre["forge_context_packet"]["prior_memory_working_view"]
         detail = self.cli("prior", "--context-view", "--preflight-receipt", self.write("reader-pre.json", reader_pre),
@@ -162,7 +169,7 @@ class FragmentVerticalTests(unittest.TestCase):
         (self.plane/"protection").rename(self.work/"saved-protection")
         blocked = f.run_due(self.store, repo_root=ROOT, git_sha=GIT_SHA)
         self.assertEqual(blocked["fragments"][0]["reason"], "FRAGMENT_WINDOW_INPUTS_NOT_COMPLETE")
-        imported = lav._consume(self.packets[1:], source=self.source, mirror=self.work/"mirror", plane=self.plane)
+        imported = lav._consume(self.packets[1:], source=self.source, mirror=self.work/"mirror", plane=self.plane, install_protection=False)
         self.assertEqual(imported["_exit_code"], 0, imported)
         blocked = f.run_due(self.store, repo_root=ROOT, git_sha=GIT_SHA)
         self.assertEqual(blocked["fragments"][0]["reason"], "HOLDOUT_UNRESOLVED")
@@ -171,9 +178,12 @@ class FragmentVerticalTests(unittest.TestCase):
         self.assertIn("Нет актуального полного protection inventory", _research_overview_html(blocked_shelf))
         blocked_view = f.source_snapshot(self.store)[0]
         self.assertEqual(blocked_view["check"]["reason"], "HOLDOUT_UNRESOLVED")
-        # Current source completeness is a real synthetic native inventory,
-        # including a protected nomination, not a fabricated empty document.
+        # Restore the original proved-empty current metadata; the imported
+        # cohort independently retains its native frozen protection dependencies.
         (self.work/"saved-protection").rename(self.plane/"protection")
+        self.assertEqual((self.plane / "protection/current_research.json").read_bytes(), current_pointer_bytes)
+        self.assertEqual(sorted(p.name for p in (self.plane / "protection/assignments").glob("CURRENT-RESEARCH-*.json")), current_versions)
+        self.assertEqual(f.current_protection_status(self.store)["status"], "ALLOW")
         tiny = {**plan_request, "max_input_rows": 1}
         f.apply_plan(self.store, f.plan_preview(self.store, tiny), git_sha=GIT_SHA)
         too_big = f.run_due(self.store, repo_root=ROOT, git_sha=GIT_SHA)
@@ -293,6 +303,43 @@ class FragmentVerticalTests(unittest.TestCase):
                 self.assertIn(blocks[1]["result_ref"], page)
                 self.assertIn("UNKNOWN", page)
 
+    def test_late_deny_after_native_reservation_stops_before_loader_and_pause_survives_unknown(self):
+        import pyarrow.parquet as pq
+        from solana_alpha_lab.factory import hfic_ordinary_operation as operations
+        from solana_alpha_lab.factory import hfic_grounded_discovery as discovery
+        from solana_alpha_lab.factory.opportunity_episode_release import load_episode_lineage
+        from tests.test_opportunity_episodes_harness_v1 import write_assignment
+        _request, evidence = self.seed()
+        plan_request, _applied = self.plan()
+        item = load_episode_lineage(self.plane)["cohorts"][0]
+        mint = pq.read_table(self.plane / item["census_rel"], columns=["mint"]).column("mint")[0].as_py()
+        original = operations.authorize_temporal_attempt
+        def late_deny(*args, **kwargs):
+            result = original(*args, **kwargs)
+            write_assignment(self.plane, [{"identity_kind": "MINT", "identity": mint,
+                "role": "UNTOUCHED_FORWARD_HOLDOUT", "scope": {"kind": "ALL_TIME"}}])
+            return result
+        with patch.object(operations, "authorize_temporal_attempt", side_effect=late_deny), patch.object(
+                discovery, "load_admitted_partition_rows", side_effect=AssertionError("unsafe value loader")) as loader:
+            result = f.run_due(self.store, repo_root=ROOT, git_sha=GIT_SHA)
+        self.assertEqual(result["fragments"][0]["reason"], "HOLDOUT_PROTECTED")
+        self.assertFalse(result["fragments"][0]["values_loaded"])
+        loader.assert_not_called()
+        occupancy = operations.journal_occupancy(self.store, f.journal_for(self.card["fragment_version_id"]))["main"]
+        self.assertEqual((occupancy["pending"], occupancy["completed"]), (1, 0))
+        self.assertEqual([r for r in f.documents(self.store) if r["artifact_kind"] == f.CHECK], [])
+        self.assertEqual(f.source_snapshot(self.store)[0]["source"]["result_sha256"], evidence["result_sha256"])
+        # Unknown current source still permits disabling and saved readback.
+        directory = self.plane / "protection/assignments"
+        (directory / "UNKNOWN.json").write_text(json.dumps({"schema": "UNKNOWN", "entries": []}), encoding="utf-8")
+        paused = f.plan_preview(self.store, {**plan_request, "enabled": False})
+        self.assertEqual(paused["current_protection"]["status"], "UNRESOLVED_SCOPE")
+        f.apply_plan(self.store, paused, git_sha=GIT_SHA)
+        view = f.source_snapshot(self.store)[0]
+        self.assertEqual(view["check"]["status"], "DISABLED")
+        self.assertEqual(view["source"]["result_sha256"], evidence["result_sha256"])
+        self.assertEqual(operations.journal_occupancy(self.store, f.journal_for(self.card["fragment_version_id"]))["main"]["pending"], 1)
+
 
 class FragmentDamagedItemTests(unittest.TestCase):
     def test_generic_scalar_and_damaged_identity_preserve_item_boundary(self):
@@ -311,6 +358,136 @@ class FragmentDamagedItemTests(unittest.TestCase):
         self.assertEqual(due["fragments"][0]["reason"], "FRAGMENT_ARTIFACT_INTEGRITY_INVALID")
         self.assertFalse(due["new_look"])
 
+
+
+
+class CurrentProtectionTests(unittest.TestCase):
+    """Small source/installer oracles; the existing vertical owns evaluation."""
+    def setUp(self):
+        import tempfile
+        from solana_alpha_lab.factory import episode_current_protection as protection
+        self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
+        self.work = Path(self.temp.name); self.plane = self.work / "plane"
+        self.store = ResearchStore(self.plane)
+        ResearchStore(self.work / "fast_lane_research_data_plane")
+        self.p = protection
+
+    def preview(self):
+        return self.p.preview_reconciliation(self.plane)
+
+    def apply(self, preview):
+        authority = {"proposal_sha256": preview["proposal_sha256"], "read_scope": preview["proposal"]["read_scope"],
+            "source_frontier_sha256": canonical_sha256(preview["proposal"]["source_frontier"]),
+            "mutation": "VERSIONED_PROTECTION_METADATA_ONLY", "owner_scope_ref": "SYNTHETIC_METADATA_ONLY"}
+        return self.p.apply_reconciliation(self.store, preview, authority=authority)
+
+    def test_historical_copy_is_not_current_and_proven_empty_is_stable(self):
+        from tests.test_opportunity_episodes_harness_v1 import write_assignment
+        from solana_alpha_lab.factory.opportunity_episodes import inventory_from_documents
+        pin = write_assignment(self.plane, [])
+        doc = json.loads((self.plane / "protection/assignments" / (pin["assignment_id"] + ".json")).read_bytes())
+        self.assertEqual(inventory_from_documents([doc]).status, "ALLOW")
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["reason"], "CURRENT_PROTECTION_NOT_INSTALLED")
+        self.assertIsNone(status["complete_empty"])
+        preview = self.preview(); self.assertTrue(preview["assessment"]["complete_empty"])
+        first = self.apply(preview); self.assertEqual(first["status"], "APPLIED")
+        self.assertEqual(self.apply(preview)["receipt"], first["receipt"])
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["status"], "ALLOW")
+        self.assertEqual(self.preview()["status"], "UNCHANGED")
+        from datetime import datetime as RealDatetime
+        class Tomorrow(RealDatetime):
+            @classmethod
+            def now(cls, tz=None):
+                return RealDatetime.now(tz) + timedelta(days=1)
+        with patch.object(self.p, "datetime", Tomorrow):
+            tomorrow, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["context_sha256"], tomorrow["context_sha256"])
+        self.assertEqual(status["installed_assignment_sha256"], tomorrow["installed_assignment_sha256"])
+
+    def test_source_change_cas_deny_and_missing_owner(self):
+        from tests.test_opportunity_episodes_harness_v1 import write_assignment
+        from solana_alpha_lab.factory.opportunity_episodes import protection_decision
+        preview = self.preview()
+        write_assignment(self.plane, [{"identity_kind": "MINT", "identity": "ProtectedSyntheticMint",
+            "role": "UNTOUCHED_FORWARD_HOLDOUT", "scope": {"kind": "ALL_TIME"}}])
+        with self.assertRaisesRegex(self.p.CurrentProtectionError, "PROTECTION_SOURCE_CHANGED"):
+            self.apply(preview)
+        self.assertFalse((self.plane / self.p.POINTER).exists())
+        self.apply(self.preview())
+        status, inventory = self.p.resolve_current_research_protection(self.plane)
+        self.assertFalse(status["complete_empty"])
+        at = datetime.now(UTC)
+        self.assertEqual(protection_decision(inventory, "ProtectedSyntheticMint", interval_start=at, interval_end=at+timedelta(days=1))[0], "DENY_PROTECTED")
+        (self.work / "fast_lane_research_data_plane").rename(self.work / "missing-secondary")
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["status"], "UNRESOLVED_SCOPE")
+        self.assertEqual(status["owner"], "FAST_LANE_RESEARCHSTORE")
+        self.assertIsNone(status["complete_empty"])
+
+    def test_baseline_disappearance_revocation_and_scalar_scope_are_unresolved(self):
+        from tests.test_opportunity_episodes_harness_v1 import write_assignment, ASSIGNMENT_ID
+        entry = {"identity_kind": "MINT", "identity": "BaselineSyntheticDeny",
+                 "role": "UNTOUCHED_FORWARD_HOLDOUT", "scope": {"kind": "ALL_TIME"}}
+        write_assignment(self.plane, [entry]); self.apply(self.preview())
+        path = self.plane / self.p.ASSIGNMENT_DIR / (ASSIGNMENT_ID + ".json")
+        original = path.read_bytes(); path.unlink()
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["reason"], "PROTECTION_BASELINE_SOURCE_MISSING")
+        self.assertIsNone(status["complete_empty"])
+        path.write_bytes(original); write_assignment(self.plane, [])
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["reason"], "PROTECTION_BASELINE_RESTRICTION_REMOVED")
+        write_assignment(self.plane, [{**entry, "scope": "UNKNOWN_SCALAR"}])
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["reason"], "PROTECTION_SCOPE_UNKNOWN")
+        self.assertEqual(status["owner"], "LOCAL_ASSIGNMENTS")
+        self.assertIsNone(status["complete_empty"])
+
+    def test_task22_scope_requires_actual_time_nonintersection(self):
+        from solana_alpha_lab.factory.opportunity_episodes import LOGICAL_DATASET_ID
+        self.apply(self.preview())
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        binding = {"dataset_id": LOGICAL_DATASET_ID, "evidence_role": "EXPLORATORY_REUSE",
+                   "cohort_id": "REL-20261007T000000Z-20261008T000000Z"}
+        self.p.assert_input_scope(status, [binding])
+        with self.assertRaisesRegex(self.p.CurrentProtectionError, "TASK22_SOURCE_OVERLAP_LINK_UNRESOLVED"):
+            self.p.assert_input_scope(status, [{**binding, "cohort_id": "REL-20260801T000000Z-20260802T000000Z"}])
+
+    def test_crash_before_and_after_pointer_retries_same_effect(self):
+        preview = self.preview()
+        with patch.object(self.p.os, "replace", side_effect=InterruptedError("synthetic crash before pointer")):
+            with self.assertRaises(InterruptedError): self.apply(preview)
+        self.assertFalse((self.plane / self.p.POINTER).exists())
+        applied = self.apply(preview)
+        self.assertEqual(self.apply(preview)["receipt"], applied["receipt"])
+        self.assertEqual(len(list((self.plane / "protection/assignments").glob("CURRENT-RESEARCH-*.json"))), 1)
+        from tests.test_opportunity_episodes_harness_v1 import write_assignment
+        write_assignment(self.plane, [])
+        second = self.preview()
+        real_replace = self.p.os.replace
+        def publish_then_crash(source, target):
+            real_replace(source, target)
+            raise InterruptedError("synthetic crash after pointer")
+        with patch.object(self.p.os, "replace", side_effect=publish_then_crash):
+            with self.assertRaises(InterruptedError): self.apply(second)
+        self.assertEqual(self.apply(second)["status"], "ALREADY_APPLIED")
+        self.assertEqual(len(list((self.plane / "protection/assignments").glob("CURRENT-RESEARCH-*.json"))), 2)
+
+    def test_ambiguous_scope_and_transplanted_proof_fail_closed(self):
+        from tests.test_opportunity_episodes_harness_v1 import write_assignment
+        self.apply(self.preview())
+        other = self.work / "other"; other.mkdir()
+        shutil.copytree(self.plane / "protection", other / "protection")
+        status, _ = self.p.resolve_current_research_protection(other)
+        self.assertEqual(status["reason"], "CURRENT_PROTECTION_BINDING_INVALID")
+        write_assignment(self.plane, [{"identity_kind": "MINT", "identity": "AmbiguousSyntheticMint",
+            "role": "UNTOUCHED_FORWARD_HOLDOUT", "scope": {"kind": "UNKNOWN"}}])
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["reason"], "PROTECTION_SCOPE_UNKNOWN")
+        self.assertEqual(status["owner"], "LOCAL_ASSIGNMENTS")
+        self.assertIsNone(status["complete_empty"])
 
 if __name__ == "__main__":
     unittest.main()

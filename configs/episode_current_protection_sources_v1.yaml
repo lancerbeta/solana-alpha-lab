@@ -1,0 +1,165 @@
+schema: smial.episode-current-protection-sources
+schema_version: '1.0'
+source_set_id: OPPORTUNITY_EPISODES_LOCAL_EXPLORATORY_CURRENT_V1
+collection: OPPORTUNITY_EPISODES
+evidence_role: EXPLORATORY_REUSE
+secondary_store: fast_lane_research_data_plane
+required_roles:
+- LOCAL_ASSIGNMENTS
+- CANONICAL_RESEARCHSTORE
+- FAST_LANE_RESEARCHSTORE
+- CONSUMPTION_REGISTRY
+- TASK22_ACCEPTED_SPLIT
+- EXPERIMENT_POLICIES
+- LIST_A_PROTOCOL
+interpretation_version: '1.0'
+known_experiment_policies:
+  factory_v1_commissioning_quote_native_free_key_v1.yaml:
+    schema: smial.experiment-spec
+    schema_version: '1.0'
+    population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2
+    holdout_policy: No new holdout is opened; this atom commissions Factory with a
+      new live cohort and does not consume a reserved OOS split or start MOVE 3.
+  fresh_oos_baseline_vs_friction_veto_v1.yaml:
+    schema: smial.experiment-spec
+    schema_version: '1.0'
+    population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING
+    holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort
+      excluding A1, MOVE 2 and commissioning mints and does not start MOVE 3.
+  list_a_chronological_confirmation_v1.yaml:
+    schema: smial.experiment-spec
+    schema_version: '1.5'
+    population: OPPORTUNITY_EPISODES
+    holdout_policy: null
+  market_feature_creator_pressure_archetype_v1.yaml:
+    schema: smial.experiment-spec
+    schema_version: '1.0'
+    population: NO_HOLDER_SNAPSHOT_NO_ENTITY_CLUSTER
+    holdout_policy: No holdout is opened; this atom does not collect holder snapshots
+      or revive TASK-24 entity inference.
+  market_feature_liquidity_archetype_v1.yaml:
+    schema: smial.experiment-spec
+    schema_version: '1.0'
+    population: A1_FREE_KEY_QUOTE_CELLS_AND_A24_POOL_DAY
+    holdout_policy: No holdout is opened; quote observation stays forward-only and
+      is not a KEEP screen.
+  market_feature_price_path_archetype_v1.yaml:
+    schema: smial.experiment-spec
+    schema_version: '1.0'
+    population: A24_LIMITED_DIAGNOSTIC_POOL_DAY_RETROSPECTIVE
+    holdout_policy: No holdout is opened; this atom composes coverage from already-accepted
+      Git receipts.
+  ordinary_liquidity_quote_pressure_v1.yaml:
+    schema: smial.experiment-spec
+    schema_version: '1.0'
+    population: A1_FREE_KEY_QUOTE_CELLS_AND_A24_POOL_DAY
+    holdout_policy: No holdout is opened; quote observation stays forward-only and
+      cannot promote an execution hypothesis.
+  ordinary_price_path_buy_pressure_v1.yaml:
+    schema: smial.experiment-spec
+    schema_version: '1.0'
+    population: A24_LIMITED_DIAGNOSTIC_POOL_DAY_RETROSPECTIVE
+    holdout_policy: No holdout is opened; promotion is forbidden while Git-canonical
+      returns stay typed UNKNOWN.
+  prior_git_t0_friction_screen_v1.yaml:
+    schema: smial.experiment-spec
+    schema_version: '1.0'
+    population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5
+    holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort
+      excluding A1, MOVE 2, commissioning and ATOM 5 veto-campaign mints and does
+      not start MOVE 3.
+  quote_native_admissible_friction_audition_offline_v1.yaml:
+    schema: smial.experiment-spec
+    schema_version: '1.0'
+    population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED
+    holdout_policy: No new holdout is opened; this atom replays already-consumed A1
+      evidence and does not treat MOVE 2 as a new result.
+  quote_surface_retention_confirmatory_v1.yaml:
+    schema: smial.experiment-spec
+    schema_version: '1.0'
+    population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5_ATOM6_PR156
+    holdout_policy: No reserved OOS split is consumed; this confirmatory uses a new
+      live cohort excluding A1, MOVE 2, commissioning, ATOM 5, ATOM 6 and PR 156 mints
+      and does not start Atom 2.
+  quote_surface_retention_falsifier_v1.yaml:
+    schema: smial.experiment-spec
+    schema_version: '1.0'
+    population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5_ATOM6
+    holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort
+      excluding A1, MOVE 2, commissioning, ATOM 5 and ATOM 6 mints and does not start
+      Atom 2.
+embedded_exploratory_policy: EXPLORATORY_REUSE only; no untouched/forward holdout
+  reads; no execution authority. Current native protection must be independently revalidated
+  before any later action.
+task22_acceptance_ref: docs/evidence/task22/a6_split_resolution_acceptance_catalog_factory_fit_v1.json
+source_boundary: Local current namespace and canonical declarations; producer pins
+  are per-input frozen admission dependencies. Advisory holdouts_not_touched is not
+  an assignment. Unknown authoritative links stay unresolved. This source set grants
+  no confirmatory or Scout-wide protection.
+task22_acceptance_sha256: 29c1ad28d06430b74864b745ef50bf0315fcbfcfb5a7534e54b1692a3f15a019
+store_record_versions:
+- '1.0'
+store_body_versions:
+  CAPABILITY_RESULT:
+  - null
+  DISCOVERY_FEATURE_PREVIEW:
+  - null
+  DISCOVERY_QUERY_INTENT:
+  - null
+  FORGE_RESEARCH_POLICY_RUN_SNAPSHOT_V1:
+  - '1.0'
+  FORGE_RESEARCH_UNIVERSE_POLICY:
+  - '1.0'
+  FORWARD_CAPTURE_FROZEN_CONTRACT:
+  - null
+  HFIC_SEARCH_MEMORY_POLICY:
+  - '1.0'
+  ORDINARY_LOOK_RESERVATION_V1:
+  - '1.0'
+  ORDINARY_OPERATION_V1:
+  - '1.0'
+  ORDINARY_SCIENTIFIC_DISPOSITION_V1:
+  - '1.0'
+  PROVENANCE_TIME_CORRECTION:
+  - '1.0'
+  REPAIR_CONTINUATION_DISPOSITION_V1:
+  - '1.0'
+  RESEARCH_FRAGMENT_CHECK_V1:
+  - '1.0'
+  RESEARCH_FRAGMENT_PLAN_V1:
+  - '1.0'
+  RESEARCH_FRAGMENT_V1:
+  - '1.0'
+  SCIENCE_MEMORY_REBASE_RECEIPT:
+  - null
+  smial.discovery-query-look:
+  - '1.0'
+  smial.forge-research-policy-run-snapshot:
+  - '1.0'
+  smial.forge-research-universe-policy:
+  - '1.0'
+  smial.forge-run-receipt:
+  - '1.0'
+  smial.hfic-classifier-receipt:
+  - '1.0'
+  smial.hfic-ordinary-look-reservation:
+  - '1.0'
+  smial.hfic-ordinary-operation:
+  - '1.0'
+  smial.hfic-provenance-time-correction:
+  - '1.0'
+  smial.hfic-reopened-prior-hypothesis-version:
+  - '1.0'
+  smial.hfic-repair-continuation-disposition:
+  - '1.0'
+  smial.hfic-scientific-disposition:
+  - '1.0'
+  smial.hfic-search-memory-policy:
+  - '1.0'
+  smial.hypothesis-critic-result:
+  - '1.0'
+  - '1.1'
+  smial.observation-schedule-authority:
+  - '1.0'
+  smial.scientific-slot-admission:
+  - '1.0'

@@ -32089,7 +32089,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_store.py', repository_path: src/solana_alpha_lab/factory/research_store.py}
-  integrity: {kind: sha256, sha256: c4c102b35c683eadfc06f8bbd92d6b4b23c53ec6dbf491b36fb02a8f5caa42d9}
+  integrity: {kind: sha256, sha256: 84b2e7cd38411f1fcdf0b99fbfa4553b6e7d11e80bb7705985b875eeb457880c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -38607,7 +38607,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py', repository_path: src/solana_alpha_lab/factory/hfic_evidence_identity.py}
-  integrity: {kind: sha256, sha256: c30224918bdf58e813f3af7e862f7c714ee4f557f2b95402cdc37507cc271cc1}
+  integrity: {kind: sha256, sha256: 4da7b412f3973b3e97ea691f91462be462246598594a94fb16fa89f1b8a5474e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
@@ -40317,7 +40317,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_opportunity_episodes_vertical_v1.py', repository_path: tests/test_opportunity_episodes_vertical_v1.py}
-  integrity: {kind: sha256, sha256: 6ef304e3f369df415da4354b62155fb9309dcc88453b6fab14eca627de540947}
+  integrity: {kind: sha256, sha256: 092c80fa8ba689239dcf4bab68003b4b04a866532cee791e3e34001574c0b946}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
@@ -42087,7 +42087,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/episode_required_outcomes.py', repository_path: src/solana_alpha_lab/factory/episode_required_outcomes.py}
-  integrity: {kind: sha256, sha256: 1db37becb39b458afe6e730aceb38894642b9f356574808a36ff41d37b47c082}
+  integrity: {kind: sha256, sha256: 259f1ff8d2de2e80f4ee1211b389bdb4c840b98ecfda7483ed391420f3bc862e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]
@@ -42104,7 +42104,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_episode_native_required_outcome_contract_v1.py', repository_path: tests/test_episode_native_required_outcome_contract_v1.py}
-  integrity: {kind: sha256, sha256: 58c7cbf7fbaf880b4c4172511879288dfcf0af8a3ae9a093902d6a8556fafa0d}
+  integrity: {kind: sha256, sha256: 29f0a421941445a8a5b1c4c602e1af1f6b991555d157260cd3457a2a8e3df8b8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]
@@ -42121,7 +42121,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/episode_native_required_outcomes_v1.md', repository_path: docs/contracts/episode_native_required_outcomes_v1.md}
-  integrity: {kind: sha256, sha256: d0eaeb21638d9e93fdd2e2a3c830fa8c499d63f4026311fcedd6b243ba13a906}
+  integrity: {kind: sha256, sha256: 4b81d4782e8cbd9a792d2537ffc4d97fc34c104563e7d2d4ed8f98c0c368ec06}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]
@@ -43321,7 +43321,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_fragments.py', repository_path: src/solana_alpha_lab/factory/research_fragments.py}
-  integrity: {kind: sha256, sha256: b1f62853834e5ec6fa83d512d3ee706a66fafa9885d4770379669e93ca19642d}
+  integrity: {kind: sha256, sha256: ac97bbe6b98931ece63a0be16e2dc979bcd423074abdcf8c6d479a64b762bcfe}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43338,7 +43338,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/research_fragments.py', repository_path: scripts/research_fragments.py}
-  integrity: {kind: sha256, sha256: 9f08f739141c72ff45a10e6a3dd5a97e4a5d7d3a20345ee88d84ceeb2c8a84cc}
+  integrity: {kind: sha256, sha256: 83a4e8cd4a0ea150d6192368abb2ea5c3bf93595abdd83efdf32af94a321be43}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43372,7 +43372,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/RESEARCH_FRAGMENTS_V1.md', repository_path: docs/operator/RESEARCH_FRAGMENTS_V1.md}
-  integrity: {kind: sha256, sha256: 14c27b59506fa7674c167fbfd7642f32184bb073fc83d64ba841dd36ab25d660}
+  integrity: {kind: sha256, sha256: 0e0d305419fca2008c9107bca4c5b7e7f7072d2d4df756409580212b7c863be6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43389,10 +43389,137 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_research_fragments_v1.py', repository_path: tests/test_research_fragments_v1.py}
-  integrity: {kind: sha256, sha256: b9029a68572d3253cea1843b7b2129ad4acfac74d9c9496a2d378a80e9308003}
+  integrity: {kind: sha256, sha256: 824f9496461192a00177c24123bdc0d6b24ccbb1a446452b6c4f9a5a0f1a4c2c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
   evidence: []
   search_terms: [SMIAL_RESEARCH_FRAGMENTS_V1, research fragments, source snapshot, bounded due, cold resume]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-OPPORTUNITY-EPISODES-PROTECTION-COMPLETENESS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Bounded current protection reconciliation, source closure, native consumers
+    and exact installation/merge boundaries.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-19'
+  truth_owner: OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/tasks/OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1.md
+    repository_path: docs/tasks/OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1.md
+  integrity:
+    kind: sha256
+    sha256: 6310da8be7fd03adf8c01977af95f2eedab172f2bcb6e9bbc0daaf6b5982c009
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-OPPORTUNITY-EPISODES-001
+  consumers:
+  - FACTORY-001
+  - HYPOTHESIS-FORGE
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - OPPORTUNITY_EPISODES
+  - current protection
+  - protection-preview
+  - source completeness
+  - TASK-22
+  - current vs frozen
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: MODULE-EPISODE-CURRENT-PROTECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Source-owned current exploratory protection assessment, immutable native
+    proof installation and revalidation before episode values.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-19'
+  truth_owner: OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/factory/episode_current_protection.py
+    repository_path: src/solana_alpha_lab/factory/episode_current_protection.py
+  integrity:
+    kind: sha256
+    sha256: f9e0906df0e88e021189f4dd9f2a6d91cd91bcd437cdd5b51ff39cbc372cb3e0
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-OPPORTUNITY-EPISODES-001
+  - relation_type: governed_by
+    target_asset_id: CTRL-OPPORTUNITY-EPISODES-PROTECTION-COMPLETENESS-001
+  consumers:
+  - FACTORY-001
+  - HYPOTHESIS-FORGE
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - OPPORTUNITY_EPISODES
+  - current protection
+  - protection-preview
+  - source completeness
+  - TASK-22
+  - current vs frozen
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: CONFIG-EPISODE-CURRENT-PROTECTION-SOURCES-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Explicit scoped authority source roles and supported native interpretations;
+    no assignments or scientific grant.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-19'
+  truth_owner: OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1
+  location:
+    kind: git_path
+    logical_uri: repo://configs/episode_current_protection_sources_v1.yaml
+    repository_path: configs/episode_current_protection_sources_v1.yaml
+  integrity:
+    kind: sha256
+    sha256: d7dee1ed66c2dca49ed5655fcdc603a6ddb0a4a4483c25fd55a94213fe43371f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: MODULE-OPPORTUNITY-EPISODES-001
+  - relation_type: governed_by
+    target_asset_id: CTRL-OPPORTUNITY-EPISODES-PROTECTION-COMPLETENESS-001
+  consumers:
+  - FACTORY-001
+  - HYPOTHESIS-FORGE
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - OPPORTUNITY_EPISODES
+  - current protection
+  - protection-preview
+  - source completeness
+  - TASK-22
+  - current vs frozen
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET

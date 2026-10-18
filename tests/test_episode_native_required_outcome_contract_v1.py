@@ -76,6 +76,8 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         shutil.copytree(self.template / "plane", self.plane)
         self.store = ResearchStore(self.plane)
         self.store.prepare_write_lookup()
+        from tests.test_opportunity_episodes_vertical_v1 import install_current_fixture
+        install_current_fixture(self.plane, reset_root_binding=True)
         self.spec, self.frozen = load_case(self.template)
         self.definition = self.frozen["selected_definition_sha256"]
 
@@ -175,6 +177,23 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         recipe["frozen_input"][-1]["observations_sha256"] = "0" * 64
         with self.assertRaisesRegex(GroundedDiscoveryError, "EPISODE_SOURCE_BINDING_CONFLICT"):
             self.project(spec)
+
+    def test_explicit_single_pair_uses_same_current_gate_before_loader(self):
+        from solana_alpha_lab.factory import hfic_grounded_discovery as discovery
+        binding = discovery.resolve_published_episode_binding(self.plane)
+        item = binding["cohorts"][0]
+        single = {**binding, "cohorts": [item]}
+        kwargs = dict(data_root=None, binding_doc=single, partitions=None,
+                      census_path=self.plane / item["census_rel"],
+                      observations_path=self.plane / item["observations_rel"])
+        loaded = discovery.load_admitted_partition_rows(**kwargs)
+        self.assertTrue(loaded["values_loaded"])
+        self.assertGreater(len(loaded["census"]), 0)
+        (self.plane / "protection/current_research.json").rename(self.work / "missing-current-pointer")
+        with patch.object(discovery, "load_parquet_rows", side_effect=AssertionError("UNSAFE_FALLBACK_VALUE_LOADER")) as loader:
+            with self.assertRaisesRegex(GroundedDiscoveryError, "HOLDOUT_UNRESOLVED"):
+                discovery.load_admitted_partition_rows(**kwargs)
+        loader.assert_not_called()
 
     def test_current_protection_denies_before_values(self):
         import pyarrow.parquet as pq

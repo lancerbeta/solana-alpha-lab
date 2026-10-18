@@ -442,18 +442,9 @@ def root_identity(store: Any) -> str:
 
 
 def current_protection_status(store: Any) -> dict[str, Any]:
-    """Native completeness only; historical admission pins cannot fill a gap."""
-    from solana_alpha_lab.factory.opportunity_episodes import ASSIGNMENT_DIR, inventory_from_documents
-    folder = store.root / ASSIGNMENT_DIR
-    try:
-        _require(folder.is_dir() and not folder.is_symlink(), "HOLDOUT_UNRESOLVED")
-        paths = sorted(folder.glob("*.json"))
-        _require(all(not p.is_symlink() for p in paths), "HOLDOUT_UNRESOLVED")
-        inventory = inventory_from_documents([json.loads(p.read_text(encoding="utf-8")) for p in paths])
-        return {"status": inventory.status, "reason": inventory.reason,
-                "sources": list(inventory.sources), "inventory_sha256": inventory.fingerprint()}
-    except (ValueError, OSError):
-        return {"status": "UNRESOLVED_SCOPE", "reason": "HOLDOUT_UNRESOLVED", "sources": []}
+    """Read-only source-owned current proof; historical pins cannot fill it."""
+    from solana_alpha_lab.factory.episode_current_protection import resolve_current_research_protection
+    return resolve_current_research_protection(store.root)[0]
 
 
 def plan_preview(store: Any, request: Mapping[str, Any], *, now: datetime | None = None) -> dict[str, Any]:
@@ -784,6 +775,9 @@ def run_due(store: Any, *, repo_root: Path, git_sha: str) -> dict[str, Any]:
             authorize_temporal_attempt(store, operation_sha256=operation["operation_sha256"], spec=spec,
                 journal_scope=operation["journal_scope"], binding_cohorts=binding,
                 verified_market=operation["market_evidence_epoch_sha256"], repo_root=repo_root, data_root=store.root)
+            # A change after native reservation must still stop before the
+            # first value loader. Reservation/accounting survives this refusal.
+            _verify_inputs(store.root, binding, plan["max_input_rows"])
             # Frozen verified partitions: later publication pointers cannot
             # replace their manifest ids or widen the denominator at load time.
             values_loaded = True

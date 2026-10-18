@@ -20,8 +20,7 @@ from solana_alpha_lab.factory.hfic_grounded_discovery import (
 )
 from solana_alpha_lab.factory import hfic_temporal_discovery as temporal
 from solana_alpha_lab.factory.opportunity_episodes import (
-    ALLOW, ASSIGNMENT_DIR, DENY_PROTECTED, cohort_day_bounds,
-    inventory_from_documents, point_offset, resolve_point, schedule_binding,
+    ALLOW, DENY_PROTECTED, cohort_day_bounds, point_offset, resolve_point, schedule_binding,
 )
 from solana_alpha_lab.factory.run_passport import canonical_sha256, experiment_spec_sha256
 
@@ -82,16 +81,15 @@ def _verify_frozen_episode_sources(data_root: Path, frozen: Sequence[Mapping[str
     )
 
     admit_discovery_binding(frozen)
-    assignment_dir = _contained(data_root, ASSIGNMENT_DIR)
-    _require(assignment_dir.is_dir(), "HOLDOUT_UNRESOLVED")
+    from solana_alpha_lab.factory.episode_current_protection import resolve_current_research_protection, with_frozen_protection
+    current_status, current = resolve_current_research_protection(data_root)
+    if current_status["status"] != ALLOW:
+        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED", {"current_protection": current_status})
+    from solana_alpha_lab.factory.episode_current_protection import assert_input_scope, CurrentProtectionError
     try:
-        current = [_json(data_root, str(path.relative_to(data_root)).replace("\\", "/"))
-                   for path in sorted(assignment_dir.glob("*.json"))]
-    except (OSError, ValueError, GroundedDiscoveryError) as exc:
-        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED") from exc
-    # Historical admission completeness cannot establish current completeness.
-    # A legal empty current inventory is an explicit native complete-empty doc.
-    _require(inventory_from_documents(current).status == ALLOW, "HOLDOUT_UNRESOLVED")
+        assert_input_scope(current_status, frozen)
+    except CurrentProtectionError as exc:
+        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED", {"source_reason": exc.code, "owner": exc.owner}) from exc
     manifest_parts: dict[str, list[Any]] = {}
     protection = []
     source_refs = []
@@ -148,9 +146,8 @@ def _verify_frozen_episode_sources(data_root: Path, frozen: Sequence[Mapping[str
             matching = [p for p in manifest_parts[manifest_id] if p.logical_location == item[rel_key]]
             _require(len(matching) == 1 and matching[0].file_sha256 == item[hash_key]
                      and matching[0].content_sha256 == item[hash_key], "EPISODE_SOURCE_BINDING_CONFLICT")
-        inventory = inventory_from_documents([
-            *frozen_protection_from_release(census.parent, expected_schedule_sha256=str(item["schedule_sha256"])), *current,
-        ])
+        inventory = with_frozen_protection(current,
+            frozen_protection_from_release(census.parent, expected_schedule_sha256=str(item["schedule_sha256"])))
         start, end = cohort_day_bounds(str(item["cohort_id"]))
         for mint in pq.read_table(census, columns=["mint"]).column("mint").to_pylist():
             verdict, _ = protection_decision_for_source(inventory, mint, start, end)

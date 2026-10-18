@@ -64,6 +64,8 @@ _CAPABILITY_PROTOCOL_FILES = (
     "src/solana_alpha_lab/factory/hfic_generation_context.py",
     "src/solana_alpha_lab/factory/hfic_packet_capacity.py",
     "src/solana_alpha_lab/factory/research_fragments.py",
+    "src/solana_alpha_lab/factory/episode_current_protection.py",
+    "configs/episode_current_protection_sources_v1.yaml",
     "catalog/schemas/research_fragment_v1.schema.json",
     "scripts/research_fragments.py",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py",

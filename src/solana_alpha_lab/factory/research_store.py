@@ -1792,8 +1792,10 @@ class ResearchStore:
             )
             return self._receipt(manifest, disposition)
 
-    def iter_committed_records(self) -> Iterator[ResearchEvent]:
-        cache = _lifecycle_read_cache.get()
+    def iter_committed_records(self, *, fresh: bool = False) -> Iterator[ResearchEvent]:
+        # Admission revalidation must observe external commits even inside a
+        # lifecycle packet that safely caches historical display reads.
+        cache = None if fresh else _lifecycle_read_cache.get()
         key = (str(self._root.resolve()), "verified_history")
         generation = cache.get(("", "generation"), 0) if cache is not None else None
         if cache is not None and key in cache:
@@ -1801,7 +1803,7 @@ class ResearchStore:
             return
         seen: set[str] = set()
         verified: list[ResearchEvent] = []
-        for manifest in self._committed_manifests():
+        for manifest in self._committed_manifests(fresh=fresh):
             for record in self._verify_partition(manifest):
                 if record.record_id in seen:
                     raise ResearchStoreError("DUPLICATE_RECORD_ID")

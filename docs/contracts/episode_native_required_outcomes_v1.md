@@ -18,13 +18,26 @@ Schema: `catalog/schemas/experiment_spec_v1_4.schema.json`. Loader:
 Штатная поверхность: existing `apply-classification` после сохранённого Critic
 `PASS_TO_CLASSIFICATION`; cold `load_session_bundle` возвращает старый receipt.
 Повтор действия классификации заново проверяет источники и current protection.
-Текущий inventory должен отдельно иметь native completeness proof. Законный
-пустой inventory выражается complete-empty assignment document существующего
-owner; missing/empty/unreadable/incomplete current source даёт HOLDOUT_UNRESOLVED.
-Историческая completeness frozen admission не заменяет текущую.
-Completeness приносит protection owner; агент не выставляет complete ради READY.
-Test fixture может заявить empty inventory только для полностью контролируемого
-disposable synthetic consumer.
+Текущий inventory должен отдельно иметь source-owned completeness proof.
+Единственный current owner — `factory.episode_current_protection` с explicit
+source set `configs/episode_current_protection_sources_v1.yaml`. Native assignment
+1.0 envelope сохраняется; additive completeness metadata связывает exact root,
+read role, source versions/frontier и immutable installation receipt. Raw
+complete-empty или historical admission pin сами не являются current authority.
+Доказанный scoped complete-empty допустим после metadata assessment всех
+обязательных owners и отдельно разрешённой установки. Missing/unknown источник
+остаётся HOLDOUT_UNRESOLVED с source detail. TASK-22 v2 DENY остаётся у своего
+TASK-21 dataset; UNBOUND List A не является confirmatory grant. `checked_at`
+не TTL; compatible cohort и обычные CHECK не требуют ручного renewal.
+
+Fixed-time binder, classifier, native discovery и fragment runner используют
+один resolver. Current namespace проверяется заново перед actual value loader,
+включая frozen callers, которым не нужен mutable corpus pointer. Frozen release
+integrity и per-mint interval intersection проверяются отдельно; protected subset
+не удаляется из denominator. Source-specific metadata proof не сбрасывает market
+identity/budget и не перепривязывает старый saved result к новому capability SHA.
+Test fixture устанавливает proof только в полностью контролируемом disposable
+consumer через тот же native preview/apply; gate не monkeypatch-ится в ALLOW.
 
 Весь existing envelope сохраняется. Обязательны exact selected definition,
 frozen `parameters.temporal_recipe` из Critic packet, native census/observations,
