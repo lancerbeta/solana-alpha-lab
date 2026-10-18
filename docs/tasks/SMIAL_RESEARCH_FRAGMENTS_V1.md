@@ -38,6 +38,7 @@ managed_write_set:
 - catalog/schemas/owner_lifecycle_projection_v1.schema.json
 - catalog/schemas/hypothesis_critic_input_v1.schema.json
 - tests/test_research_fragments_v1.py
+- tests/test_factory_ordinary_market_hypothesis.py
 - tests/test_owner_lifecycle_projection_spine_v1.py
 - tests/test_research_lifecycle_workbench_v1.py
 - tests/test_forge_evidence_guided_generation_v1.py

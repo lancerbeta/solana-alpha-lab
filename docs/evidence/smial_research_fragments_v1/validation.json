@@ -1,4 +1,13 @@
 {
+  "ci_repair": {
+    "cause": "Current engineering workbench SHA pin predates authorized fragment presentation. Other core pins and all behavioral assertions unchanged; historical evidence untouched.",
+    "failed_job": "validate-tests (3)",
+    "failed_test": "test_factory_core_python_unchanged",
+    "new_real_market_look": false,
+    "product_code_changed": false,
+    "repair": "Update only current workbench pin/comment; exact test path added to task write set. Native Catalog sync and fresh exact-head CI required.",
+    "run_id": 39150097888
+  },
   "full_gate": "Not run locally; exact-head project CI and guarded merge own full verification",
   "non_claims": [
     "NO_REAL_SEED_REGISTERED",
@@ -67,6 +76,13 @@
       "elapsed_seconds": 12.029,
       "log_sha256": "79e9e51329cb34c52b0026adbb97a59c24183b836aa0c3a1d4a4afb340ee5dec",
       "tests": 3,
+      "verdict": "PASS"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_factory_ordinary_market_hypothesis -v",
+      "elapsed_seconds": 10.598,
+      "log_sha256": "f8923e8bdf0e248521595d89b83cf0ece637d1d75e5d5038c9206ed520025461",
+      "tests": 13,
       "verdict": "PASS"
     }
   ],
