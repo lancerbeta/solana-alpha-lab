@@ -1880,7 +1880,7 @@ def _fragment_detail_html(fragment: Mapping[str, Any]) -> str:
         f"<h3>Следующая проверка</h3><p>{esc(check.get('status'))} · {esc(blocker_label(check['reason']) if check.get('reason') else check.get('next_trigger') or 'UNKNOWN')}</p>"
         + (f"<p class=\"mono\">{esc(check['reason'])}</p>" if check.get('reason') else "")
         + ("<p>Следующая проверка заблокирована. Сохранённые результаты доступны; уточните причину через read перед повторным запуском.</p>" if check.get('status') == 'BLOCKED' else "")
-        + f"<p>План включён: {'да' if plan.get('enabled') else 'нет'}. Максимум новых измерений: {esc(plan.get('max_evaluations', '—'))}; "
+        + f"<p>План включён: {'UNKNOWN' if not plan and check.get('status') == 'BLOCKED' else 'да' if plan.get('enabled') else 'нет'}. Максимум новых измерений: {esc(plan.get('max_evaluations', '—'))}; "
         f"крайний срок: {esc(plan.get('execution_deadline', '—'))}.</p>"
         "<p>Запуск: локальный завершённый import или явный run-due. При выключенном ПК проверки не выполняются. "
         "GET этой страницы не запускает измерение.</p>"

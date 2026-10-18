@@ -25744,7 +25744,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: 6937104bb198dc285a23036d2f22702378aebec01d037fcbbfe3c4f8ca43b381}
+  integrity: {kind: sha256, sha256: 3d42a9b42b702d51080d8d03ab47214d8402be3d3bb7d2885ffd47aa2e13fcdd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}

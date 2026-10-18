@@ -40,6 +40,7 @@
     "execution_failure_preserves_verified_prior_evidence": "Native malformed PLAN appended; both evidence blocks retained in snapshot and ordinary capsule, exact BLOCKED reason",
     "recovery_readback": "Landed native result with no CHECK reports DUE/FRAGMENT_RECOVER_LANDED_RESULT before cold recovery",
     "transient_attempts": "Concurrent Catalog mutation invalidated one preflight composite; serialized sync/test. One final assertion used the wrong existing API key; corrected to capsules and complete current scenario rerun PASS.",
+    "unknown_plan_render": "PASS_METADATA_ONLY_UNKNOWN_PLAN_RENDER: unavailable enabled value is UNKNOWN, exact blocker retained; no Store or market access",
     "verdict": "PASS"
   },
   "scope": "SYNTHETIC_VERTICAL_AND_READ_ONLY_REAL_SOURCE",
