@@ -265,6 +265,37 @@ def _fragment_operations(store: Any, fragment: str) -> list[dict[str, Any]]:
             if (o.get("fragment_check") or {}).get("fragment_version_id") == fragment})]
 
 
+def _plan_by_sha(rows: list[dict[str, Any]], digest: str) -> dict[str, Any] | None:
+    matches = [p for p in rows if p["artifact_kind"] == PLAN and p.get("plan_sha256") == digest]
+    _require(len(matches) <= 1, "FRAGMENT_PLAN_SOURCE_AMBIGUOUS")
+    if not matches or matches[0].get("_error"):
+        return None
+    plan = matches[0]
+    unsigned = {k: v for k, v in plan.items() if not k.startswith("_") and k != "plan_sha256"}
+    return plan if canonical_sha256(unsigned) == digest else None
+
+
+def _saved_check_basis(result: Mapping[str, Any], check: Mapping[str, Any],
+                       rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """Unavailable execution metadata cannot erase independently verified results."""
+    try:
+        plan = _plan_by_sha(rows, check["plan_sha256"])
+        _require(plan is not None, "FRAGMENT_INFORMATION_RULE_SOURCE_UNAVAILABLE")
+        return {"status": "AVAILABLE", **_information_basis(result, plan["information_rule"])}
+    except (StopIteration, KeyError, TypeError, ValueError):
+        return {"status": "UNKNOWN", "reason": "FRAGMENT_INFORMATION_RULE_SOURCE_UNAVAILABLE",
+                "source_plan_sha256": check["plan_sha256"], "criteria": None, "enough": None}
+
+
+def _fragment_cards(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    cards = [r for r in rows if r["artifact_kind"] == CARD]
+    known = {r.get("fragment_version_id") for r in cards}
+    # Execution metadata errors belong to their card's dependent gate, not
+    # a competing error-card whose partition order could hide trusted evidence.
+    return cards + [r for r in rows if r.get("_error") and r["artifact_kind"] != CARD
+                    and r.get("fragment_version_id") not in known]
+
+
 def source_snapshot(store: Any, *, as_of: datetime | str | None = None,
                     now: datetime | None = None) -> list[dict[str, Any]]:
     """One read-only source snapshot for UI, CLI and ordinary prior consumers."""
@@ -281,7 +312,7 @@ def source_snapshot(store: Any, *, as_of: datetime | str | None = None,
                 return iter(visible)
         store = VisibleRead()
     views = []
-    for card in (r for r in rows if r["artifact_kind"] == CARD or r.get("_error")):
+    for card in _fragment_cards(rows):
         fragment = card.get("fragment_version_id")
         try:
             _require(not card.get("_error"), "FRAGMENT_ARTIFACT_INTEGRITY_INVALID")
@@ -302,8 +333,7 @@ def source_snapshot(store: Any, *, as_of: datetime | str | None = None,
                 _require(result_sha256(look["result"]) == check["result_sha256"], "FRAGMENT_CHECK_RESULT_HASH_MISMATCH")
                 blocks.append({**{k: check[k] for k in ("window", "result_ref", "result_sha256", "assessment", "attention")},
                                "kind": "MONITORING", "summary": _summary(look["result"]),
-                               "information_basis": _information_basis(look["result"], next(
-                                   p["information_rule"] for p in rows if p.get("plan_sha256") == check["plan_sha256"])),
+                               "information_basis": _saved_check_basis(look["result"], check, rows),
                                "exposure": "EXPLORATORY_MONITORING", "source_ref": check["_record_id"]})
             plan = None
             try:
@@ -312,6 +342,9 @@ def source_snapshot(store: Any, *, as_of: datetime | str | None = None,
             except (ValueError, KeyError, TypeError, OSError, ResearchStoreError) as exc:
                 # Execution metadata cannot erase already verified evidence.
                 freshness = {"status": "BLOCKED", "reason": getattr(exc, "code", "FRAGMENT_EXECUTION_UNAVAILABLE"), "new_look": False}
+            if freshness["status"] != "BLOCKED" and any(
+                    (b.get("information_basis") or {}).get("status") == "UNKNOWN" for b in blocks):
+                freshness = {**freshness, "status": "BLOCKED", "reason": "FRAGMENT_INFORMATION_RULE_SOURCE_UNAVAILABLE"}
             if (not as_of and plan and plan.get("enabled") and freshness["status"] in {"DUE", "FUTURE_WAIT"}
                     and freshness.get("reason") != "FRAGMENT_RECOVER_LANDED_RESULT"):
                 protection = current_protection_status(store)
@@ -360,7 +393,7 @@ def plan_status(store: Any, card: Mapping[str, Any], plan: Mapping[str, Any] | N
             continue
         state = operation_lifecycle(store, operation)["effective_state"]
         context = operation["fragment_check"]
-        original = next((p for p in rows if p.get("plan_sha256") == context["plan_sha256"]), None)
+        original = _plan_by_sha(rows, context["plan_sha256"])
         matches = context["capability_epoch_sha256"] == plan["capability_epoch_sha256"]
         contract_allows = (original is not None and matches and context["window"] in plan["windows"]
                            and now <= min(_time(plan["execution_deadline"]), _time(original["execution_deadline"])))
@@ -621,7 +654,7 @@ def validate_operation(store: Any, operation: Mapping[str, Any], *, data_root: P
     fragment = context["fragment_version_id"]
     card = _card(store, fragment)
     plan = current_plan(rows, fragment)
-    original = next((p for p in rows if p.get("plan_sha256") == context["plan_sha256"]), None)
+    original = _plan_by_sha(rows, context["plan_sha256"])
     _require(plan and original and plan.get("enabled"), "FRAGMENT_PLAN_DISABLED_OR_UNAVAILABLE")
     _require(plan["source_definition_sha256"] == original["source_definition_sha256"] == card["source"]["definition_sha256"],
              "FRAGMENT_DEFINITION_MISMATCH")
@@ -674,7 +707,8 @@ def validate_operation(store: Any, operation: Mapping[str, Any], *, data_root: P
 def _link_check(store: Any, operation: Mapping[str, Any], look: Mapping[str, Any], *, git_sha: str) -> dict[str, Any]:
     context = operation["fragment_check"]
     rows = documents(store)
-    plan = next(p for p in rows if p.get("plan_sha256") == context["plan_sha256"])
+    plan = _plan_by_sha(rows, context["plan_sha256"])
+    _require(plan is not None, "FRAGMENT_INFORMATION_RULE_SOURCE_UNAVAILABLE")
     readout = _summary(look["result"])
     matched = (readout.get("matched") or {}).get("downside") or {}
     baseline = (readout.get("baseline") or {}).get("downside") or {}
@@ -708,7 +742,7 @@ def run_due(store: Any, *, repo_root: Path, git_sha: str) -> dict[str, Any]:
     from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
     rows = documents(store)
     reports = []
-    for card in (r for r in rows if r["artifact_kind"] == CARD or r.get("_error")):
+    for card in _fragment_cards(rows):
         fragment = card.get("fragment_version_id") or card["_record_id"]
         values_loaded = False
         status = {}

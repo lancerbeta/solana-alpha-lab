@@ -66,7 +66,8 @@ external_caps:
   deployment: false
 stop_conditions:
 - EXACT_HEAD_CI_AND_MERGE_READINESS_THEN_OWNER_PHRASE_BEFORE_MERGE
-- NO_REAL_REGISTRATION_PLAN_ACTIVATION_OR_NEW_VALUES_BEFORE_EXACT_POST_MERGE_OWNER_SCOPE
+- NO_REAL_SEED_REGISTRATION_BEFORE_ACCEPTED_MERGE_AND_EXACT_SOURCE_READBACK
+- NO_REAL_PLAN_ACTIVATION_OR_NEW_VALUES_WITHOUT_CURRENT_PROTECTION_AND_EXACT_OWNER_PLAN_SCOPE
 - NO_REAL_MARKET_LOOK_PROTECTION_OR_BUDGET_MUTATION_HISTORICAL_REWRITE_OR_COMPLETED_OPERATION_REOPEN
 - NO_PROVIDER_VPS_DEPLOYMENT_TRADING_PAPERPLANE_COMPOSER_OR_NEW_DATABASE_SCHEDULER_ACCOUNTING
 - PRESERVE_UNKNOWN_AND_STOP_DEPENDENT_ACTION_ON_SOURCE_PROTECTION_AUTHORITY_CONFLICT
@@ -110,8 +111,10 @@ native accounting/protection boundaries.
 CAPABILITY_OR_EVIDENCE: registration -> projection -> /research and CLI ->
 ordinary bounded prior/source detail -> actual run-due -> native result/readback.
 Consumers: owner and ordinary Forge. PaperPlane is not a new consumer.
-STOP: exact-head merge gate; real post-merge actions require the prepared exact
-local owner scope. Missing authoritative protection blocks dependent reads,
+STOP: exact-head merge gate. The owner's PR416 content-review request explicitly
+authorizes after accepted merge: exact seed registration, shelf and ordinary prior
+readback. Enablement and new science separately require current protection and
+the exact approved plan scope. Missing authoritative protection blocks dependent reads,
 not display of already admitted saved evidence.
 NEXT: one coherent PR and one reviewable post-merge seed/plan/cleanup command.
 REPLAN_TRIGGER: second DB/scheduler/evaluator/accounting; hidden scientific

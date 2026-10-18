@@ -264,6 +264,34 @@ class FragmentVerticalTests(unittest.TestCase):
         remembered = collect_verified_priors(cold, as_of=None)
         source_cap = next(c for c in remembered["capsules"] if c["hypothesis_version_id"] == self.card["source"]["candidate_id"])
         self.assertEqual(source_cap["source_detail"]["research_fragments"][0]["evidence_blocks"], blocks)
+        # CHECK and PLAN share plan_sha256. Neither CHECK-first ordering nor
+        # missing/corrupt original PLAN may discard hash-verified results.
+        original = next(p for p in f.documents(cold) if p["artifact_kind"] == f.PLAN
+                        and p["plan_sha256"] == checks[0]["plan_sha256"])
+        rows = f.documents(cold)
+        reordered = sorted(rows, key=lambda r: r["artifact_kind"] != f.CHECK)
+        with patch.object(f, "documents", return_value=reordered):
+            self.assertEqual(f.source_snapshot(cold)[0]["evidence_blocks"], blocks)
+        for damage in ("MISSING", "CORRUPT", "STALE_INNER_HASH"):
+            missing = [r for r in rows if r["_record_id"] != original["_record_id"]]
+            if damage == "CORRUPT":
+                missing.insert(0, {**original, "_error": "FRAGMENT_ARTIFACT_INTEGRITY_INVALID"})
+            if damage == "STALE_INNER_HASH":
+                missing.insert(0, {**original, "information_rule": {**original["information_rule"], "min_days": 999}})
+            with patch.object(f, "documents", return_value=missing):
+                views = f.source_snapshot(cold)
+                self.assertEqual(len(views), 1)
+                retained = views[0]
+                self.assertEqual(len(retained["evidence_blocks"]), 2)
+                self.assertEqual(retained["evidence_blocks"][1]["summary"], blocks[1]["summary"])
+                self.assertEqual(retained["evidence_blocks"][1]["information_basis"]["status"], "UNKNOWN")
+                self.assertEqual(retained["check"]["status"], "BLOCKED")
+                remembered = collect_verified_priors(cold, as_of=None)
+                cap = next(c for c in remembered["capsules"] if c["hypothesis_version_id"] == self.card["source"]["candidate_id"])
+                self.assertEqual(cap["source_detail"]["research_fragments"][0]["evidence_blocks"], retained["evidence_blocks"])
+                page = _research_detail_html(compose_research_detail(build_lifecycle_projection(ROOT, research_store=cold), locator, root=ROOT))
+                self.assertIn(blocks[1]["result_ref"], page)
+                self.assertIn("UNKNOWN", page)
 
 
 class FragmentDamagedItemTests(unittest.TestCase):

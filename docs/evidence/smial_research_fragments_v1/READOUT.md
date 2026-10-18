@@ -7,7 +7,7 @@
 | Уровень результата | Состояние и основание |
 |---|---|
 | `CAPABILITY_DELIVERED` | **WAITING** принятия версии: реализован связный путь registration → projection/HTTP GET → ordinary prior/context-view/freeze → настоящий import caller → native bounded measurement → cold resume. Проверки и границы — в [validation.json](validation.json); exact-head CI, review и merge имеют отдельные gates. |
-| `SEED_REGISTERED` | **WAITING** post-merge scope. Реальный registration preview прошёл; карточек пока 0. Exact seed и проверка неизменности источника — [source-readback.json](source-readback.json), [entry.json](entry.json). |
+| `SEED_REGISTERED` | **WAITING** принятого merge и exact source readback. Регистрация разрешена прямым post-merge scope владельца; registration preview прошёл; карточек пока 0. Exact seed и проверка неизменности источника — [source-readback.json](source-readback.json), [entry.json](entry.json). |
 | `PLAN_ENABLED` | **BLOCKED — HOLDOUT_UNRESOLVED**. Текущий `protection/assignments` не даёт native complete inventory. Исторический bootstrap pin as_of 2026-10-06 и пустой Git registry не доказывают сегодняшнюю полноту. План — proposal, не enabled artifact. |
 | `NEW_EVIDENCE_OBSERVED` | **WAITING** разрешённого плана, закрытого окна и полного импорта. Новых реальных market looks нет; исходный MAIN остаётся 1. |
 

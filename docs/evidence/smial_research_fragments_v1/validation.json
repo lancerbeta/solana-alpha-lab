@@ -16,6 +16,7 @@
     "native_open_after_tail": 0,
     "no_result_check_count": 0,
     "oracle_correction": "Initial synthetic assertion wrongly treated C member as B. Authored synthetic seed explicitly B union C; real seed unchanged.",
+    "post_merge_authority": "Direct owner PR416 request authorizes exact seed registration+shelf+ordinary prior readback after accepted merge; enable/new science separately requires current protection and exact approved plan.",
     "reviewed_head": "722437d942ab559744510d108fdb10bd5801731d",
     "scope": "Same PR416; no new task, subsystem, real market look or scientific state"
   },
@@ -57,6 +58,11 @@
   },
   "review_regressions": {
     "blocked_shelf": "Actual projection and shelf render current inventory reason in Russian before future trigger",
+    "exact_plan_source": {
+      "finding": "Unfiltered plan_sha lookup could choose CHECK and erase trusted blocks; corrupt PLAN could create competing error-card.",
+      "proof": "GOAL metadata source_snapshot/HTML/prior4of4 PASS, native two-window vertical extended original PLAN missing/corrupt and order cases PASS315.222. Final inner-hash predicate, duplicate/missing/corrupt/CHECK-first compact probe PASS; stale-inner-hash case added to same fixture for exact-head CI.",
+      "repair": "Shared exact PLAN-kind/inner-hash/unique resolver at all4 consumers; missing/corrupt rule basis UNKNOWN, dependent BLOCKED, one trusted card."
+    },
     "execution_failure_preserves_verified_prior_evidence": "Native malformed PLAN appended; both evidence blocks retained in snapshot and ordinary capsule, exact BLOCKED reason",
     "recovery_readback": "Landed native result with no CHECK reports DUE/FRAGMENT_RECOVER_LANDED_RESULT before cold recovery",
     "transient_attempts": "Concurrent Catalog mutation invalidated one preflight composite; serialized sync/test. One final assertion used the wrong existing API key; corrected to capsules and complete current scenario rerun PASS.",
@@ -109,6 +115,14 @@
       "elapsed_seconds": 30.86,
       "log_sha256": "bc28c3376af41dac72f07d1e56ee814cbc5e8d3e23029d50716389e36826af84",
       "tests": 51,
+      "verdict": "PASS"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_research_fragments_v1 -v",
+      "elapsed_seconds": 315.222,
+      "log_sha256": "15f82816b0cf464f2bb2652cd6e385274c3aeac7f9963af7778b6d9aeee1a430",
+      "scope": "Native two-window vertical plus CHECK-first and missing/corrupt-original-PLAN preservation in shelf and prior; subsequent inner-hash-only predicate also covered by compact probe and required exact-head CI",
+      "tests": 2,
       "verdict": "PASS"
     }
   ],

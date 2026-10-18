@@ -78,6 +78,9 @@ execution без CHECK, INCONCLUSIVE или refund. Следующий run-due �
 исходного плана. Исторические CHECK не переписываются: основание читается из
 сохранённых native result и plan. `discovery-show --result-ref EXACT_REF --offset 0
 --limit 20` даёт существующий bounded detail-read; это чтение без нового look.
+Поиск исходного плана проверяет тип PLAN, exact inner hash и единственность.
+Если план повреждён или недоступен, basis остаётся UNKNOWN, выполнение BLOCKED,
+а hash-verified result summaries сохраняются в полке и обычном Forge prior.
 Потеря процесса после result восстанавливает CHECK-ссылку без evaluator/списания.
 До восстановления read/полка показывают DUE / FRAGMENT_RECOVER_LANDED_RESULT,
 а не COMPLETE; run-due связывает уже сохранённый результат даже при paused plan.
