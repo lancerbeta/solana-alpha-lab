@@ -1,0 +1,52 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "task_id": "SMIAL_RESEARCH_FRAGMENTS_V1",
+  "acceptance_id": "SMIAL_RESEARCH_FRAGMENTS_V1-ENGINEERING-CHECKPOINT",
+  "as_of": "2026-10-18",
+  "base_main": "ab852a45e812984d14893e585b976707bf119aa1",
+  "state_change": "ENGINEERING_VALIDATION_IN_PROGRESS_REAL_SEED_AND_PLAN_NOT_APPLIED",
+  "implementation_bindings": {},
+  "validation": {
+    "targeted": "IN_PROGRESS",
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [],
+    "independent_review": {
+      "path": "docs/evidence/smial_research_fragments_v1/independent-review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "NOT_READY"
+    }
+  },
+  "factory_fit": {
+    "path": "docs/evidence/smial_research_fragments_v1/factory-fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "NOT_READY"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "material_owner_decision": false,
+    "external_material_action": false,
+    "auth_or_access_recovery": false,
+    "user_only_activation": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "side_effects": {
+    "local_writes": 1,
+    "network_calls": 0,
+    "external_actions": 0,
+    "scope": "PRODUCT_DOMAIN_EXCLUDING_AUTHORIZED_ROUTINE_GIT_GITHUB_DELIVERY_TRANSPORT"
+  },
+  "non_claims": [
+    "NO_REAL_REGISTRATION_OR_PLAN_ACTIVATION",
+    "NO_NEW_REAL_MARKET_LOOK",
+    "NO_PROTECTION_BUDGET_OR_HISTORICAL_RESULT_MUTATION",
+    "NO_SCOUT_IMPORT_NO_OOS_NO_ALPHA",
+    "NO_TRADING_COMPOSER_PAPERPLANE_OR_DEPLOY",
+    "NO_MERGE_NO_CANONICAL_DONE"
+  ]
+}

@@ -12,6 +12,15 @@ Visual owner: `SMIAL_VISUAL_OPERATING_SYSTEM_V1`
 authority_granted = false
 ```
 
+`/research?kind=fragments` adds the source-owned ResearchStore fragment shelf.
+The projection adapter calls `research_fragments.source_snapshot`; overview,
+detail and ordinary Forge consume the same source refs. A card shows role,
+separate discovery/monitoring evidence, plan freshness/next trigger and allowed
+use. Missing or damaged sources degrade the affected item. Display grants no
+scientific look, strategy activation or untouched OOS claim. Run-due belongs
+to the completed local import / explicit CLI owner, never GET. Operator contract:
+`docs/operator/RESEARCH_FRAGMENTS_V1.md`.
+
 ## 1. Owner questions
 
 ```text

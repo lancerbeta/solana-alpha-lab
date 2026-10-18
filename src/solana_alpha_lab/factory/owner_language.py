@@ -350,6 +350,7 @@ STATUS_GLOSS = {
 }
 
 KIND_LABELS = {
+    "RESEARCH_FRAGMENT": "Исследовательский фрагмент",
     "DECISION": "Решение",
     "EXPERIMENT_SPEC": "Эксперимент",
     "EXPERIMENT": "Эксперимент",

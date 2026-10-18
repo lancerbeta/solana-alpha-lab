@@ -1,0 +1,32 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "SMIAL_RESEARCH_FRAGMENTS_V1",
+  "review_id": "SMIAL_RESEARCH_FRAGMENTS_V1-FIT",
+  "as_of": "2026-10-18",
+  "mode": "FULL_REVIEW",
+  "verdict": "NOT_READY",
+  "dimensions": {
+    "mission": "Useful saved observations become source-bound advisory fragments without strategy promotion.",
+    "research_truth": "Original result, condition, target, negative findings and Scout adaptive exposure retained; monitoring exploratory.",
+    "owner_operability": "Existing /research and one native read/preview/apply/run-due CLI; no UI effects.",
+    "monitoring_and_recovery": "Actual completed import hook; native pending/reservations and result-link recovery; no new scheduler.",
+    "context_efficiency": "One task contract and one source snapshot; ordinary bounded capsule closure, no archive dump.",
+    "flexibility_and_history": "Prospective plan revision, stable native journal across epochs; no refund or retrospective schedule rewrite.",
+    "security": "Exact root/source/code binding and current native protection before values.",
+    "red_team": "Missing protection, invalid source, resource bound, same-window ownership, cutoff and crash proof.",
+    "build_vs_buy": "ADOPT ResearchStore, projection, ordinary accounting and native evaluator; no dependency.",
+    "execution_to_cashflow": "Research advisory only; no trading, strategy composition, deploy or executable-return claim."
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "No new tool or service needed."
+  },
+  "limits": [
+    "REAL_SEED_REGISTRATION_REQUIRES_ACCEPTED_MERGE_AND_OWNER_SCOPE",
+    "CURRENT_PROTECTION_HOLDOUT_UNRESOLVED",
+    "SCOUT_ACCESS_EXPOSED_OR_UNKNOWN",
+    "NO_CONFIRMATION_NO_NEW_REAL_MAIN"
+  ],
+  "recovery": "Disable exact plan via native preview/apply; preserve every artifact and native charge. Ordinary code revert only; no canonical data removal."
+}

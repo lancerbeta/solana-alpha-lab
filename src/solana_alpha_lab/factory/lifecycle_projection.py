@@ -1644,6 +1644,37 @@ def _adapt_research_store(
                     "derivation_method": "EXPLICIT_SOURCE_FIELD",
                 }
             )
+    from solana_alpha_lab.factory.research_fragments import source_snapshot
+    class ProjectionRead:
+        # Reuse the adapter's one native inventory, not a second store crawl.
+        @property
+        def root(self):
+            return store.root
+        @property
+        def _root(self):
+            return store.root
+        def iter_committed_records(self):
+            return iter(records)
+    for fragment in source_snapshot(ProjectionRead(), now=datetime.fromisoformat(observed_at.replace("Z", "+00:00"))):
+        check = fragment.get("check") or {}
+        error = fragment.get("error")
+        ref = {"kind": "research_store", "value": fragment["source_ref"]}
+        entities.append(_entity(entity_id=fragment["fragment_version_id"], projection_class="RESEARCH",
+            native_kind="RESEARCH_FRAGMENT", native_state="SOURCE_INVALID" if error else "RESEARCH_ADVISORY",
+            source_owner=source_id, source_ref=ref, truth_plane="EVIDENCE", contributing_source_ids=[source_id],
+            as_of=fragment.get("first_reliable_available_at"), observed_at=observed_at,
+            evidence_class="EXPLORATORY_REUSE", freshness_status="READBACK",
+            freshness_basis="approved_plan_and_native_evidence", blocker=error or ("ADVERSE_REVIEW_REQUIRED" if fragment.get("attention") else None),
+            next_safe_action=error or ("REVIEW_ADVERSE_EVIDENCE" if fragment.get("attention") else None) or check.get("reason") or check.get("next_trigger") or "READ_FRAGMENT_EVIDENCE",
+            summary=fragment["title"], source_owned_fields={"research_fragment": fragment}))
+        projected += 1
+        if error:
+            gaps.append(_gap(gap_code="SOURCE_INVALID", source_id=source_id, reason=error, source_ref=ref,
+                             impact="affected_fragment_only", next_safe_action="REPAIR_EXACT_SOURCE_BINDING"))
+        else:
+            relations.append({"relation_type": "FRAGMENT_SOURCE_HYPOTHESIS", "from_entity_id": fragment["fragment_version_id"],
+                "to_entity_id": fragment["source"]["candidate_id"], "resolution": "TARGET_GAP", "source_ref": ref,
+                "derivation_method": "EXPLICIT_SOURCE_FIELD"})
     status = "AVAILABLE" if projected else ("EMPTY" if not records else "AVAILABLE")
     detail = f"projected={projected};unprojected={skipped}" if skipped else f"projected={projected}"
     source = _source(

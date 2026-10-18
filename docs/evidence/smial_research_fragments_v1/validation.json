@@ -1,0 +1,66 @@
+{
+  "full_gate": "Not run locally; exact-head project CI and guarded merge own full verification",
+  "non_claims": [
+    "NO_REAL_SEED_REGISTERED",
+    "NO_REAL_PLAN_ENABLED",
+    "NO_NEW_REAL_EVIDENCE",
+    "NO_UNTOUCHED_OOS",
+    "NO_AUTONOMOUS_PRODUCTION_LIFECYCLE",
+    "NO_ALPHA_OR_TRADE",
+    "NO_MERGE"
+  ],
+  "proof": {
+    "exposure": "Monitoring exploratory; original negative/restriction fields retained; historical archive fingerprint unchanged after future checks",
+    "integrity": "Wrong real/synthetic result binding refuses; damaged item isolated; unrelated generic scalar artifact ignored",
+    "native_measurement": "Existing recorded evaluator, operation and reservation; synthetic B outcomes -.40,+.05, baseline N2 ES10-.40; matched0 => INCONCLUSIVE",
+    "ordinary_forge": "Native prior context-view, RF-ART material reference, persist and freeze; typed restrictions closure",
+    "production_caller": "Actual public consume CLI -> unpack/import and duplicate/replay; follow-up independent of parent import success",
+    "recovery": "Crash before values retains one pending; compatible epoch import retains frozen subset; changed code refuses; crash after native result followed by pause and cold subprocess links CHECK without another look",
+    "resource_gate": "Native raw parquet row metadata cap refuses before reservation; native plan revision raises capacity without code change",
+    "shelf": "Actual FactoryApplication HTTP GET overview and detail; zero Store change"
+  },
+  "real_science": {
+    "current_protection": {
+      "reason": "HOLDOUT_UNRESOLVED",
+      "sources": [],
+      "status": "UNRESOLVED_SCOPE"
+    },
+    "main_after": 1,
+    "main_before": 1,
+    "native_pending": 0,
+    "new_market_looks": 0,
+    "operation_effective_state": "COMPLETED",
+    "real_fragment_count": 0,
+    "real_plan_enabled": false,
+    "store_inventory_unchanged": true,
+    "values_loaded": false
+  },
+  "scope": "SYNTHETIC_VERTICAL_AND_READ_ONLY_REAL_SOURCE",
+  "targeted": [
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_research_fragments_v1 -v",
+      "elapsed_seconds": 187.969,
+      "log_sha256": "c1bcac1a5f46ee44139ec9e0f3efd54f907414ec27692a6b74ea96384b929214",
+      "tests": 2,
+      "verdict": "PASS"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_owner_lifecycle_projection_spine_v1 tests.test_research_lifecycle_workbench_v1 tests.test_hfic_ordinary_operation_v1 tests.test_forge_evidence_guided_generation_v1.SelectionSafetyTests",
+      "initial_failures": [
+        "2 stale derived Catalog bindings",
+        "projection repeated native inventory read"
+      ],
+      "initial_passed": 56,
+      "resolution": "Native incremental sync; one inventory projection adapter; exact three failing tests rerun PASS",
+      "tests": 59
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_owner_lifecycle_projection_spine_v1.OwnerLifecycleProjectionSpineTests.test_catalog_binding_and_semantic_route tests.test_research_lifecycle_workbench_v1.ResearchLifecycleWorkbenchTests.test_semantic_discovery_and_anti_hijack tests.test_research_lifecycle_workbench_v1.ResearchLifecycleWorkbenchTests.test_evidence_detail_does_not_match_foreign_keys_or_rescan -v",
+      "elapsed_seconds": 10.85,
+      "log_sha256": "b3661d4e66ff9e90f4e440be785815705b8e19280d8b6728f0ec78c6b401db16",
+      "tests": 3,
+      "verdict": "PASS"
+    }
+  ],
+  "task_id": "SMIAL_RESEARCH_FRAGMENTS_V1"
+}

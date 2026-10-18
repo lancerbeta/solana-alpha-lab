@@ -1320,6 +1320,14 @@ def _research_rows(rows: list[dict[str, Any]], *, start_ordinal: int = 1) -> str
         )
         kind_cell = f"<td><a href=\"{href}\">{kind_html}</a></td>" if href else f"<td>{kind_html}</td>"
         title_cell = f"<td>{linked}{extra}</td>"
+        fragment = row.get("fragment")
+        if isinstance(fragment, dict):
+            check = fragment.get("check") or {}
+            role = {"CONTEXT_FILTER": "Контекстный фильтр", "ENTRY": "Вход", "EXIT": "Выход", "RISK_CONSTRAINT": "Ограничение риска"}.get(fragment.get("role"), "UNKNOWN")
+            finding = "Есть adverse окно: требуется оценка" if fragment.get("attention") else "Предварительное наблюдение"
+            title_cell = (f"<td>{linked}<p>{esc(role)} · {esc(finding)}</p>"
+                          f"<p>{esc(check.get('status') or fragment.get('error') or 'UNKNOWN')} · "
+                          f"{esc(check.get('next_trigger') or check.get('reason') or 'Читать ограничения')}</p></td>")
         marker = []
         if row.get("attention"):
             marker.append(counter_label("ATTENTION"))
@@ -1519,6 +1527,7 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
         + "<p class=\"filters\">"
         + f"<a href=\"/research\">{html.escape(research_copy('all'))}</a> "
         + f"<a href=\"/research?kind=hypotheses\">{html.escape(research_copy('hypotheses'))}</a> "
+        + '<a href="/research?kind=fragments">Фрагменты</a> '
         + f"<a href=\"/research?kind=experiments\">{html.escape(research_copy('experiments'))}</a> "
         + f"<a href=\"/research?kind=trials\">{html.escape(research_copy('trials'))}</a> "
         + f"<a href=\"/research?kind=decisions\">{html.escape(research_copy('decisions'))}</a> "
@@ -1833,6 +1842,50 @@ def _dossier_html(dossier: Mapping[str, Any]) -> str:
     )
 
 
+def _fragment_detail_html(fragment: Mapping[str, Any]) -> str:
+    """Editorial view over projection fields; never a store reader or evaluator."""
+    if fragment.get("error"):
+        return f'<p class="semantic-unknown">Источник недоступен: {esc(fragment["error"])}</p>'
+    candidate = fragment.get("source_candidate") or {}
+    rows = []
+    for block in fragment.get("evidence_blocks") or []:
+        summary = block.get("summary") or {}
+        a = (summary.get("matched") or {}).get("downside") or {}
+        b = (summary.get("baseline") or {}).get("downside") or {}
+        def percent(value):
+            return "UNKNOWN" if value is None else f"{100 * value:.4f}%"
+        rows.append("<tr>" + "".join(f"<td>{esc(v)}</td>" for v in (
+            block.get("kind"), (block.get("window") or {}).get("end", "Исходный discovery"),
+            a.get("observed_n", "UNKNOWN"), b.get("observed_n", "UNKNOWN"),
+            percent(a.get("es10_return")), percent(b.get("es10_return")),
+            a.get("es10_tail_mass_n", "UNKNOWN"), a.get("missing_n", "UNKNOWN"), b.get("missing_n", "UNKNOWN"),
+            block.get("assessment"), block.get("attention", "Исходный discovery"), block.get("result_ref"))) + "</tr>")
+    check = fragment.get("check") or {}
+    plan = fragment.get("plan") or {}
+    restrictions = []
+    for key, label in {"confounders": "Зависимости и смешение", "pit_leakage_survivorship_risks": "PIT / exposure",
+                       "execution_capacity_risks": "Исполнение", "missing_or_forward_only_data": "Неизвестные данные"}.items():
+        value = (fragment.get("source_restrictions") or {}).get(key)
+        values = value if isinstance(value, list) else [value or "UNKNOWN"]
+        restrictions.append(f"<li>{esc(label)}: {esc('; '.join(str(v) for v in values))}</li>")
+    return ("<section class=\"research-fragment\"><h3>Что известно</h3>"
+        f"<p>{esc(candidate.get('claim') or fragment['title'])}</p>"
+        f"<p>{esc(candidate.get('population'))} · {esc(candidate.get('primary_x_family'))} · {esc(candidate.get('primary_y'))}</p>"
+        "<p>Предварительное наблюдение. Research advisory; самостоятельная стратегия не включена. "
+        "FALSE означает отсутствие условия; UNKNOWN сохраняется. Повтор proxy не подтверждает исполнимую доходность.</p>"
+        "<table><tr><th>Evidence</th><th>Окно до</th><th>Matched N</th><th>Baseline N</th><th>Matched ES10</th>"
+        "<th>Baseline ES10</th><th>Масса хвоста</th><th>Matched gaps</th><th>Baseline gaps</th><th>Оценка</th><th>Внимание</th><th>Result</th></tr>" + "".join(rows) + "</table>"
+        "<p>Baseline может включать matched; окна не объединяются в один ES10. Discovery и monitoring — exploratory evidence. "
+        "Scout adaptive exposure сохранён в исходной карточке; Scout H/L — другой механизм. Source event times могут быть UNKNOWN.</p>"
+        f"<h3>Следующая проверка</h3><p>{esc(check.get('status'))} · {esc(check.get('reason') or check.get('next_trigger') or 'UNKNOWN')}</p>"
+        f"<p>План включён: {'да' if plan.get('enabled') else 'нет'}. Максимум новых измерений: {esc(plan.get('max_evaluations', '—'))}; "
+        f"крайний срок: {esc(plan.get('execution_deadline', '—'))}.</p>"
+        "<p>Запуск: локальный завершённый import или явный run-due. При выключенном ПК проверки не выполняются. "
+        "GET этой страницы не запускает измерение.</p>"
+        + "<h3>Ограничения источника</h3><ul>" + "".join(restrictions) + "</ul>"
+        f"<p>Источник: {esc(fragment['source_ref'])}; definition: {esc(fragment['source']['definition_sha256'])}</p></section>")
+
+
 def _research_detail_html(view: Mapping[str, Any]) -> str:
     header = view.get("header") if isinstance(view.get("header"), dict) else {}
     fields = view.get("fields") if isinstance(view.get("fields"), dict) else {}
@@ -1864,7 +1917,9 @@ def _research_detail_html(view: Mapping[str, Any]) -> str:
     )
     technical = view.get("technical") if isinstance(view.get("technical"), dict) else {}
     provenance = view.get("provenance") if isinstance(view.get("provenance"), dict) else {}
-    field_rows = _rows({str(key): value for key, value in fields.items()}, translate_keys=True)
+    fragment = fields.get("research_fragment")
+    fragment_html = _fragment_detail_html(fragment) if isinstance(fragment, dict) else ""
+    field_rows = "" if fragment_html else _rows({str(key): value for key, value in fields.items()}, translate_keys=True)
     dossier_html = _dossier_html(dossier) if dossier else ""
     return (
         "<article class=\"evidence-editorial\" data-mode=\"EVIDENCE_EDITORIAL\">"
@@ -1893,6 +1948,7 @@ def _research_detail_html(view: Mapping[str, Any]) -> str:
         )
         + "</table></header>"
         + dossier_html
+        + fragment_html
         + f"<h3>{html.escape(research_copy('detail'))}</h3><table>"
         + (field_rows or "<tr><td class=\"semantic-unknown\">UNKNOWN</td></tr>")
         + "</table>"

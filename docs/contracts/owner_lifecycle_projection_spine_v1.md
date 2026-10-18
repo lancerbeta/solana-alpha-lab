@@ -14,6 +14,14 @@ attempt/result and recovery contract in
 modeled reconciliation remain separate; this link grants no runtime authority.
 Schema: `smial.owner-lifecycle-projection` / `1.0`
 
+The additive `RESEARCH_FRAGMENT` native kind indexes verified fragment artifacts
+from ResearchStore through `research_fragments.source_snapshot`. Generic
+RESEARCH_ARTIFACT rows do not become lifecycle objects indiscriminately.
+`source_owned_fields.research_fragment` carries the one source snapshot; the
+workbench does not build another join. Explicit candidate relations retain
+TARGET_GAP if the endpoint is absent. Plan status remains a source field;
+projection freshness stays the existing READBACK vocabulary.
+
 ## 1. Job
 
 Answer, deterministically:

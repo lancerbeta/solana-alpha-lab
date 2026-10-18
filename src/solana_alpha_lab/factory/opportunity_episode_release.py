@@ -1361,6 +1361,32 @@ def verify_current_episode_import_metadata(data_root: Path, lineage: Mapping[str
 
 
 def import_episode_release(
+    *, release_root: Path, data_root: Path, import_time: datetime | None = None,
+) -> dict[str, Any]:
+    """Commit the native import first; research follow-up has its own outcome.
+
+    This is the production caller shared by workstation import, duplicate import
+    and replay. The same fragment owner is callable explicitly for cold resume.
+    No scheduler or UI side effect is introduced.
+    """
+    imported = _import_episode_release(release_root=release_root, data_root=data_root, import_time=import_time)
+    from solana_alpha_lab.factory.research_store import ResearchStore
+    from solana_alpha_lab.factory.research_fragments import run_due
+    root = Path(__file__).resolve().parents[3]
+    try:
+        store = ResearchStore(Path(data_root).resolve(), create_if_missing=False)
+        if any(True for _ in store.iter_committed_records()):
+            import subprocess
+            git_sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, check=True,
+                                     capture_output=True, text=True).stdout.strip()
+            imported["fragment_refresh"] = run_due(store, repo_root=root, git_sha=git_sha)
+    except Exception as exc:  # import success never becomes a refresh failure
+        imported["fragment_refresh"] = {"status": "BLOCKED", "reason": getattr(exc, "code", "FRAGMENT_FOLLOWUP_UNAVAILABLE"),
+                                        "new_look": "UNKNOWN", "values_loaded": "UNKNOWN"}
+    return imported
+
+
+def _import_episode_release(
     *,
     release_root: Path,
     data_root: Path,
@@ -1630,6 +1656,7 @@ def replay_imported_episode_release(
         "release_id": verified["release_id"],
         "sealed_at": verified["sealed_at"],
         "import_status": PASS_ALREADY_PRESENT_EXACT,
+        "fragment_refresh": imported.get("fragment_refresh", {"status": "NO_ENABLED_PLAN", "new_look": False}),
         "epoch_bump": False,
         "population_card": build_population_card(data_root),
         "transfer_manifest_sha256": manifest.get("manifest_sha256"),
@@ -1677,6 +1704,7 @@ def unpack_next_episode_cohort(
         "release_id": verified["release_id"],
         "sealed_at": sealed["sealed_at"],
         "import_status": imported["status"],
+        "fragment_refresh": imported.get("fragment_refresh", {"status": "NO_ENABLED_PLAN", "new_look": False}),
         "epoch_bump": imported.get("epoch_bump", imported["status"] == "IMPORTED"),
         "population_card": card,
         "transfer_manifest_sha256": manifest.get("manifest_sha256"),

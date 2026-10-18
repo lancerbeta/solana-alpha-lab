@@ -6353,6 +6353,11 @@
       "target_asset_id": "CTRL-PAPER-PLANE-WRITE-INTEGRITY-001"
     },
     {
+      "source_asset_id": "DOC-RESEARCH-FRAGMENTS-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001"
+    },
+    {
       "source_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-OWNER-LIFECYCLE-PROJECTION-001"
@@ -13028,6 +13033,11 @@
       "target_asset_id": "TEST-RC002-H11-PARK-FROM-PRIORITY-001"
     },
     {
+      "source_asset_id": "MODULE-RESEARCH-FRAGMENTS-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001"
+    },
+    {
       "source_asset_id": "MODULE-RESEARCH-LIFECYCLE-WORKBENCH-001",
       "relation": "consumes",
       "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
@@ -15528,6 +15538,11 @@
       "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
+      "source_asset_id": "SCHEMA-RESEARCH-FRAGMENTS-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001"
+    },
+    {
       "source_asset_id": "SCHEMA-RESEARCH-MEMORY-PROJECTION-V1-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-RESEARCH-EVENT-ENVELOPE-V1-001"
@@ -16601,6 +16616,11 @@
       "source_asset_id": "SCRIPT-RC002-H11-PARK-FROM-PRIORITY-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-RC002-H11-PARK-FROM-PRIORITY-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-RESEARCH-FRAGMENTS-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001"
     },
     {
       "source_asset_id": "SCRIPT-SEMANTIC-PREMISE-REVIEW-CLI-001",
@@ -18991,6 +19011,11 @@
       "source_asset_id": "TEST-RC002-H11-PARK-FROM-PRIORITY-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-RC002-H11-PARK-FROM-PRIORITY-001"
+    },
+    {
+      "source_asset_id": "TEST-RESEARCH-FRAGMENTS-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001"
     },
     {
       "source_asset_id": "TEST-RESEARCH-LIFECYCLE-WORKBENCH-001",

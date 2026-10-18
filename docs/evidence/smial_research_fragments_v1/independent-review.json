@@ -1,0 +1,20 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "SMIAL_RESEARCH_FRAGMENTS_V1",
+  "review_id": "SMIAL_RESEARCH_FRAGMENTS_V1-REVIEW",
+  "as_of": "2026-10-18",
+  "verdict": "NOT_READY",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [],
+  "non_claims": [
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_MERGE"
+  ]
+}
