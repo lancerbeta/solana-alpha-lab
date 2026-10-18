@@ -115,7 +115,11 @@ from solana_alpha_lab.factory.research_store import (  # noqa: E402
 )
 
 
-MAX_JSON_BYTES = 262144
+from solana_alpha_lab.factory.hfic_packet_capacity import (  # noqa: E402
+    DEFAULT_CAPACITY, PacketCapacityError, load_json_document, packet_capacity,
+)
+
+MAX_JSON_BYTES = DEFAULT_CAPACITY.json_bytes
 _WINDOWS_PHYSICAL_PATH_RE = re.compile(
     r"""
     (?:
@@ -510,16 +514,8 @@ def _assert_no_path_leak(payload: dict[str, Any], *forbidden: str) -> None:
     walk(payload)
 
 
-def _load_json_file(path: Path) -> dict[str, Any]:
-    if path.is_symlink() or not path.is_file():
-        raise HficCliError("HFIC_PROTOCOL_INVALID")
-    data = path.read_bytes()
-    if len(data) > MAX_JSON_BYTES:
-        raise HficCliError("HFIC_PROTOCOL_INVALID")
-    loaded = json.loads(data.decode("utf-8"))
-    if not isinstance(loaded, dict):
-        raise HficCliError("HFIC_PROTOCOL_INVALID")
-    return loaded
+def _load_json_file(path: Path, *, repo_root: Path = ROOT) -> dict[str, Any]:
+    return load_json_document(path, repo_root=repo_root)
 
 
 def _load_fast_lane():
@@ -1210,7 +1206,7 @@ def cmd_disposition_record(
 
     data_root = _existing_data_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root, create_if_missing=False)
-    packet = _load_json_file(input_path)
+    packet = _load_json_file(input_path, repo_root=repo_root)
     mode = (packet.get("provenance") or {}).get("mode", MODE_NEW) if isinstance(packet, dict) else MODE_NEW
     market = _current_market(repo_root, data_root, store)
     if mode == MODE_NEW and market is None:
@@ -2654,7 +2650,7 @@ def cmd_memory_policy_apply(
 ) -> int:
     data_root = _existing_data_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root, create_if_missing=False)
-    proposal = _load_json_file(proposal_path)
+    proposal = _load_json_file(proposal_path, repo_root=repo_root)
     nested = proposal.get("proposal")
     body = nested if isinstance(nested, dict) else proposal
     payload = apply_memory_policy(
@@ -2919,7 +2915,7 @@ def cmd_research_policy_apply(
 
     data_root = _existing_data_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root, create_if_missing=False)
-    document = _load_json_file(proposal_path)
+    document = _load_json_file(proposal_path, repo_root=repo_root)
     if isinstance(document.get("proposals"), list):
         bodies = [item.get("proposal") if isinstance(item, dict) and "proposal" in item else item for item in document["proposals"]]
     elif isinstance(document.get("proposal"), dict):
@@ -3076,7 +3072,7 @@ def cmd_universe_policy_apply(
 
     data_root = _existing_data_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root, create_if_missing=False)
-    proposal = _load_json_file(proposal_path)
+    proposal = _load_json_file(proposal_path, repo_root=repo_root)
     nested = proposal.get("proposal")
     body = nested if isinstance(nested, dict) else proposal
     try:
@@ -3167,7 +3163,7 @@ def cmd_operation_stop(
 
     data_root = _existing_data_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root, create_if_missing=False)
-    proposal = _load_json_file(proposal_path)
+    proposal = _load_json_file(proposal_path, repo_root=repo_root)
     nested = proposal.get("proposal")
     body = nested if isinstance(nested, dict) else proposal
     try:
@@ -3382,7 +3378,7 @@ def cmd_vision_acceptance(
             "trajectory_blind": preview.get("CONTROL_TRAJECTORY_BLIND_FENCE")
             is True,
             "packet_bytes": packet_bytes,
-            "packet_within_bound": packet_bytes <= FORGE_OPERATIONAL_PACKET_MAX_BYTES,
+            "packet_within_bound": packet_bytes <= packet_capacity(ctx_packet).packet_bytes,
             "growth_warning": packet_bytes > FORGE_PACKET_GROWTH_WARNING_BYTES,
             "evidence_surface_mode": ctx_packet.get("evidence_surface_mode"),
         }
@@ -3593,15 +3589,15 @@ def cmd_freeze(
     next_action_path: Path | None = None,
 ) -> int:
     git_before = repository_git_snapshot(repo_root)
-    draft = _load_json_file(draft_path)
+    draft = _load_json_file(draft_path, repo_root=repo_root)
     _assert_no_path_leak(draft, str(repo_root))
     if preflight_path is None:
         raise HficCliError("PREFLIGHT_RECEIPT_REQUIRED")
-    receipt = _load_json_file(preflight_path)
+    receipt = _load_json_file(preflight_path, repo_root=repo_root)
     _assert_no_path_leak(receipt, str(repo_root))
     next_action_draft = None
     if next_action_path is not None:
-        next_action_draft = _load_json_file(next_action_path)
+        next_action_draft = _load_json_file(next_action_path, repo_root=repo_root)
         _assert_no_path_leak(next_action_draft, str(repo_root))
     data_root = _store_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root)
@@ -3651,8 +3647,8 @@ def cmd_persist_draft(
     model_provenance_sha256: str | None,
 ) -> int:
     git_before = repository_git_snapshot(repo_root)
-    draft = _load_json_file(draft_path)
-    receipt = _load_json_file(preflight_path)
+    draft = _load_json_file(draft_path, repo_root=repo_root)
+    receipt = _load_json_file(preflight_path, repo_root=repo_root)
     _assert_no_path_leak(draft, str(repo_root))
     _assert_no_path_leak(receipt, str(repo_root))
     data_root = _existing_data_root(repo_root, explicit_data_root)
@@ -3731,7 +3727,7 @@ def cmd_finalize(
     from solana_alpha_lab.factory.hfic_session import finalize_session, load_session_bundle
 
     git_before = repository_git_snapshot(repo_root)
-    critic_result = _load_json_file(critic_path)
+    critic_result = _load_json_file(critic_path, repo_root=repo_root)
     _assert_no_path_leak(critic_result, str(repo_root))
     data_root = _store_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root)
@@ -3761,7 +3757,7 @@ def cmd_revise(
     from solana_alpha_lab.factory.hfic_session import load_session_bundle
 
     git_before = repository_git_snapshot(repo_root)
-    draft = _load_json_file(draft_path)
+    draft = _load_json_file(draft_path, repo_root=repo_root)
     _assert_no_path_leak(draft, str(repo_root))
     data_root = _store_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root)
@@ -3790,7 +3786,7 @@ def cmd_classify(
     from solana_alpha_lab.factory.hfic_session import load_session_bundle
 
     git_before = repository_git_snapshot(repo_root)
-    packet = _load_json_file(spec_path)
+    packet = _load_json_file(spec_path, repo_root=repo_root)
     _assert_no_path_leak(packet, str(repo_root))
     data_root = _store_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root)
@@ -3883,7 +3879,7 @@ def cmd_prior(
         data_root = _existing_data_root(repo_root, explicit_data_root)
         try:
             from solana_alpha_lab.factory.research_store import ExistingResearchStoreReader
-            payload = read_context_view(ExistingResearchStoreReader(data_root), receipt=_load_json_file(preflight_path), query_sha256=selection_query_sha256, source_ref=source_ref)
+            payload = read_context_view(ExistingResearchStoreReader(data_root), receipt=_load_json_file(preflight_path, repo_root=repo_root), query_sha256=selection_query_sha256, source_ref=source_ref)
         except GenerationContextError as exc:
             raise HficSessionError(exc.code, detail=exc.detail) from exc
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
@@ -4341,7 +4337,7 @@ def cmd_backfill(
     repo_root: Path,
     explicit_data_root: Path | None,
 ) -> int:
-    packet = _load_json_file(packet_path)
+    packet = _load_json_file(packet_path, repo_root=repo_root)
     _assert_no_path_leak(packet, str(repo_root))
     preview = backfill_legacy(packet, persist=False)
     _assert_no_path_leak(preview, str(repo_root))
@@ -5467,6 +5463,13 @@ def main(argv: list[str] | None = None) -> int:
                 confirm_append_only=bool(args.confirm_append_only),
             )
         raise HficCliError(f"HFIC_COMMAND_NOT_READY:{args.command}")
+    except PacketCapacityError as exc:
+        resource = exc.code.endswith("RESOURCE_LIMIT_EXCEEDED")
+        return emit({"status": "BLOCKED_TECHNICAL_RESOURCE" if resource else "BLOCKED_TECHNICAL_INPUT", "reason_code": exc.code,
+                     "detail": exc.detail, "scientific_negative": False, "new_look": None,
+                     "writes": None, "effects_readback_required": True,
+                     "next_action": "READBACK_EFFECTS_ADJUST_LOCAL_CAPACITY_AND_RESUME_SAVED_INPUT" if resource else "VERIFY_SAVED_INPUT_AND_LOCAL_CAPACITY_SETTINGS",
+                     "owner_readout": "Технический отказ. Сначала прочитайте resolver/сохранённое состояние: эффекты этого вызова здесь не измерены. Проверьте reason_code, detail и локальные SMIAL_HFIC_* настройки; сохраните evidence, cutoff и бюджет. Продолжите те же входы без нового look."}, exit_code=2)
     except RepairContinuationError as exc:
         return emit_repair_blocked(str(exc))
     except (
@@ -5490,8 +5493,8 @@ def main(argv: list[str] | None = None) -> int:
                     "RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK",
                     "Повторите persistent preflight на том же data root с тем же owner_focus и discovery contract; используйте новый receipt. Исходный cutoff и просмотренное evidence сохраняются. Новый look не открывайте."),
                 "GENERATION_MANDATORY_CONTEXT_EXCEEDS_BOUND": (
-                    "INSPECT_MANDATORY_SOURCES_REFINE_WITH_EXISTING_AUTHORITY",
-                    "Обязательные источники не помещаются: проверьте detail.mandatory_hypothesis_version_ids, consulted_source_refs и bounds. Читайте каждый источник через prior --context-view с исходным receipt и его selection_query_sha256. Не удаляйте material evidence и не увеличивайте cap. Уточнение scope требует существующего основания; пока BLOCKED."),
+                    "ADJUST_LOCAL_TECHNICAL_CAPACITY_AND_RESUME_SAVED_INPUT",
+                    "Техническая ёмкость обязательного контекста исчерпана: проверьте detail и локальные SMIAL_HFIC_PACKET_BYTES / SMIAL_HFIC_RESOURCE_RECORDS. Сохраните все mandatory источники, исходный cutoff и result; настройте ёмкость и продолжите те же входы без нового MAIN. Отсутствующий источник или повреждённый binding по-прежнему BLOCKED."),
                 "GENERATION_CONSULTED_SOURCE_UNAVAILABLE": (
                     "VERIFY_EXACT_ADMISSIBLE_SOURCE_OR_STOP",
                     "Источник из detail.source_ref или hypothesis_version_ids отсутствует в допустимой истории этого cutoff. Проверьте точный сохранённый источник и его research clocks; если восстановить и сверить его нельзя — BLOCKED. Поздние сведения не добавляйте задним числом; новый look не открывайте."),

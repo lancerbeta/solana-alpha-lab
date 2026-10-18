@@ -1,0 +1,93 @@
+{
+  "acceptance_id": "FORGE_PACKET_CAPACITY_RESUME_V1-ENGINEERING-CHECKPOINT",
+  "active_stop_conditions": [],
+  "as_of": "2026-10-18",
+  "base_main": "88763e400e5dac7462e70275b23b74e061410445",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/forge_packet_capacity_resume_v1/factory-fit.json",
+    "sha256": "50e8d9a65fdb9e5488f585830da0dc1e4501e921dc676dd4a298d7424f71dca5",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "923cc07b9a687011720718ca73563c86cdb1b79e932c8b8447380d0367038876",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "bb4a3669409a5aa7e6fef1caf61cee7254a45290a795d792ad7e67eba1758b41",
+    "catalog/assets/core.yaml": "28e0f23d6e538924e4aaf8ed32f61c44da663cb321d86d976713731f244a5576",
+    "catalog/assets/lifecycle.yaml": "136c2126c562622ac76cde85b1b5da71cc758790834a2f84de9f5347407159f8",
+    "catalog/catalog_manifest.yaml": "5ee4a118a8db4341d5a7d49d74ef0b0641dc09e9706067e92354ce1eff2e7875",
+    "catalog/generated/asset_edges.json": "add681734dcc8066c9da8106941849646ed367ce6c3d07b1841c916e161fc7bd",
+    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "e5523ee6a43f3b7ee15c004642dbd96ae721eec4b06e7115645fc16b4798535b",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "a3d151761fca643fe02338de6edd3407c244d3a0ad62158ee4d4b2eac0b6b1ae",
+    "docs/PROJECT_MAP.md": "0640e4f94f4bc152d1da49b972a00f7baf5587193e51ad2f07c467651ff66ba3",
+    "docs/contracts/forge_evidence_guided_generation_v1.md": "e365ea505ca19e4de863fe17c30ea08d6a89060f9aa46a8c059d9fcafdc30dfc",
+    "docs/evidence/forge_packet_capacity_resume_v1/READOUT.md": "64a2f15360a2a5cdd8295e48bf0a648c9ab9b69f173f5cde167184aed8966dec",
+    "docs/evidence/forge_packet_capacity_resume_v1/recovery.json": "d7698249fed54382d92c8ea703424f7e9223b11bab64b3ac280d72f31643cdec",
+    "docs/evidence/forge_packet_capacity_resume_v1/validation.json": "af8264843c7bba85d13cbecc8edcdd11b2af5add34d2bcb42a843d7435aaa474",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "95b3e7598a38625125c94645a1b0216d706dd2c622135637e8ffba68c85d6322",
+    "docs/tasks/FORGE_PACKET_CAPACITY_RESUME_V1.md": "fd771a224cb7c932e0900aa10868159b9bca803b00dac1ef97f2bce53528b8d9",
+    "scripts/hypothesis_fast_lane.py": "852f4c9eb97afad82a3c6aedf1d10bf33d39bd4417f4c0b1bc2f260aff0595dd",
+    "scripts/hypothesis_forge.py": "8f0bc87fcd527bf770fd7fb1cb95f0fc34c1db99e8c7f3af14102d5f3bc0eea9",
+    "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "52831722008aae2dda16681eed22acc528a9e502789bf006afa82c9835ff6f73",
+    "src/solana_alpha_lab/factory/hfic_generation_context.py": "e3c858f0d798fafe80141db1697fd27c0f30fbeba7d7bcdf9e47b15815bbf0c4",
+    "src/solana_alpha_lab/factory/hfic_packet_capacity.py": "3a1d5f15cde09736f0139e6cdaf7947acae2b705b18dc68a9044392d841b2301",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "bff50c0347dbe6ff3a23310cfafce199f8fb9023ab84ced6a01b57c89647d727",
+    "src/solana_alpha_lab/factory/hfic_prior_memory.py": "dcec939bfd4b3e5a32693d2d5963811f0b50e0c79430e747b2779435dd295f00",
+    "src/solana_alpha_lab/factory/hfic_representation_probe.py": "de08258476bd520155fe8b8841427d91cdf6b152e2b695211de5f4964d27b4fb",
+    "src/solana_alpha_lab/factory/hfic_session.py": "1bc63c5f303af7049106dac2593cdfedbb68ac4214f99bc707bbea43bcb4cd76",
+    "tests/test_forge_downside_readout_v1.py": "562c6711f4b1bee13c394657473ad7efafe210ce899f52809fad08853ad45ef3",
+    "tests/test_forge_evidence_guided_generation_v1.py": "3df069f573e32e27e0bf402d3f5d01d3af3ae80cdb16c6a2cfe15bacfd3e2e46",
+    "tests/test_forge_evidence_identity_and_owner_gold_v1.py": "0e5ead0f6ac5f8725195f149d35988453995508600c029bdd7a9ca9f136b6ff7",
+    "tests/test_hfic_cli.py": "e9e5feb0f7980ef001ec3ca8926e758601284fc6b11989f1f8d70027af12320a",
+    "tests/test_hfic_critic_prior_memory_closure_v1.py": "d5ff27b2ab90d44106e6a42c4edf96ed6be25d93401b2882162a05ea1a16924d",
+    "tests/test_hfic_forge_prior_context_capacity_repair_v1.py": "10b77535796f785a27d02a6cf4e79add5a905208c42e9e777e68d074642f27c6",
+    "tests/test_hfic_operational_closure_v1.py": "6c3d0b0f3fe294d5d1e93d2725b0418d63a7b2ae53f20561892222a19797512f",
+    "tests/test_hfic_operational_memory_quarantine_v1.py": "1a1984e94cb21719d17a2e4a0088ed7ac97a2948f293c9d5a879f5c4e82c6e3c",
+    "tests/test_hfic_operational_packet_guard_simplification_v1.py": "1536d3a4acdcc341dade676cec3673d2f6063ea04fdb193794e2694f118424ff",
+    "tests/test_hfic_reopened_prior_search_routing_v1.py": "b7efe47e80798793fdb8e48e1d174aa5d7a10493e2769fae6eed8fa69094ee47",
+    "tests/test_hfic_representation_probe.py": "0c1621e898cafd2370dbfa7829cc10509d7fb127681c35ea156c8ed2bca19191",
+    "tests/test_hfic_scientific_disposition_continuity_v1.py": "4595333e4819731b458bd5406975ff7a95766554e2f3aff673cad9923a114bbf",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "e91ae2904d7c460fe63300a0db6ea65802c73abacd9bd9a76cadcd25490c578e",
+    "tests/test_normalized_trajectory_probe_preregistration_v1.py": "271f28b59feb771525584578b057e3fff22babc93bb49dc5610cdb2d9577514e"
+  },
+  "non_claims": [
+    "NO_MERGE",
+    "NO_REAL_SCIENTIFIC_CRITIC_YET",
+    "NO_ALPHA",
+    "NO_OOS",
+    "NO_NEW_REAL_MAIN",
+    "NO_BUDGET_REFUND",
+    "NO_EXECUTION_DEPLOY_OR_TRADING",
+    "NO_CANONICAL_DONE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "external_actions": 0,
+    "local_writes": 1,
+    "network_calls": 0,
+    "scope": "PRODUCT_DOMAIN_EXCLUDING_AUTHORIZED_ROUTINE_GIT_GITHUB_DELIVERY_TRANSPORT"
+  },
+  "state_change": "TECHNICAL_PROOF_AND_ISOLATED_REVIEW_PASS_REAL_CONTINUATION_PENDING_ACCEPTED_MERGE",
+  "task_id": "FORGE_PACKET_CAPACITY_RESUME_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/forge_packet_capacity_resume_v1/independent-review.json",
+      "sha256": "70768fa122eecb4d434c61b3a4fbefe7b4b9ac2acdbf687532215a863f56dd61",
+      "verdict": "PASS"
+    },
+    "project_checks": [],
+    "targeted": "PASS_104_BASELINE_43_PREFLIGHT_43_REVIEW_DELTA_30_FINAL_DELTA_2_NESTED_CONTROL_FAILURE_HISTORY_RETAINED_19_OWNER_UX_DELTA_34_CI_DELTA"
+  }
+}

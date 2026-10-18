@@ -171,6 +171,14 @@ next_epistemic_action:
     - CAPABILITY_OPTION_READY
   proposed_phrase_status: PROPOSED_NOT_AUTHORITY
   execute_proposed_phrase: false
+packet_capacity:
+  # Operational recommendations and resource safeguards, never scientific budgets.
+  # Local override: SMIAL_HFIC_<UPPERCASE_FIELD>, decimal integer, no PR required.
+  working_records: 8
+  working_bytes: 65536
+  packet_bytes: 8388608
+  json_bytes: 67108864
+  resource_records: 10000
 prior_memory:
   snapshot_schema: smial.hfic-prior-memory-snapshot
   snapshot_schema_version: '1.0'
@@ -185,15 +193,15 @@ prior_memory:
     safety_scope: FULL_ELIGIBLE_ARCHIVE_BEFORE_SELECTION
     optional_selection: STRUCTURAL_DIVERSITY_THEN_TEXT
     source_detail: SAVED_ADMISSIBLE_DESCRIPTIVE_RESULT_ONLY
-    mandatory_overflow: GENERATION_MANDATORY_CONTEXT_EXCEEDS_BOUND
+    mandatory_overflow: HFIC_MEMORY_RESOURCE_LIMIT_EXCEEDED
     research_clock: EFFECTIVE_AND_FIRST_RELIABLE_AVAILABLE
   historical_v1_1_required: false
   source: HYPOTHESIS_VERSION
   include_ranked_shortlist_only: false
-  max_records: 64
-  max_bytes: 65536
+  # Complete mandatory closure may exceed working recommendations. Frozen
+  # historical snapshots retain their own recorded bounds and identities.
   silent_truncation: false
-  capacity_exceeded: PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED
+  capacity_exceeded: HFIC_MEMORY_RESOURCE_LIMIT_EXCEEDED
   memory_status:
     - HARD_CLOSE
     - PARK

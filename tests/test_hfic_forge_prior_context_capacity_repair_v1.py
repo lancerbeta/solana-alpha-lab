@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
+import os
 import tempfile
 import unittest
 from datetime import UTC, datetime
@@ -15,6 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
+
+from solana_alpha_lab.factory.hfic_packet_capacity import DEFAULT_CAPACITY, PacketCapacityError
 
 from solana_alpha_lab.factory.hfic_memory_policy import (  # noqa: E402
     iter_search_memory_hypothesis_payloads,
@@ -401,11 +404,8 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
                 transaction_id=txn,
             )
             payloads = list(iter_search_memory_hypothesis_payloads(store))
-            with patch(
-                "solana_alpha_lab.factory.hfic_preflight.FORGE_OPERATIONAL_PACKET_MAX_BYTES",
-                64,
-            ):
-                with self.assertRaises(HficPreflightError) as raised:
+            with patch.dict(os.environ, {"SMIAL_HFIC_PACKET_BYTES": "64"}):
+                with self.assertRaises(PacketCapacityError) as raised:
                     build_forge_context_packet(
                         ROOT,
                         Path(raw),
@@ -420,7 +420,7 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
                     )
             self.assertEqual(
                 str(raised.exception),
-                "FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED",
+                "HFIC_PACKET_RESOURCE_LIMIT_EXCEEDED",
             )
             self.assertNotEqual(str(raised.exception), BODY_INCOMPLETE)
 
@@ -442,11 +442,8 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
                 transaction_id=txn,
             )
             payloads = list(iter_search_memory_hypothesis_payloads(store))
-            with patch(
-                "solana_alpha_lab.factory.hfic_preflight.FORGE_OPERATIONAL_PACKET_MAX_BYTES",
-                2500,
-            ):
-                with self.assertRaises(HficPreflightError) as raised:
+            with patch.dict(os.environ, {"SMIAL_HFIC_PACKET_BYTES": "2500"}):
+                with self.assertRaises(PacketCapacityError) as raised:
                     build_forge_context_packet(
                         ROOT,
                         Path(raw),
@@ -461,7 +458,7 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
                     )
             self.assertEqual(
                 str(raised.exception),
-                "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND",
+                "HFIC_PACKET_RESOURCE_LIMIT_EXCEEDED",
             )
             self.assertNotEqual(str(raised.exception), BODY_INCOMPLETE)
 
@@ -470,15 +467,15 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
             CURRENT_REPRESENTATION_CONTROL_V1,
         )
 
-        self.assertEqual(forge_context_packet_max_bytes(None), 65536)
-        self.assertEqual(forge_context_packet_max_bytes(""), 65536)
+        self.assertEqual(forge_context_packet_max_bytes(None), DEFAULT_CAPACITY.packet_bytes)
+        self.assertEqual(forge_context_packet_max_bytes(""), DEFAULT_CAPACITY.packet_bytes)
         self.assertEqual(
             forge_context_packet_max_bytes(CURRENT_REPRESENTATION_CONTROL_V1),
-            65536,
+            DEFAULT_CAPACITY.packet_bytes,
         )
-        self.assertEqual(MAX_PACKET_BYTES, 65536)
-        self.assertEqual(ORDINARY_FORGE_MAX_PACKET_BYTES, 65536)
-        self.assertEqual(FORGE_OPERATIONAL_PACKET_MAX_BYTES, 65536)
+        self.assertEqual(MAX_PACKET_BYTES, DEFAULT_CAPACITY.packet_bytes)
+        self.assertEqual(ORDINARY_FORGE_MAX_PACKET_BYTES, DEFAULT_CAPACITY.packet_bytes)
+        self.assertEqual(FORGE_OPERATIONAL_PACKET_MAX_BYTES, DEFAULT_CAPACITY.packet_bytes)
         self.assertEqual(FORGE_PACKET_GROWTH_WARNING_BYTES, 20480)
 
     def test_ordinary_exceeds_20kib_still_capacity_terminal(self) -> None:
@@ -497,11 +494,8 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
                 )
             store.append(events, transaction_id=txn)
             payloads = list(iter_search_memory_hypothesis_payloads(store))
-            with patch(
-                "solana_alpha_lab.factory.hfic_preflight.FORGE_OPERATIONAL_PACKET_MAX_BYTES",
-                4000,
-            ):
-                with self.assertRaises(HficPreflightError) as raised:
+            with patch.dict(os.environ, {"SMIAL_HFIC_PACKET_BYTES": "4000"}):
+                with self.assertRaises(PacketCapacityError) as raised:
                     build_forge_context_packet(
                         ROOT,
                         Path(raw),
@@ -517,8 +511,8 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
             self.assertIn(
                 str(raised.exception),
                 {
-                    "FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED",
-                    "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND",
+                    "HFIC_PACKET_RESOURCE_LIMIT_EXCEEDED",
+                    "HFIC_PACKET_RESOURCE_LIMIT_EXCEEDED",
                     "FORGE_VISION_INTEGRITY_BLOCKED",
                 },
             )

@@ -8,15 +8,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 from solana_alpha_lab.factory.run_passport import canonical_json_bytes, canonical_sha256
+from solana_alpha_lab.factory.hfic_packet_capacity import DEFAULT_CAPACITY, PacketCapacityError, resolve_packet_capacity
 
 
 SCHEMA = "smial.hfic-prior-memory-snapshot"
 SCHEMA_VERSION = "1.0"
-DEFAULT_MAX_RECORDS = 64
-DEFAULT_MAX_BYTES = 65536
+DEFAULT_MAX_RECORDS = DEFAULT_CAPACITY.resource_records
+DEFAULT_MAX_BYTES = DEFAULT_CAPACITY.packet_bytes
 CONFIG_RELATIVE = "configs/hypothesis_forge_independent_critic_v1.yaml"
 
 MEMORY_HARD_CLOSE = "HARD_CLOSE"
@@ -57,7 +56,7 @@ _SCOPE_FIELDS = (
 )
 
 
-class PriorMemoryCapacityError(ValueError):
+class PriorMemoryCapacityError(PacketCapacityError):
     """Eligible prior memory cannot be represented inside the declared bound."""
 
     def __init__(
@@ -69,13 +68,15 @@ class PriorMemoryCapacityError(ValueError):
         max_records: int,
         max_bytes: int,
     ) -> None:
-        self.code = "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED"
         self.eligible_count = eligible_count
         self.emitted_count = emitted_count
         self.payload_bytes = payload_bytes
         self.max_records = max_records
         self.max_bytes = max_bytes
-        super().__init__(self.code)
+        super().__init__("HFIC_MEMORY_RESOURCE_LIMIT_EXCEEDED",
+                         eligible_count=eligible_count, emitted_count=emitted_count,
+                         actual_bytes=payload_bytes, limit_records=max_records,
+                         limit_bytes=max_bytes, setting="SMIAL_HFIC_RESOURCE_RECORDS / SMIAL_HFIC_PACKET_BYTES")
 
 
 class PriorMemoryUnidentifiedError(ValueError):
@@ -92,18 +93,9 @@ def prior_memory_bounds(
     max_records: int | None = None,
     max_bytes: int | None = None,
 ) -> tuple[int, int]:
-    records = DEFAULT_MAX_RECORDS
-    nbytes = DEFAULT_MAX_BYTES
-    if repo_root is not None:
-        path = Path(repo_root) / CONFIG_RELATIVE
-        if path.is_file():
-            loaded = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-            block = loaded.get("prior_memory") or {}
-            if isinstance(block, Mapping):
-                if isinstance(block.get("max_records"), int):
-                    records = int(block["max_records"])
-                if isinstance(block.get("max_bytes"), int):
-                    nbytes = int(block["max_bytes"])
+    capacity = resolve_packet_capacity(repo_root)
+    records = capacity.resource_records
+    nbytes = capacity.packet_bytes
     if max_records is not None:
         records = max_records
     if max_bytes is not None:

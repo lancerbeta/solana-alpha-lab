@@ -27,6 +27,7 @@ from solana_alpha_lab.factory.hfic_prior_memory import (
     build_prior_memory_snapshot,
 )
 from solana_alpha_lab.factory.hfic_session import HficSessionError, freeze_draft, lookup_prior
+from solana_alpha_lab.factory.hfic_packet_capacity import PacketCapacityError
 from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore, ResearchStoreError
 from tests.test_hfic_cli import bind_draft, run_cli, seed_minimal_market_basis
 from tests.test_hfic_session import valid_draft
@@ -308,7 +309,7 @@ class PriorMemoryUnitTests(unittest.TestCase):
                     store_inventory_digest=digest,
                     max_records=2,
                 )
-            self.assertEqual(raised.exception.code, "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED")
+            self.assertEqual(raised.exception.code, "HFIC_MEMORY_RESOURCE_LIMIT_EXCEEDED")
             self.assertGreater(raised.exception.eligible_count, 2)
             self.assertEqual(raised.exception.emitted_count, 0)
 
@@ -508,14 +509,14 @@ class PriorMemoryFreezeE2ETests(unittest.TestCase):
                 "solana_alpha_lab.factory.hfic_prior_memory.prior_memory_bounds",
                 return_value=(2, 65536),
             ):
-                with self.assertRaises(HficSessionError) as raised:
+                with self.assertRaises(PacketCapacityError) as raised:
                     freeze_draft(
                         bound,
                         preflight_receipt=fresh_receipt,
                         store=ResearchStore(data_root),
                         repo_root=ROOT,
                     )
-            self.assertEqual(str(raised.exception), "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED")
+            self.assertEqual(str(raised.exception), "HFIC_MEMORY_RESOURCE_LIMIT_EXCEEDED")
             store_after_cap = ResearchStore(data_root)
             self.assertEqual(
                 [

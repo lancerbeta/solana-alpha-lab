@@ -25,7 +25,6 @@ from solana_alpha_lab.factory.early_market_panel_importer import (  # noqa: E402
 from solana_alpha_lab.factory.scientific_eligibility_projection import (  # noqa: E402
     MIN_USABLE_BASE_X_POPULATION,
 )
-from solana_alpha_lab.factory.hfic_preflight import MAX_PACKET_BYTES  # noqa: E402
 from solana_alpha_lab.factory.hfic_session import PROMPT_VERSION  # noqa: E402
 from solana_alpha_lab.factory.live_cohort_discovery_release import (  # noqa: E402
     CORPUS_DATASET_ID,
@@ -93,7 +92,9 @@ class NormalizedTrajectoryProbePreregistrationTests(unittest.TestCase):
 
     def test_binds_current_hfic_and_yield_constants(self) -> None:
         self.assertEqual(self.contract["hfic_prompt_family"], PROMPT_VERSION)
-        self.assertEqual(self.contract["max_packet_bytes"], MAX_PACKET_BYTES)
+        # Frozen preregistration keeps its historical byte contract; current
+        # operational capacity can change without rewriting that evidence.
+        self.assertEqual(self.contract["max_packet_bytes"], 65536)
         self.assertEqual(
             self.contract["min_usable_yield_eligible"],
             MIN_USABLE_YIELD_ELIGIBLE,

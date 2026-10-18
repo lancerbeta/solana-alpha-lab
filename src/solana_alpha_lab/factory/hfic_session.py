@@ -38,6 +38,7 @@ from solana_alpha_lab.factory.hfic_suppression_semantics import (
     ledger_from_receipt,
 )
 from solana_alpha_lab.factory.run_passport import canonical_sha256
+from solana_alpha_lab.factory.hfic_packet_capacity import PacketCapacityError, check_packet_resource, load_json_document
 
 
 _SCHEMA_VALIDATORS: dict[str, Draft202012Validator] = {}
@@ -2226,6 +2227,8 @@ def freeze_draft(
                 as_of=bound["session_started_at"] if bound is not None else None,
             )
         except (PriorMemoryCapacityError, PriorMemoryUnidentifiedError, HficMemoryPolicyError) as exc:
+            if isinstance(exc, PacketCapacityError):
+                raise
             raise HficSessionError(exc.code) from exc
     grounded = draft.get("grounded_evidence")
     if isinstance(grounded, Mapping):
@@ -2267,7 +2270,6 @@ def freeze_draft(
                 evidence=packet.get("grounded_evidence") or {},
                 cutoff=bound["session_started_at"] if bound is not None else None,
                 inventory_digest=store_digest or "0"*64, repo_root=repo_root,
-                parent_budget_bytes=65536-len(_canonical_bytes(packet))-4096,
             )
         except GenerationContextError as exc:
             raise HficSessionError(exc.code, detail=exc.detail) from exc
@@ -2388,14 +2390,12 @@ def freeze_draft(
     if runner_up_packet is not None:
         if critic_packet_version == CRITIC_PACKET_VERSION_WORKING:
             from solana_alpha_lab.factory.hfic_generation_context import candidate_working_view, GenerationContextError
-            parent = {k:v for k,v in runner_up_packet.items() if k not in {"prior_memory", "generation_context"}}
             try:
                 guarded, memory, brief = candidate_working_view(
                     store, preflight=preflight_receipt, card=runner_up_card,
                     evidence=runner_up_packet.get("grounded_evidence") or {},
                     cutoff=bound["session_started_at"] if bound is not None else None,
                     inventory_digest=store_digest or "0"*64, repo_root=repo_root,
-                    parent_budget_bytes=65536-len(_canonical_bytes(parent))-4096,
                 )
             except GenerationContextError as exc:
                 raise HficSessionError(exc.code, detail=exc.detail) from exc
@@ -2425,9 +2425,9 @@ def freeze_draft(
         separators=(",", ":"),
         allow_nan=False,
     )
-    if critic_packet_version == CRITIC_PACKET_VERSION_WORKING:
-        if len(packet_bytes.encode("utf-8")) > 65536 or len(runner_up_packet_bytes.encode("utf-8")) > 65536:
-            raise HficSessionError("GENERATION_MANDATORY_CONTEXT_EXCEEDS_BOUND", detail={"packet_bytes":len(packet_bytes.encode("utf-8")), "runner_up_packet_bytes":len(runner_up_packet_bytes.encode("utf-8")), "max_bytes":65536})
+    check_packet_resource(packet, stage="FREEZE_PRIMARY")
+    if runner_up_packet is not None:
+        check_packet_resource(runner_up_packet, stage="FREEZE_RUNNER_UP")
     result = {
         "session_id": session_id,
         "session_state": "FROZEN_AWAITING_CRITIC",
@@ -4986,6 +4986,8 @@ def persist_generated_draft(
                     )
             except (GroundedDiscoveryError, PriorMemoryCapacityError,
                     PriorMemoryUnidentifiedError, HficMemoryPolicyError, GenerationContextError) as exc:
+                if isinstance(exc, PacketCapacityError):
+                    raise
                 raise HficSessionError(exc.code) from exc
     if _ordinary_discovery_requested(draft, receipt) and isinstance((receipt.get("forge_context_packet") or {}).get("generation_context"), Mapping):
         freeze_draft(
@@ -6453,7 +6455,9 @@ def find_session_by_epoch_focus(
             blob = Path(store._root) / FORGE_CONTEXT_ARTIFACT_DIR / f"{digest}.json"
             if blob.is_file() and not blob.is_symlink():
                 try:
-                    loaded = json.loads(blob.read_text(encoding="utf-8"))
+                    loaded = load_json_document(blob)
+                except PacketCapacityError:
+                    raise
                 except (OSError, ValueError):
                     loaded = None
                 if isinstance(loaded, dict):
@@ -6739,6 +6743,8 @@ def _load_artifact_by_sha(
                 )
             )
             raise HficSessionError(hash_code)
+        if artifact_kind == "CRITIC_INPUT_PACKET" and "operational_capacity" in parsed:
+            check_packet_resource(parsed, stage="FROZEN_ARTIFACT_READ")
         matches.append((wrapper, parsed, expected_sha))
     if not matches:
         raise HficSessionError(missing)

@@ -24,6 +24,9 @@ from solana_alpha_lab.factory.experiment_spec import (  # noqa: E402
     validate_experiment_document,
 )
 from solana_alpha_lab.factory.lane_classifier import Lane, classify_lane  # noqa: E402
+from solana_alpha_lab.factory.hfic_packet_capacity import (  # noqa: E402
+    PacketCapacityError, load_bounded_bytes,
+)
 from solana_alpha_lab.factory.operational_store import OperationalStore  # noqa: E402
 from solana_alpha_lab.factory.prior_work import (  # noqa: E402
     PriorWorkError,
@@ -112,10 +115,13 @@ def resolve_runtime_clock(
     return instant.astimezone(UTC)
 
 
-def load_packet(path: Path) -> dict[str, Any]:
+def load_packet(path: Path, *, repo_root: Path = ROOT) -> dict[str, Any]:
     if path.is_symlink() or not path.is_file():
         raise FastLaneCliError("PACKET_UNAVAILABLE")
-    text = path.read_text(encoding="utf-8")
+    try:
+        text = load_bounded_bytes(path, repo_root=repo_root).decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise FastLaneCliError("PACKET_ENCODING_INVALID") from exc
     if path.suffix.casefold() in {".yaml", ".yml"}:
         loaded = yaml.safe_load(text)
     else:
@@ -296,7 +302,7 @@ def execute_classify(
     packet_path: Path,
     as_of: datetime,
 ) -> dict[str, Any]:
-    packet = load_packet(packet_path)
+    packet = load_packet(packet_path, repo_root=root)
     decision = classify_lane(packet, root=root, data_root=data_root, as_of=as_of)
     payload = decision_payload(decision)
     payload["run_key_sha256"] = decision.run_key_sha256
@@ -315,7 +321,7 @@ def execute_submit(
     run: bool,
     authority_phrase: str | None,
 ) -> dict[str, Any]:
-    packet = load_packet(packet_path)
+    packet = load_packet(packet_path, repo_root=root)
     decision = classify_lane(packet, root=root, data_root=data_root, as_of=as_of)
     if not run:
         payload = decision_payload(decision)
@@ -670,7 +676,7 @@ def execute_commission_offline(root: Path, data_root: Path, packet_path: Path) -
     if rebuild_payload.get("status") != "REBUILD_PROJECTION_OK":
         raise FastLaneCliError("COMMISSION_REBUILD_FAILED")
 
-    packet = load_packet(packet_path)
+    packet = load_packet(packet_path, repo_root=root)
     spec = packet["experiment_spec"]
     if not isinstance(spec, dict):
         raise FastLaneCliError("PACKET_SPEC_INVALID")
@@ -980,6 +986,11 @@ def main(argv: list[str] | None = None) -> int:
                 args.destination.resolve(),
             )
         raise FastLaneCliError("COMMAND_UNSUPPORTED")
+    except PacketCapacityError as exc:
+        resource = exc.code.endswith("RESOURCE_LIMIT_EXCEEDED")
+        return emit({"status": "BLOCKED_TECHNICAL_RESOURCE" if resource else "BLOCKED_TECHNICAL_INPUT", "reason_code": exc.code,
+                     "detail": exc.detail, "scientific_negative": False,
+                     "next_action": "VERIFY_EFFECTS_ADJUST_LOCAL_CAPACITY_AND_RESUME_SAVED_INPUT" if resource else "VERIFY_SAVED_INPUT_AND_LOCAL_CAPACITY_SETTINGS"}, exit_code=2)
     except FastLaneCliError as exc:
         return emit_error(exc.code)
     except (

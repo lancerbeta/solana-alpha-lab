@@ -1003,7 +1003,8 @@ class V4OperabilityTests(_Base):
         self.assertEqual(capsule["shown"] + capsule["omitted"], total)
         self.assertEqual(sum(capsule["status_counts"].get(key, 0) for key in capsule["status_counts"] if key != disp.STATUS_NOT_RECORDED), total)
         self.assertIn("disposition-show", capsule["detail_query"])
-        self.assertEqual(FORGE_OPERATIONAL_PACKET_MAX_BYTES, 65536)
+        from solana_alpha_lab.factory.hfic_packet_capacity import DEFAULT_CAPACITY
+        self.assertEqual(FORGE_OPERATIONAL_PACKET_MAX_BYTES, DEFAULT_CAPACITY.packet_bytes)
         seen: set[str] = set()
         offset: int | None = 0
         with mock.patch(
@@ -1191,7 +1192,8 @@ class ReviewRegressionTests(_Base):
         saved = len(canonical_json_bytes(capsule)) - len(canonical_json_bytes(disp.compact_counts_only(capsule)))
         self.assertGreater(saved, 600)
         bound = full - saved + 300
-        with mock.patch.object(hfic_preflight, "forge_context_packet_max_bytes", return_value=bound):
+        import os
+        with mock.patch.dict(os.environ, {"SMIAL_HFIC_PACKET_BYTES":str(bound)}):
             squeezed = preflight()
         reduced = squeezed["scientific_disposition_context"]
         self.assertTrue(reduced["reduced_for_packet_budget"])
@@ -1205,7 +1207,7 @@ class ReviewRegressionTests(_Base):
         # Inside the window the reduced capsule cannot fit either: advice goes first, entirely.
         reduced_bytes = len(canonical_json_bytes(disp.compact_counts_only(capsule)))
         tight = full - len(canonical_json_bytes(capsule)) + reduced_bytes // 2
-        with mock.patch.object(hfic_preflight, "forge_context_packet_max_bytes", return_value=tight):
+        with mock.patch.dict(os.environ, {"SMIAL_HFIC_PACKET_BYTES":str(tight)}):
             dropped = preflight()
         self.assertNotIn("scientific_disposition_context", dropped)
         self.assertEqual(dropped["truncation_receipt"]["disposition_subjects_omitted"], capsule["total_subjects"])

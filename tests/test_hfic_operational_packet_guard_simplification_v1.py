@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -12,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
+
+from solana_alpha_lab.factory.hfic_packet_capacity import DEFAULT_CAPACITY, PacketCapacityError
 
 from solana_alpha_lab.factory.hfic_control_integrity import (  # noqa: E402
     CURRENT_REPRESENTATION_CONTROL_V1,
@@ -45,16 +48,16 @@ from tests.test_hfic_forge_prior_context_capacity_repair_v1 import (  # noqa: E4
 
 class OperationalPacketGuardSimplificationTests(unittest.TestCase):
     def test_one_operational_hard_cap_shared(self) -> None:
-        self.assertEqual(FORGE_OPERATIONAL_PACKET_MAX_BYTES, 65536)
+        self.assertEqual(FORGE_OPERATIONAL_PACKET_MAX_BYTES, DEFAULT_CAPACITY.packet_bytes)
         self.assertEqual(FORGE_PACKET_GROWTH_WARNING_BYTES, 20480)
         self.assertEqual(MAX_PACKET_BYTES, FORGE_OPERATIONAL_PACKET_MAX_BYTES)
         self.assertEqual(ORDINARY_FORGE_MAX_PACKET_BYTES, FORGE_OPERATIONAL_PACKET_MAX_BYTES)
         self.assertEqual(CONTROL_FORGE_MAX_PACKET_BYTES, FORGE_OPERATIONAL_PACKET_MAX_BYTES)
         self.assertEqual(CHALLENGER_PACKET_CAP, FORGE_OPERATIONAL_PACKET_MAX_BYTES)
-        self.assertEqual(forge_context_packet_max_bytes(None), 65536)
+        self.assertEqual(forge_context_packet_max_bytes(None), DEFAULT_CAPACITY.packet_bytes)
         self.assertEqual(
             forge_context_packet_max_bytes(CURRENT_REPRESENTATION_CONTROL_V1),
-            65536,
+            DEFAULT_CAPACITY.packet_bytes,
         )
         self.assertEqual(MAX_RANKED_PRIORS, 8)
 
@@ -131,11 +134,8 @@ class OperationalPacketGuardSimplificationTests(unittest.TestCase):
             )
             store.append(events, transaction_id=txn)
             payloads = list(iter_search_memory_hypothesis_payloads(store))
-            with patch(
-                "solana_alpha_lab.factory.hfic_preflight.FORGE_OPERATIONAL_PACKET_MAX_BYTES",
-                2000,
-            ):
-                with self.assertRaises(HficPreflightError) as raised:
+            with patch.dict(os.environ, {"SMIAL_HFIC_PACKET_BYTES": "2000"}):
+                with self.assertRaises(PacketCapacityError) as raised:
                     build_forge_context_packet(
                         ROOT,
                         Path(raw),
@@ -152,8 +152,8 @@ class OperationalPacketGuardSimplificationTests(unittest.TestCase):
             self.assertIn(
                 str(raised.exception),
                 {
-                    MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND,
-                    "FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED",
+                    "HFIC_PACKET_RESOURCE_LIMIT_EXCEEDED",
+                    "HFIC_PACKET_RESOURCE_LIMIT_EXCEEDED",
                 },
             )
 
@@ -190,7 +190,7 @@ class OperationalPacketGuardSimplificationTests(unittest.TestCase):
             self.assertLess(len(encoded), 65536)
             self.assertEqual(
                 packet["truncation_receipt"]["max_packet_bytes"],
-                65536,
+                DEFAULT_CAPACITY.packet_bytes,
             )
             self.assertNotEqual(
                 packet["truncation_receipt"].get("reason"),

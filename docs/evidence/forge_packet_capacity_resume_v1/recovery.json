@@ -1,0 +1,84 @@
+{
+  "checkpoint_budget": {
+    "adaptive": {
+      "completed": 0,
+      "deficit": 0,
+      "limit": 2,
+      "occupied": 0,
+      "pending": 0,
+      "remaining": 2
+    },
+    "main": {
+      "completed": 1,
+      "deficit": 0,
+      "limit": 6,
+      "occupied": 1,
+      "pending": 0,
+      "remaining": 5
+    },
+    "preview": {
+      "completed": 0,
+      "deficit": 0,
+      "limit": 2,
+      "occupied": 0,
+      "pending": 0,
+      "remaining": 2
+    }
+  },
+  "copy_scope": "NINE_NAMED_FILES_NOT_DATA_ROOT",
+  "files": [
+    {
+      "bytes": 6046,
+      "name": "checkpoint.json",
+      "sha256": "3e4317695a8b2b4c50b3be853e146b37c7287cfd9fb9045608f3d77148b481ba"
+    },
+    {
+      "bytes": 65249,
+      "name": "draft.json",
+      "sha256": "53182fbc7244d21ccbfc34e2e1ec01536d3ce721b1c294bd5f09822bcb83f57c"
+    },
+    {
+      "bytes": 114670,
+      "name": "preflight-source.json",
+      "sha256": "36d0850c105e78e932b06b0b9aba65a0a5361940cc1fdf2c5c0032991ddf397c"
+    },
+    {
+      "bytes": 38642,
+      "name": "discovery-exact.json",
+      "sha256": "f0ccb0833cd31a6434a25bf55431e8138ec0ed22a7184297c5cefd544271c4c8"
+    },
+    {
+      "bytes": 2155,
+      "name": "query.json",
+      "sha256": "316b6bfef4cc4343dc99c0bfdf69644abefe0d8a54e889761232d95482664bc8"
+    },
+    {
+      "bytes": 566,
+      "name": "scope.json",
+      "sha256": "7c439b39590ab0b1d3c0c809fa200222b371403f3e15c4baebd31914cfdb0583"
+    },
+    {
+      "bytes": 7907,
+      "name": "operation.json",
+      "sha256": "b661c33d68f71280058d4e081fc3dc9d724413046545f92a52a3b6dd564fa5fc"
+    },
+    {
+      "bytes": 4612,
+      "name": "assessment.json",
+      "sha256": "98a6ac989823f2a5a5fb58e6375df651919a9084b9eb42c14b2fd0956e5c6e1b"
+    },
+    {
+      "bytes": 1742,
+      "name": "gate-refusal.json",
+      "sha256": "2ce1055c8d191cced3230433099e05cdbf497c51fbd5ef3251316e69aeb17d1a"
+    }
+  ],
+  "fresh_real_store_readback": "PENDING_ACCEPTED_VERSION",
+  "manifest_sha256": "f1b0dbe5681f5515509853fef6e0d00994e6f9843ff9f7a62c99a99d8ed24ab0",
+  "real_scientific_commands_issued_during_repair": 0,
+  "retained_at": "EXISTING_LOCAL_OPERATION_RECOVERY_AREA",
+  "schema": "smial.forge-operation-recovery-binding",
+  "schema_version": "1.0",
+  "source": "OWNER_NAMED_TEMP_CHECKPOINT",
+  "verified_retained_bytes": true
+}

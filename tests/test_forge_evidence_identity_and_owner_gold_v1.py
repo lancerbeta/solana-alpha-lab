@@ -461,6 +461,8 @@ class IdentityUnitTests(unittest.TestCase):
                 "src/solana_alpha_lab/factory/hfic_evidence_identity.py",
                 "src/solana_alpha_lab/factory/hfic_preflight.py",
                 "src/solana_alpha_lab/factory/hfic_session.py",
+                "src/solana_alpha_lab/factory/hfic_packet_capacity.py",
+                "scripts/hypothesis_fast_lane.py",
                 "src/solana_alpha_lab/factory/hfic_representation_ladder.py",
                 "src/solana_alpha_lab/factory/forge_input_receipt.py",
                 "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py",
