@@ -1,0 +1,7 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "task_id": "OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1",
+  "verdict": "NOT_READY",
+  "reason": "FINAL_ISOLATED_REVIEW_PENDING"
+}

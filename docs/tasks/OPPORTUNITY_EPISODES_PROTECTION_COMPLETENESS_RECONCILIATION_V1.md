@@ -57,7 +57,7 @@ stop_conditions:
 - NO_PRODUCER_SCOUT_RUNTIME_PROVIDER_DEPENDENCY_TRADING_OR_HISTORY_CHANGE
 context_requirements:
   catalog_asset_ids: []
-  l2_roles: [ARCHITECTURE_DECISIONS]
+  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
@@ -67,7 +67,10 @@ context_requirements:
     - docs/contracts/opportunity_episodes_jupiter_v1.md
     - docs/contracts/episode_native_required_outcomes_v1.md
     - docs/operator/RESEARCH_FRAGMENTS_V1.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/opportunity_episodes_protection_completeness_reconciliation_v1/completion.json
+    - docs/evidence/opportunity_episodes_protection_completeness_reconciliation_v1/independent-review.json
+    - docs/evidence/opportunity_episodes_protection_completeness_reconciliation_v1/factory-fit.json
     HISTORICAL_CONTEXT: []
 ---
 
