@@ -1809,10 +1809,11 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
                 self.assertTrue(capsule.get("decision_timestamp"))
                 self.assertTrue(capsule.get("horizon_notional"))
                 self.assertTrue(capsule.get("negative_control"))
-            self.assertEqual(MAX_PACKET_BYTES, 65536)
+            from solana_alpha_lab.factory.hfic_packet_capacity import DEFAULT_CAPACITY
+            self.assertEqual(MAX_PACKET_BYTES, DEFAULT_CAPACITY.packet_bytes)
             self.assertEqual(
                 forge_context_packet_max_bytes(CURRENT_REPRESENTATION_CONTROL_V1),
-                65536,
+                DEFAULT_CAPACITY.packet_bytes,
             )
             self.assertEqual(
                 forge_context_packet_max_bytes(None),

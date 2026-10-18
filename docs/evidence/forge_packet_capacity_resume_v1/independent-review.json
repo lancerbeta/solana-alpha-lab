@@ -51,5 +51,5 @@
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "FORGE_PACKET_CAPACITY_RESUME_V1",
-  "verdict": "PASS"
+  "verdict": "NOT_READY"
 }

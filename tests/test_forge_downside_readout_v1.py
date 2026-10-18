@@ -172,7 +172,8 @@ class DownsideNumerics(unittest.TestCase):
         self.assertEqual(compact["detail_truncation"]["by_calendar_block"], {"total": 28, "included": 4, "truncated": True})
         self.assertEqual([row["view"] for row in compact["details"]["by_calendar_block"]], [f"DAY_{i:02}" for i in range(4)])
         self.assertLess(len(json.dumps(compact).encode()), FORGE_OPERATIONAL_PACKET_MAX_BYTES)
-        self.assertEqual(FORGE_OPERATIONAL_PACKET_MAX_BYTES, 65536)
+        from solana_alpha_lab.factory.hfic_packet_capacity import DEFAULT_CAPACITY
+        self.assertEqual(FORGE_OPERATIONAL_PACKET_MAX_BYTES, DEFAULT_CAPACITY.packet_bytes)
 
     def test_calendar_missing_only_uses_same_keys_and_explicit_truncation(self) -> None:
         from datetime import timedelta

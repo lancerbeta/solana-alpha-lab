@@ -34328,7 +34328,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_cohort_to_forge_operational_closure_v1.py', repository_path: tests/test_live_cohort_to_forge_operational_closure_v1.py}
-  integrity: {kind: sha256, sha256: bb144c0d83ff99754960ac73a34a0e11d00eab770c5445e16989f3654b785766}
+  integrity: {kind: sha256, sha256: e91ae2904d7c460fe63300a0db6ea65802c73abacd9bd9a76cadcd25490c578e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
@@ -36005,7 +36005,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: NORMALIZED_TRAJECTORY_PROBE_PREREGISTRATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_normalized_trajectory_probe_preregistration_v1.py', repository_path: tests/test_normalized_trajectory_probe_preregistration_v1.py}
-  integrity: {kind: sha256, sha256: b10e7329c3d65be13b0b01cfcaf511462352000a28355cada6c7e5aedd54647b}
+  integrity: {kind: sha256, sha256: 271f28b59feb771525584578b057e3fff22babc93bb49dc5610cdb2d9577514e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001}
@@ -37165,7 +37165,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_operational_memory_quarantine_v1.py', repository_path: tests/test_hfic_operational_memory_quarantine_v1.py}
-  integrity: {kind: sha256, sha256: 709b4c45898b7e67c3b2fdee2c9a27b47a3fab068bc4a6c2f00eb1c0e335fa8a}
+  integrity: {kind: sha256, sha256: 1a1984e94cb21719d17a2e4a0088ed7ac97a2948f293c9d5a879f5c4e82c6e3c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001}
@@ -43285,7 +43285,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: FORGE_PACKET_CAPACITY_RESUME_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FORGE_PACKET_CAPACITY_RESUME_V1.md', repository_path: docs/tasks/FORGE_PACKET_CAPACITY_RESUME_V1.md}
-  integrity: {kind: sha256, sha256: e194e64cd563284686d72d550644d64cb6dbfee8f6d79e5f7c5220165a595b39}
+  integrity: {kind: sha256, sha256: fd771a224cb7c932e0900aa10868159b9bca803b00dac1ef97f2bce53528b8d9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001}

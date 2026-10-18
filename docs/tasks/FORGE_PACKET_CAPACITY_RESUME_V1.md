@@ -34,6 +34,10 @@ managed_write_set:
 - tests/test_hfic_cli.py
 - tests/test_hfic_session.py
 - tests/test_hfic_operational_closure_v1.py
+- tests/test_hfic_operational_memory_quarantine_v1.py
+- tests/test_live_cohort_to_forge_operational_closure_v1.py
+- tests/test_normalized_trajectory_probe_preregistration_v1.py
+- tests/test_forge_downside_readout_v1.py
 - tests/test_hfic_reopened_prior_search_routing_v1.py
 - tests/test_hfic_scientific_disposition_continuity_v1.py
 - tests/test_hfic_representation_probe.py

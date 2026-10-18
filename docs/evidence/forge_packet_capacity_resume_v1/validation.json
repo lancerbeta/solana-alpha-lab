@@ -83,6 +83,20 @@
       "phase": "final owner-UX error/recovery delta",
       "ran": 19,
       "status": "PASS"
+    },
+    {
+      "command": "Repository validation run39126781972 at904e32a8c1332e1a5d7bb2358264efb91e8e027f",
+      "known_failures": 5,
+      "reason": "Obsolete assertions in memory-quarantine capacity(2), frozen preregistration capacity(1), live-cohort capacity(1), downside readout capacity(1). Core/execution/operability and shards3/4 passed; shard5 was still running at observation.",
+      "resolution": "Update only connected existing tests and exact task write set; production code and historical preregistration bytes unchanged. New exact-head CI required.",
+      "status": "FAILED_REQUIRED_JOBS",
+      "url": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/39126781972"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_hfic_operational_memory_quarantine_v1 tests.test_normalized_trajectory_probe_preregistration_v1 tests.test_live_cohort_to_forge_operational_closure_v1.LiveCohortToForgeOperationalClosureTests.test_forge_control_ready_keeps_eligible_raw_kill_and_park_priors tests.test_forge_downside_readout_v1",
+      "phase": "CI regression delta after native Catalog sync; small env64 refusal retained; historical65536 contract unchanged",
+      "ran": 34,
+      "status": "PASS"
     }
   ],
   "defaults": {
@@ -92,7 +106,7 @@
     "working_bytes": 65536,
     "working_records": 8
   },
-  "failure_history": "Intermediate runs exposed obsolete default/error assertions and a cold-read assertion comparing terminal primary to active runner-up; corrected. One development run was invalidated by concurrent checkout edits; no scientific conclusion drawn.",
+  "failure_history": "Intermediate runs exposed obsolete default/error assertions and a cold-read assertion comparing terminal primary to active runner-up; corrected. One development run was invalidated by concurrent checkout edits; no scientific conclusion drawn. First CI exposed5 obsolete assertions in4 direct capacity consumers. First targeted attempt also stopped in preregistration setup on stale Catalog hashes; native sync then34 targeted tests PASS. No scientific inference from technical failures.",
   "non_claims": [
     "NO_REAL_CRITIC_YET",
     "NO_OOS",

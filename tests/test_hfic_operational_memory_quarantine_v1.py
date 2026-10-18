@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -304,7 +305,11 @@ class HficOperationalMemoryQuarantineTests(unittest.TestCase):
             store, session_ids = _capacity_store(Path(raw))
             before = memory_policy_status(store, repo_root=ROOT)
             self.assertEqual(before["total_eligible_prior_memory_count"], 67)
-            self.assertEqual(before["fresh_freeze_capacity"], "BLOCKED")
+            self.assertEqual(before["fresh_freeze_capacity"], "PASS")
+            from unittest.mock import patch
+            with patch.dict(os.environ,{"SMIAL_HFIC_RESOURCE_RECORDS":"64"}):
+                limited=memory_policy_status(store, repo_root=ROOT)
+            self.assertEqual(limited["fresh_freeze_capacity"], "BLOCKED")
             preview = preview_memory_policy(
                 store,
                 repo_root=ROOT,
@@ -528,7 +533,7 @@ class HficOperationalMemoryQuarantineTests(unittest.TestCase):
             status = run_cli("memory-policy-status", data_root=root)
             self.assertEqual(status.returncode, 0)
             payload = json.loads(status.stdout)
-            self.assertEqual(payload["fresh_freeze_capacity"], "BLOCKED")
+            self.assertEqual(payload["fresh_freeze_capacity"], "PASS")
             preview = run_cli(
                 "memory-policy-preview",
                 "--quarantine-all-current-hfic",
