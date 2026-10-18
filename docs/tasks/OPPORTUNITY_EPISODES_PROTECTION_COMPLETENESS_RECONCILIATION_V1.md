@@ -182,16 +182,16 @@ writes from GET. Normal compatible cohorts verify their frozen deps independentl
 Mandatory sources use explicit native interpretation versions; missing/unknown
 owner is scoped UNRESOLVED, not entries=[].
 
-## Pass 2 and verification (conditional on closure)
+## Pass 2 and verification
 
 - [x] Freeze exact source set and native interpretation versions. Actual read-only assessment: scoped complete-empty; current installation remains absent. Advisory scope UNKNOWN and confirmatory restrictions remain explicit.
 - [x] Implement assessment/current resolver and metadata-only preview/apply/CAS.
 - [x] Route fragment plan/writer/last loader, fixed-time verifier and discovery
       through that resolver; preserve historical release/import and saved reads.
-- [ ] Extend existing controlled fixture for A-G: stale pin, proven empty, next
+- [x] Extend existing controlled fixture for A-G: stale pin, proven empty, next
       cohort/day, relevant/ambiguous scope, late deny, unavailable/changed source,
       crash/retry/reservation and direct consumers. Unsafe paths have loader sentinel.
-- [ ] Real read-only seed/source readback and proposal outside canonical root;
+- [x] Real read-only seed/source readback and proposal outside canonical root;
       no real outcomes/replay/plan enable. Verify next plan's neighboring gates.
 - [ ] Finish impacted operator/contracts and native Catalog propagation; isolated
       code, goal/DoD, architecture and owner-UX reviews on exact final diff.
@@ -232,3 +232,10 @@ passed, with two existing campaign-specific skips. Three-process restore's missi
 root-bound setup is repaired before its ordinary preflight (original oracles kept).
 New metadata/sentinel checks and exact-head CI must validate the strengthened final
 candidate. No full local gate; guarded merge remains its sole executor.
+
+Final local checkpoint: 17 boundary tests PASS in 17.808s; cold native three-
+process test PASS in 258.503s; committed fragment vertical 9 PASS in 506.806s.
+Final suites require exact-head CI. Native aliases and wrapper/body identity/version
+are checked; mixed partition preflight completes before any loader. Canonical root
+remains uninstalled, saved result and MAIN 1/6 unchanged. Exact scoped complete-empty
+installation preview and prospective plan live in the one task evidence directory.

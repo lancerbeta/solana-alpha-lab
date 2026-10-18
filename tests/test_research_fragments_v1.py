@@ -481,6 +481,54 @@ class CurrentProtectionTests(unittest.TestCase):
         self.assertEqual(status["reason"], "PROTECTION_DECLARATION_VERSION_UNKNOWN")
         self.assertIsNone(status["complete_empty"])
 
+    def append_native_critic(self, body, *, name, form="CRITIC_RESULT", header=None):
+        import hashlib
+        from solana_alpha_lab.factory.research_store import ResearchEvent, RecordKind
+        raw_body = json.dumps(body, sort_keys=True, separators=(",", ":"))
+        payload = json.dumps({"artifact_kind": form, "payload_canonical": raw_body, **(header or {})}, sort_keys=True, separators=(",", ":"))
+        at = datetime.now(UTC)
+        event = ResearchEvent(record_id=name, record_kind=RecordKind.RESEARCH_ARTIFACT, entity_id=name,
+            hypothesis_version_id=None, run_id=None, transaction_id="RESEARCH-TXN-"+name,
+            effective_at=at, first_reliable_available_at=at, supersedes_record_id=None,
+            payload_json=payload, payload_sha256=hashlib.sha256(payload.encode()).hexdigest(), schema_version="1.0",
+            producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001", producer_git_sha=GIT_SHA, created_at=at)
+        self.store.append([event], transaction_id=event.transaction_id)
+
+    def test_native_spec_packet_aliases_revalidate_and_conflict_is_not_empty(self):
+        import yaml
+        config = yaml.safe_load((ROOT/self.p.CONFIG).read_text(encoding="utf-8"))
+        spec = {"schema": "smial.experiment-spec", "schema_version": "1.4", "population": "OPPORTUNITY_EPISODES",
+                "holdout_policy": config["embedded_exploratory_policy"],
+                "observation_request": {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"}}
+        self.apply(self.preview()); original = (self.plane/self.p.POINTER).read_bytes()
+        for ordinal, (field, wrapped) in enumerate((("experiment_spec", False), ("experiment_spec", True), ("experiment_spec_packet", False), ("experiment_spec_packet", True))):
+            body = {"schema": "smial.hypothesis-critic-result", "schema_version": "1.1",
+                    field: {"experiment_spec": spec} if wrapped else spec}
+            self.append_native_critic(body, name="KNOWN-SPEC-"+str(ordinal))
+            status, _ = self.p.resolve_current_research_protection(self.plane)
+            self.assertEqual(status["status"], "ALLOW")
+            self.assertEqual((self.plane/self.p.POINTER).read_bytes(), original)
+        body = {"schema": "smial.hypothesis-critic-result", "schema_version": "1.1", "experiment_spec": spec,
+                "experiment_spec_packet": {"experiment_spec": {**spec, "holdout_policy": "UNRESOLVED_RESTRICTION"}}}
+        self.append_native_critic(body, name="CONFLICT-SPEC")
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["reason"], "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
+        self.assertIsNone(status["complete_empty"])
+
+    def test_wrapper_body_identity_and_wrapper_version_are_consistent(self):
+        body = {"schema": "smial.hfic-scientific-disposition", "schema_version": "1.0"}
+        self.append_native_critic(body, name="BAD-FORM", form="FORGE_DRAFT", header={"hfic_protocol": "UNKNOWN"})
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["reason"], "PROTECTION_DECLARATION_FORM_UNKNOWN")
+        self.assertIsNone(status["complete_empty"])
+
+    def test_unknown_wrapper_protocol_version_is_unresolved(self):
+        body = {"packet_schema": "smial.hypothesis-forge-draft", "packet_version": "1.3", "candidates": []}
+        self.append_native_critic(body, name="BAD-WRAPPER-VERSION", form="FORGE_DRAFT", header={"hfic_protocol": "UNKNOWN"})
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["reason"], "PROTECTION_DECLARATION_VERSION_UNKNOWN")
+        self.assertIsNone(status["complete_empty"])
+
     def test_task22_scope_requires_actual_time_nonintersection(self):
         from solana_alpha_lab.factory.opportunity_episodes import LOGICAL_DATASET_ID
         self.apply(self.preview())

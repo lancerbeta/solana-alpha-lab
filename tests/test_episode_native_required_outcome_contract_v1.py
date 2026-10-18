@@ -214,6 +214,27 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
                         discovery.load_admitted_partition_rows(**kwargs)
                 loader.assert_not_called()
 
+    def test_mixed_legacy_and_relabelled_episode_refuse_before_any_loader(self):
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+        from solana_alpha_lab.factory import hfic_grounded_discovery as discovery
+        from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
+        item = discovery.resolve_published_episode_binding(self.plane)["cohorts"][0]
+        relabel = {**item, "dataset_id": discovery.LIVE_DATASET_ID}
+        relabel.pop("population", None)
+        census, observations = self.work/"legacy-census.parquet", self.work/"legacy-observations.parquet"
+        for path in (census, observations): pq.write_table(pa.table({"mint": ["SyntheticLegacyMint"]}), path)
+        legacy = {"dataset_id": discovery.LIVE_DATASET_ID, "evidence_role": "EXPLORATORY_REUSE", "holdout": False,
+                  "cohort_id": "LEGACY-FIRST", "release_id": "LEGACY-RELEASE",
+                  "census_sha256": sha256_file_streaming(census), "observations_sha256": sha256_file_streaming(observations)}
+        pairs = [(legacy["cohort_id"], census, observations), (item["cohort_id"], self.plane/item["census_rel"], self.plane/item["observations_rel"])]
+        for ordered in (pairs, list(reversed(pairs))):
+            with patch.object(discovery, "load_parquet_rows", side_effect=AssertionError("PARTIAL_VALUE_READ")) as loader:
+                with self.assertRaisesRegex(GroundedDiscoveryError, "HOLDOUT_UNRESOLVED"):
+                    discovery.load_admitted_partition_rows(data_root=None, binding_doc={"cohorts": [legacy, relabel]},
+                        partitions=ordered, census_path=None, observations_path=None)
+            loader.assert_not_called()
+
     def test_current_protection_denies_before_values(self):
         import pyarrow.parquet as pq
         item = self.spec["parameters"]["temporal_recipe"]["frozen_input"][0]

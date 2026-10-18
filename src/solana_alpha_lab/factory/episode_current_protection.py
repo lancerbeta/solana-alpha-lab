@@ -176,11 +176,18 @@ def _store_projection(root: Path, config: Mapping[str, Any]) -> list[dict[str, A
                  "PROTECTION_DECLARATION_FORM_UNKNOWN")
         body = json.loads(wrapper["payload_canonical"]) if isinstance(wrapper.get("payload_canonical"), str) else wrapper
         _require(isinstance(body, dict) and body, "PROTECTION_DECLARATION_INVALID")
-        marked = any(body.get(key) is not None for key in ("artifact_kind", "kind", "schema"))
         identity = form if kind == "RESEARCH_ARTIFACT" else kind
-        if not marked:
-            required = config["unmarked_body_identity_fields"].get(identity)
+        _require(body.get("schema") in config["body_schema_by_form"].get(identity, [None])
+                 and body.get("kind") is None
+                 and body.get("artifact_kind") == (identity if identity in config["body_artifact_marker_forms"] else None)
+                 and body.get("packet_schema") == config["body_packet_schema_by_form"].get(identity),
+                 "PROTECTION_DECLARATION_FORM_UNKNOWN")
+        required = config["unmarked_body_identity_fields"].get(identity)
+        if required is not None:
             _require(isinstance(required, list) and bool(required) and all(key in body for key in required),
+                     "PROTECTION_DECLARATION_FORM_UNKNOWN")
+        if isinstance(wrapper.get("payload_canonical"), str):
+            _require(all(wrapper.get(key) is None for key in ("schema", "schema_version", "kind", "packet_schema", "packet_version")),
                      "PROTECTION_DECLARATION_FORM_UNKNOWN")
         _require(record.schema_version in config["store_record_versions"], "PROTECTION_RESEARCH_EVENT_VERSION_UNKNOWN")
         if "packet_schema" in body or "packet_version" in body:
@@ -188,8 +195,9 @@ def _store_projection(root: Path, config: Mapping[str, Any]) -> list[dict[str, A
                      and body.get("packet_version") in config["native_packet_versions"][body["packet_schema"]],
                      "PROTECTION_DECLARATION_VERSION_UNKNOWN")
         for field, versions in config["native_text_versions"].items():
-            if field in body:
-                _require(body[field] in versions, "PROTECTION_DECLARATION_VERSION_UNKNOWN")
+            for layer in (wrapper, body):
+                if field in layer:
+                    _require(layer[field] in versions, "PROTECTION_DECLARATION_VERSION_UNKNOWN")
         for marker_key in ("artifact_kind", "kind", "schema"):
             marker = body.get(marker_key)
             if marker is not None:
@@ -203,16 +211,25 @@ def _store_projection(root: Path, config: Mapping[str, Any]) -> list[dict[str, A
             # interpretation. A new declaration cannot be dismissed as empty.
             raise CurrentProtectionError("PROTECTION_DECLARATION_OWNER_UNSUPPORTED")
         _require(not body.get("holdout_consumption_ids"), "PROTECTION_CONSUMPTION_LINK_UNRESOLVED")
-        spec = body.get("experiment_spec")
-        if spec is None:
-            continue
-        _require(isinstance(spec, dict) and spec.get("schema") == "smial.experiment-spec", "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
-        _require(spec.get("schema_version") == "1.4" and spec.get("population") == "OPPORTUNITY_EPISODES"
-                 and spec.get("holdout_policy") == config["embedded_exploratory_policy"]
-                 and spec.get("observation_request") == {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"},
-                 "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
-        projection.append({"record_id": record.record_id, "policy": spec["holdout_policy"],
-                           "population": spec["population"], "observation_request": spec["observation_request"]})
+        declarations = {}
+        # These are the two native owner spellings, each wrapped or bare.
+        # Validate every supplied protection declaration, including conflicting
+        # duplicates; scientific parameters do not become assignment authority.
+        for field in ("experiment_spec", "experiment_spec_packet"):
+            submission = body.get(field)
+            if submission is None:
+                continue
+            _require(isinstance(submission, Mapping), "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
+            spec = submission.get("experiment_spec", submission)
+            _require(isinstance(spec, Mapping) and spec.get("schema") == "smial.experiment-spec", "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
+            _require(spec.get("schema_version") == "1.4" and spec.get("population") == "OPPORTUNITY_EPISODES"
+                     and spec.get("holdout_policy") == config["embedded_exploratory_policy"]
+                     and spec.get("observation_request") == {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"},
+                     "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
+            value = {"record_id": record.record_id, "policy": spec["holdout_policy"],
+                     "population": spec["population"], "observation_request": spec["observation_request"]}
+            declarations[canonical_sha256(value)] = value
+        projection.extend(declarations.values())
     # holdouts_not_touched is advisory source assertion, never assignment or
     # proof of empty. Its unresolved referent is retained in the boundary text.
     return sorted(projection, key=lambda item: item["record_id"])

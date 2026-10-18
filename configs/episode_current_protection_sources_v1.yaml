@@ -300,3 +300,56 @@ native_text_versions:
   - HFIC-MEMORY-POLICY-V1
   - HFIC-V1.1
   - HFIC-V1.2
+body_schema_by_form:
+  CLASSIFIER_RECEIPT:
+  - smial.hfic-classifier-receipt
+  CRITIC_RESULT:
+  - smial.hypothesis-critic-result
+  DISCOVERY_QUERY_LOOK:
+  - smial.discovery-query-look
+  FORGE_RESEARCH_POLICY_RUN_SNAPSHOT_V1:
+  - smial.forge-research-policy-run-snapshot
+  FORGE_RESEARCH_UNIVERSE_POLICY:
+  - smial.forge-research-universe-policy
+  FORGE_RUN_RECEIPT:
+  - smial.forge-run-receipt
+  HFIC_SEARCH_MEMORY_POLICY:
+  - smial.hfic-search-memory-policy
+  HYPOTHESIS_VERSION:
+  - null
+  - smial.hfic-reopened-prior-hypothesis-version
+  OBSERVATION_SCHEDULE_AUTHORITY:
+  - smial.observation-schedule-authority
+  ORDINARY_LOOK_RESERVATION_V1:
+  - smial.hfic-ordinary-look-reservation
+  ORDINARY_OPERATION_V1:
+  - smial.hfic-ordinary-operation
+  ORDINARY_SCIENTIFIC_DISPOSITION_V1:
+  - smial.hfic-scientific-disposition
+  PROVENANCE_TIME_CORRECTION:
+  - smial.hfic-provenance-time-correction
+  REPAIR_CONTINUATION_DISPOSITION_V1:
+  - smial.hfic-repair-continuation-disposition
+  SCIENTIFIC_SLOT_ADMISSION:
+  - smial.scientific-slot-admission
+body_artifact_marker_forms:
+- CAPABILITY_RESULT
+- DISCOVERY_FEATURE_PREVIEW
+- DISCOVERY_QUERY_INTENT
+- FORGE_RESEARCH_POLICY_RUN_SNAPSHOT_V1
+- FORGE_RESEARCH_UNIVERSE_POLICY
+- FORWARD_CAPTURE_FROZEN_CONTRACT
+- HFIC_SEARCH_MEMORY_POLICY
+- ORDINARY_LOOK_RESERVATION_V1
+- ORDINARY_OPERATION_V1
+- ORDINARY_SCIENTIFIC_DISPOSITION_V1
+- PROVENANCE_TIME_CORRECTION
+- REPAIR_CONTINUATION_DISPOSITION_V1
+- RESEARCH_FRAGMENT_V1
+- RESEARCH_FRAGMENT_PLAN_V1
+- RESEARCH_FRAGMENT_CHECK_V1
+- SCIENCE_MEMORY_REBASE_RECEIPT
+body_packet_schema_by_form:
+  CRITIC_INPUT_PACKET: smial.hypothesis-critic-input
+  FORGE_DRAFT: smial.hypothesis-forge-draft
+  NEXT_EPISTEMIC_ACTION: smial.hfic-next-epistemic-action

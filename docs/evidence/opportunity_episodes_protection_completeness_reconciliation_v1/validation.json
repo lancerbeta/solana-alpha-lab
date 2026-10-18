@@ -1,0 +1,55 @@
+{
+  "acceptance_oracles": {
+    "A": "Historical proof insufficient; scoped complete-empty accepted.",
+    "B": "Existing native two-window plan/due/readback fixture; numeric oracles retained.",
+    "C": "New day/cohort without proof or pointer renewal.",
+    "D": "Unknown/missing/conflicting/overlapping protection and relabelled/mixed input refuse before any loader.",
+    "E": "Late DENY after real reservation preserves pending and saved result; pause/read available.",
+    "F": "CAS, root binding and crash before/after publication with idempotent retry.",
+    "G": "Discovery, Spec1.4, last loader, cold three-process native publication/import/replay."
+  },
+  "limits": [
+    "FINAL_NATIVE_SUITES_ENFORCED_BY_FRESH_EXACT_HEAD_CI",
+    "Two existing campaign-specific skips retained",
+    "Aborted suite and mid-edit Git composite refusals are not PASS",
+    "NO_LOCAL_FULL_GATE_PRE_PR",
+    "NO_REAL_VALUES_INSTALLATION_OR_PLAN_ACTIVATION"
+  ],
+  "reproduce": [
+    "uv run --locked --managed-python python -B -m unittest tests.test_research_fragments_v1 -v",
+    "uv run --locked --managed-python python -B -m unittest tests.test_episode_native_required_outcome_contract_v1 tests.test_forge_runtime_discovery_binding_v1 -v",
+    "uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_vertical_v1.ThreeProcessProofTest -v"
+  ],
+  "schema": "smial.protection-completeness-validation",
+  "schema_version": "1.0",
+  "scout": "Native1.0 envelope backward-readable; new enforcement/all-reader guarantee UNPROVEN",
+  "source_readback": "source-readback.json",
+  "static": "FACTORY_STATIC: PASS",
+  "targeted": [
+    {
+      "candidate": "c20bc5377a470ee76adf1c5ba45fceea30dbf7a5",
+      "log_ref": "local/protection_completeness_v1/fragments-committed.log",
+      "seconds": 506.806,
+      "sha256": "92bd0ee48ce19c06af91fffd1f5899bd9077a66ac7c14c50a4a2b4c25f49c7fb",
+      "tests": 9,
+      "verdict": "PASS"
+    },
+    {
+      "candidate": "ad3e2dbfe61f8613228199726980ea8a449cd49a",
+      "log_ref": "local/protection_completeness_v1/cold-native-final.log",
+      "seconds": 258.503,
+      "sha256": "73db77f223bfd41582edb2e138f5a30a2094fd7e9f13bae2d31a13f064461e5f",
+      "tests": 1,
+      "verdict": "PASS"
+    },
+    {
+      "candidate": "FINAL_WORKTREE",
+      "log_ref": "local/protection_completenessness-final-boundary.log",
+      "seconds": 17.808,
+      "sha256": "e29107d0fd8615bf6c250a21f99bc1bd4007e950163a61e3c5a1aaa5a3319321",
+      "tests": 17,
+      "verdict": "PASS"
+    }
+  ],
+  "task_id": "OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1"
+}

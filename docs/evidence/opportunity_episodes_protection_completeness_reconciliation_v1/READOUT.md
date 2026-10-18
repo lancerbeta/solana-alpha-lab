@@ -1,0 +1,19 @@
+# Current protection → native fragment plan/check
+
+Engineering candidate: один resolver для текущей защиты, отдельный от frozen admission pins. Scope — local OPPORTUNITY_EPISODES / EXPLORATORY_REUSE. Установка на canonical root и включение monitoring ещё не выполнены; scientific acceptance не следует из engineering PASS.
+
+Source closure CLOSED_SCOPED: native assignment namespace, canonical и Fast Lane ResearchStore declarations, consumption registry, accepted TASK-22 v2, experiment policies и List A protocol. Реальная сверка доказала complete-empty только для применимых local assignments. TASK-22 T21-R3 остаётся UNTOUCHED/DENY в своём August TASK-21 dataset; October inputs доказуемо не пересекаются по information interval. UNBOUND List A и advisory holdouts_not_touched не дают confirmatory authority; advisory referent UNKNOWN сохранён.
+
+Исторический bootstrap complete=true остаётся frozen dependency и больше не заменяет current proof. Date/as_of не TTL. Проверяются source-specific declarations и версии, а не whole-store hash, mtime или число записей. Известная безопасная metadata delta перечитывается автоматически; новый день/cohort/card/check сам по себе не требует PR или переустановки. Неизвестный owner/version/link, исчезнувший baseline assignment и снятие baseline restrictions закрывают новое чтение. Namespace предполагается native append-only; read-only gate не является защитой от несанкционированного удаления ранее transient источника.
+
+Native wrapper owner/kind/form/version и обе experiment-spec alias families проверяются; конфликт даёт UNRESOLVED.
+
+Direct consumers: fragment preview/apply/run_due, last native loader, discovery binder и Spec 1.4 fixed-time verifier. Release/import/frozen parser не переписаны. Unsafe current gate останавливает loader, pending budget сохраняется; пауза и saved reads доступны. Old Scout source pin читает assignment schema1.0 envelope; исполнения новых правил этим pin и гарантии future holdouts для всех readers не заявляем.
+
+Real readback: seed RFV-8228C9408D18DE5CC98C9C1EA924B1C8; result SHA39028f4afacd8c0af9575ee37bf0447be10c19f147fda56bcb62ce9114d68c87 сохранён. Native inventory до/после совпал; real new looks=0, canonical writes=0, plan DISABLED. Точный текущий gate: CURRENT_PROTECTION_NOT_INSTALLED. Существующий plan-preview проходит соседние формы/root/universe/capability проверки и отдельно показывает этот blocker; activation требует exact owner scope.
+
+Операционный следующий шаг после accepted code: отдельно разрешить installation-preview.json — один новый immutable protection receipt и CAS pointer protection/current_research.json на exact root/source frontier; без изменения assignments, science, budgets, producer и Scout. Затем cold protection-status → fragment read → existing plan-preview. Только последующее отдельное согласие может включить scientific plan. Предложенное окно не power claim, не alpha и не обязательство ждать четыре недели.
+
+CAS recovery: unchanged retry того же уже опубликованного proposal возвращает exact receipt. SOURCE_CHANGED или HEAD_CHANGED требует cold status и нового preview; старое согласие нельзя переносить на другой hash. Missing/unknown source сначала восстанавливается у указанного owner. Rollback — выключить dependent plan, сохранить ограничения, receipts и pending; permissive historical parser нельзя вернуть как current authority.
+
+Точные root identity, source refs/frontier, scope, hashes и preview — в source-readback.json и installation-preview.json. Проверки и ограничения прогона — validation.json; live CI/readiness и owner phrase сообщаются отдельно для неизменного PR head.

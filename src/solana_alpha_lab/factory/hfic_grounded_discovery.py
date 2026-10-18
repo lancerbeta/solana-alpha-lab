@@ -888,6 +888,8 @@ def load_admitted_partition_rows(
                 or binding_row.get("observations_sha256") != observations_sha
             ):
                 raise GroundedDiscoveryError("BINDING_HASH_MISMATCH")
+            if not episode_scope:
+                _assert_legacy_file_kind(Path(census_file), Path(obs_file))
         if episode_scope:
             # Frozen callers can omit mutable lineage, never current protection.
             # Infer and verify the exact root from their native relative paths.
@@ -907,8 +909,6 @@ def load_admitted_partition_rows(
             from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_frozen_input
             verify_frozen_episode_sources(next(iter(roots)), temporal_frozen_input(cohorts))
         for cohort_id, census_file, obs_file in unique:
-            if not episode_scope:
-                _assert_legacy_file_kind(Path(census_file), Path(obs_file))
             binding_row = by_cohort[cohort_id]
             for row in load_parquet_rows(census_file):
                 stamped = dict(row)

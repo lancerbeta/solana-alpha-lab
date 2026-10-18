@@ -42104,7 +42104,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_episode_native_required_outcome_contract_v1.py', repository_path: tests/test_episode_native_required_outcome_contract_v1.py}
-  integrity: {kind: sha256, sha256: e8b3b4bb5eb34c278313ce83aa63eb19f98e36fd87d6103c94f2b065427f5ea9}
+  integrity: {kind: sha256, sha256: f83a9fb6b093caee17d5f14efcd78fd0a5558cfc8b32b9942c31c06bf3f77ac3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]
@@ -43389,7 +43389,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_research_fragments_v1.py', repository_path: tests/test_research_fragments_v1.py}
-  integrity: {kind: sha256, sha256: 03475b56447d72fbeafd1b9c5b99c85df2571923b3fbb948ace3bc14656b6477}
+  integrity: {kind: sha256, sha256: 46bec8dfd6f964ff4f252d5f7889fb638c80bdee354718750d0d81eecab38c03}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43412,7 +43412,7 @@ records:
     repository_path: docs/tasks/OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1.md
   integrity:
     kind: sha256
-    sha256: 289453bf7750c56d4bccee83cb2ae6eb9d75704624204a65426dff15e64874cb
+    sha256: c182ec9b36efb273900f15bb49f22576955881ef1ae030bdd05b956cf767ebbb
   access:
     mode: read_only
     method: file
@@ -43453,7 +43453,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/episode_current_protection.py
   integrity:
     kind: sha256
-    sha256: 12d4dee25ca8e23591944e483b5e17d4b9bce5e132eaddfc948e6ee5c76b578b
+    sha256: 9dd725e9782de784e4313cf996d69a2380ffa7afb695ca1da6483816dd80efa3
   access:
     mode: read_only
     method: file
@@ -43496,7 +43496,7 @@ records:
     repository_path: configs/episode_current_protection_sources_v1.yaml
   integrity:
     kind: sha256
-    sha256: b76dfc02812bf2abf46b1dfa482d0f159019efa5cdc1fae883354fff721a49d6
+    sha256: 36bc6f2e3f031c26b15a0ee70fac4d747d67538b02c604e00dc39984be7c74f6
   access:
     mode: read_only
     method: file

@@ -1,0 +1,82 @@
+{
+  "assessment": {
+    "boundary": "LOCAL_EPISODE_EXPLORATORY_ONLY; ADVISORY_SCOPE_UNKNOWN; NO_CONFIRMATORY_OR_SCOUT_GRANT",
+    "complete_empty": true,
+    "status": "ALLOW"
+  },
+  "authority": "SEPARATE_EXACT_METADATA_ONLY_INSTALLATION_REQUIRED",
+  "proposal": {
+    "assignment_ref": "protection/assignments/CURRENT-RESEARCH-BE152CEFBB2F25DB624F01F9F4A5C887.json",
+    "assignment_sha256": "cf4541e6774b60c8481d91243f11fc9dcba11003ff37b9bfb46c3493a103ea04",
+    "checked_at": "2026-10-18T23:48:54.329443+00:00",
+    "context_sha256": "ca9d3f58c5abc71df3f2f821b927d677e34a3072fbf79e1ab5573447d547e456",
+    "contract": "EPISODE_CURRENT_PROTECTION_V1",
+    "predecessor": null,
+    "read_scope": {
+      "collection": "OPPORTUNITY_EPISODES",
+      "data_root_identity_sha256": "6ba8e087ac18c9edbb5c9216207cef47459ae534d1e6abee80db23cce3478812",
+      "evidence_role": "EXPLORATORY_REUSE"
+    },
+    "source_frontier": [
+      {
+        "assignment_document_count": 0,
+        "assignment_refs": [],
+        "owner": "LOCAL_ASSIGNMENTS",
+        "ref": "protection/assignments",
+        "semantic_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "assignment_refs": [],
+        "declaration_count": 2,
+        "declaration_refs": [
+          {
+            "record_id": "HFIC-ART-CRITIC-RESULT-HFIC-SESS-C8DA64F2899C2D8B-9BB0C6A27DF4",
+            "semantic_sha256": "38db43e627bd0aaf5e285fd31e3187cd851817ecca60a3c405859e9cf08db04d"
+          },
+          {
+            "record_id": "HFIC-ART-CRITIC-RESULT-HFIC-SESS-C8DA64F2899C2D8B-B31E12DBB42A",
+            "semantic_sha256": "64434f56cebfad7875c6edded05c1b054a6e81bac9c5ad39cd25c54e86012ed8"
+          }
+        ],
+        "owner": "CANONICAL_RESEARCHSTORE",
+        "ref": "smial-data://canonical_researchstore",
+        "semantic_sha256": "d81ba3a3c8a2fca1fbb68dfe350f94f43250da81c8f4d99f30364b4473692249"
+      },
+      {
+        "assignment_refs": [],
+        "declaration_count": 0,
+        "declaration_refs": [],
+        "owner": "FAST_LANE_RESEARCHSTORE",
+        "ref": "smial-data://fast_lane_researchstore",
+        "semantic_sha256": "4316d1c52967a8d64f806b8565ee9a231ef71ce1612ee3e35c80a03056b0098d"
+      },
+      {
+        "interpretation": "CONSUMPTION_ONLY_NOT_ASSIGNMENT_ABSENCE",
+        "owner": "CONSUMPTION_REGISTRY",
+        "ref": "registries/holdout_consumption.yaml",
+        "semantic_sha256": "3123b8d824e90c1c4de26bc74e106c270f06e21e7199432c869b257373bf7091"
+      },
+      {
+        "owner": "TASK22_ACCEPTED_SPLIT",
+        "ref": "docs/evidence/task22/a6_split_resolution_acceptance_catalog_factory_fit_v1.json",
+        "semantic_sha256": "a2ba8912272a9ed5f899d2cb0177d7c0fe40e777ee51b779d29b98e4d2f5f599"
+      },
+      {
+        "owner": "EXPERIMENT_POLICIES",
+        "ref": "configs/experiment_specs",
+        "semantic_sha256": "f96e6ee1620a510ac722dfa006f07c26b913bd45f2415d39e0eb8468e708b51e"
+      },
+      {
+        "interpretation": "UNBOUND_NO_CONFIRMATORY_GRANT_EXPLORATORY_LABELS_REQUIRED",
+        "owner": "LIST_A_PROTOCOL",
+        "ref": "configs/list_a_chronological_confirmation_v1.yaml",
+        "semantic_sha256": "baa6604253495487583cc61f4f230ee787a6cfdd6f1ee81ecf4f58d02abdb9ec"
+      }
+    ],
+    "source_set_sha256": "c7e614c13194cf18f6ea33680d2c7286c4b2c395962d9f7634ac83d0ce6d59f2"
+  },
+  "proposal_sha256": "044345a7a16ee6645cacc632e86cf28f48c0dd68772730919863ab925bed14a5",
+  "status": "PREVIEW_READY",
+  "values_loaded": false,
+  "writes": false
+}
