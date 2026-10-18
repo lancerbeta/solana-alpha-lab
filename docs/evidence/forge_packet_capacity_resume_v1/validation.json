@@ -35,6 +35,7 @@
     "new_helper_in_execution_code_binding": true,
     "new_real_main_during_repair": 0,
     "real_candidate_session_created": false,
+    "real_main_after_fresh_readback": "PENDING_ACCEPTED_VERSION",
     "real_main_before": 1,
     "real_store_reset": false,
     "restart_journal_occupancy_unchanged": true,
@@ -76,6 +77,12 @@
       "command": "uv run --locked --managed-python python -B -m unittest tests.test_hfic_scientific_disposition_continuity_v1.V4OperabilityTests.test_bounded_context_reports_omitted_and_pages_detail tests.test_hfic_scientific_disposition_continuity_v1.ReviewRegressionTests.test_capsule_shrinks_first_under_packet_budget",
       "ran": 2,
       "status": "PASS"
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_hfic_cli.HficPacketCapacityReaderTests tests.test_hfic_operational_closure_v1",
+      "phase": "final owner-UX error/recovery delta",
+      "ran": 19,
+      "status": "PASS"
     }
   ],
   "defaults": {
@@ -100,6 +107,10 @@
     "result_sha256": "39028f4afacd8c0af9575ee37bf0447be10c19f147fda56bcb62ce9114d68c87",
     "run_id": "FORGE-RUN-245CEE89F63CE453",
     "scope": "OPPORTUNITY_EPISODES:AUTO"
+  },
+  "recovery_binding": {
+    "path": "docs/evidence/forge_packet_capacity_resume_v1/recovery.json",
+    "sha256": "d7698249fed54382d92c8ea703424f7e9223b11bab64b3ac280d72f31643cdec"
   },
   "schema": "smial.forge-packet-capacity-validation",
   "schema_version": "1.0",

@@ -987,9 +987,10 @@ def main(argv: list[str] | None = None) -> int:
             )
         raise FastLaneCliError("COMMAND_UNSUPPORTED")
     except PacketCapacityError as exc:
-        return emit({"status": "BLOCKED_TECHNICAL_RESOURCE", "reason_code": exc.code,
+        resource = exc.code.endswith("RESOURCE_LIMIT_EXCEEDED")
+        return emit({"status": "BLOCKED_TECHNICAL_RESOURCE" if resource else "BLOCKED_TECHNICAL_INPUT", "reason_code": exc.code,
                      "detail": exc.detail, "scientific_negative": False,
-                     "next_action": "VERIFY_EFFECTS_ADJUST_LOCAL_CAPACITY_AND_RESUME_SAVED_INPUT"}, exit_code=2)
+                     "next_action": "VERIFY_EFFECTS_ADJUST_LOCAL_CAPACITY_AND_RESUME_SAVED_INPUT" if resource else "VERIFY_SAVED_INPUT_AND_LOCAL_CAPACITY_SETTINGS"}, exit_code=2)
     except FastLaneCliError as exc:
         return emit_error(exc.code)
     except (

@@ -16,8 +16,10 @@ challenger используют сохранённый контракт; нов�
 полномочий. Исходные неуспешные проверки не скрыты.
 
 Девять именованных recovery-файлов закреплены в существующей локальной области
-операции с исходными hashes. Data root не копировался. Реальный MAIN:1→1,
-новых расчётов0, candidate/session ещё нет. Result SHA остаётся
+операции с исходными hashes (recovery.json). Data root не копировался.
+В исходном checkpoint MAIN=1; реальных научных команд в ремонте0,
+candidate/session ещё не создавались. Свежий readback реального Store следует
+после принятия версии. Сохранённый Result SHA:
 39028f4afacd8c0af9575ee37bf0447be10c19f147fda56bcb62ce9114d68c87.
 
 После exact-head CI/readiness требуется отдельная owner merge phrase.

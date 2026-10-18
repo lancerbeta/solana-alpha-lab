@@ -30,7 +30,9 @@ overrides `SMIAL_HFIC_WORKING_RECORDS`, `SMIAL_HFIC_WORKING_BYTES`,
 `SMIAL_HFIC_RESOURCE_RECORDS` need no code change. New packets freeze their
 selection settings; cold replay retains saved sources/cutoff instead of
 reselecting under today's defaults. Explicit resource overrides can resume the
-same saved input after a typed `HFIC_*_RESOURCE_LIMIT_EXCEEDED` refusal. File
+same saved input after a typed `HFIC_*_RESOURCE_LIMIT_EXCEEDED` refusal. Before
+retry, read `forge-run --no-write` and saved state for the same focus, then
+follow resolver NEXT; effects of the refused call may be UNKNOWN. File
 readers consume at most the JSON allowance plus one sentinel byte. Capacity
 changes grant no scientific budget, exposure, eligibility or authority.
 

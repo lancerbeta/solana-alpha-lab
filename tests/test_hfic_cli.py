@@ -251,6 +251,7 @@ class HficPacketCapacityReaderTests(unittest.TestCase):
     def test_reader_bounds_actual_io_and_accepts_large_unicode_outer_json(self):
         from scripts.hypothesis_forge import _load_json_file
         from scripts.hypothesis_fast_lane import load_packet
+        from scripts import hypothesis_fast_lane as fast_lane_cli
         from solana_alpha_lab.factory.hfic_preflight import verify_forge_context_packet, FORGE_CONTEXT_ARTIFACT_DIR
         from solana_alpha_lab.factory.hfic_packet_capacity import PacketCapacityError, resolve_packet_capacity
         with tempfile.TemporaryDirectory() as raw:
@@ -260,6 +261,14 @@ class HficPacketCapacityReaderTests(unittest.TestCase):
             self.assertGreater(path.stat().st_size,262144)
             self.assertEqual(_load_json_file(path),value)
             self.assertEqual(load_packet(path),value)
+            from contextlib import redirect_stdout
+            from io import StringIO
+            for allowance,status in (("0","BLOCKED_TECHNICAL_INPUT"),("1000","BLOCKED_TECHNICAL_RESOURCE")):
+                output=StringIO()
+                with patch.dict(os.environ,{"SMIAL_HFIC_JSON_BYTES":allowance}), patch.object(fast_lane_cli,"resolve_data_root",return_value=Path(raw)), redirect_stdout(output):
+                    result=fast_lane_cli.main(["classify","--packet",str(path)])
+                self.assertEqual(result,2)
+                self.assertEqual(json.loads(output.getvalue())["status"],status)
             yaml_path=Path(raw)/"input.yaml"
             yaml_path.write_text("packet: retained\n",encoding="utf-8")
             self.assertEqual(load_packet(yaml_path),{"packet":"retained"})

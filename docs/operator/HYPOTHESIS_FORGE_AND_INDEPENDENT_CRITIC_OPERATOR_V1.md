@@ -402,8 +402,10 @@ returns `ALREADY_APPLIED`. Contract:
    `forge-run` so the aggregate reads the real V1 artifacts. That is not the
    scientific V1 probe.
    `RESUME_V1` reuses `--saved-draft-sha256`, not a new START envelope.
-   При `HFIC_*_RESOURCE_LIMIT_EXCEEDED` сохраните входы и увеличьте указанную
-   локальную техническую настройку, затем продолжите persist/freeze с тем же
+   При `HFIC_*_RESOURCE_LIMIT_EXCEEDED` сохраните входы. Сначала выполните
+   `forge-run --no-write` на том же focus и прочитайте сохранённое состояние:
+   эффекты отказавшего вызова могут быть UNKNOWN. Следуйте resolver NEXT,
+   увеличьте указанную локальную настройку, затем продолжите persist/freeze с тем же
    результатом. Это технический BLOCKED, без нового MAIN или возврата бюджета.
    Не удаляйте mandatory priors и не используйте quarantine/reset как ремонт
    ёмкости. `PRIOR_MEMORY_RECORD_UNIDENTIFIED` означает дефект источника:
@@ -812,7 +814,9 @@ Defaults live in `packet_capacity` in
 `configs/hypothesis_forge_independent_critic_v1.yaml`. An operator may set
 `SMIAL_HFIC_PACKET_BYTES`, `SMIAL_HFIC_JSON_BYTES` or
 `SMIAL_HFIC_RESOURCE_RECORDS` locally without a PR. Resource errors identify
-actual usage, limit and setting; adjust it and resume the same saved input.
+actual usage, limit and setting. First read `forge-run --no-write` and saved
+state for the same focus: refused-call effects may be UNKNOWN. Follow resolver
+NEXT, adjust the setting, and resume the same saved operation/input.
 The JSON reader reads no more than its allowance plus one byte. Unicode,
 escaping and duplicated outer representations are measured through actual
 serialization/file reads. Working recommendations can be set with

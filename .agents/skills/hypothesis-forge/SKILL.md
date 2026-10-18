@@ -636,8 +636,10 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
    explicit accounted evidence, never a silent memory refresh. Do not emit
    HFIC-V1.3 Prompt A. If freeze returns
    a legacy capacity code or `HFIC_*_RESOURCE_LIMIT_EXCEEDED`: technical BLOCKED;
-   do not launch Critic on a partial packet. Adjust the reported local resource
-   setting and resume the same saved input, without a new MAIN or budget refund.
+   do not launch Critic on a partial packet. First run `forge-run --no-write`
+   for the same focus/operation and read saved state: effects may be UNKNOWN.
+   Follow its NEXT, adjust the reported local resource setting, and resume the
+   same saved input without a new MAIN or budget refund.
    If freeze returns `PRIOR_MEMORY_RECORD_UNIDENTIFIED`: BLOCKED; session was
    not written; do not launch Critic. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`.
 7. **Mandatory auto-handoff (selected path only):** launch Independent Critic in a new isolated context
@@ -796,8 +798,10 @@ growth warning remains telemetry. Extra resource headroom does not expand
 optional recall. Historical packets retain their bytes and saved contracts.
 
 Use local `SMIAL_HFIC_PACKET_BYTES`, `SMIAL_HFIC_JSON_BYTES` or
-`SMIAL_HFIC_RESOURCE_RECORDS` to adjust technical capacity and resume the exact
-saved input without a PR or new owner choice. Fresh view recommendations use
+`SMIAL_HFIC_RESOURCE_RECORDS` to adjust technical capacity without a PR or new
+owner choice. Before retry, run `forge-run --no-write` for the same focus and
+read saved state/resolver NEXT; effects of a refused call may be UNKNOWN.
+Resume only that saved operation. Fresh view recommendations use
 `SMIAL_HFIC_WORKING_RECORDS` / `SMIAL_HFIC_WORKING_BYTES`; frozen selections
 ignore today's recommendations. Do not drop mandatory/material evidence,
 quarantine valid history, reset budgets or rerun MAIN to repair capacity.
