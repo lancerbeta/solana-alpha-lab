@@ -13,11 +13,43 @@
     "OWNER_UX_CRITIC"
   ],
   "review_id": "FORGE_PACKET_CAPACITY_RESUME_V1-REVIEW",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviews": [],
+  "reviewed_bindings_sha256": "966bf78d46e42a986de352c867f1f8c309cf6d15896fb889704d2685ff932f3d",
+  "reviewed_inventory_sha256": "116338025cd4547b68cb66ef7cd5892c5045bd4680500da059d2381d921e6bd8",
+  "reviews": [
+    {
+      "findings": [
+        "Isolated read-only review; four initial defects and nested-control resource edge resolved. Final34 file SHA and canonical aggregate bindings independently verified; no open findings."
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Engineering checkpoint only: native synthetic lifecycle and adversarial resource/source cases provide falsifiable technical proof. Recovery binding is durable; real scientific Critic and fresh Store readback remain pending accepted merge. Final34 file SHA and aggregate bindings verified."
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "packet_fingerprint_sha256=d3886fa52ebd322cd89279a42a030b479b5458478a1344066e02eb18d52e835e",
+        "SEMANTIC_PREMISE PASS for exact057b25237abe789f5a3726ddf2783cf598ce653c; frozen packet+diff+three source-bound candidate blobs. Mandatory/full-archive guards, saved selection/cutoff, actual code binding and scientific accounting retain their owners.",
+        "Tests can pass while research validity breaks if a real packet loses a material restriction, includes post-cutoff information or retry creates another look. No scientific acceptance inferred from synthetic lifecycle; UNKNOWN effects require readback. Model diversity UNPROVEN; isolation is PROCESS_OBLIGATION, packet assertion is PACKET_INFORMATION_PATH only.",
+        "Final34 file SHA and aggregate bindings verified; no open findings."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Both initial recovery findings resolved: active instructions require resolver/readback before retry; Fast Lane distinguishes resource refusal from invalid input/settings. Local capacity needs no PR or owner byte selection. Final34 file SHA and aggregate bindings independently verified; no open findings."
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "FORGE_PACKET_CAPACITY_RESUME_V1",
-  "verdict": "NOT_READY"
+  "verdict": "PASS"
 }
