@@ -39,40 +39,44 @@
     "OWNER_UX_CRITIC"
   ],
   "review_id": "SMIAL_RESEARCH_FRAGMENTS_V1-REVIEW",
-  "reviewed_bindings_sha256": "6505b288c6db540bc40cc40f1eae5829a0013952ff8029c9cb669caa8eebec69",
-  "reviewed_inventory_sha256": "51e425a4893612b6b0a62c98722c3a355379af8590fa95393f4679fe402c71e9",
+  "reviewed_bindings_sha256": "d09dd2ce4ff04ec931a8aac38010f852207ef72f0ccdc12ea269cfb54adbbfe9",
+  "reviewed_inventory_sha256": "163fc8599f6ea68d17c739a96c1108baa122024a19608e8501a2ecee84a746a0",
   "reviews": [
     {
       "findings": [
-        "Isolated read-only; candidate 792e15c6002bc1213a2a00167ebfd90d04aad46f; 30/30 committed/worktree SHA256 and full/delta diff verified; both canonical aggregate hashes MATCH. No real reads/writes or repeated suites.",
-        "Three precommit defects closed: RF-ART mandatory closure, direct runtime capability bindings, damaged-item isolation. Final evidence/recovery/UNKNOWN deltas introduce no actionable findings."
+        "Isolated read-only; candidate fdd7152031f5b3d0e50dffb139908f827603d5eb; 31/31 committed/worktree SHA256 and implementation delta verified; both canonical aggregate hashes MATCH. No real reads/writes or repeated suites.",
+        "Three precommit defects closed: RF-ART mandatory closure, direct runtime capability bindings, damaged-item isolation. Final evidence/recovery/UNKNOWN deltas introduce no actionable findings.",
+        "CI-only delta PASS: current engineering workbench pin/comment, exact test path, native Catalog and validation receipt. Product code, other core pins, behavioral assertions and historical scientific evidence unchanged; 13 targeted tests PASS. Fresh exact-head CI required."
       ],
       "role": "CODE_REVIEWER",
       "verdict": "PASS"
     },
     {
       "findings": [
-        "Isolated read-only; candidate 792e15c6002bc1213a2a00167ebfd90d04aad46f; 30/30 committed/worktree SHA256 and full/delta diff verified; both canonical aggregate hashes MATCH. No real reads/writes or repeated suites.",
-        "Source/shelf/ordinary-prior-freeze/actual-import/native-measurement/cold-resume satisfies bounded engineering outcome. Four acceptance levels and unapplied real scope remain explicit; no scientific acceptance."
+        "Isolated read-only; candidate fdd7152031f5b3d0e50dffb139908f827603d5eb; 31/31 committed/worktree SHA256 and implementation delta verified; both canonical aggregate hashes MATCH. No real reads/writes or repeated suites.",
+        "Source/shelf/ordinary-prior-freeze/actual-import/native-measurement/cold-resume satisfies bounded engineering outcome. Four acceptance levels and unapplied real scope remain explicit; no scientific acceptance.",
+        "CI-only delta PASS: current engineering workbench pin/comment, exact test path, native Catalog and validation receipt. Product code, other core pins, behavioral assertions and historical scientific evidence unchanged; 13 targeted tests PASS. Fresh exact-head CI required."
       ],
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS"
     },
     {
       "findings": [
-        "packet_fingerprint_sha256=f268ff89080db7907d4a384248b9bcf5debc870387776c3671604c38b23da0ef",
-        "Isolated read-only; candidate 792e15c6002bc1213a2a00167ebfd90d04aad46f; 30/30 committed/worktree SHA256 and full/delta diff verified; both canonical aggregate hashes MATCH. No real reads/writes or repeated suites.",
+        "packet_fingerprint_sha256=ff7ea5e04245d60b3afd0f88fb0d31d60068f035d3701b816ad8c22cb63eb09b",
+        "Isolated read-only; candidate fdd7152031f5b3d0e50dffb139908f827603d5eb; 31/31 committed/worktree SHA256 and implementation delta verified; both canonical aggregate hashes MATCH. No real reads/writes or repeated suites.",
         "SEMANTIC_PREMISE PASS. Plan/accounting failure preserves verified evidence and prior; pending CHECK recovery is metadata-only. Missing plan enabled value stays UNKNOWN.",
         "Tests can pass while proxy/event-time UNKNOWN and adaptive Scout exposure are misread as independent OOS or executable return. Candidate makes neither claim. Native events/manifests own truth; DuckDB is derived. Private adapter imports remain bounded technical debt.",
-        "PACKET_INFORMATION_PATH only; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN."
+        "PACKET_INFORMATION_PATH only; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN.",
+        "CI-only delta PASS: current engineering workbench pin/comment, exact test path, native Catalog and validation receipt. Product code, other core pins, behavioral assertions and historical scientific evidence unchanged; 13 targeted tests PASS. Fresh exact-head CI required."
       ],
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS"
     },
     {
       "findings": [
-        "Isolated read-only; candidate 792e15c6002bc1213a2a00167ebfd90d04aad46f; 30/30 committed/worktree SHA256 and full/delta diff verified; both canonical aggregate hashes MATCH. No real reads/writes or repeated suites.",
-        "Blocked reason precedes future date and carries Russian recovery guidance. Landed result without CHECK is DUE recovery, including paused plan. Unknown plan flag is not displayed as false. Real seed/plan/new evidence remain unapplied."
+        "Isolated read-only; candidate fdd7152031f5b3d0e50dffb139908f827603d5eb; 31/31 committed/worktree SHA256 and implementation delta verified; both canonical aggregate hashes MATCH. No real reads/writes or repeated suites.",
+        "Blocked reason precedes future date and carries Russian recovery guidance. Landed result without CHECK is DUE recovery, including paused plan. Unknown plan flag is not displayed as false. Real seed/plan/new evidence remain unapplied.",
+        "CI-only delta PASS: current engineering workbench pin/comment, exact test path, native Catalog and validation receipt. Product code, other core pins, behavioral assertions and historical scientific evidence unchanged; 13 targeted tests PASS. Fresh exact-head CI required."
       ],
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS"
