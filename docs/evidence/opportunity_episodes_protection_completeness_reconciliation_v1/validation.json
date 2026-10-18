@@ -18,7 +18,7 @@
   "reproduce": [
     "uv run --locked --managed-python python -B -m unittest tests.test_research_fragments_v1 -v",
     "uv run --locked --managed-python python -B -m unittest tests.test_episode_native_required_outcome_contract_v1 tests.test_forge_runtime_discovery_binding_v1 -v",
-    "uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_vertical_v1.ThreeProcessProofTest -v"
+    "uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_vertical_v1.ThreeProcessVerticalTests -v"
   ],
   "schema": "smial.protection-completeness-validation",
   "schema_version": "1.0",
