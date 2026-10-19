@@ -529,6 +529,25 @@ class CurrentProtectionTests(unittest.TestCase):
         self.assertEqual(status["reason"], "PROTECTION_DECLARATION_VERSION_UNKNOWN")
         self.assertIsNone(status["complete_empty"])
 
+    def test_unknown_unmarked_native_body_version_is_unresolved(self):
+        import hashlib
+        from solana_alpha_lab.factory.research_store import ResearchEvent, RecordKind
+        self.apply(self.preview()); pointer = (self.plane/self.p.POINTER).read_bytes()
+        payload = json.dumps({"hypothesis_version_id": "SYNTHETIC-HV", "schema_version": "99.0"}, sort_keys=True, separators=(",", ":"))
+        at = datetime.now(UTC)
+        event = ResearchEvent(record_id="UNKNOWN-HV-BODY-VERSION", record_kind=RecordKind.HYPOTHESIS_VERSION,
+            entity_id="SYNTHETIC-HV", hypothesis_version_id="SYNTHETIC-HV", run_id=None,
+            transaction_id="RESEARCH-TXN-UNKNOWN-HV", effective_at=at, first_reliable_available_at=at,
+            supersedes_record_id=None, payload_json=payload, payload_sha256=hashlib.sha256(payload.encode()).hexdigest(),
+            schema_version="1.0", producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001", producer_git_sha=GIT_SHA, created_at=at)
+        self.store.append([event], transaction_id=event.transaction_id)
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["status"], "UNRESOLVED_SCOPE")
+        self.assertEqual(status["reason"], "PROTECTION_DECLARATION_VERSION_UNKNOWN")
+        self.assertEqual(status["owner"], "CANONICAL_RESEARCHSTORE")
+        self.assertIsNone(status["complete_empty"])
+        self.assertEqual((self.plane/self.p.POINTER).read_bytes(), pointer)
+
     def test_wrapper_authoritative_link_is_not_empty(self):
         self.apply(self.preview())
         self.append_native_critic({"schema": "smial.hypothesis-critic-result", "schema_version": "1.1"},

@@ -24,7 +24,7 @@
       "scout": "EXPOSED_OR_UNKNOWN"
     },
     "artifact_kind": "RESEARCH_FRAGMENT_PLAN_V1",
-    "capability_epoch_sha256": "f13d7bee6b7081275e7be4d7f1356e7a7dbefd40720ce9f165396d5a7b7a23c3",
+    "capability_epoch_sha256": "f8fb24763cae96abd0a19ea46cfaa14adf0edc62e4ac375e513ce2d3e2d3b365",
     "collection": "OPPORTUNITY_EPISODES",
     "data_root_identity_sha256": "6ba8e087ac18c9edbb5c9216207cef47459ae534d1e6abee80db23cce3478812",
     "enabled": true,
@@ -40,8 +40,8 @@
     "max_evaluations": 1,
     "max_input_rows": 10000000,
     "owner_scope_ref": "SMIAL-RFV-8228C940-20261020-20261117-EXPLORATORY-1",
-    "plan_sha256": "0e123e87a567bb2ed26f2367805e934450765deb4af0196e7a4278758b2303c7",
-    "prepared_at": "2026-10-19T00:04:31.014462+00:00",
+    "plan_sha256": "f7a5e5d18fbd3f73987eb1c08d90c6fc8ad5c7b352cc64a580795eee2b7e32b9",
+    "prepared_at": "2026-10-19T00:15:06.400966+00:00",
     "previous_plan_sha256": null,
     "schema_version": "1.0",
     "scientific_use": "EXPLORATORY_MONITORING",
@@ -57,6 +57,6 @@
       }
     ]
   },
-  "proposal_sha256": "31d39a4449052445ff57c24bbd21798c78d2bcb797f8cad9ac01ce8c00846c75",
+  "proposal_sha256": "b07077eaceb863b7d14d431a5d5148b153a33db33d3e8dba2c431147a8701a87",
   "writes": false
 }

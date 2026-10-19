@@ -249,3 +249,9 @@ before exclusion. Reserved NOT_GRANTED installation scope is rejected before
 writes; relative CLI root requests input correction. Four red witnesses caught
 these defects; final focused boundary suite 21 PASS in 19.422s, static PASS.
 Real inventory/result/MAIN unchanged; final proposal regenerated on these bytes.
+
+Native unmarked version checkpoint: actual controlled HYPOTHESIS_VERSION with
+body schema_version99.0 reproduced the last known version gap; explicit body
+version now requires a supported native marker. 22 focused tests PASS in20.322s,
+static PASS. Existing installation proposal revalidated unchanged root/frontier/
+context/assignment bytes; no timestamp renewal or canonical write required.

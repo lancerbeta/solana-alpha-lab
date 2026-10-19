@@ -214,6 +214,10 @@ def _store_projection(root: Path, config: Mapping[str, Any]) -> list[dict[str, A
             for layer in (wrapper, body):
                 if field in layer:
                     _require(layer[field] in versions, "PROTECTION_DECLARATION_VERSION_UNKNOWN")
+        # Native unmarked bodies are unversioned; an added schema version
+        # is a new interpretation, never evidence of an empty declaration.
+        _require("schema_version" not in body or any(body.get(key) is not None for key in ("artifact_kind", "kind", "schema")),
+                 "PROTECTION_DECLARATION_VERSION_UNKNOWN")
         for marker_key in ("artifact_kind", "kind", "schema"):
             marker = body.get(marker_key)
             if marker is not None:

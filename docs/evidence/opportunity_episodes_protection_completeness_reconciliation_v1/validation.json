@@ -58,7 +58,16 @@
       "sha256": "7b781c77c69a1e9703e7ac0edd9703085950b0ab8418173b9f8f1e831b32fcf1",
       "tests": 21,
       "verdict": "PASS"
+    },
+    {
+      "candidate": "FINAL_UNMARKED_VERSION_WORKTREE",
+      "log_ref": "local/protection_completeness_v1/ready3-boundary.log",
+      "seconds": 20.322,
+      "sha256": "69b8e667bcc0ca5a0552db7f6aa3f6a6600298f66025ea847d9ca9ae22e1e956",
+      "tests": 22,
+      "verdict": "PASS"
     }
   ],
-  "task_id": "OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1"
+  "task_id": "OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1",
+  "unmarked_version_witness": "Actual native synthetic HYPOTHESIS_VERSION append accepted by ResearchStore: schema_version99.0 previously ALLOW, now UNRESOLVED_SCOPE/complete_empty=null, no pointer change. Native unmarked forms have no body schema_version; explicit unsupported version rejected."
 }

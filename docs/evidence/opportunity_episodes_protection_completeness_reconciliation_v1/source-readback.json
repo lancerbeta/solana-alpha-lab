@@ -8,7 +8,7 @@
   "canonical_writes": false,
   "code_bindings": {
     "configs/episode_current_protection_sources_v1.yaml": "36bc6f2e3f031c26b15a0ee70fac4d747d67538b02c604e00dc39984be7c74f6",
-    "src/solana_alpha_lab/factory/episode_current_protection.py": "546ad75dc0ccb950371b689d75ab665799f9cb39635042a2b46328299e691deb"
+    "src/solana_alpha_lab/factory/episode_current_protection.py": "a214943139e16cf8b078cd38ed5560a0b8645de5b3ddaaebc172c76e1810658a"
   },
   "context_sha256": "ca9d3f58c5abc71df3f2f821b927d677e34a3072fbf79e1ab5573447d547e456",
   "current_reason": "CURRENT_PROTECTION_NOT_INSTALLED",
@@ -42,6 +42,7 @@
     "writes": false
   },
   "prepared_code_context": "WORKTREE_CANDIDATE_BOUND_BY_COMPLETION",
+  "prepared_installation_proposal_revalidation": "UNCHANGED_ROOT_FRONTIER_CONTEXT_ASSIGNMENT_BYTES_NO_TIME_RENEWAL",
   "preview_sha256": "cefc571e042b00a518f5fa8e6ceff46b343435c80fd40b8fe79c55b824bf5e18",
   "prospective_plan_activation": "REQUIRES_EXACT_OWNER_SCOPE",
   "prospective_plan_current_gate": {
@@ -59,7 +60,7 @@
     "values_loaded": false,
     "writes": false
   },
-  "prospective_plan_proposal_sha256": "31d39a4449052445ff57c24bbd21798c78d2bcb797f8cad9ac01ce8c00846c75",
+  "prospective_plan_proposal_sha256": "b07077eaceb863b7d14d431a5d5148b153a33db33d3e8dba2c431147a8701a87",
   "read_scope": {
     "collection": "OPPORTUNITY_EPISODES",
     "data_root_identity_sha256": "6ba8e087ac18c9edbb5c9216207cef47459ae534d1e6abee80db23cce3478812",
