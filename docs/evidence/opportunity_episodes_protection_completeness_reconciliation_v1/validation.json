@@ -24,6 +24,111 @@
   "schema": "smial.protection-completeness-validation",
   "schema_version": "1.0",
   "scout": "Native1.0 envelope backward-readable; new enforcement/all-reader guarantee UNPROVEN",
+  "semantic_acceptance_patch": {
+    "P1_01": "Native active-policy/snapshot/extension forms, schemas and versions come from hfic_research_policy constants; no duplicate budget interpretation. Existing legacy decision entity identity and supported1.1 input-binding schema retain native history.",
+    "P1_02": "Finite protection meanings and native schema validation over dynamic actual instance files, independent of filename/extension. Per-ref full file and meaning fingerprints; installed baseline deletion/replacement fail closed; pointer/receipt/source_set unchanged for supported new instance.",
+    "P1_03": "Typed safe source_reason/owner/source_ref/observed_form/version/next_action reaches direct status, CLI and actual fragment run_due. Source recovery does not request new scope; installation authority remains separate.",
+    "alias_conflict_red": {
+      "log_ref": "local/protection_completeness_v1/semantic-alias-conflict-red.log",
+      "observed": "ALLOW/complete_empty=true for different known aliases",
+      "sha256": "100ffbd5e247406788c634fea5cc32ae788d07bad66fcef2b912a9df55eb0b0d"
+    },
+    "alias_conflict_resolution": "Conflicting known alias projections now UNRESOLVED_SCOPE; equal native aliases deduplicate. Exact record ref retained; covered in final23.",
+    "canonical_writes": 0,
+    "cli_source_recovery": {
+      "log_ref": "local/protection_completeness_v1/semantic-cli-recovery.log",
+      "next_action": "RESTORE_OR_REPAIR_NAMED_SOURCE_THEN_RETRY",
+      "sha256": "f8d1a9a6fb012bcebe601322050a02b8a4cefd5821de998c64e98a884f750b4b",
+      "source_ref": "smial-data://fast_lane_researchstore",
+      "verdict": "PASS_ACTUAL_CLI"
+    },
+    "exact_reviewed_component_counterexamples": {
+      "config_sha256": "36bc6f2e3f031c26b15a0ee70fac4d747d67538b02c604e00dc39984be7c74f6",
+      "expected_reasons": [
+        "PROTECTION_DECLARATION_FORM_UNKNOWN",
+        "EXPERIMENT_POLICY_SOURCE_SET_CHANGED"
+      ],
+      "log_ref": "local/protection_completeness_v1/semantic-p1-exact-component-red.log",
+      "method": "Exact reviewed module/config blobs, unchanged native policy writer, minimal actual metadata tree; no full checkout or market DataPlane copy",
+      "module_sha256": "a214943139e16cf8b078cd38ed5560a0b8645de5b3ddaaebc172c76e1810658a",
+      "sha256": "eb6e6c02e36e6510378db014076d7fba86afedfbecf3de6b8befd2bde768ab87",
+      "tests": 2
+    },
+    "final_boundaries": {
+      "log_ref": "local/protection_completeness_v1/semantic-p1-final-boundaries.log",
+      "seconds": 25.65,
+      "sha256": "1305b122f23c1cbd398137277df7ed513d240b58d64bbf6a6bdb19460db6c4e2",
+      "tests": 23,
+      "verdict": "PASS"
+    },
+    "fragment_runner": {
+      "attempt_overall": "26 methods; two remaining legacy form failures reproduced then fixed; whole attempt was FAIL",
+      "log_ref": "local/protection_completeness_v1/semantic-p1-fragments-flow.log",
+      "sha256": "64a057d5578b67cb8fcfbd34d1403d9907ab75a64fb73ed8a67faca3ccf43f65",
+      "verdict": "PASS_ALL_23_FRAGMENT_MODULE_METHODS_ONLY"
+    },
+    "implementation_code_head": "e79ab22237a790d617887e147f5294afa0dad837",
+    "initial_ci": {
+      "failed_shards": [
+        2,
+        4,
+        5
+      ],
+      "final_exact_head_ci": "REQUIRED_LIVE_NOT_ASSUMED_FROM_FIXTURES",
+      "head": "6861c58171ca39bd6464d8c3f514fc6aaa77c6c9",
+      "run_id": 39180789580,
+      "verdict": "FAIL"
+    },
+    "initial_counterexamples": {
+      "failures": 2,
+      "log_ref": "local/protection_completeness_v1/semantic-p1-red.log",
+      "phase": "BEFORE_P1_IMPLEMENTATION_POLICY_AND_FILENAME_GATES_UNCHANGED",
+      "sha256": "20174565444d1acf3eeb22ce3c8ec24cafbd80fe507f7ed76c0a99cf2d7a1d28",
+      "tests": 2
+    },
+    "lav": {
+      "attempt_overall": "Interrupted owned local run during subsequent Cycle2 after concrete additional native compatibility failures; no whole-suite PASS; final Cycle2 enforced by exact-head CI",
+      "log_ref": "local/protection_completeness_v1/semantic-p1-consumers.log",
+      "sha256": "f79079a0edb71a09302877bc73e2ffa4b2883cf1805f5fc2425b9c473debec93",
+      "verdict": "PASS_ALL_10_LAV_METHODS_ONLY"
+    },
+    "native_document_runner": {
+      "attempt_overall": "One other method denied on Git composite and old cached Spec1.4 fixture denied; these are not whole-suite PASS",
+      "log_ref": "local/protection_completeness_v1/semantic-p1-native-consumers-green.log",
+      "sha256": "d96deb74cd500124f56b33ac25ca1171da82de0bc9f75800aab16eac981db6b4",
+      "test": "test_scripted_positive_boundary_runs_real_classify_final_runner_replay",
+      "verdict": "PASS_THIS_METHOD_ONLY"
+    },
+    "native_git_fence_and_policy_owners": "UNCHANGED_BYTES_FROM_FROZEN_BASE",
+    "native_prior_matrix": {
+      "log_ref": "local/protection_completeness_v1/semantic-git-fence-diagnostic.log",
+      "method": "Actual unchanged native test method with additional read-only Git snapshot observations; receipts and all Git components matched",
+      "sha256": "b55d7ae37442a66153279d747002339cf74aaa43dac6d5f1edf7b32d2c1f4c53",
+      "tests": 1,
+      "verdict": "PASS"
+    },
+    "real_new_looks": 0,
+    "reproduce": [
+      "uv run --locked --managed-python python -B -m unittest tests.test_research_fragments_v1 -v",
+      "uv run --locked --managed-python python -B -m unittest tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_persisted_prior_matrix_reaches_public_context_candidate_and_run tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_scripted_positive_boundary_runs_real_classify_final_runner_replay -v",
+      "uv run --locked --managed-python python -B -m unittest tests.test_episode_native_required_outcome_contract_v1.EpisodeRequiredOutcomeTests.test_authoritative_persistence_exact_repeat_cold_readback_and_guard -v"
+    ],
+    "review_source_sha256": "b07b4e44986297a8309e1592d4f2797b25eafbfbe799dd26fbd8336c860f47d8",
+    "reviewed_head": "6861c58171ca39bd6464d8c3f514fc6aaa77c6c9",
+    "source_frontier_revalidation": {
+      "log_ref": "local/protection_completeness_v1/semantic-proposal-revalidated.log",
+      "sha256": "7ea0d007e9bfbc357c6c9c17c745e8a649392cd2519c318c9cd4e4bcb4bb383f",
+      "verdict": "SAME_ROOT_FRONTIER_CONTEXT_AND_PROPOSAL_HASH_NO_DATE_TTL"
+    },
+    "spec14_exact_repeat_cold_readback": {
+      "fixture": "Fresh native freeze on final code using exact existing immutable ingress; no weakening of Git fence",
+      "log_ref": "local/protection_completeness_v1/semantic-spec14-repeat.log",
+      "seconds": 29.176,
+      "sha256": "d7c46645e81cdbfff7b4389241c012f31bb9f00bc2ba9d462ca0d4cce42facf8",
+      "tests": 1,
+      "verdict": "PASS"
+    }
+  },
   "source_readback": "source-readback.json",
   "static": "FACTORY_STATIC: PASS",
   "targeted": [

@@ -1,11 +1,11 @@
 {
   "mutation": "VERSIONED_PROTECTION_METADATA_ONLY",
   "owner_scope_ref": "OWNER_APPROVAL_REQUIRED_NOT_GRANTED",
-  "proposal_sha256": "cefc571e042b00a518f5fa8e6ceff46b343435c80fd40b8fe79c55b824bf5e18",
+  "proposal_sha256": "1ae7cddea9368407b3821864a0998c919b3b5ab7ce25cb30ffe73d6f65523e9c",
   "read_scope": {
     "collection": "OPPORTUNITY_EPISODES",
     "data_root_identity_sha256": "6ba8e087ac18c9edbb5c9216207cef47459ae534d1e6abee80db23cce3478812",
     "evidence_role": "EXPLORATORY_REUSE"
   },
-  "source_frontier_sha256": "99b6efa71e55be34ab34a99a32a5d57655608a8a76a98c50c1810b73a36020fe"
+  "source_frontier_sha256": "592fd41fa7ed89f024efa51415b34ffa08a5218dcc10fe102731914d36849561"
 }

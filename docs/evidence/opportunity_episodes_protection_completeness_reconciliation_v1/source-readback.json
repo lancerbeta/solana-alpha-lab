@@ -4,13 +4,34 @@
     "complete_empty": true,
     "status": "ALLOW"
   },
-  "assignment_sha256": "a2cec651294a10ee24447655645169f975fb078361b623f7e87b9a7158394854",
+  "assignment_sha256": "4292a957624273deaf28c83d3c60aee5b3451a18010e79e6a19d23635f1e6e51",
   "canonical_writes": false,
   "code_bindings": {
-    "configs/episode_current_protection_sources_v1.yaml": "36bc6f2e3f031c26b15a0ee70fac4d747d67538b02c604e00dc39984be7c74f6",
-    "src/solana_alpha_lab/factory/episode_current_protection.py": "a214943139e16cf8b078cd38ed5560a0b8645de5b3ddaaebc172c76e1810658a"
+    "configs/episode_current_protection_sources_v1.yaml": "ebe56afa0efddc116bb71d35c8a15b7660075f35a94350b8b9194a92dbaac23f",
+    "src/solana_alpha_lab/factory/episode_current_protection.py": "2a7f5b0f3b4b8aef0f22ef717a09d160afadff6d02c15dc1dd18ffaac103054a"
   },
-  "context_sha256": "ca9d3f58c5abc71df3f2f821b927d677e34a3072fbf79e1ab5573447d547e456",
+  "context_sha256": "28d8d5fc617b96d42942c3506bcbc5a84f4f96fdc44c5774eae6df16c6d68ecc",
+  "current_protection": {
+    "complete_empty": null,
+    "next_action": "PREPARE_EXACT_METADATA_INSTALLATION_PROPOSAL",
+    "owner": "LOCAL_ASSIGNMENTS",
+    "reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+    "source_reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+    "source_ref": "protection/current_research.json",
+    "sources": [],
+    "status": "UNRESOLVED_SCOPE",
+    "unresolved": [
+      {
+        "next_action": "PREPARE_EXACT_METADATA_INSTALLATION_PROPOSAL",
+        "owner": "LOCAL_ASSIGNMENTS",
+        "reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+        "source_reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+        "source_ref": "protection/current_research.json"
+      }
+    ],
+    "values_loaded": false,
+    "writes": false
+  },
   "current_reason": "CURRENT_PROTECTION_NOT_INSTALLED",
   "frozen_bootstrap_semantic_sha256": "f70a7f2d82b27bd39b1affbb72be339401bb0d223275965ce68df795112ec3ef",
   "inventory_after": "56663b87d35c7f4597243c2d61f37dc99a6a79533dbc7dfc32ea5177bd7ea684",
@@ -28,39 +49,51 @@
   "owner_prd_sha256": "89503bb3a3d7ef2911fee1df748dbba81c0b0faa3f2f3473f8b6472dd5c27d45",
   "plan_current_protection": {
     "complete_empty": null,
+    "next_action": "PREPARE_EXACT_METADATA_INSTALLATION_PROPOSAL",
     "owner": "LOCAL_ASSIGNMENTS",
     "reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+    "source_reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+    "source_ref": "protection/current_research.json",
     "sources": [],
     "status": "UNRESOLVED_SCOPE",
     "unresolved": [
       {
+        "next_action": "PREPARE_EXACT_METADATA_INSTALLATION_PROPOSAL",
         "owner": "LOCAL_ASSIGNMENTS",
-        "reason": "CURRENT_PROTECTION_NOT_INSTALLED"
+        "reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+        "source_reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+        "source_ref": "protection/current_research.json"
       }
     ],
     "values_loaded": false,
     "writes": false
   },
   "prepared_code_context": "WORKTREE_CANDIDATE_BOUND_BY_COMPLETION",
-  "prepared_installation_proposal_revalidation": "UNCHANGED_ROOT_FRONTIER_CONTEXT_ASSIGNMENT_BYTES_NO_TIME_RENEWAL",
-  "preview_sha256": "cefc571e042b00a518f5fa8e6ceff46b343435c80fd40b8fe79c55b824bf5e18",
+  "prepared_installation_proposal_revalidation": "EXACT_ROOT_FRONTIER_CONTEXT_REVALIDATED_PROPOSAL_PRESERVED_NO_DATE_TTL",
+  "preview_sha256": "1ae7cddea9368407b3821864a0998c919b3b5ab7ce25cb30ffe73d6f65523e9c",
   "prospective_plan_activation": "REQUIRES_EXACT_OWNER_SCOPE",
   "prospective_plan_current_gate": {
     "complete_empty": null,
+    "next_action": "PREPARE_EXACT_METADATA_INSTALLATION_PROPOSAL",
     "owner": "LOCAL_ASSIGNMENTS",
     "reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+    "source_reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+    "source_ref": "protection/current_research.json",
     "sources": [],
     "status": "UNRESOLVED_SCOPE",
     "unresolved": [
       {
+        "next_action": "PREPARE_EXACT_METADATA_INSTALLATION_PROPOSAL",
         "owner": "LOCAL_ASSIGNMENTS",
-        "reason": "CURRENT_PROTECTION_NOT_INSTALLED"
+        "reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+        "source_reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+        "source_ref": "protection/current_research.json"
       }
     ],
     "values_loaded": false,
     "writes": false
   },
-  "prospective_plan_proposal_sha256": "b07077eaceb863b7d14d431a5d5148b153a33db33d3e8dba2c431147a8701a87",
+  "prospective_plan_proposal_sha256": "6cfb729e3fd8b9abc268b0efec56c9630445fd978a4d10a868e5d40f135c102b",
   "read_scope": {
     "collection": "OPPORTUNITY_EPISODES",
     "data_root_identity_sha256": "6ba8e087ac18c9edbb5c9216207cef47459ae534d1e6abee80db23cce3478812",
@@ -93,9 +126,10 @@
     "source_pin": "88763e400e5dac7462e70275b23b74e061410445",
     "synthetic_only": true
   },
+  "semantic_review_sha256": "b07b4e44986297a8309e1592d4f2797b25eafbfbe799dd26fbd8336c860f47d8",
   "source_closure": "CLOSED_SCOPED",
-  "source_frontier_sha256": "99b6efa71e55be34ab34a99a32a5d57655608a8a76a98c50c1810b73a36020fe",
-  "source_set_sha256": "c7e614c13194cf18f6ea33680d2c7286c4b2c395962d9f7634ac83d0ce6d59f2",
+  "source_frontier_sha256": "592fd41fa7ed89f024efa51415b34ffa08a5218dcc10fe102731914d36849561",
+  "source_set_sha256": "a9bffa69962253dca9a0671c149ff2e85414c856406a6e663cb4510dc65a8652",
   "task22": {
     "accepted_split_version": "2.0",
     "advisory_scope": "UNKNOWN_NOT_AN_ASSIGNMENT",

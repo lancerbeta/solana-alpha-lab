@@ -6,10 +6,10 @@
   },
   "authority": "SEPARATE_EXACT_METADATA_ONLY_INSTALLATION_REQUIRED",
   "proposal": {
-    "assignment_ref": "protection/assignments/CURRENT-RESEARCH-A951A1CDD9B236B374170CA8594BD286.json",
-    "assignment_sha256": "a2cec651294a10ee24447655645169f975fb078361b623f7e87b9a7158394854",
-    "checked_at": "2026-10-19T00:04:31.014139+00:00",
-    "context_sha256": "ca9d3f58c5abc71df3f2f821b927d677e34a3072fbf79e1ab5573447d547e456",
+    "assignment_ref": "protection/assignments/CURRENT-RESEARCH-050C5A64AC687E271B28E738E124E8CC.json",
+    "assignment_sha256": "4292a957624273deaf28c83d3c60aee5b3451a18010e79e6a19d23635f1e6e51",
+    "checked_at": "2026-10-19T01:33:53.220418+00:00",
+    "context_sha256": "28d8d5fc617b96d42942c3506bcbc5a84f4f96fdc44c5774eae6df16c6d68ecc",
     "contract": "EPISODE_CURRENT_PROTECTION_V1",
     "predecessor": null,
     "read_scope": {
@@ -63,8 +63,70 @@
       },
       {
         "owner": "EXPERIMENT_POLICIES",
+        "policy_refs": [
+          {
+            "ref": "configs/experiment_specs/factory_v1_commissioning_quote_native_free_key_v1.yaml",
+            "semantic_sha256": "c6ccd70cd3c8ed524e6d58ddded1ec56fb1f492565197f7459586018e984c613",
+            "sha256": "190e219428a8b0ab3f2ab0831aee02d7f3a8235a82d3b1483168df91e2d0c699"
+          },
+          {
+            "ref": "configs/experiment_specs/fresh_oos_baseline_vs_friction_veto_v1.yaml",
+            "semantic_sha256": "a741a140c84635f4d2f34af066743a1115c5b854604029109b562ebf3f68f7a9",
+            "sha256": "3f8766d353f9daa2e4e7cbee9dd62014f3479e07950763ac7c0d2717c9b90927"
+          },
+          {
+            "ref": "configs/experiment_specs/list_a_chronological_confirmation_v1.yaml",
+            "semantic_sha256": "fc3c22de3539dcc583fafe7bb31762e5e7924df65993ec81e6cca584c5e59ced",
+            "sha256": "789118443839aba34a1a979c611ed4a37b0c675cb5f3b0bb8aebd2b21b44341b"
+          },
+          {
+            "ref": "configs/experiment_specs/market_feature_creator_pressure_archetype_v1.yaml",
+            "semantic_sha256": "60181199ce83189cf508953d06cf4f7b5817a2dc81a6cd711d91ea5ed3f9c2cf",
+            "sha256": "be4e96d87d3041c1f92eddf8a1ab82eccba6bc1546f313271e90fd5914fb7103"
+          },
+          {
+            "ref": "configs/experiment_specs/market_feature_liquidity_archetype_v1.yaml",
+            "semantic_sha256": "bebeb9db77677f81fe1eb33f8766ce81f63c6e98047f79bda4c32d71cc3ac22a",
+            "sha256": "65d6a399300416af1e4ee8bd067516d197e25e58520f8dd26ccaf145b434b1d2"
+          },
+          {
+            "ref": "configs/experiment_specs/market_feature_price_path_archetype_v1.yaml",
+            "semantic_sha256": "2c727d3932d0286158333829f6f1ee9bc81a8bb8f09d6ed985538016ec4032ba",
+            "sha256": "6916ad4a8fe90b4c13b90821aba88e1a74be5b9d3248d92601f9bec0f99a5e9f"
+          },
+          {
+            "ref": "configs/experiment_specs/ordinary_liquidity_quote_pressure_v1.yaml",
+            "semantic_sha256": "09fc851c3ad9c46c154faff93f82c51b0f0375e1de4c25c1558bb152050f99fd",
+            "sha256": "0568bbe172e4bbe9623fe3fd50f3718b7dea8ba49853e1b521c99b95edfaca74"
+          },
+          {
+            "ref": "configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml",
+            "semantic_sha256": "6d16a15f4861c9c30e7f3b6c75556f5a4d363c776cfbb5fbfe407bad5d74db95",
+            "sha256": "b3ee621f429bda46b0e351af8ba7f96df91f82d69610f3946fd7511d1c719d15"
+          },
+          {
+            "ref": "configs/experiment_specs/prior_git_t0_friction_screen_v1.yaml",
+            "semantic_sha256": "c5d894b83053aab0f89444d6ac9922f028d5b39afad4ab00785293b2f6924592",
+            "sha256": "f6da0e556549a698175586a05c4b90fe4cc32d013e9e9cc1e5d1105c80e472da"
+          },
+          {
+            "ref": "configs/experiment_specs/quote_native_admissible_friction_audition_offline_v1.yaml",
+            "semantic_sha256": "84524ff66cb0216f3d5fd0fbb7971dba2f7a2f66427bf295c9647466a1a1eedf",
+            "sha256": "9d82483f96eb7049f0785f04390a019cc5be4e958bd06da737966800cd1a3d9e"
+          },
+          {
+            "ref": "configs/experiment_specs/quote_surface_retention_confirmatory_v1.yaml",
+            "semantic_sha256": "299da4f82cf39bc8d611421d20dfc3fd0603f201f8711c6362a1ba68a618989b",
+            "sha256": "7f25df28373e10092a31c92384c959c08aa55064081ea63e62a9a57b419e575f"
+          },
+          {
+            "ref": "configs/experiment_specs/quote_surface_retention_falsifier_v1.yaml",
+            "semantic_sha256": "de3d71c4d4de1512fb6baf5911b6aae64aa1d2de17777c1cb322546e2e8e6948",
+            "sha256": "cb622464244df3d900def0a54aa0ed4b327fbb0cf9d5ae77da065e955d2e2731"
+          }
+        ],
         "ref": "configs/experiment_specs",
-        "semantic_sha256": "f96e6ee1620a510ac722dfa006f07c26b913bd45f2415d39e0eb8468e708b51e"
+        "semantic_sha256": "5345312952b73fd80ea1551a0f7bce8e2e107ed41a13de05be7b6b8cd7279dde"
       },
       {
         "interpretation": "UNBOUND_NO_CONFIRMATORY_GRANT_EXPLORATORY_LABELS_REQUIRED",
@@ -73,9 +135,9 @@
         "semantic_sha256": "baa6604253495487583cc61f4f230ee787a6cfdd6f1ee81ecf4f58d02abdb9ec"
       }
     ],
-    "source_set_sha256": "c7e614c13194cf18f6ea33680d2c7286c4b2c395962d9f7634ac83d0ce6d59f2"
+    "source_set_sha256": "a9bffa69962253dca9a0671c149ff2e85414c856406a6e663cb4510dc65a8652"
   },
-  "proposal_sha256": "cefc571e042b00a518f5fa8e6ceff46b343435c80fd40b8fe79c55b824bf5e18",
+  "proposal_sha256": "1ae7cddea9368407b3821864a0998c919b3b5ab7ce25cb30ffe73d6f65523e9c",
   "status": "PREVIEW_READY",
   "values_loaded": false,
   "writes": false
