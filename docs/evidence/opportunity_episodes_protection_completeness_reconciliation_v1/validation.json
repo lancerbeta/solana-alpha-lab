@@ -69,6 +69,14 @@
     },
     "implementation_code_head": "e79ab22237a790d617887e147f5294afa0dad837",
     "independent_review_followup": {
+      "cas_unchanged_recovery": {
+        "log_ref": "local/protection_completeness_v1/semantic-cas-unchanged.log",
+        "meaning": "Different concurrent proposal, same frontier: ALLOW + UNCHANGED accepts current receipt without apply or new scope.",
+        "seconds": 1.806,
+        "sha256": "b92010279920f9aa65aa369c755ef61d9b84b9a393beb8656d13f6948c06cdb0",
+        "tests": 1,
+        "verdict": "PASS"
+      },
       "code_head": "c3096d5c3e354fe50c04252f9856c9241c9e5ce9",
       "green_seconds": 28.363,
       "green_tests": 26,

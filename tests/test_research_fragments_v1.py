@@ -544,6 +544,11 @@ class CurrentProtectionTests(unittest.TestCase):
         self.assertEqual(caught.exception.detail["source_ref"], self.p.POINTER)
         self.assertEqual(caught.exception.detail["next_action"], "REFRESH_SOURCE_STATUS_AND_PREVIEW")
         self.assertEqual((self.plane/self.p.POINTER).read_bytes(), pointer)
+        self.assertEqual(self.p.resolve_current_research_protection(self.plane)[0]["status"], "ALLOW")
+        fresh = self.preview()
+        self.assertEqual(fresh["status"], "UNCHANGED")
+        self.assertNotIn("proposal", fresh)
+        self.assertEqual(fresh["current"]["proposal_sha256"], winner["proposal_sha256"])
 
     def test_missing_baseline_declaration_names_the_lost_record(self):
         import yaml

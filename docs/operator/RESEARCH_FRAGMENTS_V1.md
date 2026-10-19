@@ -158,9 +158,11 @@ CLI, не freshness, срок годности или научное исчер�
 При PROTECTION_SOURCE_CHANGED (owner SOURCE_SET) или PROTECTION_HEAD_CHANGED
 (owner LOCAL_ASSIGNMENTS): сначала cold protection-status. Если тот же proposal
 уже установлен, повтор исходного apply возвращает exact receipt без нового effect.
-Иначе создать новый protection-preview и запросить exact metadata-only scope для
-нового proposal hash; старое согласие не переносится. Не повторять старый пакет
-вслепую. Missing baseline source/removed restriction требует восстановления у
+Затем выполнить fresh protection-preview. Если cold status — ALLOW, а preview —
+UNCHANGED, другой proposal уже мог установить тот же current frontier: принять
+его current receipt и завершить installation recovery без apply и нового scope.
+Только PREVIEW_READY требует exact metadata-only scope для нового proposal hash;
+старое согласие не переносится. Не повторять старый пакет вслепую. Missing baseline source/removed restriction требует восстановления у
 указанного owner, а не установки нового empty proof. Unknown owner/version/link
 сначала разрешается у владельца источника. JSON ошибки включает next_action.
 

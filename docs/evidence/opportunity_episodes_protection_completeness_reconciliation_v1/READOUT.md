@@ -53,3 +53,7 @@ unwrap вложенного spec packet. До unwrap теперь проверя
 сценария дали9 assertion failures; полный набор26 source/installation checks
 после исправления PASS. Read-only operational revalidation сохранила тот же
 proposal1ae7cdde, canonical inventory, saved result и MAIN1/6; installation absent.
+
+CAS recovery: cold ALLOW + fresh preview UNCHANGED принимает уже установленный
+current receipt без повторного apply и нового scope, даже если proposal другой.
+PREVIEW_READY нового proposal сохраняет отдельную installation authority.
