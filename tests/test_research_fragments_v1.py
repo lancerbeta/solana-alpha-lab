@@ -497,6 +497,22 @@ class CurrentProtectionTests(unittest.TestCase):
         self.store.append([bad], transaction_id=bad.transaction_id)
         self.assertEqual(self.p.resolve_current_research_protection(self.plane)[0]["reason"], "PROTECTION_DECLARATION_OWNER_UNSUPPORTED")
 
+    def test_different_known_spec_aliases_in_one_record_are_unresolved(self):
+        import yaml
+        from tests.test_fast_lane_runner import offline_v1_1_spec
+        self.apply(self.preview()); pointer = (self.plane/self.p.POINTER).read_bytes()
+        config = yaml.safe_load((ROOT/self.p.CONFIG).read_bytes())
+        episode = {"schema": "smial.experiment-spec", "schema_version": "1.4", "population": "OPPORTUNITY_EPISODES",
+            "holdout_policy": config["embedded_exploratory_policy"],
+            "observation_request": {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"}}
+        self.append_native_critic({"schema": "smial.hypothesis-critic-result", "schema_version": "1.1",
+            "experiment_spec": offline_v1_1_spec(), "experiment_spec_packet": episode}, name="DUAL-KNOWN-DIFFERENT-MEANINGS")
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["reason"], "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
+        self.assertEqual(status["source_ref"], "research-record://DUAL-KNOWN-DIFFERENT-MEANINGS")
+        self.assertIsNone(status["complete_empty"])
+        self.assertEqual((self.plane/self.p.POINTER).read_bytes(), pointer)
+
     def test_native_legacy_spec_binding_version_preserves_known_policy_meaning(self):
         from tests.test_fast_lane_runner import offline_v1_1_spec
         self.apply(self.preview()); pointer = (self.plane/self.p.POINTER).read_bytes()

@@ -346,6 +346,7 @@ def _store_projection(root: Path, config: Mapping[str, Any], repo: Path) -> list
                 if spec["schema_version"] == "1.1":
                     value.update(native_spec_version="1.1", data_bindings=spec["data_bindings"])
                 declarations[canonical_sha256(value)] = value
+            _require(len(declarations) <= 1, "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
             projection.extend(declarations.values())
         except (CurrentProtectionError, ValueError, KeyError, TypeError) as exc:
             error = exc if isinstance(exc, CurrentProtectionError) else CurrentProtectionError("PROTECTION_DECLARATION_INVALID")

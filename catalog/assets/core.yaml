@@ -43389,7 +43389,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_research_fragments_v1.py', repository_path: tests/test_research_fragments_v1.py}
-  integrity: {kind: sha256, sha256: 01430a584093b5362a65cd8f3e379432d66cf4ec76a0af2f15c519f4a7db786f}
+  integrity: {kind: sha256, sha256: 774a0191e5f896dd8e3ce775483b3236015301843a591a87446a9a159762d4f8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43453,7 +43453,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/episode_current_protection.py
   integrity:
     kind: sha256
-    sha256: 005544d585fe236bbf5aba08e03cdaf16fe0aebfd6e699fa2d6481b64be83974
+    sha256: 2a7f5b0f3b4b8aef0f22ef717a09d160afadff6d02c15dc1dd18ffaac103054a
   access:
     mode: read_only
     method: file
