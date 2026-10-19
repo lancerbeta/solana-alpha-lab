@@ -32,10 +32,19 @@ ROLES = ("LOCAL_ASSIGNMENTS", "CANONICAL_RESEARCHSTORE", "FAST_LANE_RESEARCHSTOR
 
 
 def _public_identifier(value: Any) -> str | None:
-    # Only bounded metadata identifiers; never render raw exceptions or paths.
-    if (isinstance(value, str) and re.fullmatch(r"[A-Za-z0-9_./:-]{1,200}", value)
-            and not value.startswith(("/", "\\")) and not re.match(r"^[A-Za-z]:", value)
-            and ".." not in value.split("/")):
+    return value if isinstance(value, str) and re.fullmatch(r"[A-Za-z0-9_.-]{1,160}", value) else None
+
+
+def _public_ref(value: Any) -> str | None:
+    # Only repository-relative refs or our logical identities, never a raw URL,
+    # absolute machine path, exception string or untrusted payload.
+    if not isinstance(value, str):
+        return None
+    for prefix in ("research-record://", "smial-data://", "authority://"):
+        if value.startswith(prefix):
+            return value if _public_identifier(value[len(prefix):]) else None
+    if (re.fullmatch(r"[A-Za-z0-9_./-]{1,240}", value) and not value.startswith("/")
+            and not any(part in {"", ".", ".."} for part in value.split("/"))):
         return value
     return None
 
@@ -57,7 +66,7 @@ class CurrentProtectionError(ValueError):
                  observed_form: str | None = None, observed_version: str | None = None) -> None:
         super().__init__(code)
         self.code, self.owner = code, owner
-        self.source_ref = _public_identifier(source_ref)
+        self.source_ref = _public_ref(source_ref)
         self.observed_form = _public_identifier(observed_form)
         self.observed_version = _public_identifier(observed_version)
 
@@ -88,7 +97,7 @@ def _owned(role: str, operation, *, source_ref: str | None = None):
         if exc.owner is None:
             exc.owner = role
         if exc.source_ref is None:
-            exc.source_ref = _public_identifier(source_ref)
+            exc.source_ref = _public_ref(source_ref)
         raise
     except (OSError, ValueError, KeyError, TypeError, yaml.YAMLError, ResearchStoreError) as exc:
         raise CurrentProtectionError("PROTECTION_SOURCE_UNAVAILABLE", owner=role, source_ref=source_ref) from exc
@@ -221,7 +230,7 @@ def _assignment_documents(root: Path) -> list[dict[str, Any]]:
             result.append(doc)
         except (CurrentProtectionError, OSError, ValueError, KeyError, TypeError) as exc:
             error = exc if isinstance(exc, CurrentProtectionError) else CurrentProtectionError("PROTECTION_ASSIGNMENT_SOURCE_INVALID")
-            error.source_ref = _public_identifier(path.relative_to(root).as_posix())
+            error.source_ref = _public_ref(path.relative_to(root).as_posix())
             error.observed_form = _public_identifier(doc.get("schema"))
             error.observed_version = _public_identifier(doc.get("schema_version"))
             raise error from None
@@ -322,7 +331,7 @@ def _store_projection(root: Path, config: Mapping[str, Any]) -> list[dict[str, A
             projection.extend(declarations.values())
         except (CurrentProtectionError, ValueError, KeyError, TypeError) as exc:
             error = exc if isinstance(exc, CurrentProtectionError) else CurrentProtectionError("PROTECTION_DECLARATION_INVALID")
-            error.source_ref = _public_identifier("research-record://" + record.record_id)
+            error.source_ref = _public_ref("research-record://" + record.record_id)
             error.observed_form = _public_identifier(wrapper.get("artifact_kind") if isinstance(wrapper, Mapping) else None) or str(record.record_kind)
             if isinstance(body, Mapping):
                 error.observed_version = _public_identifier(body.get("schema_version") or body.get("packet_version"))

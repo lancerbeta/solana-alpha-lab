@@ -706,6 +706,9 @@ class CurrentProtectionTests(unittest.TestCase):
         self.assertEqual(status["source_ref"], ref)
 
     def test_recovery_detail_missing_file_unknown_record_and_version(self):
+        unsafe = self.p.CurrentProtectionError("PROTECTION_SOURCE_UNAVAILABLE",
+            source_ref="C:/private/source", observed_form="https://private.invalid/source").detail
+        self.assertNotIn("private", json.dumps(unsafe))
         repo = self.metadata_repo(); self.apply(self.preview(repo_root=repo), repo_root=repo)
         missing_ref = "registries/holdout_consumption.yaml"
         (repo/missing_ref).unlink()
