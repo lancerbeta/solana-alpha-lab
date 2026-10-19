@@ -1,7 +1,118 @@
 {
+  "as_of": "2026-10-19",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_MERGE"
+  ],
+  "remediation_history": [
+    {
+      "finding": "Single-pair episode bypass, baseline disappearance/revocation and scalar assignment scope required current fail-closed handling.",
+      "observed_head": "c20bc5377a470ee76adf1c5ba45fceea30dbf7a5",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Contradictory/relabelled native identity and unknown native owner/form could bypass or disappear from protection.",
+      "observed_head": "c20bc5377a470ee76adf1c5ba45fceea30dbf7a5",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Native experiment_spec_packet aliases and contradictory wrapper/body forms or versions were not interpreted consistently.",
+      "observed_head": "ad3e2dbfe61f8613228199726980ea8a449cd49a",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Mixed legacy/episode partitions required complete metadata preflight before the first value loader.",
+      "observed_head": "ad3e2dbfe61f8613228199726980ea8a449cd49a",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Authoritative links outside canonical body and malformed self-marked derived receipts could collapse UNKNOWN into empty.",
+      "observed_head": "223ef1c179dd202161b836ce58a8b9bb619ab638",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Prepared NOT_GRANTED scope was executable and relative-path input error incorrectly requested a new owner scope.",
+      "observed_head": "223ef1c179dd202161b836ce58a8b9bb619ab638",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "An explicitly unsupported schema_version on an otherwise unmarked native HypothesisVersion could be projected as absent; final guard requires a supported marker or unversioned native form.",
+      "observed_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "6124540c7e057c3b1f97d1116e4d4aa1c0fd47a4",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    }
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "review_id": "OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1-REVIEW",
+  "reviewed_bindings_sha256": "587ab68ac2fba878449547a2fcce28369d977cd5b9e33bc0664cfe256a00401b",
+  "reviewed_inventory_sha256": "299eaf67b2cd2c507b59fcefa73896aa0a937712f0b01b7fdc5ccfa7d1e03176",
+  "reviews": [
+    {
+      "findings": [
+        "packet_fingerprint_sha256=eb00a5612b84f75c660c5e3014ba0895824b88e897e0942039e27fd3353b046e",
+        "Isolated read-only SEMANTIC_PREMISE PASS; exact head6124540c7e057c3b1f97d1116e4d4aa1c0fd47a4; task/diff/all packet refs and27 committed/worktree bindings plus canonical aggregates MATCH. Native AST/mock probes: supported alias accepted; unknown owner/body/unmarked version/wrapper link and conflicting aliases refused; fresh=True used. No real Store/values/network/writes.",
+        "Current completeness scoped to explicit local exploratory owners; frozen dependencies remain mandatory. TASK22 is accepted dataset/time scope, not global mint ban. Last loader and post-reservation current+frozen validation retained. Native immutable publication/writer lease/CAS/retry adequate; no new framework or authority.",
+        "Tests could pass while a bypassed value gate, external current writer outside closure or illicit transient source deletion breaks validity. Checked native bypasses closed; external/all-reader/tamperproof guarantees not claimed. ALLOW grants no untouched/OOS/alpha/family closure/Scout permission. Committed Parquet/manifests and native source/assignment/pointer bytes remain truth without DuckDB. No foreign TASK private API import.",
+        "PACKET_INFORMATION_PATH only; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN. Fresh exact-head CI/readiness required; no merge/install/scientific activation grant."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Isolated read-only; exact candidate 6124540c7e057c3b1f97d1116e4d4aa1c0fd47a4; 27 committed/worktree bindings and canonical inventory/diff MATCH. No suites, real Store/values or writes; fresh exact-head CI required.",
+        "No actionable correctness/security/regression findings. Native wrapper/body links, aliases, full derived receipt validation, baseline retention, current+frozen gates, mixed-input preflight and late reservation refusal checked; four wrapper refusals independently memory-probed.",
+        "Final unmarked-body version guard independently memory-probed: supported forms retained, unknown versions refused. No actionable findings."
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Isolated read-only; exact candidate 6124540c7e057c3b1f97d1116e4d4aa1c0fd47a4; exact diff, 27 committed/worktree bindings and both canonical aggregates MATCH. Installation/plan hashes agree with source readback.",
+        "No bounded DoD gaps: native A-G, scoped empty versus UNKNOWN, ordinary next-cohort operation and saved result/MAIN retained. Real looks=0; canonical installation and scientific activation unapplied. Fresh exact-head CI/readiness required. No suites/Store/values/mutations."
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Isolated read-only; exact candidate 6124540c7e057c3b1f97d1116e4d4aa1c0fd47a4; 27/27 bindings and both native aggregate hashes MATCH; fresh exact-head CI required.",
+        "Reserved NOT_GRANTED draft denied before writer lease/writes; relative root gives INPUT/CORRECT_ABSOLUTE_DATA_ROOT. Existing operator workflow, proposal/frontier/scope and CAS recovery coherent; installation absent, plan DISABLED."
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1",
-  "verdict": "NOT_READY",
-  "reason": "FINAL_ISOLATED_REVIEW_PENDING"
+  "verdict": "PASS"
 }
