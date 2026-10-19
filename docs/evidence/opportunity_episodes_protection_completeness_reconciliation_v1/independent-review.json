@@ -4,7 +4,7 @@
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "NO_MODEL_DIVERSITY_PROOF",
     "NO_SCIENTIFIC_ACCEPTANCE",
-    "NO_MERGE"
+    "NO_MERGE_INSTALLATION_OR_SCIENTIFIC_AUTHORITY_FROM_REVIEW"
   ],
   "remediation_history": [
     {
@@ -62,6 +62,38 @@
       "resolved_by_head": "6124540c7e057c3b1f97d1116e4d4aa1c0fd47a4",
       "role": "ARCHITECTURE_CRITIC",
       "severity": "MAJOR"
+    },
+    {
+      "finding": "Nested native spec envelope could discard adjacent unknown authority; both aliases now validate envelope links/versions before unwrap. CAS conflict now requests fresh status/preview.",
+      "observed_head": "861aefb835b0032c173283ac560e9aa0044584da",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "CAS action requested incorrect repair; missing baseline lost known exact assignment/record ref. Recovery details corrected and native counterexamples checked.",
+      "observed_head": "861aefb835b0032c173283ac560e9aa0044584da",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "Nested unsupported version was reported as outer1.1; explicit nested version now preserved and unsafe value omitted without outer substitution.",
+      "observed_head": "ee611afe77ba4c3488b215d0741d00e68d60d6cf",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f",
+      "role": "CODE_REVIEWER",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "Runbook omitted successful ALLOW plus UNCHANGED after another same-frontier proposal won CAS. Explicit no-apply/no-new-scope recovery documented and tested.",
+      "observed_head": "ee611afe77ba4c3488b215d0741d00e68d60d6cf",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
     }
   ],
   "required_roles": [
@@ -71,41 +103,44 @@
     "OWNER_UX_CRITIC"
   ],
   "review_id": "OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1-REVIEW",
-  "reviewed_bindings_sha256": "587ab68ac2fba878449547a2fcce28369d977cd5b9e33bc0664cfe256a00401b",
-  "reviewed_inventory_sha256": "299eaf67b2cd2c507b59fcefa73896aa0a937712f0b01b7fdc5ccfa7d1e03176",
+  "reviewed_bindings_sha256": "6d30110bb871ba8a316d38db1fa4da35ebace449169557f12a71a90b3d6cb201",
+  "reviewed_inventory_sha256": "1bf61e3f1720214542e5ae19ab193f23b8e12019013311e861cef81caab339b4",
   "reviews": [
     {
       "findings": [
-        "packet_fingerprint_sha256=eb00a5612b84f75c660c5e3014ba0895824b88e897e0942039e27fd3353b046e",
-        "Isolated read-only SEMANTIC_PREMISE PASS; exact head6124540c7e057c3b1f97d1116e4d4aa1c0fd47a4; task/diff/all packet refs and27 committed/worktree bindings plus canonical aggregates MATCH. Native AST/mock probes: supported alias accepted; unknown owner/body/unmarked version/wrapper link and conflicting aliases refused; fresh=True used. No real Store/values/network/writes.",
-        "Current completeness scoped to explicit local exploratory owners; frozen dependencies remain mandatory. TASK22 is accepted dataset/time scope, not global mint ban. Last loader and post-reservation current+frozen validation retained. Native immutable publication/writer lease/CAS/retry adequate; no new framework or authority.",
-        "Tests could pass while a bypassed value gate, external current writer outside closure or illicit transient source deletion breaks validity. Checked native bypasses closed; external/all-reader/tamperproof guarantees not claimed. ALLOW grants no untouched/OOS/alpha/family closure/Scout permission. Committed Parquet/manifests and native source/assignment/pointer bytes remain truth without DuckDB. No foreign TASK private API import.",
-        "PACKET_INFORMATION_PATH only; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN. Fresh exact-head CI/readiness required; no merge/install/scientific activation grant."
+        "packet_fingerprint_sha256=73816335fa6df90664bf4d47871f3e2203a47a138412f4be51115e59be37f607",
+        "Isolated SEMANTIC_PREMISE PASS exact head8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f. Exact Git diff/hash, task, all50 evidence hashes and all28 primary bindings match worktree/committed blobs and both canonical aggregates. Excluded selfmetadata not verdict evidence.",
+        "Native policy constants own administrative forms; dynamic ExperimentSpec files use native schema and finite authority meanings, no filename grant. Baseline refs/identities/restrictions retained; this is not byte immutability of every assignment. Current/frozen restrictions both mandatory before all episode value loads; TASK22 dataset/time scope retained. Unknown owner/form/version/link and nested envelopes deny with complete_empty=null.",
+        "Native immutable receipt before CAS pointer under writer lease; exact scope/root/frontier and idempotent retry, winner preserved. Committed Parquet/manifests and native source/assignment bytes own truth, not DuckDB. Native owners reused; no new platform/dependency or foreign TASK-private production imports.",
+        "Tests can pass while upstream availability/provenance is inaccurate or an unenumerated authoritative writer exists. Hashes do not establish provenance truth. Scoped completeness grants no independent OOS, future/all-reader holdout protection, Scout enforcement or scientific authority. In-memory policy/nested-unknown/frozen-deny/missing-proof/TASK22-overlap falsifiers passed.",
+        "No suites/real stores/network/writes. PACKET_INFORMATION_PATH respected; launch remains PROCESS_OBLIGATION, no live attestation inferred from builder flags; model diversity UNPROVEN. Fresh exact-head CI/readiness mandatory."
       ],
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS"
     },
     {
       "findings": [
-        "Isolated read-only; exact candidate 6124540c7e057c3b1f97d1116e4d4aa1c0fd47a4; 27 committed/worktree bindings and canonical inventory/diff MATCH. No suites, real Store/values or writes; fresh exact-head CI required.",
-        "No actionable correctness/security/regression findings. Native wrapper/body links, aliases, full derived receipt validation, baseline retention, current+frozen gates, mixed-input preflight and late reservation refusal checked; four wrapper refusals independently memory-probed.",
-        "Final unmarked-body version guard independently memory-probed: supported forms retained, unknown versions refused. No actionable findings."
+        "Isolated read-only full frozen diff exact base6d8588fac51a8e95779e166a4f8e14f76a0cf115 to head8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f matches Git; all28 primary bindings match committed and worktree bytes, both canonical aggregates match. Final26/proposal/CAS logs hashes verified; excluded selfmetadata not used as current verdict.",
+        "Independent in-memory probes confirm both native aliases reject unknown nested authority, preserve offending nested version, omit unsafe private values, and pass detail through native fragment adapter. Earlier P1/P2 closed; no material findings.",
+        "No writes/suites/network/production reads. Fresh exact-head CI, native evidence rebind and machine readiness remain mandatory; review grants no merge/install/scientific authority."
       ],
       "role": "CODE_REVIEWER",
       "verdict": "PASS"
     },
     {
       "findings": [
-        "Isolated read-only; exact candidate 6124540c7e057c3b1f97d1116e4d4aa1c0fd47a4; exact diff, 27 committed/worktree bindings and both canonical aggregates MATCH. Installation/plan hashes agree with source readback.",
-        "No bounded DoD gaps: native A-G, scoped empty versus UNKNOWN, ordinary next-cohort operation and saved result/MAIN retained. Real looks=0; canonical installation and scientific activation unapplied. Fresh exact-head CI/readiness required. No suites/Store/values/mutations."
+        "Isolated read-only exact head8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f; full frozen diff matches Git, all28 bindings and both canonical aggregate hashes match. Excluded selfmetadata PASS not used.",
+        "No material bounded DoD gaps. Eight independent pure probes confirm native policy forms, compatible new ExperimentSpec and unknown nested link/version denial with exact safe diagnosis. Installation/root/frontier/plan chain and final log hashes agree; late-deny/accounting/frozen history/saved-read boundaries preserved.",
+        "No suites/real stores/values/network/writes. Fresh exact-head CI, current native binding and readiness required; no canonical installation or plan activation authority."
       ],
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS"
     },
     {
       "findings": [
-        "Isolated read-only; exact candidate 6124540c7e057c3b1f97d1116e4d4aa1c0fd47a4; 27/27 bindings and both native aggregate hashes MATCH; fresh exact-head CI required.",
-        "Reserved NOT_GRANTED draft denied before writer lease/writes; relative root gives INPUT/CORRECT_ABSOLUTE_DATA_ROOT. Existing operator workflow, proposal/frontier/scope and CAS recovery coherent; installation absent, plan DISABLED."
+        "Isolated read-only OWNER_UX review exact head8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f; all28 bindings match, full review diff exactly matches base...head. Excluded selfmetadata not accepted as PASS evidence.",
+        "No material UX/operability gaps. CAS recovery explicitly ends ALLOW+UNCHANGED without apply/new scope; missing baseline gives exact ref; nested version refusal retains offending safe version.",
+        "Readout/proposals distinguish absent installation, exact installation authority and separately scoped scientific activation. Review grants none of these."
       ],
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS"
