@@ -1,0 +1,153 @@
+{
+  "as_of": "2026-10-19",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_MERGE_INSTALLATION_OR_SCIENTIFIC_AUTHORITY_FROM_REVIEW"
+  ],
+  "remediation_history": [
+    {
+      "finding": "Single-pair episode bypass, baseline disappearance/revocation and scalar assignment scope required current fail-closed handling.",
+      "observed_head": "c20bc5377a470ee76adf1c5ba45fceea30dbf7a5",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Contradictory/relabelled native identity and unknown native owner/form could bypass or disappear from protection.",
+      "observed_head": "c20bc5377a470ee76adf1c5ba45fceea30dbf7a5",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Native experiment_spec_packet aliases and contradictory wrapper/body forms or versions were not interpreted consistently.",
+      "observed_head": "ad3e2dbfe61f8613228199726980ea8a449cd49a",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Mixed legacy/episode partitions required complete metadata preflight before the first value loader.",
+      "observed_head": "ad3e2dbfe61f8613228199726980ea8a449cd49a",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Authoritative links outside canonical body and malformed self-marked derived receipts could collapse UNKNOWN into empty.",
+      "observed_head": "223ef1c179dd202161b836ce58a8b9bb619ab638",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Prepared NOT_GRANTED scope was executable and relative-path input error incorrectly requested a new owner scope.",
+      "observed_head": "223ef1c179dd202161b836ce58a8b9bb619ab638",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "An explicitly unsupported schema_version on an otherwise unmarked native HypothesisVersion could be projected as absent; final guard requires a supported marker or unversioned native form.",
+      "observed_head": "ad4d08135f444bb4676a280adae8b2c3c8053c40",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "6124540c7e057c3b1f97d1116e4d4aa1c0fd47a4",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Nested native spec envelope could discard adjacent unknown authority; both aliases now validate envelope links/versions before unwrap. CAS conflict now requests fresh status/preview.",
+      "observed_head": "861aefb835b0032c173283ac560e9aa0044584da",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "CAS action requested incorrect repair; missing baseline lost known exact assignment/record ref. Recovery details corrected and native counterexamples checked.",
+      "observed_head": "861aefb835b0032c173283ac560e9aa0044584da",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "Nested unsupported version was reported as outer1.1; explicit nested version now preserved and unsafe value omitted without outer substitution.",
+      "observed_head": "ee611afe77ba4c3488b215d0741d00e68d60d6cf",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f",
+      "role": "CODE_REVIEWER",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "Runbook omitted successful ALLOW plus UNCHANGED after another same-frontier proposal won CAS. Explicit no-apply/no-new-scope recovery documented and tested.",
+      "observed_head": "ee611afe77ba4c3488b215d0741d00e68d60d6cf",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
+    }
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "review_id": "OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1-REVIEW",
+  "reviewed_bindings_sha256": "6d30110bb871ba8a316d38db1fa4da35ebace449169557f12a71a90b3d6cb201",
+  "reviewed_inventory_sha256": "1bf61e3f1720214542e5ae19ab193f23b8e12019013311e861cef81caab339b4",
+  "reviews": [
+    {
+      "findings": [
+        "packet_fingerprint_sha256=73816335fa6df90664bf4d47871f3e2203a47a138412f4be51115e59be37f607",
+        "Isolated SEMANTIC_PREMISE PASS exact head8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f. Exact Git diff/hash, task, all50 evidence hashes and all28 primary bindings match worktree/committed blobs and both canonical aggregates. Excluded selfmetadata not verdict evidence.",
+        "Native policy constants own administrative forms; dynamic ExperimentSpec files use native schema and finite authority meanings, no filename grant. Baseline refs/identities/restrictions retained; this is not byte immutability of every assignment. Current/frozen restrictions both mandatory before all episode value loads; TASK22 dataset/time scope retained. Unknown owner/form/version/link and nested envelopes deny with complete_empty=null.",
+        "Native immutable receipt before CAS pointer under writer lease; exact scope/root/frontier and idempotent retry, winner preserved. Committed Parquet/manifests and native source/assignment bytes own truth, not DuckDB. Native owners reused; no new platform/dependency or foreign TASK-private production imports.",
+        "Tests can pass while upstream availability/provenance is inaccurate or an unenumerated authoritative writer exists. Hashes do not establish provenance truth. Scoped completeness grants no independent OOS, future/all-reader holdout protection, Scout enforcement or scientific authority. In-memory policy/nested-unknown/frozen-deny/missing-proof/TASK22-overlap falsifiers passed.",
+        "No suites/real stores/network/writes. PACKET_INFORMATION_PATH respected; launch remains PROCESS_OBLIGATION, no live attestation inferred from builder flags; model diversity UNPROVEN. Fresh exact-head CI/readiness mandatory."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Isolated read-only full frozen diff exact base6d8588fac51a8e95779e166a4f8e14f76a0cf115 to head8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f matches Git; all28 primary bindings match committed and worktree bytes, both canonical aggregates match. Final26/proposal/CAS logs hashes verified; excluded selfmetadata not used as current verdict.",
+        "Independent in-memory probes confirm both native aliases reject unknown nested authority, preserve offending nested version, omit unsafe private values, and pass detail through native fragment adapter. Earlier P1/P2 closed; no material findings.",
+        "No writes/suites/network/production reads. Fresh exact-head CI, native evidence rebind and machine readiness remain mandatory; review grants no merge/install/scientific authority."
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Isolated read-only exact head8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f; full frozen diff matches Git, all28 bindings and both canonical aggregate hashes match. Excluded selfmetadata PASS not used.",
+        "No material bounded DoD gaps. Eight independent pure probes confirm native policy forms, compatible new ExperimentSpec and unknown nested link/version denial with exact safe diagnosis. Installation/root/frontier/plan chain and final log hashes agree; late-deny/accounting/frozen history/saved-read boundaries preserved.",
+        "No suites/real stores/values/network/writes. Fresh exact-head CI, current native binding and readiness required; no canonical installation or plan activation authority."
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Isolated read-only OWNER_UX review exact head8fce3571da6d62e08c834eeb4a14e1f48bf9ec0f; all28 bindings match, full review diff exactly matches base...head. Excluded selfmetadata not accepted as PASS evidence.",
+        "No material UX/operability gaps. CAS recovery explicitly ends ALLOW+UNCHANGED without apply/new scope; missing baseline gives exact ref; nested version refusal retains offending safe version.",
+        "Readout/proposals distinguish absent installation, exact installation authority and separately scoped scientific activation. Review grants none of these."
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1",
+  "verdict": "PASS"
+}

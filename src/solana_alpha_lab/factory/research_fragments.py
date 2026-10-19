@@ -26,9 +26,21 @@ ROLES = frozenset({"CONTEXT_FILTER", "ENTRY", "EXIT", "RISK_CONSTRAINT"})
 
 
 class FragmentError(ValueError):
-    def __init__(self, code: str):
+    def __init__(self, code: str, detail: Mapping[str, Any] | None = None):
         self.code = code
+        self.detail = dict(detail or {})
         super().__init__(code)
+
+
+def source_detail(source: Any) -> dict[str, Any]:
+    """Carry only the current-protection owner's public recovery metadata."""
+    detail = source if isinstance(source, Mapping) else getattr(source, "detail", {})
+    if not isinstance(detail, Mapping):
+        return {}
+    detail = detail.get("current_protection", detail)
+    if not isinstance(detail, Mapping) or not detail.get("source_reason"):
+        return {}
+    return {key: detail[key] for key in ("source_reason", "owner", "source_ref", "observed_form", "observed_version", "next_action") if key in detail}
 
 
 def _require(condition: Any, code: str) -> None:
@@ -341,7 +353,7 @@ def source_snapshot(store: Any, *, as_of: datetime | str | None = None,
                 freshness = plan_status(store, card, plan, rows=rows, now=_time(as_of) if as_of else _now(now))
             except (ValueError, KeyError, TypeError, OSError, ResearchStoreError) as exc:
                 # Execution metadata cannot erase already verified evidence.
-                freshness = {"status": "BLOCKED", "reason": getattr(exc, "code", "FRAGMENT_EXECUTION_UNAVAILABLE"), "new_look": False}
+                freshness = {"status": "BLOCKED", "reason": getattr(exc, "code", "FRAGMENT_EXECUTION_UNAVAILABLE"), **source_detail(exc), "new_look": False}
             if freshness["status"] != "BLOCKED" and any(
                     (b.get("information_basis") or {}).get("status") == "UNKNOWN" for b in blocks):
                 freshness = {**freshness, "status": "BLOCKED", "reason": "FRAGMENT_INFORMATION_RULE_SOURCE_UNAVAILABLE"}
@@ -349,7 +361,7 @@ def source_snapshot(store: Any, *, as_of: datetime | str | None = None,
                     and freshness.get("reason") != "FRAGMENT_RECOVER_LANDED_RESULT"):
                 protection = current_protection_status(store)
                 if protection["status"] != "ALLOW":
-                    freshness = {**freshness, "status": "BLOCKED", "reason": "HOLDOUT_UNRESOLVED"}
+                    freshness = {**freshness, "status": "BLOCKED", "reason": "HOLDOUT_UNRESOLVED", **source_detail(protection)}
                 else:
                     try:
                         from solana_alpha_lab.factory.hfic_evidence_identity import compute_capability_epoch_for_repo
@@ -358,7 +370,7 @@ def source_snapshot(store: Any, *, as_of: datetime | str | None = None,
                         recheck_spec(store, card)
                     except (ValueError, KeyError, TypeError, OSError, ResearchStoreError) as exc:
                         # A dependent execution gate never hides saved evidence.
-                        freshness = {**freshness, "status": "BLOCKED", "reason": getattr(exc, "code", "FRAGMENT_EXECUTION_UNAVAILABLE")}
+                        freshness = {**freshness, "status": "BLOCKED", "reason": getattr(exc, "code", "FRAGMENT_EXECUTION_UNAVAILABLE"), **source_detail(exc)}
             restrictions = {k: copy.deepcopy(source["candidate"].get(k)) for k in (
                 "confounders", "pit_leakage_survivorship_risks", "execution_capacity_risks", "missing_or_forward_only_data")}
             views.append({"fragment_version_id": fragment, "title": card["title"], "role": card["role"],
@@ -442,18 +454,9 @@ def root_identity(store: Any) -> str:
 
 
 def current_protection_status(store: Any) -> dict[str, Any]:
-    """Native completeness only; historical admission pins cannot fill a gap."""
-    from solana_alpha_lab.factory.opportunity_episodes import ASSIGNMENT_DIR, inventory_from_documents
-    folder = store.root / ASSIGNMENT_DIR
-    try:
-        _require(folder.is_dir() and not folder.is_symlink(), "HOLDOUT_UNRESOLVED")
-        paths = sorted(folder.glob("*.json"))
-        _require(all(not p.is_symlink() for p in paths), "HOLDOUT_UNRESOLVED")
-        inventory = inventory_from_documents([json.loads(p.read_text(encoding="utf-8")) for p in paths])
-        return {"status": inventory.status, "reason": inventory.reason,
-                "sources": list(inventory.sources), "inventory_sha256": inventory.fingerprint()}
-    except (ValueError, OSError):
-        return {"status": "UNRESOLVED_SCOPE", "reason": "HOLDOUT_UNRESOLVED", "sources": []}
+    """Read-only source-owned current proof; historical pins cannot fill it."""
+    from solana_alpha_lab.factory.episode_current_protection import resolve_current_research_protection
+    return resolve_current_research_protection(store.root)[0]
 
 
 def plan_preview(store: Any, request: Mapping[str, Any], *, now: datetime | None = None) -> dict[str, Any]:
@@ -560,7 +563,9 @@ def apply_plan(store: Any, proposal: Mapping[str, Any], *, git_sha: str,
         _require((head["plan_sha256"] if head else None) == body["previous_plan_sha256"], "FRAGMENT_PLAN_CHANGED")
         if body["enabled"]:
             _card(store, body["fragment_version_id"])
-            _require(current_protection_status(store)["status"] == "ALLOW", "HOLDOUT_UNRESOLVED")
+            protection = current_protection_status(store)
+            if protection["status"] != "ALLOW":
+                raise FragmentError("HOLDOUT_UNRESOLVED", {"current_protection": protection})
             from solana_alpha_lab.factory.hfic_evidence_identity import compute_capability_epoch_for_repo
             _require(compute_capability_epoch_for_repo(Path(__file__).resolve().parents[3])[0] == body["capability_epoch_sha256"],
                      "FRAGMENT_EXECUTION_BINDING_CHANGED")
@@ -784,6 +789,9 @@ def run_due(store: Any, *, repo_root: Path, git_sha: str) -> dict[str, Any]:
             authorize_temporal_attempt(store, operation_sha256=operation["operation_sha256"], spec=spec,
                 journal_scope=operation["journal_scope"], binding_cohorts=binding,
                 verified_market=operation["market_evidence_epoch_sha256"], repo_root=repo_root, data_root=store.root)
+            # A change after native reservation must still stop before the
+            # first value loader. Reservation/accounting survives this refusal.
+            _verify_inputs(store.root, binding, plan["max_input_rows"])
             # Frozen verified partitions: later publication pointers cannot
             # replace their manifest ids or widen the denominator at load time.
             values_loaded = True
@@ -802,7 +810,7 @@ def run_due(store: Any, *, repo_root: Path, git_sha: str) -> dict[str, Any]:
                     "result_ref": look["record_id"], "new_look": evidence.get("new_look"), "values_loaded": True}
         except (ValueError, KeyError, TypeError, OSError, ResearchStoreError) as exc:
             reports.append({**status, "fragment_version_id": fragment, "status": "BLOCKED",
-                            "reason": getattr(exc, "code", "FRAGMENT_SOURCE_INVALID"),
+                            "reason": getattr(exc, "code", "FRAGMENT_SOURCE_INVALID"), **source_detail(exc),
                             "new_look": "UNKNOWN" if values_loaded else False, "values_loaded": values_loaded})
             if values_loaded:
                 return {"status": "BLOCKED_AFTER_VALUE_ATTEMPT", "fragments": reports, "new_look": "UNKNOWN", "values_loaded": True}

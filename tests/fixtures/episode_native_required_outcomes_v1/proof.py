@@ -119,6 +119,7 @@ def prepare(work: Path, *, target_price: float = 1.10, missing_target: bool = Fa
                     availability_cutoff=(AS_OF + timedelta(hours=2)).isoformat().replace("+00:00", "Z"),
                     observation_request={"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"},
                     required_outcomes=[{"point_id": "E14400", "field_ids": [lav.PRICE], "role": "PRIMARY"}])
+        spec["holdout_policy"] = "EXPLORATORY_REUSE only; no untouched/forward holdout reads; no execution authority. Current native protection must be independently revalidated before any later action."
         spec["parameters"]["hfic_replay_session_id"] = frozen["session_id"]
         dump(case.work / "spec.json", spec)
         dump(case.work / "frozen.json", bundle)

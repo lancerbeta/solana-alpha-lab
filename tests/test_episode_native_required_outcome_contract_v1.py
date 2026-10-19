@@ -76,6 +76,8 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         shutil.copytree(self.template / "plane", self.plane)
         self.store = ResearchStore(self.plane)
         self.store.prepare_write_lookup()
+        from tests.test_opportunity_episodes_vertical_v1 import install_current_fixture
+        install_current_fixture(self.plane, reset_root_binding=True)
         self.spec, self.frozen = load_case(self.template)
         self.definition = self.frozen["selected_definition_sha256"]
 
@@ -175,6 +177,63 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         recipe["frozen_input"][-1]["observations_sha256"] = "0" * 64
         with self.assertRaisesRegex(GroundedDiscoveryError, "EPISODE_SOURCE_BINDING_CONFLICT"):
             self.project(spec)
+
+    def test_explicit_single_pair_uses_same_current_gate_before_loader(self):
+        from solana_alpha_lab.factory import hfic_grounded_discovery as discovery
+        binding = discovery.resolve_published_episode_binding(self.plane)
+        item = binding["cohorts"][0]
+        single = {**binding, "cohorts": [item]}
+        kwargs = dict(data_root=None, binding_doc=single, partitions=None,
+                      census_path=self.plane / item["census_rel"],
+                      observations_path=self.plane / item["observations_rel"])
+        loaded = discovery.load_admitted_partition_rows(**kwargs)
+        self.assertTrue(loaded["values_loaded"])
+        self.assertGreater(len(loaded["census"]), 0)
+        (self.plane / "protection/current_research.json").rename(self.work / "missing-current-pointer")
+        with patch.object(discovery, "load_parquet_rows", side_effect=AssertionError("UNSAFE_FALLBACK_VALUE_LOADER")) as loader:
+            with self.assertRaisesRegex(GroundedDiscoveryError, "HOLDOUT_UNRESOLVED"):
+                discovery.load_admitted_partition_rows(**kwargs)
+        loader.assert_not_called()
+
+    def test_relabelled_episode_bytes_cannot_use_legacy_value_entry(self):
+        from solana_alpha_lab.factory import hfic_grounded_discovery as discovery
+        original = discovery.resolve_published_episode_binding(self.plane)
+        item = original["cohorts"][0]
+        for strip_population in (False, True):
+            relabel = {**item, "dataset_id": discovery.LIVE_DATASET_ID}
+            if strip_population:
+                relabel.pop("population", None)
+            for explicit_pair in (False, True):
+                kwargs = dict(data_root=None, binding_doc={"cohorts": [relabel]},
+                    partitions=None if explicit_pair else [(item["cohort_id"], self.plane/item["census_rel"], self.plane/item["observations_rel"])],
+                    census_path=self.plane/item["census_rel"] if explicit_pair else None,
+                    observations_path=self.plane/item["observations_rel"] if explicit_pair else None)
+                with self.subTest(strip=strip_population, pair=explicit_pair), patch.object(
+                        discovery, "load_parquet_rows", side_effect=AssertionError("RELABELLED_VALUE_LOADER")) as loader:
+                    with self.assertRaisesRegex(GroundedDiscoveryError, "HOLDOUT_UNRESOLVED"):
+                        discovery.load_admitted_partition_rows(**kwargs)
+                loader.assert_not_called()
+
+    def test_mixed_legacy_and_relabelled_episode_refuse_before_any_loader(self):
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+        from solana_alpha_lab.factory import hfic_grounded_discovery as discovery
+        from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
+        item = discovery.resolve_published_episode_binding(self.plane)["cohorts"][0]
+        relabel = {**item, "dataset_id": discovery.LIVE_DATASET_ID}
+        relabel.pop("population", None)
+        census, observations = self.work/"legacy-census.parquet", self.work/"legacy-observations.parquet"
+        for path in (census, observations): pq.write_table(pa.table({"mint": ["SyntheticLegacyMint"]}), path)
+        legacy = {"dataset_id": discovery.LIVE_DATASET_ID, "evidence_role": "EXPLORATORY_REUSE", "holdout": False,
+                  "cohort_id": "LEGACY-FIRST", "release_id": "LEGACY-RELEASE",
+                  "census_sha256": sha256_file_streaming(census), "observations_sha256": sha256_file_streaming(observations)}
+        pairs = [(legacy["cohort_id"], census, observations), (item["cohort_id"], self.plane/item["census_rel"], self.plane/item["observations_rel"])]
+        for ordered in (pairs, list(reversed(pairs))):
+            with patch.object(discovery, "load_parquet_rows", side_effect=AssertionError("PARTIAL_VALUE_READ")) as loader:
+                with self.assertRaisesRegex(GroundedDiscoveryError, "HOLDOUT_UNRESOLVED"):
+                    discovery.load_admitted_partition_rows(data_root=None, binding_doc={"cohorts": [legacy, relabel]},
+                        partitions=ordered, census_path=None, observations_path=None)
+            loader.assert_not_called()
 
     def test_current_protection_denies_before_values(self):
         import pyarrow.parquet as pq

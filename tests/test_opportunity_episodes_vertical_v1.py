@@ -478,7 +478,31 @@ def _import_legacy(plane: Path, scratch: Path) -> dict[str, Any]:
     return import_live_cohort(release_root=release, data_root=plane, import_time=as_of + timedelta(hours=1))
 
 
-def _consume(packets: list[str], *, source: Path, mirror: Path, plane: Path) -> dict[str, Any]:
+def install_current_fixture(plane: Path, *, reset_root_binding: bool = False) -> dict[str, Any]:
+    """Explicit proof for a fully controlled synthetic consumer, through real IO."""
+    from solana_alpha_lab.factory import episode_current_protection as protection
+    from solana_alpha_lab.factory.research_store import ResearchStore
+    from solana_alpha_lab.factory.run_passport import canonical_sha256
+    plane = plane.resolve()
+    if reset_root_binding:
+        # A copied receipt is correctly invalid in a new root. These are only
+        # this disposable fixture's derived outputs, never assignment sources.
+        (plane / protection.POINTER).unlink(missing_ok=True)
+        for path in (plane / protection.ASSIGNMENT_DIR).glob("CURRENT-RESEARCH-*.json"):
+            path.unlink()
+    secondary = plane.parent / "fast_lane_research_data_plane"
+    ResearchStore(secondary)
+    store = ResearchStore(plane)
+    preview = protection.preview_reconciliation(plane)
+    if preview["status"] == "UNCHANGED":
+        return preview
+    authority = {"proposal_sha256": preview["proposal_sha256"], "read_scope": preview["proposal"]["read_scope"],
+        "source_frontier_sha256": canonical_sha256(preview["proposal"]["source_frontier"]),
+        "mutation": "VERSIONED_PROTECTION_METADATA_ONLY", "owner_scope_ref": "CONTROLLED_SYNTHETIC_FIXTURE"}
+    return protection.apply_reconciliation(store, preview, authority=authority)
+
+
+def _consume(packets: list[str], *, source: Path, mirror: Path, plane: Path, install_protection: bool = True) -> dict[str, Any]:
     argv = [sys.executable, "-B", str(ROOT / "scripts" / "discovery_evidence_release.py"), "unpack-next-live-cohort",
             "--collection", "OPPORTUNITY_EPISODES", "--max-cohorts", str(len(packets)),
             "--source-rdp", str(source), "--mirror-rdp", str(mirror), "--data-root", str(plane),
@@ -492,6 +516,8 @@ def _consume(packets: list[str], *, source: Path, mirror: Path, plane: Path) -> 
     payload = json.loads(lines[-1]) if lines else {"stderr": done.stderr[-2000:]}
     payload["_exit_code"] = done.returncode
     payload["_wall_seconds"] = round(wall, 2)
+    if done.returncode == 0 and install_protection:
+        install_current_fixture(plane)
     return payload
 
 
@@ -834,6 +860,9 @@ def phase_p3(work: Path) -> dict[str, Any]:
         return {"exit": code, "owner_class": body.get("owner_class"), "owner_final": body.get("owner_final"),
                 "blocking_reason_codes": body.get("blocking_reason_codes"), "market_evidence_epoch_sha256": body.get("market_evidence_epoch_sha256")}
 
+    # Root-bound current metadata must be installed before native preflight
+    # or an explicit new synthetic replay; historical saved artifacts stay unchanged.
+    install_current_fixture(cold, reset_root_binding=True)
     # The first focus completed on the previous epoch: new evidence must not
     # carry that completion forward. The next focus reads its saved result.
     report["readback_superseded"] = saved_readback(p2["focus"])

@@ -15,6 +15,9 @@ UI GET ничего не пишет, не измеряет рынок и не з
 | `register` | тот же request + `--confirm-append-only`; idempotent карточка |
 | `plan-preview` | request с RFV, root identity, fixed future windows/caps/rules и owner scope; zero writes/looks |
 | `plan-apply` | полный сохранённый preview + `--confirm-append-only`; CAS головы плана |
+| `protection-status` | текущий local status, exact reason/owner, source refs; zero writes/values |
+| `protection-preview` | source assessment и exact metadata-only installation proposal; zero canonical writes |
+| `protection-apply` | `--input preview.json --authority scope.json --confirm-append-only`; versioned proof + CAS pointer |
 | `run-due` | `--confirm-append-only`; максимум одно новое измерение, либо metadata recovery |
 
 Registration request: `title`, declared `role` (`CONTEXT_FILTER`, `ENTRY`, `EXIT`,
@@ -40,8 +43,51 @@ deadline не позже end+14d. Первый proposal оставляет ча�
 current complete protection и совместимый frozen universe profile. Пропущенный
 день не выкидывается из знаменателя. Отсутствие current inventory не равно
 complete-empty; historical admission pin не заменяет current completeness.
-Ни UI, ни plan-apply не создают protection documents. При unresolved inventory
-включение блокируется; выключение остаётся доступным.
+Один owner `episode_current_protection` проверяет explicit source set из
+`configs/episode_current_protection_sources_v1.yaml`: оба ResearchStore,
+local assignment namespace, consumption registry, принятый TASK-22 v2,
+experiment policies и List A protocol. Producer/release pins и labels выбранных
+inputs проверяются отдельно как frozen dependencies. TASK-22 R3 остаётся DENY
+в его TASK-21 dataset; это не global mint ban. UNBOUND у List A не выдаёт
+confirmatory grant; advisory `holdouts_not_touched` не назначает reservation,
+его referent UNKNOWN не подменяется доказанной пустотой.
+
+Рабочий порядок: `protection-status` → `protection-preview` → отдельное exact
+разрешение metadata-only scope → `protection-apply` → cold `protection-status`
+и `read` → existing `plan-preview`. Сохранить полный stdout preview в файл,
+а не только поле proposal. Installation authority JSON содержит
+`proposal_sha256`, `read_scope` (точно из proposal),
+`source_frontier_sha256` (canonical SHA256 массива source_frontier),
+`mutation=VERSIONED_PROTECTION_METADATA_ONLY`, `owner_scope_ref` точного согласия.
+Executor готовит эти файлы; ручное редактирование policy JSON владельцем не нужно.
+Scope связывает actual root identity, exact source frontier и inventory hash.
+Перед apply все mutable metadata перечитываются. Неизменный retry возвращает
+исходный receipt; CAS conflict не перезаписывает прежнюю голову.
+
+Current pointer `protection/current_research.json` находится вне assignment glob.
+Сначала native atomic writer публикует immutable backward-readable assignment
+receipt, затем меняется pointer под существующим ResearchStore writer lease.
+Manifest/receipt не являются первичными assignment sources. `read`/GET/status
+ничего не устанавливают. Старый `complete=true`, новая папка или копия bootstrap
+не лечат `CURRENT_PROTECTION_NOT_INSTALLED`. Нечитаемый/unknown owner даёт
+UNRESOLVED с причиной; это не inventory с нулём ограничений.
+
+`checked_at` — provenance без TTL. Source-specific fingerprints не зависят от
+CHECK/log/card, часов или whole-store inventory. Обычная совместимая cohort
+перепроверяет свои frozen inputs; известная metadata delta переоценивается перед
+действием без PR, переустановки proof и ежедневного approval. Новая версия owner,
+неизвестная policy/authority link или неоднозначный scope закрывает новое чтение.
+Metadata change никогда не возвращает MAIN budget и не меняет старый result.
+Current gate повторяется под native reservation и непосредственно перед values;
+поздний deny сохраняет reservation и блокирует loader. UI GET не делает apply.
+
+План, scientific grant и новое измерение остаются отдельными уровнями authority.
+При unresolved inventory включение блокируется; выключение и saved seed read
+остаются доступны. Старый Scout native pin читает тот же assignment envelope,
+но не доказывает исполнение новых current rules. Нет Scout-wide/untouched-holdout
+гарантии, source event times UNKNOWN и confirmatory reuse forbidden сохраняются.
+Rollback: выключить зависимый план, сохранить current restrictions и receipts;
+не возвращать permissive current parsing и не переписывать historical pins.
 
 Первичный caller — `opportunity_episode_release.import_episode_release`, общий
 для штатного workstation consume/unpack, duplicate import и replay. Он сначала
@@ -102,3 +148,71 @@ Owner readback отдельно сообщает CAPABILITY_DELIVERED, SEED_REGI
 PLAN_ENABLED, NEW_EVIDENCE_OBSERVED как FACT/WAITING/BLOCKED с источником.
 Это четыре вопроса приёмки, не новые domain states. До exact post-merge scope
 реальные registration/plan/new values не выполняются.
+
+Protection apply JSON читается с настраиваемым локальным memory bound:
+`--protection-metadata-max-bytes` (default 16777216). При реальном росте metadata
+можно явно поднять этот bound без PR или смены scientific scope. Это защита памяти
+CLI, не freshness, срок годности или научное исчерпание. Остальные native caps
+не изменены. Unknown authoritative source/schema не лечится увеличением bound.
+
+При PROTECTION_SOURCE_CHANGED (owner SOURCE_SET) или PROTECTION_HEAD_CHANGED
+(owner LOCAL_ASSIGNMENTS): сначала cold protection-status. Если тот же proposal
+уже установлен, повтор исходного apply возвращает exact receipt без нового effect.
+Затем выполнить fresh protection-preview. Если cold status — ALLOW, а preview —
+UNCHANGED, другой proposal уже мог установить тот же current frontier: принять
+его current receipt и завершить installation recovery без apply и нового scope.
+Только PREVIEW_READY требует exact metadata-only scope для нового proposal hash;
+старое согласие не переносится. Не повторять старый пакет вслепую. Missing baseline source/removed restriction требует восстановления у
+указанного owner, а не установки нового empty proof. Unknown owner/version/link
+сначала разрешается у владельца источника. JSON ошибки включает next_action.
+
+Текущие native assignments и committed declarations предполагаются append-only.
+Installation baseline refs и restrictions сохраняются при revalidation. Read-only
+resolver не ведёт историю transient источника, удалённого после installation;
+несанкционированная правка namespace не входит в гарантию completeness. Это не
+защита от потери истории или враждебного администратора; новый журнал не создаётся.
+
+Current source interpretation узнаёт native envelope по producer capability,
+record kind, wrapper/body form и поддержанной версии. Opaque/unknown owner или
+новый packet version даёт UNRESOLVED; observed record count не является whitelist.
+Таблица форм связана с существующими native owner modules. Обычные новые записи
+той же формы не требуют ручного обновления. Producer schedule records остаются
+frozen admission metadata, advisory packets не становятся assignment operations.
+Legacy LIVE loader проверяет только Parquet footer/schema до values: episode_id
+в native episode bytes нельзя скрыть переименованием dataset/population binding.
+
+`context_sha256` описывает полный проверенный frontier источников; он может
+измениться при новой допустимой declaration. `inventory_sha256` связывает root,
+source interpretation и действующие restrictions. При неизменной protection
+semantics новые native receipts не меняют scientific binding и не ломают exact
+repeat. Это не cache допуска: каждый value entry всё равно перечитывает current
+источники; missing/unknown/conflict и новые применимые restrictions закрывают его.
+
+Current protection интерпретирует формы active policy / frozen snapshot / scope
+extension из констант native `hfic_research_policy`, не из списка наблюдавшихся
+записей. Лимиты и accounting остаются у native policy/operation owners.
+`configs/experiment_specs` — перечисляемый namespace экземпляров. Каждый файл
+проходит native schema validation и проверку поддержанного protection meaning;
+новое имя и новый вопрос с известной семантикой не требуют переустановки.
+Legacy prose сравнивается с конечными буквальными шаблонами, без NLP. Baseline
+refs и fingerprints сохраняются: удаление или замена уже принятого файла закрывают
+admission; неизвестные role/policy/authority binding тоже остаются UNKNOWN.
+
+При отказе `protection-status`, CLI и fragment runner сохраняют `source_reason`,
+`owner`, безопасный `source_ref`, известные `observed_form`/`observed_version` и
+`next_action`. `RESTORE_OR_REPAIR_NAMED_SOURCE_THEN_RETRY` — восстановить названный
+источник; `RESOLVE_NAMED_AUTHORITY_INTERPRETATION` — разрешить конкретную неизвестную
+authority semantics; `REFRESH_SOURCE_STATUS_AND_PREVIEW` — перечитать изменившийся
+CAS/source vector. Эти действия сами по себе не требуют нового owner scope.
+`PREPARE_EXACT_METADATA_INSTALLATION_PROPOSAL` означает отсутствие current proof;
+только `REQUEST_AUTHORITY_FOR_EXACT_METADATA_PROPOSAL` запрашивает отдельную
+installation authority для уже подготовленного exact proposal.
+
+Native compatibility: `DECISION_EVENT` может брать identity из ResearchEvent.entity_id
+по существующему legacy пути prior-memory/session owner; требуются связанные
+hypothesis и interpretable decision fields. ExperimentSpec 1.1 сохраняет известное
+legacy protection meaning версии 1.0 и добавляет native input bindings. Для 1.1
+проверяется полный native schema, а bindings сохраняются в declaration frontier.
+Это advisory declaration, не разрешение открыть указанный dataset: exact input и
+current/frozen value gates остаются обязательными. Общий interpreter применяется
+к native spec packets и файлам; имя и расширение файла не задают authority.

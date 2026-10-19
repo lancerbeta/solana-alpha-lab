@@ -1,0 +1,94 @@
+{
+  "acceptance_id": "OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1-ENGINEERING-CHECKPOINT",
+  "active_stop_conditions": [],
+  "as_of": "2026-10-19",
+  "base_main": "6d8588fac51a8e95779e166a4f8e14f76a0cf115",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/opportunity_episodes_protection_completeness_reconciliation_v1/factory-fit.json",
+    "sha256": "2de776fb5a2c3dcec02eca341255a2b7ffbb8c0fa46fc1c94d5a6103125ad988",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "fc34cc20bd28343c4e1b7890fcaf35dacf00c5560b7ec33dc6b4407313248456",
+    "catalog/assets/lifecycle.yaml": "96215535f29c55d6ce61ad36e21f583837d5c5d09414ce0c001fe72e9a828184",
+    "catalog/catalog_manifest.yaml": "fc7343362de8594761c98aee9f0a71389c85a48221adf6596649986e4b33f64e",
+    "catalog/generated/asset_edges.json": "3edf3810bdc2dc8efc4175511f08a1b9a6be57dd23bbb3daa16b53115b608d45",
+    "configs/episode_current_protection_sources_v1.yaml": "ebe56afa0efddc116bb71d35c8a15b7660075f35a94350b8b9194a92dbaac23f",
+    "docs/PROJECT_MAP.md": "3e55377000047acc23c88bbd896605dde5314be00fdb963e3a8b43f67bdd13dd",
+    "docs/contracts/episode_native_required_outcomes_v1.md": "4b81d4782e8cbd9a792d2537ffc4d97fc34c104563e7d2d4ed8f98c0c368ec06",
+    "docs/evidence/opportunity_episodes_protection_completeness_reconciliation_v1/READOUT.md": "a71c4cb2ee80f5a0cb2f2ece457e7bc63b2bbb52baa47d915a9008d1cb115047",
+    "docs/evidence/opportunity_episodes_protection_completeness_reconciliation_v1/installation-authority-proposed.json": "6497463da769eacbf569412baeb6f1799db24dc2ad2f8fa30de2fdebd3d9d254",
+    "docs/evidence/opportunity_episodes_protection_completeness_reconciliation_v1/installation-preview.json": "f6b978ce12e82a8510cc77cd5c55a2edd5b47d471812f68a9e4aa94afecf5962",
+    "docs/evidence/opportunity_episodes_protection_completeness_reconciliation_v1/monitoring-plan-preview.json": "40e0fae6d7ed85a10961e465209730ac196b0b03975ea15951ec3401ca22f4b0",
+    "docs/evidence/opportunity_episodes_protection_completeness_reconciliation_v1/source-readback.json": "d12d74eded493c7fcf6134228a0b12b62ad9f130fb1c856f179ad326a1489a0d",
+    "docs/evidence/opportunity_episodes_protection_completeness_reconciliation_v1/validation.json": "718c39aa8c40c08b6334f1e9f6a135c05d6bae4398afe67c2eda0cb50a149c87",
+    "docs/operator/RESEARCH_FRAGMENTS_V1.md": "a8fdab5afcacc2d41dfbaf9cc29dfed50d87d79b85b4ba767150b77fd1e6e669",
+    "docs/tasks/OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1.md": "b82a1cd37f9d941a5d8999af6cd9802365749f32d030a76c35a82d247e822407",
+    "scripts/research_fragments.py": "9ee3efcc60a9e52b23161bbf9e5a941ecacf7d4a32b6b23feb766cf4e23fb73b",
+    "src/solana_alpha_lab/factory/episode_current_protection.py": "83bdde42f221f173bc2c97d7e7a7479dc49808182dda9c98277e349538cc5749",
+    "src/solana_alpha_lab/factory/episode_required_outcomes.py": "a05d5c2a0cedaa59b9b04aaabb35927e1e9a2ac0e30d646f34c45094a69a3305",
+    "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "4da7b412f3973b3e97ea691f91462be462246598594a94fb16fa89f1b8a5474e",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "ea74952b72485f39015547ffa1ae1d8d2d663ddaee6175ddefa725aee7062515",
+    "src/solana_alpha_lab/factory/research_fragments.py": "063243831b4cf58eb2df51d67ddc70548c2e581de4b5d30b069cee08ff23f018",
+    "src/solana_alpha_lab/factory/research_store.py": "84b2e7cd38411f1fcdf0b99fbfa4553b6e7d11e80bb7705985b875eeb457880c",
+    "tests/fixtures/episode_native_required_outcomes_v1/proof.py": "d603c556595a524904601fe8a0860b593a3ca0b931a38b755e3a6614a46f0374",
+    "tests/test_episode_native_required_outcome_contract_v1.py": "f83a9fb6b093caee17d5f14efcd78fd0a5558cfc8b32b9942c31c06bf3f77ac3",
+    "tests/test_forge_research_flow_reliability_v1.py": "3fe66b9f029cad867eb3af02a2ecc22c34337f68b2a6099e2dabff3b2baf3e69",
+    "tests/test_hfic_list_aware_vertical_v1.py": "1aa57e957c957825181a4a2b13e40bc387c065cc0e5394dd174a6d06f7590770",
+    "tests/test_opportunity_episodes_vertical_v1.py": "fe6a18178918ebe7cace01791d0d16d2d55e3144d2a8754b83e02bb220f1afa1",
+    "tests/test_research_fragments_v1.py": "438cdc02892d12f092f0095fbb9786cc77d2ffdc1deae4fc517df4669e96e132"
+  },
+  "non_claims": [
+    "NO_CANONICAL_INSTALLATION",
+    "NO_PLAN_ACTIVATION",
+    "NO_REAL_MARKET_VALUES_NEW_LOOK_MAIN_OR_CRITIC",
+    "NO_ASSIGNMENT_OR_BUDGET_OR_HISTORICAL_PIN_MUTATION",
+    "NO_CONFIRMATORY_ALPHA_TRADING_OR_CASHFLOW_CLAIM",
+    "NO_SCOUT_RUNTIME_CHANGE_OR_ALL_READERS_GUARANTEE",
+    "NO_MERGE_OR_CANONICAL_DONE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "canonical_writes": 0,
+    "external_mutations": 0,
+    "local_engineering_and_synthetic_writes": true,
+    "producer_metadata_delta": "READ_ONLY_HASH_SCHEMA_COUNT_ONLY",
+    "real_new_looks": 0,
+    "scope": "BOUNDED_ENGINEERING_AND_CONTROLLED_FIXTURES_EXCLUDING_ROUTINE_GIT_GITHUB_TRANSPORT"
+  },
+  "state_change": "CURRENT_SOURCE_COMPLETENESS_NATIVE_PLAN_CHECK_READY_INSTALLATION_AND_SCIENTIFIC_ACTIVATION_UNAPPLIED",
+  "task_id": "OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/opportunity_episodes_protection_completeness_reconciliation_v1/independent-review.json",
+      "sha256": "5a5b189eb10ee452ddfde35bef9b39f489727be18f2d816f8359165a64bea178",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_FACTORY_STATIC",
+      "PASS_NATIVE_CATALOG_INCREMENTAL_SYNC_AND_PRECOMMIT",
+      "PASS_REAL_METADATA_READBACK_SAME_INVENTORY_RESULT_MAIN_1_OF_6",
+      "PASS_SCOPED_COMPLETE_EMPTY_NO_TTL_NO_MANUAL_NEXT_COHORT_RENEWAL",
+      "PASS_CURRENT_AND_FROZEN_LAST_VALUE_GATES_NATIVE_ALIASES_MIXED_INPUT_SENTINELS",
+      "PASS_EXACT_METADATA_INSTALLATION_AND_PROSPECTIVE_PLAN_PROPOSALS_PREPARED",
+      "PASS_NATIVE_POLICY_LIFECYCLE_AND_DYNAMIC_SUPPORTED_EXPERIMENT_SPEC_INSTANCE",
+      "PASS_NESTED_UNKNOWN_AUTHORITY_AND_VERSION_FAIL_CLOSED_EXACT_RECOVERY_DETAIL",
+      "PASS_ISOLATED_FOUR_ROLE_REVIEW_FINAL_28_PRIMARY_BINDINGS"
+    ],
+    "targeted": "PASS_NATIVE_SOURCE_BOUNDARIES_26_CAS_UNCHANGED_NATIVE_CONSUMERS_AND_COLD_REPLAY_SEE_VALIDATION_JSON"
+  }
+}

@@ -1,0 +1,351 @@
+schema: smial.episode-current-protection-sources
+schema_version: '1.0'
+source_set_id: OPPORTUNITY_EPISODES_LOCAL_EXPLORATORY_CURRENT_V1
+collection: OPPORTUNITY_EPISODES
+evidence_role: EXPLORATORY_REUSE
+secondary_store: fast_lane_research_data_plane
+required_roles:
+- LOCAL_ASSIGNMENTS
+- CANONICAL_RESEARCHSTORE
+- FAST_LANE_RESEARCHSTORE
+- CONSUMPTION_REGISTRY
+- TASK22_ACCEPTED_SPLIT
+- EXPERIMENT_POLICIES
+- LIST_A_PROTOCOL
+interpretation_version: '1.0'
+embedded_exploratory_policy: EXPLORATORY_REUSE only; no untouched/forward holdout
+  reads; no execution authority. Current native protection must be independently revalidated
+  before any later action.
+task22_acceptance_ref: docs/evidence/task22/a6_split_resolution_acceptance_catalog_factory_fit_v1.json
+source_boundary: Local current namespace and canonical declarations; producer pins
+  are per-input frozen admission dependencies. Advisory holdouts_not_touched is not
+  an assignment. Unknown authoritative links stay unresolved. This source set grants
+  no confirmatory or Scout-wide protection.
+task22_acceptance_sha256: 29c1ad28d06430b74864b745ef50bf0315fcbfcfb5a7534e54b1692a3f15a019
+store_record_versions:
+- '1.0'
+store_body_versions:
+  CAPABILITY_RESULT:
+  - null
+  DISCOVERY_FEATURE_PREVIEW:
+  - null
+  DISCOVERY_QUERY_INTENT:
+  - null
+  FORGE_RESEARCH_UNIVERSE_POLICY:
+  - '1.0'
+  FORWARD_CAPTURE_FROZEN_CONTRACT:
+  - null
+  HFIC_SEARCH_MEMORY_POLICY:
+  - '1.0'
+  ORDINARY_LOOK_RESERVATION_V1:
+  - '1.0'
+  ORDINARY_OPERATION_V1:
+  - '1.0'
+  ORDINARY_SCIENTIFIC_DISPOSITION_V1:
+  - '1.0'
+  PROVENANCE_TIME_CORRECTION:
+  - '1.0'
+  REPAIR_CONTINUATION_DISPOSITION_V1:
+  - '1.0'
+  RESEARCH_FRAGMENT_CHECK_V1:
+  - '1.0'
+  RESEARCH_FRAGMENT_PLAN_V1:
+  - '1.0'
+  RESEARCH_FRAGMENT_V1:
+  - '1.0'
+  SCIENCE_MEMORY_REBASE_RECEIPT:
+  - null
+  smial.discovery-query-look:
+  - '1.0'
+  smial.forge-research-universe-policy:
+  - '1.0'
+  smial.forge-run-receipt:
+  - '1.0'
+  smial.hfic-classifier-receipt:
+  - '1.0'
+  smial.hfic-ordinary-look-reservation:
+  - '1.0'
+  smial.hfic-ordinary-operation:
+  - '1.0'
+  smial.hfic-provenance-time-correction:
+  - '1.0'
+  smial.hfic-reopened-prior-hypothesis-version:
+  - '1.0'
+  smial.hfic-repair-continuation-disposition:
+  - '1.0'
+  smial.hfic-scientific-disposition:
+  - '1.0'
+  smial.hfic-search-memory-policy:
+  - '1.0'
+  smial.hypothesis-critic-result:
+  - '1.0'
+  - '1.1'
+  smial.observation-schedule-authority:
+  - '1.0'
+  smial.scientific-slot-admission:
+  - '1.0'
+native_envelope_owners:
+  CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001:
+    RESEARCH_ARTIFACT:
+    - CAPABILITY_RESULT
+    - CLASSIFIER_RECEIPT
+    - CRITIC_INPUT_PACKET
+    - CRITIC_RESULT
+    - DISCOVERY_FEATURE_PREVIEW
+    - DISCOVERY_QUERY_INTENT
+    - DISCOVERY_QUERY_LOOK
+    - FORGE_CONTEXT_PACKET
+    - FORGE_DRAFT
+    - FORGE_RESEARCH_UNIVERSE_POLICY
+    - FORGE_RUN_RECEIPT
+    - HFIC_SEARCH_MEMORY_POLICY
+    - NEXT_EPISTEMIC_ACTION
+    - PROVENANCE_TIME_CORRECTION
+    - SCIENCE_MEMORY_REBASE_RECEIPT
+    - SCIENTIFIC_SLOT_ADMISSION
+    - SESSION_RECEIPT
+    HYPOTHESIS_VERSION:
+    - NATIVE_DIRECT
+    RUN_COMPLETED:
+    - NATIVE_DIRECT
+    RESEARCH_CYCLE:
+    - NATIVE_DIRECT
+    EVIDENCE_BINDING:
+    - NATIVE_DIRECT
+    DECISION_EVENT:
+    - NATIVE_DIRECT
+    RUN_STARTED:
+    - NATIVE_DIRECT
+    EXPERIMENT_METRIC:
+    - NATIVE_DIRECT
+  CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001:
+    HYPOTHESIS_VERSION:
+    - NATIVE_DIRECT
+    RUN_STARTED:
+    - NATIVE_DIRECT
+    RUN_COMPLETED:
+    - NATIVE_DIRECT
+    EXPERIMENT_METRIC:
+    - NATIVE_DIRECT
+    EVIDENCE_BINDING:
+    - NATIVE_DIRECT
+    RESEARCH_ARTIFACT:
+    - CAPABILITY_RESULT
+  CAP-HFIC-ORDINARY-OPERATION-001:
+    RESEARCH_ARTIFACT:
+    - ORDINARY_LOOK_RESERVATION_V1
+    - ORDINARY_OPERATION_V1
+  CAP-HFIC-SCIENTIFIC-DISPOSITION-001:
+    RESEARCH_ARTIFACT:
+    - ORDINARY_SCIENTIFIC_DISPOSITION_V1
+  CAP-HFIC-TEMPORAL-OPERABILITY-REPAIR-001:
+    RESEARCH_ARTIFACT:
+    - FORGE_RUN_RECEIPT
+    - REPAIR_CONTINUATION_DISPOSITION_V1
+  CAP-JUPITER-FREE-KEY-FORWARD-H900-QUOTE-CAPTURE-001:
+    RESEARCH_ARTIFACT:
+    - FORWARD_CAPTURE_FROZEN_CONTRACT
+    HYPOTHESIS_VERSION:
+    - NATIVE_DIRECT
+  CAP-OBSERVATION-SCHEDULE-COMPILE-BIND-001:
+    OBSERVATION_SCHEDULE_AUTHORITY:
+    - NATIVE_DIRECT
+    OBSERVATION_SCHEDULE:
+    - NATIVE_DIRECT
+  CAP-RESEARCH-FRAGMENTS-001:
+    RESEARCH_ARTIFACT:
+    - RESEARCH_FRAGMENT_V1
+    - RESEARCH_FRAGMENT_PLAN_V1
+    - RESEARCH_FRAGMENT_CHECK_V1
+unmarked_body_identity_fields:
+  HYPOTHESIS_VERSION:
+  - hypothesis_version_id
+  RESEARCH_CYCLE:
+  - research_cycle_id
+  EVIDENCE_BINDING:
+  - evidence_binding_id
+  DECISION_EVENT:
+  - decision_event_id
+  RUN_STARTED:
+  - run_id
+  - run_key_sha256
+  RUN_COMPLETED:
+  - run_id
+  - run_key_sha256
+  EXPERIMENT_METRIC:
+  - metric_id
+  OBSERVATION_SCHEDULE:
+  - schedule_key
+  - schedule_sha256
+  FORGE_CONTEXT_PACKET:
+  - prompt_version
+  - capability_ids
+  - dataset_manifest_ids
+  CRITIC_INPUT_PACKET:
+  - packet_schema
+  - packet_version
+  - selected_candidate
+  FORGE_DRAFT:
+  - packet_schema
+  - packet_version
+  - candidates
+  NEXT_EPISTEMIC_ACTION:
+  - packet_schema
+  - packet_version
+  - action_id
+  SESSION_RECEIPT:
+  - session_id
+  - session_state
+  - prompt_version
+envelope_owner_bindings:
+  document_runner: src/solana_alpha_lab/factory/document_runner.py
+  offline: src/solana_alpha_lab/factory/hfic_session.py
+  discovery: src/solana_alpha_lab/factory/hfic_grounded_discovery.py
+  policy: src/solana_alpha_lab/factory/hfic_research_policy.py
+  ordinary: src/solana_alpha_lab/factory/hfic_ordinary_operation.py
+  disposition: src/solana_alpha_lab/factory/hfic_scientific_disposition.py
+  repair: src/solana_alpha_lab/factory/hfic_repair_continuation.py
+  forward: src/solana_alpha_lab/factory/forward_h900_quote_capture.py
+  schedule: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py
+  fragment: src/solana_alpha_lab/factory/research_fragments.py
+  prior_memory: src/solana_alpha_lab/factory/hfic_prior_memory.py
+native_packet_versions:
+  smial.hypothesis-forge-draft:
+  - '1.1'
+  - '1.2'
+  - '1.3'
+  smial.hypothesis-critic-input:
+  - '1.1'
+  - '1.3'
+  - '1.4'
+  - '1.5'
+  smial.hfic-next-epistemic-action:
+  - '1.0'
+native_text_versions:
+  prompt_version:
+  - HFIC-NEXT-V1.0
+  - HFIC-V1.1
+  - HFIC-V1.2
+  generator_prompt_version:
+  - HFIC-V1.1
+  - HFIC-V1.2
+  hfic_protocol:
+  - HFIC-MEMORY-POLICY-V1
+  - HFIC-V1.1
+  - HFIC-V1.2
+body_schema_by_form:
+  CLASSIFIER_RECEIPT:
+  - smial.hfic-classifier-receipt
+  CRITIC_RESULT:
+  - smial.hypothesis-critic-result
+  DISCOVERY_QUERY_LOOK:
+  - smial.discovery-query-look
+  FORGE_RESEARCH_UNIVERSE_POLICY:
+  - smial.forge-research-universe-policy
+  FORGE_RUN_RECEIPT:
+  - smial.forge-run-receipt
+  HFIC_SEARCH_MEMORY_POLICY:
+  - smial.hfic-search-memory-policy
+  HYPOTHESIS_VERSION:
+  - null
+  - smial.hfic-reopened-prior-hypothesis-version
+  OBSERVATION_SCHEDULE_AUTHORITY:
+  - smial.observation-schedule-authority
+  ORDINARY_LOOK_RESERVATION_V1:
+  - smial.hfic-ordinary-look-reservation
+  ORDINARY_OPERATION_V1:
+  - smial.hfic-ordinary-operation
+  ORDINARY_SCIENTIFIC_DISPOSITION_V1:
+  - smial.hfic-scientific-disposition
+  PROVENANCE_TIME_CORRECTION:
+  - smial.hfic-provenance-time-correction
+  REPAIR_CONTINUATION_DISPOSITION_V1:
+  - smial.hfic-repair-continuation-disposition
+  SCIENTIFIC_SLOT_ADMISSION:
+  - smial.scientific-slot-admission
+body_artifact_marker_forms:
+- CAPABILITY_RESULT
+- DISCOVERY_FEATURE_PREVIEW
+- DISCOVERY_QUERY_INTENT
+- FORGE_RESEARCH_UNIVERSE_POLICY
+- FORWARD_CAPTURE_FROZEN_CONTRACT
+- HFIC_SEARCH_MEMORY_POLICY
+- ORDINARY_LOOK_RESERVATION_V1
+- ORDINARY_OPERATION_V1
+- ORDINARY_SCIENTIFIC_DISPOSITION_V1
+- PROVENANCE_TIME_CORRECTION
+- REPAIR_CONTINUATION_DISPOSITION_V1
+- RESEARCH_FRAGMENT_V1
+- RESEARCH_FRAGMENT_PLAN_V1
+- RESEARCH_FRAGMENT_CHECK_V1
+- SCIENCE_MEMORY_REBASE_RECEIPT
+body_packet_schema_by_form:
+  CRITIC_INPUT_PACKET: smial.hypothesis-critic-input
+  FORGE_DRAFT: smial.hypothesis-forge-draft
+  NEXT_EPISTEMIC_ACTION: smial.hfic-next-epistemic-action
+legacy_experiment_policy_meanings:
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2
+  holdout_policy: No new holdout is opened; this atom commissions Factory with a new
+    live cohort and does not consume a reserved OOS split or start MOVE 3.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING
+  holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort
+    excluding A1, MOVE 2 and commissioning mints and does not start MOVE 3.
+- schema: smial.experiment-spec
+  schema_version: '1.5'
+  population: OPPORTUNITY_EPISODES
+  holdout_policy: null
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: NO_HOLDER_SNAPSHOT_NO_ENTITY_CLUSTER
+  holdout_policy: No holdout is opened; this atom does not collect holder snapshots
+    or revive TASK-24 entity inference.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: A1_FREE_KEY_QUOTE_CELLS_AND_A24_POOL_DAY
+  holdout_policy: No holdout is opened; quote observation stays forward-only and is
+    not a KEEP screen.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: A24_LIMITED_DIAGNOSTIC_POOL_DAY_RETROSPECTIVE
+  holdout_policy: No holdout is opened; this atom composes coverage from already-accepted
+    Git receipts.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: A1_FREE_KEY_QUOTE_CELLS_AND_A24_POOL_DAY
+  holdout_policy: No holdout is opened; quote observation stays forward-only and cannot
+    promote an execution hypothesis.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: A24_LIMITED_DIAGNOSTIC_POOL_DAY_RETROSPECTIVE
+  holdout_policy: No holdout is opened; promotion is forbidden while Git-canonical
+    returns stay typed UNKNOWN.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5
+  holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort
+    excluding A1, MOVE 2, commissioning and ATOM 5 veto-campaign mints and does not
+    start MOVE 3.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED
+  holdout_policy: No new holdout is opened; this atom replays already-consumed A1
+    evidence and does not treat MOVE 2 as a new result.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5_ATOM6_PR156
+  holdout_policy: No reserved OOS split is consumed; this confirmatory uses a new
+    live cohort excluding A1, MOVE 2, commissioning, ATOM 5, ATOM 6 and PR 156 mints
+    and does not start Atom 2.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5_ATOM6
+  holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort
+    excluding A1, MOVE 2, commissioning, ATOM 5 and ATOM 6 mints and does not start
+    Atom 2.
+legacy_experiment_policy_versions:
+- '1.0'
+- '1.1'

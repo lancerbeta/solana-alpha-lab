@@ -593,6 +593,16 @@
       "target_asset_id": "CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
     },
     {
+      "source_asset_id": "CONFIG-EPISODE-CURRENT-PROTECTION-SOURCES-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OPPORTUNITY-EPISODES-001"
+    },
+    {
+      "source_asset_id": "CONFIG-EPISODE-CURRENT-PROTECTION-SOURCES-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-PROTECTION-COMPLETENESS-001"
+    },
+    {
       "source_asset_id": "CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-FAST-LANE-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-EXPERIMENT-CAPABILITY-DESCRIPTOR-V1-001"
@@ -4256,6 +4266,11 @@
       "source_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-OPPORTUNITY-EPISODES-VERTICAL-001"
+    },
+    {
+      "source_asset_id": "CTRL-OPPORTUNITY-EPISODES-PROTECTION-COMPLETENESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OPPORTUNITY-EPISODES-001"
     },
     {
       "source_asset_id": "CTRL-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
@@ -11671,6 +11686,16 @@
       "source_asset_id": "MODULE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "MODULE-EPISODE-CURRENT-PROTECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OPPORTUNITY-EPISODES-001"
+    },
+    {
+      "source_asset_id": "MODULE-EPISODE-CURRENT-PROTECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-PROTECTION-COMPLETENESS-001"
     },
     {
       "source_asset_id": "MODULE-EPISODE-DECISION-001",

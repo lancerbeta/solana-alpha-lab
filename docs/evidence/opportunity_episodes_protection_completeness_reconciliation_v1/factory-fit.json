@@ -1,0 +1,35 @@
+{
+  "as_of": "2026-10-19",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Accepted code and exact metadata installation; separately scoped scientific plan. No new service/tool required."
+  },
+  "dimensions": {
+    "build_vs_buy": "ADOPT native parser, ResearchStore, writer lease, accounting and runner; one neighboring IO owner, no dependency/provider.",
+    "context_efficiency": "One contract/connected packet; native policy constants and finite schema-backed protection meanings over dynamic instances. No duplicate PRD/SSD/audit or per-record/filename authority.",
+    "execution_to_cashflow": "Research gate only; no alpha, strategy promotion, executable return or cashflow evidence.",
+    "flexibility_and_history": "Frozen release/producer pins and saved negative result retained; known source deltas revalidate without per-day approval.",
+    "mission": "Current completeness makes the saved exploratory fragment reusable through native plan/check without renewing historical pins.",
+    "monitoring_and_recovery": "Native immutable receipt plus writer-lease CAS; crash retry idempotent; late deny retains pending; pause and saved reads remain available.",
+    "owner_operability": "Source reason/ref/owner/offending version and recovery survive to native fragment runner. CAS refresh; ALLOW+UNCHANGED needs no apply/new scope; exact missing baseline identity retained. Installation/plan authority separate.",
+    "red_team": "Unknown nested envelope authority/versions and conflicting known aliases; baseline loss/replacement; last-loader current/frozen and late-deny sentinels; source/CAS/crash/root guards. Final26 source checks PASS with native consumer evidence; exact-head full CI mandatory.",
+    "research_truth": "Scoped complete-empty is distinct from advisory UNKNOWN, permission and independence; TASK22 v2 remains dataset/time-specific DENY.",
+    "security": "Source forms/versions, root identity, baseline retention and input metadata preflight fail closed before values."
+  },
+  "limits": [
+    "CANONICAL_CURRENT_PROTECTION_NOT_INSTALLED",
+    "PLAN_DISABLED_NO_REAL_NEW_LOOK",
+    "ADVISORY_SCOPE_UNKNOWN",
+    "SCOUT_OLD_READER_NEW_ENFORCEMENT_UNPROVEN",
+    "NO_FUTURE_ALL_READERS_HOLDOUT_GUARANTEE"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "Disable only dependent plan if necessary; retain restrictions, immutable receipts, saved evidence and native charges. Never restore permissive frozen parser as current authority.",
+  "review_id": "OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1-FIT",
+  "reviewed_bindings_sha256": "6d30110bb871ba8a316d38db1fa4da35ebace449169557f12a71a90b3d6cb201",
+  "reviewed_inventory_sha256": "1bf61e3f1720214542e5ae19ab193f23b8e12019013311e861cef81caab339b4",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1",
+  "verdict": "PASS"
+}

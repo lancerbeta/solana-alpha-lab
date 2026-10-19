@@ -1,0 +1,68 @@
+{
+  "activation": "REQUIRES_EXACT_OWNER_SCOPE",
+  "current_protection": {
+    "complete_empty": null,
+    "next_action": "PREPARE_EXACT_METADATA_INSTALLATION_PROPOSAL",
+    "owner": "LOCAL_ASSIGNMENTS",
+    "reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+    "source_reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+    "source_ref": "protection/current_research.json",
+    "sources": [],
+    "status": "UNRESOLVED_SCOPE",
+    "unresolved": [
+      {
+        "next_action": "PREPARE_EXACT_METADATA_INSTALLATION_PROPOSAL",
+        "owner": "LOCAL_ASSIGNMENTS",
+        "reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+        "source_reason": "CURRENT_PROTECTION_NOT_INSTALLED",
+        "source_ref": "protection/current_research.json"
+      }
+    ],
+    "values_loaded": false,
+    "writes": false
+  },
+  "new_look": false,
+  "proposal": {
+    "access_boundary": {
+      "confirmatory_claims": false,
+      "forge": "EXPOSED_OR_UNKNOWN",
+      "protected_holdouts": "EXCLUDE",
+      "scout": "EXPOSED_OR_UNKNOWN"
+    },
+    "artifact_kind": "RESEARCH_FRAGMENT_PLAN_V1",
+    "capability_epoch_sha256": "79948a83280d646384c86f33ed90b2d93a73db0122c381a23e7dd94dd4366728",
+    "collection": "OPPORTUNITY_EPISODES",
+    "data_root_identity_sha256": "6ba8e087ac18c9edbb5c9216207cef47459ae534d1e6abee80db23cce3478812",
+    "enabled": true,
+    "execution_deadline": "2026-11-24T00:00:00+00:00",
+    "fragment_version_id": "RFV-8228C9408D18DE5CC98C9C1EA924B1C8",
+    "information_rule": {
+      "adverse_es10_delta": 0.05,
+      "min_days": 14,
+      "min_matched": 60,
+      "min_tail_mass": 6
+    },
+    "journal_scope": "1c25e959179f279a6a9ed7ebe79bbaacbdd324d9e5faad17308d1ffd0ce463b8",
+    "max_evaluations": 1,
+    "max_input_rows": 10000000,
+    "owner_scope_ref": "SMIAL-RFV-8228C940-20261020-20261117-EXPLORATORY-1",
+    "plan_sha256": "8c2d2b040294a3535beae458a2f759b9df2ff56c6ce9031f1c2dfc2a41e27d4d",
+    "prepared_at": "2026-10-19T02:23:05.010736+00:00",
+    "previous_plan_sha256": null,
+    "schema_version": "1.0",
+    "scientific_use": "EXPLORATORY_MONITORING",
+    "source_definition_sha256": "297e8ef0f13ff93bacb39318dc57a6044c00e321a173ae6ecf763bd8d13f5b87",
+    "source_roles": [
+      "EXPLORATORY_REUSE"
+    ],
+    "windows": [
+      {
+        "end": "2026-11-17T00:00:00+00:00",
+        "input_closed_at": "2026-11-20T01:00:00+00:00",
+        "start": "2026-10-20T00:00:00+00:00"
+      }
+    ]
+  },
+  "proposal_sha256": "3749cccb1e020b82431b765280663312271364afcb71669f3d913acd2766d023",
+  "writes": false
+}

@@ -194,10 +194,8 @@ def resolve_published_episode_binding(data_root: Path, *, cohort_ids: Sequence[s
     )
     from solana_alpha_lab.factory.opportunity_episodes import (
         ALLOW,
-        ASSIGNMENT_DIR,
         DENY_PROTECTED,
         cohort_day_bounds,
-        inventory_from_documents,
         protection_decision,
     )
 
@@ -236,13 +234,15 @@ def resolve_published_episode_binding(data_root: Path, *, cohort_ids: Sequence[s
         if not wanted or not wanted <= {str(item["cohort_id"]) for item in raw_cohorts}:
             raise GroundedDiscoveryError("SCOPE_COHORT_NOT_IN_BINDING")
         raw_cohorts = [item for item in raw_cohorts if str(item["cohort_id"]) in wanted]
-    current_documents = []
-    assignment_dir = root / ASSIGNMENT_DIR
-    if assignment_dir.is_dir():
-        for path in sorted(assignment_dir.glob("*.json")):
-            if path.is_symlink():
-                raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
-            current_documents.append(json.loads(path.read_text(encoding="utf-8")))
+    from solana_alpha_lab.factory.episode_current_protection import resolve_current_research_protection, with_frozen_protection
+    current_status, current = resolve_current_research_protection(root)
+    if current_status["status"] != ALLOW:
+        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED", {"current_protection": current_status})
+    from solana_alpha_lab.factory.episode_current_protection import assert_input_scope, CurrentProtectionError
+    try:
+        assert_input_scope(current_status, [{**item, "dataset_id": EPISODE_DATASET_ID, "evidence_role": LIVE_EVIDENCE_ROLE} for item in raw_cohorts])
+    except CurrentProtectionError as exc:
+        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED", exc.detail) from exc
     bound: list[dict[str, Any]] = []
     for item in sorted(raw_cohorts, key=lambda row: int(row.get("corpus_version") or 0)):
         census_rel = str(item.get("census_rel") or "")
@@ -261,7 +261,7 @@ def resolve_published_episode_binding(data_root: Path, *, cohort_ids: Sequence[s
             )
         except (EpisodeReleaseError, OSError, ValueError):
             raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED") from None
-        inventory = inventory_from_documents([*frozen_documents, *current_documents])
+        inventory = with_frozen_protection(current, frozen_documents)
         start, end = cohort_day_bounds(str(item["cohort_id"]))
         mints = pq.read_table(root / census_rel, columns=["mint"]).column("mint").to_pylist()
         for mint in mints:
@@ -310,6 +310,10 @@ def admit_discovery_binding(cohorts: Sequence[Mapping[str, Any]]) -> dict[str, A
 
     if not cohorts:
         raise GroundedDiscoveryError("DISCOVERY_BINDING_EMPTY")
+    if any(not isinstance(item, Mapping) for item in cohorts):
+        raise GroundedDiscoveryError("DISCOVERY_BINDING_INCOMPLETE")
+    if any(item.get("population") == EPISODE_POPULATION and item.get("dataset_id") != EPISODE_DATASET_ID for item in cohorts):
+        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED", {"reason": "EPISODE_BINDING_IDENTITY_CONFLICT"})
     episode_flags = {
         item.get("dataset_id") == EPISODE_DATASET_ID for item in cohorts if isinstance(item, Mapping)
     }
@@ -751,6 +755,17 @@ def collapse_exact_partition_duplicates(
     return unique, eliminated
 
 
+def _assert_legacy_file_kind(census: Path, observations: Path) -> None:
+    """Footer/schema only: native episode bytes cannot be relabelled as LIVE."""
+    import pyarrow.parquet as pq
+    try:
+        episode = any("episode_id" in pq.ParquetFile(path).schema_arrow.names for path in (census, observations))
+    except (OSError, ValueError) as exc:
+        raise GroundedDiscoveryError("DISCOVERY_INPUT_INVALID") from exc
+    if episode:
+        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED", {"reason": "EPISODE_ARTIFACT_RELABELED"})
+
+
 def load_admitted_partition_rows(
     *,
     data_root: Path | None,
@@ -852,6 +867,12 @@ def load_admitted_partition_rows(
                         Path(data_root) / obs_rel,
                     )
                 )
+    if episode_scope and not supplied and census_path is not None and observations_path is not None:
+        # The public single-pair CLI is another spelling of the same episode
+        # partition, not an escape from current + frozen value-entry checks.
+        if len(cohorts) != 1:
+            raise GroundedDiscoveryError("BINDING_PARTITION_REQUIRED")
+        supplied.append((str(cohorts[0].get("cohort_id")), Path(census_path), Path(observations_path)))
     unique, eliminated = collapse_exact_partition_duplicates(supplied)
     census: list[dict[str, Any]] = []
     observations: list[dict[str, Any]] = []
@@ -867,6 +888,26 @@ def load_admitted_partition_rows(
                 or binding_row.get("observations_sha256") != observations_sha
             ):
                 raise GroundedDiscoveryError("BINDING_HASH_MISMATCH")
+            if not episode_scope:
+                _assert_legacy_file_kind(Path(census_file), Path(obs_file))
+        if episode_scope:
+            # Frozen callers can omit mutable lineage, never current protection.
+            # Infer and verify the exact root from their native relative paths.
+            roots = set()
+            for cohort_id, census_file, obs_file in unique:
+                item = by_cohort[cohort_id]
+                relative = Path(str(item.get("census_rel") or ""))
+                if not relative.parts or relative.is_absolute() or ".." in relative.parts:
+                    raise GroundedDiscoveryError("EPISODE_SOURCE_BINDING_CONFLICT")
+                source_root = Path(census_file).resolve().parents[len(relative.parts)-1]
+                if (source_root / relative).resolve() != Path(census_file).resolve() or (source_root / str(item.get("observations_rel"))).resolve() != Path(obs_file).resolve():
+                    raise GroundedDiscoveryError("EPISODE_SOURCE_BINDING_CONFLICT")
+                roots.add(source_root)
+            if len(roots) != 1 or (data_root is not None and next(iter(roots)) != Path(data_root).resolve()):
+                raise GroundedDiscoveryError("EPISODE_SOURCE_BINDING_CONFLICT")
+            from solana_alpha_lab.factory.episode_required_outcomes import verify_frozen_episode_sources
+            from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_frozen_input
+            verify_frozen_episode_sources(next(iter(roots)), temporal_frozen_input(cohorts))
         for cohort_id, census_file, obs_file in unique:
             binding_row = by_cohort[cohort_id]
             for row in load_parquet_rows(census_file):
@@ -893,6 +934,8 @@ def load_admitted_partition_rows(
         observations_sha = sha256_file_streaming(observations_path)
         if distinct != {(census_sha, observations_sha)}:
             raise GroundedDiscoveryError("BINDING_HASH_MISMATCH")
+        if not episode_scope:
+            _assert_legacy_file_kind(Path(census_path), Path(observations_path))
         census = load_parquet_rows(census_path)
         observations = (load_parquet_rows(observations_path, filters=observation_filters) if observation_filters is not None else load_parquet_rows(observations_path))
     return {
