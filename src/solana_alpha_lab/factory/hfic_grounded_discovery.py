@@ -242,7 +242,7 @@ def resolve_published_episode_binding(data_root: Path, *, cohort_ids: Sequence[s
     try:
         assert_input_scope(current_status, [{**item, "dataset_id": EPISODE_DATASET_ID, "evidence_role": LIVE_EVIDENCE_ROLE} for item in raw_cohorts])
     except CurrentProtectionError as exc:
-        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED", {"source_reason": exc.code, "owner": exc.owner}) from exc
+        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED", exc.detail) from exc
     bound: list[dict[str, Any]] = []
     for item in sorted(raw_cohorts, key=lambda row: int(row.get("corpus_version") or 0)):
         census_rel = str(item.get("census_rel") or "")

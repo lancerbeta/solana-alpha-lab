@@ -178,3 +178,30 @@ record kind, wrapper/body form и поддержанной версии. Opaque/
 frozen admission metadata, advisory packets не становятся assignment operations.
 Legacy LIVE loader проверяет только Parquet footer/schema до values: episode_id
 в native episode bytes нельзя скрыть переименованием dataset/population binding.
+
+`context_sha256` описывает полный проверенный frontier источников; он может
+измениться при новой допустимой declaration. `inventory_sha256` связывает root,
+source interpretation и действующие restrictions. При неизменной protection
+semantics новые native receipts не меняют scientific binding и не ломают exact
+repeat. Это не cache допуска: каждый value entry всё равно перечитывает current
+источники; missing/unknown/conflict и новые применимые restrictions закрывают его.
+
+Current protection интерпретирует формы active policy / frozen snapshot / scope
+extension из констант native `hfic_research_policy`, не из списка наблюдавшихся
+записей. Лимиты и accounting остаются у native policy/operation owners.
+`configs/experiment_specs` — перечисляемый namespace экземпляров. Каждый файл
+проходит native schema validation и проверку поддержанного protection meaning;
+новое имя и новый вопрос с известной семантикой не требуют переустановки.
+Legacy prose сравнивается с конечными буквальными шаблонами, без NLP. Baseline
+refs и fingerprints сохраняются: удаление или замена уже принятого файла закрывают
+admission; неизвестные role/policy/authority binding тоже остаются UNKNOWN.
+
+При отказе `protection-status`, CLI и fragment runner сохраняют `source_reason`,
+`owner`, безопасный `source_ref`, известные `observed_form`/`observed_version` и
+`next_action`. `RESTORE_OR_REPAIR_NAMED_SOURCE_THEN_RETRY` — восстановить названный
+источник; `RESOLVE_NAMED_AUTHORITY_INTERPRETATION` — разрешить конкретную неизвестную
+authority semantics; `REFRESH_SOURCE_STATUS_AND_PREVIEW` — перечитать изменившийся
+CAS/source vector. Эти действия сами по себе не требуют нового owner scope.
+`PREPARE_EXACT_METADATA_INSTALLATION_PROPOSAL` означает отсутствие current proof;
+только `REQUEST_AUTHORITY_FOR_EXACT_METADATA_PROPOSAL` запрашивает отдельную
+installation authority для уже подготовленного exact proposal.

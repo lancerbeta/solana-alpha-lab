@@ -89,7 +89,7 @@ def _verify_frozen_episode_sources(data_root: Path, frozen: Sequence[Mapping[str
     try:
         assert_input_scope(current_status, frozen)
     except CurrentProtectionError as exc:
-        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED", {"source_reason": exc.code, "owner": exc.owner}) from exc
+        raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED", exc.detail) from exc
     manifest_parts: dict[str, list[Any]] = {}
     protection = []
     source_refs = []

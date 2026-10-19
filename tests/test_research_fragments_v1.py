@@ -332,6 +332,39 @@ class FragmentVerticalTests(unittest.TestCase):
         # Unknown current source still permits disabling and saved readback.
         directory = self.plane / "protection/assignments"
         (directory / "UNKNOWN.json").write_text(json.dumps({"schema": "UNKNOWN", "entries": []}), encoding="utf-8")
+        for defect in ("unknown_assignment", "missing_store", "unsupported_version", "unknown_link"):
+            if defect != "unknown_assignment": (directory/"UNKNOWN.json").unlink()
+            if defect == "missing_store":
+                secondary = self.plane.parent/"fast_lane_research_data_plane"
+                secondary.rename(self.plane.parent/"temporarily-missing-secondary")
+            if defect == "unsupported_version":
+                from tests.test_opportunity_episodes_harness_v1 import ASSIGNMENT_ID
+                path = directory/(ASSIGNMENT_ID+".json")
+                broken = json.loads(path.read_bytes()); broken["schema_version"] = "99.0"
+                (directory/"UNKNOWN.json").write_text(json.dumps(broken), encoding="utf-8")
+            if defect == "unknown_link":
+                declaration = CurrentProtectionTests(); declaration.store = self.store
+                declaration.append_native_critic({"schema": "smial.hypothesis-critic-result", "schema_version": "1.1"},
+                    name="RUNNER-UNKNOWN-LINK", header={"assignment_sources": [{"owner": "UNKNOWN", "ref": "UNKNOWN_SCOPE"}]})
+            with patch.object(discovery, "load_admitted_partition_rows", side_effect=AssertionError("unsafe value loader")) as sentinel:
+                refused = f.run_due(self.store, repo_root=ROOT, git_sha=GIT_SHA)
+            report = refused["fragments"][0]
+            self.assertEqual(report["reason"], "HOLDOUT_UNRESOLVED", report)
+            self.assertTrue(report["source_reason"])
+            self.assertEqual(report["source_ref"], "research-record://RUNNER-UNKNOWN-LINK" if defect == "unknown_link" else
+                "smial-data://fast_lane_researchstore" if defect == "missing_store" else "protection/assignments/UNKNOWN.json")
+            self.assertFalse(report["values_loaded"])
+            if defect == "unknown_link":
+                self.assertEqual(report["source_reason"], "PROTECTION_DECLARATION_OWNER_UNSUPPORTED")
+                self.assertEqual(report["observed_form"], "CRITIC_RESULT")
+            if defect == "unsupported_version":
+                self.assertEqual(report["observed_version"], "99.0")
+                self.assertEqual(report["source_reason"], "PROTECTION_ASSIGNMENT_VERSION_UNKNOWN")
+            sentinel.assert_not_called()
+            self.assertEqual(operations.journal_occupancy(self.store, f.journal_for(self.card["fragment_version_id"]))["main"], occupancy)
+            if defect == "missing_store":
+                (self.plane.parent/"temporarily-missing-secondary").rename(secondary)
+                (directory/"UNKNOWN.json").write_text(json.dumps({"schema": "UNKNOWN", "entries": []}), encoding="utf-8")
         paused = f.plan_preview(self.store, {**plan_request, "enabled": False})
         self.assertEqual(paused["current_protection"]["status"], "UNRESOLVED_SCOPE")
         f.apply_plan(self.store, paused, git_sha=GIT_SHA)
@@ -372,14 +405,77 @@ class CurrentProtectionTests(unittest.TestCase):
         ResearchStore(self.work / "fast_lane_research_data_plane")
         self.p = protection
 
-    def preview(self):
-        return self.p.preview_reconciliation(self.plane)
+    def preview(self, *, repo_root=None):
+        return self.p.preview_reconciliation(self.plane, repo_root=repo_root)
 
-    def apply(self, preview):
+    def apply(self, preview, *, repo_root=None):
         authority = {"proposal_sha256": preview["proposal_sha256"], "read_scope": preview["proposal"]["read_scope"],
             "source_frontier_sha256": canonical_sha256(preview["proposal"]["source_frontier"]),
             "mutation": "VERSIONED_PROTECTION_METADATA_ONLY", "owner_scope_ref": "SYNTHETIC_METADATA_ONLY"}
-        return self.p.apply_reconciliation(self.store, preview, authority=authority)
+        return self.p.apply_reconciliation(self.store, preview, authority=authority, repo_root=repo_root)
+
+    def metadata_repo(self):
+        """Actual source closure only: no checkout, market partitions or fake collector."""
+        repo = self.work / "metadata-repo"
+        refs = [self.p.CONFIG, "registries/holdout_consumption.yaml",
+            "docs/evidence/task22/a6_split_resolution_acceptance_catalog_factory_fit_v1.json",
+            "docs/evidence/task22/dataset_split_manifest_v2.json",
+            "docs/evidence/task22/holdout_access_ledger_v1.json",
+            "docs/evidence/task22/holdout_access_ledger_v2.json",
+            "configs/task22_task23_consumer_time_profile_v1.yaml",
+            "configs/list_a_chronological_confirmation_v1.yaml"]
+        refs += ["catalog/schemas/experiment_spec.schema.json", "catalog/schemas/experiment_spec_v1_4.schema.json", "catalog/schemas/experiment_spec_v1_5.schema.json"]
+        refs += [p.relative_to(ROOT).as_posix() for p in sorted((ROOT/"configs/experiment_specs").iterdir())]
+        for ref in refs:
+            target = repo/ref; target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT/ref, target)
+        self.assertLess(sum(p.stat().st_size for p in repo.rglob("*") if p.is_file()), 1_048_576)
+        self.assertFalse((repo/".git").exists())
+        return repo
+
+    def test_native_policy_change_and_scope_extension_keep_current_protection(self):
+        from solana_alpha_lab.factory import hfic_research_policy as policy
+        self.apply(self.preview()); pointer = (self.plane/self.p.POINTER).read_bytes()
+        change = policy.preview_policy_change(self.store, limits_delta={"main_total": 7})
+        policy.apply_policy_change(self.store, proposal=change["proposal"], confirm_append_only=True)
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["status"], "ALLOW", status)
+        scope = "a1"*32
+        policy.ensure_scope_snapshot(self.store, scope)
+        extension = policy.propose_run_extension(self.store, scope_key=scope,
+            parent_operation_sha256="1"*64, limits_delta={"main_total": 8})
+        policy.apply_run_extension(self.store, proposal=extension, confirm_append_only=True)
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["status"], "ALLOW", status)
+        self.assertEqual(policy.limits_for_frozen_run(self.store, scope)["main_total"], 8)
+        self.assertEqual((self.plane/self.p.POINTER).read_bytes(), pointer)
+
+    def test_new_supported_spec_instance_revalidates_without_installation(self):
+        repo = self.metadata_repo()
+        self.apply(self.preview(repo_root=repo), repo_root=repo)
+        before, _ = self.p.resolve_current_research_protection(self.plane, repo_root=repo)
+        pointer = (self.plane/self.p.POINTER).read_bytes()
+        ref = "configs/experiment_specs/another_supported_question_v1.yaml"
+        import yaml
+        spec = yaml.safe_load((repo/"configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml").read_bytes())
+        spec["experiment_id"] = "EXP-ANOTHER-SUPPORTED-QUESTION-V1"
+        spec["question"] = "A new question using the same supported protection meaning."
+        (repo/ref).write_text(yaml.safe_dump(spec), encoding="utf-8")
+        after, _ = self.p.resolve_current_research_protection(self.plane, repo_root=repo)
+        self.assertEqual(after["status"], "ALLOW", after)
+        self.assertEqual(after["installed_assignment_sha256"], before["installed_assignment_sha256"])
+        self.assertEqual(after["inventory_sha256"], before["inventory_sha256"])
+        self.assertNotEqual(after["context_sha256"], before["context_sha256"])
+        source = next(s for s in after["sources"] if s["owner"] == "EXPERIMENT_POLICIES")
+        self.assertIn(ref, [d["ref"] for d in source["policy_refs"]])
+        real_iterdir = Path.iterdir
+        def reordered(directory):
+            entries = list(real_iterdir(directory))
+            return iter(reversed(entries)) if directory == repo/"configs/experiment_specs" else iter(entries)
+        with patch.object(Path, "iterdir", reordered):
+            again, _ = self.p.resolve_current_research_protection(self.plane, repo_root=repo)
+        self.assertEqual(after, again)
+        self.assertEqual((self.plane/self.p.POINTER).read_bytes(), pointer)
 
     def test_historical_copy_is_not_current_and_proven_empty_is_stable(self):
         from tests.test_opportunity_episodes_harness_v1 import write_assignment
@@ -479,6 +575,8 @@ class CurrentProtectionTests(unittest.TestCase):
         self.store.append([event], transaction_id=event.transaction_id)
         status, _ = self.p.resolve_current_research_protection(self.plane)
         self.assertEqual(status["reason"], "PROTECTION_DECLARATION_VERSION_UNKNOWN")
+        self.assertEqual(status["source_ref"], "research-record://UNKNOWN-VERSION")
+        self.assertEqual(status["observed_version"], "UNKNOWN")
         self.assertIsNone(status["complete_empty"])
 
     def append_native_critic(self, body, *, name, form="CRITIC_RESULT", header=None):
@@ -501,6 +599,7 @@ class CurrentProtectionTests(unittest.TestCase):
                 "holdout_policy": config["embedded_exploratory_policy"],
                 "observation_request": {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"}}
         self.apply(self.preview()); original = (self.plane/self.p.POINTER).read_bytes()
+        inventory_before = self.p.resolve_current_research_protection(self.plane)[0]["inventory_sha256"]
         for ordinal, (field, wrapped) in enumerate((("experiment_spec", False), ("experiment_spec", True), ("experiment_spec_packet", False), ("experiment_spec_packet", True))):
             body = {"schema": "smial.hypothesis-critic-result", "schema_version": "1.1",
                     field: {"experiment_spec": spec} if wrapped else spec}
@@ -508,6 +607,9 @@ class CurrentProtectionTests(unittest.TestCase):
             status, _ = self.p.resolve_current_research_protection(self.plane)
             self.assertEqual(status["status"], "ALLOW")
             self.assertEqual((self.plane/self.p.POINTER).read_bytes(), original)
+            # New service declarations must not change an unchanged protection
+            # meaning or invalidate an already stored scientific binding.
+            self.assertEqual(status["inventory_sha256"], inventory_before)
         body = {"schema": "smial.hypothesis-critic-result", "schema_version": "1.1", "experiment_spec": spec,
                 "experiment_spec_packet": {"experiment_spec": {**spec, "holdout_policy": "UNRESOLVED_RESTRICTION"}}}
         self.append_native_critic(body, name="CONFLICT-SPEC")
@@ -576,6 +678,49 @@ class CurrentProtectionTests(unittest.TestCase):
                     self.assertIsNone(status["complete_empty"])
             finally: path.unlink()
         self.assertEqual(self.p.resolve_current_research_protection(self.plane)[0]["status"], "ALLOW")
+
+    def test_spec_unknown_role_binding_and_baseline_deletion_replacement_fail_closed(self):
+        import yaml
+        repo = self.metadata_repo(); self.apply(self.preview(repo_root=repo), repo_root=repo)
+        ref = "configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml"
+        path = repo/ref; original = path.read_bytes()
+        for defect in ("role", "policy", "replacement", "deletion"):
+            value = yaml.safe_load(original)
+            if defect == "role": value["observation_request"] = {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "UNKNOWN"}
+            elif defect == "policy": value["holdout_policy"] = "UNKNOWN_RESERVED_ASSIGNMENT"
+            elif defect == "replacement": value["question"] += " changed"
+            if defect == "deletion": path.unlink()
+            else: path.write_text(yaml.safe_dump(value), encoding="utf-8")
+            status, _ = self.p.resolve_current_research_protection(self.plane, repo_root=repo)
+            with self.subTest(defect=defect):
+                self.assertEqual(status["status"], "UNRESOLVED_SCOPE")
+                self.assertEqual(status["source_ref"], ref)
+                self.assertIsNone(status["complete_empty"])
+            path.write_bytes(original)
+        ref = "configs/experiment_specs/list_a_chronological_confirmation_v1.yaml"
+        path = repo/ref; value = yaml.safe_load(path.read_bytes())
+        value["parameters"]["protocol_core_sha256"] = "0"*64
+        path.write_text(yaml.safe_dump(value), encoding="utf-8")
+        status, _ = self.p.resolve_current_research_protection(self.plane, repo_root=repo)
+        self.assertEqual(status["source_reason"], "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
+        self.assertEqual(status["source_ref"], ref)
+
+    def test_recovery_detail_missing_file_unknown_record_and_version(self):
+        repo = self.metadata_repo(); self.apply(self.preview(repo_root=repo), repo_root=repo)
+        missing_ref = "registries/holdout_consumption.yaml"
+        (repo/missing_ref).unlink()
+        missing, _ = self.p.resolve_current_research_protection(self.plane, repo_root=repo)
+        self.assertEqual(missing["source_ref"], missing_ref)
+        self.assertEqual(missing["source_reason"], "PROTECTION_SOURCE_UNAVAILABLE")
+        self.assertEqual(missing["next_action"], "RESTORE_OR_REPAIR_NAMED_SOURCE_THEN_RETRY")
+        shutil.copy2(ROOT/missing_ref, repo/missing_ref)
+        self.append_native_critic({"schema": "smial.hypothesis-critic-result", "schema_version": "1.1"},
+            name="DETAIL-UNKNOWN-LINK", header={"assignment_sources": [{"owner": "UNKNOWN", "ref": "UNKNOWN_SCOPE"}]})
+        unknown, _ = self.p.resolve_current_research_protection(self.plane, repo_root=repo)
+        self.assertEqual(unknown["source_ref"], "research-record://DETAIL-UNKNOWN-LINK")
+        self.assertEqual(unknown["observed_form"], "CRITIC_RESULT")
+        self.assertEqual(unknown["observed_version"], "1.1")
+        self.assertEqual(unknown["next_action"], "RESOLVE_NAMED_AUTHORITY_INTERPRETATION")
 
     def test_ungranted_authority_draft_cannot_install(self):
         preview = self.preview()

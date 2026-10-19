@@ -82,11 +82,12 @@ def main() -> int:
     except (ValueError, KeyError, TypeError, OSError, ResearchStoreError, subprocess.SubprocessError) as exc:
         reason = getattr(exc, "code", "FRAGMENT_INPUT_OR_SOURCE_INVALID")
         input_path = reason == "FRAGMENT_ABSOLUTE_DATA_ROOT_REQUIRED"
-        print(json.dumps({"status": "BLOCKED", "reason": reason,
-                          "new_look": False, "owner": "INPUT" if input_path else getattr(exc, "owner", None) or ("SOURCE_SET" if args.action.startswith("protection-") else None),
-                          "next_action": ("CORRECT_ABSOLUTE_DATA_ROOT" if input_path else
-                                          "COLD_STATUS_THEN_NEW_PREVIEW_AND_EXACT_METADATA_SCOPE"
-                                          if args.action.startswith("protection-") else "CORRECT_INPUT_OR_SOURCE")}, ensure_ascii=True))
+        from solana_alpha_lab.factory.episode_current_protection import CurrentProtectionError
+        detail = exc.detail if isinstance(exc, CurrentProtectionError) else fragments.source_detail(exc)
+        print(json.dumps({"status": "BLOCKED", "reason": reason, "new_look": False,
+                          "owner": "INPUT" if input_path else "INPUT_OR_SOURCE",
+                          "next_action": "CORRECT_ABSOLUTE_DATA_ROOT" if input_path else "CORRECT_INPUT_OR_SOURCE",
+                          **detail}, ensure_ascii=True))
         return 2
 
 

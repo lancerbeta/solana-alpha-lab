@@ -457,6 +457,8 @@ class ListAwareVerticalTests(unittest.TestCase):
             as_of=as_of,
         )
         self.assertEqual(decision.terminal, "FAST_LANE_READY", decision.reason_codes)
+        from solana_alpha_lab.factory import episode_current_protection as current_protection
+        pointer_before = (self.plane / current_protection.POINTER).read_bytes()
         ops = OperationalStore(self.plane / "ops" / "operational_state.sqlite")
         try:
             result = DocumentRunner(root=ROOT, store=ops).start_document(
@@ -471,6 +473,10 @@ class ListAwareVerticalTests(unittest.TestCase):
         finally:
             ops.close()
         self.assertEqual(result["status"], "COMPLETE", result)
+        # Native runner records are known source forms, not new assignments.
+        current = current_protection.resolve_current_research_protection(self.plane)[0]
+        self.assertEqual(current["status"], "ALLOW", current)
+        self.assertEqual((self.plane / current_protection.POINTER).read_bytes(), pointer_before)
         run_id = str(result["run_id_or_null"])
         artifact = self.plane / "research" / "artifacts" / "results" / f"RESULT-ARTIFACT-{run_id.removeprefix('RUN-')}.json"
         saved = json.loads(artifact.read_text(encoding="utf-8"))["capability_result"]["summary"]
@@ -523,6 +529,12 @@ class ListAwareVerticalTests(unittest.TestCase):
         saved = json.loads((self.work / "runner-summary.json").read_text(encoding="utf-8"))
         moved = self.work / "moved-root"
         shutil.copytree(self.plane, moved)
+        # A copied proof is correctly root-bound. Reconcile only this owned
+        # disposable fixture before replay; frozen source pins stay unchanged.
+        from tests.test_opportunity_episodes_vertical_v1 import install_current_fixture
+        from solana_alpha_lab.factory.episode_current_protection import resolve_current_research_protection
+        install_current_fixture(moved, reset_root_binding=True)
+        self.assertEqual(resolve_current_research_protection(moved)[0]["status"], "ALLOW")
         hidden = self.work / "plane-hidden"
         self.plane.rename(hidden)
         script = self.work / "cold.py"

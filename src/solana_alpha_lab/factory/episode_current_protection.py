@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import tempfile
 from collections.abc import Mapping
 from datetime import UTC, datetime
@@ -30,26 +31,67 @@ ROLES = ("LOCAL_ASSIGNMENTS", "CANONICAL_RESEARCHSTORE", "FAST_LANE_RESEARCHSTOR
          "CONSUMPTION_REGISTRY", "TASK22_ACCEPTED_SPLIT", "EXPERIMENT_POLICIES", "LIST_A_PROTOCOL")
 
 
+def _public_identifier(value: Any) -> str | None:
+    # Only bounded metadata identifiers; never render raw exceptions or paths.
+    if (isinstance(value, str) and re.fullmatch(r"[A-Za-z0-9_./:-]{1,200}", value)
+            and not value.startswith(("/", "\\")) and not re.match(r"^[A-Za-z]:", value)
+            and ".." not in value.split("/")):
+        return value
+    return None
+
+
+def _recovery_action(code: str) -> str:
+    if code == "CURRENT_PROTECTION_NOT_INSTALLED":
+        return "PREPARE_EXACT_METADATA_INSTALLATION_PROPOSAL"
+    if code == "PROTECTION_INSTALLATION_AUTHORITY_REQUIRED":
+        return "REQUEST_AUTHORITY_FOR_EXACT_METADATA_PROPOSAL"
+    if code in {"PROTECTION_SOURCE_CHANGED", "PROTECTION_PROPOSAL_CHANGED", "CURRENT_PROTECTION_SOURCE_SET_CHANGED"}:
+        return "REFRESH_SOURCE_STATUS_AND_PREVIEW"
+    if any(part in code for part in ("UNKNOWN", "UNSUPPORTED", "UNRESOLVED")):
+        return "RESOLVE_NAMED_AUTHORITY_INTERPRETATION"
+    return "RESTORE_OR_REPAIR_NAMED_SOURCE_THEN_RETRY"
+
+
 class CurrentProtectionError(ValueError):
-    def __init__(self, code: str, *, owner: str | None = None) -> None:
+    def __init__(self, code: str, *, owner: str | None = None, source_ref: str | None = None,
+                 observed_form: str | None = None, observed_version: str | None = None) -> None:
         super().__init__(code)
         self.code, self.owner = code, owner
+        self.source_ref = _public_identifier(source_ref)
+        self.observed_form = _public_identifier(observed_form)
+        self.observed_version = _public_identifier(observed_version)
+
+    @property
+    def detail(self) -> dict[str, Any]:
+        return {"source_reason": self.code, "owner": self.owner or "SOURCE_SET",
+                "source_ref": self.source_ref or {"LOCAL_ASSIGNMENTS": POINTER,
+                    "CANONICAL_RESEARCHSTORE": "smial-data://canonical_researchstore",
+                    "FAST_LANE_RESEARCHSTORE": "smial-data://fast_lane_researchstore",
+                    "CONSUMPTION_REGISTRY": "registries/holdout_consumption.yaml",
+                    "TASK22_ACCEPTED_SPLIT": "docs/evidence/task22/a6_split_resolution_acceptance_catalog_factory_fit_v1.json",
+                    "EXPERIMENT_POLICIES": "configs/experiment_specs",
+                    "LIST_A_PROTOCOL": "configs/list_a_chronological_confirmation_v1.yaml"}.get(self.owner, CONFIG),
+                **({"observed_form": self.observed_form} if self.observed_form else {}),
+                **({"observed_version": self.observed_version} if self.observed_version else {}),
+                "next_action": _recovery_action(self.code)}
 
 
-def _require(ok: Any, code: str, owner: str | None = None) -> None:
+def _require(ok: Any, code: str, owner: str | None = None, *, source_ref: str | None = None) -> None:
     if not ok:
-        raise CurrentProtectionError(code, owner=owner)
+        raise CurrentProtectionError(code, owner=owner, source_ref=source_ref)
 
 
-def _owned(role: str, operation):
+def _owned(role: str, operation, *, source_ref: str | None = None):
     try:
         return operation()
     except CurrentProtectionError as exc:
         if exc.owner is None:
             exc.owner = role
+        if exc.source_ref is None:
+            exc.source_ref = _public_identifier(source_ref)
         raise
     except (OSError, ValueError, KeyError, TypeError, yaml.YAMLError, ResearchStoreError) as exc:
-        raise CurrentProtectionError("PROTECTION_SOURCE_UNAVAILABLE", owner=role) from exc
+        raise CurrentProtectionError("PROTECTION_SOURCE_UNAVAILABLE", owner=role, source_ref=source_ref) from exc
 
 
 def _safe(root: Path, relative: str) -> Path:
@@ -96,6 +138,18 @@ def _config(repo: Path) -> dict[str, Any]:
              and value.get("collection") == "OPPORTUNITY_EPISODES" and value.get("evidence_role") == "EXPLORATORY_REUSE"
              and value.get("required_roles") == list(ROLES)
              and value.get("secondary_store") == "fast_lane_research_data_plane", "PROTECTION_SOURCE_SET_UNSUPPORTED")
+    # These three administrative meanings belong to the native policy owner.
+    # Resolve every form/schema/version check from the same native constants;
+    # budgets, CAS chains and limits remain that owner's responsibility.
+    from solana_alpha_lab.factory import hfic_research_policy as policy
+    meanings = {policy.ARTIFACT_KIND: policy.SCHEMA, policy.SNAPSHOT_KIND: policy.SNAPSHOT_SCHEMA,
+                policy.EXTENSION_KIND: policy.EXTENSION_SCHEMA}
+    value["native_envelope_owners"][policy.PRODUCER] = {"RESEARCH_ARTIFACT": list(meanings)}
+    for form, schema in meanings.items():
+        value["body_schema_by_form"][form] = [schema]
+        value["body_artifact_marker_forms"].append(form)
+        value["store_body_versions"][form] = [policy.SCHEMA_VERSION]
+        value["store_body_versions"][schema] = [policy.SCHEMA_VERSION]
     return value
 
 
@@ -113,53 +167,64 @@ def _assignment_documents(root: Path) -> list[dict[str, Any]]:
             # Native atomic publication may leave an inactive temporary file.
             _require(path.name.startswith(".") and path.name.endswith(".tmp"), "PROTECTION_ASSIGNMENT_SOURCE_UNKNOWN")
             continue
-        doc = _json(_safe(root, path.relative_to(root).as_posix()))
-        metadata = doc.get("completeness") or {}
-        _require(inventory_from_documents([doc]).status == ALLOW, "PROTECTION_ASSIGNMENT_SOURCE_INVALID")
-        _require(doc.get("interpretation_version") == "1.0" and isinstance(doc.get("entries"), list),
-                 "PROTECTION_ASSIGNMENT_VERSION_UNKNOWN")
-        _require(path.stem == doc.get("assignment_id"), "PROTECTION_ASSIGNMENT_IDENTITY_MISMATCH")
-        for entry in doc["entries"]:
-            scope = entry.get("scope") or {}
-            _require(isinstance(scope, Mapping), "PROTECTION_SCOPE_UNKNOWN")
-            _require(scope.get("kind") in {"ALL_TIME", "INTERVAL"}, "PROTECTION_SCOPE_UNKNOWN")
-            if scope["kind"] == "INTERVAL":
-                _require(_time(scope.get("start")) < _time(scope.get("end")), "PROTECTION_SCOPE_INVALID")
-        if isinstance(metadata, Mapping) and "current_contract" in metadata:
-            _require(metadata["current_contract"] == CONTRACT, "CURRENT_PROTECTION_VERSION_UNKNOWN")
-            _require(doc.get("schema") == ASSIGNMENT_SCHEMA and doc.get("schema_version") == "1.0"
-                     and doc.get("interpretation_version") == "1.0" and metadata.get("complete") is True,
-                     "CURRENT_PROTECTION_RECEIPT_INVALID")
-            _require(set(doc) == {"schema", "schema_version", "interpretation_version", "assignment_id", "owner", "completeness", "entries"}
-                     and doc.get("owner") == "OPPORTUNITY_EPISODES"
-                     and set(metadata) == {"complete", "current_contract", "checked_at", "read_scope", "source_set_sha256", "source_frontier", "context_sha256", "predecessor", "boundary"}
-                     and metadata.get("boundary") == "LOCAL_EPISODE_EXPLORATORY_ONLY; ADVISORY_SCOPE_UNKNOWN; NO_CONFIRMATORY_OR_SCOUT_GRANT",
-                     "CURRENT_PROTECTION_RECEIPT_INVALID")
-            _require(metadata.get("read_scope") == _scope(root), "CURRENT_PROTECTION_BINDING_INVALID")
-            digest = lambda value: isinstance(value, str) and len(value) == 64 and all(c in "0123456789abcdef" for c in value)
-            frontier = metadata["source_frontier"]
-            _require(digest(metadata["source_set_sha256"]) and (metadata["predecessor"] is None or digest(metadata["predecessor"]))
-                     and isinstance(frontier, list) and all(isinstance(item, Mapping) for item in frontier)
-                     and [item.get("owner") for item in frontier] == list(ROLES)
-                     and all(isinstance(item.get("ref"), str) and bool(item["ref"]) and digest(item.get("semantic_sha256")) for item in frontier),
-                     "CURRENT_PROTECTION_RECEIPT_INVALID")
-            context = {"contract": CONTRACT, "read_scope": metadata["read_scope"], "source_set_sha256": metadata["source_set_sha256"],
-                       "source_frontier": frontier, "effective_restrictions_sha256": canonical_sha256(doc["entries"])}
-            _require(metadata["context_sha256"] == canonical_sha256(context), "CURRENT_PROTECTION_RECEIPT_INVALID")
-            basis = canonical_sha256({"context": metadata["context_sha256"], "checked_at": metadata["checked_at"],
-                                      "predecessor": metadata["predecessor"]})
-            _require(doc.get("assignment_id") == path.stem == "CURRENT-RESEARCH-" + basis[:32].upper(),
-                     "CURRENT_PROTECTION_RECEIPT_INVALID")
-            _require(_time(metadata["checked_at"]) <= datetime.now(UTC), "CURRENT_PROTECTION_TIME_INVALID")
-            # Only correctly formed derived receipts are excluded, never a
-            # foreign primary assignment carrying an arbitrary output marker.
-            continue
-        if isinstance(metadata, Mapping) and "as_of" in metadata:
-            value = metadata["as_of"]
-            _require(isinstance(value, str), "PROTECTION_SOURCE_TIME_INVALID")
-            stamp = _time(value + "T00:00:00Z" if len(value) == 10 else value)
-            _require(stamp <= datetime.now(UTC), "PROTECTION_SOURCE_TIME_INVALID")
-        result.append(doc)
+        doc = {}
+        try:
+            doc = _json(_safe(root, path.relative_to(root).as_posix()))
+            if doc.get("schema") == ASSIGNMENT_SCHEMA:
+                _require(doc.get("schema_version") == "1.0" and doc.get("interpretation_version") == "1.0",
+                         "PROTECTION_ASSIGNMENT_VERSION_UNKNOWN")
+            metadata = doc.get("completeness") or {}
+            _require(inventory_from_documents([doc]).status == ALLOW, "PROTECTION_ASSIGNMENT_SOURCE_INVALID")
+            _require(doc.get("interpretation_version") == "1.0" and isinstance(doc.get("entries"), list),
+                     "PROTECTION_ASSIGNMENT_VERSION_UNKNOWN")
+            _require(path.stem == doc.get("assignment_id"), "PROTECTION_ASSIGNMENT_IDENTITY_MISMATCH")
+            for entry in doc["entries"]:
+                scope = entry.get("scope") or {}
+                _require(isinstance(scope, Mapping), "PROTECTION_SCOPE_UNKNOWN")
+                _require(scope.get("kind") in {"ALL_TIME", "INTERVAL"}, "PROTECTION_SCOPE_UNKNOWN")
+                if scope["kind"] == "INTERVAL":
+                    _require(_time(scope.get("start")) < _time(scope.get("end")), "PROTECTION_SCOPE_INVALID")
+            if isinstance(metadata, Mapping) and "current_contract" in metadata:
+                _require(metadata["current_contract"] == CONTRACT, "CURRENT_PROTECTION_VERSION_UNKNOWN")
+                _require(doc.get("schema") == ASSIGNMENT_SCHEMA and doc.get("schema_version") == "1.0"
+                         and doc.get("interpretation_version") == "1.0" and metadata.get("complete") is True,
+                         "CURRENT_PROTECTION_RECEIPT_INVALID")
+                _require(set(doc) == {"schema", "schema_version", "interpretation_version", "assignment_id", "owner", "completeness", "entries"}
+                         and doc.get("owner") == "OPPORTUNITY_EPISODES"
+                         and set(metadata) == {"complete", "current_contract", "checked_at", "read_scope", "source_set_sha256", "source_frontier", "context_sha256", "predecessor", "boundary"}
+                         and metadata.get("boundary") == "LOCAL_EPISODE_EXPLORATORY_ONLY; ADVISORY_SCOPE_UNKNOWN; NO_CONFIRMATORY_OR_SCOUT_GRANT",
+                         "CURRENT_PROTECTION_RECEIPT_INVALID")
+                _require(metadata.get("read_scope") == _scope(root), "CURRENT_PROTECTION_BINDING_INVALID")
+                digest = lambda value: isinstance(value, str) and len(value) == 64 and all(c in "0123456789abcdef" for c in value)
+                frontier = metadata["source_frontier"]
+                _require(digest(metadata["source_set_sha256"]) and (metadata["predecessor"] is None or digest(metadata["predecessor"]))
+                         and isinstance(frontier, list) and all(isinstance(item, Mapping) for item in frontier)
+                         and [item.get("owner") for item in frontier] == list(ROLES)
+                         and all(isinstance(item.get("ref"), str) and bool(item["ref"]) and digest(item.get("semantic_sha256")) for item in frontier),
+                         "CURRENT_PROTECTION_RECEIPT_INVALID")
+                context = {"contract": CONTRACT, "read_scope": metadata["read_scope"], "source_set_sha256": metadata["source_set_sha256"],
+                           "source_frontier": frontier, "effective_restrictions_sha256": canonical_sha256(doc["entries"])}
+                _require(metadata["context_sha256"] == canonical_sha256(context), "CURRENT_PROTECTION_RECEIPT_INVALID")
+                basis = canonical_sha256({"context": metadata["context_sha256"], "checked_at": metadata["checked_at"],
+                                          "predecessor": metadata["predecessor"]})
+                _require(doc.get("assignment_id") == path.stem == "CURRENT-RESEARCH-" + basis[:32].upper(),
+                         "CURRENT_PROTECTION_RECEIPT_INVALID")
+                _require(_time(metadata["checked_at"]) <= datetime.now(UTC), "CURRENT_PROTECTION_TIME_INVALID")
+                # Only correctly formed derived receipts are excluded, never a
+                # foreign primary assignment carrying an arbitrary output marker.
+                continue
+            if isinstance(metadata, Mapping) and "as_of" in metadata:
+                value = metadata["as_of"]
+                _require(isinstance(value, str), "PROTECTION_SOURCE_TIME_INVALID")
+                stamp = _time(value + "T00:00:00Z" if len(value) == 10 else value)
+                _require(stamp <= datetime.now(UTC), "PROTECTION_SOURCE_TIME_INVALID")
+            result.append(doc)
+        except (CurrentProtectionError, OSError, ValueError, KeyError, TypeError) as exc:
+            error = exc if isinstance(exc, CurrentProtectionError) else CurrentProtectionError("PROTECTION_ASSIGNMENT_SOURCE_INVALID")
+            error.source_ref = _public_identifier(path.relative_to(root).as_posix())
+            error.observed_form = _public_identifier(doc.get("schema"))
+            error.observed_version = _public_identifier(doc.get("schema_version"))
+            raise error from None
     return result
 
 
@@ -179,80 +244,89 @@ def _store_projection(root: Path, config: Mapping[str, Any]) -> list[dict[str, A
     # Native committed Parquet + manifests are truth; no projection rebuild or
     # operational database open, and no whole-store digest used as freshness.
     for record in ResearchStore(root, create_if_missing=False).iter_committed_records(fresh=True):
-        wrapper = json.loads(record.payload_json)
-        _require(isinstance(wrapper, dict), "PROTECTION_DECLARATION_INVALID")
-        owners = config["native_envelope_owners"]
-        _require(record.producer_capability_id in owners, "PROTECTION_DECLARATION_OWNER_UNKNOWN")
-        forms = owners[record.producer_capability_id]
-        kind = str(record.record_kind)
-        _require(kind in forms, "PROTECTION_DECLARATION_FORM_UNKNOWN")
-        form = wrapper.get("artifact_kind") if kind == "RESEARCH_ARTIFACT" else "NATIVE_DIRECT"
-        _require(isinstance(form, str) and form in forms[kind], "PROTECTION_DECLARATION_FORM_UNKNOWN")
-        _require("payload_canonical" not in wrapper or isinstance(wrapper["payload_canonical"], str),
-                 "PROTECTION_DECLARATION_FORM_UNKNOWN")
-        body = json.loads(wrapper["payload_canonical"]) if isinstance(wrapper.get("payload_canonical"), str) else wrapper
-        _require(isinstance(body, dict) and body, "PROTECTION_DECLARATION_INVALID")
-        identity = form if kind == "RESEARCH_ARTIFACT" else kind
-        _require(body.get("schema") in config["body_schema_by_form"].get(identity, [None])
-                 and body.get("kind") is None
-                 and body.get("artifact_kind") == (identity if identity in config["body_artifact_marker_forms"] else None)
-                 and body.get("packet_schema") == config["body_packet_schema_by_form"].get(identity),
-                 "PROTECTION_DECLARATION_FORM_UNKNOWN")
-        required = config["unmarked_body_identity_fields"].get(identity)
-        if required is not None:
-            _require(isinstance(required, list) and bool(required) and all(key in body for key in required),
+        wrapper, body = {}, {}
+        try:
+            wrapper = json.loads(record.payload_json)
+            _require(isinstance(wrapper, dict), "PROTECTION_DECLARATION_INVALID")
+            owners = config["native_envelope_owners"]
+            _require(record.producer_capability_id in owners, "PROTECTION_DECLARATION_OWNER_UNKNOWN")
+            forms = owners[record.producer_capability_id]
+            kind = str(record.record_kind)
+            _require(kind in forms, "PROTECTION_DECLARATION_FORM_UNKNOWN")
+            form = wrapper.get("artifact_kind") if kind == "RESEARCH_ARTIFACT" else "NATIVE_DIRECT"
+            _require(isinstance(form, str) and form in forms[kind], "PROTECTION_DECLARATION_FORM_UNKNOWN")
+            _require("payload_canonical" not in wrapper or isinstance(wrapper["payload_canonical"], str),
                      "PROTECTION_DECLARATION_FORM_UNKNOWN")
-        if isinstance(wrapper.get("payload_canonical"), str):
-            _require(all(wrapper.get(key) is None for key in ("schema", "schema_version", "kind", "packet_schema", "packet_version")),
+            body = json.loads(wrapper["payload_canonical"]) if isinstance(wrapper.get("payload_canonical"), str) else wrapper
+            _require(isinstance(body, dict) and body, "PROTECTION_DECLARATION_INVALID")
+            identity = form if kind == "RESEARCH_ARTIFACT" else kind
+            _require(body.get("schema") in config["body_schema_by_form"].get(identity, [None])
+                     and body.get("kind") is None
+                     and body.get("artifact_kind") == (identity if identity in config["body_artifact_marker_forms"] else None)
+                     and body.get("packet_schema") == config["body_packet_schema_by_form"].get(identity),
                      "PROTECTION_DECLARATION_FORM_UNKNOWN")
-        _require(record.schema_version in config["store_record_versions"], "PROTECTION_RESEARCH_EVENT_VERSION_UNKNOWN")
-        if "packet_schema" in body or "packet_version" in body:
-            _require(body.get("packet_schema") in config["native_packet_versions"]
-                     and body.get("packet_version") in config["native_packet_versions"][body["packet_schema"]],
-                     "PROTECTION_DECLARATION_VERSION_UNKNOWN")
-        for field, versions in config["native_text_versions"].items():
-            for layer in (wrapper, body):
-                if field in layer:
-                    _require(layer[field] in versions, "PROTECTION_DECLARATION_VERSION_UNKNOWN")
-        # Native unmarked bodies are unversioned; an added schema version
-        # is a new interpretation, never evidence of an empty declaration.
-        _require("schema_version" not in body or any(body.get(key) is not None for key in ("artifact_kind", "kind", "schema")),
-                 "PROTECTION_DECLARATION_VERSION_UNKNOWN")
-        for marker_key in ("artifact_kind", "kind", "schema"):
-            marker = body.get(marker_key)
-            if marker is not None:
-                _require(isinstance(marker, str) and marker in config["store_body_versions"]
-                         and body.get("schema_version") in config["store_body_versions"][marker],
+            required = config["unmarked_body_identity_fields"].get(identity)
+            if required is not None:
+                _require(isinstance(required, list) and bool(required) and all(key in body for key in required),
+                         "PROTECTION_DECLARATION_FORM_UNKNOWN")
+            if isinstance(wrapper.get("payload_canonical"), str):
+                _require(all(wrapper.get(key) is None for key in ("schema", "schema_version", "kind", "packet_schema", "packet_version")),
+                         "PROTECTION_DECLARATION_FORM_UNKNOWN")
+            _require(record.schema_version in config["store_record_versions"], "PROTECTION_RESEARCH_EVENT_VERSION_UNKNOWN")
+            if "packet_schema" in body or "packet_version" in body:
+                _require(body.get("packet_schema") in config["native_packet_versions"]
+                         and body.get("packet_version") in config["native_packet_versions"][body["packet_schema"]],
                          "PROTECTION_DECLARATION_VERSION_UNKNOWN")
-        for layer in (wrapper, body):
-            if layer.get("schema") == ASSIGNMENT_SCHEMA or any(k in layer for k in
-                    ("protection_assignments", "protected_assignments", "holdout_assignments", "assignment_sources",
-                     "holdout", "protected", "assignment", "split", "holdout_policy")):
-                # Neither native layer has an assignment writer in this
-                # interpretation; an unknown link cannot disappear as empty.
-                raise CurrentProtectionError("PROTECTION_DECLARATION_OWNER_UNSUPPORTED")
-            _require(not layer.get("holdout_consumption_ids"), "PROTECTION_CONSUMPTION_LINK_UNRESOLVED")
-        _require(wrapper is body or not any(key in wrapper for key in ("experiment_spec", "experiment_spec_packet")),
-                 "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
-        declarations = {}
-        # These are the two native owner spellings, each wrapped or bare.
-        # Validate every supplied protection declaration, including conflicting
-        # duplicates; scientific parameters do not become assignment authority.
-        for field in ("experiment_spec", "experiment_spec_packet"):
-            submission = body.get(field)
-            if submission is None:
-                continue
-            _require(isinstance(submission, Mapping), "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
-            spec = submission.get("experiment_spec", submission)
-            _require(isinstance(spec, Mapping) and spec.get("schema") == "smial.experiment-spec", "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
-            _require(spec.get("schema_version") == "1.4" and spec.get("population") == "OPPORTUNITY_EPISODES"
-                     and spec.get("holdout_policy") == config["embedded_exploratory_policy"]
-                     and spec.get("observation_request") == {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"},
+            for field, versions in config["native_text_versions"].items():
+                for layer in (wrapper, body):
+                    if field in layer:
+                        _require(layer[field] in versions, "PROTECTION_DECLARATION_VERSION_UNKNOWN")
+            # Native unmarked bodies are unversioned; an added schema version
+            # is a new interpretation, never evidence of an empty declaration.
+            _require("schema_version" not in body or any(body.get(key) is not None for key in ("artifact_kind", "kind", "schema")),
+                     "PROTECTION_DECLARATION_VERSION_UNKNOWN")
+            for marker_key in ("artifact_kind", "kind", "schema"):
+                marker = body.get(marker_key)
+                if marker is not None:
+                    _require(isinstance(marker, str) and marker in config["store_body_versions"]
+                             and body.get("schema_version") in config["store_body_versions"][marker],
+                             "PROTECTION_DECLARATION_VERSION_UNKNOWN")
+            for layer in (wrapper, body):
+                if layer.get("schema") == ASSIGNMENT_SCHEMA or any(k in layer for k in
+                        ("protection_assignments", "protected_assignments", "holdout_assignments", "assignment_sources",
+                         "holdout", "protected", "assignment", "split", "holdout_policy")):
+                    # Neither native layer has an assignment writer in this
+                    # interpretation; an unknown link cannot disappear as empty.
+                    raise CurrentProtectionError("PROTECTION_DECLARATION_OWNER_UNSUPPORTED")
+                _require(not layer.get("holdout_consumption_ids"), "PROTECTION_CONSUMPTION_LINK_UNRESOLVED")
+            _require(wrapper is body or not any(key in wrapper for key in ("experiment_spec", "experiment_spec_packet")),
                      "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
-            value = {"record_id": record.record_id, "policy": spec["holdout_policy"],
-                     "population": spec["population"], "observation_request": spec["observation_request"]}
-            declarations[canonical_sha256(value)] = value
-        projection.extend(declarations.values())
+            declarations = {}
+            # These are the two native owner spellings, each wrapped or bare.
+            # Validate every supplied protection declaration, including conflicting
+            # duplicates; scientific parameters do not become assignment authority.
+            for field in ("experiment_spec", "experiment_spec_packet"):
+                submission = body.get(field)
+                if submission is None:
+                    continue
+                _require(isinstance(submission, Mapping), "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
+                spec = submission.get("experiment_spec", submission)
+                _require(isinstance(spec, Mapping) and spec.get("schema") == "smial.experiment-spec", "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
+                _require(spec.get("schema_version") == "1.4" and spec.get("population") == "OPPORTUNITY_EPISODES"
+                         and spec.get("holdout_policy") == config["embedded_exploratory_policy"]
+                         and spec.get("observation_request") == {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"},
+                         "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
+                value = {"record_id": record.record_id, "policy": spec["holdout_policy"],
+                         "population": spec["population"], "observation_request": spec["observation_request"]}
+                declarations[canonical_sha256(value)] = value
+            projection.extend(declarations.values())
+        except (CurrentProtectionError, ValueError, KeyError, TypeError) as exc:
+            error = exc if isinstance(exc, CurrentProtectionError) else CurrentProtectionError("PROTECTION_DECLARATION_INVALID")
+            error.source_ref = _public_identifier("research-record://" + record.record_id)
+            error.observed_form = _public_identifier(wrapper.get("artifact_kind") if isinstance(wrapper, Mapping) else None) or str(record.record_kind)
+            if isinstance(body, Mapping):
+                error.observed_version = _public_identifier(body.get("schema_version") or body.get("packet_version"))
+            raise error from None
     # holdouts_not_touched is advisory source assertion, never assignment or
     # proof of empty. Its unresolved referent is retained in the boundary text.
     return sorted(projection, key=lambda item: item["record_id"])
@@ -268,11 +342,12 @@ def _task22(repo: Path, config: Mapping[str, Any]) -> dict[str, Any]:
     _require({p.name for p in directory.glob("holdout_access_ledger*.json")} ==
              {"holdout_access_ledger_v1.json", "holdout_access_ledger_v2.json"}, "TASK22_SOURCE_VERSION_UNKNOWN")
     import hashlib
-    accepted_path = _safe(repo, str(config["task22_acceptance_ref"]))
-    _require(hashlib.sha256(accepted_path.read_bytes()).hexdigest() == config["task22_acceptance_sha256"], "TASK22_ACCEPTANCE_BINDING_CHANGED")
-    receipt = _json(accepted_path)
-    split = _json(_safe(repo, owner.SPLIT_PATH)); ledger = _json(_safe(repo, owner.LEDGER_PATH))
-    sha = lambda rel: hashlib.sha256(_safe(repo, rel).read_bytes()).hexdigest()
+    read_bytes = lambda rel: _owned("TASK22_ACCEPTED_SPLIT", lambda: _safe(repo, rel).read_bytes(), source_ref=rel)
+    read_json = lambda rel: _owned("TASK22_ACCEPTED_SPLIT", lambda: _json(_safe(repo, rel)), source_ref=rel)
+    _require(hashlib.sha256(read_bytes(str(config["task22_acceptance_ref"]))).hexdigest() == config["task22_acceptance_sha256"], "TASK22_ACCEPTANCE_BINDING_CHANGED")
+    receipt = read_json(str(config["task22_acceptance_ref"]))
+    split = read_json(owner.SPLIT_PATH); ledger = read_json(owner.LEDGER_PATH)
+    sha = lambda rel: hashlib.sha256(read_bytes(rel)).hexdigest()
     accepted = receipt["accepted_result"]
     _require(receipt.get("status") == "PASS_SPLIT_READY_WITH_LIMITATIONS"
              and split.get("schema") == "smial.task22.dataset-split-manifest-v2" and split.get("schema_version") == "2.0"
@@ -298,17 +373,61 @@ def _task22(repo: Path, config: Mapping[str, Any]) -> dict[str, Any]:
             "applicability": "TASK21_FROZEN_DATASET_ONLY_NOT_GLOBAL_MINT_BAN"}
 
 
+def _experiment_policy(path: Path, repo: Path, config: Mapping[str, Any]) -> dict[str, Any]:
+    from solana_alpha_lab.factory.experiment_spec import validate_experiment_document, ExperimentSpecError
+    import hashlib
+    ref = path.relative_to(repo).as_posix()
+    _require(path.suffix == ".yaml" and path.is_file(), "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
+    value = yaml.safe_load(_safe(repo, ref).read_bytes())
+    _require(isinstance(value, dict), "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
+    try:
+        try:
+            validate_experiment_document(value, root=repo)
+        except ExperimentSpecError:
+            raise CurrentProtectionError("EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN",
+                observed_form=value.get("schema"), observed_version=value.get("schema_version")) from None
+        projection = {k: value.get(k) for k in ("schema", "schema_version", "population", "holdout_policy")}
+        _require(not any(key in value for key in ("protection_assignments", "protected_assignments", "holdout_assignments",
+            "assignment_sources", "holdout", "protected", "assignment", "split", "holdout_consumption_ids")),
+            "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
+        if value["schema_version"] == "1.4":
+            observation = value.get("observation_request")
+            _require(value.get("population") == "OPPORTUNITY_EPISODES"
+                     and value.get("holdout_policy") == config["embedded_exploratory_policy"]
+                     and observation == {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"},
+                     "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
+            projection["observation_request"] = observation
+        else:
+            _require(projection in config["legacy_experiment_policy_meanings"] and "observation_request" not in value,
+                     "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
+            if value["schema_version"] == "1.5":
+                protocol_ref = "configs/list_a_chronological_confirmation_v1.yaml"
+                protocol = yaml.safe_load(_safe(repo, protocol_ref).read_bytes())
+                parameters = value["parameters"]
+                _require(parameters.get("protocol_ref") == "repo://" + protocol_ref
+                         and parameters.get("protocol_core_sha256") == canonical_sha256(protocol["protocol_core"]),
+                         "EXPERIMENT_POLICY_AUTHORITY_BINDING_UNKNOWN")
+                projection["parameters"] = parameters
+        return {"ref": ref, "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                "semantic_sha256": canonical_sha256(projection), **projection}
+    except CurrentProtectionError as exc:
+        exc.observed_form = _public_identifier(value.get("schema"))
+        exc.observed_version = _public_identifier(value.get("schema_version"))
+        raise
+
+
+
 def collect_current_sources(data_root: Path, *, repo_root: Path | None = None) -> dict[str, Any]:
     """One source-specific vector. Does not claim cross-root atomicity."""
     root, repo = Path(data_root), Path(repo_root or REPO)
     _require(root.is_absolute() and root.is_dir(), "PROTECTION_DATA_ROOT_INVALID")
     _safe(root, "research")
-    config = _owned("SOURCE_SET", lambda: _config(repo))
+    config = _owned("SOURCE_SET", lambda: _config(repo), source_ref=CONFIG)
     frontier = []
     entries = []
     def add(role, ref, payload, **detail):
         frontier.append({"owner": role, "ref": ref, "semantic_sha256": canonical_sha256(payload), **detail})
-    primary = _owned("LOCAL_ASSIGNMENTS", lambda: _assignment_documents(root))
+    primary = _owned("LOCAL_ASSIGNMENTS", lambda: _assignment_documents(root), source_ref=ASSIGNMENT_DIR)
     for doc in primary:
         entries.extend(doc["entries"])
     add("LOCAL_ASSIGNMENTS", ASSIGNMENT_DIR, [{"assignment_id": d["assignment_id"],
@@ -317,35 +436,32 @@ def collect_current_sources(data_root: Path, *, repo_root: Path | None = None) -
     secondary = root.parent / config["secondary_store"]
     for role, source_root in (("CANONICAL_RESEARCHSTORE", root), ("FAST_LANE_RESEARCHSTORE", secondary)):
         _owned(role, lambda: _safe(source_root, "research"))
-        declarations = _owned(role, lambda: _store_projection(source_root, config))
-        native = _owned(role, lambda: _assignment_documents(source_root)) if role == "FAST_LANE_RESEARCHSTORE" else []
+        declarations = _owned(role, lambda: _store_projection(source_root, config), source_ref="smial-data://" + role.lower())
+        native = _owned(role, lambda: _assignment_documents(source_root), source_ref=ASSIGNMENT_DIR) if role == "FAST_LANE_RESEARCHSTORE" else []
         for doc in native:
             entries.extend(doc["entries"])
         add(role, "smial-data://" + role.lower(), {"root_identity": root_identity(source_root),
             "declarations": declarations, "assignments": native}, declaration_count=len(declarations),
             declaration_refs=[{"record_id": d["record_id"], "semantic_sha256": canonical_sha256(d)} for d in declarations],
             assignment_refs=[{"assignment_id": d["assignment_id"], "sha256": assignment_document_sha256(d)} for d in native])
-    registry = _owned("CONSUMPTION_REGISTRY", lambda: yaml.safe_load(_safe(repo, "registries/holdout_consumption.yaml").read_bytes()))
+    registry = _owned("CONSUMPTION_REGISTRY", lambda: yaml.safe_load(_safe(repo, "registries/holdout_consumption.yaml").read_bytes()), source_ref="registries/holdout_consumption.yaml")
     _require(isinstance(registry, dict) and registry.get("schema_version") == "1.0"
              and registry.get("registry_id") == "SMIAL-REGISTRY-HOLDOUT-CONSUMPTION"
              and registry.get("truth_owner") == "TASK-03" and registry.get("records") == [], "CONSUMPTION_SOURCE_SCOPE_UNKNOWN", "CONSUMPTION_REGISTRY")
     add("CONSUMPTION_REGISTRY", "registries/holdout_consumption.yaml", {k: registry[k] for k in
         ("schema_version", "registry_id", "truth_owner", "records")}, interpretation="CONSUMPTION_ONLY_NOT_ASSIGNMENT_ABSENCE")
-    task22 = _owned("TASK22_ACCEPTED_SPLIT", lambda: _task22(repo, config))
+    task22 = _owned("TASK22_ACCEPTED_SPLIT", lambda: _task22(repo, config), source_ref=config["task22_acceptance_ref"])
     add("TASK22_ACCEPTED_SPLIT", config["task22_acceptance_ref"], task22)
     policies = []
-    directory = _owned("EXPERIMENT_POLICIES", lambda: _safe(repo, "configs/experiment_specs"))
-    _require(directory.is_dir(), "EXPERIMENT_POLICY_SOURCE_MISSING", "EXPERIMENT_POLICIES")
-    paths = _owned("EXPERIMENT_POLICIES", lambda: sorted(directory.iterdir()))
-    _require({p.name for p in paths} == set(config["known_experiment_policies"]), "EXPERIMENT_POLICY_SOURCE_SET_CHANGED", "EXPERIMENT_POLICIES")
+    directory = _owned("EXPERIMENT_POLICIES", lambda: _safe(repo, "configs/experiment_specs"), source_ref="configs/experiment_specs")
+    _require(directory.is_dir(), "EXPERIMENT_POLICY_SOURCE_MISSING", "EXPERIMENT_POLICIES", source_ref="configs/experiment_specs")
+    paths = _owned("EXPERIMENT_POLICIES", lambda: sorted(directory.iterdir()), source_ref="configs/experiment_specs")
     for path in paths:
-        value = _owned("EXPERIMENT_POLICIES", lambda: yaml.safe_load(_safe(repo, path.relative_to(repo).as_posix()).read_bytes()))
-        _require(isinstance(value, dict), "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN", "EXPERIMENT_POLICIES")
-        projection = {k: value.get(k) for k in ("schema", "schema_version", "population", "holdout_policy")}
-        _require(projection == config["known_experiment_policies"][path.name], "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN", "EXPERIMENT_POLICIES")
-        policies.append({"ref": path.relative_to(repo).as_posix(), **projection})
-    add("EXPERIMENT_POLICIES", "configs/experiment_specs", policies)
-    protocol = _owned("LIST_A_PROTOCOL", lambda: yaml.safe_load(_safe(repo, "configs/list_a_chronological_confirmation_v1.yaml").read_bytes()))
+        ref = path.relative_to(repo).as_posix()
+        policies.append(_owned("EXPERIMENT_POLICIES", lambda: _experiment_policy(path, repo, config), source_ref=ref))
+    add("EXPERIMENT_POLICIES", "configs/experiment_specs", policies,
+        policy_refs=[{k: item[k] for k in ("ref", "sha256", "semantic_sha256")} for item in policies])
+    protocol = _owned("LIST_A_PROTOCOL", lambda: yaml.safe_load(_safe(repo, "configs/list_a_chronological_confirmation_v1.yaml").read_bytes()), source_ref="configs/list_a_chronological_confirmation_v1.yaml")
     _require(isinstance(protocol, dict), "LIST_A_SOURCE_VERSION_UNKNOWN", "LIST_A_PROTOCOL")
     _require(protocol.get("schema") == "smial.list-a-confirmation-protocol" and protocol.get("schema_version") == "1.0",
              "LIST_A_SOURCE_VERSION_UNKNOWN", "LIST_A_PROTOCOL")
@@ -385,17 +501,17 @@ def _head(root: Path) -> dict[str, Any] | None:
     path = _safe(root, POINTER)
     if not path.exists():
         return None
-    pointer = _json(path)
+    pointer = _owned("LOCAL_ASSIGNMENTS", lambda: _json(path), source_ref=POINTER)
     unsigned = {k: v for k, v in pointer.items() if k != "pointer_sha256"}
     _require(pointer.get("contract") == CONTRACT and pointer.get("pointer_sha256") == canonical_sha256(unsigned),
-             "CURRENT_PROTECTION_POINTER_INVALID")
+             "CURRENT_PROTECTION_POINTER_INVALID", "LOCAL_ASSIGNMENTS", source_ref=POINTER)
     return pointer
 
 
 def _installed(root: Path, snapshot: Mapping[str, Any], *, require_current_source_set: bool = True) -> tuple[dict[str, Any], dict[str, Any]]:
     pointer = _head(root)
-    _require(pointer is not None, "CURRENT_PROTECTION_NOT_INSTALLED", "LOCAL_ASSIGNMENTS")
-    doc = _json(_safe(root, pointer["assignment_ref"]))
+    _require(pointer is not None, "CURRENT_PROTECTION_NOT_INSTALLED", "LOCAL_ASSIGNMENTS", source_ref=POINTER)
+    doc = _owned("LOCAL_ASSIGNMENTS", lambda: _json(_safe(root, pointer["assignment_ref"])), source_ref=pointer["assignment_ref"])
     _require(assignment_document_sha256(doc) == pointer["assignment_sha256"], "CURRENT_PROTECTION_RECEIPT_CHANGED")
     proof = doc.get("completeness") or {}
     _require(isinstance(proof, Mapping) and isinstance(doc.get("entries"), list), "CURRENT_PROTECTION_RECEIPT_INVALID", "LOCAL_ASSIGNMENTS")
@@ -420,6 +536,13 @@ def _installed(root: Path, snapshot: Mapping[str, Any], *, require_current_sourc
             expected = {item[identity] for item in source.get(key, [])}
             present = {item[identity] for item in fresh[role].get(key, [])}
             _require(expected <= present, "PROTECTION_BASELINE_SOURCE_MISSING", role)
+        if role == "EXPERIMENT_POLICIES":
+            present_policies = {item["ref"]: item for item in fresh[role]["policy_refs"]}
+            for item in source.get("policy_refs", []):
+                ref = item["ref"]
+                _require(ref in present_policies, "PROTECTION_BASELINE_SOURCE_MISSING", role, source_ref=ref)
+                _require(present_policies[ref]["sha256"] == item["sha256"],
+                         "PROTECTION_BASELINE_SOURCE_REPLACED", role, source_ref=ref)
     _require({canonical_sha256(entry) for entry in doc["entries"]} <=
              {canonical_sha256(entry) for entry in snapshot["entries"]},
              "PROTECTION_BASELINE_RESTRICTION_REMOVED", "LOCAL_ASSIGNMENTS")
@@ -434,7 +557,10 @@ def resolve_current_research_protection(data_root: Path, *, repo_root: Path | No
         pointer, _doc = _installed(root, snapshot)
         ephemeral = {"schema": ASSIGNMENT_SCHEMA, "schema_version": "1.0", "interpretation_version": "1.0",
             "assignment_id": "CURRENT-RESEARCH-CONTEXT", "completeness": {"complete": True,
-                "current_contract": CONTRACT, "context_sha256": snapshot["context_sha256"]}, "entries": snapshot["entries"]}
+                "current_contract": CONTRACT, "read_scope": snapshot["read_scope"],
+                "source_set_sha256": snapshot["source_set_sha256"],
+                "effective_restrictions_sha256": canonical_sha256({"entries": snapshot["entries"],
+                    "scoped_restrictions": snapshot["scoped_restrictions"]})}, "entries": snapshot["entries"]}
         inventory = inventory_from_documents([ephemeral])
         status = {"status": ALLOW, "reason": None, "sources": snapshot["source_frontier"],
             "inventory_sha256": inventory.fingerprint(), "context_sha256": snapshot["context_sha256"],
@@ -445,12 +571,12 @@ def resolve_current_research_protection(data_root: Path, *, repo_root: Path | No
             "permission_boundary": "COMPLETENESS_ONLY; EXACT_INPUT_AND_FROZEN_GATES_REQUIRED"}
         return status, inventory
     except (OSError, ValueError, KeyError, TypeError) as exc:
-        reason = getattr(exc, "code", "PROTECTION_SOURCE_UNAVAILABLE")
-        return ({"status": "UNRESOLVED_SCOPE", "reason": reason, "owner": getattr(exc, "owner", None) or "SOURCE_SET",
-                 "sources": [], "complete_empty": None,
-                 "unresolved": [{"owner": getattr(exc, "owner", None) or "SOURCE_SET", "reason": reason}],
+        error = exc if isinstance(exc, CurrentProtectionError) else CurrentProtectionError("PROTECTION_SOURCE_UNAVAILABLE")
+        detail = error.detail
+        return ({"status": "UNRESOLVED_SCOPE", "reason": error.code, **detail,
+                 "sources": [], "complete_empty": None, "unresolved": [detail],
                  "writes": False, "values_loaded": False},
-                ProtectionInventory("UNRESOLVED_SCOPE", (), {}, reason))
+                ProtectionInventory("UNRESOLVED_SCOPE", (), {}, error.code))
 
 
 def _document(snapshot: Mapping[str, Any], *, checked_at: str, predecessor: str | None) -> dict[str, Any]:
@@ -492,7 +618,7 @@ def apply_reconciliation(store: ResearchStore, preview: Mapping[str, Any], *, au
              and authority.get("mutation") == "VERSIONED_PROTECTION_METADATA_ONLY"
              and isinstance(authority.get("owner_scope_ref"), str) and bool(authority["owner_scope_ref"].strip())
              and authority["owner_scope_ref"].strip() != "OWNER_APPROVAL_REQUIRED_NOT_GRANTED",
-             "PROTECTION_INSTALLATION_AUTHORITY_REQUIRED")
+             "PROTECTION_INSTALLATION_AUTHORITY_REQUIRED", "INSTALLATION_AUTHORITY", source_ref="authority://" + CONTRACT)
     _require(_time(proposal["checked_at"]) <= datetime.now(UTC), "CURRENT_PROTECTION_TIME_INVALID")
     with store.writer_lease():
         snapshot = _snapshot(store.root, repo_root)

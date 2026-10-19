@@ -13,81 +13,6 @@ required_roles:
 - EXPERIMENT_POLICIES
 - LIST_A_PROTOCOL
 interpretation_version: '1.0'
-known_experiment_policies:
-  factory_v1_commissioning_quote_native_free_key_v1.yaml:
-    schema: smial.experiment-spec
-    schema_version: '1.0'
-    population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2
-    holdout_policy: No new holdout is opened; this atom commissions Factory with a
-      new live cohort and does not consume a reserved OOS split or start MOVE 3.
-  fresh_oos_baseline_vs_friction_veto_v1.yaml:
-    schema: smial.experiment-spec
-    schema_version: '1.0'
-    population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING
-    holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort
-      excluding A1, MOVE 2 and commissioning mints and does not start MOVE 3.
-  list_a_chronological_confirmation_v1.yaml:
-    schema: smial.experiment-spec
-    schema_version: '1.5'
-    population: OPPORTUNITY_EPISODES
-    holdout_policy: null
-  market_feature_creator_pressure_archetype_v1.yaml:
-    schema: smial.experiment-spec
-    schema_version: '1.0'
-    population: NO_HOLDER_SNAPSHOT_NO_ENTITY_CLUSTER
-    holdout_policy: No holdout is opened; this atom does not collect holder snapshots
-      or revive TASK-24 entity inference.
-  market_feature_liquidity_archetype_v1.yaml:
-    schema: smial.experiment-spec
-    schema_version: '1.0'
-    population: A1_FREE_KEY_QUOTE_CELLS_AND_A24_POOL_DAY
-    holdout_policy: No holdout is opened; quote observation stays forward-only and
-      is not a KEEP screen.
-  market_feature_price_path_archetype_v1.yaml:
-    schema: smial.experiment-spec
-    schema_version: '1.0'
-    population: A24_LIMITED_DIAGNOSTIC_POOL_DAY_RETROSPECTIVE
-    holdout_policy: No holdout is opened; this atom composes coverage from already-accepted
-      Git receipts.
-  ordinary_liquidity_quote_pressure_v1.yaml:
-    schema: smial.experiment-spec
-    schema_version: '1.0'
-    population: A1_FREE_KEY_QUOTE_CELLS_AND_A24_POOL_DAY
-    holdout_policy: No holdout is opened; quote observation stays forward-only and
-      cannot promote an execution hypothesis.
-  ordinary_price_path_buy_pressure_v1.yaml:
-    schema: smial.experiment-spec
-    schema_version: '1.0'
-    population: A24_LIMITED_DIAGNOSTIC_POOL_DAY_RETROSPECTIVE
-    holdout_policy: No holdout is opened; promotion is forbidden while Git-canonical
-      returns stay typed UNKNOWN.
-  prior_git_t0_friction_screen_v1.yaml:
-    schema: smial.experiment-spec
-    schema_version: '1.0'
-    population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5
-    holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort
-      excluding A1, MOVE 2, commissioning and ATOM 5 veto-campaign mints and does
-      not start MOVE 3.
-  quote_native_admissible_friction_audition_offline_v1.yaml:
-    schema: smial.experiment-spec
-    schema_version: '1.0'
-    population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED
-    holdout_policy: No new holdout is opened; this atom replays already-consumed A1
-      evidence and does not treat MOVE 2 as a new result.
-  quote_surface_retention_confirmatory_v1.yaml:
-    schema: smial.experiment-spec
-    schema_version: '1.0'
-    population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5_ATOM6_PR156
-    holdout_policy: No reserved OOS split is consumed; this confirmatory uses a new
-      live cohort excluding A1, MOVE 2, commissioning, ATOM 5, ATOM 6 and PR 156 mints
-      and does not start Atom 2.
-  quote_surface_retention_falsifier_v1.yaml:
-    schema: smial.experiment-spec
-    schema_version: '1.0'
-    population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5_ATOM6
-    holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort
-      excluding A1, MOVE 2, commissioning, ATOM 5 and ATOM 6 mints and does not start
-      Atom 2.
 embedded_exploratory_policy: EXPLORATORY_REUSE only; no untouched/forward holdout
   reads; no execution authority. Current native protection must be independently revalidated
   before any later action.
@@ -106,8 +31,6 @@ store_body_versions:
   - null
   DISCOVERY_QUERY_INTENT:
   - null
-  FORGE_RESEARCH_POLICY_RUN_SNAPSHOT_V1:
-  - '1.0'
   FORGE_RESEARCH_UNIVERSE_POLICY:
   - '1.0'
   FORWARD_CAPTURE_FROZEN_CONTRACT:
@@ -133,8 +56,6 @@ store_body_versions:
   SCIENCE_MEMORY_REBASE_RECEIPT:
   - null
   smial.discovery-query-look:
-  - '1.0'
-  smial.forge-research-policy-run-snapshot:
   - '1.0'
   smial.forge-research-universe-policy:
   - '1.0'
@@ -197,9 +118,19 @@ native_envelope_owners:
     - NATIVE_DIRECT
     EXPERIMENT_METRIC:
     - NATIVE_DIRECT
-  CAP-FORGE-RESEARCH-POLICY-001:
+  CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001:
+    HYPOTHESIS_VERSION:
+    - NATIVE_DIRECT
+    RUN_STARTED:
+    - NATIVE_DIRECT
+    RUN_COMPLETED:
+    - NATIVE_DIRECT
+    EXPERIMENT_METRIC:
+    - NATIVE_DIRECT
+    EVIDENCE_BINDING:
+    - NATIVE_DIRECT
     RESEARCH_ARTIFACT:
-    - FORGE_RESEARCH_POLICY_RUN_SNAPSHOT_V1
+    - CAPABILITY_RESULT
   CAP-HFIC-ORDINARY-OPERATION-001:
     RESEARCH_ARTIFACT:
     - ORDINARY_LOOK_RESERVATION_V1
@@ -267,6 +198,7 @@ unmarked_body_identity_fields:
   - session_state
   - prompt_version
 envelope_owner_bindings:
+  document_runner: src/solana_alpha_lab/factory/document_runner.py
   offline: src/solana_alpha_lab/factory/hfic_session.py
   discovery: src/solana_alpha_lab/factory/hfic_grounded_discovery.py
   policy: src/solana_alpha_lab/factory/hfic_research_policy.py
@@ -307,8 +239,6 @@ body_schema_by_form:
   - smial.hypothesis-critic-result
   DISCOVERY_QUERY_LOOK:
   - smial.discovery-query-look
-  FORGE_RESEARCH_POLICY_RUN_SNAPSHOT_V1:
-  - smial.forge-research-policy-run-snapshot
   FORGE_RESEARCH_UNIVERSE_POLICY:
   - smial.forge-research-universe-policy
   FORGE_RUN_RECEIPT:
@@ -336,7 +266,6 @@ body_artifact_marker_forms:
 - CAPABILITY_RESULT
 - DISCOVERY_FEATURE_PREVIEW
 - DISCOVERY_QUERY_INTENT
-- FORGE_RESEARCH_POLICY_RUN_SNAPSHOT_V1
 - FORGE_RESEARCH_UNIVERSE_POLICY
 - FORWARD_CAPTURE_FROZEN_CONTRACT
 - HFIC_SEARCH_MEMORY_POLICY
@@ -353,3 +282,66 @@ body_packet_schema_by_form:
   CRITIC_INPUT_PACKET: smial.hypothesis-critic-input
   FORGE_DRAFT: smial.hypothesis-forge-draft
   NEXT_EPISTEMIC_ACTION: smial.hfic-next-epistemic-action
+legacy_experiment_policy_meanings:
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2
+  holdout_policy: No new holdout is opened; this atom commissions Factory with a new
+    live cohort and does not consume a reserved OOS split or start MOVE 3.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING
+  holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort
+    excluding A1, MOVE 2 and commissioning mints and does not start MOVE 3.
+- schema: smial.experiment-spec
+  schema_version: '1.5'
+  population: OPPORTUNITY_EPISODES
+  holdout_policy: null
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: NO_HOLDER_SNAPSHOT_NO_ENTITY_CLUSTER
+  holdout_policy: No holdout is opened; this atom does not collect holder snapshots
+    or revive TASK-24 entity inference.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: A1_FREE_KEY_QUOTE_CELLS_AND_A24_POOL_DAY
+  holdout_policy: No holdout is opened; quote observation stays forward-only and is
+    not a KEEP screen.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: A24_LIMITED_DIAGNOSTIC_POOL_DAY_RETROSPECTIVE
+  holdout_policy: No holdout is opened; this atom composes coverage from already-accepted
+    Git receipts.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: A1_FREE_KEY_QUOTE_CELLS_AND_A24_POOL_DAY
+  holdout_policy: No holdout is opened; quote observation stays forward-only and cannot
+    promote an execution hypothesis.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: A24_LIMITED_DIAGNOSTIC_POOL_DAY_RETROSPECTIVE
+  holdout_policy: No holdout is opened; promotion is forbidden while Git-canonical
+    returns stay typed UNKNOWN.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5
+  holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort
+    excluding A1, MOVE 2, commissioning and ATOM 5 veto-campaign mints and does not
+    start MOVE 3.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED
+  holdout_policy: No new holdout is opened; this atom replays already-consumed A1
+    evidence and does not treat MOVE 2 as a new result.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5_ATOM6_PR156
+  holdout_policy: No reserved OOS split is consumed; this confirmatory uses a new
+    live cohort excluding A1, MOVE 2, commissioning, ATOM 5, ATOM 6 and PR 156 mints
+    and does not start Atom 2.
+- schema: smial.experiment-spec
+  schema_version: '1.0'
+  population: LIVE_OUTCOME_BLIND_TOKENS_V2_FREE_KEY_6_RECENT_6_TRADED_EXCLUDING_A1_MOVE2_COMMISSIONING_ATOM5_ATOM6
+  holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort
+    excluding A1, MOVE 2, commissioning, ATOM 5 and ATOM 6 mints and does not start
+    Atom 2.

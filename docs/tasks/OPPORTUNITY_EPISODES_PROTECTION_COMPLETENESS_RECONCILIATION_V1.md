@@ -255,3 +255,23 @@ body schema_version99.0 reproduced the last known version gap; explicit body
 version now requires a supported native marker. 22 focused tests PASS in20.322s,
 static PASS. Existing installation proposal revalidated unchanged root/frontier/
 context/assignment bytes; no timestamp renewal or canonical write required.
+
+## PR 417 semantic acceptance patch
+
+The direct owner request on 2026-10-19 requires P1-01/02/03 before merge in this
+same atom and PR. Review source SHA256
+b07b4e44986297a8309e1592d4f2797b25eafbfbe799dd26fbd8336c860f47d8;
+reviewed head 6861c58171ca39bd6464d8c3f514fc6aaa77c6c9. It is an acceptance
+source, not independent execution authority. Reproduce native policy change and
+new supported ExperimentSpec instance first; recognize native meanings/versions,
+retain dynamic instance refs, baseline deletion/replacement denial, source detail
+through the runner, late deny, accounting and immutable historical evidence.
+No new policy-owner implementation or write-set expansion is needed: consume its
+existing constants, and the existing ExperimentSpec validator/schema owner.
+
+A subsequent direct owner message explicitly authorizes the agent to obtain and
+insert the readiness-rendered exact merge phrase for this same PR after green
+exact-head CI, then execute the existing guarded merge and post-merge readback.
+This supersedes the earlier no-merge instruction for PR 417 only; failed machine
+evidence still denies merge. Canonical installation and scientific plan activation
+remain separately ungranted. No source or budget writes on canonical data roots.
