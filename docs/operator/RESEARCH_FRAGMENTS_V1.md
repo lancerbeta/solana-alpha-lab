@@ -205,3 +205,12 @@ CAS/source vector. Эти действия сами по себе не треб�
 `PREPARE_EXACT_METADATA_INSTALLATION_PROPOSAL` означает отсутствие current proof;
 только `REQUEST_AUTHORITY_FOR_EXACT_METADATA_PROPOSAL` запрашивает отдельную
 installation authority для уже подготовленного exact proposal.
+
+Native compatibility: `DECISION_EVENT` может брать identity из ResearchEvent.entity_id
+по существующему legacy пути prior-memory/session owner; требуются связанные
+hypothesis и interpretable decision fields. ExperimentSpec 1.1 сохраняет известное
+legacy protection meaning версии 1.0 и добавляет native input bindings. Для 1.1
+проверяется полный native schema, а bindings сохраняются в declaration frontier.
+Это advisory declaration, не разрешение открыть указанный dataset: exact input и
+current/frozen value gates остаются обязательными. Общий interpreter применяется
+к native spec packets и файлам; имя и расширение файла не задают authority.

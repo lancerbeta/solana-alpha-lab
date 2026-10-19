@@ -56,14 +56,16 @@ def main() -> int:
                 result = protection.preview_reconciliation(root)
             else:
                 if args.authority is None:
-                    raise protection.CurrentProtectionError("PROTECTION_INSTALLATION_AUTHORITY_REQUIRED")
+                    raise protection.CurrentProtectionError("PROTECTION_INSTALLATION_AUTHORITY_REQUIRED",
+                        owner="INSTALLATION_AUTHORITY", source_ref="authority://" + protection.CONTRACT)
                 with args.authority.open("rb") as stream:
                     raw_authority = stream.read(args.protection_metadata_max_bytes + 1)
                 if len(raw_authority) > args.protection_metadata_max_bytes:
                     raise protection.CurrentProtectionError("PROTECTION_METADATA_INPUT_LIMIT_EXCEEDED")
                 authority = json.loads(raw_authority)
                 if not isinstance(authority, dict):
-                    raise protection.CurrentProtectionError("PROTECTION_INSTALLATION_AUTHORITY_REQUIRED")
+                    raise protection.CurrentProtectionError("PROTECTION_INSTALLATION_AUTHORITY_REQUIRED",
+                        owner="INSTALLATION_AUTHORITY", source_ref="authority://" + protection.CONTRACT)
                 result = protection.apply_reconciliation(store, request, authority=authority)
         elif args.action == "read":
             result = {"fragments": fragments.source_snapshot(store), "data_root_identity_sha256": fragments.root_identity(store), "writes": False, "new_look": False}

@@ -43338,7 +43338,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/research_fragments.py', repository_path: scripts/research_fragments.py}
-  integrity: {kind: sha256, sha256: 7a0411d4a863812cdef2b05ed06d209c813ba2321550c3c2f2510b82b4d81d55}
+  integrity: {kind: sha256, sha256: 9ee3efcc60a9e52b23161bbf9e5a941ecacf7d4a32b6b23feb766cf4e23fb73b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43372,7 +43372,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/RESEARCH_FRAGMENTS_V1.md', repository_path: docs/operator/RESEARCH_FRAGMENTS_V1.md}
-  integrity: {kind: sha256, sha256: a789ef7eab2f57b869536d821ecef46f0f5b728696fc671ee5e6e165d1458e9a}
+  integrity: {kind: sha256, sha256: 32f7ec31de026b82c17e747250f0a1f06ae81c4cb313234efdf0aa4bd34c895a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43389,7 +43389,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_research_fragments_v1.py', repository_path: tests/test_research_fragments_v1.py}
-  integrity: {kind: sha256, sha256: 670d80708c20192634b265f26f622e0cb60cd6156f6c9a3ab4b170741a3cca21}
+  integrity: {kind: sha256, sha256: 01430a584093b5362a65cd8f3e379432d66cf4ec76a0af2f15c519f4a7db786f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43453,7 +43453,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/episode_current_protection.py
   integrity:
     kind: sha256
-    sha256: c150fa646d988b1c25671e32e401639eb19b44a8a0bcc69977602da909e3f814
+    sha256: 005544d585fe236bbf5aba08e03cdaf16fe0aebfd6e699fa2d6481b64be83974
   access:
     mode: read_only
     method: file
@@ -43496,7 +43496,7 @@ records:
     repository_path: configs/episode_current_protection_sources_v1.yaml
   integrity:
     kind: sha256
-    sha256: ffc7b5c7bca21ade80d46caaf992a3c4d082dd2a64d04e57a461a54092987fa2
+    sha256: ebe56afa0efddc116bb71d35c8a15b7660075f35a94350b8b9194a92dbaac23f
   access:
     mode: read_only
     method: file

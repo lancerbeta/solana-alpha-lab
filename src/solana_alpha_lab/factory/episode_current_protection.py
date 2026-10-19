@@ -247,7 +247,7 @@ def _time(value: Any) -> datetime:
         raise CurrentProtectionError("PROTECTION_SOURCE_TIME_INVALID") from None
 
 
-def _store_projection(root: Path, config: Mapping[str, Any]) -> list[dict[str, Any]]:
+def _store_projection(root: Path, config: Mapping[str, Any], repo: Path) -> list[dict[str, Any]]:
     _require(root.is_dir() and not root.is_symlink() and not root.is_junction(), "PROTECTION_RESEARCHSTORE_MISSING")
     projection = []
     # Native committed Parquet + manifests are truth; no projection rebuild or
@@ -276,7 +276,16 @@ def _store_projection(root: Path, config: Mapping[str, Any]) -> list[dict[str, A
                      "PROTECTION_DECLARATION_FORM_UNKNOWN")
             required = config["unmarked_body_identity_fields"].get(identity)
             if required is not None:
-                _require(isinstance(required, list) and bool(required) and all(key in body for key in required),
+                # Native prior-memory/session readers also accept legacy direct
+                # decisions whose identity is the ResearchEvent entity. The
+                # hypothesis link and decision fields must still be interpretable.
+                legacy_decision = (identity == "DECISION_EVENT" and "decision_event_id" not in body
+                    and isinstance(record.entity_id, str) and bool(record.entity_id)
+                    and body.get("hypothesis_version_id") == record.hypothesis_version_id
+                    and all(isinstance(body.get(key), str) and bool(body[key])
+                            for key in ("hypothesis_version_id", "decision_kind", "reason_code")))
+                _require(isinstance(required, list) and bool(required)
+                         and (all(key in body for key in required) or legacy_decision),
                          "PROTECTION_DECLARATION_FORM_UNKNOWN")
             if isinstance(wrapper.get("payload_canonical"), str):
                 _require(all(wrapper.get(key) is None for key in ("schema", "schema_version", "kind", "packet_schema", "packet_version")),
@@ -320,21 +329,30 @@ def _store_projection(root: Path, config: Mapping[str, Any]) -> list[dict[str, A
                     continue
                 _require(isinstance(submission, Mapping), "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
                 spec = submission.get("experiment_spec", submission)
-                _require(isinstance(spec, Mapping) and spec.get("schema") == "smial.experiment-spec", "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
-                _require(spec.get("schema_version") == "1.4" and spec.get("population") == "OPPORTUNITY_EPISODES"
-                         and spec.get("holdout_policy") == config["embedded_exploratory_policy"]
-                         and spec.get("observation_request") == {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"},
-                         "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
-                value = {"record_id": record.record_id, "policy": spec["holdout_policy"],
-                         "population": spec["population"], "observation_request": spec["observation_request"]}
+                try:
+                    _require(isinstance(spec, Mapping), "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
+                    if spec.get("schema_version") == "1.1":
+                        # Native 1.1 adds input bindings to the same legacy
+                        # protection meaning; it is not a fresh holdout grant.
+                        from solana_alpha_lab.factory.experiment_spec import validate_experiment_document
+                        validate_experiment_document(spec, root=repo)
+                    meaning = _experiment_meaning(spec, config, repo)
+                except ValueError:
+                    raise CurrentProtectionError("PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN",
+                        observed_form=spec.get("schema") if isinstance(spec, Mapping) else None,
+                        observed_version=spec.get("schema_version") if isinstance(spec, Mapping) else None) from None
+                value = {"record_id": record.record_id, "policy": meaning["holdout_policy"],
+                         "population": meaning["population"], "observation_request": meaning.get("observation_request")}
+                if spec["schema_version"] == "1.1":
+                    value.update(native_spec_version="1.1", data_bindings=spec["data_bindings"])
                 declarations[canonical_sha256(value)] = value
             projection.extend(declarations.values())
         except (CurrentProtectionError, ValueError, KeyError, TypeError) as exc:
             error = exc if isinstance(exc, CurrentProtectionError) else CurrentProtectionError("PROTECTION_DECLARATION_INVALID")
             error.source_ref = _public_ref("research-record://" + record.record_id)
-            error.observed_form = _public_identifier(wrapper.get("artifact_kind") if isinstance(wrapper, Mapping) else None) or str(record.record_kind)
+            error.observed_form = error.observed_form or _public_identifier(wrapper.get("artifact_kind") if isinstance(wrapper, Mapping) else None) or str(record.record_kind)
             if isinstance(body, Mapping):
-                error.observed_version = _public_identifier(body.get("schema_version") or body.get("packet_version"))
+                error.observed_version = error.observed_version or _public_identifier(body.get("schema_version") or body.get("packet_version"))
             raise error from None
     # holdouts_not_touched is advisory source assertion, never assignment or
     # proof of empty. Its unresolved referent is retained in the boundary text.
@@ -382,11 +400,42 @@ def _task22(repo: Path, config: Mapping[str, Any]) -> dict[str, Any]:
             "applicability": "TASK21_FROZEN_DATASET_ONLY_NOT_GLOBAL_MINT_BAN"}
 
 
+def _experiment_meaning(value: Mapping[str, Any], config: Mapping[str, Any], repo: Path) -> dict[str, Any]:
+    _require(value.get("schema") == "smial.experiment-spec", "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
+    projection = {k: value.get(k) for k in ("schema", "schema_version", "population", "holdout_policy")}
+    _require(not any(key in value for key in ("protection_assignments", "protected_assignments", "holdout_assignments",
+        "assignment_sources", "holdout", "protected", "assignment", "split", "holdout_consumption_ids")),
+        "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
+    if value["schema_version"] == "1.4":
+        observation = value.get("observation_request")
+        _require(value.get("population") == "OPPORTUNITY_EPISODES"
+                 and value.get("holdout_policy") == config["embedded_exploratory_policy"]
+                 and observation == {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"},
+                 "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
+        projection["observation_request"] = observation
+    elif value["schema_version"] in config["legacy_experiment_policy_versions"]:
+        _require({**projection, "schema_version": "1.0"} in config["legacy_experiment_policy_meanings"] and "observation_request" not in value,
+                 "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
+    elif value["schema_version"] == "1.5":
+        _require(projection in config["legacy_experiment_policy_meanings"] and "observation_request" not in value,
+                 "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
+        protocol_ref = "configs/list_a_chronological_confirmation_v1.yaml"
+        protocol = yaml.safe_load(_safe(repo, protocol_ref).read_bytes())
+        parameters = value["parameters"]
+        _require(parameters.get("protocol_ref") == "repo://" + protocol_ref
+                 and parameters.get("protocol_core_sha256") == canonical_sha256(protocol["protocol_core"]),
+                 "EXPERIMENT_POLICY_AUTHORITY_BINDING_UNKNOWN")
+        projection["parameters"] = parameters
+    else:
+        raise CurrentProtectionError("EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
+    return projection
+
+
 def _experiment_policy(path: Path, repo: Path, config: Mapping[str, Any]) -> dict[str, Any]:
     from solana_alpha_lab.factory.experiment_spec import validate_experiment_document, ExperimentSpecError
     import hashlib
     ref = path.relative_to(repo).as_posix()
-    _require(path.suffix == ".yaml" and path.is_file(), "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
+    _require(path.is_file(), "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
     value = yaml.safe_load(_safe(repo, ref).read_bytes())
     _require(isinstance(value, dict), "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
     try:
@@ -395,28 +444,7 @@ def _experiment_policy(path: Path, repo: Path, config: Mapping[str, Any]) -> dic
         except ExperimentSpecError:
             raise CurrentProtectionError("EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN",
                 observed_form=value.get("schema"), observed_version=value.get("schema_version")) from None
-        projection = {k: value.get(k) for k in ("schema", "schema_version", "population", "holdout_policy")}
-        _require(not any(key in value for key in ("protection_assignments", "protected_assignments", "holdout_assignments",
-            "assignment_sources", "holdout", "protected", "assignment", "split", "holdout_consumption_ids")),
-            "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
-        if value["schema_version"] == "1.4":
-            observation = value.get("observation_request")
-            _require(value.get("population") == "OPPORTUNITY_EPISODES"
-                     and value.get("holdout_policy") == config["embedded_exploratory_policy"]
-                     and observation == {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"},
-                     "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
-            projection["observation_request"] = observation
-        else:
-            _require(projection in config["legacy_experiment_policy_meanings"] and "observation_request" not in value,
-                     "EXPERIMENT_POLICY_INTERPRETATION_UNKNOWN")
-            if value["schema_version"] == "1.5":
-                protocol_ref = "configs/list_a_chronological_confirmation_v1.yaml"
-                protocol = yaml.safe_load(_safe(repo, protocol_ref).read_bytes())
-                parameters = value["parameters"]
-                _require(parameters.get("protocol_ref") == "repo://" + protocol_ref
-                         and parameters.get("protocol_core_sha256") == canonical_sha256(protocol["protocol_core"]),
-                         "EXPERIMENT_POLICY_AUTHORITY_BINDING_UNKNOWN")
-                projection["parameters"] = parameters
+        projection = _experiment_meaning(value, config, repo)
         return {"ref": ref, "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
                 "semantic_sha256": canonical_sha256(projection), **projection}
     except CurrentProtectionError as exc:
@@ -445,7 +473,7 @@ def collect_current_sources(data_root: Path, *, repo_root: Path | None = None) -
     secondary = root.parent / config["secondary_store"]
     for role, source_root in (("CANONICAL_RESEARCHSTORE", root), ("FAST_LANE_RESEARCHSTORE", secondary)):
         _owned(role, lambda: _safe(source_root, "research"))
-        declarations = _owned(role, lambda: _store_projection(source_root, config), source_ref="smial-data://" + role.lower())
+        declarations = _owned(role, lambda: _store_projection(source_root, config, repo), source_ref="smial-data://" + role.lower())
         native = _owned(role, lambda: _assignment_documents(source_root), source_ref=ASSIGNMENT_DIR) if role == "FAST_LANE_RESEARCHSTORE" else []
         for doc in native:
             entries.extend(doc["entries"])

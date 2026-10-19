@@ -424,7 +424,7 @@ class CurrentProtectionTests(unittest.TestCase):
             "docs/evidence/task22/holdout_access_ledger_v2.json",
             "configs/task22_task23_consumer_time_profile_v1.yaml",
             "configs/list_a_chronological_confirmation_v1.yaml"]
-        refs += ["catalog/schemas/experiment_spec.schema.json", "catalog/schemas/experiment_spec_v1_4.schema.json", "catalog/schemas/experiment_spec_v1_5.schema.json"]
+        refs += ["catalog/schemas/experiment_spec_v1_1.schema.json", "catalog/schemas/experiment_spec.schema.json", "catalog/schemas/experiment_spec_v1_4.schema.json", "catalog/schemas/experiment_spec_v1_5.schema.json"]
         refs += [p.relative_to(ROOT).as_posix() for p in sorted((ROOT/"configs/experiment_specs").iterdir())]
         for ref in refs:
             target = repo/ref; target.parent.mkdir(parents=True, exist_ok=True)
@@ -455,12 +455,13 @@ class CurrentProtectionTests(unittest.TestCase):
         self.apply(self.preview(repo_root=repo), repo_root=repo)
         before, _ = self.p.resolve_current_research_protection(self.plane, repo_root=repo)
         pointer = (self.plane/self.p.POINTER).read_bytes()
-        ref = "configs/experiment_specs/another_supported_question_v1.yaml"
+        ref = "configs/experiment_specs/another_supported_question_v1.yml"
         import yaml
         spec = yaml.safe_load((repo/"configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml").read_bytes())
         spec["experiment_id"] = "EXP-ANOTHER-SUPPORTED-QUESTION-V1"
         spec["question"] = "A new question using the same supported protection meaning."
         (repo/ref).write_text(yaml.safe_dump(spec), encoding="utf-8")
+        shutil.copy2(repo/ref, repo/"configs/experiment_specs/another_supported_copy.yaml")
         after, _ = self.p.resolve_current_research_protection(self.plane, repo_root=repo)
         self.assertEqual(after["status"], "ALLOW", after)
         self.assertEqual(after["installed_assignment_sha256"], before["installed_assignment_sha256"])
@@ -476,6 +477,42 @@ class CurrentProtectionTests(unittest.TestCase):
             again, _ = self.p.resolve_current_research_protection(self.plane, repo_root=repo)
         self.assertEqual(after, again)
         self.assertEqual((self.plane/self.p.POINTER).read_bytes(), pointer)
+
+    def test_native_legacy_decision_entity_identity_is_not_unknown_protection(self):
+        from tests.test_hfic_critic_prior_memory_closure_v1 import _event
+        from solana_alpha_lab.factory.research_store import RecordKind
+        self.apply(self.preview()); pointer = (self.plane/self.p.POINTER).read_bytes()
+        body = {"hypothesis_version_id": "HYP-NATIVE-LEGACY", "decision_kind": "PARK", "reason_code": "PARK_UNTIL_EVIDENCE"}
+        at = datetime.now(UTC)
+        event = _event(record_id="LEGACY-DECISION", kind=RecordKind.DECISION_EVENT,
+            entity_id="LEGACY-DECISION", hypothesis_version_id="HYP-NATIVE-LEGACY", payload=body, created=at)
+        self.store.append([event], transaction_id=event.transaction_id)
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["status"], "ALLOW", status)
+        self.assertEqual((self.plane/self.p.POINTER).read_bytes(), pointer)
+        bad = _event(record_id="LEGACY-DECISION-UNKNOWN-LINK", kind=RecordKind.DECISION_EVENT,
+            entity_id="LEGACY-DECISION-UNKNOWN-LINK", hypothesis_version_id="HYP-NATIVE-LEGACY",
+            payload={**body, "assignment_sources": ["UNKNOWN"]}, created=at,
+            transaction_id="RESEARCH-TXN-LEGACY-UNKNOWN")
+        self.store.append([bad], transaction_id=bad.transaction_id)
+        self.assertEqual(self.p.resolve_current_research_protection(self.plane)[0]["reason"], "PROTECTION_DECLARATION_OWNER_UNSUPPORTED")
+
+    def test_native_legacy_spec_binding_version_preserves_known_policy_meaning(self):
+        from tests.test_fast_lane_runner import offline_v1_1_spec
+        self.apply(self.preview()); pointer = (self.plane/self.p.POINTER).read_bytes()
+        spec = offline_v1_1_spec()
+        self.append_native_critic({"schema": "smial.hypothesis-critic-result", "schema_version": "1.1",
+            "experiment_spec_packet": {"experiment_spec": spec}}, name="NATIVE-SPEC-11")
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["status"], "ALLOW", status)
+        self.assertEqual((self.plane/self.p.POINTER).read_bytes(), pointer)
+        spec["holdout_policy"] = "UNKNOWN_RESERVED_HOLDOUT"
+        self.append_native_critic({"schema": "smial.hypothesis-critic-result", "schema_version": "1.1",
+            "experiment_spec_packet": {"experiment_spec": spec}}, name="NATIVE-SPEC-11-UNKNOWN")
+        refused, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(refused["reason"], "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
+        self.assertEqual(refused["observed_version"], "1.1")
+        self.assertEqual(refused["source_ref"], "research-record://NATIVE-SPEC-11-UNKNOWN")
 
     def test_historical_copy_is_not_current_and_proven_empty_is_stable(self):
         from tests.test_opportunity_episodes_harness_v1 import write_assignment

@@ -208,6 +208,7 @@ envelope_owner_bindings:
   forward: src/solana_alpha_lab/factory/forward_h900_quote_capture.py
   schedule: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py
   fragment: src/solana_alpha_lab/factory/research_fragments.py
+  prior_memory: src/solana_alpha_lab/factory/hfic_prior_memory.py
 native_packet_versions:
   smial.hypothesis-forge-draft:
   - '1.1'
@@ -345,3 +346,6 @@ legacy_experiment_policy_meanings:
   holdout_policy: No reserved OOS split is consumed; this atom uses a new live cohort
     excluding A1, MOVE 2, commissioning, ATOM 5 and ATOM 6 mints and does not start
     Atom 2.
+legacy_experiment_policy_versions:
+- '1.0'
+- '1.1'
