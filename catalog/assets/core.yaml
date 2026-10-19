@@ -43453,7 +43453,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/episode_current_protection.py
   integrity:
     kind: sha256
-    sha256: 17e153e0de76cb2b7f7bb18b35b119afc86b833593a44f45ee77c3afa3cee844
+    sha256: c150fa646d988b1c25671e32e401639eb19b44a8a0bcc69977602da909e3f814
   access:
     mode: read_only
     method: file

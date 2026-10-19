@@ -583,7 +583,7 @@ def resolve_current_research_protection(data_root: Path, *, repo_root: Path | No
         error = exc if isinstance(exc, CurrentProtectionError) else CurrentProtectionError("PROTECTION_SOURCE_UNAVAILABLE")
         detail = error.detail
         return ({"status": "UNRESOLVED_SCOPE", "reason": error.code, **detail,
-                 "sources": [], "complete_empty": None, "unresolved": [detail],
+                 "sources": [], "complete_empty": None, "unresolved": [{"reason": error.code, **detail}],
                  "writes": False, "values_loaded": False},
                 ProtectionInventory("UNRESOLVED_SCOPE", (), {}, error.code))
 
