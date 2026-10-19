@@ -69,6 +69,7 @@ class CurrentProtectionError(ValueError):
         self.source_ref = _public_ref(source_ref)
         self.observed_form = _public_identifier(observed_form)
         self.observed_version = _public_identifier(observed_version)
+        self.observed_version_supplied = observed_version is not None
 
     @property
     def detail(self) -> dict[str, Any]:
@@ -335,12 +336,13 @@ def _store_projection(root: Path, config: Mapping[str, Any], repo: Path) -> list
                     # Unwrap only after checking the native unversioned envelope;
                     # neighbouring authority links must never disappear with it.
                     _check_declaration_links(submission)
-                    _require(not any(key in submission for key in
-                        ("schema", "schema_version", "kind", "artifact_kind", "packet_schema", "packet_version")),
-                        "PROTECTION_DECLARATION_VERSION_UNKNOWN")
+                    if any(key in submission for key in
+                            ("schema", "schema_version", "kind", "artifact_kind", "packet_schema", "packet_version")):
+                        raise CurrentProtectionError("PROTECTION_DECLARATION_VERSION_UNKNOWN",
+                            observed_version=submission.get("schema_version", submission.get("packet_version", "")))
                     for key, versions in config["native_text_versions"].items():
-                        _require(key not in submission or submission[key] in versions,
-                                 "PROTECTION_DECLARATION_VERSION_UNKNOWN")
+                        if key in submission and submission[key] not in versions:
+                            raise CurrentProtectionError("PROTECTION_DECLARATION_VERSION_UNKNOWN", observed_version=submission[key])
                 spec = submission.get("experiment_spec", submission)
                 try:
                     _require(isinstance(spec, Mapping), "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
@@ -365,7 +367,7 @@ def _store_projection(root: Path, config: Mapping[str, Any], repo: Path) -> list
             error = exc if isinstance(exc, CurrentProtectionError) else CurrentProtectionError("PROTECTION_DECLARATION_INVALID")
             error.source_ref = _public_ref("research-record://" + record.record_id)
             error.observed_form = error.observed_form or _public_identifier(wrapper.get("artifact_kind") if isinstance(wrapper, Mapping) else None) or str(record.record_kind)
-            if isinstance(body, Mapping):
+            if isinstance(body, Mapping) and not error.observed_version_supplied:
                 error.observed_version = error.observed_version or _public_identifier(body.get("schema_version") or body.get("packet_version"))
             raise error from None
     # holdouts_not_touched is advisory source assertion, never assignment or

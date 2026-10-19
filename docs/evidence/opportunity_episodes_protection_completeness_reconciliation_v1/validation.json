@@ -78,6 +78,17 @@
         "verdict": "PASS"
       },
       "code_head": "c3096d5c3e354fe50c04252f9856c9241c9e5ce9",
+      "final_version_detail": {
+        "logs": {
+          "semantic-final-proposal.log": "7ea0d007e9bfbc357c6c9c17c745e8a649392cd2519c318c9cd4e4bcb4bb383f",
+          "semantic-final26.log": "170a38fb971df4b4275c99b161b5f685ec4b99ef59a378163cc79daa5495dc0a"
+        },
+        "meaning": "Nested schema_version99.0 and prompt_versionUNKNOWN report offending safe version rather than outer1.1. Explicit unrepresentable version is omitted, never substituted from outer layer.",
+        "runtime_sha256": "83bdde42f221f173bc2c97d7e7a7479dc49808182dda9c98277e349538cc5749",
+        "seconds": 29.51,
+        "tests": 26,
+        "verdict": "PASS"
+      },
       "green_seconds": 28.363,
       "green_tests": 26,
       "logs": {

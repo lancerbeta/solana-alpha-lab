@@ -522,7 +522,8 @@ class CurrentProtectionTests(unittest.TestCase):
         for alias in ("experiment_spec", "experiment_spec_packet"):
             for key, value, reason in (("assignment_sources", [{"owner": "UNKNOWN", "ref": "UNKNOWN_SCOPE"}], "PROTECTION_DECLARATION_OWNER_UNSUPPORTED"),
                     ("holdout_consumption_ids", ["UNKNOWN"], "PROTECTION_CONSUMPTION_LINK_UNRESOLVED"),
-                    ("schema_version", "99.0", "PROTECTION_DECLARATION_VERSION_UNKNOWN")):
+                    ("schema_version", "99.0", "PROTECTION_DECLARATION_VERSION_UNKNOWN"),
+                    ("prompt_version", "UNKNOWN", "PROTECTION_DECLARATION_VERSION_UNKNOWN")):
                 with self.subTest(alias=alias, key=key):
                     name = (alias+"-"+key).upper()
                     self.store = ResearchStore(self.work/name)
@@ -531,6 +532,8 @@ class CurrentProtectionTests(unittest.TestCase):
                     status, _ = self.p.resolve_current_research_protection(self.store.root)
                     self.assertEqual(status["reason"], reason, status)
                     self.assertEqual(status["source_ref"], "research-record://"+name)
+                    if key in {"schema_version", "prompt_version"}:
+                        self.assertEqual(status["observed_version"], value)
                     self.assertIsNone(status["complete_empty"])
                     self.assertFalse(status["values_loaded"])
                     self.assertFalse((self.store.root/self.p.POINTER).exists())

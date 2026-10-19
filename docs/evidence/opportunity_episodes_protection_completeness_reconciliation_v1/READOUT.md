@@ -57,3 +57,7 @@ proposal1ae7cdde, canonical inventory, saved result и MAIN1/6; installation abs
 CAS recovery: cold ALLOW + fresh preview UNCHANGED принимает уже установленный
 current receipt без повторного apply и нового scope, даже если proposal другой.
 PREVIEW_READY нового proposal сохраняет отдельную installation authority.
+
+Вложенный version refusal теперь сохраняет offending schema/prompt version,
+не подставляя внешнюю1.1. Финальные26 checks PASS; installation proposal и
+canonical inventory/result/MAIN повторно проверены без записи и изменения.
