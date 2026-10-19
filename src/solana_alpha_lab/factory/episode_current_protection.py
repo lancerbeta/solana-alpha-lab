@@ -115,11 +115,37 @@ def _assignment_documents(root: Path) -> list[dict[str, Any]]:
             continue
         doc = _json(_safe(root, path.relative_to(root).as_posix()))
         metadata = doc.get("completeness") or {}
+        _require(inventory_from_documents([doc]).status == ALLOW, "PROTECTION_ASSIGNMENT_SOURCE_INVALID")
+        _require(doc.get("interpretation_version") == "1.0" and isinstance(doc.get("entries"), list),
+                 "PROTECTION_ASSIGNMENT_VERSION_UNKNOWN")
+        _require(path.stem == doc.get("assignment_id"), "PROTECTION_ASSIGNMENT_IDENTITY_MISMATCH")
+        for entry in doc["entries"]:
+            scope = entry.get("scope") or {}
+            _require(isinstance(scope, Mapping), "PROTECTION_SCOPE_UNKNOWN")
+            _require(scope.get("kind") in {"ALL_TIME", "INTERVAL"}, "PROTECTION_SCOPE_UNKNOWN")
+            if scope["kind"] == "INTERVAL":
+                _require(_time(scope.get("start")) < _time(scope.get("end")), "PROTECTION_SCOPE_INVALID")
         if isinstance(metadata, Mapping) and "current_contract" in metadata:
             _require(metadata["current_contract"] == CONTRACT, "CURRENT_PROTECTION_VERSION_UNKNOWN")
             _require(doc.get("schema") == ASSIGNMENT_SCHEMA and doc.get("schema_version") == "1.0"
                      and doc.get("interpretation_version") == "1.0" and metadata.get("complete") is True,
                      "CURRENT_PROTECTION_RECEIPT_INVALID")
+            _require(set(doc) == {"schema", "schema_version", "interpretation_version", "assignment_id", "owner", "completeness", "entries"}
+                     and doc.get("owner") == "OPPORTUNITY_EPISODES"
+                     and set(metadata) == {"complete", "current_contract", "checked_at", "read_scope", "source_set_sha256", "source_frontier", "context_sha256", "predecessor", "boundary"}
+                     and metadata.get("boundary") == "LOCAL_EPISODE_EXPLORATORY_ONLY; ADVISORY_SCOPE_UNKNOWN; NO_CONFIRMATORY_OR_SCOUT_GRANT",
+                     "CURRENT_PROTECTION_RECEIPT_INVALID")
+            _require(metadata.get("read_scope") == _scope(root), "CURRENT_PROTECTION_BINDING_INVALID")
+            digest = lambda value: isinstance(value, str) and len(value) == 64 and all(c in "0123456789abcdef" for c in value)
+            frontier = metadata["source_frontier"]
+            _require(digest(metadata["source_set_sha256"]) and (metadata["predecessor"] is None or digest(metadata["predecessor"]))
+                     and isinstance(frontier, list) and all(isinstance(item, Mapping) for item in frontier)
+                     and [item.get("owner") for item in frontier] == list(ROLES)
+                     and all(isinstance(item.get("ref"), str) and bool(item["ref"]) and digest(item.get("semantic_sha256")) for item in frontier),
+                     "CURRENT_PROTECTION_RECEIPT_INVALID")
+            context = {"contract": CONTRACT, "read_scope": metadata["read_scope"], "source_set_sha256": metadata["source_set_sha256"],
+                       "source_frontier": frontier, "effective_restrictions_sha256": canonical_sha256(doc["entries"])}
+            _require(metadata["context_sha256"] == canonical_sha256(context), "CURRENT_PROTECTION_RECEIPT_INVALID")
             basis = canonical_sha256({"context": metadata["context_sha256"], "checked_at": metadata["checked_at"],
                                       "predecessor": metadata["predecessor"]})
             _require(doc.get("assignment_id") == path.stem == "CURRENT-RESEARCH-" + basis[:32].upper(),
@@ -133,16 +159,6 @@ def _assignment_documents(root: Path) -> list[dict[str, Any]]:
             _require(isinstance(value, str), "PROTECTION_SOURCE_TIME_INVALID")
             stamp = _time(value + "T00:00:00Z" if len(value) == 10 else value)
             _require(stamp <= datetime.now(UTC), "PROTECTION_SOURCE_TIME_INVALID")
-        _require(inventory_from_documents([doc]).status == ALLOW, "PROTECTION_ASSIGNMENT_SOURCE_INVALID")
-        _require(doc.get("interpretation_version") == "1.0" and isinstance(doc.get("entries"), list),
-                 "PROTECTION_ASSIGNMENT_VERSION_UNKNOWN")
-        _require(path.stem == doc.get("assignment_id"), "PROTECTION_ASSIGNMENT_IDENTITY_MISMATCH")
-        for entry in doc["entries"]:
-            scope = entry.get("scope") or {}
-            _require(isinstance(scope, Mapping), "PROTECTION_SCOPE_UNKNOWN")
-            _require(scope.get("kind") in {"ALL_TIME", "INTERVAL"}, "PROTECTION_SCOPE_UNKNOWN")
-            if scope["kind"] == "INTERVAL":
-                _require(_time(scope.get("start")) < _time(scope.get("end")), "PROTECTION_SCOPE_INVALID")
         result.append(doc)
     return result
 
@@ -204,13 +220,16 @@ def _store_projection(root: Path, config: Mapping[str, Any]) -> list[dict[str, A
                 _require(isinstance(marker, str) and marker in config["store_body_versions"]
                          and body.get("schema_version") in config["store_body_versions"][marker],
                          "PROTECTION_DECLARATION_VERSION_UNKNOWN")
-        if body.get("schema") == ASSIGNMENT_SCHEMA or any(k in body for k in
-                ("protection_assignments", "protected_assignments", "holdout_assignments", "assignment_sources",
-                 "holdout", "protected", "assignment", "split", "holdout_policy")):
-            # There is no native ResearchEvent assignment writer in this
-            # interpretation. A new declaration cannot be dismissed as empty.
-            raise CurrentProtectionError("PROTECTION_DECLARATION_OWNER_UNSUPPORTED")
-        _require(not body.get("holdout_consumption_ids"), "PROTECTION_CONSUMPTION_LINK_UNRESOLVED")
+        for layer in (wrapper, body):
+            if layer.get("schema") == ASSIGNMENT_SCHEMA or any(k in layer for k in
+                    ("protection_assignments", "protected_assignments", "holdout_assignments", "assignment_sources",
+                     "holdout", "protected", "assignment", "split", "holdout_policy")):
+                # Neither native layer has an assignment writer in this
+                # interpretation; an unknown link cannot disappear as empty.
+                raise CurrentProtectionError("PROTECTION_DECLARATION_OWNER_UNSUPPORTED")
+            _require(not layer.get("holdout_consumption_ids"), "PROTECTION_CONSUMPTION_LINK_UNRESOLVED")
+        _require(wrapper is body or not any(key in wrapper for key in ("experiment_spec", "experiment_spec_packet")),
+                 "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
         declarations = {}
         # These are the two native owner spellings, each wrapped or bare.
         # Validate every supplied protection declaration, including conflicting
@@ -467,7 +486,8 @@ def apply_reconciliation(store: ResearchStore, preview: Mapping[str, Any], *, au
     _require(authority.get("proposal_sha256") == digest and authority.get("read_scope") == _scope(store.root)
              and authority.get("source_frontier_sha256") == canonical_sha256(proposal["source_frontier"])
              and authority.get("mutation") == "VERSIONED_PROTECTION_METADATA_ONLY"
-             and isinstance(authority.get("owner_scope_ref"), str) and bool(authority["owner_scope_ref"].strip()),
+             and isinstance(authority.get("owner_scope_ref"), str) and bool(authority["owner_scope_ref"].strip())
+             and authority["owner_scope_ref"].strip() != "OWNER_APPROVAL_REQUIRED_NOT_GRANTED",
              "PROTECTION_INSTALLATION_AUTHORITY_REQUIRED")
     _require(_time(proposal["checked_at"]) <= datetime.now(UTC), "CURRENT_PROTECTION_TIME_INVALID")
     with store.writer_lease():

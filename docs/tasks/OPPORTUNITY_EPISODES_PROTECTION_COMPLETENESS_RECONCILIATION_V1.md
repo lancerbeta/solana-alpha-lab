@@ -242,3 +242,10 @@ Final suites require exact-head CI. Native aliases and wrapper/body identity/ver
 are checked; mixed partition preflight completes before any loader. Canonical root
 remains uninstalled, saved result and MAIN 1/6 unchanged. Exact scoped complete-empty
 installation preview and prospective plan live in the one task evidence directory.
+
+Review-remediation checkpoint: source links are checked on wrapper and body;
+derived outputs require full native shape/root/owner/context/entry invariants
+before exclusion. Reserved NOT_GRANTED installation scope is rejected before
+writes; relative CLI root requests input correction. Four red witnesses caught
+these defects; final focused boundary suite 21 PASS in 19.422s, static PASS.
+Real inventory/result/MAIN unchanged; final proposal regenerated on these bytes.

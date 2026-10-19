@@ -43338,7 +43338,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/research_fragments.py', repository_path: scripts/research_fragments.py}
-  integrity: {kind: sha256, sha256: 83a4e8cd4a0ea150d6192368abb2ea5c3bf93595abdd83efdf32af94a321be43}
+  integrity: {kind: sha256, sha256: d6ac94f8476003803a6e6b48a14dd356e01482bcbdfcf115edba0bbebd84d84b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43389,7 +43389,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_research_fragments_v1.py', repository_path: tests/test_research_fragments_v1.py}
-  integrity: {kind: sha256, sha256: 46bec8dfd6f964ff4f252d5f7889fb638c80bdee354718750d0d81eecab38c03}
+  integrity: {kind: sha256, sha256: deb9999cf2191f7285fa9379d6636aa98f1f5ed82bfb32fb7563b84d8e363496}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43412,7 +43412,7 @@ records:
     repository_path: docs/tasks/OPPORTUNITY_EPISODES_PROTECTION_COMPLETENESS_RECONCILIATION_V1.md
   integrity:
     kind: sha256
-    sha256: 87950598ec94a180714f13e4411cbc4a2fcebbdfb2768fd45228ab60df047676
+    sha256: 714d2c7381db25517ab28a6051f4b5bda34ca6f72919501eae10dc9391fd4a04
   access:
     mode: read_only
     method: file
@@ -43453,7 +43453,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/episode_current_protection.py
   integrity:
     kind: sha256
-    sha256: 9dd725e9782de784e4313cf996d69a2380ffa7afb695ca1da6483816dd80efa3
+    sha256: 546ad75dc0ccb950371b689d75ab665799f9cb39635042a2b46328299e691deb
   access:
     mode: read_only
     method: file

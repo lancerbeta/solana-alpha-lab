@@ -20,6 +20,7 @@
     "uv run --locked --managed-python python -B -m unittest tests.test_episode_native_required_outcome_contract_v1 tests.test_forge_runtime_discovery_binding_v1 -v",
     "uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_vertical_v1.ThreeProcessVerticalTests -v"
   ],
+  "review_remediation": "Wrapper authoritative link and malformed/foreign derived receipt refuse; NOT_GRANTED draft writes nothing; relative root directs INPUT correction. Red witnesses:4 tests/7 assertion failures, then21 focused PASS.",
   "schema": "smial.protection-completeness-validation",
   "schema_version": "1.0",
   "scout": "Native1.0 envelope backward-readable; new enforcement/all-reader guarantee UNPROVEN",
@@ -48,6 +49,14 @@
       "seconds": 17.808,
       "sha256": "e29107d0fd8615bf6c250a21f99bc1bd4007e950163a61e3c5a1aaa5a3319321",
       "tests": 17,
+      "verdict": "PASS"
+    },
+    {
+      "candidate": "FINAL_REVIEW_REMEDIATION_WORKTREE",
+      "log_ref": "local/protection_completeness_v1/review-final-boundary.log",
+      "seconds": 19.422,
+      "sha256": "7b781c77c69a1e9703e7ac0edd9703085950b0ab8418173b9f8f1e831b32fcf1",
+      "tests": 21,
       "verdict": "PASS"
     }
   ],

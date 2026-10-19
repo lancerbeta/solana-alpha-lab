@@ -529,6 +529,54 @@ class CurrentProtectionTests(unittest.TestCase):
         self.assertEqual(status["reason"], "PROTECTION_DECLARATION_VERSION_UNKNOWN")
         self.assertIsNone(status["complete_empty"])
 
+    def test_wrapper_authoritative_link_is_not_empty(self):
+        self.apply(self.preview())
+        self.append_native_critic({"schema": "smial.hypothesis-critic-result", "schema_version": "1.1"},
+            name="WRAPPER-UNKNOWN-AUTHORITY", header={"assignment_sources": [{"owner": "UNKNOWN", "ref": "UNKNOWN_SCOPE"}]})
+        status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["reason"], "PROTECTION_DECLARATION_OWNER_UNSUPPORTED")
+        self.assertEqual(status["owner"], "CANONICAL_RESEARCHSTORE")
+        self.assertIsNone(status["complete_empty"])
+
+    def test_malformed_or_foreign_derived_receipt_cannot_hide_as_output(self):
+        self.apply(self.preview())
+        snapshot = self.p.collect_current_sources(self.plane)
+        for ordinal, defect in enumerate(("owner", "read_scope", "context", "entries")):
+            doc = self.p._document(snapshot, checked_at=(datetime.now(UTC)-timedelta(seconds=ordinal+1)).isoformat(), predecessor=None)
+            if defect == "owner": doc["owner"] = "UNKNOWN_FOREIGN_OWNER"
+            elif defect == "read_scope": doc["completeness"].pop("read_scope")
+            elif defect == "context": doc["completeness"]["source_set_sha256"] = "0"*64
+            else: doc["entries"] = [{"identity_kind": "MINT", "identity": "SyntheticUnknown", "scope": {"kind": "UNKNOWN"}}]
+            path = self.plane/self.p.ASSIGNMENT_DIR/(doc["assignment_id"]+".json")
+            path.write_text(json.dumps(doc), encoding="utf-8")
+            try:
+                with self.subTest(defect=defect):
+                    status, _ = self.p.resolve_current_research_protection(self.plane)
+                    self.assertEqual(status["status"], "UNRESOLVED_SCOPE")
+                    self.assertEqual(status["owner"], "LOCAL_ASSIGNMENTS")
+                    self.assertIsNone(status["complete_empty"])
+            finally: path.unlink()
+        self.assertEqual(self.p.resolve_current_research_protection(self.plane)[0]["status"], "ALLOW")
+
+    def test_ungranted_authority_draft_cannot_install(self):
+        preview = self.preview()
+        authority = {"proposal_sha256": preview["proposal_sha256"], "read_scope": preview["proposal"]["read_scope"],
+            "source_frontier_sha256": canonical_sha256(preview["proposal"]["source_frontier"]),
+            "mutation": "VERSIONED_PROTECTION_METADATA_ONLY", "owner_scope_ref": "OWNER_APPROVAL_REQUIRED_NOT_GRANTED"}
+        with self.assertRaisesRegex(self.p.CurrentProtectionError, "PROTECTION_INSTALLATION_AUTHORITY_REQUIRED"):
+            self.p.apply_reconciliation(self.store, preview, authority=authority)
+        self.assertFalse((self.plane/self.p.POINTER).exists())
+        self.assertFalse((self.plane/self.p.ASSIGNMENT_DIR).exists())
+
+    def test_cli_relative_root_recovers_input_without_requesting_scope(self):
+        result = subprocess.run([sys.executable, "-B", str(ROOT/"scripts/research_fragments.py"),
+            "protection-status", "--data-root", "relative"], cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 2)
+        body = json.loads(result.stdout)
+        self.assertEqual(body["reason"], "FRAGMENT_ABSOLUTE_DATA_ROOT_REQUIRED")
+        self.assertEqual(body["owner"], "INPUT")
+        self.assertEqual(body["next_action"], "CORRECT_ABSOLUTE_DATA_ROOT")
+
     def test_task22_scope_requires_actual_time_nonintersection(self):
         from solana_alpha_lab.factory.opportunity_episodes import LOGICAL_DATASET_ID
         self.apply(self.preview())

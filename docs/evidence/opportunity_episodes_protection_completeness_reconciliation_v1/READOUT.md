@@ -6,7 +6,7 @@ Source closure CLOSED_SCOPED: native assignment namespace, canonical и Fast Lan
 
 Исторический bootstrap complete=true остаётся frozen dependency и больше не заменяет current proof. Date/as_of не TTL. Проверяются source-specific declarations и версии, а не whole-store hash, mtime или число записей. Известная безопасная metadata delta перечитывается автоматически; новый день/cohort/card/check сам по себе не требует PR или переустановки. Неизвестный owner/version/link, исчезнувший baseline assignment и снятие baseline restrictions закрывают новое чтение. Namespace предполагается native append-only; read-only gate не является защитой от несанкционированного удаления ранее transient источника.
 
-Native wrapper owner/kind/form/version и обе experiment-spec alias families проверяются; конфликт даёт UNRESOLVED.
+Native wrapper/body owner/kind/form/version и обе experiment-spec alias families проверяются; конфликт или authoritative link на любом native слое даёт UNRESOLVED. Derived receipt исключается только после полной shape/root/owner/context/entries проверки. NOT_GRANTED draft не проходит installer authority gate; ошибка относительного пути возвращает INPUT и исправление пути.
 
 Direct consumers: fragment preview/apply/run_due, last native loader, discovery binder и Spec 1.4 fixed-time verifier. Release/import/frozen parser не переписаны. Unsafe current gate останавливает loader, pending budget сохраняется; пауза и saved reads доступны. Old Scout source pin читает assignment schema1.0 envelope; исполнения новых правил этим pin и гарантии future holdouts для всех readers не заявляем.
 

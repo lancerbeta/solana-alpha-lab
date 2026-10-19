@@ -6,9 +6,9 @@
   },
   "authority": "SEPARATE_EXACT_METADATA_ONLY_INSTALLATION_REQUIRED",
   "proposal": {
-    "assignment_ref": "protection/assignments/CURRENT-RESEARCH-BE152CEFBB2F25DB624F01F9F4A5C887.json",
-    "assignment_sha256": "cf4541e6774b60c8481d91243f11fc9dcba11003ff37b9bfb46c3493a103ea04",
-    "checked_at": "2026-10-18T23:48:54.329443+00:00",
+    "assignment_ref": "protection/assignments/CURRENT-RESEARCH-A951A1CDD9B236B374170CA8594BD286.json",
+    "assignment_sha256": "a2cec651294a10ee24447655645169f975fb078361b623f7e87b9a7158394854",
+    "checked_at": "2026-10-19T00:04:31.014139+00:00",
     "context_sha256": "ca9d3f58c5abc71df3f2f821b927d677e34a3072fbf79e1ab5573447d547e456",
     "contract": "EPISODE_CURRENT_PROTECTION_V1",
     "predecessor": null,
@@ -75,7 +75,7 @@
     ],
     "source_set_sha256": "c7e614c13194cf18f6ea33680d2c7286c4b2c395962d9f7634ac83d0ce6d59f2"
   },
-  "proposal_sha256": "044345a7a16ee6645cacc632e86cf28f48c0dd68772730919863ab925bed14a5",
+  "proposal_sha256": "cefc571e042b00a518f5fa8e6ceff46b343435c80fd40b8fe79c55b824bf5e18",
   "status": "PREVIEW_READY",
   "values_loaded": false,
   "writes": false
