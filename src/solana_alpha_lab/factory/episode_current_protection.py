@@ -54,7 +54,7 @@ def _recovery_action(code: str) -> str:
         return "PREPARE_EXACT_METADATA_INSTALLATION_PROPOSAL"
     if code == "PROTECTION_INSTALLATION_AUTHORITY_REQUIRED":
         return "REQUEST_AUTHORITY_FOR_EXACT_METADATA_PROPOSAL"
-    if code in {"PROTECTION_SOURCE_CHANGED", "PROTECTION_PROPOSAL_CHANGED", "CURRENT_PROTECTION_SOURCE_SET_CHANGED"}:
+    if code in {"PROTECTION_SOURCE_CHANGED", "PROTECTION_PROPOSAL_CHANGED", "PROTECTION_HEAD_CHANGED", "CURRENT_PROTECTION_SOURCE_SET_CHANGED"}:
         return "REFRESH_SOURCE_STATUS_AND_PREVIEW"
     if any(part in code for part in ("UNKNOWN", "UNSUPPORTED", "UNRESOLVED")):
         return "RESOLVE_NAMED_AUTHORITY_INTERPRETATION"
@@ -247,6 +247,15 @@ def _time(value: Any) -> datetime:
         raise CurrentProtectionError("PROTECTION_SOURCE_TIME_INVALID") from None
 
 
+def _check_declaration_links(layer: Mapping[str, Any]) -> None:
+    if layer.get("schema") == ASSIGNMENT_SCHEMA or any(k in layer for k in
+            ("protection_assignments", "protected_assignments", "holdout_assignments", "assignment_sources",
+             "holdout", "protected", "assignment", "split", "holdout_policy")):
+        # These native envelopes have no assignment writer in this interpretation.
+        raise CurrentProtectionError("PROTECTION_DECLARATION_OWNER_UNSUPPORTED")
+    _require(not layer.get("holdout_consumption_ids"), "PROTECTION_CONSUMPTION_LINK_UNRESOLVED")
+
+
 def _store_projection(root: Path, config: Mapping[str, Any], repo: Path) -> list[dict[str, Any]]:
     _require(root.is_dir() and not root.is_symlink() and not root.is_junction(), "PROTECTION_RESEARCHSTORE_MISSING")
     projection = []
@@ -310,13 +319,7 @@ def _store_projection(root: Path, config: Mapping[str, Any], repo: Path) -> list
                              and body.get("schema_version") in config["store_body_versions"][marker],
                              "PROTECTION_DECLARATION_VERSION_UNKNOWN")
             for layer in (wrapper, body):
-                if layer.get("schema") == ASSIGNMENT_SCHEMA or any(k in layer for k in
-                        ("protection_assignments", "protected_assignments", "holdout_assignments", "assignment_sources",
-                         "holdout", "protected", "assignment", "split", "holdout_policy")):
-                    # Neither native layer has an assignment writer in this
-                    # interpretation; an unknown link cannot disappear as empty.
-                    raise CurrentProtectionError("PROTECTION_DECLARATION_OWNER_UNSUPPORTED")
-                _require(not layer.get("holdout_consumption_ids"), "PROTECTION_CONSUMPTION_LINK_UNRESOLVED")
+                _check_declaration_links(layer)
             _require(wrapper is body or not any(key in wrapper for key in ("experiment_spec", "experiment_spec_packet")),
                      "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
             declarations = {}
@@ -328,6 +331,16 @@ def _store_projection(root: Path, config: Mapping[str, Any], repo: Path) -> list
                 if submission is None:
                     continue
                 _require(isinstance(submission, Mapping), "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
+                if "experiment_spec" in submission:
+                    # Unwrap only after checking the native unversioned envelope;
+                    # neighbouring authority links must never disappear with it.
+                    _check_declaration_links(submission)
+                    _require(not any(key in submission for key in
+                        ("schema", "schema_version", "kind", "artifact_kind", "packet_schema", "packet_version")),
+                        "PROTECTION_DECLARATION_VERSION_UNKNOWN")
+                    for key, versions in config["native_text_versions"].items():
+                        _require(key not in submission or submission[key] in versions,
+                                 "PROTECTION_DECLARATION_VERSION_UNKNOWN")
                 spec = submission.get("experiment_spec", submission)
                 try:
                     _require(isinstance(spec, Mapping), "PROTECTION_EXPERIMENT_DECLARATION_UNKNOWN")
@@ -573,7 +586,11 @@ def _installed(root: Path, snapshot: Mapping[str, Any], *, require_current_sourc
                      "CURRENT_PROTECTION_RECEIPT_INVALID", role)
             expected = {item[identity] for item in source.get(key, [])}
             present = {item[identity] for item in fresh[role].get(key, [])}
-            _require(expected <= present, "PROTECTION_BASELINE_SOURCE_MISSING", role)
+            missing = expected - present
+            if missing:
+                identity = sorted(missing)[0]
+                ref = ASSIGNMENT_DIR + "/" + identity + ".json" if key == "assignment_refs" else "research-record://" + identity
+                raise CurrentProtectionError("PROTECTION_BASELINE_SOURCE_MISSING", owner=role, source_ref=ref)
         if role == "EXPERIMENT_POLICIES":
             present_policies = {item["ref"]: item for item in fresh[role]["policy_refs"]}
             for item in source.get("policy_refs", []):
@@ -666,14 +683,14 @@ def apply_reconciliation(store: ResearchStore, preview: Mapping[str, Any], *, au
         if head and head.get("proposal_sha256") == digest:
             _installed(store.root, snapshot)
             return {"status": "ALREADY_APPLIED", "receipt": head, "values_loaded": False}
-        _require((head["pointer_sha256"] if head else None) == proposal["predecessor"], "PROTECTION_HEAD_CHANGED", "LOCAL_ASSIGNMENTS")
+        _require((head["pointer_sha256"] if head else None) == proposal["predecessor"], "PROTECTION_HEAD_CHANGED", "LOCAL_ASSIGNMENTS", source_ref=POINTER)
         doc = _document(snapshot, checked_at=proposal["checked_at"], predecessor=proposal["predecessor"])
         _require(proposal["assignment_ref"] == ASSIGNMENT_DIR + "/" + doc["assignment_id"] + ".json"
                  and assignment_document_sha256(doc) == proposal["assignment_sha256"], "PROTECTION_PROPOSAL_CHANGED")
         raw = (json.dumps(doc, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False) + "\n").encode()
         publish_immutable_artifact(store.root, proposal["assignment_ref"], raw)
         _require(_snapshot(store.root, repo_root)["context_sha256"] == snapshot["context_sha256"], "PROTECTION_SOURCE_CHANGED", "SOURCE_SET")
-        _require((_head(store.root) or {}).get("pointer_sha256") == proposal["predecessor"], "PROTECTION_HEAD_CHANGED", "LOCAL_ASSIGNMENTS")
+        _require((_head(store.root) or {}).get("pointer_sha256") == proposal["predecessor"], "PROTECTION_HEAD_CHANGED", "LOCAL_ASSIGNMENTS", source_ref=POINTER)
         pointer = {"contract": CONTRACT, "proposal_sha256": digest, "assignment_ref": proposal["assignment_ref"],
             "assignment_sha256": proposal["assignment_sha256"], "predecessor": proposal["predecessor"],
             "owner_scope_ref": authority["owner_scope_ref"]}

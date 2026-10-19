@@ -513,6 +513,56 @@ class CurrentProtectionTests(unittest.TestCase):
         self.assertIsNone(status["complete_empty"])
         self.assertEqual((self.plane/self.p.POINTER).read_bytes(), pointer)
 
+    def test_nested_spec_envelope_unknown_authority_and_version_are_not_discarded(self):
+        import yaml
+        config = yaml.safe_load((ROOT/self.p.CONFIG).read_bytes())
+        spec = {"schema": "smial.experiment-spec", "schema_version": "1.4", "population": "OPPORTUNITY_EPISODES",
+            "holdout_policy": config["embedded_exploratory_policy"],
+            "observation_request": {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"}}
+        for alias in ("experiment_spec", "experiment_spec_packet"):
+            for key, value, reason in (("assignment_sources", [{"owner": "UNKNOWN", "ref": "UNKNOWN_SCOPE"}], "PROTECTION_DECLARATION_OWNER_UNSUPPORTED"),
+                    ("holdout_consumption_ids", ["UNKNOWN"], "PROTECTION_CONSUMPTION_LINK_UNRESOLVED"),
+                    ("schema_version", "99.0", "PROTECTION_DECLARATION_VERSION_UNKNOWN")):
+                with self.subTest(alias=alias, key=key):
+                    name = (alias+"-"+key).upper()
+                    self.store = ResearchStore(self.work/name)
+                    self.append_native_critic({"schema": "smial.hypothesis-critic-result", "schema_version": "1.1",
+                        alias: {"experiment_spec": spec, key: value}}, name=name)
+                    status, _ = self.p.resolve_current_research_protection(self.store.root)
+                    self.assertEqual(status["reason"], reason, status)
+                    self.assertEqual(status["source_ref"], "research-record://"+name)
+                    self.assertIsNone(status["complete_empty"])
+                    self.assertFalse(status["values_loaded"])
+                    self.assertFalse((self.store.root/self.p.POINTER).exists())
+
+    def test_pointer_cas_conflict_requests_fresh_preview_and_keeps_winner(self):
+        first = self.preview(); winner = self.preview()
+        self.assertNotEqual(first["proposal_sha256"], winner["proposal_sha256"])
+        self.apply(winner); pointer = (self.plane/self.p.POINTER).read_bytes()
+        with self.assertRaisesRegex(self.p.CurrentProtectionError, "PROTECTION_HEAD_CHANGED") as caught:
+            self.apply(first)
+        self.assertEqual(caught.exception.detail["source_ref"], self.p.POINTER)
+        self.assertEqual(caught.exception.detail["next_action"], "REFRESH_SOURCE_STATUS_AND_PREVIEW")
+        self.assertEqual((self.plane/self.p.POINTER).read_bytes(), pointer)
+
+    def test_missing_baseline_declaration_names_the_lost_record(self):
+        import yaml
+        config = yaml.safe_load((ROOT/self.p.CONFIG).read_bytes())
+        self.append_native_critic({"schema": "smial.hypothesis-critic-result", "schema_version": "1.1",
+            "experiment_spec": {"schema": "smial.experiment-spec", "schema_version": "1.4", "population": "OPPORTUNITY_EPISODES",
+                "holdout_policy": config["embedded_exploratory_policy"],
+                "observation_request": {"collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"}}}, name="BASELINE-SPEC")
+        self.apply(self.preview()); pointer = (self.plane/self.p.POINTER).read_bytes()
+        # Simulate loss of the committed record namespace, never manufacture ALLOW.
+        real = self.p._store_projection
+        with patch.object(self.p, "_store_projection", lambda root, config, repo: [] if root == self.plane else real(root, config, repo)):
+            status, _ = self.p.resolve_current_research_protection(self.plane)
+        self.assertEqual(status["reason"], "PROTECTION_BASELINE_SOURCE_MISSING")
+        self.assertEqual(status["owner"], "CANONICAL_RESEARCHSTORE")
+        self.assertEqual(status["source_ref"], "research-record://BASELINE-SPEC")
+        self.assertIsNone(status["complete_empty"])
+        self.assertEqual((self.plane/self.p.POINTER).read_bytes(), pointer)
+
     def test_native_legacy_spec_binding_version_preserves_known_policy_meaning(self):
         from tests.test_fast_lane_runner import offline_v1_1_spec
         self.apply(self.preview()); pointer = (self.plane/self.p.POINTER).read_bytes()
@@ -584,6 +634,7 @@ class CurrentProtectionTests(unittest.TestCase):
         original = path.read_bytes(); path.unlink()
         status, _ = self.p.resolve_current_research_protection(self.plane)
         self.assertEqual(status["reason"], "PROTECTION_BASELINE_SOURCE_MISSING")
+        self.assertEqual(status["source_ref"], self.p.ASSIGNMENT_DIR+"/"+ASSIGNMENT_ID+".json")
         self.assertIsNone(status["complete_empty"])
         path.write_bytes(original); write_assignment(self.plane, [])
         status, _ = self.p.resolve_current_research_protection(self.plane)
