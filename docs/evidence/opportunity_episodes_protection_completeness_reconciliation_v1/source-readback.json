@@ -8,7 +8,7 @@
   "canonical_writes": false,
   "code_bindings": {
     "configs/episode_current_protection_sources_v1.yaml": "ebe56afa0efddc116bb71d35c8a15b7660075f35a94350b8b9194a92dbaac23f",
-    "src/solana_alpha_lab/factory/episode_current_protection.py": "2a7f5b0f3b4b8aef0f22ef717a09d160afadff6d02c15dc1dd18ffaac103054a"
+    "src/solana_alpha_lab/factory/episode_current_protection.py": "da79de445a9dbca0e4ec7b6db6b2411792ecb7f9d5c40e2528cb2454e457223c"
   },
   "context_sha256": "28d8d5fc617b96d42942c3506bcbc5a84f4f96fdc44c5774eae6df16c6d68ecc",
   "current_protection": {
@@ -93,7 +93,7 @@
     "values_loaded": false,
     "writes": false
   },
-  "prospective_plan_proposal_sha256": "6cfb729e3fd8b9abc268b0efec56c9630445fd978a4d10a868e5d40f135c102b",
+  "prospective_plan_proposal_sha256": "98253d4236a788b10cd1bbb50f3297e5cee4e1522c9bd930e7e7d5e72dd348e3",
   "read_scope": {
     "collection": "OPPORTUNITY_EPISODES",
     "data_root_identity_sha256": "6ba8e087ac18c9edbb5c9216207cef47459ae534d1e6abee80db23cce3478812",

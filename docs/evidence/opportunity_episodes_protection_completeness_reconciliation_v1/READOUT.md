@@ -45,3 +45,11 @@ inventory и saved result прежние; MAIN completed1/pending0/limit6, пл�
 Последнее прямое разрешение владельца позволяет агенту после зелёного CI/readiness
 подставить machine-rendered точную merge phrase и выполнить guarded merge. Оно не
 разрешает canonical installation или scientific plan activation.
+
+Повторный независимый review на 861aefb обнаружил потерю authority-соседей при
+unwrap вложенного spec packet. До unwrap теперь проверяются оба native aliases;
+неизвестные ссылки и версии закрывают gate. CAS конфликт требует fresh preview,
+а потерянные baseline assignment/record возвращают точный safe ref. Четыре red
+сценария дали9 assertion failures; полный набор26 source/installation checks
+после исправления PASS. Read-only operational revalidation сохранила тот же
+proposal1ae7cdde, canonical inventory, saved result и MAIN1/6; installation absent.

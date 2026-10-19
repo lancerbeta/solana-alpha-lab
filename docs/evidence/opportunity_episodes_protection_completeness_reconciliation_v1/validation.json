@@ -68,6 +68,25 @@
       "verdict": "PASS_ALL_23_FRAGMENT_MODULE_METHODS_ONLY"
     },
     "implementation_code_head": "e79ab22237a790d617887e147f5294afa0dad837",
+    "independent_review_followup": {
+      "code_head": "c3096d5c3e354fe50c04252f9856c9241c9e5ce9",
+      "green_seconds": 28.363,
+      "green_tests": 26,
+      "logs": {
+        "semantic-ux2-green.log": "6f1f746729b52bea2e941aaf3796581b94fc0ec84e3c928c9e896f8fc8c6cc5a",
+        "semantic-ux2-proposal.log": "7ea0d007e9bfbc357c6c9c17c745e8a649392cd2519c318c9cd4e4bcb4bb383f",
+        "semantic-ux2-red.log": "0b837289cb6a28603269ba3d6fc2af542fbfadf61adb6ae131f7036a4d74b1bc"
+      },
+      "observed_head": "861aefb835b0032c173283ac560e9aa0044584da",
+      "proof_scope": "Actual native committed records and metadata publication; declaration namespace loss simulated only for denial, never ALLOW. No canonical mutation or values loaded.",
+      "red_assertion_failures": 9,
+      "red_tests": 4,
+      "repairs": [
+        "Known nested native spec envelopes checked for unknown authority links and versions before unwrap on both aliases.",
+        "Pointer CAS conflict requests REFRESH_SOURCE_STATUS_AND_PREVIEW and preserves winner.",
+        "Missing assignment/declaration baseline returns exact safe assignment/record ref."
+      ]
+    },
     "initial_ci": {
       "failed_shards": [
         2,
