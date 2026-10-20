@@ -40650,7 +40650,7 @@ records:
   as_of: '2026-10-09'
   truth_owner: FORGE_EVIDENCE_GUIDED_GENERATION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_generation_context.py', repository_path: src/solana_alpha_lab/factory/hfic_generation_context.py}
-  integrity: {kind: sha256, sha256: 7cab231d392f92c9286a69d3269bd0dcd8475f0814b98f23351be288aeb69cda}
+  integrity: {kind: sha256, sha256: 7006b17de02f16bd845042922b244e44e993ea71846583552f7a2d9b850c2e11}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001}
@@ -43389,7 +43389,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_research_fragments_v1.py', repository_path: tests/test_research_fragments_v1.py}
-  integrity: {kind: sha256, sha256: 438cdc02892d12f092f0095fbb9786cc77d2ffdc1deae4fc517df4669e96e132}
+  integrity: {kind: sha256, sha256: 4f168e9da4e37eb306fad7a3a9bcd67ad1a25f62741f8783fd42b25b6622ca5a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]

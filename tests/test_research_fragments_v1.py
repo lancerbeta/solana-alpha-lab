@@ -900,5 +900,23 @@ class CurrentProtectionTests(unittest.TestCase):
         self.assertEqual(status["owner"], "LOCAL_ASSIGNMENTS")
         self.assertIsNone(status["complete_empty"])
 
+class FrozenArchiveFingerprintTests(unittest.TestCase):
+    def test_summary_readout_projection_keeps_frozen_view_fingerprint(self):
+        # A view frozen before the shelf summary gained readout projections
+        # must still match; a material change of the bound result must not.
+        from solana_alpha_lab.factory.hfic_generation_context import archive_fingerprint
+        block = {"kind": "DISCOVERY", "result_sha256": "a" * 64, "summary": {"matched": {"n": 5}}}
+        frozen = {"capsules": [{"hypothesis_version_id": "HFIC-CAND-X", "source_detail": {
+            "research_fragments": [{"fragment_version_id": "RFV-X", "evidence_blocks": [block]}]}}]}
+        later = copy.deepcopy(frozen)
+        later["capsules"][0]["source_detail"]["research_fragments"][0]["evidence_blocks"][0]["summary"].update(
+            research_scope={"contrast": {"comparator": {"n": 7}}}, scientific_identity={"research_scope_rule_sha256": "b" * 64})
+        self.assertEqual(archive_fingerprint(later), archive_fingerprint(frozen))
+        self.assertIn("research_scope", later["capsules"][0]["source_detail"]["research_fragments"][0]["evidence_blocks"][0]["summary"])
+        changed = copy.deepcopy(later)
+        changed["capsules"][0]["source_detail"]["research_fragments"][0]["evidence_blocks"][0]["result_sha256"] = "c" * 64
+        self.assertNotEqual(archive_fingerprint(changed), archive_fingerprint(frozen))
+
+
 if __name__ == "__main__":
     unittest.main()
