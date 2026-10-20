@@ -2369,8 +2369,9 @@ def _superseded_by_classification_correction(
 def _owner_final_receipt_for_stage_ref(
     store: ResearchStore, identity: str, stage_ref: str
 ) -> dict[str, Any] | None:
-    """The saved owner-final of this run whose stage is the given session receipt."""
+    """The latest saved owner-final of this run whose stage is the given session receipt."""
 
+    best: tuple[str, str, dict[str, Any]] | None = None
     for record in store.iter_committed_records():
         if getattr(record.record_kind, "value", record.record_kind) != RecordKind.RESEARCH_ARTIFACT.value:
             continue
@@ -2386,8 +2387,10 @@ def _owner_final_receipt_for_stage_ref(
             and any(isinstance(row, Mapping) and row.get("stage_ref_sha256") == stage_ref
                     for row in body.get("stages") or [])
         ):
-            return body
-    return None
+            key = (str(getattr(record, "effective_at", "") or ""), str(record.record_id))
+            if best is None or key > best[:2]:
+                best = (key[0], key[1], body)
+    return best[2] if best else None
 
 
 def _input_has_current_surface(input_receipt: Mapping[str, Any]) -> bool:

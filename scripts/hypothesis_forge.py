@@ -3804,7 +3804,7 @@ def cmd_classify(
             data_root=data_root,
         )
     except HficSessionError as exc:
-        if exc.code != CLASSIFICATION_INPUT_INVALID:
+        if exc.code not in {CLASSIFICATION_INPUT_INVALID, "CLASSIFIER_CLOCK_INVALID", "CLASSIFIER_CONFIG_UNAVAILABLE"}:
             raise
         return _classification_refusal(exc, store=store, before=before)
     git_after = repository_git_snapshot(repo_root)
@@ -3814,21 +3814,59 @@ def cmd_classify(
     return emit(payload)
 
 
-def _classification_refusal(exc: Any, *, store: Any, before: str) -> int:
+_CORRECTION_NEXT_ACTIONS = {
+    "SESSION_NOT_FOUND": "CHECK_SESSION_ID_AND_DATA_ROOT",
+    "CONFIRM_APPEND_ONLY_REQUIRED": "RERUN_APPLY_WITH_CONFIRM_APPEND_ONLY",
+    "CLASSIFICATION_CORRECTION_PREVIEW_STALE": "RERUN_PREVIEW_SAVE_NEW_STDOUT_THEN_APPLY",
+    "CLASSIFICATION_CORRECTION_ALREADY_APPLIED": "READ_SHOW_SESSION_THEN_FORGE_RUN_NO_WRITE",
+    "CLASSIFICATION_CORRECTION_PROPOSAL_INVALID": "PASS_THE_SAVED_PREVIEW_STDOUT_UNCHANGED",
+    "CLASSIFICATION_CORRECTION_PACKET_INVALID": "REBUILD_PACKET_FROM_TEMPLATE_THEN_RERUN_PREVIEW",
+    "CLASSIFICATION_CORRECTION_SCOPE_FORBIDDEN": "CHANGE_ONLY_CORRECTABLE_FIELDS_THEN_RERUN_PREVIEW",
+    "CLASSIFICATION_CORRECTION_TIME_RULE_VIOLATED": "SET_BOTH_TIMES_TO_ONE_INSTANT_BETWEEN_NOT_BEFORE_AND_NOW_THEN_RERUN_PREVIEW",
+    "CLASSIFICATION_INPUT_INVALID": "CORRECT_NAMED_FIELDS_THEN_RERUN_PREVIEW",
+    "CLASSIFIER_CLOCK_INVALID": "REMOVE_CLASSIFIER_EVALUATED_AT_THEN_RERUN",
+    "CLASSIFIER_CONFIG_UNAVAILABLE": "RESTORE_CLASSIFIER_CONFIGURATION_THEN_RERUN_PREVIEW",
+    "CLASSIFICATION_CORRECTION_CURRENT_GATE_DENIED": "STOP_CURRENT_GATE_DENIES_CORRECTION_KEEP_HISTORY",
+    "CLASSIFICATION_CORRECTION_NOT_INPUT_REFUSAL": "STOP_NOT_CORRECTABLE_READ_SAVED_RESULT",
+    "CLASSIFICATION_CORRECTION_ORIGINAL_PASS_UNAVAILABLE": "STOP_NOT_CORRECTABLE_READ_SAVED_RESULT",
+    "CLASSIFICATION_CORRECTION_SESSION_NOT_COMPLETE": "USE_CLASSIFY_ON_THE_PENDING_SESSION",
+    "CLASSIFICATION_CORRECTION_SOURCE_UNAVAILABLE": "STOP_RESTORE_EXACT_SAVED_RESULT",
+    "CLASSIFICATION_CORRECTION_FORK": "STOP_RESOLVE_FORKED_CORRECTION_HISTORY",
+}
+
+
+def _classification_refusal(exc: Any, *, store: Any, before: str, stage: str | None = None) -> int:
     """One JSON object on stdout: stage, reason, field locator, next action, actual writes."""
 
     detail = dict(getattr(exc, "detail", None) or {})
     detail.pop("writes", None)
+    if stage and "stage" not in detail:
+        detail["stage"] = stage
     after = store.diagnostics().committed_inventory_sha256
+    next_action = (
+        (_CORRECTION_NEXT_ACTIONS.get(exc.code) if stage else None)
+        or detail.get("next_action")
+        or _CORRECTION_NEXT_ACTIONS.get(exc.code)
+        or "INSPECT_DETAIL"
+    )
     return emit({
         "status": "BLOCKED",
         "reason_code": exc.code,
         "detail": detail,
-        "next_action": detail.get("next_action") or "INSPECT_DETAIL_REUSE_SAVED_SESSION",
+        "next_action": next_action,
         "writes": {"research_store": int(after != before)},
         "new_look": False,
         "scientific_negative": False,
     }, exit_code=2)
+
+
+def _forge_run_args_for_focus(owner_focus: str) -> list[str]:
+    """The public forge-run arguments that address a stored canonical focus."""
+
+    collection, sep, focus = owner_focus.partition(":")
+    if sep and collection in {"OPPORTUNITY_EPISODES", "LIVE_LIFECYCLE"}:
+        return ["--collection", collection, "--owner-focus", focus or "AUTO"]
+    return ["--owner-focus", owner_focus or "AUTO"]
 
 
 def cmd_classification_correction(
@@ -3844,6 +3882,7 @@ def cmd_classification_correction(
 
     from solana_alpha_lab.factory.hfic_session import (
         apply_classification_correction,
+        classification_correction_template,
         preview_classification_correction,
     )
 
@@ -3851,8 +3890,11 @@ def cmd_classification_correction(
     data_root = _existing_data_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root, create_if_missing=False)
     before = store.diagnostics().committed_inventory_sha256
+    stage = "CLASSIFICATION_CORRECTION_APPLY" if proposal_path is not None else "CLASSIFICATION_CORRECTION_PREVIEW"
     try:
-        if proposal_path is None:
+        if proposal_path is None and spec_path is None:
+            payload = classification_correction_template(store, str(session_id), repo_root=repo_root)
+        elif proposal_path is None:
             packet = _load_json_file(spec_path, repo_root=repo_root)
             _assert_no_path_leak(packet, str(repo_root))
             payload = preview_classification_correction(
@@ -3873,13 +3915,15 @@ def cmd_classification_correction(
                 "session_receipt_sha256": bundle.get("session_receipt_sha256"),
                 "writes": {"research_store": int(store.diagnostics().committed_inventory_sha256 != before)},
                 "new_look": False,
-                "next_action": "RUN_FORGE_RUN_NO_WRITE_THEN_PERSIST_FOR_SAME_FOCUS",
+                "owner_focus": bundle.get("owner_focus"),
+                "forge_run_args": _forge_run_args_for_focus(str(bundle.get("owner_focus") or "")),
+                "next_action": "RUN_FORGE_RUN_NO_WRITE_WITH_FORGE_RUN_ARGS_THEN_PERSIST",
             }
     except HficSessionError as exc:
-        if not (exc.code.startswith("CLASSIFICATION_") or exc.code in {
+        if not (exc.code.startswith(("CLASSIFICATION_", "CLASSIFIER_")) or exc.code in {
                 "SESSION_NOT_FOUND", "CONFIRM_APPEND_ONLY_REQUIRED"}):
             raise
-        return _classification_refusal(exc, store=store, before=before)
+        return _classification_refusal(exc, store=store, before=before, stage=stage)
     if not git_before.unchanged(repository_git_snapshot(repo_root)):
         raise HficCliError("GIT_MUTATION_DETECTED")
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
@@ -4843,7 +4887,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="read-only proof and exact proposal to correct one recorded classification input refusal",
     )
     correction_preview.add_argument("--session-id", required=True)
-    correction_preview.add_argument("--experiment-spec", type=Path, required=True)
+    correction_preview.add_argument(
+        "--experiment-spec", type=Path, default=None,
+        help="corrected packet; omit to print the read-only template with the refused packet")
     correction_preview.add_argument("--format", choices=("json",), default="json")
     correction_apply = subparsers.add_parser(
         "classification-correction-apply",

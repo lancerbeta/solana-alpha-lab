@@ -509,10 +509,12 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
      `PASS_TO_CLASSIFICATION` is not complete. The input is
      `{experiment_spec, hypothesis_definition_sha256}`; `as_of` and
      `availability_cutoff` must not be later than the real UTC now.
-     `CLASSIFICATION_INPUT_INVALID` writes nothing: fix the named `fields`, then
-     classify the same session again. A pre-repair recorded refusal
-     (`DENY_INVALID_SPEC`/`EXPERIMENT_SPEC_INVALID`) uses
-     `classification-correction-preview` then `-apply --confirm-append-only`
+     `CLASSIFICATION_INPUT_INVALID`, `CLASSIFIER_CLOCK_INVALID` and
+     `CLASSIFIER_CONFIG_UNAVAILABLE` write nothing: fix the named `fields`
+     (or config), then classify the same session again. A pre-repair recorded
+     refusal (`DENY_INVALID_SPEC`/`EXPERIMENT_SPEC_INVALID`) uses
+     `classification-correction-preview --session-id` (read-only TEMPLATE), then
+     preview with the corrected packet, then `-apply --confirm-append-only`
      (`docs/contracts/episode_native_required_outcomes_v1.md`). It is not a new Critic, look or session.
    - `STOP` → report the named terminal; stop.
      For `CONTROL_YIELD_BELOW_MIN`: show `control_yield_eligible` vs

@@ -135,6 +135,37 @@ session. Recovery inputs and receipts are preserved outside Temp in
   whose stage_ref equals the correction's refused session receipt.
 - Fragment summary carries saved `research_scope`/`scientific_identity`.
 
+Review round 1 (a0e7be02, all four roles NOT_READY) remediation:
+- the corrected completion carries the correction-time capability epoch
+  (`corrected.capability_epoch_sha256`; refused one kept), accepted by the
+  session loader and `list_hfic_sessions` only under the correction marker, so
+  forge-run, bundle and shelf agree after the merge changes capability;
+- caller `classifier_evaluated_at` must be aware and not later than runtime
+  (`CLASSIFIER_CLOCK_INVALID`); registry/schema load is `CLASSIFIER_CONFIG_UNAVAILABLE`;
+  structural Spec errors are typed input refusals; all write nothing;
+- correction allowlist: envelope time causes only, diff ⊆ {as_of,
+  availability_cutoff}, both one instant ≥ refused evaluation time ≤ now; a
+  current KILL/BLOCKED_DATA classification is `CURRENT_GATE_DENIED` with no write;
+  the saved result is re-verified;
+- compare-before-append `before_commit` guard; loader `CLASSIFICATION_CORRECTION_FORK`;
+  refused receipt existence checked;
+- operator surface: read-only TEMPLATE preview, per-code next_action and stage,
+  uniform `writes`, `show-session.classification_correction`, apply `forge_run_args`.
+
+Post-merge runbook (C6, after accepted merge, on the canonical workstation root):
+1. `forge-run --collection OPPORTUNITY_EPISODES --owner-focus AUTO --no-write`
+   must show BASE session HFIC-SESS-78F92D0FE3E6BC8E (NON_SCIENTIFIC_STOP readback);
+   otherwise STOP (cheapest falsifier).
+2. `classification-correction-preview --session-id HFIC-SESS-78F92D0FE3E6BC8E` → TEMPLATE;
+   copy the refused packet, set as_of = availability_cutoff = one real UTC instant
+   of preparation (≥ the refused evaluation time printed, ≤ now), remove nothing else.
+3. Preview with the packet → save stdout → apply `--confirm-append-only`.
+4. `show-session`, `forge-run --no-write` (expect OWNER_CANDIDATE), then `--persist`.
+5. Confirm read-only that the result readout has `research_scope.contrast.comparator`;
+   `research_fragments.py registration-preview` → `register --confirm-append-only`
+   for one CONTEXT_FILTER; cold `read` and prior capsule readback; RFV-8228C940 plan
+   state readback. No monitoring plan for the new card.
+
 Existing tests that used a future Spec to obtain a persisted classifier KILL now
 use a bound-hash integrity mismatch (a real classifier deny). The P0b
 future-Spec test asserts the stronger pre-write refusal.

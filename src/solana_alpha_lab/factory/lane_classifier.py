@@ -160,7 +160,12 @@ def spec_input_refusal(
     elif version not in {None, "1.1"}:
         return _input_refusal("SPEC_SCHEMA_VERSION_UNSUPPORTED", ("schema_version",))
     try:
-        jsonschema.validate(dict(spec), _load_json_object(root / schema_relative))
+        schema = _load_json_object(root / schema_relative)
+    except (OSError, ValueError):
+        # An unreadable schema file is configuration, never the caller's input.
+        return {"stage": "CLASSIFIER_CONFIG", "reason_code": "SPEC_SCHEMA_UNAVAILABLE", "fields": []}
+    try:
+        jsonschema.validate(dict(spec), schema)
     except jsonschema.ValidationError as exc:
         field = ".".join(str(part) for part in exc.absolute_path) or "experiment_spec"
         return _input_refusal("SPEC_SCHEMA_INVALID", (field,))
