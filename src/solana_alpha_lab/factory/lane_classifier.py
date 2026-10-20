@@ -6,7 +6,7 @@ import hashlib
 import json
 import re
 import subprocess
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -126,15 +126,29 @@ def _parse_timestamp(value: object) -> datetime:
     return parsed.astimezone(UTC)
 
 
-def _validate_spec(
+SPEC_TIME_FIELDS = ("as_of", "availability_cutoff")
+
+
+def _input_refusal(reason_code: str, fields: Sequence[str] = ()) -> dict[str, Any]:
+    return {"stage": "CLASSIFICATION_INPUT", "reason_code": reason_code, "fields": list(fields)}
+
+
+def spec_input_refusal(
     submission: Mapping[str, Any],
     *,
     root: Path,
     as_of: datetime,
-) -> Mapping[str, Any] | None:
+) -> dict[str, Any] | None:
+    """Typed envelope refusal of the submitted Spec, or None when admissible.
+
+    This is the single authoritative envelope check shared by `classify_lane`
+    and the HFIC writer. It names the failing input field; it does not judge
+    the hypothesis and it does not cover registry, source or protection gates.
+    """
+
     spec = submission.get("experiment_spec")
     if not isinstance(spec, Mapping):
-        return None
+        return _input_refusal("EXPERIMENT_SPEC_MISSING", ("experiment_spec",))
     version = spec.get("schema_version")
     schema_relative = SPEC_SCHEMA_RELATIVE
     if version == "1.4":
@@ -144,16 +158,25 @@ def _validate_spec(
     elif version == "1.2":
         schema_relative = SPEC_SCHEMA_V1_2_RELATIVE
     elif version not in {None, "1.1"}:
-        return None
+        return _input_refusal("SPEC_SCHEMA_VERSION_UNSUPPORTED", ("schema_version",))
     try:
-        jsonschema.validate(dict(spec), _load_json_object(root / schema_relative))
+        schema = _load_json_object(root / schema_relative)
+    except (OSError, ValueError):
+        # An unreadable schema file is configuration, never the caller's input.
+        return {"stage": "CLASSIFIER_CONFIG", "reason_code": "SPEC_SCHEMA_UNAVAILABLE", "fields": []}
+    try:
+        jsonschema.validate(dict(spec), schema)
+    except jsonschema.ValidationError as exc:
+        field = ".".join(str(part) for part in exc.absolute_path) or "experiment_spec"
+        return _input_refusal("SPEC_SCHEMA_INVALID", (field,))
+    try:
         capabilities = spec["capabilities"]
         if (
             not isinstance(capabilities, list)
             or len(capabilities) != 1
             or capabilities[0] != spec["capability_id"]
         ):
-            return None
+            return _input_refusal("SPEC_CAPABILITY_BINDING_INVALID", ("capabilities", "capability_id"))
         for requirement in spec["data_requirements"]:
             requirement_path = str(requirement["path"])
             posix_path = PurePosixPath(requirement_path)
@@ -166,16 +189,33 @@ def _validate_spec(
                 or ".." in posix_path.parts
                 or ".." in windows_path.parts
             ):
-                return None
-        if as_of.tzinfo is None:
-            return None
+                return _input_refusal("SPEC_DATA_REQUIREMENT_PATH_UNSAFE", ("data_requirements",))
+    except (KeyError, TypeError):
+        return _input_refusal("SPEC_SCHEMA_INVALID", ("experiment_spec",))
+    if as_of.tzinfo is None:
+        # The evaluation clock, not the submitted Spec, is malformed.
+        return {"stage": "CLASSIFIER_CLOCK", "reason_code": "CLASSIFIER_CLOCK_NAIVE", "fields": []}
+    try:
         spec_as_of = _parse_timestamp(spec["as_of"])
         availability_cutoff = _parse_timestamp(spec["availability_cutoff"])
-        if availability_cutoff > spec_as_of or spec_as_of > as_of.astimezone(UTC):
-            return None
-    except (jsonschema.ValidationError, KeyError, TypeError, ValueError):
+    except (KeyError, TypeError, ValueError):
+        return _input_refusal("SPEC_TIME_INVALID", SPEC_TIME_FIELDS)
+    if availability_cutoff > spec_as_of:
+        return _input_refusal("SPEC_AVAILABILITY_CUTOFF_AFTER_AS_OF", SPEC_TIME_FIELDS)
+    if spec_as_of > as_of.astimezone(UTC):
+        return _input_refusal("SPEC_AS_OF_AFTER_EVALUATION", SPEC_TIME_FIELDS)
+    return None
+
+
+def _validate_spec(
+    submission: Mapping[str, Any],
+    *,
+    root: Path,
+    as_of: datetime,
+) -> Mapping[str, Any] | None:
+    if spec_input_refusal(submission, root=root, as_of=as_of) is not None:
         return None
-    return spec
+    return submission["experiment_spec"]
 
 
 def _git_head_sha(root: Path) -> str | None:

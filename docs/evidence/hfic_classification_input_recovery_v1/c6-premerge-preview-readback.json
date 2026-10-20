@@ -1,0 +1,87 @@
+{
+  "schema": "smial.hfic-classification-correction-premerge-readback",
+  "schema_version": "1.0",
+  "as_of": "2026-10-20",
+  "session_id": "HFIC-SESS-78F92D0FE3E6BC8E",
+  "code_head_note": "PR #418 candidate code; read-only, no apply",
+  "inventory_before": "1be2c6a0a723d629563153b3e447cb55f06b47067e761c88be26a3746912260a",
+  "inventory_after": "1be2c6a0a723d629563153b3e447cb55f06b47067e761c88be26a3746912260a",
+  "writes": {
+    "template": {
+      "research_store": 0
+    },
+    "preview": {
+      "research_store": 0
+    }
+  },
+  "new_look": false,
+  "first_attempt_blocker": "CLASSIFICATION_CORRECTION_ORIGINAL_PASS_UNAVAILABLE: real Critic PASS carries classifier_receipt/experiment_spec null placeholders; fixed in the same seam (placeholder keys excluded on both sides, must be empty)",
+  "template": {
+    "refusal": {
+      "classifier_evaluated_at": "2026-10-20T12:48:38Z",
+      "fields": [
+        "as_of",
+        "availability_cutoff"
+      ],
+      "reason_code": "SPEC_AS_OF_AFTER_EVALUATION",
+      "stage": "CLASSIFICATION_INPUT"
+    },
+    "expected_instant": "2026-10-20T12:48:38Z",
+    "refused_at_source": "session_receipt.created_at",
+    "critic_pass_effective_at": "2026-10-20 12:47:01+00:00",
+    "correctable_fields": [
+      "as_of",
+      "availability_cutoff"
+    ]
+  },
+  "preview_status": "PREVIEW_READY",
+  "correction_sha256": "27d502e3bfc0281e1ea5fac3fbeaa416bc926a39ab016d3c833d1810c598f1ac",
+  "original_pass_critic_result_sha256": "e16d63891fc3128d1adeb737c59ad1f093b37a6ac2bae68238134002f5894568",
+  "grounded_result_refs": [
+    "HFIC-ART-DISCOVERY-E6D9B0C5F86162A7CCB80D5AEC41B7530EE8CEC9"
+  ],
+  "grounded_result_sha256": "095dfd0fda8c474fd980afe7123376a157a56d908609cc67404fa769ba1bfe8b",
+  "refused": {
+    "capability_epoch_sha256": "79948a83280d646384c86f33ed90b2d93a73db0122c381a23e7dd94dd4366728",
+    "cause": {
+      "classifier_evaluated_at": "2026-10-20T12:48:38Z",
+      "fields": [
+        "as_of",
+        "availability_cutoff"
+      ],
+      "reason_code": "SPEC_AS_OF_AFTER_EVALUATION",
+      "stage": "CLASSIFICATION_INPUT"
+    },
+    "classifier_receipt_sha256": "778f49171b7818b0bd040530e264860f656fab4c5a96aa862c90ba41b2942559",
+    "critic_result_sha256": "eca194774575e90a6f178e5d7024a5bcd130be36b1bd2a7a2977ba26b1982b1c",
+    "experiment_spec_sha256": "898c348b180d1e50071785bbd84090e8dbfd7de13a1375fc9ba0ce1c5c435891",
+    "final_session_terminal": "KILL_UNBOUND_EVIDENCE",
+    "session_receipt_sha256": "87de379ed31c8a16dc369402191d0a13828825185814ed3707009823a6bd39e8"
+  },
+  "corrected": {
+    "capability_epoch_sha256": "1ba7e1e9e0818bf54c48be8fb44d269f90414d551eec3c6ec335fd9904c8cd66",
+    "classifier_receipt_sha256": "1360749e5a2e6b7a8e7dd0f691edae3bd3c4d94587187f8c8f257ddd20d99eda",
+    "experiment_spec_sha256": "c2dbcc61b8f8f391cceecc93931b7aca667ed3a1cc8c16242fb39d72a508e01c",
+    "field_changes": [
+      {
+        "after": "2026-10-20T12:48:38Z",
+        "before": "2026-10-20T14:30:00Z",
+        "field": "as_of"
+      },
+      {
+        "after": "2026-10-20T12:48:38Z",
+        "before": "2026-10-20T14:30:00Z",
+        "field": "availability_cutoff"
+      }
+    ],
+    "final_session_terminal": "PASS_FAST_LANE_READY",
+    "lane_classifier_terminal": "FAST_LANE_READY"
+  },
+  "accounting": {
+    "critic_screens_added": 0,
+    "new_look": false,
+    "revision_allowance_used": false,
+    "scientific_look_delta": 0
+  },
+  "note": "corrected.capability_epoch_sha256 is the candidate code's; after merge the preview is re-run and binds the merged capability"
+}

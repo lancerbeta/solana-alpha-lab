@@ -368,11 +368,14 @@ class ObservationFastLaneP0AddendumTests(unittest.TestCase):
             self.assertEqual(compiled.hypothesis_registered_at, AS_OF_NOON)
 
     def test_p0b_hfic_future_spec_is_denied(self) -> None:
+        # Still denied; now as a typed input refusal before any terminal write.
+        from solana_alpha_lab.factory.hfic_session import HficSessionError
         spec = v1_2_spec(as_of="2026-09-01T12:00:00Z")
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
-            forged = forge_classify(packet_for(spec), data_root, AS_OF_START)
-            self.assertEqual(forged["classifier_terminal"], "DENY_INVALID_SPEC")
+            with self.assertRaisesRegex(HficSessionError, "CLASSIFICATION_INPUT_INVALID") as caught:
+                forge_classify(packet_for(spec), data_root, AS_OF_START)
+            self.assertEqual(caught.exception.detail["reason_code"], "SPEC_AS_OF_AFTER_EVALUATION")
 
     def test_p0b_later_maturation_does_not_rebase_registration(self) -> None:
         spec_early = v1_2_spec(as_of="2026-09-01T00:00:00Z")

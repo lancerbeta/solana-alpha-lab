@@ -120,6 +120,12 @@ artifacts. That wiring does not execute the scientific V1 probe. Do not
 launch Critic on empty BASE. `RESUME_V1` uses `--saved-draft-sha256` or
 pending classify, not the START helper.
 Prompt C `WAIT` is not the owner-final while V1 is eligible.
+`classify` input is `{experiment_spec, hypothesis_definition_sha256}`; Spec
+`as_of`/`availability_cutoff` must not be later than the real UTC now.
+`CLASSIFICATION_INPUT_INVALID`/`CLASSIFIER_CLOCK_INVALID`/`CLASSIFIER_CONFIG_UNAVAILABLE`
+write nothing: fix the named fields and classify again. A pre-repair recorded
+refusal uses `classification-correction-preview` (TEMPLATE without a packet, then
+with it) and `-apply --confirm-append-only` (`docs/contracts/episode_native_required_outcomes_v1.md`).
 `RETURN_EXISTING_RUN` is run-level readback. The preflight/session action
 `RETURN_EXISTING_SESSION` means the bound lifecycle session was found; the
 ladder then exposes that result as `RETURN_EXISTING_RUN`. Owner prose may use

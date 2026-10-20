@@ -245,6 +245,10 @@ def _summary(result: Mapping[str, Any]) -> dict[str, Any]:
     summary = {k: copy.deepcopy(readout.get(k)) for k in (
         "status", "matched", "baseline", "missingness", "tail_support", "baseline_may_include_matched",
         "details", "detail_truncation", "selection_policy")}
+    # A list contrast keeps its own comparator: the pool baseline includes the
+    # matched side and is never a complement. Legacy results stay UNKNOWN.
+    for key in ("research_scope", "scientific_identity"):
+        summary[key] = copy.deepcopy(readout.get(key)) if readout.get(key) is not None else "UNKNOWN"
     # Saved native dependency markers only. Absence is UNKNOWN, never a new
     # mint-overlap calculation or a claim of independent calendar replication.
     summary["dependence"] = {k: copy.deepcopy(result.get(k)) for k in (

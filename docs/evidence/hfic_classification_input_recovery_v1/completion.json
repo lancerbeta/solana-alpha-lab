@@ -1,0 +1,80 @@
+{
+  "acceptance_id": "HFIC_CLASSIFICATION_INPUT_RECOVERY_V1-ENGINEERING-CHECKPOINT",
+  "active_stop_conditions": [],
+  "as_of": "2026-10-20",
+  "base_main": "a8ad00859b52e1c99c4926a549b708b62f4254c0",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/hfic_classification_input_recovery_v1/factory-fit.json",
+    "sha256": "46ddb5c92173c17b7beda171bf2dc4b2a895fc468f6f8df4ec0a3deedc20f710",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "c26ab0ae64686e91ccb3a29c6cdc1a6b81ef5f3f295bc4381583150a3e6a8e27",
+    ".cursor/commands/hypothesis-forge.md": "f91c1504b650a7b6fc2222b98c5e56737f2babd9dda604fef3d37add6ba3bf10",
+    "catalog/assets/core.yaml": "85ce707fe74f129a01600cef1ff89c0afce587e9de5c3f6e59c2c132b9e4f60e",
+    "docs/contracts/episode_native_required_outcomes_v1.md": "cb56f43eb0c5577b489e75aa98157a1029dcac8159f85400ed8055443e870669",
+    "docs/evidence/hfic_classification_input_recovery_v1/READOUT.md": "d8980f4fcc96116fed1aae52c032a1430e6b17d672398ce38a37594465e0601b",
+    "docs/evidence/hfic_classification_input_recovery_v1/c6-premerge-preview-readback.json": "b998cd2458adf91415d8f835fbb92c3491295ba89d7d7f09ea9a821c45be123b",
+    "docs/operator/RESEARCH_FRAGMENTS_V1.md": "70869c9d63d6ce5449917c60093c8f29f0b8fb4eb44938d0d08015082be3301b",
+    "docs/tasks/HFIC_CLASSIFICATION_INPUT_RECOVERY_V1.md": "a22c5640b16ced030480b5c8245559627a2310a7d2b0dadf7866accfcd54064f",
+    "scripts/hypothesis_forge.py": "d975327d5cbe1be048950b07379b679efad40a6608f15c825d94737e55e7fbcf",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "edf010d53f476205e1b36dd8556aa3c9c1dd602155c888b3181a78c5fb7ea45a",
+    "src/solana_alpha_lab/factory/hfic_session.py": "d3e030cdabe3f7697761dc62b9b0e2bff4c6826ac5526140ccb23092b4f50429",
+    "src/solana_alpha_lab/factory/lane_classifier.py": "7580f907ceeae624f40c4f3fbf93ecf8d94f848973f37aa72761acc72746c9e8",
+    "src/solana_alpha_lab/factory/research_fragments.py": "6bc8ec60ad5231e90e1e2a17cf637a5314c7f98118b591df0196be7114ad9e0c",
+    "tests/test_episode_native_required_outcome_contract_v1.py": "e81ff9aaa1cba361b16d575032d679f4735bc88c1d4879ac77391bc9c3816bd9",
+    "tests/test_hfic_fresh_control_decision_integrity_closure_v1.py": "b3e7e68e2f74e5eebc1e1780c0502ab98d6de37cbad40c592f922b54247b242c",
+    "tests/test_hfic_one_frozen_runner_up_failover_v1.py": "2a31a7729f84bfb650dc38750013cbd201bb16720dcec09914195159c37c7897",
+    "tests/test_observation_fast_lane_p0_addendum.py": "03c30f757072df6cc61d39b985cab9f23ab31c644b5a8ba2760417f0431d2b24"
+  },
+  "non_claims": [
+    "NO_REAL_C6_CORRECTION_OR_FRAGMENT_BEFORE_MERGE",
+    "NO_NEW_LOOK_CRITIC_OR_SESSION",
+    "NO_GENERAL_KILL_REOPENING",
+    "NO_POLICY_PROTECTION_OR_BUDGET_CHANGE",
+    "NO_ALPHA_OOS_OR_CASHFLOW_CLAIM",
+    "NO_MERGE_OR_CANONICAL_DONE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "canonical_writes": 0,
+    "external_mutations": 0,
+    "local_engineering_and_synthetic_writes": true,
+    "producer_metadata_delta": "NONE",
+    "real_new_looks": 0,
+    "scope": "BOUNDED_ENGINEERING_AND_CONTROLLED_FIXTURES_EXCLUDING_ROUTINE_GIT_GITHUB_TRANSPORT"
+  },
+  "state_change": "CLASSIFICATION_INPUT_REFUSAL_AND_RECORDED_REFUSAL_CORRECTION_READY_REAL_C6_PENDING_MERGE",
+  "task_id": "HFIC_CLASSIFICATION_INPUT_RECOVERY_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_classification_input_recovery_v1/independent-review.json",
+      "sha256": "0f5c5eddef38be4f62086501633973e6f0363d6ddc28458da1a3b9e4dac56d9f",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_NATIVE_CATALOG_INCREMENTAL_SYNC_AND_PRECOMMIT",
+      "PASS_FROZEN_TREE_21_CONSUMER_SUITES_496_TESTS",
+      "PASS_PUBLIC_CLI_REFUSAL_TEMPLATE_PREVIEW_APPLY_FORGE_RUN_SHELF_VERTICAL",
+      "PASS_CAPABILITY_DRIFT_LATE_DENIAL_RACE",
+      "PASS_ISOLATED_REVIEW_ARCH_CODE_ROUND3_GOAL_UX_ROUND2",
+      "PASS_CHRONOLOGY_GUARD_CRITIC_PASS_LE_REFUSAL_LE_CORRECTION",
+      "PASS_REAL_C6_READONLY_TEMPLATE_AND_PREVIEW_READY_INVENTORY_UNCHANGED"
+    ],
+    "targeted": "PASS_tests.test_episode_native_required_outcome_contract_v1_correction_and_refusal_vertical"
+  }
+}

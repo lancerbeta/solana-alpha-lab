@@ -86,6 +86,104 @@ Incomplete data вне required horizon не создаёт veto.
 | Integrity/query/definition/source/schedule conflict | Исправить exact binding штатным owner; не редактировать hashes или исторический receipt |
 | EPISODE_CLASSIFICATION_REVALIDATION_DENIED | Сохранённый historical receipt доступен; fresh action запрещён |
 
+## Отказ входа и исправление записанного отказа
+
+Невалидная оболочка Spec — это отказ входа, а не вердикт гипотезы.
+`lane_classifier.spec_input_refusal` — единственная проверка оболочки; её
+используют и `classify_lane`, и HFIC writer. В публичном `classify` все такие
+отказы происходят до записи receipt, decision или terminal. Stdout — один JSON
+(`status`, `reason_code`, `detail.stage`/`reason_code`/`fields`, `next_action`,
+фактические `writes.research_store`). Сессия остаётся `AWAITING_CLASSIFICATION`;
+исправленный packet проходит тот же `classify`.
+
+| reason_code | stage | смысл |
+|---|---|---|
+| `CLASSIFICATION_INPUT_INVALID` | `CLASSIFICATION_INPUT` | оболочка Spec: schema/document, time, capabilities, path; `fields` называет поля |
+| `CLASSIFIER_CLOCK_INVALID` | `CLASSIFIER_CLOCK` | переданный `classifier_evaluated_at` будущий, naive или нечитаемый |
+| `CLASSIFIER_CONFIG_UNAVAILABLE` | `CLASSIFIER_CONFIG` | registry/schema недоступны: конфигурация, не вердикт |
+
+Время оценки — runtime UTC. Переданный `classifier_evaluated_at` допустим только
+aware и не позже runtime (replay/тесты); будущим значением запрет не обходится.
+Source, protection, integrity и прочие `DENY_*` с конкретным reason сохраняют
+прежний смысл. На уже завершённой сессии revalidation даёт
+`EPISODE_CLASSIFICATION_REVALIDATION_DENIED`.
+
+Отказ, записанный до этого ремонта (`DENY_INVALID_SPEC` +
+`EXPERIMENT_SPEC_INVALID` → `KILL_UNBOUND_EVIDENCE`), исправляется
+append-only, а не переоткрытием науки. Это не `apply-provenance-correction`
+(тот исправляет placeholder-время записей). `--data-root` — глобальный флаг до
+подкоманды:
+
+```text
+hypothesis_forge.py --data-root <root> classification-correction-preview --session-id <S>
+hypothesis_forge.py --data-root <root> classification-correction-preview --session-id <S> --experiment-spec <packet.json>
+hypothesis_forge.py --data-root <root> classification-correction-apply --proposal <saved preview stdout> --confirm-append-only
+```
+
+1. Без `--experiment-spec` preview только читает: `TEMPLATE` с
+   `refused_experiment_spec_packet`, причиной, `correctable_fields`,
+   `expected_instant` и `refused_at_source`.
+2. Скопируйте `refused_experiment_spec_packet`, уберите `classifier_evaluated_at`.
+   В `experiment_spec` поставьте и `as_of`, и `availability_cutoff` ровно в
+   `expected_instant` — момент исходной оценки, округлённый вниз до секунды.
+   Другие значения не принимаются: более поздний cutoff засчитал бы исходы,
+   созревшие после оценки. Если на этот момент данные не готовы, это
+   `CURRENT_GATE_DENIED`, а не поправка. Другие поля не меняйте.
+3. Preview с packet доказывает одновременно:
+   - исходный isolated `PASS_TO_CLASSIFICATION` на том же packet и definition;
+   - сохранённый запрос заново даёт отказ времени оболочки
+     (`SPEC_AS_OF_AFTER_EVALUATION`, `SPEC_AVAILABILITY_CUTOFF_AFTER_AS_OF`,
+     `SPEC_TIME_INVALID`) на своё время оценки;
+   - изменены только `as_of`/`availability_cutoff` (allowlist), оба = `expected_instant`;
+   - хронология Critic PASS ≤ отказанная оценка ≤ эта проверка (с точностью до секунды);
+   - сохранённый result всё ещё hash-verified look;
+   - свежий classifier на исходных inputs допущен текущими gates. KILL или
+     `BLOCKED_DATA` — это отказ без записи, а не поправка.
+4. Сохраните весь stdout `PREVIEW_READY` и передайте его в apply.
+
+| reason_code | next_action |
+|---|---|
+| `CLASSIFICATION_CORRECTION_PREVIEW_STALE` | повторить preview, сохранить новый stdout, затем apply |
+| `CLASSIFICATION_CORRECTION_ALREADY_APPLIED` | `show-session`, затем `forge-run --no-write` |
+| `CONFIRM_APPEND_ONLY_REQUIRED` | повторить apply с `--confirm-append-only` |
+| `CLASSIFICATION_CORRECTION_PACKET_INVALID` / `_SCOPE_FORBIDDEN` / `_TIME_RULE_VIOLATED` | пересобрать packet из TEMPLATE и повторить preview |
+| `CLASSIFICATION_CORRECTION_CURRENT_GATE_DENIED` | остановиться: текущий gate запрещает, история сохраняется |
+| `CLASSIFICATION_CORRECTION_NOT_INPUT_REFUSAL` / `_ORIGINAL_PASS_UNAVAILABLE` | остановиться: не исправляется, читать сохранённый result |
+| `CLASSIFICATION_CORRECTION_SOURCE_UNAVAILABLE` / `_FORK` | остановиться: восстановить exact saved source / разобрать историю |
+| `CLASSIFICATION_CORRECTION_PROPOSAL_INVALID` | передать сохранённый stdout preview без изменений |
+| `CLASSIFICATION_CORRECTION_CHRONOLOGY_UNPROVEN` | остановиться: порядок Critic PASS ≤ отказ ≤ исправление (по секундам) не доказан |
+| `CLASSIFICATION_CORRECTION_SESSION_NOT_COMPLETE` | сессия ещё ждёт классификации: обычный `classify` |
+| `SESSION_NOT_FOUND` | проверить `--session-id` и `--data-root` |
+| `CLASSIFICATION_INPUT_INVALID` / `CLASSIFIER_*` из preview | исправить названные поля / убрать `classifier_evaluated_at` / восстановить config |
+
+Поле `next_action` в JSON авторитетно; таблица его поясняет.
+
+Apply сверяет parent session receipt и SHA тела поправки (`correction_sha256`),
+под writer lease (compare-before-append) пишет в ту же сессию цикл
+`COMPLETE-CLSCORR-<sha12>` со своими CRITIC_RESULT, CLASSIFIER_RECEIPT,
+SESSION_RECEIPT и решением выбранного кандидата. Цикл несёт
+`classification_correction` (refused → corrected, `field_changes` по каждому
+полю, refused/corrected capability, accounting `scientific_look_delta=0`).
+Исправленная классификация выполнена текущим кодом: её capability epoch —
+capability завершения (execution binding выводится из него), исходный остаётся в
+`refused`; это единственное разрешённое изменение execution identity, как у
+repair continuation. Это единственное разрешённое исключение по capability;
+оно не означает, что look и Critic выполнялись текущим кодом: их capability —
+`look_capability_epoch_sha256` (= `refused`). Повтор, в том числе одновременный,
+возвращает ту же запись; две разные поправки одной
+сессии — `CLASSIFICATION_CORRECTION_FORK`. Отказ, исходный owner-final, look
+ledger и бюджет остаются в истории; operation не переоткрывается; чтение на
+cutoff до поправки показывает прежний REJECT. Receipt помечает
+`no_git_fence_receipt.fence_basis=CLASSIFICATION_CORRECTION`.
+
+`load_session_bundle` и `show-session` (`classification_correction`) читают
+receipt и lineage активного цикла. Apply возвращает `forge_run_args`.
+Aggregate `forge-run` снимает completed readback один раз — только если
+сохранённый owner-final указывал на exact отказанный session receipt этой
+поправки; после `forge-run --persist` readback — новый receipt. Перед persist на
+реальном store сначала `forge-run --no-write`: BASE-стадия должна быть этой
+сессией; иначе остановиться.
+
 `episode_outcome_binding` в classifier receipt связывает Spec/definition/recipe,
 sources, current protection, policy/scope, exact membership и required coverage
 через canonical binding_sha256. Caller projection не является authority.
