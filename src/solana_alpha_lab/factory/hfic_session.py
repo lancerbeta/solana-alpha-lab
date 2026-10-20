@@ -172,6 +172,9 @@ _FORBIDDEN_DECISION_TERMINALS = frozenset({"PROMOTE", "PROMOTION_LANE"})
 _INTERMEDIATE_CRITIC_TERMINALS = frozenset({"REVISE_ONCE", "PASS_TO_CLASSIFICATION"})
 
 
+CLASSIFICATION_INPUT_INVALID = "CLASSIFICATION_INPUT_INVALID"
+
+
 class HficSessionError(ValueError):
     """Fail-closed HFIC session/protocol error."""
 
@@ -7134,6 +7137,16 @@ def run_live_classifier(
         as_of = datetime.now(UTC)
     packet = dict(submission)
     packet["hypothesis_definition_sha256"] = caller_hash
+    from solana_alpha_lab.factory.lane_classifier import spec_input_refusal
+
+    # A malformed envelope is an input refusal, not a hypothesis verdict: it
+    # stops before any classifier receipt, decision or terminal is written.
+    refusal = spec_input_refusal(packet, root=Path(repo_root), as_of=as_of)
+    if refusal is not None:
+        raise HficSessionError(CLASSIFICATION_INPUT_INVALID, detail={
+            **refusal, "classifier_evaluated_at": render_canonical_utc(as_of),
+            "next_action": "CORRECT_EXPERIMENT_SPEC_REUSE_SAVED_SESSION", "writes": False,
+        })
     from solana_alpha_lab.factory.scientific_eligibility_projection import (
         ScientificEligibilityError,
         try_project_scientific_eligibility_from_data_root,
@@ -7877,6 +7890,254 @@ def apply_classification(
     )
 
 
+CLASSIFICATION_CORRECTION_SCHEMA = "smial.hfic-classification-input-correction"
+# Spec envelope keys that carry the research question and its inputs. A
+# correction that touches them would be a different classification request.
+_CORRECTION_FORBIDDEN_SPEC_KEYS = frozenset({
+    "parameters", "hypothesis_version", "population", "capability_id", "capabilities",
+    "required_outcomes", "data_bindings", "data_requirements", "observation_request",
+    "query_recipe_ids", "estimand", "question", "schema_version",
+})
+
+
+def _original_pass_critic(store: Any, existing: Mapping[str, Any]) -> tuple[dict[str, Any], str, str]:
+    """The isolated Critic PASS that opened classification, bound to this packet."""
+
+    session_id = str(existing["session_id"])
+    cycles, artifacts = [], {}
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        payload = json.loads(record.payload_json)
+        if payload.get("session_id") != session_id:
+            continue
+        if kind == "RESEARCH_CYCLE" and payload.get("phase") == "AWAITING_CLASSIFICATION":
+            cycles.append((payload, str(getattr(record, "effective_at", "") or "")))
+        elif kind == "RESEARCH_ARTIFACT" and payload.get("artifact_kind") == "CRITIC_RESULT":
+            raw = payload.get("payload_canonical")
+            if isinstance(raw, str):
+                artifacts[hashlib.sha256(raw.encode("utf-8")).hexdigest()] = raw
+    if len(cycles) != 1:
+        raise HficSessionError("CLASSIFICATION_CORRECTION_ORIGINAL_PASS_UNAVAILABLE")
+    cycle, effective_at = cycles[0]
+    digest = str(cycle.get("critic_result_sha256") or "")
+    raw = artifacts.get(digest)
+    if raw is None or cycle.get("critic_terminal") != "PASS_TO_CLASSIFICATION":
+        raise HficSessionError("CLASSIFICATION_CORRECTION_ORIGINAL_PASS_UNAVAILABLE")
+    critic = json.loads(raw)
+    if (
+        critic.get("critic_terminal") != "PASS_TO_CLASSIFICATION"
+        or cycle.get("critic_input_packet_sha256") != existing.get("critic_input_packet_sha256")
+        or cycle.get("selected_candidate_id") != existing.get("selected_candidate_id")
+        or cycle.get("selected_definition_sha256") != existing.get("selected_definition_sha256")
+    ):
+        raise HficSessionError("CLASSIFICATION_CORRECTION_ORIGINAL_PASS_UNAVAILABLE")
+    return critic, digest, effective_at
+
+
+def _prepare_classification_correction(
+    store: Any,
+    session_id: str,
+    experiment_spec_packet: Mapping[str, Any],
+    *,
+    repo_root: Any,
+    data_root: Any,
+    clock: Clock | None = None,
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """Prove one recorded input refusal and re-run only its classification.
+
+    Returns (existing bundle, corrected critic result, correction body).
+    Nothing is written. The research question, frozen recipe, result, Critic
+    packet and look ledger are inputs, never outputs, of this function.
+    """
+
+    from datetime import UTC, datetime
+
+    from solana_alpha_lab.factory.lane_classifier import SPEC_TIME_FIELDS, spec_input_refusal
+    from solana_alpha_lab.factory.run_passport import experiment_spec_sha256
+
+    existing = load_session_bundle(store, session_id)
+    if existing is None:
+        raise HficSessionError("SESSION_NOT_FOUND")
+    if existing.get("session_state") != "SYNTHESIS_COMPLETE":
+        raise HficSessionError("CLASSIFICATION_CORRECTION_SESSION_NOT_COMPLETE")
+    if existing.get("classification_correction_sha256"):
+        raise HficSessionError("CLASSIFICATION_CORRECTION_ALREADY_APPLIED", detail={
+            "classification_correction_sha256": existing["classification_correction_sha256"]})
+    receipt = existing.get("classifier_receipt") or {}
+    selected = str(existing.get("selected_candidate_id") or "")
+    if (
+        existing.get("runner_up_failover_used")
+        or existing.get("runner_up_candidate_id")
+        or existing.get("repair_continuation_disposition_sha256")
+        or existing.get("final_session_terminal") != "KILL_UNBOUND_EVIDENCE"
+        or receipt.get("lane_classifier_terminal") != "DENY_INVALID_SPEC"
+        or list(receipt.get("reason_codes") or []) != ["EXPERIMENT_SPEC_INVALID"]
+        or receipt.get("episode_outcome_binding") is not None
+        or (existing.get("decisions") or {}).get(selected)
+        != {"decision_kind": "REJECT", "reason_code": "KILL_UNBOUND_EVIDENCE"}
+    ):
+        raise HficSessionError("CLASSIFICATION_CORRECTION_NOT_INPUT_REFUSAL")
+    refused_critic = existing.get("critic_result") or {}
+    refused_packet = refused_critic.get("experiment_spec_packet")
+    if not isinstance(refused_packet, Mapping) or refused_critic.get("classifier_receipt") != receipt:
+        raise HficSessionError("CLASSIFICATION_CORRECTION_NOT_INPUT_REFUSAL")
+    pass_critic, pass_sha, pass_at = _original_pass_critic(store, existing)
+    derived = {k: v for k, v in refused_critic.items()
+               if k not in {"experiment_spec_packet", "classifier_receipt", "critic_terminal", "next"}}
+    if derived != {k: v for k, v in pass_critic.items() if k not in {"critic_terminal", "next"}}:
+        raise HficSessionError("CLASSIFICATION_CORRECTION_ORIGINAL_PASS_UNAVAILABLE")
+    # Re-derive the cause from the saved request at the time it was judged.
+    refused_at_text = (
+        refused_packet.get("classifier_evaluated_at")
+        or (existing.get("session_receipt") or {}).get("created_at")
+    )
+    try:
+        refused_at = datetime.fromisoformat(str(refused_at_text).replace("Z", "+00:00")).astimezone(UTC)
+    except ValueError as exc:
+        raise HficSessionError("CLASSIFICATION_CORRECTION_NOT_INPUT_REFUSAL") from exc
+    cause = spec_input_refusal(dict(refused_packet), root=Path(repo_root), as_of=refused_at)
+    if cause is None or cause.get("stage") != "CLASSIFICATION_INPUT":
+        raise HficSessionError("CLASSIFICATION_CORRECTION_NOT_INPUT_REFUSAL")
+    if not isinstance(experiment_spec_packet, Mapping) or "classifier_evaluated_at" in experiment_spec_packet:
+        # The evaluation clock is the runtime clock, never caller supplied here.
+        raise HficSessionError("CLASSIFICATION_CORRECTION_PACKET_INVALID")
+    if set(experiment_spec_packet) != {"experiment_spec", "hypothesis_definition_sha256"} or (
+        experiment_spec_packet.get("hypothesis_definition_sha256") != existing.get("selected_definition_sha256")
+        or refused_packet.get("hypothesis_definition_sha256") != existing.get("selected_definition_sha256")
+    ):
+        raise HficSessionError("CLASSIFICATION_CORRECTION_PACKET_INVALID")
+    old_spec = refused_packet.get("experiment_spec")
+    new_spec = experiment_spec_packet.get("experiment_spec")
+    if not isinstance(old_spec, Mapping) or not isinstance(new_spec, Mapping):
+        raise HficSessionError("CLASSIFICATION_CORRECTION_PACKET_INVALID")
+    named = {str(field).split(".")[0] for field in cause.get("fields") or []}
+    changed = sorted(key for key in set(old_spec) | set(new_spec) if old_spec.get(key) != new_spec.get(key))
+    if not changed or not set(changed) <= named or set(changed) & _CORRECTION_FORBIDDEN_SPEC_KEYS:
+        raise HficSessionError("CLASSIFICATION_CORRECTION_SCOPE_FORBIDDEN", detail={
+            "changed_fields": changed, "refusal_fields": sorted(named)})
+    if set(changed) & set(SPEC_TIME_FIELDS):
+        # A corrected Spec is dated no earlier than the Critic PASS it follows.
+        floor = datetime.fromisoformat(pass_at.replace("Z", "+00:00")).astimezone(UTC) if pass_at else None
+        for key in SPEC_TIME_FIELDS:
+            value = new_spec.get(key)
+            try:
+                stamp = datetime.fromisoformat(str(value).replace("Z", "+00:00")).astimezone(UTC)
+            except ValueError as exc:
+                raise HficSessionError("CLASSIFICATION_CORRECTION_PACKET_INVALID") from exc
+            if floor is None or stamp < floor.replace(microsecond=0):
+                raise HficSessionError("CLASSIFICATION_CORRECTION_TIME_BEFORE_CRITIC_PASS", detail={
+                    "field": key, "critic_pass_effective_at": pass_at})
+    critic = dict(pass_critic)
+    critic["experiment_spec_packet"] = dict(experiment_spec_packet)
+    view = _classifier_frozen_view(existing, critic)
+    _require_recipe_preserves_research_scope(view, experiment_spec_packet)
+    corrected = run_live_classifier(critic, view, repo_root=repo_root, data_root=data_root)
+    if corrected.get("lane_classifier_terminal") == "DENY_INVALID_SPEC":
+        raise HficSessionError("CLASSIFICATION_CORRECTION_STILL_INVALID", detail={
+            "reason_codes": list(corrected.get("reason_codes") or [])})
+    terminal = _classifier_to_hfic_terminal(corrected)
+    critic["classifier_receipt"] = corrected
+    critic["critic_terminal"] = terminal
+    critic["next"] = "PAUSE" if terminal in _PAUSE_TERMINALS else "STOP"
+    evidence = (existing.get("critic_input_packet") or {}).get("grounded_evidence") or {}
+    body = {
+        "schema": CLASSIFICATION_CORRECTION_SCHEMA,
+        "schema_version": "1.0",
+        "session_id": session_id,
+        "selected_candidate_id": selected,
+        "selected_definition_sha256": existing.get("selected_definition_sha256"),
+        "critic_input_packet_sha256": existing.get("critic_input_packet_sha256"),
+        "original_pass_critic_result_sha256": pass_sha,
+        "grounded_result_refs": list(evidence.get("result_refs") or []),
+        "grounded_result_sha256": evidence.get("result_sha256"),
+        "refused": {
+            "session_receipt_sha256": existing.get("session_receipt_sha256"),
+            "critic_result_sha256": existing.get("critic_result_sha256"),
+            "classifier_receipt_sha256": canonical_sha256(receipt),
+            "experiment_spec_sha256": experiment_spec_sha256(dict(old_spec)),
+            "final_session_terminal": existing.get("final_session_terminal"),
+            "cause": {**cause, "classifier_evaluated_at": render_canonical_utc(refused_at)},
+        },
+        "corrected": {
+            "experiment_spec_sha256": experiment_spec_sha256(dict(new_spec)),
+            "field_changes": [{"field": key, "before": old_spec.get(key), "after": new_spec.get(key)}
+                              for key in changed],
+            "classifier_receipt_sha256": canonical_sha256(corrected),
+            "lane_classifier_terminal": corrected.get("lane_classifier_terminal"),
+            "final_session_terminal": terminal,
+        },
+        "accounting": {"new_look": False, "scientific_look_delta": 0, "critic_screens_added": 0,
+                       "revision_allowance_used": False},
+    }
+    return existing, critic, body
+
+
+def preview_classification_correction(
+    store: Any,
+    session_id: str,
+    experiment_spec_packet: Mapping[str, Any],
+    *,
+    repo_root: Any,
+    data_root: Any,
+    clock: Clock | None = None,
+) -> dict[str, Any]:
+    """Read-only: the exact correction that apply would append, or a refusal."""
+
+    existing = load_session_bundle(store, session_id)
+    if isinstance(existing, Mapping) and existing.get("classification_correction_sha256"):
+        return {"status": "ALREADY_APPLIED", "writes": False, "new_look": False,
+                "classification_correction_sha256": existing["classification_correction_sha256"],
+                "final_session_terminal": existing.get("final_session_terminal")}
+    _existing, _critic, body = _prepare_classification_correction(
+        store, session_id, experiment_spec_packet, repo_root=repo_root, data_root=data_root, clock=clock)
+    proposal = {"correction": body, "experiment_spec_packet": dict(experiment_spec_packet),
+                "parent_session_receipt_sha256": _existing.get("session_receipt_sha256")}
+    return {"status": "PREVIEW_READY", "proposal": proposal, "proposal_sha256": canonical_sha256(proposal),
+            "writes": False, "new_look": False}
+
+
+def apply_classification_correction(
+    store: Any,
+    proposal: Mapping[str, Any],
+    *,
+    repo_root: Any,
+    data_root: Any,
+    confirm_append_only: bool,
+    clock: Clock | None = None,
+) -> dict[str, Any]:
+    """Append one correction cycle for a proven input refusal; idempotent."""
+
+    if confirm_append_only is not True:
+        raise HficSessionError("CONFIRM_APPEND_ONLY_REQUIRED")
+    correction = proposal.get("correction") if isinstance(proposal, Mapping) else None
+    packet = proposal.get("experiment_spec_packet") if isinstance(proposal, Mapping) else None
+    if not isinstance(correction, Mapping) or not isinstance(packet, Mapping):
+        raise HficSessionError("CLASSIFICATION_CORRECTION_PROPOSAL_INVALID")
+    session_id = str(correction.get("session_id") or "")
+    current = load_session_bundle(store, session_id)
+    digest = canonical_sha256(correction)
+    if isinstance(current, Mapping) and current.get("classification_correction_sha256"):
+        if current["classification_correction_sha256"] == digest:
+            return current
+        raise HficSessionError("CLASSIFICATION_CORRECTION_ALREADY_APPLIED")
+    if not isinstance(current, Mapping) or current.get("session_receipt_sha256") != proposal.get(
+            "parent_session_receipt_sha256"):
+        raise HficSessionError("CLASSIFICATION_CORRECTION_PREVIEW_STALE")
+    existing, critic, body = _prepare_classification_correction(
+        store, session_id, packet, repo_root=repo_root, data_root=data_root, clock=clock)
+    if canonical_sha256(body) != digest:
+        raise HficSessionError("CLASSIFICATION_CORRECTION_PREVIEW_STALE")
+    return finalize_session(
+        existing,
+        critic,
+        store=store,
+        repo_root=repo_root,
+        data_root=data_root,
+        clock=clock,
+        classification_correction=body,
+    )
+
+
 def persist_primary_kill_awaiting_runner_up(
     store: Any,
     frozen: Mapping[str, Any],
@@ -8106,12 +8367,20 @@ def finalize_session(
     repo_root: Any,
     data_root: Any = None,
     clock: Clock | None = None,
+    classification_correction: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind
 
     existing = load_session_bundle(store, str(frozen["session_id"]))
-    if existing is not None and existing.get("session_state") == "SYNTHESIS_COMPLETE":
+    correction_sha = canonical_sha256(classification_correction) if classification_correction else None
+    if correction_sha and isinstance(existing, Mapping):
+        # Only apply_classification_correction reaches here, after its proof.
+        if existing.get("classification_correction_sha256") == correction_sha:
+            return existing
+        if existing.get("classification_correction_sha256"):
+            raise HficSessionError("CLASSIFICATION_CORRECTION_ALREADY_APPLIED")
+    elif existing is not None and existing.get("session_state") == "SYNTHESIS_COMPLETE":
         retry_payload = dict(critic_result)
         if (
             existing.get("runner_up_failover_used")
@@ -8286,7 +8555,11 @@ def finalize_session(
     if isinstance(existing, Mapping):
         repair_disp_for_txn = existing.get("repair_continuation_disposition_sha256")
     transaction_id = f"RESEARCH-TXN-HFICFIN-{session_id[-16:]}"
-    if isinstance(repair_disp_for_txn, str) and repair_disp_for_txn:
+    # Correction records keep their own ids; the refused completion stays history.
+    correction_suffix = f"-CLSCORR-{correction_sha[:12].upper()}" if correction_sha else ""
+    if correction_sha:
+        transaction_id += correction_suffix
+    elif isinstance(repair_disp_for_txn, str) and repair_disp_for_txn:
         transaction_id = (
             f"RESEARCH-TXN-HFICFIN-{session_id[-16:]}-REPAIR-"
             f"{repair_disp_for_txn[:12].upper()}"
@@ -8355,14 +8628,19 @@ def finalize_session(
         )
     for candidate_id in frozen["candidate_ids"]:
         prior = ((existing or {}).get("decisions") or {}).get(str(candidate_id))
-        if isinstance(prior, Mapping) and prior.get("decision_kind") == "REJECT":
+        corrected_selected = bool(correction_sha) and candidate_id == selected_id
+        if isinstance(prior, Mapping) and prior.get("decision_kind") == "REJECT" and not corrected_selected:
             decision_ids.append(_persisted_session_rejection_id(store, session_id, str(candidate_id), prior))
+            continue
+        if correction_sha and not corrected_selected:
+            # Unselected decisions are unchanged by a classification correction.
+            decision_ids.append(_session_decision_record_id(str(candidate_id), session_id))
             continue
         if candidate_id == selected_id:
             kind, code = decision_kind, reason
         else:
             kind, code = "PAUSE", "NOT_SELECTED_IN_SESSION"
-        decision_id = _session_decision_record_id(str(candidate_id), session_id)
+        decision_id = _session_decision_record_id(str(candidate_id), session_id) + correction_suffix
         decision_ids.append(decision_id)
         records.append(
             event(
@@ -8401,13 +8679,14 @@ def finalize_session(
         )
     if classifier_receipt is not None:
         classifier_bytes = _canonical_bytes(classifier_receipt)
+        classifier_artifact_id = f"HFIC-ART-CLASSIFIER-{session_id}{correction_suffix}"
         records.append(
             event(
-                record_id=f"HFIC-ART-CLASSIFIER-{session_id}",
+                record_id=classifier_artifact_id,
                 kind=RecordKind.RESEARCH_ARTIFACT,
-                entity_id=f"HFIC-ART-CLASSIFIER-{session_id}",
+                entity_id=classifier_artifact_id,
                 payload={
-                    "research_artifact_id": f"HFIC-ART-CLASSIFIER-{session_id}",
+                    "research_artifact_id": classifier_artifact_id,
                     "session_id": session_id,
                     "hfic_protocol": prompt_version,
                     "artifact_kind": "CLASSIFIER_RECEIPT",
@@ -8423,7 +8702,10 @@ def finalize_session(
     preflight_composite = frozen.get("git_composite_sha256")
     if not isinstance(preflight_composite, str) or len(preflight_composite) != 64:
         raise HficSessionError("GIT_COMPOSITE_CHANGED")
-    if preflight_composite != git_after.composite_sha256:
+    # A correction runs on later code than its session: its own fence is the
+    # correction itself, and the receipt keeps the original preflight value.
+    fence_before = git_before.composite_sha256 if correction_sha else preflight_composite
+    if fence_before != git_after.composite_sha256:
         raise HficSessionError("GIT_COMPOSITE_CHANGED")
     forge_selected_id = str(frozen.get("selected_candidate_id") or selected_id)
     failover_used = bool(frozen.get("runner_up_failover_used")) or (
@@ -8671,7 +8953,16 @@ def finalize_session(
         )
     complete_suffix = "COMPLETE"
     receipt_artifact_id = f"HFIC-ART-SESSION-RECEIPT-{session_id}"
-    if isinstance(repair_disp, str) and repair_disp:
+    if correction_sha:
+        complete_suffix = f"COMPLETE{correction_suffix}"
+        receipt_artifact_id = f"HFIC-ART-SESSION-RECEIPT-{session_id}{correction_suffix}"
+        complete_cycle["research_cycle_id"] = f"{session_id}-{complete_suffix}"
+        complete_cycle["classification_correction_sha256"] = correction_sha
+        complete_cycle["classification_correction"] = dict(classification_correction)
+        complete_cycle["classifier_receipt_sha256"] = canonical_sha256(classifier_receipt)
+        complete_cycle["parent_cycle_seq"] = int((existing or {}).get("hfic_cycle_seq") or 0)
+        complete_cycle["correction_git_composite_sha256"] = git_after.composite_sha256
+    elif isinstance(repair_disp, str) and repair_disp:
         complete_suffix = f"REPAIR-COMPLETE-{repair_disp[:12].upper()}"
         receipt_artifact_id = (
             f"HFIC-ART-SESSION-RECEIPT-{session_id}-{complete_suffix}"
@@ -8704,6 +8995,11 @@ def finalize_session(
     store.append(records, transaction_id=transaction_id)
     store.rebuild_projection()
     receipt["store_inventory_digest"] = store.diagnostics().committed_inventory_sha256
+    if correction_sha:
+        corrected = load_session_bundle(store, session_id)
+        if not isinstance(corrected, Mapping) or corrected.get("classification_correction_sha256") != correction_sha:
+            raise HficSessionError("CLASSIFICATION_CORRECTION_READBACK_MISMATCH")
+        return corrected
     decisions: dict[str, dict[str, str]] = {}
     prior_decisions = dict((existing or {}).get("decisions") or {})
     for candidate_id in frozen["candidate_ids"]:
@@ -8983,7 +9279,29 @@ def load_session_bundle(
                 receipt_sha=receipt_sha,
             )
             _verify_failover_receipt_identity(session_receipt)
-    if isinstance(session_receipt, Mapping):
+    bound_classifier_sha = str(cycle.get("classifier_receipt_sha256") or "")
+    correction_marker = cycle.get("classification_correction_sha256")
+    if correction_marker or bound_classifier_sha:
+        correction_body = cycle.get("classification_correction")
+        if (
+            not isinstance(correction_body, Mapping)
+            or canonical_sha256(correction_body) != correction_marker
+            or (correction_body.get("corrected") or {}).get("classifier_receipt_sha256") != bound_classifier_sha
+            or correction_body.get("session_id") != session_id
+            or correction_body.get("critic_input_packet_sha256") != expected_input_sha
+        ):
+            raise HficSessionError("CLASSIFICATION_CORRECTION_BINDING_INVALID")
+    if isinstance(session_receipt, Mapping) and bound_classifier_sha:
+        # A correction cycle names its own receipt; the refused one stays history.
+        matches = [
+            json.loads(raw) for wrapper, raw in artifacts
+            if wrapper.get("artifact_kind") == "CLASSIFIER_RECEIPT" and isinstance(raw, str)
+            and canonical_sha256(json.loads(raw)) == bound_classifier_sha
+        ]
+        if not matches:
+            raise HficSessionError("CLASSIFIER_RECEIPT_UNAVAILABLE")
+        classifier_receipt = matches[0]
+    elif isinstance(session_receipt, Mapping):
         for wrapper, raw in artifacts:
             if wrapper.get("artifact_kind") != "CLASSIFIER_RECEIPT":
                 continue
@@ -9054,6 +9372,8 @@ def load_session_bundle(
         "repair_continuation_disposition_sha256": cycle.get(
             "repair_continuation_disposition_sha256"
         ),
+        "classification_correction_sha256": cycle.get("classification_correction_sha256"),
+        "classification_correction": cycle.get("classification_correction"),
         "grounded_result_sha256": cycle.get("grounded_result_sha256"),
         "grounded_result_refs": list(cycle.get("grounded_result_refs") or [])
         if isinstance(cycle.get("grounded_result_refs"), list)

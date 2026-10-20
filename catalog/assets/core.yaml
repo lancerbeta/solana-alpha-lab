@@ -32052,7 +32052,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lane_classifier.py', repository_path: src/solana_alpha_lab/factory/lane_classifier.py}
-  integrity: {kind: sha256, sha256: f2bbf3079eb0c8397c627bce9dcd2f94eb83c3487690b2e0001db1376e9a1c6a}
+  integrity: {kind: sha256, sha256: 610e8d4c34df771f1a7e186aa40136721ec9ecd725ec0eae282901a079fcca81}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32368,7 +32368,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 8f0bc87fcd527bf770fd7fb1cb95f0fc34c1db99e8c7f3af14102d5f3bc0eea9}
+  integrity: {kind: sha256, sha256: 57fad6c7014afec978a7d0cd9c947aad77569a0d43741c93a2638902536002c3}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32390,7 +32390,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 1bc63c5f303af7049106dac2593cdfedbb68ac4214f99bc707bbea43bcb4cd76}
+  integrity: {kind: sha256, sha256: 10e534bbb110511807ef87d6eb9cf90c996120fffc8b6e61e1a2225d6741d526}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34732,7 +34732,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: ffce0893cbb1820be708ddd594a94902706a18966ef79ed600f91d257e453958}
+  integrity: {kind: sha256, sha256: cc83311f23f4d32a479467e269fcc84989516219e451fc3209864df6f3c12559}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-NATIVE-LIFECYCLE-CLOSURE-001}
@@ -38527,7 +38527,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_ladder.py}
-  integrity: {kind: sha256, sha256: ccfb74b62701382cd530edb0cd6680a767571358a2b22084b566f5fa08c2cb4d}
+  integrity: {kind: sha256, sha256: 18e5d775029839869755f16a7d90992a64125be2335fd6193ddd230b3f031148}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
@@ -42104,7 +42104,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_episode_native_required_outcome_contract_v1.py', repository_path: tests/test_episode_native_required_outcome_contract_v1.py}
-  integrity: {kind: sha256, sha256: f83a9fb6b093caee17d5f14efcd78fd0a5558cfc8b32b9942c31c06bf3f77ac3}
+  integrity: {kind: sha256, sha256: 47ab2d6257a4768c0bfe2a137a9f034b640a9ef7cf0b2d7adae554465cf5820a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]
@@ -42121,7 +42121,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/episode_native_required_outcomes_v1.md', repository_path: docs/contracts/episode_native_required_outcomes_v1.md}
-  integrity: {kind: sha256, sha256: 4b81d4782e8cbd9a792d2537ffc4d97fc34c104563e7d2d4ed8f98c0c368ec06}
+  integrity: {kind: sha256, sha256: 1661c14f62b79a8722a27ec9d899fe58854aba2b7085abac2c6a5de3f99b86d9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]
@@ -43321,7 +43321,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_fragments.py', repository_path: src/solana_alpha_lab/factory/research_fragments.py}
-  integrity: {kind: sha256, sha256: 063243831b4cf58eb2df51d67ddc70548c2e581de4b5d30b069cee08ff23f018}
+  integrity: {kind: sha256, sha256: 6bc8ec60ad5231e90e1e2a17cf637a5314c7f98118b591df0196be7114ad9e0c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43372,7 +43372,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/RESEARCH_FRAGMENTS_V1.md', repository_path: docs/operator/RESEARCH_FRAGMENTS_V1.md}
-  integrity: {kind: sha256, sha256: a8fdab5afcacc2d41dfbaf9cc29dfed50d87d79b85b4ba767150b77fd1e6e669}
+  integrity: {kind: sha256, sha256: 70869c9d63d6ce5449917c60093c8f29f0b8fb4eb44938d0d08015082be3301b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]

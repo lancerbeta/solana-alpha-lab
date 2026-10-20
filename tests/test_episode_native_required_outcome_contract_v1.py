@@ -23,6 +23,7 @@ from tests.fixtures.episode_native_required_outcomes_v1.proof import prepare, lo
 from solana_alpha_lab.factory.episode_required_outcomes import project_episode_required_outcomes, _metadata_status
 from solana_alpha_lab.factory.hfic_session import (
     finalize_session, apply_classification, load_session_bundle, run_live_classifier, HficSessionError,
+    preview_classification_correction,
 )
 from solana_alpha_lab.factory.experiment_spec import validate_experiment_document, ExperimentSpecError
 from solana_alpha_lab.factory.hfic_grounded_discovery import GroundedDiscoveryError
@@ -383,6 +384,173 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
             apply_classification(self.frozen, self.packet(), store=self.store, repo_root=ROOT, data_root=self.plane)
         self.assertFalse(any("typed_value" in (t["columns"] or []) for t in recorder.trace))
         self.assertEqual(self.store.diagnostics().committed_inventory_sha256, guarded_inventory)
+
+    def _pass(self):
+        critic = _critic_result(self.frozen, "PASS_TO_CLASSIFICATION")
+        critic["non_claims"].append("SCRIPTED_TEST_CRITIC_NOT_SCIENTIFIC_ACCEPTANCE")
+        return finalize_session(self.frozen, critic, store=self.store, repo_root=ROOT, data_root=self.plane)
+
+    def _future_packet(self):
+        future = copy.deepcopy(self.spec)
+        future["as_of"] = future["availability_cutoff"] = (AS_OF + timedelta(hours=5)).isoformat().replace("+00:00", "Z")
+        return self.packet(future)
+
+    def test_malformed_spec_is_input_refusal_and_session_stays_pending(self):
+        self._pass()
+        before = self.store.diagnostics().committed_inventory_sha256
+        with self.assertRaisesRegex(HficSessionError, "CLASSIFICATION_INPUT_INVALID") as caught:
+            apply_classification(self.frozen, self._future_packet(), store=self.store, repo_root=ROOT, data_root=self.plane)
+        self.assertEqual(caught.exception.detail["reason_code"], "SPEC_AS_OF_AFTER_EVALUATION")
+        self.assertEqual(caught.exception.detail["fields"], ["as_of", "availability_cutoff"])
+        self.assertFalse(caught.exception.detail["writes"])
+        self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
+        pending = load_session_bundle(self.store, self.frozen["session_id"])
+        self.assertEqual(pending["session_state"], "AWAITING_CLASSIFICATION")
+        self.assertEqual(pending["critic_terminal"], "PASS_TO_CLASSIFICATION")
+        apply_classification(self.frozen, self.packet(), store=self.store, repo_root=ROOT, data_root=self.plane)
+        done = load_session_bundle(self.store, self.frozen["session_id"])
+        self.assertEqual(done["classifier_receipt"]["lane_classifier_terminal"], "FAST_LANE_READY")
+        # A correctly classified session is not a correction subject.
+        with self.assertRaisesRegex(HficSessionError, "CLASSIFICATION_CORRECTION_NOT_INPUT_REFUSAL"):
+            preview_classification_correction(self.store, self.frozen["session_id"], self._corrected_packet(),
+                                              repo_root=ROOT, data_root=self.plane)
+
+    def _corrected_packet(self):
+        from datetime import UTC, datetime
+        corrected = copy.deepcopy(self.spec)
+        now = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        corrected["as_of"] = corrected["availability_cutoff"] = now
+        return {"experiment_spec": corrected, "hypothesis_definition_sha256": self.definition}
+
+    def _legacy_refusal(self):
+        """Reproduce the pre-repair writer: the envelope guard was absent there."""
+        import inspect
+        from solana_alpha_lab.factory import lane_classifier
+        original = lane_classifier.spec_input_refusal
+        def legacy(*args, **kwargs):
+            if inspect.stack()[1].function == "run_live_classifier":
+                return None
+            return original(*args, **kwargs)
+        self._pass()
+        with patch.object(lane_classifier, "spec_input_refusal", legacy):
+            apply_classification(self.frozen, self._future_packet(), store=self.store, repo_root=ROOT, data_root=self.plane)
+        refused = load_session_bundle(self.store, self.frozen["session_id"])
+        self.assertEqual(refused["final_session_terminal"], "KILL_UNBOUND_EVIDENCE")
+        self.assertEqual(refused["classifier_receipt"]["lane_classifier_terminal"], "DENY_INVALID_SPEC")
+        return refused
+
+    def test_recorded_input_refusal_correction_lineage_and_fragment(self):
+        from solana_alpha_lab.factory.hfic_session import (
+            preview_classification_correction as preview, apply_classification_correction as apply)
+        from solana_alpha_lab.factory import research_fragments as fragments
+        refused = self._legacy_refusal()
+        sid = self.frozen["session_id"]
+        packet = self._corrected_packet()
+        for forged, code in (
+            ({**packet, "classifier_evaluated_at": "2026-10-15T09:00:00Z"}, "CLASSIFICATION_CORRECTION_PACKET_INVALID"),
+            ({**packet, "hypothesis_definition_sha256": "0" * 64}, "CLASSIFICATION_CORRECTION_PACKET_INVALID"),
+            ({**packet, "experiment_spec": {**packet["experiment_spec"], "estimand": "changed"}}, "CLASSIFICATION_CORRECTION_SCOPE_FORBIDDEN"),
+            ({**packet, "experiment_spec": {**packet["experiment_spec"], "as_of": "2026-10-15T07:00:00Z",
+                                             "availability_cutoff": "2026-10-15T07:00:00Z"}}, "CLASSIFICATION_CORRECTION_TIME_BEFORE_CRITIC_PASS"),
+        ):
+            with self.assertRaisesRegex(HficSessionError, code):
+                preview(self.store, sid, forged, repo_root=ROOT, data_root=self.plane)
+        from tests.test_forge_research_flow_reliability_v1 import public_cli
+        focus = refused["owner_focus"]
+        code, run_before = public_cli(self.plane, "forge-run", "--collection", "OPPORTUNITY_EPISODES",
+                                      "--owner-focus", focus, "--no-write", "--format", "json")
+        self.assertEqual(code, 0, run_before)
+        base_before = next(r for r in run_before["stages"] if r["representation_id"] == "BASE")
+        self.assertEqual(base_before["effective_terminal"], "KILL_UNBOUND_EVIDENCE")
+        code, stopped = public_cli(self.plane, "forge-run", "--collection", "OPPORTUNITY_EPISODES",
+                                   "--owner-focus", focus, "--persist", "--format", "json")
+        self.assertEqual((code, stopped["owner_final"]), (0, "NON_SCIENTIFIC_STOP"), stopped)
+        before = self.store.diagnostics().committed_inventory_sha256
+        packet_path = self.work / "corrected-packet.json"
+        packet_path.write_text(json.dumps(packet), encoding="utf-8")
+        with patch("solana_alpha_lab.factory.hfic_temporal_discovery.execute_temporal_discovery",
+                   side_effect=AssertionError("no outcome evaluator")):
+            ready = preview(self.store, sid, packet, repo_root=ROOT, data_root=self.plane)
+        code, public_ready = public_cli(self.plane, "classification-correction-preview", "--session-id", sid,
+                                        "--experiment-spec", str(packet_path), "--format", "json")
+        self.assertEqual(code, 0, public_ready)
+        self.assertEqual(ready["status"], "PREVIEW_READY")
+        self.assertEqual(public_ready["proposal"]["correction"]["refused"], ready["proposal"]["correction"]["refused"])
+        self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
+        body = ready["proposal"]["correction"]
+        self.assertEqual(body["refused"]["cause"]["reason_code"], "SPEC_AS_OF_AFTER_EVALUATION")
+        self.assertEqual([c["field"] for c in body["corrected"]["field_changes"]], ["as_of", "availability_cutoff"])
+        self.assertEqual(body["accounting"]["scientific_look_delta"], 0)
+        with self.assertRaisesRegex(HficSessionError, "CONFIRM_APPEND_ONLY_REQUIRED"):
+            apply(self.store, ready["proposal"], repo_root=ROOT, data_root=self.plane, confirm_append_only=False)
+        stale = copy.deepcopy(ready["proposal"])
+        stale["parent_session_receipt_sha256"] = "0" * 64
+        with self.assertRaisesRegex(HficSessionError, "CLASSIFICATION_CORRECTION_PREVIEW_STALE"):
+            apply(self.store, stale, repo_root=ROOT, data_root=self.plane, confirm_append_only=True)
+        proposal_path = self.work / "correction-preview.json"
+        proposal_path.write_text(json.dumps(public_ready), encoding="utf-8")
+        code, refused_cli = public_cli(self.plane, "classification-correction-apply", "--proposal", str(proposal_path), "--format", "json")
+        self.assertEqual((code, refused_cli["reason_code"], refused_cli["writes"]["research_store"]),
+                         (2, "CONFIRM_APPEND_ONLY_REQUIRED", 0))
+        code, applied = public_cli(self.plane, "classification-correction-apply", "--proposal", str(proposal_path),
+                                   "--confirm-append-only", "--format", "json")
+        self.assertEqual(code, 0, applied)
+        self.assertEqual((applied["status"], applied["writes"]["research_store"], applied["new_look"]), ("APPLIED", 1, False))
+        self.store = ResearchStore(self.plane)
+        corrected = load_session_bundle(self.store, sid)
+        self.assertEqual(corrected["final_session_terminal"], "PASS_FAST_LANE_READY")
+        self.assertEqual(corrected["classifier_receipt"]["lane_classifier_terminal"], "FAST_LANE_READY")
+        self.assertEqual(corrected["critic_input_packet_sha256"], refused["critic_input_packet_sha256"])
+        self.assertEqual(corrected["selected_definition_sha256"], self.definition)
+        self.assertEqual(corrected["decisions"][self.frozen["selected_candidate_id"]]["decision_kind"], "PAUSE")
+        self.assertEqual(corrected["classification_correction"], body)
+        # History keeps the refusal; a repeat (lost response) writes nothing.
+        after = self.store.diagnostics().committed_inventory_sha256
+        again = apply(self.store, ready["proposal"], repo_root=ROOT, data_root=self.plane, confirm_append_only=True)
+        self.assertEqual(again["classification_correction_sha256"], corrected["classification_correction_sha256"])
+        self.assertEqual(self.store.diagnostics().committed_inventory_sha256, after)
+        self.assertEqual(preview(self.store, sid, packet, repo_root=ROOT, data_root=self.plane)["status"], "ALREADY_APPLIED")
+        kinds = [json.loads(r.payload_json).get("artifact_kind") for r in self.store.iter_committed_records()
+                 if json.loads(r.payload_json).get("session_id") == sid]
+        self.assertEqual(kinds.count("CLASSIFIER_RECEIPT"), 2)
+        self.assertEqual(kinds.count("SESSION_RECEIPT"), 2)
+        code = "from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; from solana_alpha_lab.factory.hfic_session import load_session_bundle; import json,sys; b=load_session_bundle(ResearchStore(Path(sys.argv[1])),sys.argv[2]); print(json.dumps([b['final_session_terminal'], b['classification_correction_sha256']]))"
+        cold = subprocess.run([sys.executable, "-B", "-c", code, str(self.plane), sid], cwd=ROOT, capture_output=True,
+                              encoding="utf-8", timeout=180, env={**os.environ, "PYTHONPATH": str(ROOT / "src")})
+        self.assertEqual(cold.returncode, 0, cold.stderr)
+        self.assertEqual(json.loads(cold.stdout), ["PASS_FAST_LANE_READY", corrected["classification_correction_sha256"]])
+        code, run_after = public_cli(self.plane, "forge-run", "--collection", "OPPORTUNITY_EPISODES",
+                                     "--owner-focus", focus, "--no-write", "--format", "json")
+        self.assertEqual(code, 0, run_after)
+        base_after = next(r for r in run_after["stages"] if r["representation_id"] == "BASE")
+        self.assertEqual(base_after["effective_terminal"], "PASS_FAST_LANE_READY", run_after.get("owner_readout"))
+        self.assertEqual(base_after["session_id"], sid)
+        self.assertEqual(run_after["owner_final"], "OWNER_CANDIDATE")
+        code, persisted = public_cli(self.plane, "forge-run", "--collection", "OPPORTUNITY_EPISODES",
+                                     "--owner-focus", focus, "--persist", "--format", "json")
+        self.assertEqual((code, persisted["owner_final"]), (0, "OWNER_CANDIDATE"), persisted)
+        self.assertNotEqual(persisted["receipt_sha256"], stopped["receipt_sha256"])
+        receipts = [json.loads(json.loads(r.payload_json)["payload_canonical"]) for r in ResearchStore(self.plane).iter_committed_records()
+                    if json.loads(r.payload_json).get("artifact_kind") == "FORGE_RUN_RECEIPT"]
+        self.assertIn("NON_SCIENTIFIC_STOP", [r.get("owner_final") for r in receipts])
+        code, replay = public_cli(self.plane, "forge-run", "--collection", "OPPORTUNITY_EPISODES",
+                                  "--owner-focus", focus, "--no-write", "--format", "json")
+        self.assertEqual((code, replay["next_action"], replay["owner_final"]), (0, "RETURN_EXISTING_RUN", "OWNER_CANDIDATE"))
+        # The native shelf reads the corrected terminal and the exact list contrast.
+        grounded = corrected["critic_input_packet"]["grounded_evidence"]
+        request = {"title": "fixture list contrast", "role": "CONTEXT_FILTER", "session_id": sid,
+                   "candidate_id": self.frozen["selected_candidate_id"], "definition_sha256": self.definition,
+                   "result_ref": grounded["result_refs"][0], "result_sha256": grounded["result_sha256"]}
+        card = fragments.register(self.store, request, git_sha="0" * 40)
+        self.assertEqual(card["status"], "REGISTERED")
+        view = next(v for v in fragments.source_snapshot(self.store) if v["fragment_version_id"] == card["fragment"]["fragment_version_id"])
+        self.assertEqual(view["source_terminal"], "PASS_FAST_LANE_READY")
+        summary = view["evidence_blocks"][0]["summary"]
+        scope = summary["research_scope"]
+        self.assertEqual(scope["contrast"]["kind"], "MATCHED_VS_ELIGIBLE_COMPLEMENT")
+        self.assertEqual(scope["contrast"]["comparator"]["n"], scope["decision_eligible_n"] - scope["matched"]["n"])
+        self.assertNotEqual(scope["contrast"]["comparator"]["n"], summary["baseline"]["eligible_n"])
+        self.assertTrue(summary["baseline_may_include_matched"])
 
     def test_republished_numeric_values_and_missing_target_keep_denominator(self):
         variants = os.environ.get("ERNOC_VARIANTS")

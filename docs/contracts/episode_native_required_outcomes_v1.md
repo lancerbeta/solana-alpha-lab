@@ -86,6 +86,48 @@ Incomplete data вне required horizon не создаёт veto.
 | Integrity/query/definition/source/schedule conflict | Исправить exact binding штатным owner; не редактировать hashes или исторический receipt |
 | EPISODE_CLASSIFICATION_REVALIDATION_DENIED | Сохранённый historical receipt доступен; fresh action запрещён |
 
+## Отказ входа и исправление записанного отказа
+
+Невалидная оболочка Spec — это отказ входа, а не вердикт гипотезы.
+`lane_classifier.spec_input_refusal` — единственная проверка оболочки; её
+используют и `classify_lane`, и HFIC writer. В публичном `classify` она
+срабатывает до записи receipt, decision или terminal. Ответ —
+`CLASSIFICATION_INPUT_INVALID` (JSON: `detail.stage`, `reason_code`, `fields`,
+`classifier_evaluated_at`, `next_action`, фактические `writes`). Сессия остаётся
+`AWAITING_CLASSIFICATION`; исправленная оболочка проходит тот же `classify`.
+Время оценки — runtime UTC; подставлять будущее `classifier_evaluated_at`
+нельзя. Сбой registry, source, protection и прочие `DENY_*` с конкретным
+reason сохраняют прежний смысл.
+
+Отказ, записанный до этого ремонта (`DENY_INVALID_SPEC` +
+`EXPERIMENT_SPEC_INVALID` → `KILL_UNBOUND_EVIDENCE`), исправляется
+append-only, а не переоткрытием науки:
+
+```text
+hypothesis_forge.py classification-correction-preview --session-id <S> --experiment-spec <packet.json>
+hypothesis_forge.py classification-correction-apply --proposal <saved preview stdout> --confirm-append-only
+```
+
+Packet содержит только `experiment_spec` и `hypothesis_definition_sha256`.
+Preview доказывает одновременно:
+- исходный isolated `PASS_TO_CLASSIFICATION` на том же packet и definition;
+- сохранённый запрос заново даёт тот же отказ оболочки на своё время оценки;
+- изменены только поля, названные этим отказом. Ключи вопроса, recipe,
+  bindings, outcomes и scope запрещены; исправленное время не раньше Critic PASS;
+- свежий classifier на исходных inputs проходит текущие gates.
+
+Научный KILL, runner-up, repair continuation, иной receipt или вторая
+поправка отказывают. Apply сверяет parent receipt и proposal SHA, пишет в ту же
+сессию цикл `COMPLETE-CLSCORR-<sha12>` со своими CRITIC_RESULT, CLASSIFIER_RECEIPT,
+SESSION_RECEIPT и решением выбранного кандидата. Цикл несёт
+`classification_correction` (refused → corrected, diff полей, accounting
+`scientific_look_delta=0`). Повтор возвращает ту же запись. Отказ, исходный
+owner-final и бюджет остаются в истории; operation не переоткрывается.
+`load_session_bundle` читает receipt, связанный с активным циклом. Aggregate
+`forge-run` снимает completed readback один раз — только если сохранённый
+owner-final указывал на exact отказанный session receipt этой поправки. Новый
+`forge-run --persist` становится readback.
+
 `episode_outcome_binding` в classifier receipt связывает Spec/definition/recipe,
 sources, current protection, policy/scope, exact membership и required coverage
 через canonical binding_sha256. Caller projection не является authority.

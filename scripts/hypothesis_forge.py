@@ -62,6 +62,7 @@ from solana_alpha_lab.factory.hfic_prospects import (  # noqa: E402
     HficProspectError,
 )
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
+    CLASSIFICATION_INPUT_INVALID,
     HficSessionError,
     _execution_identity_fields,
     PENDING_STATES,
@@ -3793,15 +3794,93 @@ def cmd_classify(
     frozen = load_session_bundle(store, session_id)
     if frozen is None:
         raise HficCliError("SESSION_NOT_FOUND")
-    payload = apply_classification(
-        frozen,
-        packet,
-        store=store,
-        repo_root=repo_root,
-        data_root=data_root,
-    )
+    before = store.diagnostics().committed_inventory_sha256
+    try:
+        payload = apply_classification(
+            frozen,
+            packet,
+            store=store,
+            repo_root=repo_root,
+            data_root=data_root,
+        )
+    except HficSessionError as exc:
+        if exc.code != CLASSIFICATION_INPUT_INVALID:
+            raise
+        return _classification_refusal(exc, store=store, before=before)
     git_after = repository_git_snapshot(repo_root)
     if not git_before.unchanged(git_after):
+        raise HficCliError("GIT_MUTATION_DETECTED")
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def _classification_refusal(exc: Any, *, store: Any, before: str) -> int:
+    """One JSON object on stdout: stage, reason, field locator, next action, actual writes."""
+
+    detail = dict(getattr(exc, "detail", None) or {})
+    detail.pop("writes", None)
+    after = store.diagnostics().committed_inventory_sha256
+    return emit({
+        "status": "BLOCKED",
+        "reason_code": exc.code,
+        "detail": detail,
+        "next_action": detail.get("next_action") or "INSPECT_DETAIL_REUSE_SAVED_SESSION",
+        "writes": {"research_store": int(after != before)},
+        "new_look": False,
+        "scientific_negative": False,
+    }, exit_code=2)
+
+
+def cmd_classification_correction(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    session_id: str | None = None,
+    spec_path: Path | None = None,
+    proposal_path: Path | None = None,
+    confirm_append_only: bool = False,
+) -> int:
+    """Preview (session + packet) or apply (saved preview) one input-refusal correction."""
+
+    from solana_alpha_lab.factory.hfic_session import (
+        apply_classification_correction,
+        preview_classification_correction,
+    )
+
+    git_before = repository_git_snapshot(repo_root)
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    before = store.diagnostics().committed_inventory_sha256
+    try:
+        if proposal_path is None:
+            packet = _load_json_file(spec_path, repo_root=repo_root)
+            _assert_no_path_leak(packet, str(repo_root))
+            payload = preview_classification_correction(
+                store, str(session_id), packet, repo_root=repo_root, data_root=data_root)
+        else:
+            saved = _load_json_file(proposal_path, repo_root=repo_root)
+            proposal = saved.get("proposal") if isinstance(saved.get("proposal"), dict) else saved
+            bundle = apply_classification_correction(
+                store, proposal, repo_root=repo_root, data_root=data_root,
+                confirm_append_only=confirm_append_only)
+            payload = {
+                "status": "APPLIED",
+                "session_id": bundle.get("session_id"),
+                "session_state": bundle.get("session_state"),
+                "final_session_terminal": bundle.get("final_session_terminal"),
+                "lane_classifier_terminal": bundle.get("lane_classifier_terminal"),
+                "classification_correction_sha256": bundle.get("classification_correction_sha256"),
+                "session_receipt_sha256": bundle.get("session_receipt_sha256"),
+                "writes": {"research_store": int(store.diagnostics().committed_inventory_sha256 != before)},
+                "new_look": False,
+                "next_action": "RUN_FORGE_RUN_NO_WRITE_THEN_PERSIST_FOR_SAME_FOCUS",
+            }
+    except HficSessionError as exc:
+        if not (exc.code.startswith("CLASSIFICATION_") or exc.code in {
+                "SESSION_NOT_FOUND", "CONFIRM_APPEND_ONLY_REQUIRED"}):
+            raise
+        return _classification_refusal(exc, store=store, before=before)
+    if not git_before.unchanged(repository_git_snapshot(repo_root)):
         raise HficCliError("GIT_MUTATION_DETECTED")
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     return emit(payload)
@@ -4759,6 +4838,20 @@ def build_parser() -> argparse.ArgumentParser:
     classify_cmd.add_argument("--session-id", required=True)
     classify_cmd.add_argument("--experiment-spec", type=Path, required=True)
     classify_cmd.add_argument("--format", choices=("json",), default="json")
+    correction_preview = subparsers.add_parser(
+        "classification-correction-preview",
+        help="read-only proof and exact proposal to correct one recorded classification input refusal",
+    )
+    correction_preview.add_argument("--session-id", required=True)
+    correction_preview.add_argument("--experiment-spec", type=Path, required=True)
+    correction_preview.add_argument("--format", choices=("json",), default="json")
+    correction_apply = subparsers.add_parser(
+        "classification-correction-apply",
+        help="append one previewed classification correction; requires --confirm-append-only",
+    )
+    correction_apply.add_argument("--proposal", type=Path, required=True)
+    correction_apply.add_argument("--confirm-append-only", action="store_true")
+    correction_apply.add_argument("--format", choices=("json",), default="json")
 
     show_session_cmd = subparsers.add_parser("show-session")
     show_session_cmd.add_argument("--session-id", default=None)
@@ -5281,6 +5374,20 @@ def main(argv: list[str] | None = None) -> int:
                 args.session_id,
                 args.experiment_spec,
                 args.data_root,
+            )
+        if args.command == "classification-correction-preview":
+            return cmd_classification_correction(
+                repo_root,
+                explicit_data_root=args.data_root,
+                session_id=args.session_id,
+                spec_path=args.experiment_spec,
+            )
+        if args.command == "classification-correction-apply":
+            return cmd_classification_correction(
+                repo_root,
+                explicit_data_root=args.data_root,
+                proposal_path=args.proposal,
+                confirm_append_only=bool(args.confirm_append_only),
             )
         if args.command == "show-session":
             return cmd_show_session(

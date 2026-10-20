@@ -59,6 +59,16 @@ def _happy_with_pit_runner_up() -> dict:
     return draft
 
 
+
+def _integrity_mismatch_spec(spec: dict) -> dict:
+    """Valid envelope whose bound catalog bytes do not match: DENY_INTEGRITY_MISMATCH."""
+    spec = dict(spec)
+    spec["data_bindings"] = [
+        {**binding, "expected_content_sha256_or_dataset_fingerprint": "0" * 64}
+        for binding in spec["data_bindings"]
+    ]
+    return spec
+
 class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
     def setUp(self) -> None:
         from tests import test_hfic_session as session_tests
@@ -294,12 +304,13 @@ class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
             v1_2_spec,
         )
 
-        spec = v1_2_spec(as_of="2026-09-01T12:00:00Z")
+        # A classifier-owned deny (not an input refusal, which writes nothing).
+        spec = _integrity_mismatch_spec(v1_2_spec())
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             forged = forge_classify(packet_for(spec), data_root, AS_OF_START)
             self.assertEqual(forged["session_state"], RUNNER_UP_AWAITING_CRITIC)
-            self.assertEqual(forged["classifier_terminal"], "DENY_INVALID_SPEC")
+            self.assertEqual(forged["classifier_terminal"], "DENY_INTEGRITY_MISMATCH")
             self.assertEqual(forged["hfic_terminal"], "KILL_UNBOUND_EVIDENCE")
 
     def test_classifier_mapped_c1_kill_then_c2_classify(self) -> None:
@@ -320,7 +331,7 @@ class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
                 repo_root=ROOT,
             )
             future = _with_selected_feats(
-                packet_for(v1_2_spec(as_of="2026-09-01T12:00:00Z")),
+                packet_for(_integrity_mismatch_spec(v1_2_spec())),
                 frozen["critic_input_packet"],
             )
             future["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
@@ -334,7 +345,7 @@ class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
             )
             self.assertEqual(parked["session_state"], RUNNER_UP_AWAITING_CRITIC)
             parked_receipt = parked.get("classifier_receipt") or {}
-            self.assertEqual(parked_receipt.get("lane_classifier_terminal"), "DENY_INVALID_SPEC")
+            self.assertEqual(parked_receipt.get("lane_classifier_terminal"), "DENY_INTEGRITY_MISMATCH")
             waiting = finalize_session(
                 parked,
                 critic_result_from_packet_only(

@@ -117,6 +117,15 @@ execution без CHECK, INCONCLUSIVE или refund. Следующий run-due �
 либо явно завершайте попытку native STOP. Binding guard не ослабляется.
 Оба выбора остаются явными; sign результата не участвует в выборе окна.
 
+Для list-кандидата summary переносит сохранённые `research_scope` и
+`scientific_identity`. Comparator `MATCHED_VS_ELIGIBLE_COMPLEMENT` — это
+`research_scope.contrast.comparator` (n = decision-eligible минус matched).
+`baseline` остаётся pool, включающим matched (`baseline_may_include_matched`);
+его ES10 не является ES10 complement. Для legacy result без блока — `UNKNOWN`.
+`source_terminal` читается из текущей сессии: после связанной
+classification-поправки это исправленный терминал, исходный отказ остаётся в
+истории сессии.
+
 Общий snapshot сохраняет native bounded by_cohort / by_calendar_block (до четырёх
 каждого, с total/included/truncated), источник result_ref, native markers зависимости
 и episode_counts/repeated_mint_n, где они сохранены. UNKNOWN не достраивается.

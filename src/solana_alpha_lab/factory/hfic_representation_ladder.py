@@ -2335,6 +2335,61 @@ def _lookup_run_artifact_for_session(
     return repair_completed or completed or latest
 
 
+def _superseded_by_classification_correction(
+    store: ResearchStore,
+    existing: Mapping[str, Any],
+    live_stages: Sequence[Mapping[str, Any]],
+) -> str | None:
+    """Corrected session receipt SHA, only when a saved stage points at the exact
+    refused session receipt named by that session's bound correction."""
+
+    saved = {
+        str(row.get("session_id")): row
+        for row in existing.get("stages") or []
+        if isinstance(row, Mapping) and row.get("session_id")
+    }
+    for row in live_stages:
+        sid = str((row or {}).get("session_id") or "")
+        if sid not in saved:
+            continue
+        bundle = load_session_bundle(store, sid, read_mode=True) or {}
+        body = bundle.get("classification_correction")
+        if not isinstance(body, Mapping):
+            continue
+        refused = (body.get("refused") or {}).get("session_receipt_sha256")
+        if (
+            refused
+            and saved[sid].get("stage_ref_sha256") == refused
+            and row.get("stage_ref_sha256") == bundle.get("session_receipt_sha256")
+        ):
+            return str(bundle.get("session_receipt_sha256"))
+    return None
+
+
+def _owner_final_receipt_for_stage_ref(
+    store: ResearchStore, identity: str, stage_ref: str
+) -> dict[str, Any] | None:
+    """The saved owner-final of this run whose stage is the given session receipt."""
+
+    for record in store.iter_committed_records():
+        if getattr(record.record_kind, "value", record.record_kind) != RecordKind.RESEARCH_ARTIFACT.value:
+            continue
+        payload = json.loads(record.payload_json)
+        raw = payload.get("payload_canonical")
+        if payload.get("artifact_kind") != FORGE_RUN_ARTIFACT_KIND or not isinstance(raw, str):
+            continue
+        body = json.loads(raw)
+        if (
+            isinstance(body, dict)
+            and body.get("run_identity_sha256") == identity
+            and body.get("owner_final")
+            and any(isinstance(row, Mapping) and row.get("stage_ref_sha256") == stage_ref
+                    for row in body.get("stages") or [])
+        ):
+            return body
+    return None
+
+
 def _input_has_current_surface(input_receipt: Mapping[str, Any]) -> bool:
     """True when forge input already names a current corpus surface.
 
@@ -3185,6 +3240,20 @@ def evaluate_forge_run(
             ACTION_NON_SCIENTIFIC_STOP,
         }
     )
+    corrected_ref = (
+        _superseded_by_classification_correction(store, existing, resolved_stages)
+        if existing_owner_final else None
+    )
+    if corrected_ref:
+        # The saved owner-final answered exactly the refused completion that a
+        # bound correction supersedes. A receipt already saved for the corrected
+        # completion is the readback; otherwise compute it once.
+        corrected_receipt = _owner_final_receipt_for_stage_ref(
+            store, str(existing.get("run_identity_sha256") or ""), corrected_ref)
+        if corrected_receipt is not None:
+            existing = corrected_receipt
+        else:
+            existing_owner_final = False
     if existing is not None:
         if not saved_draft_sha256:
             for row in existing.get("stages") or []:
