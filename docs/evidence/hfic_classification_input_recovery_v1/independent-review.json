@@ -1,0 +1,100 @@
+{
+  "as_of": "2026-10-20",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_MERGE_OR_SCIENTIFIC_AUTHORITY_FROM_REVIEW"
+  ],
+  "remediation_history": [
+    {
+      "finding": "Capability epoch after merge would make forge-run disagree with session and shelf; caller classifier_evaluated_at bypass.",
+      "observed_head": "a0e7be02672fc02898eabee364aae8f13ab081d8",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "c8c2b73b61685aafa6b75a1eb0e53a9d159d4705",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "No compare-before-append or fork detection; caller clock bypass on public classify.",
+      "observed_head": "a0e7be02672fc02898eabee364aae8f13ab081d8",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "c8c2b73b61685aafa6b75a1eb0e53a9d159d4705",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Config vs input, late denial, CAS, unpinned time rule and missing authority-not-widened evidence.",
+      "observed_head": "a0e7be02672fc02898eabee364aae8f13ab081d8",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "c8c2b73b61685aafa6b75a1eb0e53a9d159d4705",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Generic next_action, no refused-packet readback, no public lineage readback, caller clock.",
+      "observed_head": "a0e7be02672fc02898eabee364aae8f13ab081d8",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "c8c2b73b61685aafa6b75a1eb0e53a9d159d4705",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Corrected cutoff could exceed the refused judgement and admit matured outcomes.",
+      "observed_head": "c8c2b73b61685aafa6b75a1eb0e53a9d159d4705",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "14cc8e481f083f459bdb4820fb980e728d5909bc",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    }
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "review_id": "HFIC_CLASSIFICATION_INPUT_RECOVERY_V1-REVIEW",
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=aa386df09c0f1a2a93cf8350d54fec6ffaa74a4ed5ac56bd25a4e36d55764eef",
+        "Isolated SEMANTIC_PREMISE round 3 PASS at exact head 14cc8e481f083f459bdb4820fb980e728d5909bc; packet and diff hashes match. Corrected as_of and availability_cutoff are pinned to the refused judgement instant; a later cutoff is refused; a non-ready result is CURRENT_GATE_DENIED; the capability exception is single, marker-bound, cross-checked and the look capability is exposed.",
+        "Can pass tests and still break validity: backdated first_reliable_available_at written after the judgement (general data-plane PIT premise); readers must use look_capability_epoch_sha256 for look provenance.",
+        "MINOR: no maturation fixture test; prefix pass-through filter; idempotence only for a byte-identical proposal."
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated round 3 PASS at exact head 14cc8e481f083f459bdb4820fb980e728d5909bc (round 2 PASS at c8c2b73b61685aafa6b75a1eb0e53a9d159d4705). Pinned instant enforced by exact set equality; CLASSIFI codes re-raised; idempotent race writes nothing; loader capability cross-check matches finalize.",
+        "MINOR: broad ValueError/KeyError/OSError wrap during correction is reported as CURRENT_GATE_DENIED; the different-body before_commit STALE race branch is untested."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated round 2 PASS at c8c2b73b61685aafa6b75a1eb0e53a9d159d4705; the round-3 delta (time pin and minor hardening) was reviewed by ARCHITECTURE_CRITIC and CODE_REVIEWER only, by explicit owner decision.",
+        "All round-1 GOAL_DOD MAJORs closed; the post-merge runbook uses delivered public commands.",
+        "MINOR: no negative tests for ORIGINAL_PASS_UNAVAILABLE, mismatched receipt or SOURCE_UNAVAILABLE."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated round 2 PASS at c8c2b73b61685aafa6b75a1eb0e53a9d159d4705; the round-3 delta was reviewed by ARCHITECTURE_CRITIC and CODE_REVIEWER by explicit owner decision.",
+        "Per-code next_action and stage, TEMPLATE refused packet, show-session lineage, forge_run_args and uniform writes; an operator can cold-start C6 from the contract and runbook.",
+        "MINOR: PREVIEW_READY time bounds are nested."
+      ]
+    }
+  ],
+  "schema": "smial.delivery-independent-review",
+  "schema_version": "1.0",
+  "task_id": "HFIC_CLASSIFICATION_INPUT_RECOVERY_V1",
+  "verdict": "PASS"
+}

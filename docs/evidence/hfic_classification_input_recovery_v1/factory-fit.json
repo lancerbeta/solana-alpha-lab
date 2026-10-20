@@ -1,0 +1,33 @@
+{
+  "as_of": "2026-10-20",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Accepted code, then the bounded real C6 correction and one advisory fragment; no new service or tool."
+  },
+  "dimensions": {
+    "build_vs_buy": "ADOPT lane classifier, finalize_session, ResearchStore append/before_commit, session cycle ranking, ladder readback and fragment shelf; WRAP one envelope refusal and one proof-bound correction cycle. No dependency, provider or new artifact kind.",
+    "context_efficiency": "One task contract plus one contract section; no duplicate PRD, SSD or plan.",
+    "execution_to_cashflow": "Research lifecycle repair only; no alpha, strategy, executable return or cashflow claim.",
+    "flexibility_and_history": "Append-only: refused receipt, owner-final, look ledger and budget stay in history; historical cutoff readers keep REJECT.",
+    "mission": "An envelope typo no longer closes a scientific session; one recorded refusal reaches its ordinary classification, owner-final and advisory fragment without a new look.",
+    "monitoring_and_recovery": "Typed non-writing refusals with per-code next_action; idempotent apply, compare-before-append, fork detection; forward-fix only after a real correction.",
+    "owner_operability": "TEMPLATE preview with refused packet and expected instant; show-session lineage; apply returns forge_run_args; contract code-to-action table and C6 runbook.",
+    "red_team": "Future or naive caller clock, config outage, scope beyond time fields, later cutoff with matured outcomes, late protection denial, concurrent apply, capability drift after merge and scientific KILL are refused or tested.",
+    "research_truth": "The correction re-judges the same request at its own judgement instant; the capability exception is single, marker-bound and keeps look_capability_epoch_sha256; no causality or OOS claim.",
+    "security": "No credentials or network; envelope, clock and protection gates fail closed before writes."
+  },
+  "limits": [
+    "REAL_C6_CORRECTION_AND_FRAGMENT_PENDING_ACCEPTED_MERGE",
+    "PAST_CALLER_CLASSIFIER_CLOCK_ACCEPTED_ON_ORDINARY_CLASSIFY",
+    "CORRECTED_CRITIC_RESULT_COPY_IN_CRITIC_SOURCES",
+    "MARKET_EPOCH_DRIFT_IS_RUNBOOK_STOP_NOT_MACHINE_GATE",
+    "NULL_EXECUTION_BINDING_WHEN_PARENT_COMPONENTS_ABSENT"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "Before any real correction: ordinary revert. After a real correction record: forward-fix only, because a reverted loader would read the first classifier receipt.",
+  "review_id": "HFIC_CLASSIFICATION_INPUT_RECOVERY_V1-FIT",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "HFIC_CLASSIFICATION_INPUT_RECOVERY_V1",
+  "verdict": "PASS"
+}
