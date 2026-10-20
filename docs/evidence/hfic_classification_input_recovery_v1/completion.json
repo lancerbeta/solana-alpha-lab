@@ -9,10 +9,26 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hfic_classification_input_recovery_v1/factory-fit.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "2499d806a53d82ffb2dfd330ad8a2586c5c08809a7e3529777b99e074faf005c",
     "verdict": "PASS"
   },
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "c26ab0ae64686e91ccb3a29c6cdc1a6b81ef5f3f295bc4381583150a3e6a8e27",
+    ".cursor/commands/hypothesis-forge.md": "f91c1504b650a7b6fc2222b98c5e56737f2babd9dda604fef3d37add6ba3bf10",
+    "catalog/assets/core.yaml": "3a4f8e80561ed1bd50dcb7fd7a30ca2703f5e6f2a9ec2ad1c6d26097c8d77c7a",
+    "docs/contracts/episode_native_required_outcomes_v1.md": "2320f9419d4732931c60c0735334c6f25ec4ab2ba5df2d97c7d5976166d48f84",
+    "docs/evidence/hfic_classification_input_recovery_v1/READOUT.md": "d8980f4fcc96116fed1aae52c032a1430e6b17d672398ce38a37594465e0601b",
+    "docs/operator/RESEARCH_FRAGMENTS_V1.md": "70869c9d63d6ce5449917c60093c8f29f0b8fb4eb44938d0d08015082be3301b",
+    "docs/tasks/HFIC_CLASSIFICATION_INPUT_RECOVERY_V1.md": "499226d0619ccc813e8c54cec2018b7b3ea5356e8e2f6895fc458c360f591b40",
+    "scripts/hypothesis_forge.py": "2e10f72ec1849de4f7f711fefe3392087ab486b5ff03632debc9a9a34ae68bc5",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "edf010d53f476205e1b36dd8556aa3c9c1dd602155c888b3181a78c5fb7ea45a",
+    "src/solana_alpha_lab/factory/hfic_session.py": "3f74cd6d4facbf59b55858f4eafaf9ab08c3cbe978ce3ce4406e2ff06633970e",
+    "src/solana_alpha_lab/factory/lane_classifier.py": "7580f907ceeae624f40c4f3fbf93ecf8d94f848973f37aa72761acc72746c9e8",
+    "src/solana_alpha_lab/factory/research_fragments.py": "6bc8ec60ad5231e90e1e2a17cf637a5314c7f98118b591df0196be7114ad9e0c",
+    "tests/test_episode_native_required_outcome_contract_v1.py": "b5077c3e95357b53b129a083af89dfbfc7e4b0efeb055110a8988b271e287e26",
+    "tests/test_hfic_one_frozen_runner_up_failover_v1.py": "2a31a7729f84bfb650dc38750013cbd201bb16720dcec09914195159c37c7897",
+    "tests/test_observation_fast_lane_p0_addendum.py": "03c30f757072df6cc61d39b985cab9f23ab31c644b5a8ba2760417f0431d2b24"
+  },
   "non_claims": [
     "NO_REAL_C6_CORRECTION_OR_FRAGMENT_BEFORE_MERGE",
     "NO_NEW_LOOK_CRITIC_OR_SESSION",
@@ -45,7 +61,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hfic_classification_input_recovery_v1/independent-review.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "2e7fe5c267bee0bacae54133784434c4bb9f30c6c2905b150ccf09db41dab7a6",
       "verdict": "PASS"
     },
     "project_checks": [
