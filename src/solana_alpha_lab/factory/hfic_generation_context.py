@@ -262,8 +262,29 @@ def original_working_view(store: Any, *, search_key: str) -> dict[str, Any] | No
     return min(candidates, key=lambda item: item[:2])[2] if candidates else None
 
 
+# Readout projections of an already hash-bound fragment result. They are added
+# to the shelf summary later and must not make earlier frozen views look changed;
+# the result they project is still fingerprinted through its result_sha256.
+_FRAGMENT_SUMMARY_PROJECTIONS = ("research_scope", "scientific_identity")
+
+
+def _fingerprint_capsule(capsule: Mapping[str, Any]) -> Any:
+    fragments = (capsule.get("source_detail") or {}).get("research_fragments")
+    if not isinstance(fragments, list):
+        return capsule
+    stable = copy.deepcopy(dict(capsule))
+    for fragment in stable["source_detail"]["research_fragments"]:
+        for block in (fragment.get("evidence_blocks") or []) if isinstance(fragment, dict) else []:
+            summary = block.get("summary") if isinstance(block, dict) else None
+            if isinstance(summary, dict):
+                for key in _FRAGMENT_SUMMARY_PROJECTIONS:
+                    summary.pop(key, None)
+    return stable
+
+
 def archive_fingerprint(inventory: Mapping[str, Any]) -> str:
-    return canonical_sha256(sorted(inventory["capsules"], key=lambda c: c["hypothesis_version_id"]))
+    return canonical_sha256(sorted((_fingerprint_capsule(c) for c in inventory["capsules"]),
+                                   key=lambda c: c["hypothesis_version_id"]))
 
 
 def reissue_working_view(original: Mapping[str, Any], inventory: Mapping[str, Any], *, inventory_digest: str) -> dict[str, Any]:

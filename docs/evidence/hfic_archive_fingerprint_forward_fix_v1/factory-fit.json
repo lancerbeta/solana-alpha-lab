@@ -1,0 +1,33 @@
+{
+  "as_of": "2026-10-21",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "C6 runbook continues on accepted code."
+  },
+  "dimensions": {
+    "build_vs_buy": "ADOPT the single archive_fingerprint owner; no new rule system.",
+    "context_efficiency": "One small contract; no duplicate design.",
+    "execution_to_cashflow": "Prior-memory integrity fix only; no alpha or cashflow claim.",
+    "flexibility_and_history": "Frozen views are not rewritten; they match again.",
+    "mission": "Unblock the C6 correction runbook broken by PR 418 readout projections.",
+    "monitoring_and_recovery": "Revert restores the mismatch; forward-only otherwise.",
+    "owner_operability": "No operator surface change.",
+    "red_team": "Material result change still changes the fingerprint; only two named readout projections are excluded.",
+    "research_truth": "Both projections are determined by the hash-bound result whose result_sha256 stays fingerprinted.",
+    "security": "No credentials, network or writes."
+  },
+  "limits": [
+    "NAME_SPECIFIC_EXCLUSION_NOT_STRUCTURAL_READOUT_RULE",
+    "SOURCE_DETAIL_NON_MAPPING_SHAPE_RAISES",
+    "REAL_FINGERPRINT_MATCH_IS_MANUAL_READONLY_OBSERVATION"
+  ],
+  "mode": "FAST_PATH",
+  "recovery": "Ordinary revert.",
+  "review_id": "HFIC_ARCHIVE_FINGERPRINT_FORWARD_FIX_V1-FIT",
+  "reviewed_bindings_sha256": "b714e11adf936047131d59c18751f035f4c9d7875baeb3d70cc55010aa22626b",
+  "reviewed_inventory_sha256": "c2042e2246ffac5e4782bc1ff0349104bf8671e6a0839375fbe4e4527b2fd3a0",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "HFIC_ARCHIVE_FINGERPRINT_FORWARD_FIX_V1",
+  "verdict": "PASS"
+}

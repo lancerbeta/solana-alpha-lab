@@ -1,0 +1,39 @@
+{
+  "as_of": "2026-10-21",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_SCIENTIFIC_ACCEPTANCE"
+  ],
+  "remediation_history": [],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER"
+  ],
+  "review_id": "HFIC_ARCHIVE_FINGERPRINT_FORWARD_FIX_V1-REVIEW",
+  "reviewed_bindings_sha256": "b714e11adf936047131d59c18751f035f4c9d7875baeb3d70cc55010aa22626b",
+  "reviewed_inventory_sha256": "c2042e2246ffac5e4782bc1ff0349104bf8671e6a0839375fbe4e4527b2fd3a0",
+  "reviews": [
+    {
+      "findings": [
+        "packet_fingerprint_sha256=8db59929d7ce49d13166c81e4c446477e85b884c1bd52dca8c162ab28c0011f6",
+        "Isolated SEMANTIC_PREMISE PASS at 6940a18102343bba7d218b01928272986649d9ae: both excluded keys are projections of the hash-bound result; all four fingerprint uses share one owner; no other frozen capsule hash recomputed.",
+        "MINOR: name-specific exclusion; replan to a structural source-identity rule if a readout mismatch recurs."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Isolated PASS at 6940a18102343bba7d218b01928272986649d9ae: deep copy, no caller mutation, unchanged sort key, identical bytes for capsules without projections; test proves invariance and result-hash sensitivity.",
+        "MINOR: truthy non-Mapping source_detail raises; no pinned old-formula equality assertion."
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "HFIC_ARCHIVE_FINGERPRINT_FORWARD_FIX_V1",
+  "verdict": "PASS"
+}
