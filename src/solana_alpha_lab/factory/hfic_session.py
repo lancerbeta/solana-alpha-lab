@@ -8045,9 +8045,13 @@ def _correction_basis(store: Any, session_id: str, *, repo_root: Any) -> dict[st
     if not isinstance(refused_packet, Mapping) or refused_critic.get("classifier_receipt") != receipt:
         raise HficSessionError("CLASSIFICATION_CORRECTION_NOT_INPUT_REFUSAL")
     pass_critic, pass_sha, pass_at = _original_pass_critic(store, existing)
-    derived = {k: v for k, v in refused_critic.items()
-               if k not in {"experiment_spec_packet", "classifier_receipt", "critic_terminal", "next"}}
-    if derived != {k: v for k, v in pass_critic.items() if k not in {"critic_terminal", "next"}}:
+    # apply_classification derived the refused result from the PASS by setting
+    # these keys only. A real Critic may carry them as empty placeholders.
+    classification_keys = {"experiment_spec_packet", "classifier_receipt", "critic_terminal", "next"}
+    if any(pass_critic.get(key) not in (None, {}) for key in ("experiment_spec_packet", "classifier_receipt")):
+        raise HficSessionError("CLASSIFICATION_CORRECTION_ORIGINAL_PASS_UNAVAILABLE")
+    derived = {k: v for k, v in refused_critic.items() if k not in classification_keys}
+    if derived != {k: v for k, v in pass_critic.items() if k not in classification_keys}:
         raise HficSessionError("CLASSIFICATION_CORRECTION_ORIGINAL_PASS_UNAVAILABLE")
     # Re-derive the cause from the saved request at the time it was judged.
     refused_at_text = (
@@ -8058,6 +8062,21 @@ def _correction_basis(store: Any, session_id: str, *, repo_root: Any) -> dict[st
         refused_at = _utc(refused_at_text)
     except ValueError as exc:
         raise HficSessionError("CLASSIFICATION_CORRECTION_NOT_INPUT_REFUSAL") from exc
+    # Chronology: original Critic PASS <= refused classification <= this
+    # correction (second precision, as stored). Unknown or contradictory
+    # times are not repaired into a valid history.
+    from datetime import UTC, datetime
+
+    try:
+        pass_instant = _utc(pass_at).replace(microsecond=0)
+    except ValueError as exc:
+        raise HficSessionError("CLASSIFICATION_CORRECTION_CHRONOLOGY_UNPROVEN", detail={
+            "critic_pass_effective_at": pass_at}) from exc
+    refused_instant = refused_at.replace(microsecond=0)
+    if not pass_instant <= refused_instant <= datetime.now(UTC):
+        raise HficSessionError("CLASSIFICATION_CORRECTION_CHRONOLOGY_UNPROVEN", detail={
+            "critic_pass_effective_at": render_canonical_utc(pass_instant),
+            "refused_classifier_evaluated_at": render_canonical_utc(refused_instant)})
     cause = spec_input_refusal(dict(refused_packet), root=Path(repo_root), as_of=refused_at)
     if cause is None or cause.get("stage") != "CLASSIFICATION_INPUT" or cause.get("reason_code") not in _CORRECTABLE_REFUSALS:
         raise HficSessionError("CLASSIFICATION_CORRECTION_NOT_INPUT_REFUSAL", detail={

@@ -24,6 +24,7 @@ managed_write_set:
 - tests/test_episode_native_required_outcome_contract_v1.py
 - tests/test_hfic_one_frozen_runner_up_failover_v1.py
 - tests/test_observation_fast_lane_p0_addendum.py
+- tests/test_hfic_fresh_control_decision_integrity_closure_v1.py
 - docs/contracts/episode_native_required_outcomes_v1.md
 - docs/operator/RESEARCH_FRAGMENTS_V1.md
 - .agents/skills/hypothesis-forge/SKILL.md
@@ -157,6 +158,11 @@ instant is pinned to the refused judgement time (a later cutoff could admit matu
 outcomes); classifier/projection errors during correction are CURRENT_GATE_DENIED;
 an identical concurrent apply is idempotent; the loader cross-checks the cycle
 capability against the correction body and exposes `look_capability_epoch_sha256`.
+
+Owner content review of PR #418 (f079c43a, PATCH_BEFORE_MERGE): chronology guard (Critic PASS ≤ refused
+classification ≤ correction, second precision, else CHRONOLOGY_UNPROVEN); real C6 read-only TEMPLATE →
+PREVIEW_READY with unchanged inventory, after fixing the seam where a real Critic PASS carries empty
+classifier_receipt/experiment_spec placeholders (`c6-premerge-preview-readback.json`).
 
 Post-merge runbook (C6, after accepted merge, on the canonical workstation root):
 1. `forge-run --collection OPPORTUNITY_EPISODES --owner-focus AUTO --no-write`

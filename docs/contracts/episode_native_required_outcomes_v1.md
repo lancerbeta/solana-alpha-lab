@@ -135,6 +135,7 @@ hypothesis_forge.py --data-root <root> classification-correction-apply --proposa
      (`SPEC_AS_OF_AFTER_EVALUATION`, `SPEC_AVAILABILITY_CUTOFF_AFTER_AS_OF`,
      `SPEC_TIME_INVALID`) на своё время оценки;
    - изменены только `as_of`/`availability_cutoff` (allowlist), оба = `expected_instant`;
+   - хронология Critic PASS ≤ отказанная оценка ≤ эта проверка (с точностью до секунды);
    - сохранённый result всё ещё hash-verified look;
    - свежий classifier на исходных inputs допущен текущими gates. KILL или
      `BLOCKED_DATA` — это отказ без записи, а не поправка.
@@ -150,6 +151,7 @@ hypothesis_forge.py --data-root <root> classification-correction-apply --proposa
 | `CLASSIFICATION_CORRECTION_NOT_INPUT_REFUSAL` / `_ORIGINAL_PASS_UNAVAILABLE` | остановиться: не исправляется, читать сохранённый result |
 | `CLASSIFICATION_CORRECTION_SOURCE_UNAVAILABLE` / `_FORK` | остановиться: восстановить exact saved source / разобрать историю |
 | `CLASSIFICATION_CORRECTION_PROPOSAL_INVALID` | передать сохранённый stdout preview без изменений |
+| `CLASSIFICATION_CORRECTION_CHRONOLOGY_UNPROVEN` | остановиться: порядок Critic PASS ≤ отказ ≤ исправление (по секундам) не доказан |
 | `CLASSIFICATION_CORRECTION_SESSION_NOT_COMPLETE` | сессия ещё ждёт классификации: обычный `classify` |
 | `SESSION_NOT_FOUND` | проверить `--session-id` и `--data-root` |
 | `CLASSIFICATION_INPUT_INVALID` / `CLASSIFIER_*` из preview | исправить названные поля / убрать `classifier_evaluated_at` / восстановить config |

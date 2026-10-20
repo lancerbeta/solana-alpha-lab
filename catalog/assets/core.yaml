@@ -32368,7 +32368,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 2e10f72ec1849de4f7f711fefe3392087ab486b5ff03632debc9a9a34ae68bc5}
+  integrity: {kind: sha256, sha256: d975327d5cbe1be048950b07379b679efad40a6608f15c825d94737e55e7fbcf}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32390,7 +32390,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 3f74cd6d4facbf59b55858f4eafaf9ab08c3cbe978ce3ce4406e2ff06633970e}
+  integrity: {kind: sha256, sha256: d3e030cdabe3f7697761dc62b9b0e2bff4c6826ac5526140ccb23092b4f50429}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -42104,7 +42104,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_episode_native_required_outcome_contract_v1.py', repository_path: tests/test_episode_native_required_outcome_contract_v1.py}
-  integrity: {kind: sha256, sha256: b5077c3e95357b53b129a083af89dfbfc7e4b0efeb055110a8988b271e287e26}
+  integrity: {kind: sha256, sha256: e81ff9aaa1cba361b16d575032d679f4735bc88c1d4879ac77391bc9c3816bd9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]
@@ -42121,7 +42121,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/episode_native_required_outcomes_v1.md', repository_path: docs/contracts/episode_native_required_outcomes_v1.md}
-  integrity: {kind: sha256, sha256: 2320f9419d4732931c60c0735334c6f25ec4ab2ba5df2d97c7d5976166d48f84}
+  integrity: {kind: sha256, sha256: cb56f43eb0c5577b489e75aa98157a1029dcac8159f85400ed8055443e870669}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]

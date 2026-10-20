@@ -288,6 +288,10 @@ class ExperimentSpecBindTests(unittest.TestCase):
             "solana_alpha_lab.factory.lane_classifier.classify_lane",
             return_value=decision,
         ), mock.patch(
+            # The stubbed classifier owns its envelope check too.
+            "solana_alpha_lab.factory.lane_classifier.spec_input_refusal",
+            return_value=None,
+        ), mock.patch(
             "solana_alpha_lab.factory.run_passport.experiment_spec_sha256",
             return_value="cd" * 32,
         ):

@@ -390,6 +390,8 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
     def _pass(self):
         critic = _critic_result(self.frozen, "PASS_TO_CLASSIFICATION")
         critic["non_claims"].append("SCRIPTED_TEST_CRITIC_NOT_SCIENTIFIC_ACCEPTANCE")
+        # A real isolated Critic leaves the classification fields as empty placeholders.
+        critic["experiment_spec"] = critic["classifier_receipt"] = None
         return finalize_session(self.frozen, critic, store=self.store, repo_root=ROOT, data_root=self.plane)
 
     def _future_packet(self):
@@ -450,6 +452,16 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
             preview_classification_correction(self.store, sid, self._corrected_packet(),
                                               repo_root=ROOT, data_root=self.plane)
 
+    def test_contradictory_chronology_is_not_repaired(self):
+        # Refusal stamped before the Critic PASS that opened classification.
+        self._legacy_refusal(packet=self._future_packet())
+        before = self.store.diagnostics().committed_inventory_sha256
+        with self.assertRaisesRegex(HficSessionError, "CLASSIFICATION_CORRECTION_CHRONOLOGY_UNPROVEN"):
+            preview_classification_correction(self.store, self.frozen["session_id"],
+                                              self._corrected_packet((AS_OF + timedelta(hours=3)).isoformat().replace("+00:00", "Z")),
+                                              repo_root=ROOT, data_root=self.plane)
+        self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
+
     def test_scientific_kill_is_not_a_correction_subject(self):
         finalize_session(self.frozen, _critic_result(self.frozen, "KILL_MECHANISM"), store=self.store, repo_root=ROOT,
                          data_root=self.plane)
@@ -460,13 +472,27 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
 
     def _corrected_packet(self, instant=None):
-        """Pinned to the refused judgement time (the legacy packet's evaluation clock)."""
+        """Pinned to the refused judgement instant printed by the read-only TEMPLATE."""
+        from solana_alpha_lab.factory.hfic_session import classification_correction_template
+        if instant is None:
+            try:
+                instant = classification_correction_template(
+                    self.store, self.frozen["session_id"], repo_root=ROOT)["expected_instant"]
+            except HficSessionError:
+                instant = (AS_OF + timedelta(hours=3)).isoformat().replace("+00:00", "Z")
         corrected = copy.deepcopy(self.spec)
-        pinned = instant or (AS_OF + timedelta(hours=3)).isoformat().replace("+00:00", "Z")
-        corrected["as_of"] = corrected["availability_cutoff"] = pinned
+        corrected["as_of"] = corrected["availability_cutoff"] = instant
         return {"experiment_spec": corrected, "hypothesis_definition_sha256": self.definition}
 
-    def _legacy_refusal(self):
+    def _runtime_future_packet(self):
+        """A future Spec judged at the real runtime clock (no caller evaluation time)."""
+        from datetime import UTC, datetime
+        future = copy.deepcopy(self.spec)
+        later = (datetime.now(UTC) + timedelta(days=1)).replace(microsecond=0)
+        future["as_of"] = future["availability_cutoff"] = later.isoformat().replace("+00:00", "Z")
+        return {"experiment_spec": future, "hypothesis_definition_sha256": self.definition}
+
+    def _legacy_refusal(self, packet=None):
         """Reproduce the pre-repair writer: the envelope guard was absent there."""
         import inspect
         from solana_alpha_lab.factory import lane_classifier
@@ -478,7 +504,8 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         self._pass()
         with patch.object(lane_classifier, "spec_input_refusal", legacy), patch(
                 "solana_alpha_lab.factory.hfic_session._raise_classifier_config_refusal"):
-            apply_classification(self.frozen, self._future_packet(), store=self.store, repo_root=ROOT, data_root=self.plane)
+            apply_classification(self.frozen, packet or self._runtime_future_packet(), store=self.store,
+                                 repo_root=ROOT, data_root=self.plane)
         refused = load_session_bundle(self.store, self.frozen["session_id"])
         self.assertEqual(refused["final_session_terminal"], "KILL_UNBOUND_EVIDENCE")
         self.assertEqual(refused["classifier_receipt"]["lane_classifier_terminal"], "DENY_INVALID_SPEC")
@@ -503,7 +530,7 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
             ({**packet, "experiment_spec": {**packet["experiment_spec"], "availability_cutoff": "2026-10-15T08:30:00Z"}},
              "CLASSIFICATION_CORRECTION_TIME_RULE_VIOLATED"),
             # A later instant would admit outcomes that matured after the judgement.
-            (self._corrected_packet(datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")),
+            (self._corrected_packet((datetime.now(UTC) + timedelta(minutes=5)).replace(microsecond=0).isoformat().replace("+00:00", "Z")),
              "CLASSIFICATION_CORRECTION_TIME_RULE_VIOLATED"),
         ):
             with self.assertRaisesRegex(HficSessionError, code):
