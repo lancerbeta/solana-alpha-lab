@@ -9,10 +9,15 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hfic_archive_fingerprint_forward_fix_v1/factory-fit.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "711a7981ff151a4191fb22b5758068294336b731de12ce60c306c6c5de0aab75",
     "verdict": "PASS"
   },
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "d9f8d335d937e820a37c7d19cf1db5ccd8d09ac4e1783b1d5707aa2bc36691e8",
+    "docs/tasks/HFIC_ARCHIVE_FINGERPRINT_FORWARD_FIX_V1.md": "b0e0179d736e924c6b95e67ed476dada1c5ea6789b1cbcdd1069c48494b6f6ad",
+    "src/solana_alpha_lab/factory/hfic_generation_context.py": "7006b17de02f16bd845042922b244e44e993ea71846583552f7a2d9b850c2e11",
+    "tests/test_research_fragments_v1.py": "4f168e9da4e37eb306fad7a3a9bcd67ad1a25f62741f8783fd42b25b6622ca5a"
+  },
   "non_claims": [
     "NO_CANONICAL_WRITE",
     "NO_FROZEN_VIEW_REWRITE",
@@ -43,7 +48,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hfic_archive_fingerprint_forward_fix_v1/independent-review.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "a353a780c7d69dda0eac2c5a1bbc8b89e016883c891121d3d3a29ce89e03e6bb",
       "verdict": "PASS"
     },
     "project_checks": [
