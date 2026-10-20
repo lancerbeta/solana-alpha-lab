@@ -46,6 +46,14 @@
       "resolved_by_head": "14cc8e481f083f459bdb4820fb980e728d5909bc",
       "role": "ARCHITECTURE_CRITIC",
       "severity": "MAJOR"
+    },
+    {
+      "finding": "Owner content review: correction chronology unproven; real C6 preview blocked by real Critic placeholder keys.",
+      "observed_head": "f079c43adcd7abf36504baaf480893b94ddd1853",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "0016fe830a049ec83eb0f21fc7fcf9be67d80708",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MAJOR"
     }
   ],
   "required_roles": [
@@ -63,7 +71,8 @@
         "packet_fingerprint_sha256=aa386df09c0f1a2a93cf8350d54fec6ffaa74a4ed5ac56bd25a4e36d55764eef",
         "Isolated SEMANTIC_PREMISE round 3 PASS at exact head 14cc8e481f083f459bdb4820fb980e728d5909bc; packet and diff hashes match. Corrected as_of and availability_cutoff are pinned to the refused judgement instant; a later cutoff is refused; a non-ready result is CURRENT_GATE_DENIED; the capability exception is single, marker-bound, cross-checked and the look capability is exposed.",
         "Can pass tests and still break validity: backdated first_reliable_available_at written after the judgement (general data-plane PIT premise); readers must use look_capability_epoch_sha256 for look provenance.",
-        "MINOR: no maturation fixture test; prefix pass-through filter; idempotence only for a byte-identical proposal."
+        "MINOR: no maturation fixture test; prefix pass-through filter; idempotence only for a byte-identical proposal.",
+        "Owner-patch delta f079c43a..0016fe83 isolated PASS at 0016fe830a049ec83eb0f21fc7fcf9be67d80708: relaxed PASS proof admits only empty classification placeholders, PASS still bound to the single AWAITING cycle; chronology guard refuses unknown/contradictory order; real C6 readback consistent (pin 12:48:38Z >= PASS 12:47:01Z, diff as_of/availability_cutoff only, PASS_FAST_LANE_READY, zero writes)."
       ],
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS"
@@ -71,7 +80,8 @@
     {
       "findings": [
         "Isolated round 3 PASS at exact head 14cc8e481f083f459bdb4820fb980e728d5909bc (round 2 PASS at c8c2b73b61685aafa6b75a1eb0e53a9d159d4705). Pinned instant enforced by exact set equality; CLASSIFI codes re-raised; idempotent race writes nothing; loader capability cross-check matches finalize.",
-        "MINOR: broad ValueError/KeyError/OSError wrap during correction is reported as CURRENT_GATE_DENIED; the different-body before_commit STALE race branch is untested."
+        "MINOR: broad ValueError/KeyError/OSError wrap during correction is reported as CURRENT_GATE_DENIED; the different-body before_commit STALE race branch is untested.",
+        "Owner-patch delta f079c43a..0016fe83 isolated PASS at 0016fe830a049ec83eb0f21fc7fcf9be67d80708: timestamp parsing, boundary equality, naive/unparseable refusal, relaxed derivation proof and test changes correct; MINOR same-second tolerance by design, template fallback in test helper."
       ],
       "role": "CODE_REVIEWER",
       "verdict": "PASS"
