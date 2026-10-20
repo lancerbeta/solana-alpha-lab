@@ -26,6 +26,8 @@
   "mode": "FULL_REVIEW",
   "recovery": "Before any real correction: ordinary revert. After a real correction record: forward-fix only, because a reverted loader would read the first classifier receipt.",
   "review_id": "HFIC_CLASSIFICATION_INPUT_RECOVERY_V1-FIT",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
   "task_id": "HFIC_CLASSIFICATION_INPUT_RECOVERY_V1",
