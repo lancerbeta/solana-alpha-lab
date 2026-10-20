@@ -152,13 +152,20 @@ Review round 1 (a0e7be02, all four roles NOT_READY) remediation:
 - operator surface: read-only TEMPLATE preview, per-code next_action and stage,
   uniform `writes`, `show-session.classification_correction`, apply `forge_run_args`.
 
+Review round 2 (c8c2b73b: UX/GOAL/CODE PASS, ARCHITECTURE NOT_READY): the corrected
+instant is pinned to the refused judgement time (a later cutoff could admit matured
+outcomes); classifier/projection errors during correction are CURRENT_GATE_DENIED;
+an identical concurrent apply is idempotent; the loader cross-checks the cycle
+capability against the correction body and exposes `look_capability_epoch_sha256`.
+
 Post-merge runbook (C6, after accepted merge, on the canonical workstation root):
 1. `forge-run --collection OPPORTUNITY_EPISODES --owner-focus AUTO --no-write`
    must show BASE session HFIC-SESS-78F92D0FE3E6BC8E (NON_SCIENTIFIC_STOP readback);
    otherwise STOP (cheapest falsifier).
 2. `classification-correction-preview --session-id HFIC-SESS-78F92D0FE3E6BC8E` → TEMPLATE;
-   copy the refused packet, set as_of = availability_cutoff = one real UTC instant
-   of preparation (≥ the refused evaluation time printed, ≤ now), remove nothing else.
+   copy the refused packet, remove `classifier_evaluated_at`, set as_of =
+   availability_cutoff = the printed `expected_instant` (refused judgement time,
+   floored to the second; ≈2026-10-20T12:48:38Z for C6); change nothing else.
 3. Preview with the packet → save stdout → apply `--confirm-append-only`.
 4. `show-session`, `forge-run --no-write` (expect OWNER_CANDIDATE), then `--persist`.
 5. Confirm read-only that the result readout has `research_scope.contrast.comparator`;

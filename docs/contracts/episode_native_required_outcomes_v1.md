@@ -121,18 +121,20 @@ hypothesis_forge.py --data-root <root> classification-correction-apply --proposa
 ```
 
 1. Без `--experiment-spec` preview только читает: `TEMPLATE` с
-   `refused_experiment_spec_packet`, причиной, `correctable_fields` и временем
-   исходной оценки.
+   `refused_experiment_spec_packet`, причиной, `correctable_fields`,
+   `expected_instant` и `refused_at_source`.
 2. Скопируйте `refused_experiment_spec_packet`, уберите `classifier_evaluated_at`.
-   В `experiment_spec` поставьте `as_of` и `availability_cutoff` в один реальный
-   UTC-момент подготовки packet: не раньше `refusal.classifier_evaluated_at` и не
-   позже «сейчас». Другие поля не меняйте.
+   В `experiment_spec` поставьте и `as_of`, и `availability_cutoff` ровно в
+   `expected_instant` — момент исходной оценки, округлённый вниз до секунды.
+   Другие значения не принимаются: более поздний cutoff засчитал бы исходы,
+   созревшие после оценки. Если на этот момент данные не готовы, это
+   `CURRENT_GATE_DENIED`, а не поправка. Другие поля не меняйте.
 3. Preview с packet доказывает одновременно:
    - исходный isolated `PASS_TO_CLASSIFICATION` на том же packet и definition;
    - сохранённый запрос заново даёт отказ времени оболочки
      (`SPEC_AS_OF_AFTER_EVALUATION`, `SPEC_AVAILABILITY_CUTOFF_AFTER_AS_OF`,
      `SPEC_TIME_INVALID`) на своё время оценки;
-   - изменены только `as_of`/`availability_cutoff` (allowlist) по правилу времени;
+   - изменены только `as_of`/`availability_cutoff` (allowlist), оба = `expected_instant`;
    - сохранённый result всё ещё hash-verified look;
    - свежий classifier на исходных inputs допущен текущими gates. KILL или
      `BLOCKED_DATA` — это отказ без записи, а не поправка.
@@ -147,6 +149,12 @@ hypothesis_forge.py --data-root <root> classification-correction-apply --proposa
 | `CLASSIFICATION_CORRECTION_CURRENT_GATE_DENIED` | остановиться: текущий gate запрещает, история сохраняется |
 | `CLASSIFICATION_CORRECTION_NOT_INPUT_REFUSAL` / `_ORIGINAL_PASS_UNAVAILABLE` | остановиться: не исправляется, читать сохранённый result |
 | `CLASSIFICATION_CORRECTION_SOURCE_UNAVAILABLE` / `_FORK` | остановиться: восстановить exact saved source / разобрать историю |
+| `CLASSIFICATION_CORRECTION_PROPOSAL_INVALID` | передать сохранённый stdout preview без изменений |
+| `CLASSIFICATION_CORRECTION_SESSION_NOT_COMPLETE` | сессия ещё ждёт классификации: обычный `classify` |
+| `SESSION_NOT_FOUND` | проверить `--session-id` и `--data-root` |
+| `CLASSIFICATION_INPUT_INVALID` / `CLASSIFIER_*` из preview | исправить названные поля / убрать `classifier_evaluated_at` / восстановить config |
+
+Поле `next_action` в JSON авторитетно; таблица его поясняет.
 
 Apply сверяет parent session receipt и SHA тела поправки (`correction_sha256`),
 под writer lease (compare-before-append) пишет в ту же сессию цикл
@@ -157,7 +165,10 @@ SESSION_RECEIPT и решением выбранного кандидата. Ц�
 Исправленная классификация выполнена текущим кодом: её capability epoch —
 capability завершения (execution binding выводится из него), исходный остаётся в
 `refused`; это единственное разрешённое изменение execution identity, как у
-repair continuation. Повтор возвращает ту же запись; две разные поправки одной
+repair continuation. Это единственное разрешённое исключение по capability;
+оно не означает, что look и Critic выполнялись текущим кодом: их capability —
+`look_capability_epoch_sha256` (= `refused`). Повтор, в том числе одновременный,
+возвращает ту же запись; две разные поправки одной
 сессии — `CLASSIFICATION_CORRECTION_FORK`. Отказ, исходный owner-final, look
 ledger и бюджет остаются в истории; operation не переоткрывается; чтение на
 cutoff до поправки показывает прежний REJECT. Receipt помечает

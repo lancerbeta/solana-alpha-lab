@@ -32390,7 +32390,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 2fb57bc652a9687a246243201bae96b7e36d45f1b76d3a856c4d9978508f2f20}
+  integrity: {kind: sha256, sha256: 3f74cd6d4facbf59b55858f4eafaf9ab08c3cbe978ce3ce4406e2ff06633970e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -42104,7 +42104,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_episode_native_required_outcome_contract_v1.py', repository_path: tests/test_episode_native_required_outcome_contract_v1.py}
-  integrity: {kind: sha256, sha256: ca62d864cfac4448b71faa54531b40e0dad2b2a43bd37e8be69379af8e62bfc4}
+  integrity: {kind: sha256, sha256: b5077c3e95357b53b129a083af89dfbfc7e4b0efeb055110a8988b271e287e26}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]
@@ -42121,7 +42121,7 @@ records:
   as_of: '2026-10-14'
   truth_owner: EPISODE_NATIVE_REQUIRED_OUTCOME_CONTRACT_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/episode_native_required_outcomes_v1.md', repository_path: docs/contracts/episode_native_required_outcomes_v1.md}
-  integrity: {kind: sha256, sha256: 570f928a59bc2d399984bc9f366f384ce1e7ef8b8a4a6df7294c50b4e0fffadb}
+  integrity: {kind: sha256, sha256: 2320f9419d4732931c60c0735334c6f25ec4ab2ba5df2d97c7d5976166d48f84}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-EPISODE-REQUIRED-OUTCOMES-001}]
   consumers: [FACTORY-001, HYPOTHESIS-FORGE, INDEPENDENT-CRITIC, GOAL-OWNER]

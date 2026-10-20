@@ -459,11 +459,11 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
                                               repo_root=ROOT, data_root=self.plane)
         self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
 
-    def _corrected_packet(self, *, delay_seconds=0):
-        from datetime import UTC, datetime
+    def _corrected_packet(self, instant=None):
+        """Pinned to the refused judgement time (the legacy packet's evaluation clock)."""
         corrected = copy.deepcopy(self.spec)
-        now = (datetime.now(UTC) - timedelta(seconds=delay_seconds)).replace(microsecond=0)
-        corrected["as_of"] = corrected["availability_cutoff"] = now.isoformat().replace("+00:00", "Z")
+        pinned = instant or (AS_OF + timedelta(hours=3)).isoformat().replace("+00:00", "Z")
+        corrected["as_of"] = corrected["availability_cutoff"] = pinned
         return {"experiment_spec": corrected, "hypothesis_definition_sha256": self.definition}
 
     def _legacy_refusal(self):
@@ -489,6 +489,7 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
             preview_classification_correction as preview, apply_classification_correction as apply, show_session)
         from solana_alpha_lab.factory import research_fragments as fragments
         from solana_alpha_lab.factory.hfic_prior_memory import latest_hypothesis_decisions
+        from datetime import UTC, datetime
         refused = self._legacy_refusal()
         sid = self.frozen["session_id"]
         candidate = self.frozen["selected_candidate_id"]
@@ -499,7 +500,10 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
             ({**packet, "experiment_spec": {**packet["experiment_spec"], "estimand": "changed"}}, "CLASSIFICATION_CORRECTION_SCOPE_FORBIDDEN"),
             ({**packet, "experiment_spec": {**packet["experiment_spec"], "as_of": "2026-10-15T07:00:00Z",
                                              "availability_cutoff": "2026-10-15T07:00:00Z"}}, "CLASSIFICATION_CORRECTION_TIME_RULE_VIOLATED"),
-            ({**packet, "experiment_spec": {**packet["experiment_spec"], "availability_cutoff": "2026-10-15T09:30:00Z"}},
+            ({**packet, "experiment_spec": {**packet["experiment_spec"], "availability_cutoff": "2026-10-15T08:30:00Z"}},
+             "CLASSIFICATION_CORRECTION_TIME_RULE_VIOLATED"),
+            # A later instant would admit outcomes that matured after the judgement.
+            (self._corrected_packet(datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")),
              "CLASSIFICATION_CORRECTION_TIME_RULE_VIOLATED"),
         ):
             with self.assertRaisesRegex(HficSessionError, code):
@@ -509,6 +513,7 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         self.assertEqual((code, template["status"]), (0, "TEMPLATE"), template)
         self.assertEqual(template["refused_experiment_spec_packet"], refused["critic_result"]["experiment_spec_packet"])
         self.assertEqual(template["correctable_fields"], ["as_of", "availability_cutoff"])
+        self.assertEqual(template["expected_instant"], packet["experiment_spec"]["as_of"])
         focus = refused["owner_focus"]
         code, run_before = public_cli(self.plane, "forge-run", "--collection", "OPPORTUNITY_EPISODES",
                                       "--owner-focus", focus, "--no-write", "--format", "json")
@@ -518,7 +523,6 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         code, stopped = public_cli(self.plane, "forge-run", "--collection", "OPPORTUNITY_EPISODES",
                                    "--owner-focus", focus, "--persist", "--format", "json")
         self.assertEqual((code, stopped["owner_final"]), (0, "NON_SCIENTIFIC_STOP"), stopped)
-        from datetime import UTC, datetime
         cutoff_before_correction = datetime.now(UTC)
         looks_before = self._look_counts()
         before = self.store.diagnostics().committed_inventory_sha256
@@ -650,9 +654,8 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         item = self.spec["parameters"]["temporal_recipe"]["frozen_input"][0]
         mint = pq.read_table(self.plane / item["census_rel"], columns=["mint"]).column("mint")[0].as_py()
         write_assignment(self.plane, [{"identity_kind": "MINT", "identity": mint, "role": "UNTOUCHED_FORWARD_HOLDOUT", "scope": {"kind": "ALL_TIME"}}])
-        with self.assertRaises(HficSessionError) as denied:
+        with self.assertRaisesRegex(HficSessionError, "CLASSIFICATION_CORRECTION_CURRENT_GATE_DENIED"):
             preview_classification_correction(self.store, sid, self._corrected_packet(), repo_root=ROOT, data_root=self.plane)
-        self.assertIn(denied.exception.code, {"CLASSIFICATION_CORRECTION_CURRENT_GATE_DENIED", "EPISODE_SOURCE_BINDING_CONFLICT"})
         self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
         write_assignment(self.plane, [])
         from tests.test_opportunity_episodes_vertical_v1 import install_current_fixture
@@ -661,12 +664,9 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
         with patch.object(identity, "compute_capability_epoch_for_repo", drifted):
             stopped = evaluate_forge_run(ROOT, self.plane, owner_focus=focus, persist=True)
             self.assertEqual(stopped["owner_final"], "NON_SCIENTIFIC_STOP")
-            first = preview_classification_correction(self.store, sid, self._corrected_packet(delay_seconds=1),
+            first = preview_classification_correction(self.store, sid, self._corrected_packet(),
                                                       repo_root=ROOT, data_root=self.plane)["proposal"]
-            second = preview_classification_correction(self.store, sid, self._corrected_packet(),
-                                                       repo_root=ROOT, data_root=self.plane)["proposal"]
-            self.assertNotEqual(canonical(first["correction"]), canonical(second["correction"]))
-            # Race: another apply lands between the second apply's proof and its append.
+            # Race: the same apply lands between this apply's proof and its append.
             original_append, raced = ResearchStore.append, []
             def racing(store_self, records, *, transaction_id, before_commit=None):
                 if "CLSCORR" in transaction_id and not raced:
@@ -674,8 +674,16 @@ class EpisodeRequiredOutcomeTests(unittest.TestCase):
                     apply(ResearchStore(self.plane), first, repo_root=ROOT, data_root=self.plane, confirm_append_only=True)
                 return original_append(store_self, records, transaction_id=transaction_id, before_commit=before_commit)
             with patch.object(ResearchStore, "append", racing):
-                with self.assertRaisesRegex(HficSessionError, "CLASSIFICATION_CORRECTION_PREVIEW_STALE"):
-                    apply(self.store, second, repo_root=ROOT, data_root=self.plane, confirm_append_only=True)
+                landed = apply(self.store, first, repo_root=ROOT, data_root=self.plane, confirm_append_only=True)
+            self.assertEqual(landed["classification_correction_sha256"], canonical(first["correction"]))
+            kinds = [json.loads(r.payload_json).get("artifact_kind") for r in ResearchStore(self.plane).iter_committed_records()
+                     if json.loads(r.payload_json).get("session_id") == sid]
+            self.assertEqual(kinds.count("SESSION_RECEIPT"), 2)
+            # A different stale proposal against the corrected head is refused.
+            stale = copy.deepcopy(first)
+            stale["correction"]["corrected"]["lane_classifier_terminal"] = "FORGED"
+            with self.assertRaisesRegex(HficSessionError, "CLASSIFICATION_CORRECTION_ALREADY_APPLIED"):
+                apply(ResearchStore(self.plane), stale, repo_root=ROOT, data_root=self.plane, confirm_append_only=True)
             bundle = load_session_bundle(ResearchStore(self.plane), sid)
             self.assertEqual(bundle["classification_correction_sha256"], canonical(first["correction"]))
             self.assertEqual(bundle["capability_epoch_sha256"], drifted(ROOT)[0])

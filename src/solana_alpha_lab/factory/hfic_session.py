@@ -7199,7 +7199,8 @@ def run_live_classifier(
     refusal = None if validated.get("schema_version") == "1.5" else spec_input_refusal(
         packet, root=Path(repo_root), as_of=as_of)
     if refusal is not None:
-        code = CLASSIFIER_CONFIG_UNAVAILABLE if refusal["stage"] == "CLASSIFIER_CONFIG" else CLASSIFICATION_INPUT_INVALID
+        code = {"CLASSIFIER_CONFIG": CLASSIFIER_CONFIG_UNAVAILABLE,
+                "CLASSIFIER_CLOCK": CLASSIFIER_CLOCK_INVALID}.get(refusal["stage"], CLASSIFICATION_INPUT_INVALID)
         raise HficSessionError(code, detail={
             **refusal, "classifier_evaluated_at": render_canonical_utc(as_of),
             "next_action": NEXT_CORRECT_SPEC if code == CLASSIFICATION_INPUT_INVALID else NEXT_RESTORE_CONFIG,
@@ -7957,6 +7958,10 @@ def apply_classification(
 
 
 CLASSIFICATION_CORRECTION_SCHEMA = "smial.hfic-classification-input-correction"
+
+
+class _CorrectionAlreadyLanded(Exception):
+    """Internal: an identical correction committed between proof and append."""
 # Only an envelope time refusal is correctable; the diff may touch only these.
 _CORRECTABLE_REFUSALS = frozenset({
     "SPEC_AS_OF_AFTER_EVALUATION", "SPEC_AVAILABILITY_CUTOFF_AFTER_AS_OF", "SPEC_TIME_INVALID",
@@ -8082,8 +8087,11 @@ def classification_correction_template(store: Any, session_id: str, *, repo_root
         "refused_experiment_spec_packet": basis["refused_packet"],
         "refusal": {**basis["cause"], "classifier_evaluated_at": render_canonical_utc(basis["refused_at"])},
         "correctable_fields": list(_CORRECTABLE_FIELDS),
-        "time_rule": "set as_of and availability_cutoff to one real UTC instant, not earlier than "
-                     "refusal.classifier_evaluated_at and not later than now (the moment you prepare the packet)",
+        "time_rule": "set as_of and availability_cutoff both to expected_instant (the refused judgement time, "
+                     "floored to the second); no other value is accepted",
+        "expected_instant": render_canonical_utc(basis["refused_at"].replace(microsecond=0)),
+        "refused_at_source": "experiment_spec_packet.classifier_evaluated_at"
+        if basis["refused_packet"].get("classifier_evaluated_at") else "session_receipt.created_at",
         "packet_shape": "{experiment_spec, hypothesis_definition_sha256}; remove classifier_evaluated_at",
         "critic_pass_effective_at": basis["pass_at"],
         "writes": {"research_store": 0}, "new_look": False,
@@ -8132,16 +8140,26 @@ def _prepare_classification_correction(
         corrected_times = {key: _utc(new_spec.get(key)) for key in _CORRECTABLE_FIELDS}
     except ValueError as exc:
         raise HficSessionError("CLASSIFICATION_CORRECTION_PACKET_INVALID", detail={"fields": list(_CORRECTABLE_FIELDS)}) from exc
-    floor = basis["refused_at"].replace(microsecond=0)
-    if len(set(corrected_times.values())) != 1 or next(iter(corrected_times.values())) < floor:
-        # One preparation instant, not earlier than the refused judgement.
+    expected = basis["refused_at"].replace(microsecond=0)
+    if set(corrected_times.values()) != {expected}:
+        # The correction re-judges the same request at its own judgement time.
+        # A later cutoff would admit outcomes that matured afterwards.
         raise HficSessionError("CLASSIFICATION_CORRECTION_TIME_RULE_VIOLATED", detail={
-            "fields": list(_CORRECTABLE_FIELDS), "not_before": render_canonical_utc(floor)})
+            "fields": list(_CORRECTABLE_FIELDS), "expected_instant": render_canonical_utc(expected)})
     critic = dict(basis["pass_critic"])
     critic["experiment_spec_packet"] = dict(experiment_spec_packet)
     view = _classifier_frozen_view(existing, critic)
     _require_recipe_preserves_research_scope(view, experiment_spec_packet)
-    corrected = run_live_classifier(critic, view, repo_root=repo_root, data_root=data_root)
+    try:
+        corrected = run_live_classifier(critic, view, repo_root=repo_root, data_root=data_root)
+    except HficSessionError as exc:
+        if exc.code.startswith("CLASSIFI"):
+            raise
+        raise HficSessionError("CLASSIFICATION_CORRECTION_CURRENT_GATE_DENIED", detail={
+            "reason_codes": [exc.code]}) from exc
+    except (ValueError, KeyError, OSError) as exc:
+        raise HficSessionError("CLASSIFICATION_CORRECTION_CURRENT_GATE_DENIED", detail={
+            "reason_codes": [str(getattr(exc, "code", None) or type(exc).__name__)]}) from exc
     terminal = _classifier_to_hfic_terminal(corrected)
     if terminal.startswith("KILL") or corrected.get("lane_classifier_terminal") == "BLOCKED_DATA":
         # Eligibility (5): a current gate denial is a refusal, not a correction.
@@ -9124,6 +9142,8 @@ def finalize_session(
     def correction_head_unchanged() -> None:
         # Compare-before-append under the writer lease: one correction per refusal.
         head = load_session_bundle(store, session_id)
+        if isinstance(head, Mapping) and head.get("classification_correction_sha256") == correction_sha:
+            raise _CorrectionAlreadyLanded()
         if (
             not isinstance(head, Mapping)
             or head.get("classification_correction_sha256")
@@ -9133,7 +9153,11 @@ def finalize_session(
             raise HficSessionError("CLASSIFICATION_CORRECTION_PREVIEW_STALE")
 
     if correction_sha:
-        store.append(records, transaction_id=transaction_id, before_commit=correction_head_unchanged)
+        try:
+            store.append(records, transaction_id=transaction_id, before_commit=correction_head_unchanged)
+        except _CorrectionAlreadyLanded:
+            # The same correction landed concurrently: return it, write nothing.
+            return load_session_bundle(store, session_id)
     else:
         store.append(records, transaction_id=transaction_id)
     store.rebuild_projection()
@@ -9442,6 +9466,8 @@ def load_session_bundle(
             or (correction_body.get("corrected") or {}).get("classifier_receipt_sha256") != bound_classifier_sha
             or correction_body.get("session_id") != session_id
             or correction_body.get("critic_input_packet_sha256") != expected_input_sha
+            or cycle.get("capability_epoch_sha256")
+            != (correction_body.get("corrected") or {}).get("capability_epoch_sha256")
             or not any(
                 wrapper.get("artifact_kind") == "SESSION_RECEIPT"
                 and wrapper.get("payload_sha256") == (correction_body.get("refused") or {}).get("session_receipt_sha256")
@@ -9532,6 +9558,10 @@ def load_session_bundle(
         ),
         "classification_correction_sha256": cycle.get("classification_correction_sha256"),
         "classification_correction": cycle.get("classification_correction"),
+        # The look and Critic ran under this capability; the corrected
+        # classification's capability is `capability_epoch_sha256`.
+        "look_capability_epoch_sha256": ((cycle.get("classification_correction") or {}).get("refused") or {}).get(
+            "capability_epoch_sha256") if cycle.get("classification_correction_sha256") else None,
         "grounded_result_sha256": cycle.get("grounded_result_sha256"),
         "grounded_result_refs": list(cycle.get("grounded_result_refs") or [])
         if isinstance(cycle.get("grounded_result_refs"), list)
