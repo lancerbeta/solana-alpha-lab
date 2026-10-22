@@ -63,10 +63,14 @@ TEMPORAL_CALCULATION_VERSION_EPISODES_V1 = "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODE
 # their original meaning; fresh V3 preserves source decimal ratios for decisions.
 TEMPORAL_CALCULATION_VERSION_EPISODES_V2 = "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V2"
 TEMPORAL_CALCULATION_VERSION_EPISODES_V3 = "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V3"
-# V4 = V3 arithmetic plus the paired block-local comparator (`block_comparator`).
+# V4 = V3 arithmetic plus the paired block-local comparator (`block_comparator`). Not the BASE_X
+# TEMPORAL_CALCULATION_VERSION_V4 that the downside CALCULATION_REVISION path names.
 # Saved V3 results keep their bytes and stay current: they do not carry the block.
 TEMPORAL_CALCULATION_VERSION_EPISODES_V4 = "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V4"
 BLOCK_COMPARATOR_SCHEMA = "smial.block-comparator"
+_BLOCK_REFERENCE_KINDS = frozenset(
+    {"SAME_DECISION_ELIGIBLE", "MATCHED_VS_DECISION_ELIGIBLE", "MATCHED_VS_ELIGIBLE_COMPLEMENT"}
+)
 # Saved V1 episode looks remain current replay artifacts: the arithmetic fix
 # never automatically recomputes/rebinds their original values or charges.
 TEMPORAL_CURRENT_CALCULATION_VERSIONS = frozenset({TEMPORAL_CALCULATION_VERSION_V5, TEMPORAL_CALCULATION_VERSION_EPISODES_V1, TEMPORAL_CALCULATION_VERSION_EPISODES_V2, TEMPORAL_CALCULATION_VERSION_EPISODES_V3, TEMPORAL_CALCULATION_VERSION_EPISODES_V4})
@@ -1859,16 +1863,24 @@ def _comparator_side(group: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     }
 
 
-def _comparator_pair(view: str, matched: Sequence[Mapping[str, Any]], reference: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+def _pair_state(left_observed: int, right_observed: int, *, includes_matched: bool) -> str:
+    if left_observed and right_observed:
+        # An inclusive reference that holds no observed target beyond the matched ones is not a comparator.
+        return "NO_UNMATCHED_OBSERVED" if includes_matched and left_observed == right_observed else "EVALUATED"
+    if left_observed:
+        return "EMPTY_REFERENCE"
+    return "EMPTY_MATCHED" if right_observed else "EMPTY_BOTH"
+
+
+def _comparator_pair(
+    view: str,
+    matched: Sequence[Mapping[str, Any]],
+    reference: Sequence[Mapping[str, Any]],
+    *,
+    includes_matched: bool,
+) -> dict[str, Any]:
     left, right = _comparator_side(matched), _comparator_side(reference)
-    if left["observed_n"] and right["observed_n"]:
-        state = "EVALUATED"
-    elif left["observed_n"]:
-        state = "EMPTY_REFERENCE"
-    elif right["observed_n"]:
-        state = "EMPTY_MATCHED"
-    else:
-        state = "EMPTY_BOTH"
+    state = _pair_state(left["observed_n"], right["observed_n"], includes_matched=includes_matched)
     delta = None
     if state == "EVALUATED" and left["mean_target"] is not None and right["mean_target"] is not None:
         delta = left["mean_target"] - right["mean_target"]
@@ -1898,6 +1910,8 @@ def block_comparator_summary(
     cohort seats of the one computation: no second filter and no second scan.
     """
 
+    if contrast is not None and contrast not in _BLOCK_REFERENCE_KINDS:
+        raise GroundedDiscoveryError("BLOCK_COMPARATOR_CONTRAST_UNSUPPORTED")
     complement = contrast == "MATCHED_VS_ELIGIBLE_COMPLEMENT"
     reference_kind = contrast if contrast is not None else "SAME_DECISION_ELIGIBLE"
 
@@ -1909,9 +1923,12 @@ def block_comparator_summary(
 
     by_block: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     for item in decision_members:
-        by_block[str(item["block"])].append(item)
+        if not item.get("integrity_excluded"):
+            by_block[str(item["block"])].append(item)
     block_rows = [
-        _comparator_pair(key, [item for item in group if is_matched(item)], reference_of(group))
+        _comparator_pair(
+            key, [item for item in group if is_matched(item)], reference_of(group), includes_matched=not complement
+        )
         for key, group in sorted(by_block.items())
     ]
     owners = _cohort_identity_owners(cohort_slots)
@@ -1920,7 +1937,12 @@ def block_comparator_summary(
         bucket = cohort_slots.get(cohort_id, {})
         active = [view for view in bucket.values() if not view.get("integrity_excluded")]
         eligible = [view for view in active if view.get("decision_eligible")]
-        row = _comparator_pair(cohort_id, [view for view in active if view.get("matched")], reference_of(eligible))
+        row = _comparator_pair(
+            cohort_id,
+            [view for view in active if view.get("matched")],
+            reference_of(eligible),
+            includes_matched=not complement,
+        )
         row["cohort_id"] = cohort_id
         row["shared_decision_n"] = sum(
             1
@@ -2240,10 +2262,6 @@ def _downside_issues(
     return issues
 
 
-_BLOCK_REFERENCE_KINDS = frozenset(
-    {"SAME_DECISION_ELIGIBLE", "MATCHED_VS_DECISION_ELIGIBLE", "MATCHED_VS_ELIGIBLE_COMPLEMENT"}
-)
-
 
 def _block_comparator_issues(summary: Mapping[str, Any]) -> list[dict[str, Any]]:
     """Do the stored block pairs read the same samples as the pooled views?
@@ -2255,6 +2273,9 @@ def _block_comparator_issues(summary: Mapping[str, Any]) -> list[dict[str, Any]]
 
     comparator = summary.get("block_comparator")
     if comparator is None:
+        if summary.get("calculation_version") == TEMPORAL_CALCULATION_VERSION_EPISODES_V4:
+            # V4 is the version that saves the block: its absence is an inconsistency, not an older result.
+            return [{"view": "block_comparator", "field": "present", "expected": True, "actual": None}]
         return []
     issues: list[dict[str, Any]] = []
 
@@ -2278,6 +2299,10 @@ def _block_comparator_issues(summary: Mapping[str, Any]) -> list[dict[str, Any]]
         issue("block_comparator", "reference_includes_matched", not complement, comparator.get("reference_includes_matched"))
     scope_block = summary.get("research_scope")
     scope_contrast = scope_block.get("contrast") if isinstance(scope_block, Mapping) else None
+    # The reference kind is the query's own contrast; without one it is the pooled-eligible baseline.
+    native_kind = scope_contrast.get("kind") if isinstance(scope_contrast, Mapping) else "SAME_DECISION_ELIGIBLE"
+    if kind != native_kind:
+        issue("block_comparator", "reference_kind", native_kind, kind)
     expected_ref = None
     if complement:
         native = scope_contrast.get("comparator") if isinstance(scope_contrast, Mapping) else None
@@ -2287,6 +2312,8 @@ def _block_comparator_issues(summary: Mapping[str, Any]) -> list[dict[str, Any]]
                 "observed_n": native.get("target_observed_n"),
                 "mean_target": native.get("mean_target"),
             }
+        else:
+            issue("block_comparator", "native_comparator", "RESEARCH_SCOPE_CONTRAST_COMPARATOR", None)
     else:
         base = summary.get("baseline")
         if isinstance(base, Mapping):
@@ -2332,15 +2359,7 @@ def _block_comparator_issues(summary: Mapping[str, Any]) -> list[dict[str, Any]]
             n_left, n_right = _int_or_none(left.get("observed_n")), _int_or_none(right.get("observed_n"))
             if n_left is None or n_right is None:
                 continue
-            expected_state = (
-                "EVALUATED"
-                if n_left and n_right
-                else "EMPTY_REFERENCE"
-                if n_left
-                else "EMPTY_MATCHED"
-                if n_right
-                else "EMPTY_BOTH"
-            )
+            expected_state = _pair_state(n_left, n_right, includes_matched=not complement)
             if row.get("comparison_state") != expected_state:
                 issue(label, "comparison_state", expected_state, row.get("comparison_state"))
             mean_left, mean_right = _finite_number(left.get("mean_target")), _finite_number(right.get("mean_target"))
@@ -2401,13 +2420,28 @@ def _block_comparator_issues(summary: Mapping[str, Any]) -> list[dict[str, Any]]
                         want = eligible - matched_n if complement else eligible
                         if ref_n != want:
                             issue(f"block_comparator.{field}:{key}", "reference.eligible_n", want, ref_n)
-        if field == "by_cohort" and any(
-            (_int_or_none(row.get("shared_decision_n")) or 0) > 0 for row in rows if isinstance(row, Mapping)
-        ):
-            # Overlapping cohorts legitimately count a shared decision more than once.
-            if comparator.get("cohort_rows_overlap") is not True:
-                issue("block_comparator", "cohort_rows_overlap", True, comparator.get("cohort_rows_overlap"))
-            continue
+        if field == "by_cohort":
+            saved_shared = {
+                str(item.get("cohort_id")): _int_or_none(item.get("shared_decision_n")) or 0
+                for item in (summary.get("by_cohort") or [])
+                if isinstance(item, Mapping)
+            }
+            for row in rows:
+                if isinstance(row, Mapping) and (_int_or_none(row.get("shared_decision_n")) or 0) != saved_shared.get(
+                    str(row.get("cohort_id")), 0
+                ):
+                    issue(
+                        f"block_comparator.{field}:{row.get('view')}",
+                        "shared_decision_n",
+                        saved_shared.get(str(row.get("cohort_id")), 0),
+                        row.get("shared_decision_n"),
+                    )
+            overlapping = any(value > 0 for value in saved_shared.values())
+            if comparator.get("cohort_rows_overlap") is not overlapping:
+                issue("block_comparator", "cohort_rows_overlap", overlapping, comparator.get("cohort_rows_overlap"))
+            if overlapping:
+                # Overlapping cohorts legitimately count a shared decision more than once.
+                continue
         for key, total in (
             ("eligible_n", totals["m_eligible"]),
             ("observed_n", totals["m_observed"]),

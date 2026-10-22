@@ -2274,6 +2274,11 @@ def block_comparator_readout(comparator: Mapping[str, Any], *, detail_limit: int
             for row in rows[:detail_limit]
         ]
         truncation[key] = {"total": len(rows), "included": min(len(rows), detail_limit), "truncated": len(rows) > detail_limit}
+        states: dict[str, int] = {}
+        for row in rows:
+            states[str(row.get("comparison_state"))] = states.get(str(row.get("comparison_state")), 0) + 1
+        # A prefix can be filled by rows without a usable comparison; the counts say how many rows there are of each kind.
+        truncation[key]["comparison_states"] = dict(sorted(states.items()))
     return {
         "schema": comparator.get("schema"),
         "schema_version": comparator.get("schema_version"),

@@ -87,9 +87,13 @@ and cohort seats. There is no second filter, clock or scan.
   observed sample. Quantiles and ES10 are never averaged across sides or
   derived by subtraction. A missing target stays a count; an empty observed
   sample has null statistics, not zero.
-- `matched_minus_reference_mean` is set only when both sides observed targets;
-  `comparison_state` separates `EVALUATED`, `EMPTY_MATCHED`, `EMPTY_REFERENCE`
-  and `EMPTY_BOTH`. Days with no matched member still appear (reference only);
+- `matched_minus_reference_mean` is set only when both sides observed targets
+  and, for an inclusive reference, the reference observed something beyond the
+  matched members; `comparison_state` separates `EVALUATED`,
+  `NO_UNMATCHED_OBSERVED` (reference equals matched: no comparator, not a zero
+  difference), `EMPTY_MATCHED`, `EMPTY_REFERENCE` and `EMPTY_BOTH`. Because an
+  inclusive reference contains matched, its delta shrinks as matched's share
+  grows: per-block deltas are not comparable across blocks of different share. Days with no matched member still appear (reference only);
   the saved `by_calendar_block` and `block_count` keep counting matched days.
 - A within-block difference is descriptive. It does not remove calendar or
   cohort dependence (`cohort_rows_overlap`, `shared_decision_n`), mint repeats,
@@ -101,8 +105,10 @@ and cohort seats. There is no second filter, clock or scan.
 Versioning. V4 is a new episode calculation version; V3 and earlier stay
 current and readable and are not recomputed, revised or re-hashed. A V3 result
 has no block: `discovery-show` reports `block_comparator_status:
-NOT_SAVED_BY_THIS_CALCULATION_VERSION`, a runtime hint outside every hashed
-capsule. `descriptive_return_readout` and the fragment summary add
+NOT_SAVED_BY_THIS_CALCULATION_VERSION` (`NOT_APPLICABLE_NON_EPISODE` for BASE_X,
+`INVALID` for a non-mapping block), a runtime hint that no working view, bound
+draft or archive fingerprint reads (only the CLI prints it). A V4 result must
+carry the block; its absence is incoherent. `descriptive_return_readout` and the fragment summary add
 `block_comparator` only for a result that saved it, so older prior capsules,
 working-view fingerprints and bound drafts stay byte-identical. The compact
 readout shows at most four paired rows per list (`detail_truncation` names

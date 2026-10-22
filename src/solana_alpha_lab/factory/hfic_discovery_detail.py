@@ -48,9 +48,15 @@ def _block_comparator_detail(look: Mapping[str, Any]) -> dict[str, Any]:
     """
 
     result = look.get("result")
-    block = result.get("block_comparator") if isinstance(result, Mapping) else None
+    if not isinstance(result, Mapping):
+        return {"block_comparator_status": "NO_RESULT"}
+    block = result.get("block_comparator")
     if isinstance(block, Mapping):
-        return {"block_comparator_status": "SAVED", "block_comparator": dict(block)}
+        return {"block_comparator_status": "SAVED", "block_comparator": json.loads(json.dumps(block))}
+    if block is not None:
+        return {"block_comparator_status": "INVALID"}
+    if result.get("population") != "OPPORTUNITY_EPISODES":
+        return {"block_comparator_status": "NOT_APPLICABLE_NON_EPISODE"}
     return {"block_comparator_status": "NOT_SAVED_BY_THIS_CALCULATION_VERSION"}
 
 

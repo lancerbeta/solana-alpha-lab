@@ -38049,7 +38049,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: f91b2e260f33774a2188e7d079878d2b5105a7119438567a3a4343c5322d4e69}
+  integrity: {kind: sha256, sha256: 94c7154adf29c20bdc7dc940424b9ad4bc73d3a558e2aa1d7c59e42342a566e6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -39567,7 +39567,7 @@ records:
   as_of: '2026-10-03'
   truth_owner: FORGE_DOWNSIDE_READOUT_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_downside_descriptive_v1.md', repository_path: docs/contracts/forge_downside_descriptive_v1.md}
-  integrity: {kind: sha256, sha256: 0370ac2ebb8edbe3a51e9b046c836b29f0d9bc6c1edfca2b2e18c1f20e25bffd}
+  integrity: {kind: sha256, sha256: 97ff31adf252997b563e480769ec8a1d6d8eef085ddfbec37e3bd0246bff1b90}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}

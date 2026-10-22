@@ -259,12 +259,84 @@ class BoundaryTests(unittest.TestCase):
             self.assertEqual(temporal_result_coherence(broken)["status"], "INCOHERENT", mutate)
         self.assertEqual(temporal_result_coherence(out)["status"], "COHERENT")
 
-    def test_baseline_only_executors_never_gain_the_block(self) -> None:
+    def test_older_version_result_without_the_block_stays_coherent_and_unprojected(self) -> None:
         out = run(NUMERIC_DRAFT)
         legacy = {k: v for k, v in out.items() if k != "block_comparator"}
         legacy["calculation_version"] = temporal.TEMPORAL_CALCULATION_VERSION_EPISODES_V3
         self.assertEqual(temporal_result_coherence(legacy)["status"], "COHERENT")
         self.assertNotIn("block_comparator", descriptive_return_readout(legacy))
+
+    def test_inclusive_reference_without_unmatched_observation_is_not_zero_difference(self) -> None:
+        fixture = dict(TWO_DAYS)
+        fixture["m6"] = ("A", True, 0.30, 2)  # the only eligible member of day 3 is matched
+        out = run(NUMERIC_DRAFT, fixture)
+        day3 = by_view(out["block_comparator"]["by_calendar_block"])["2026-10-07"]
+        self.assertEqual(day3["comparison_state"], "NO_UNMATCHED_OBSERVED")
+        self.assertEqual(day3["matched"]["observed_n"], day3["reference"]["observed_n"])
+        self.assertIsNone(day3["matched_minus_reference_mean"])
+        self.assertEqual(temporal_result_coherence(out)["status"], "COHERENT")
+        # Under a complement the same day has no reference at all.
+        out = run(LIST_DRAFT, fixture)
+        self.assertEqual(by_view(out["block_comparator"]["by_calendar_block"])["2026-10-07"]["comparison_state"], "EMPTY_REFERENCE")
+
+    def test_integrity_conflict_leaves_both_paths_on_the_same_population(self) -> None:
+        import copy as _copy
+
+        c2, r2 = "REL-20261006T000000Z-20261007T000000Z", "cd" * 32
+        ev = evidence(TWO_DAYS)
+        draft = dict(NUMERIC_DRAFT, list_aliases={"A": A, "B": B, "C": "JUPITER:toptrending:5m"})
+        query = rs.canonicalize_query_scope(draft, ev)
+        bound = validate_temporal_query(query)["scientific_body"]
+        census, rows = corpus(TWO_DAYS)
+        census.append(dict(census[0], cohort_id=c2, release_id=r2))
+        for row in [x for x in rows if x["episode_id"] == "m1"]:
+            copy_row = dict(row, cohort_id=c2, release_id=r2)
+            if copy_row["point_id"] == "E1800" and copy_row["field_id"] == PRICE:
+                copy_row["typed_value"] = "1.5"  # the second delivery disagrees: INTEGRITY_CONFLICT
+            rows.append(copy_row)
+        resolved = rs.ResolvedScope(
+            scope=bound["research_scope"], list_condition=bound.get("list_condition"), evidence=ev,
+            episode_ids=[x["episode_id"] for x in census], slices=[],
+        )
+        out = execute_temporal_discovery(
+            census, rows, query, [binding_item(), binding_item(cohort_id=c2, release_id=r2)], research_scope=resolved
+        )["summary"]
+        self.assertEqual(out["integrity_conflict_count"], 1)
+        self.assertEqual((out["decision_eligible_n"], out["matched_n"]), (7, 3))
+        block = out["block_comparator"]
+        day1 = by_view(block["by_calendar_block"])[DAY1]
+        # The excluded decision is gone from the matched AND the reference side of its day.
+        self.assertEqual((day1["matched"]["eligible_n"], day1["reference"]["eligible_n"]), (0, 3))
+        self.assertEqual(block["by_cohort"][0]["reference"]["eligible_n"], 7)
+        self.assertEqual(sum(r["reference"]["observed_n"] for r in block["by_calendar_block"]), out["baseline"]["observed_n"])
+        self.assertEqual(temporal_result_coherence(out)["status"], "COHERENT")
+        broken = _copy.deepcopy(out)
+        broken["block_comparator"]["by_calendar_block"][0]["reference"]["eligible_n"] = 4
+        broken["block_comparator"]["by_calendar_block"][0]["reference"]["missing_n"] = 1
+        self.assertEqual(temporal_result_coherence(broken)["status"], "INCOHERENT")
+
+    def test_complement_kind_and_overlap_mutations_are_incoherent(self) -> None:
+        out = run(LIST_DRAFT)
+        self.assertEqual(temporal_result_coherence(out)["status"], "COHERENT")
+        for mutate in (
+            lambda r: r["block_comparator"]["by_calendar_block"][0]["reference"].__setitem__("observed_n", 5),
+            lambda r: r["block_comparator"]["by_calendar_block"][1].__setitem__("matched_minus_reference_mean", 0.9),
+            lambda r: r["block_comparator"].__setitem__("reference_kind", "MATCHED_VS_DECISION_ELIGIBLE"),
+            lambda r: r["block_comparator"]["by_cohort"][0].__setitem__("shared_decision_n", 1),
+            lambda r: r["block_comparator"].__setitem__("cohort_rows_overlap", True),
+            lambda r: r.pop("research_scope"),
+            lambda r: r.pop("block_comparator"),
+        ):
+            broken = copy.deepcopy(out)
+            mutate(broken)
+            self.assertEqual(temporal_result_coherence(broken)["status"], "INCOHERENT", mutate)
+        numeric = run(NUMERIC_DRAFT)
+        wrong_kind = copy.deepcopy(numeric)
+        wrong_kind["block_comparator"]["reference_kind"] = "MATCHED_VS_DECISION_ELIGIBLE"
+        self.assertEqual(temporal_result_coherence(wrong_kind)["status"], "INCOHERENT")
+        with self.assertRaises(Exception) as caught:
+            temporal.block_comparator_summary([], {}, [], contrast="SOMETHING_ELSE", calendar_key="UTC_DAY_OF_DECISION")
+        self.assertEqual(getattr(caught.exception, "code", None), "BLOCK_COMPARATOR_CONTRAST_UNSUPPORTED")
 
 
 class ConsumerPathTests(unittest.TestCase):
@@ -281,7 +353,9 @@ class ConsumerPathTests(unittest.TestCase):
             self.assertIn("matched", row)
             self.assertIn("reference", row)
         truncation = compact["detail_truncation"]["by_calendar_block"]
-        self.assertEqual(truncation, {"total": 7, "included": 4, "truncated": True})
+        self.assertEqual(truncation["total"], 7)
+        self.assertEqual((truncation["included"], truncation["truncated"]), (4, True))
+        self.assertEqual(truncation["comparison_states"], {"EMPTY_MATCHED": 5, "EVALUATED": 2})
         self.assertEqual(len(out["block_comparator"]["by_calendar_block"]), 7)
         self.assertIn("discovery-show", compact["full_detail"])
         # Same rows as the saved result, in the same canonical order (prefix), compact downside subset.
@@ -327,9 +401,14 @@ class ConsumerPathTests(unittest.TestCase):
             _block_comparator_detail({"result": legacy}),
             {"block_comparator_status": "NOT_SAVED_BY_THIS_CALCULATION_VERSION"},
         )
-        fresh = _block_comparator_detail({"result": run(NUMERIC_DRAFT)})
+        fresh_result = run(NUMERIC_DRAFT)
+        fresh = _block_comparator_detail({"result": fresh_result})
         self.assertEqual(fresh["block_comparator_status"], "SAVED")
         self.assertEqual(len(fresh["block_comparator"]["by_calendar_block"]), 2)
+        self.assertIsNot(fresh["block_comparator"]["by_calendar_block"], fresh_result["block_comparator"]["by_calendar_block"])
+        self.assertEqual(_block_comparator_detail({"result": dict(fresh_result, population="BASE_X", block_comparator=None)})["block_comparator_status"], "NOT_APPLICABLE_NON_EPISODE")
+        self.assertEqual(_block_comparator_detail({"result": dict(fresh_result, block_comparator="x")})["block_comparator_status"], "INVALID")
+        self.assertEqual(_block_comparator_detail({})["block_comparator_status"], "NO_RESULT")
 
 
 if __name__ == "__main__":
