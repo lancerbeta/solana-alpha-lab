@@ -13,7 +13,24 @@ from typing import Any, Mapping
 from .hfic_grounded_discovery import result_sha256
 from .hfic_ordinary_operation import OPERATION_KIND, RESERVATION_KIND, _sha, result_readout
 from .hfic_scientific_disposition import ARTIFACT_KIND as DISPOSITION_KIND, RECORD_PREFIX as DISPOSITION_PREFIX, _View, _applicability, resolve_subject, subject_key
-from .hfic_temporal_discovery import _public_query_from_recipe, canonical_temporal_spec, current_look_evidence, validate_temporal_query
+from .hfic_temporal_discovery import (
+    TEMPORAL_CALCULATION_VERSION_EPISODES_V1,
+    TEMPORAL_CALCULATION_VERSION_EPISODES_V2,
+    TEMPORAL_CALCULATION_VERSION_EPISODES_V3,
+    TEMPORAL_CALCULATION_VERSION_EPISODES_V4,
+    _public_query_from_recipe,
+    canonical_temporal_spec,
+    current_look_evidence,
+    validate_temporal_query,
+)
+
+EPISODE_VERSIONS_WITHOUT_BLOCK = frozenset(
+    {
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V1,
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V2,
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V3,
+    }
+)
 
 
 class DiscoveryDetailError(Exception):
@@ -55,6 +72,12 @@ def _block_comparator_detail(look: Mapping[str, Any]) -> dict[str, Any]:
         return {"block_comparator_status": "SAVED", "block_comparator": json.loads(json.dumps(block))}
     if block is not None:
         return {"block_comparator_status": "INVALID"}
+    version = str(result.get("calculation_version") or look.get("calculation_version") or "")
+    if version == TEMPORAL_CALCULATION_VERSION_EPISODES_V4:
+        # The version that saves the block must carry it; this is corruption, not an older result.
+        return {"block_comparator_status": "MISSING_IN_BLOCK_VERSION"}
+    if version in EPISODE_VERSIONS_WITHOUT_BLOCK:
+        return {"block_comparator_status": "NOT_SAVED_BY_THIS_CALCULATION_VERSION"}
     if result.get("population") != "OPPORTUNITY_EPISODES":
         return {"block_comparator_status": "NOT_APPLICABLE_NON_EPISODE"}
     return {"block_comparator_status": "NOT_SAVED_BY_THIS_CALCULATION_VERSION"}

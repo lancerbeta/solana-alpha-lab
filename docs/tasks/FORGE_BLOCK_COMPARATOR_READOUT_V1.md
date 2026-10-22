@@ -98,17 +98,23 @@ the one existing computation already holds:
 - reference = native comparator: every decision-eligible member (matched and
   feature-UNKNOWN included) for `SAME_DECISION_ELIGIBLE`; exactly the
   decision-eligible non-matched members for `MATCHED_VS_ELIGIBLE_COMPLEMENT`;
-- delta only when both sides observed; empty sides are typed, never zero;
+- delta only when both sides observed and, for an inclusive reference, something
+  beyond matched was observed (`NO_UNMATCHED_OBSERVED` otherwise); empty sides are
+  typed, never zero; inclusive deltas are not comparable across blocks of different
+  matched share (full state list and statuses: the contract below);
 - no averaging or subtraction of quantiles/ES10; no new metric, threshold, query
   field, scheduler, API or statistics stack;
 - coherence validator extended: pairs must equal the saved rows and add up to
-  the native baseline or complement.
+  the native baseline or complement; a V4 result must carry the block.
+
+Contract and operator text: `docs/contracts/forge_downside_descriptive_v1.md`
+(section "Block-local comparator"), `docs/operator/RESEARCH_FRAGMENTS_V1.md`.
 
 ## Compatibility
 
 V3 and earlier stay current and readable; same-query retry returns the saved
 result; nothing is recomputed, revised or re-hashed. Older results are marked
-`NOT_SAVED_BY_THIS_CALCULATION_VERSION` only by a runtime hint in `discovery-show`.
+`NOT_SAVED_BY_THIS_CALCULATION_VERSION` (other statuses: contract) only by a runtime hint in `discovery-show`.
 `descriptive_return_readout` and the fragment summary add the block only when the
 result saved it, so older capsules, frozen working views and archive fingerprints
 are byte-identical. BASE_X is unchanged. Rollback after a V4 result exists is

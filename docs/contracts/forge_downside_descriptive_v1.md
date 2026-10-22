@@ -106,7 +106,7 @@ Versioning. V4 is a new episode calculation version; V3 and earlier stay
 current and readable and are not recomputed, revised or re-hashed. A V3 result
 has no block: `discovery-show` reports `block_comparator_status:
 NOT_SAVED_BY_THIS_CALCULATION_VERSION` (`NOT_APPLICABLE_NON_EPISODE` for BASE_X,
-`INVALID` for a non-mapping block), a runtime hint that no working view, bound
+`INVALID` for a non-mapping block, `MISSING_IN_BLOCK_VERSION` for a V4 result without it), a runtime hint that no working view, bound
 draft or archive fingerprint reads (only the CLI prints it). A V4 result must
 carry the block; its absence is incoherent. `descriptive_return_readout` and the fragment summary add
 `block_comparator` only for a result that saved it, so older prior capsules,

@@ -1784,6 +1784,16 @@ def _cohort_identity_owners(slots: dict[str, dict[tuple, dict[str, Any]]]) -> di
     return owners
 
 
+def _cohort_shared_count(bucket: dict[tuple, dict[str, Any]], owners: dict[tuple, set[str]]) -> int:
+    """Decisions of one cohort that another cohort also holds (the one counter for rows and pairs)."""
+
+    return sum(
+        1
+        for identity, view in bucket.items()
+        if not view.get("integrity_excluded") and len(owners.get(identity, ())) > 1
+    )
+
+
 def _cohort_rows(
     slots: dict[str, dict[tuple, dict[str, Any]]],
     admitted_ids: Sequence[str],
@@ -1804,11 +1814,7 @@ def _cohort_rows(
             reason = item.get("exclusion")
             if isinstance(reason, str) and reason:
                 exclusions[reason] += 1
-        shared = sum(
-            1
-            for identity, view in bucket.items()
-            if not view.get("integrity_excluded") and len(owners.get(identity, ())) > 1
-        )
+        shared = _cohort_shared_count(bucket, owners)
         target_exclusions: dict[str, int] = defaultdict(int)
         for item in matched:
             reason = item.get("target_exclusion")
@@ -1910,7 +1916,9 @@ def block_comparator_summary(
     cohort seats of the one computation: no second filter and no second scan.
     """
 
-    if contrast is not None and contrast not in _BLOCK_REFERENCE_KINDS:
+    from solana_alpha_lab.factory.hfic_research_scope import CONTRAST_KINDS
+
+    if contrast is not None and contrast not in CONTRAST_KINDS:
         raise GroundedDiscoveryError("BLOCK_COMPARATOR_CONTRAST_UNSUPPORTED")
     complement = contrast == "MATCHED_VS_ELIGIBLE_COMPLEMENT"
     reference_kind = contrast if contrast is not None else "SAME_DECISION_ELIGIBLE"
@@ -1944,11 +1952,7 @@ def block_comparator_summary(
             includes_matched=not complement,
         )
         row["cohort_id"] = cohort_id
-        row["shared_decision_n"] = sum(
-            1
-            for identity, view in bucket.items()
-            if not view.get("integrity_excluded") and len(owners.get(identity, ())) > 1
-        )
+        row["shared_decision_n"] = _cohort_shared_count(bucket, owners)
         cohort_rows.append(row)
     return {
         "schema": BLOCK_COMPARATOR_SCHEMA,

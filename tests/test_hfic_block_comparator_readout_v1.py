@@ -279,6 +279,64 @@ class BoundaryTests(unittest.TestCase):
         out = run(LIST_DRAFT, fixture)
         self.assertEqual(by_view(out["block_comparator"]["by_calendar_block"])["2026-10-07"]["comparison_state"], "EMPTY_REFERENCE")
 
+    def test_integrity_excluded_member_never_enters_a_block_group(self) -> None:
+        """Defensive: the executor already drops excluded members from decision_members."""
+
+        injected = {
+            "block": "2026-10-05", "matched": True, "target": 0.5, "target_is_observed": True,
+            "integrity_excluded": True, "decision_eligible": False,
+        }
+        kept = {"block": "2026-10-05", "matched": True, "target": 0.1, "target_is_observed": True}
+        out = temporal.block_comparator_summary([injected, kept], {}, [], contrast=None, calendar_key="UTC_DAY_OF_DECISION")
+        pair = out["by_calendar_block"][0]
+        self.assertEqual((pair["matched"]["eligible_n"], pair["reference"]["eligible_n"]), (1, 1))
+        self.assertEqual(pair["comparison_state"], "NO_UNMATCHED_OBSERVED")
+
+    def test_shared_decisions_are_counted_by_one_helper_for_rows_and_pairs(self) -> None:
+        """The episode path never seats a decision in two cohorts, so exercise the shared branch on the seats directly."""
+
+        def seat(target, matched=True):
+            return {
+                "in_base": True, "decision_eligible": True, "matched": matched, "target_is_observed": True,
+                "target": target, "feature_unknown": False, "exclusion": None, "integrity_excluded": False,
+            }
+
+        slots = {
+            "C1": {("m", "d1"): seat(0.1), ("n", "d1"): seat(0.2, matched=False)},
+            "C2": {("m", "d1"): seat(0.1), ("p", "d2"): seat(0.3, matched=False)},
+        }
+        rows = temporal._cohort_rows(slots, ["C1", "C2"])
+        pairs = temporal.block_comparator_summary([], slots, ["C1", "C2"], contrast=None, calendar_key="UTC_DAY_OF_DECISION")
+        self.assertEqual([row["shared_decision_n"] for row in rows], [1, 1])
+        self.assertEqual([row["shared_decision_n"] for row in pairs["by_cohort"]], [1, 1])
+        self.assertTrue(pairs["cohort_rows_overlap"])
+        # A legitimately overlapping result: saved rows and pairs agree, so no false INCOHERENT.
+        summary = {
+            "calculation_version": temporal.TEMPORAL_CALCULATION_VERSION_EPISODES_V4,
+            "by_cohort": rows, "block_comparator": pairs, "by_calendar_block": [],
+        }
+        self.assertEqual([i for i in temporal._block_comparator_issues(summary) if "shared" in i["field"] or "overlap" in i["field"]], [])
+
+    def test_contrast_kinds_follow_the_scope_owner_and_mixed_kind_is_coherent(self) -> None:
+        self.assertEqual(temporal._BLOCK_REFERENCE_KINDS, rs.CONTRAST_KINDS | {"SAME_DECISION_ELIGIBLE"})
+        mixed = spec("MIXED_LIST_NUMERIC", list_condition={"clauses": [{"all_of": ["A"]}]}, **NUMERIC)
+        out = run(mixed)
+        self.assertEqual(out["research_scope"]["contrast"]["kind"], "MATCHED_VS_DECISION_ELIGIBLE")
+        self.assertEqual(out["block_comparator"]["reference_kind"], "MATCHED_VS_DECISION_ELIGIBLE")
+        self.assertTrue(out["block_comparator"]["reference_includes_matched"])
+        self.assertEqual(temporal_result_coherence(out)["status"], "COHERENT")
+
+    def test_same_query_retry_of_a_saved_v3_look_is_not_a_new_look(self) -> None:
+        query = rs.canonicalize_query_scope(
+            dict(NUMERIC_DRAFT, list_aliases={"A": A, "B": B, "C": "JUPITER:toptrending:5m"}), evidence(TWO_DAYS)
+        )
+        saved = {
+            "spec_sha256": validate_temporal_query(query)["spec_sha256"], "look_class": "MAIN", "new_look": True,
+            "search_tier": "COMPOUND_SCREEN", "calculation_version": temporal.TEMPORAL_CALCULATION_VERSION_EPISODES_V3,
+        }
+        decision = temporal.classify_temporal_look([saved], query)
+        self.assertEqual((decision["look_class"], decision["new_look"]), ("RETRY_SAME_BYTES", False))
+
     def test_integrity_conflict_leaves_both_paths_on_the_same_population(self) -> None:
         import copy as _copy
 
@@ -414,12 +472,17 @@ class ConsumerPathTests(unittest.TestCase):
             _block_comparator_detail({"result": legacy}),
             {"block_comparator_status": "NOT_SAVED_BY_THIS_CALCULATION_VERSION"},
         )
+        v4_without_block = {k: v for k, v in run(NUMERIC_DRAFT).items() if k != "block_comparator"}
+        self.assertEqual(_block_comparator_detail({"result": v4_without_block})["block_comparator_status"], "MISSING_IN_BLOCK_VERSION")
+        v3_like = dict(v4_without_block, calculation_version=temporal.TEMPORAL_CALCULATION_VERSION_EPISODES_V3)
+        v3_like.pop("population")
+        self.assertEqual(_block_comparator_detail({"result": v3_like})["block_comparator_status"], "NOT_SAVED_BY_THIS_CALCULATION_VERSION")
         fresh_result = run(NUMERIC_DRAFT)
         fresh = _block_comparator_detail({"result": fresh_result})
         self.assertEqual(fresh["block_comparator_status"], "SAVED")
         self.assertEqual(len(fresh["block_comparator"]["by_calendar_block"]), 2)
         self.assertIsNot(fresh["block_comparator"]["by_calendar_block"], fresh_result["block_comparator"]["by_calendar_block"])
-        self.assertEqual(_block_comparator_detail({"result": dict(fresh_result, population="BASE_X", block_comparator=None)})["block_comparator_status"], "NOT_APPLICABLE_NON_EPISODE")
+        self.assertEqual(_block_comparator_detail({"result": dict(fresh_result, population="BASE_X", block_comparator=None, calculation_version=temporal.TEMPORAL_CALCULATION_VERSION_V5)})["block_comparator_status"], "NOT_APPLICABLE_NON_EPISODE")
         self.assertEqual(_block_comparator_detail({"result": dict(fresh_result, block_comparator="x")})["block_comparator_status"], "INVALID")
         self.assertEqual(_block_comparator_detail({})["block_comparator_status"], "NO_RESULT")
 
