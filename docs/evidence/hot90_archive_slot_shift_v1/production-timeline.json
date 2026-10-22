@@ -1,0 +1,46 @@
+{
+  "schema": "smial.hot90-archive-slot-timeline",
+  "as_of": "2026-10-22",
+  "source": "READ_ONLY_PRODUCER_JOURNAL_AND_RECEIPTS",
+  "incident": {
+    "unit": "factory-hot90-closed-day-archive.service",
+    "started_at": "2026-10-22T01:15:00Z",
+    "killed_at": "2026-10-22T01:30:00Z",
+    "result": "timeout",
+    "timeout_start_sec": 900,
+    "cpu_seconds": 10.05,
+    "receipt_written": false
+  },
+  "overlapping_delta_backup": {
+    "unit": "factory-remote-backup-gdrive-delta.service",
+    "on_calendar_utc": "*-*-* 00:45:00 UTC",
+    "attempt_started_at": "2026-10-22T00:45:34Z",
+    "packed_local_verified_at": "2026-10-22T00:48:57Z",
+    "uploaded_at": "2026-10-22T01:24:35Z",
+    "finished_at": "2026-10-22T01:26:51Z",
+    "source_bytes": 1155844902,
+    "terminal": "DAILY_DELTA_VERIFIED"
+  },
+  "delta_attempt_duration_seconds": {
+    "2026-10-17": 310, "2026-10-19": 1536, "2026-10-20": 659, "2026-10-21": 2079, "2026-10-22": 2346
+  },
+  "weekly_full": {"on_calendar_utc": "Sun *-*-* 00:30:00 UTC", "2026-10-18_attempt_duration_seconds": 846, "code_bound_worst_case_minutes": 110},
+  "manual_rerun_without_overlap": {
+    "started_at": "2026-10-22T05:32:34Z",
+    "finished_at": "2026-10-22T05:34:48Z",
+    "cpu_seconds": 44.6,
+    "result": "success",
+    "day_verified": "20261021",
+    "cohort_verified": "REL-20261018T000000Z-20261019T000000Z",
+    "cohort_terminal": "REMOTE_CONTENT_SHA256_VERIFIED"
+  },
+  "other_timers_utc": {
+    "factory-remote-backup.timer": ["00:15", "12:15"],
+    "factory-collector-owner-pulse.timer": ["06:20"],
+    "factory-same-envelope-renewal.timer": ["06:40"],
+    "factory-operability-watch.timer": ["every 15 min"],
+    "factory-external-heartbeat.timer": ["every 5 min"]
+  },
+  "previous_archive_slots_utc": ["01:15", "07:15", "13:15", "19:15"],
+  "new_archive_slots_utc": ["04:15", "10:15", "16:15", "22:15"]
+}
