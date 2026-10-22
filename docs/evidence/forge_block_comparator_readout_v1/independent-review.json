@@ -70,5 +70,6 @@
   ],
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
-  "task_id": "FORGE_BLOCK_COMPARATOR_READOUT_V1"
+  "task_id": "FORGE_BLOCK_COMPARATOR_READOUT_V1",
+  "verdict": "PASS"
 }
