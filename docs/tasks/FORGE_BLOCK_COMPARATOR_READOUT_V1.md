@@ -27,6 +27,7 @@ managed_write_set:
 - docs/operator/RESEARCH_FRAGMENTS_V1.md
 - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
 - docs/evidence/forge_block_comparator_readout_v1/**
+- docs/evidence/list_a_confirmation_protocol_freeze_v1/main-refresh.json
 - catalog/assets/core.yaml
 - catalog/assets/lifecycle.yaml
 - catalog/catalog_manifest.yaml
