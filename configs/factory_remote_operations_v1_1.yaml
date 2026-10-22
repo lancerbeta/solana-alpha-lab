@@ -88,7 +88,7 @@ archive:
   max_days_per_run: 3
   max_runtime_seconds: 900
   local_verified_staging_retention: 1
-  on_calendar_utc: "*-*-* 01:15:00 UTC"
+  on_calendar_utc: "*-*-* 04:15:00 UTC"
 monitoring:
   freshness_max_seconds: 900
   stall_max_seconds: 1800

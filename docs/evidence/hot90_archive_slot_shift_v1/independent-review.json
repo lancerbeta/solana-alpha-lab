@@ -1,0 +1,39 @@
+{
+  "as_of": "2026-10-22",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_SCIENTIFIC_ACCEPTANCE"
+  ],
+  "remediation_history": [],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER"
+  ],
+  "review_id": "HOT90_ARCHIVE_SLOT_SHIFT_V1-REVIEW",
+  "reviewed_bindings_sha256": "d0fb452821f8277a39f22934b4f36a79ea781ad68fb216979477ffaa3f32a35a",
+  "reviewed_inventory_sha256": "ec4a5fb9c44ffa26279ed09afc78a0066366940a5e0fe5b1106f4450ad0cd2aa",
+  "reviews": [
+    {
+      "findings": [
+        "packet_fingerprint_sha256=ae744d6d7be9d9e1ea4fae5dca93d3a2d9b411fe1008797bfc9323d6c8af0d4a",
+        "Isolated SEMANTIC_PREMISE PASS at 6f66c359508e02a3aecee9a4dc50ff35b22e7af0: no admission, cohort maturity, PIT or hash semantics depend on the archive slot; timer, constants, YAML, schema const and doc move together; 24 h RPO holds.",
+        "MINOR: margin is observed, not guaranteed (5 delta runs); Persistent=true may fire a missed slot after boot; the claim is avoidance of the observed backup window, not isolation."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Isolated PASS at 6f66c359508e02a3aecee9a4dc50ff35b22e7af0: no remaining consumer of the old slots; IMMUTABLE_ARCHIVE_STALE is age-based; margin matches SCHEDULED_BUSY_RETRY_BUDGET_SECONDS and the observed delta durations.",
+        "MINOR: the test checks the timer slots with assertIn only and does not pin the YAML value to ARCHIVE_ON_CALENDAR (the schema const does)."
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "HOT90_ARCHIVE_SLOT_SHIFT_V1",
+  "verdict": "PASS"
+}

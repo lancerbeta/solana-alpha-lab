@@ -248,7 +248,7 @@
         "max_days_per_run": {"const": 3},
         "max_runtime_seconds": {"const": 900},
         "local_verified_staging_retention": {"const": 1},
-        "on_calendar_utc": {"const": "*-*-* 01:15:00 UTC"}
+        "on_calendar_utc": {"const": "*-*-* 04:15:00 UTC"}
       }
     },
     "monitoring": {

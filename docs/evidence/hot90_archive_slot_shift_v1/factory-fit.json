@@ -1,0 +1,33 @@
+{
+  "as_of": "2026-10-22",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "If a new slot times out, bound the rclone call by the remaining runtime budget so the failure gets a typed receipt."
+  },
+  "dimensions": {
+    "build_vs_buy": "ADOPT the existing timer and single calendar owner; no new lock or scheduler.",
+    "context_efficiency": "One small contract plus a read-only timeline.",
+    "execution_to_cashflow": "Storage reliability only; no alpha or cashflow claim.",
+    "flexibility_and_history": "Archive content, receipts and cohort maturity are unchanged; only start times move.",
+    "mission": "Stop the first daily archive run from colliding with the Drive backups.",
+    "monitoring_and_recovery": "6 h catch-up slots and the 24 h IMMUTABLE_ARCHIVE_STALE alert stay; revert and reinstall the old timer to roll back.",
+    "owner_operability": "A mature cohort reaches Drive about 3 h later (about 04:20Z).",
+    "red_team": "An unusually long weekly full (> about 3 h 45 min) could still overlap; the 10:15 catch-up then recovers within 6 h.",
+    "research_truth": "No admission, cohort or hash semantics change; RPO is still 24 h.",
+    "security": "No credentials, network or writes in this PR."
+  },
+  "limits": [
+    "DEPLOY_AND_UNIT_INSTALL_ARE_A_SEPARATE_OPERATE",
+    "BACKUP_DURATION_IS_DRIVE_THROUGHPUT_BOUND_NOT_GUARANTEED",
+    "SIGTERM_MID_UPLOAD_STILL_WRITES_NO_RECEIPT"
+  ],
+  "mode": "FAST_PATH",
+  "recovery": "Revert, then reinstall the previous timer unit and reload systemd.",
+  "review_id": "HOT90_ARCHIVE_SLOT_SHIFT_V1-FIT",
+  "reviewed_bindings_sha256": "d0fb452821f8277a39f22934b4f36a79ea781ad68fb216979477ffaa3f32a35a",
+  "reviewed_inventory_sha256": "ec4a5fb9c44ffa26279ed09afc78a0066366940a5e0fe5b1106f4450ad0cd2aa",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "HOT90_ARCHIVE_SLOT_SHIFT_V1",
+  "verdict": "PASS"
+}

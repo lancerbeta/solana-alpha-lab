@@ -33144,7 +33144,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_remote_operations_v1_1.schema.json', repository_path: catalog/schemas/factory_remote_operations_v1_1.schema.json}
-  integrity: {kind: sha256, sha256: c556379b9c81a013f011627f132cbe143d670754d3bf8dbe6cbb7bfe2d181670}
+  integrity: {kind: sha256, sha256: b80dbbea2d551513cdbec4068a4926bffe894bee63f8a171fdc3d1aae81c12b1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33213,7 +33213,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_remote_operations_v1_1.yaml', repository_path: configs/factory_remote_operations_v1_1.yaml}
-  integrity: {kind: sha256, sha256: 025c17193d46ce2ae5cb14041686e28098c18c8c251d88eac4a0d596659c9730}
+  integrity: {kind: sha256, sha256: 9939098638a1ec6123b791b4653f4e25a5845940f684e9d8787f27470e6cdbe7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -36565,7 +36565,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_UNATTENDED_OPERABILITY.md', repository_path: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md}
-  integrity: {kind: sha256, sha256: 7397b2db3e33742622b352463e901cd852a896ee118805b73db1fb86febba1ae}
+  integrity: {kind: sha256, sha256: 18c340c130a1e28ecd74b7c643dbffcddc7acb8d2245c0cf70795d2777b14afe}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -36585,7 +36585,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_unattended_operability_closure_v1.py', repository_path: tests/test_factory_unattended_operability_closure_v1.py}
-  integrity: {kind: sha256, sha256: 7c59421a2cbbef72a75b77a10e6235390897f136c6cbfd77b1d048aa24936af0}
+  integrity: {kind: sha256, sha256: af4e01a39cef52a32038907634744328c9fdc4404b5ec56832843019dc4d706a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001}

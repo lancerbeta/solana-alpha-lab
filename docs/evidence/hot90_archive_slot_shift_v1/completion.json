@@ -1,0 +1,66 @@
+{
+  "acceptance_id": "HOT90_ARCHIVE_SLOT_SHIFT_V1-ENGINEERING-CHECKPOINT",
+  "active_stop_conditions": [],
+  "as_of": "2026-10-22",
+  "base_main": "81aca3994a302a5771c7311651fc3e38d0d67b15",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/hot90_archive_slot_shift_v1/factory-fit.json",
+    "sha256": "e2e49f4e85378d597a5b071fcc475cd00dce087d904c35c294d0e5cd19c0b081",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "c71c7827915d5569941b5ea048c1e6a9091cee8116e6847f4e941922d9cfb3c4",
+    "catalog/schemas/factory_remote_operations_v1_1.schema.json": "b80dbbea2d551513cdbec4068a4926bffe894bee63f8a171fdc3d1aae81c12b1",
+    "configs/factory_remote_operations_v1_1.yaml": "9939098638a1ec6123b791b4653f4e25a5845940f684e9d8787f27470e6cdbe7",
+    "configs/factory_remote_ops/factory-hot90-closed-day-archive.timer": "a006e77434f3e14ca161d4a49ecd8dc86a4ccb17b809fec77a33dc64bd94495d",
+    "docs/evidence/hot90_archive_slot_shift_v1/production-timeline.json": "90010ade0c2fe04d6d89a06ddfbc6783ae6b6a64d308f51cd4a7971e13d1aba5",
+    "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "18c340c130a1e28ecd74b7c643dbffcddc7acb8d2245c0cf70795d2777b14afe",
+    "docs/tasks/HOT90_ARCHIVE_SLOT_SHIFT_V1.md": "db4b2239c1f14728a690c6bf180a8c94afc115b6d85680e9b684d5a502efa060",
+    "src/solana_alpha_lab/factory/hot90_closed_day_loop.py": "1b89354e6271f8ecef83c6e5cdfa495c6fa7b8aaaee21db25a257915e0825c07",
+    "tests/test_factory_unattended_operability_closure_v1.py": "af4e01a39cef52a32038907634744328c9fdc4404b5ec56832843019dc4d706a"
+  },
+  "non_claims": [
+    "NO_DEPLOY_OR_UNIT_INSTALL",
+    "NO_ARCHIVE_CONTENT_OR_HASH_CHANGE",
+    "NO_RPO_OR_ALERT_THRESHOLD_CHANGE",
+    "NO_MERGE_OR_CANONICAL_DONE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "canonical_writes": 0,
+    "external_mutations": 0,
+    "local_engineering_and_synthetic_writes": true,
+    "producer_metadata_delta": "NONE",
+    "real_new_looks": 0,
+    "scope": "BOUNDED_ENGINEERING_EXCLUDING_ROUTINE_GIT_GITHUB_TRANSPORT"
+  },
+  "state_change": "CLOSED_DAY_ARCHIVE_SLOTS_AFTER_DRIVE_BACKUPS",
+  "task_id": "HOT90_ARCHIVE_SLOT_SHIFT_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/hot90_archive_slot_shift_v1/independent-review.json",
+      "sha256": "f5a12ff8b6c3e15b9f0c44ca64208b3c87b06d95b7d8836b88fc6761855595c0",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_NATIVE_CATALOG_INCREMENTAL_SYNC_AND_PRECOMMIT",
+      "PASS_SCHEDULE_CONSUMER_SUITES_338",
+      "PASS_READONLY_PRODUCER_TIMELINE_MANUAL_RERUN_134S"
+    ],
+    "targeted": "PASS_tests.test_factory_unattended_operability_closure_v1"
+  }
+}
