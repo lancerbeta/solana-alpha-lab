@@ -372,6 +372,19 @@ class ConsumerPathTests(unittest.TestCase):
         self.assertIn("FULL_PROFILE_IN_SAVED_RESULT", compact["downside_projection"])
         self.assertEqual(block_comparator_readout(out["block_comparator"])["details"], compact["details"])
 
+    def test_full_size_compact_readout_stays_bounded(self) -> None:
+        fixture = dict(TWO_DAYS)
+        for index in range(6):
+            fixture[f"y{index}"] = ("A", True, 0.05 * (index - 2), 2 + index)
+            fixture[f"z{index}"] = ("B", False, -0.02 * index, 2 + index)
+        out = run(NUMERIC_DRAFT, fixture)
+        self.assertEqual(len(out["block_comparator"]["by_calendar_block"]), 8)
+        compact = descriptive_return_readout(out)["block_comparator"]
+        self.assertEqual(compact["detail_truncation"]["by_calendar_block"]["included"], 4)
+        # 4 day pairs + 1 cohort pair, each with two compact sides.
+        self.assertLess(len(json.dumps(compact, sort_keys=True)), 9000)
+        self.assertLess(len(json.dumps(out["block_comparator"], sort_keys=True)), 30000)
+
     def test_owner_readout_and_fragment_summary_carry_the_block(self) -> None:
         from solana_alpha_lab.factory.research_fragments import _summary
 
