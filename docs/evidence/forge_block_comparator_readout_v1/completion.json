@@ -9,15 +9,16 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/forge_block_comparator_readout_v1/factory-fit.json",
-    "sha256": "8c5ccea7eb909203bbb15559daededaa03353faa9fa6ef1017a3c9090a4edb98",
+    "sha256": "42f329f3755b0efa6f827e99a72998f9c70c033b7c3ae1fded1962c7a4a981c1",
     "verdict": "PASS"
   },
   "implementation_bindings": {
     "catalog/assets/core.yaml": "893e8a8b0eadac5c80f216ce08d3397c64ae1f597c3d6efeb605e3f1e57e7c0d",
     "docs/contracts/forge_downside_descriptive_v1.md": "273ec89253238e4ae12e07614c72bc88043254581f62edd5646415b6c61bacc6",
+    "docs/evidence/list_a_confirmation_protocol_freeze_v1/main-refresh.json": "9877dc56d4ad60343dfc4d94abdb30db90c4147c5c27b2f37812094b07fd30a5",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "54990b343a7a91ffb11b4dd9946c422cd605b0120f55553175ae73a34d25aef8",
     "docs/operator/RESEARCH_FRAGMENTS_V1.md": "f95ce5f11eead41306d83274e9946ec841c9d433671fea6f75e11f8910d65fae",
-    "docs/tasks/FORGE_BLOCK_COMPARATOR_READOUT_V1.md": "942c30bc6f66f42a5c9bec47586adf4aae8afa7b6c6ca7f2c8b46eeaec135ac6",
+    "docs/tasks/FORGE_BLOCK_COMPARATOR_READOUT_V1.md": "b6a83801337b9e6635215521ff1e5c85ea050bfd1875369eed8ee626fce2bae0",
     "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "126d1658c00373c6eefdebee4634b434dcec4bf18b5af234efc8bbccbb4dd282",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "81c63bff3dccecc422a3d160a74e31a8e58e43645ff10a8c837748eb9330bd03",
     "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "b5d9752f636ab51fe643ac7bcc47f04fa0ac362b4c686e670623641498f09eb7",
@@ -57,7 +58,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/forge_block_comparator_readout_v1/independent-review.json",
-      "sha256": "32c8748d7372857e93011000b87527a4d1474ec76f76b0e3b961103f373136d4",
+      "sha256": "3955e2e829e177d774ca4742d0055d9a6558af75537317343aefc6862eaae038",
       "verdict": "PASS"
     },
     "project_checks": [
