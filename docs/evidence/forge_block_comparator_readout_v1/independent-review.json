@@ -38,8 +38,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "FORGE_BLOCK_COMPARATOR_READOUT_V1-REVIEW",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "36115e7803c0f62a154d028592eea61f7ebe4f715008fd4c72cc69ddac43e391",
+  "reviewed_inventory_sha256": "27e8d34e44bdadc77e46a14170d4761638cbbd75c4c845872618ebb5feefe16c",
   "reviews": [
     {
       "findings": [

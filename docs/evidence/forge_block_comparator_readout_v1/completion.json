@@ -9,10 +9,23 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/forge_block_comparator_readout_v1/factory-fit.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "8c5ccea7eb909203bbb15559daededaa03353faa9fa6ef1017a3c9090a4edb98",
     "verdict": "PASS"
   },
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "893e8a8b0eadac5c80f216ce08d3397c64ae1f597c3d6efeb605e3f1e57e7c0d",
+    "docs/contracts/forge_downside_descriptive_v1.md": "273ec89253238e4ae12e07614c72bc88043254581f62edd5646415b6c61bacc6",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "54990b343a7a91ffb11b4dd9946c422cd605b0120f55553175ae73a34d25aef8",
+    "docs/operator/RESEARCH_FRAGMENTS_V1.md": "f95ce5f11eead41306d83274e9946ec841c9d433671fea6f75e11f8910d65fae",
+    "docs/tasks/FORGE_BLOCK_COMPARATOR_READOUT_V1.md": "942c30bc6f66f42a5c9bec47586adf4aae8afa7b6c6ca7f2c8b46eeaec135ac6",
+    "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "126d1658c00373c6eefdebee4634b434dcec4bf18b5af234efc8bbccbb4dd282",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "81c63bff3dccecc422a3d160a74e31a8e58e43645ff10a8c837748eb9330bd03",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "b5d9752f636ab51fe643ac7bcc47f04fa0ac362b4c686e670623641498f09eb7",
+    "src/solana_alpha_lab/factory/research_fragments.py": "bc46462fbc5c0201340cf82fd5ccf13e4467617bdf795dce92f8ad99e35aa177",
+    "tests/test_hfic_block_comparator_readout_v1.py": "c43eef3d82464ddb050b6afe0584518070afcd32532c3bc7241732adece4f004",
+    "tests/test_hfic_list_aware_vertical_v1.py": "bf26384543fea1a6518967f90a433441b48ddb8fa1149211fc87ebe74dcab523",
+    "tests/test_hfic_list_scope_executor_v1.py": "29340172adb92645e6eb4f3b4b6314a4b40a64541382b9e1bfc186609a5e83c3"
+  },
   "non_claims": [
     "NO_CANONICAL_WRITE",
     "NO_SAVED_RESULT_RECOMPUTED_OR_REVISED",
@@ -44,7 +57,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/forge_block_comparator_readout_v1/independent-review.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "32c8748d7372857e93011000b87527a4d1474ec76f76b0e3b961103f373136d4",
       "verdict": "PASS"
     },
     "project_checks": [
