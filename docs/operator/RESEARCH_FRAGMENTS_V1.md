@@ -129,6 +129,10 @@ classification-поправки это исправленный терминал
 Общий snapshot сохраняет native bounded by_cohort / by_calendar_block (до четырёх
 каждого, с total/included/truncated), источник result_ref, native markers зависимости
 и episode_counts/repeated_mint_n, где они сохранены. UNKNOWN не достраивается.
+Для результата episode V4 snapshot несёт и `block_comparator` (до четырёх парных
+строк matched/reference на день и на когорту, с total/included/truncated); у более
+старого результата поля нет, и оно не достраивается значением по умолчанию. Контракт —
+`docs/contracts/forge_downside_descriptive_v1.md`.
 Для CHECK показаны observed/required/met/reason по каждому information_rule из
 исходного плана. Исторические CHECK не переписываются: основание читается из
 сохранённых native result и plan. `discovery-show --result-ref EXACT_REF --offset 0

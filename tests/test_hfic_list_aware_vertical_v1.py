@@ -335,6 +335,26 @@ class ListAwareVerticalTests(unittest.TestCase):
         self.assertAlmostEqual(scope["contrast"]["observed_target_difference"], -0.10, places=6)
         self.assertTrue(result["missing_is_not_zero"])
 
+        # Block-local comparator: the complement pair reaches the saved result, the compact readout and discovery-show.
+        self.assertEqual(result["calculation_version"], "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V4")
+        block = result["block_comparator"]
+        self.assertEqual(block["reference_kind"], "MATCHED_VS_ELIGIBLE_COMPLEMENT")
+        self.assertFalse(block["reference_includes_matched"])
+        for rows in (block["by_calendar_block"], block["by_cohort"]):
+            self.assertEqual(len(rows), 1)
+            pair = rows[0]
+            self.assertEqual((pair["matched"]["eligible_n"], pair["matched"]["observed_n"], pair["matched"]["missing_n"]), (2, 2, 0))
+            self.assertEqual((pair["reference"]["eligible_n"], pair["reference"]["observed_n"], pair["reference"]["missing_n"]), (5, 4, 1))
+            self.assertAlmostEqual(pair["matched"]["mean_target"], 0.05, places=6)
+            self.assertAlmostEqual(pair["reference"]["mean_target"], 0.15, places=6)
+            self.assertAlmostEqual(pair["matched_minus_reference_mean"], -0.10, places=6)
+        self.assertEqual(contrast["descriptive_readout"]["block_comparator"]["details"]["by_calendar_block"], block["by_calendar_block"])
+        shown = _forge_call("discovery-show", "--result-ref", contrast["result_refs"][0], data_root=self.plane)
+        entry = shown["entries"][0]
+        self.assertEqual(entry["block_comparator_status"], "SAVED")
+        self.assertEqual(entry["block_comparator"]["by_calendar_block"], block["by_calendar_block"])
+        self.assertEqual(entry["result_readout"]["result_coherence"], "COHERENT")
+
         # D11: a numeric mechanism inside A and C.
         numeric = self._run("numeric", draft("NUMERIC_IN_SCOPE", research_scope={"universe_selector": AC}, **NUMERIC), focus="LAV_NUMERIC")
         self.assertEqual(numeric["_exit_code"], 0, numeric)
@@ -343,6 +363,12 @@ class ListAwareVerticalTests(unittest.TestCase):
         self.assertEqual(n_result["matched_n"], 1)
         self.assertAlmostEqual(n_result["mean_target"], 0.20, places=6)
         self.assertAlmostEqual(n_result["baseline"]["mean_target"], 0.05, places=6)
+        n_block = n_result["block_comparator"]
+        self.assertEqual(n_block["reference_kind"], "SAME_DECISION_ELIGIBLE")
+        self.assertTrue(n_block["reference_includes_matched"])
+        n_pair = n_block["by_calendar_block"][0]
+        self.assertEqual((n_pair["matched"]["observed_n"], n_pair["reference"]["observed_n"]), (1, 2))
+        self.assertAlmostEqual(n_pair["reference"]["mean_target"], 0.05, places=6)
 
         # D16: an unknown list is a refusal before any value.
         bad = self._resolve_expect_failure("unknown", draft("LIST_CONTRAST", list_condition={"clauses": [{"all_of": ["A", "Z"]}]}))

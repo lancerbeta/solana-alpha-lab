@@ -40,6 +40,20 @@ _SOURCE_KINDS_BY_PREFIX = {
 }
 
 
+def _block_comparator_detail(look: Mapping[str, Any]) -> dict[str, Any]:
+    """Runtime projection of the saved paired block; never written into saved bytes.
+
+    A result of an older calculation version did not save the block: say so
+    instead of presenting the pooled baseline as a block-local reference.
+    """
+
+    result = look.get("result")
+    block = result.get("block_comparator") if isinstance(result, Mapping) else None
+    if isinstance(block, Mapping):
+        return {"block_comparator_status": "SAVED", "block_comparator": dict(block)}
+    return {"block_comparator_status": "NOT_SAVED_BY_THIS_CALCULATION_VERSION"}
+
+
 def _original_request(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
     if not rows:
         return None
@@ -215,6 +229,7 @@ def discovery_detail(
             "canonical_query": public_query,
             "query_provenance": "EXACT_SAVED_PUBLIC_QUERY" if saved else "SOURCE_DERIVED_CANONICAL_QUERY",
             "original_query_bytes": "NOT_RECORDED", "result_readout": result_readout(look),
+            **_block_comparator_detail(look),
             "current_result_ref": current.get("record_id"), "is_current_result": current.get("record_id") == look["record_id"],
             "scientific_disposition": resolved, "assessment_history": history,
             "source_links": source_links,

@@ -2240,6 +2240,34 @@ def no_worthy_scope_record(evidence: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def block_comparator_readout(comparator: Mapping[str, Any], *, detail_limit: int = 4) -> dict[str, Any]:
+    """Bounded view of the saved paired block comparator.
+
+    A matched side and its reference side always travel in one row, so a cut
+    never separates them. The full rows stay in the immutable saved result.
+    """
+
+    details = {}
+    truncation = {}
+    for key in ("by_calendar_block", "by_cohort"):
+        rows = [row for row in (comparator.get(key) or []) if isinstance(row, Mapping)]
+        details[key] = [dict(row) for row in rows[:detail_limit]]
+        truncation[key] = {"total": len(rows), "included": min(len(rows), detail_limit), "truncated": len(rows) > detail_limit}
+    return {
+        "schema": comparator.get("schema"),
+        "schema_version": comparator.get("schema_version"),
+        "reference_kind": comparator.get("reference_kind"),
+        "reference_includes_matched": comparator.get("reference_includes_matched"),
+        "calendar_key": comparator.get("calendar_key"),
+        "cohort_rows_overlap": comparator.get("cohort_rows_overlap"),
+        "details": details,
+        "detail_truncation": truncation,
+        "selection_policy": "CANONICAL_ORDER_PREFIX_PAIRED_ROWS",
+        "full_detail": "result.block_comparator of the saved result; discovery-show --result-ref returns every row",
+        "claims": comparator.get("claims"),
+    }
+
+
 def descriptive_return_readout(result: Mapping[str, Any], *, detail_limit: int = 4) -> dict[str, Any]:
     """Bounded model/owner view; the full immutable result remains at its ref."""
 
@@ -2270,6 +2298,7 @@ def descriptive_return_readout(result: Mapping[str, Any], *, detail_limit: int =
     from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_holder_claim_identity
     identity = temporal_holder_claim_identity(result)
     scope_block = result.get("research_scope")
+    block_comparator = result.get("block_comparator")
     return {
         "status": "DESCRIPTIVE_PROXY",
         **({"scientific_identity": identity} if identity else {}),
@@ -2279,6 +2308,12 @@ def descriptive_return_readout(result: Mapping[str, Any], *, detail_limit: int =
         "baseline": view(result.get("baseline") or {}),
         "details": details,
         "detail_truncation": truncation,
+        # Only a result that saved the paired block carries it; an older result stays byte-identical.
+        **(
+            {"block_comparator": block_comparator_readout(block_comparator, detail_limit=detail_limit)}
+            if isinstance(block_comparator, Mapping)
+            else {}
+        ),
         "selection_policy": "CANONICAL_ORDER_PREFIX",
         "baseline_may_include_matched": True,
         "assessment": "DESCRIPTIVE_ONLY_NO_AUTOMATIC_VERDICT",
@@ -2314,6 +2349,7 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
         "descriptive_readout": descriptive_return_readout(result),
         "by_cohort": result.get("by_cohort"),
         "by_calendar_block": result.get("by_calendar_block"),
+        **({"block_comparator": result["block_comparator"]} if isinstance(result.get("block_comparator"), Mapping) else {}),
         "cohort_independent_replication": result.get("cohort_independent_replication"),
         "cohort_slices_are_descriptive": result.get("cohort_slices_are_descriptive"),
         "by_explanatory": result.get("by_explanatory"),

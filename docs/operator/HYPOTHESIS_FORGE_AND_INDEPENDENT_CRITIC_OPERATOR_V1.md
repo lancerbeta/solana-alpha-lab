@@ -1899,6 +1899,7 @@ exclusion; observed + missing = matched. Unmatched target входит толь�
 result evidence: `TEMPORAL_RESULT_INCOHERENT` — технический stop с ref, полями и
 `repair_action=CALCULATION_REVISION`, а не повод авторизовать новые looks.
 Пустая admitted cohort остаётся строкой с N=0. `INTEGRITY_CONFLICT` — другая причина того же N=0 и mean `null`: decision исключена до конца расчёта и на pooled, и на каждой затронутой когорте, включая когорту поздней копии. Причина лежит в `exclusion_reasons` результата и в `by_cohort[].exclusion_reasons`, а не в пустой cohort и не в missing target.
+Свежий episode-расчёт (`HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V4`) сохраняет ещё `block_comparator`: на каждый день решения и каждую когорту пару «matched рядом со штатным comparator того же блока» (reference включает matched для baseline и не включает для complement). Это сравнение внутри блока, а не причинность и не независимая репликация; ES10 и квантили сторон не усредняются и не вычитаются. Результат V3 и старше блока не содержит и не пересчитывается; `discovery-show` называет это `NOT_SAVED_BY_THIS_CALCULATION_VERSION`. Контракт: `docs/contracts/forge_downside_descriptive_v1.md`.
 Bound schedule может задавать per-point `(due_offset, allowed_lateness)`;
 query scalar остаётся X300 envelope. `schedule.observation_clock_policy:
 PROVIDER_REPORTED_SNAPSHOT_V1` считает exit по request/response/availability,
