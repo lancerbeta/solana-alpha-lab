@@ -1,0 +1,74 @@
+{
+  "as_of": "2026-10-23",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_MERGE_OR_SCIENTIFIC_AUTHORITY_FROM_REVIEW"
+  ],
+  "remediation_history": [
+    {
+      "finding": "Overlap cross-check had no test with legitimately overlapping cohorts and two independent shared-decision counters; discovery-show hint branched on population; V4 without the block read as COHERENT.",
+      "observed_head": "cb4e2a8ce6748ad422f08c9dfa63dec2817e4dd1",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "fa75887354e4b9711e7ff0ed339f9dd4b54c7ec6",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "Inclusive reference equal to matched reported EVALUATED with delta 0; version bump not enumerated; integrity-excluded handling untested; V4 without block coherent.",
+      "observed_head": "cc7528a4e9c989d8f6b69cc1133d8f840777ee40",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "a4ca7955b46562194467f05859c9c7f8bc757409",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "The two-day hand oracle never ran on the persisted path; the vertical used a single-day fixture.",
+      "observed_head": "cc7528a4e9c989d8f6b69cc1133d8f840777ee40",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "cb4e2a8ce6748ad422f08c9dfa63dec2817e4dd1",
+      "role": "GOAL_DOD_CRITIC",
+      "severity": "MAJOR"
+    }
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "FORGE_BLOCK_COMPARATOR_READOUT_V1-REVIEW",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "findings": [
+        "packet_fingerprint_sha256=fdc22150a7ecbf67557f9a5e1ecbcf50622ee4a55b0d6319c6ea195ca15c6765",
+        "Isolated SEMANTIC_PREMISE round 3 PASS at exact head fa75887354e4b9711e7ff0ed339f9dd4b54c7ec6: one shared-decision counter for saved cohort rows and pairs, version-based discovery-show hint, MIXED_LIST_NUMERIC contrast coherent, contrast kinds pinned to the scope owner by a drift guard, same-spec V3 retry is RETRY_SAME_BYTES. Delta changes no saved bytes, hashes, V3 readouts or BASE_X behaviour.",
+        "MINOR accepted: the builder could also reject kinds outside the coherence set (fails closed in coherence and the CI drift test today); an unknown or empty calculation_version on an episode result gets the NOT_SAVED hint (runtime-only).",
+        "Rounds 1 and 2 (NOT_READY at cc7528a4 packet 62fce7a9 and cb4e2a8c packet f881ac17) are recorded in remediation_history."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Isolated round 2 PASS at exact head cb4e2a8ce6748ad422f08c9dfa63dec2817e4dd1 (round 1 PASS at cc7528a4); no BLOCKER or MAJOR. Grouping keys, native reference sets, Fraction/float handling, empty-group paths and the _cohort_identity_owners extraction verified; both the pooled-baseline and inverted-complement failure modes are caught by the tests.",
+        "MINOR (accepted or fixed in later heads): integrity filter defensive only, overlap branch not reachable on the episode path, calendar_key/schema_version not validated, hint labels for old BASE_X results. Heads after the review: a shared-decision helper, version-based hint and falsifiers (fa758873); module tests re-run green."
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Isolated round 2 PASS at exact head cb4e2a8ce6748ad422f08c9dfa63dec2817e4dd1: persisted two-cohort vertical now carries literal hand values (per day 2/2/5/4/1 and 1/1/2/2/0; means 0.05/0.15 and 0.30/-0.025; gaps -0.10 and +0.325) through the saved result, discovery-show full rows and the compact readout.",
+        "MINOR: baseline pair and NO_UNMATCHED_OBSERVED are proven by direct tests, not by the persisted vertical; task-contract text drift fixed afterwards (task contract now names NO_UNMATCHED_OBSERVED and points to the contract)."
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review",
+  "schema_version": "1.0",
+  "task_id": "FORGE_BLOCK_COMPARATOR_READOUT_V1"
+}
