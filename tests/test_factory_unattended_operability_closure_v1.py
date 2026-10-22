@@ -664,7 +664,7 @@ class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         for item in ARCHIVE_CATCH_UP_ON_CALENDAR:
             self.assertIn(item, archive_timer)
-        self.assertEqual(ARCHIVE_ON_CALENDAR, "*-*-* 01:15:00 UTC")
+        self.assertEqual(ARCHIVE_ON_CALENDAR, "*-*-* 04:15:00 UTC")
         self.assertIn(
             "TimeoutStartSec=900",
             (ROOT / "configs/factory_remote_ops/factory-hot90-closed-day-archive.service").read_text(

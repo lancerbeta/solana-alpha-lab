@@ -40,12 +40,14 @@ STAGING_RELATIVE = "local/factory_v1/hot90_archives"
 RDP_RELATIVE = "local/factory_v1/observation_rdp"
 DEFAULT_MAX_DAYS_PER_RUN = 3
 DEFAULT_MAX_RUNTIME_SECONDS = 900
-ARCHIVE_ON_CALENDAR = "*-*-* 01:15:00 UTC"
+# 04:15 UTC keeps the archive upload clear of the Drive backups: weekly full
+# Sun 00:30 (up to 110 min) and the daily delta 00:45 that waits on its lock.
+ARCHIVE_ON_CALENDAR = "*-*-* 04:15:00 UTC"
 ARCHIVE_CATCH_UP_ON_CALENDAR = (
-    "*-*-* 01:15:00 UTC",
-    "*-*-* 07:15:00 UTC",
-    "*-*-* 13:15:00 UTC",
-    "*-*-* 19:15:00 UTC",
+    "*-*-* 04:15:00 UTC",
+    "*-*-* 10:15:00 UTC",
+    "*-*-* 16:15:00 UTC",
+    "*-*-* 22:15:00 UTC",
 )
 # Operational latest cache retention is bounded: only the latest CLOSED day may
 # keep a rebuildable cache once its day is archived and Drive-verified. Older

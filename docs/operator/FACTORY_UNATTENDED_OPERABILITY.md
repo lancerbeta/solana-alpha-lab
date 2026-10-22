@@ -209,7 +209,7 @@ After a later owner-gated commissioning (not this Git change):
 |---|---|---|
 | Lifecycle collection | existing `factory-observation-schedule.timer` | existing collector cadence |
 | Mutable-state backup | existing `factory-remote-backup*.timer` | existing backup cadence |
-| Closed-day immutable archive | `factory-hot90-closed-day-archive.timer` | `01:15 / 07:15 / 13:15 / 19:15 UTC`, max 3 days/run |
+| Closed-day immutable archive | `factory-hot90-closed-day-archive.timer` | `04:15 / 10:15 / 16:15 / 22:15 UTC`, max 3 days/run (after the Drive backups) |
 | Daily owner pulse | `factory-collector-owner-pulse.timer` | `*-*-* 06:20:00 UTC` |
 | Local operability watch | `factory-operability-watch.timer` | every 15 minutes UTC |
 | External heartbeat (local half) | `factory-external-heartbeat.timer` | every 5 minutes UTC |
