@@ -2240,6 +2240,20 @@ def no_worthy_scope_record(evidence: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+BLOCK_COMPARATOR_COMPACT_DOWNSIDE = (
+    "negative_n", "zero_n", "le_minus_20_n", "le_minus_20_rate", "le_minus_50_n", "le_minus_50_rate",
+    "es10_return", "es10_tail_mass_n",
+)
+
+
+def _compact_comparator_side(side: Mapping[str, Any]) -> dict[str, Any]:
+    downside = side.get("downside") if isinstance(side.get("downside"), Mapping) else {}
+    return {
+        **{key: side.get(key) for key in ("eligible_n", "observed_n", "missing_n", "mean_target", "median_target")},
+        "downside": {key: downside.get(key) for key in BLOCK_COMPARATOR_COMPACT_DOWNSIDE},
+    }
+
+
 def block_comparator_readout(comparator: Mapping[str, Any], *, detail_limit: int = 4) -> dict[str, Any]:
     """Bounded view of the saved paired block comparator.
 
@@ -2251,7 +2265,14 @@ def block_comparator_readout(comparator: Mapping[str, Any], *, detail_limit: int
     truncation = {}
     for key in ("by_calendar_block", "by_cohort"):
         rows = [row for row in (comparator.get(key) or []) if isinstance(row, Mapping)]
-        details[key] = [dict(row) for row in rows[:detail_limit]]
+        details[key] = [
+            {
+                **{name: value for name, value in row.items() if name not in {"matched", "reference"}},
+                "matched": _compact_comparator_side(row.get("matched") or {}),
+                "reference": _compact_comparator_side(row.get("reference") or {}),
+            }
+            for row in rows[:detail_limit]
+        ]
         truncation[key] = {"total": len(rows), "included": min(len(rows), detail_limit), "truncated": len(rows) > detail_limit}
     return {
         "schema": comparator.get("schema"),
@@ -2263,6 +2284,7 @@ def block_comparator_readout(comparator: Mapping[str, Any], *, detail_limit: int
         "details": details,
         "detail_truncation": truncation,
         "selection_policy": "CANONICAL_ORDER_PREFIX_PAIRED_ROWS",
+        "downside_projection": "COMPACT_SUBSET_OF_DOWNSIDE_DESCRIPTIVE_V1_FULL_PROFILE_IN_SAVED_RESULT",
         "full_detail": "result.block_comparator of the saved result; discovery-show --result-ref returns every row",
         "claims": comparator.get("claims"),
     }

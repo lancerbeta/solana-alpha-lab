@@ -284,8 +284,18 @@ class ConsumerPathTests(unittest.TestCase):
         self.assertEqual(truncation, {"total": 7, "included": 4, "truncated": True})
         self.assertEqual(len(out["block_comparator"]["by_calendar_block"]), 7)
         self.assertIn("discovery-show", compact["full_detail"])
-        # Same rows as the saved result, in the same canonical order (prefix).
-        self.assertEqual(rows, out["block_comparator"]["by_calendar_block"][:4])
+        # Same rows as the saved result, in the same canonical order (prefix), compact downside subset.
+        saved = out["block_comparator"]["by_calendar_block"][:4]
+        self.assertEqual([row["view"] for row in rows], [row["view"] for row in saved])
+        for compact_row, saved_row in zip(rows, saved):
+            for side in ("matched", "reference"):
+                self.assertEqual(compact_row[side]["observed_n"], saved_row[side]["observed_n"])
+                self.assertEqual(compact_row[side]["mean_target"], saved_row[side]["mean_target"])
+                self.assertEqual(compact_row[side]["downside"]["le_minus_20_n"], saved_row[side]["downside"]["le_minus_20_n"])
+                self.assertEqual(compact_row[side]["downside"]["es10_return"], saved_row[side]["downside"]["es10_return"])
+                self.assertNotIn("p05", compact_row[side]["downside"])
+            self.assertEqual(compact_row["matched_minus_reference_mean"], saved_row["matched_minus_reference_mean"])
+        self.assertIn("FULL_PROFILE_IN_SAVED_RESULT", compact["downside_projection"])
         self.assertEqual(block_comparator_readout(out["block_comparator"])["details"], compact["details"])
 
     def test_owner_readout_and_fragment_summary_carry_the_block(self) -> None:
@@ -297,7 +307,7 @@ class ConsumerPathTests(unittest.TestCase):
         self.assertIn("block_comparator", evidence_view["descriptive_readout"])
         summary = _summary(out)
         self.assertEqual(summary["block_comparator"], descriptive_return_readout(out)["block_comparator"])
-        self.assertLess(len(json.dumps(summary["block_comparator"], sort_keys=True)), 24000)
+        self.assertLess(len(json.dumps(summary["block_comparator"], sort_keys=True)), 6000)
 
     def test_older_results_are_byte_identical_through_every_consumer(self) -> None:
         from solana_alpha_lab.factory.hfic_discovery_detail import _block_comparator_detail

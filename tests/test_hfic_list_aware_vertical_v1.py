@@ -348,7 +348,11 @@ class ListAwareVerticalTests(unittest.TestCase):
             self.assertAlmostEqual(pair["matched"]["mean_target"], 0.05, places=6)
             self.assertAlmostEqual(pair["reference"]["mean_target"], 0.15, places=6)
             self.assertAlmostEqual(pair["matched_minus_reference_mean"], -0.10, places=6)
-        self.assertEqual(contrast["descriptive_readout"]["block_comparator"]["details"]["by_calendar_block"], block["by_calendar_block"])
+        compact = contrast["descriptive_readout"]["block_comparator"]["details"]["by_calendar_block"]
+        self.assertEqual(
+            [(row["view"], row["matched"]["observed_n"], row["reference"]["observed_n"]) for row in compact],
+            [(row["view"], row["matched"]["observed_n"], row["reference"]["observed_n"]) for row in block["by_calendar_block"]],
+        )
         shown = _forge_call("discovery-show", "--result-ref", contrast["result_refs"][0], data_root=self.plane)
         entry = shown["entries"][0]
         self.assertEqual(entry["block_comparator_status"], "SAVED")
