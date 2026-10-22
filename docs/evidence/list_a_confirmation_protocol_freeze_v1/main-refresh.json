@@ -172,9 +172,9 @@
     "as_of": "2026-10-14",
     "current_implementation_binding": [
       {
-        "implementation_head": "989cee4ccd676716421752ce3f8a6ef42a794bd1",
+        "implementation_head": "fa75887354e4b9711e7ff0ed339f9dd4b54c7ec6",
         "path": "src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
-        "sha256": "f5b38fa0da3766f8d19424b379bcea0ca92ecb90fb94b34d04c827f734c51c22"
+        "sha256": "b5d9752f636ab51fe643ac7bcc47f04fa0ac362b4c686e670623641498f09eb7"
       },
       {
         "implementation_head": "989cee4ccd676716421752ce3f8a6ef42a794bd1",

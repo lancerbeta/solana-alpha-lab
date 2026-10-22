@@ -249,6 +249,10 @@ def _summary(result: Mapping[str, Any]) -> dict[str, Any]:
     # matched side and is never a complement. Legacy results stay UNKNOWN.
     for key in ("research_scope", "scientific_identity"):
         summary[key] = copy.deepcopy(readout.get(key)) if readout.get(key) is not None else "UNKNOWN"
+    # Only a result that saved the paired block carries it. No default is written for older results:
+    # their frozen capsules and archive fingerprints stay byte-identical.
+    if readout.get("block_comparator") is not None:
+        summary["block_comparator"] = copy.deepcopy(readout["block_comparator"])
     # Saved native dependency markers only. Absence is UNKNOWN, never a new
     # mint-overlap calculation or a claim of independent calendar replication.
     summary["dependence"] = {k: copy.deepcopy(result.get(k)) for k in (

@@ -285,7 +285,7 @@ class LegacyGoldenTests(unittest.TestCase):
         self.assertIs(temporal.current_look_evidence(look, [look]), look)
         self.assertEqual(json.dumps(look["result"], sort_keys=True, default=str).encode(), legacy_raw)
         self.assertIn(legacy["calculation_version"], temporal.TEMPORAL_CURRENT_CALCULATION_VERSIONS)
-        self.assertEqual(summary["calculation_version"], temporal.TEMPORAL_CALCULATION_VERSION_EPISODES_V3)
+        self.assertEqual(summary["calculation_version"], temporal.TEMPORAL_CALCULATION_VERSION_EPISODES_V4)
         # Independent literal PRD vector: two matches, one censored exit,
         # observed return 1.122/1.02-1 = 0.1. No legacy result is recomputed.
         self.assertEqual((summary["matched_n"],summary["observed_target_n"],summary["missing_target_n"]),(2,1,1))

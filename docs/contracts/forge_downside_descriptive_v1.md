@@ -67,3 +67,52 @@ that source-bound V5 revision exists, correction retry reads it even if the
 current writer alias has advanced; it does not request another calculation.
 Canonical saved recipes convert through the existing `_public_query_from_recipe`
 owner, preserving the full canonical query including adaptation and clocks.
+
+## Block-local comparator (episodes, `HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V4`)
+
+A fresh OPPORTUNITY_EPISODES calculation saves `block_comparator` beside the
+existing rows. For every UTC decision day (`by_calendar_block`) and every
+admitted cohort (`by_cohort`) it keeps one **pair**: the matched side and the
+query's own reference side, computed in the same pass over the same members
+and cohort seats. There is no second filter, clock or scan.
+
+- Reference: `SAME_DECISION_ELIGIBLE` and `MATCHED_VS_DECISION_ELIGIBLE` use
+  every decision-eligible member of that block (matched included, feature
+  UNKNOWN included); `MATCHED_VS_ELIGIBLE_COMPLEMENT` uses exactly the
+  decision-eligible members that are not matched. `reference_kind` and
+  `reference_includes_matched` say which. The pooled baseline is never
+  presented as a complement.
+- Each side carries `eligible_n`, `observed_n`, `missing_n`, `mean_target`,
+  `median_target` and its own `downside` (`DOWNSIDE_DESCRIPTIVE_V1`) on its own
+  observed sample. Quantiles and ES10 are never averaged across sides or
+  derived by subtraction. A missing target stays a count; an empty observed
+  sample has null statistics, not zero.
+- `matched_minus_reference_mean` is set only when both sides observed targets
+  and, for an inclusive reference, the reference observed something beyond the
+  matched members; `comparison_state` separates `EVALUATED`,
+  `NO_UNMATCHED_OBSERVED` (reference equals matched: no comparator, not a zero
+  difference), `EMPTY_MATCHED`, `EMPTY_REFERENCE` and `EMPTY_BOTH`. Because an
+  inclusive reference contains matched, its delta shrinks as matched's share
+  grows: per-block deltas are not comparable across blocks of different share. Days with no matched member still appear (reference only);
+  the saved `by_calendar_block` and `block_count` keep counting matched days.
+- A within-block difference is descriptive. It does not remove calendar or
+  cohort dependence (`cohort_rows_overlap`, `shared_decision_n`), mint repeats,
+  list composition or selection, and implies no cause.
+- `temporal_result_coherence` checks the pairs: matched sides equal the saved
+  calendar and cohort rows, reference sides add up to the native baseline or
+  complement (day sums always; cohort sums only without shared decisions).
+
+Versioning. V4 is a new episode calculation version; V3 and earlier stay
+current and readable and are not recomputed, revised or re-hashed. A V3 result
+has no block: `discovery-show` reports `block_comparator_status:
+NOT_SAVED_BY_THIS_CALCULATION_VERSION` (`NOT_APPLICABLE_NON_EPISODE` for BASE_X,
+`INVALID` for a non-mapping block, `MISSING_IN_BLOCK_VERSION` for a V4 result without it), a runtime hint that no working view, bound
+draft or archive fingerprint reads (only the CLI prints it). A V4 result must
+carry the block; its absence is incoherent. `descriptive_return_readout` and the fragment summary add
+`block_comparator` only for a result that saved it, so older prior capsules,
+working-view fingerprints and bound drafts stay byte-identical. The compact
+readout shows at most four paired rows per list (`detail_truncation` names
+total/included/truncated, a prefix is not full coverage); `discovery-show
+--result-ref <ref>` returns every saved row. BASE_X (`HFIC_TEMPORAL_DISCOVERY_CALC_V5`)
+is unchanged. Rollback after a V4 result exists is forward-fix only: keep a
+reader that understands V4 and never delete saved history.

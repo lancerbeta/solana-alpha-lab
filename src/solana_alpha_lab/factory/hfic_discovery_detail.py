@@ -13,7 +13,24 @@ from typing import Any, Mapping
 from .hfic_grounded_discovery import result_sha256
 from .hfic_ordinary_operation import OPERATION_KIND, RESERVATION_KIND, _sha, result_readout
 from .hfic_scientific_disposition import ARTIFACT_KIND as DISPOSITION_KIND, RECORD_PREFIX as DISPOSITION_PREFIX, _View, _applicability, resolve_subject, subject_key
-from .hfic_temporal_discovery import _public_query_from_recipe, canonical_temporal_spec, current_look_evidence, validate_temporal_query
+from .hfic_temporal_discovery import (
+    TEMPORAL_CALCULATION_VERSION_EPISODES_V1,
+    TEMPORAL_CALCULATION_VERSION_EPISODES_V2,
+    TEMPORAL_CALCULATION_VERSION_EPISODES_V3,
+    TEMPORAL_CALCULATION_VERSION_EPISODES_V4,
+    _public_query_from_recipe,
+    canonical_temporal_spec,
+    current_look_evidence,
+    validate_temporal_query,
+)
+
+EPISODE_VERSIONS_WITHOUT_BLOCK = frozenset(
+    {
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V1,
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V2,
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V3,
+    }
+)
 
 
 class DiscoveryDetailError(Exception):
@@ -38,6 +55,32 @@ _SOURCE_KINDS_BY_PREFIX = {
     "HFIC-ART-FORGE-DRAFT-": "FORGE_DRAFT",
     "HFIC-ART-CRITIC-INPUT-": "CRITIC_INPUT_PACKET",
 }
+
+
+def _block_comparator_detail(look: Mapping[str, Any]) -> dict[str, Any]:
+    """Runtime projection of the saved paired block; never written into saved bytes.
+
+    A result of an older calculation version did not save the block: say so
+    instead of presenting the pooled baseline as a block-local reference.
+    """
+
+    result = look.get("result")
+    if not isinstance(result, Mapping):
+        return {"block_comparator_status": "NO_RESULT"}
+    block = result.get("block_comparator")
+    if isinstance(block, Mapping):
+        return {"block_comparator_status": "SAVED", "block_comparator": json.loads(json.dumps(block))}
+    if block is not None:
+        return {"block_comparator_status": "INVALID"}
+    version = str(result.get("calculation_version") or look.get("calculation_version") or "")
+    if version == TEMPORAL_CALCULATION_VERSION_EPISODES_V4:
+        # The version that saves the block must carry it; this is corruption, not an older result.
+        return {"block_comparator_status": "MISSING_IN_BLOCK_VERSION"}
+    if version in EPISODE_VERSIONS_WITHOUT_BLOCK:
+        return {"block_comparator_status": "NOT_SAVED_BY_THIS_CALCULATION_VERSION"}
+    if result.get("population") != "OPPORTUNITY_EPISODES":
+        return {"block_comparator_status": "NOT_APPLICABLE_NON_EPISODE"}
+    return {"block_comparator_status": "NOT_SAVED_BY_THIS_CALCULATION_VERSION"}
 
 
 def _original_request(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
@@ -215,6 +258,7 @@ def discovery_detail(
             "canonical_query": public_query,
             "query_provenance": "EXACT_SAVED_PUBLIC_QUERY" if saved else "SOURCE_DERIVED_CANONICAL_QUERY",
             "original_query_bytes": "NOT_RECORDED", "result_readout": result_readout(look),
+            **_block_comparator_detail(look),
             "current_result_ref": current.get("record_id"), "is_current_result": current.get("record_id") == look["record_id"],
             "scientific_disposition": resolved, "assessment_history": history,
             "source_links": source_links,
