@@ -228,6 +228,33 @@ class NativeShelfTests(unittest.TestCase):
         self.assertEqual(resolved["native"]["critic_terminal"], "KILL_STATISTICALLY_UNIDENTIFIABLE")
         self.assertEqual(resolved["native"]["source_restrictions"]["missing_or_forward_only_data"], dossier["source_restrictions"]["missing_or_forward_only_data"])
         self.assertEqual(resolved["shelf"]["adopted_sources"][0]["revision"]["statement"], wire.decode(raw)["statement"])
+        # Matching conflict/invalid is not retraction. The actual downstream
+        # consumer must refuse a unique origin even with one healthy current.
+        competitor = wire.capture(product="SMIAL", title="Competing origin", statement="Separate synthetic intent", now=NOW)
+        other = wire.decode(competitor)
+        other_snapshot = shelf_snapshot(competitor)
+        relation = copy.deepcopy(linked_snapshot["items"][wire.decode(raw)["item_id"]]["current"]["native_links"][0])
+        relation.update(adoption_key="independent-competing-intent",
+            adopted_item_revision=native.adopted_ref(other_snapshot, other["item_id"], other["revision_sha256"]))
+        attached = wire.revise(other_snapshot, other["item_id"], dict(state="FOLLOWING", native_links=[relation],
+            change_reason="Synthetic second association."), now=NOW, mutation_id=str(uuid4()))
+        files = dict(linked_snapshot["files"])
+        for encoded in (competitor, attached):
+            files[wire.revision_path(wire.decode(encoded))] = encoded
+        both = dict(wire.fold(files), files=files, commit="9" * 40)
+        self.assertEqual(native.find_native(both, dossier["candidate_record_refs"][0])["status"], "AMBIGUOUS_SOURCE_LINK")
+        for text in ("Administrative fork left", "Administrative fork right"):
+            fork = wire.revise(both, other["item_id"], dict(statement=text, change_reason="Explicit synthetic fork."),
+                now=NOW, mutation_id=str(uuid4()))
+            files[wire.revision_path(wire.decode(fork))] = fork
+        for invalid in (False, True):
+            if invalid:
+                files[f"{wire.PREFIX}/{other['item_id']}/invalid.json"] = b"{}"
+            uncertain = dict(wire.fold(files), files=files, commit="9" * 40)
+            refused = native.resolve_strategy(uncertain, strategy, store=ExistingResearchStoreReader(self.plane),
+                root=schema_root, git_read=lambda ref: raw)
+            self.assertEqual(refused["status"], "UNRESOLVED")
+            self.assertIn("AMBIGUOUS_SOURCE_LINK", refused["gaps"])
         altered = copy.deepcopy(strategy)
         altered["source_decision_asset_id"] = "DEC-MISSING-EXACT"
         self.assertEqual(native.resolve_strategy(linked_snapshot, altered, store=ExistingResearchStoreReader(self.plane), root=schema_root)["status"], "UNRESOLVED")

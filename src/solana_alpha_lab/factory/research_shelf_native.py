@@ -289,7 +289,7 @@ def find_native(snapshot: Mapping[str, Any], native_ref: Mapping[str, Any]) -> d
             historical_relations=history))
     return dict(status="INCOMPLETE" if not snapshot["complete"] else "AMBIGUOUS_SOURCE_LINK" if
                 sum(row["status"] == "CURRENT_SOURCE_LINK" for row in values) > 1 or
-                any(row["status"] == "AMBIGUOUS_SOURCE_LINK" for row in values) else
+                any(row["status"] not in {"CURRENT_SOURCE_LINK", "RETRACTED_SOURCE_LINK"} for row in values) else
                 "FOUND" if values else "UNRESOLVED", matches=values, reason=snapshot.get("reason"),
                 snapshot_commit=snapshot.get("commit"), source_freshness=snapshot.get("source_freshness"))
 

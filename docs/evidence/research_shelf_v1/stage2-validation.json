@@ -10,13 +10,13 @@
       "name": "entry_wire_semantic",
       "tests": 47,
       "result": "PASS",
-      "output_sha256": "db4b64a58a87609ab02431ca8630bac761d113689bc66cc034650ab23ceaacfd"
+      "output_sha256": "00d435045296ae097a478cdf4772bc89e37feed743bd277972c4434fc618ba44"
     },
     {
       "name": "native_strategy_vertical",
       "tests": 1,
       "result": "PASS",
-      "output_sha256": "f581b48e7e2cf046ff26d052cc1430753c96e5623655f4ebb9a2985cd96c204b"
+      "output_sha256": "ef99e3a571a492c927ec722ecaec241546df7bb4999c37985795db3b0878c1b7"
     },
     {
       "name": "prior_navigation",
@@ -34,10 +34,10 @@
   "overview_max_bytes": 16384,
   "source_bindings": {
     "src/solana_alpha_lab/factory/research_shelf_context.py": "48ae9a435502b21a5546677a56a75791afa8c29a7da312886c7eea2374a4e749",
-    "src/solana_alpha_lab/factory/research_shelf_native.py": "aa7ec9a2314b8fd172b256117114f40984bfcd0f7c0bdc6894061446e326345f",
+    "src/solana_alpha_lab/factory/research_shelf_native.py": "10627647ef5653eeb5ef82d2155f71911b3bbd70ef02cd7014315069402371e6",
     "tests/fixtures/research_shelf_v1/history.json": "041b2499e8c2a791d12ab1506a4e7cf8a65ef54e4c524ba501477f7f2fd0cf70",
-    "tests/test_research_shelf_entry_v1.py": "672784b031eef8796e4555dedc4377d93d59b0f715f32b5817fec0e1bb3d74e8",
-    "tests/test_research_shelf_native_v1.py": "227d511023322f31358b89d4c8403953dd1e459cd0b5bec1f8ee689455089c8e"
+    "tests/test_research_shelf_entry_v1.py": "22f311fc48bdc8bdc030e5d1af85b31d9a55429c84f910f9638838e2cd5d6f97",
+    "tests/test_research_shelf_native_v1.py": "1d241ad658c338827be731fbe50e09f4b6df70f95b1545a7e9731aa33219996a"
   },
   "reproduce": [
     "uv run --locked --managed-python python -B -m unittest tests.test_research_shelf_entry_v1 tests.test_research_shelf_v1.WireTests tests.test_factory_semantic_operability tests.test_hfic_scientific_disposition_navigation_v1 tests.test_research_shelf_native_v1 -v",
@@ -57,7 +57,8 @@
     "Actual CLI disclosure reaches mandatory scoped writer guard; PARTIAL association permits only monotonic same-candidate enrichment; unavailable snapshot retains recovery reason",
     "Shelf intent and genuine existing RESEARCH_FRAGMENT prior before consumer saved draft/freeze/Critic; fixed E1800, negative_n=4, mean=-0.55/6, UNKNOWN_EXECUTION_COSTS and RESEARCH_ADVISORY/EXPLORATORY_REUSE survive source resolver",
     "Actual saved pre-Critic PARTIAL association -> post-Critic VERIFIED enrichment -> one current inverse association plus historical version -> actual exact StrategyVersion resolver; independent live associations remain ambiguous and explicitly retracted history cannot poison a unique current source.",
-    "Historical control pins preserved: AGENTS/context-map base bytes retained; existing semantic front door, Forge skill/command, actual CLI overlays and native operator link carry entry; 47 entry/wire/semantic checks revalidated after placement replan."
+    "Historical control pins preserved: AGENTS/context-map base bytes retained; existing semantic front door, Forge skill/command, actual CLI overlays and native operator link carry entry; 47 entry/wire/semantic checks revalidated after placement replan.",
+    "One CURRENT plus matching ITEM_CONFLICT/ITEM_INVALID never becomes unique. Actual StrategyVersion resolver returns UNRESOLVED / AMBIGUOUS_SOURCE_LINK; only proven RETRACTED matches can be excluded."
   ],
   "non_claims": [
     "NO_CAPABILITY_DONE_OR_COMMISSIONING",

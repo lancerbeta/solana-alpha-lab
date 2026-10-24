@@ -89,6 +89,8 @@ bytes, прочитать exact saved target и дописать только li
 bare cache для readback); `find --input <native-ref.json>` включает CLOSED/history
 и помечает отозванную связь `RETRACTED_SOURCE_LINK`. Неоднозначность —
 `AMBIGUOUS_SOURCE_LINK`. Для переноса правильной связи применяется новая ревизия.
+Уникальность требует одной текущей связи и только доказанно отозванных прочих
+matches. Matching ITEM_CONFLICT/ITEM_INVALID остаётся unresolved и блокирует trace.
 
 `resolve --strategy <strategy.yaml> --data-root ...` начинает с exact
 `StrategyVersion.source_decision_asset_id`, проверяет immutable PROMOTE manifest,

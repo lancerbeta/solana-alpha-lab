@@ -51,3 +51,7 @@ Control placement: AGENTS.md и context-map.yaml сохранены байт-в-
 из-за действующих historical acceptance pins. Использованы существующий semantic
 front door, Forge skill/command, machine glances и native operator links. Guard
 exemptions и historical evidence не менялись; cold route проверен повторно.
+
+Uniqueness invariant: ровно одна CURRENT_SOURCE_LINK, все остальные matching
+associations только доказанно RETRACTED_SOURCE_LINK. Конфликт/invalid не означает
+отзыв. Actual StrategyVersion consumer подтверждает UNRESOLVED в обоих случаях.

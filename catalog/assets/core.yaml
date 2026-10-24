@@ -43539,7 +43539,7 @@ records:
     repository_path: docs/operator/RESEARCH_SHELF_V1.md
   integrity:
     kind: sha256
-    sha256: adf2cacf9bec1e8bfb620936310cac707c8c09f20e1ade67be2633b9a709bf28
+    sha256: c09eb2e7d01a44b83eb873d1b9f314968077740d2983b036ed16368466074a13
   access:
     mode: read_only
     method: file
@@ -43694,7 +43694,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/research_shelf_native.py
   integrity:
     kind: sha256
-    sha256: aa7ec9a2314b8fd172b256117114f40984bfcd0f7c0bdc6894061446e326345f
+    sha256: 10627647ef5653eeb5ef82d2155f71911b3bbd70ef02cd7014315069402371e6
   access:
     mode: read_only
     method: file
@@ -43848,7 +43848,7 @@ records:
     repository_path: tests/test_research_shelf_entry_v1.py
   integrity:
     kind: sha256
-    sha256: 672784b031eef8796e4555dedc4377d93d59b0f715f32b5817fec0e1bb3d74e8
+    sha256: 22f311fc48bdc8bdc030e5d1af85b31d9a55429c84f910f9638838e2cd5d6f97
   access:
     mode: read_only
     method: file
@@ -43886,7 +43886,7 @@ records:
     repository_path: tests/test_research_shelf_native_v1.py
   integrity:
     kind: sha256
-    sha256: 227d511023322f31358b89d4c8403953dd1e459cd0b5bec1f8ee689455089c8e
+    sha256: 1d241ad658c338827be731fbe50e09f4b6df70f95b1545a7e9731aa33219996a
   access:
     mode: read_only
     method: file

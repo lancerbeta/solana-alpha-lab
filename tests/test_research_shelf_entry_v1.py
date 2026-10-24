@@ -259,6 +259,20 @@ class ShelfEntryTests(unittest.TestCase):
         corrected = native.find_native(wire.fold(files), target)
         self.assertEqual(corrected["status"], "FOUND")
         self.assertEqual(sum(row["status"] == "CURRENT_SOURCE_LINK" for row in corrected["matches"]), 1)
+        # A conflict in a second source cannot make the first source unique.
+        other = wire.decode(RAW)
+        other.pop("revision_sha256")
+        other.update(item_id=other["item_id"][:-1] + "9", mutation_id=str(uuid4()), native_links=[link])
+        other_raw = wire.prepare(other)
+        files[wire.revision_path(wire.decode(other_raw))] = other_raw
+        baseline = wire.fold(files)
+        for statement in ("Competing branch left", "Competing branch right"):
+            fork = wire.revise(baseline, other["item_id"], dict(statement=statement, change_reason="Synthetic administrative fork."),
+                now=NOW, mutation_id=str(uuid4()))
+            files[wire.revision_path(wire.decode(fork))] = fork
+        conflict = native.find_native(wire.fold(files), target)
+        self.assertEqual(conflict["status"], "AMBIGUOUS_SOURCE_LINK")
+        self.assertIn("ITEM_CONFLICT", {row["status"] for row in conflict["matches"]})
         with patch.object(native, "native_dossier", return_value=dict(complete, candidate_record_refs=[extra])):
             with self.assertRaisesRegex(wire.ShelfError, "ADOPTION_KEY_CONFLICT"):
                 native.prepare_link(linked, ITEM, wire.decode(RAW)["revision_sha256"], **args)
