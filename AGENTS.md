@@ -41,14 +41,6 @@ cloud chat voluntarily outside this harness.
 
 ## ACTIVE_ROUTES_AND_STATUS
 
-Research intent/navigation uses `SEM-RESEARCH-SHELF` and
-`docs/operator/RESEARCH_SHELF_V1.md`. Before a fresh research session, refresh
-once in a separate metadata cache, then review the pinned snapshot. Machine
-entry reads it without transport. Frozen resume/RFV keeps its original inputs;
-metadata attention grants no look. Retain only an explicitly deferred question
-or exact native pointer; a terminal without follow-up needs no new OPEN item.
-Cloud readers use explicit repository/ref/path, never default-branch search.
-
 Active routes are exactly `DIRECT_CODEX_DELIVERY`, `DIRECT_CURSOR_DELIVERY`,
 `DIRECT_CLAUDE_CODE_DELIVERY`, `DIRECT_OTHER_DELIVERY` and `DESIGN_ONLY`.
 The executing client selects the route: Cursor Agent → `CURSOR`, Codex →

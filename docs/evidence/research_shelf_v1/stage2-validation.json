@@ -10,7 +10,7 @@
       "name": "entry_wire_semantic",
       "tests": 47,
       "result": "PASS",
-      "output_sha256": "5d940253603734df8b69a7d63e05d0cd2946c56b0c5476223b0e854d876cc021"
+      "output_sha256": "db4b64a58a87609ab02431ca8630bac761d113689bc66cc034650ab23ceaacfd"
     },
     {
       "name": "native_strategy_vertical",
@@ -56,7 +56,8 @@
     "Current plan and monitoring CHECK independently change a derived metadata baseline; malformed Scout source remains per-item UNKNOWN; moving private ref without source-head witness remains UNKNOWN",
     "Actual CLI disclosure reaches mandatory scoped writer guard; PARTIAL association permits only monotonic same-candidate enrichment; unavailable snapshot retains recovery reason",
     "Shelf intent and genuine existing RESEARCH_FRAGMENT prior before consumer saved draft/freeze/Critic; fixed E1800, negative_n=4, mean=-0.55/6, UNKNOWN_EXECUTION_COSTS and RESEARCH_ADVISORY/EXPLORATORY_REUSE survive source resolver",
-    "Actual saved pre-Critic PARTIAL association -> post-Critic VERIFIED enrichment -> one current inverse association plus historical version -> actual exact StrategyVersion resolver; independent live associations remain ambiguous and explicitly retracted history cannot poison a unique current source."
+    "Actual saved pre-Critic PARTIAL association -> post-Critic VERIFIED enrichment -> one current inverse association plus historical version -> actual exact StrategyVersion resolver; independent live associations remain ambiguous and explicitly retracted history cannot poison a unique current source.",
+    "Historical control pins preserved: AGENTS/context-map base bytes retained; existing semantic front door, Forge skill/command, actual CLI overlays and native operator link carry entry; 47 entry/wire/semantic checks revalidated after placement replan."
   ],
   "non_claims": [
     "NO_CAPABILITY_DONE_OR_COMMISSIONING",

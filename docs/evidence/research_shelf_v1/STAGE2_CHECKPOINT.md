@@ -46,3 +46,8 @@ Exact disclosure проходит через actual CLI до writer; PARTIAL enr
 Recovery vertical теперь сохраняет реальную PARTIAL связь до Critic, обогащает её
 после Critic и проходит inverse lookup до actual StrategyVersion resolver. Версии
 одной association сгруппированы; история отделена от действующих связей.
+
+Control placement: AGENTS.md и context-map.yaml сохранены байт-в-байт от base
+из-за действующих historical acceptance pins. Использованы существующий semantic
+front door, Forge skill/command, machine glances и native operator links. Guard
+exemptions и historical evidence не менялись; cold route проверен повторно.

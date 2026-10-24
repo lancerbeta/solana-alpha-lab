@@ -242,3 +242,9 @@ ancestor of origin/main, isolated cache, existing transport and whole-payload
 public guard. Implementing/testing that refusal path grants no real refresh,
 publication, bootstrap or commissioning. One engineering PR can therefore land
 the implementation before the owner authorizes operational metadata use.
+
+Delivery placement replan: preflight found historical shadow pins to AGENTS.md
+and context-map.yaml in TASK21/TASK30 acceptance evidence. Preserve those root
+control bytes and pins. The existing semantic front door resolves the new route;
+Forge skill/command, actual machine CLI glances and native operator links carry
+the shelf entry. No guard exemptions, historical retagging or new registry.

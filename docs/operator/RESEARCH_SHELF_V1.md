@@ -45,7 +45,7 @@ snapshot можно передать через process-local `SMIAL_RESEARCH_SH
 | `scripts/hypothesis_forge.py forge-run` | `_emit_run` adds derived `shelf_summary` on success and every blocked/missing-root path, after receipt hash |
 | `scripts/run_factory_experiment.py` | Один pinned glance до `FactoryApplication.start`; summary только в returned readout |
 | `scripts/run_factory_ordinary_market_hypothesis.py` | Тот же pinned reader на top-level entry; без hidden transport |
-| Direct preflight/discovery/operator helpers | Top-level agent follows AGENTS review; helpers keep native admission and are not wrapped separately |
+| Direct preflight/discovery/operator helpers | Top-level Forge skill/command or semantic operator review; helpers keep native admission and are not wrapped separately |
 | Frozen resume / RFV import / `research_fragments.py run-due` | Отдельный metadata CLI review; не менять frozen code/refs/inputs ради glance; старый executable допустим |
 
 Missing shelf never заменяет native `next_action` и не запрещает независимое уже

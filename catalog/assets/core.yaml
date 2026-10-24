@@ -751,7 +751,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: b11e287a87b8b1f26cb0c7d7ea159fb8c63c0571275dc607098c9c41c472a48a
+    sha256: eaa6bdd038ef7f265fbbb7d2daeb2e84a34455e330be35c7f9366a283e99dc0c
   access:
     mode: read_only
     method: file
@@ -19782,7 +19782,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/context-map.yaml', repository_path: delivery-harness/context-map.yaml}
-  integrity: {kind: sha256, sha256: 2db9a0d25969f6d9a8aacef0aace22c6c8230294cb0cd30e9b9579be3d2a8e85}
+  integrity: {kind: sha256, sha256: 9bfd7b35b4e5836f64e918eff5b8495ebb1f5e515e19841f35b44c55b44fe949}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -43539,7 +43539,7 @@ records:
     repository_path: docs/operator/RESEARCH_SHELF_V1.md
   integrity:
     kind: sha256
-    sha256: 3753697cf2399f53757a178adfe1ffde2b761cbd3634f098bf780b82784ef069
+    sha256: adf2cacf9bec1e8bfb620936310cac707c8c09f20e1ade67be2633b9a709bf28
   access:
     mode: read_only
     method: file
