@@ -259,19 +259,37 @@ def prepare_link(snapshot: Mapping[str, Any], item_id: str, revision: str, *, st
 
 def find_native(snapshot: Mapping[str, Any], native_ref: Mapping[str, Any]) -> dict[str, Any]:
     """Historical lookup includes CLOSED items and explicitly retracted relations."""
-    matches = {}
+    groups = {}
     for item_id, row in snapshot["items"].items():
         for revision in row["revisions"].values():
             for link in revision["native_links"]:
                 if not any(all(ref.get(k) == native_ref.get(k) for k in ("owner", "entity_kind", "entity_id", "payload_sha256"))
                            for ref in link["destination_refs"]):
                     continue
-                key = wire.canonical(dict(item_id=item_id, link=link)).decode("utf-8")
-                active = row["current"] is not None and link in row["current"]["native_links"]
-                matches[key] = dict(item_id=item_id, relation=copy.deepcopy(link),
-                    status="CURRENT_SOURCE_LINK" if active else "RETRACTED_SOURCE_LINK" if row["current"] else row["status"])
-    values = [matches[k] for k in sorted(matches)]
-    return dict(status="INCOMPLETE" if not snapshot["complete"] else "AMBIGUOUS_SOURCE_LINK" if len(values) > 1 else
+                targets = sorted((ref for ref in link["destination_refs"] if ref.get("kind") == "NATIVE"
+                    and ref.get("entity_kind") == "HYPOTHESIS_VERSION"), key=wire.canonical)
+                association = (dict(adoption_key=link["adoption_key"], adopted=link["adopted_item_revision"],
+                    relation=link["relation"], targets=targets) if link["adoption_key"] and targets else link)
+                key = wire.canonical(dict(item_id=item_id, association=association))
+                group = groups.setdefault(key, dict(item_id=item_id, versions={}, active={}, row_status=row["status"],
+                    has_current=row["current"] is not None))
+                version = wire.canonical(link)
+                group["versions"][version] = link
+                if row["current"] is not None and link in row["current"]["native_links"]:
+                    group["active"][version] = link
+    values = []
+    for key in sorted(groups):
+        group = groups[key]
+        active = list(group["active"].values())
+        history = [copy.deepcopy(link) for version, link in sorted(group["versions"].items()) if version not in group["active"]]
+        status = ("AMBIGUOUS_SOURCE_LINK" if len(active) > 1 else "CURRENT_SOURCE_LINK" if active else
+                  "RETRACTED_SOURCE_LINK" if group["has_current"] else group["row_status"])
+        values.append(dict(item_id=group["item_id"], status=status, relation=copy.deepcopy(active[0]) if len(active) == 1 else
+            copy.deepcopy(next(iter(group["versions"].values()))) if len(group["versions"]) == 1 else None,
+            historical_relations=history))
+    return dict(status="INCOMPLETE" if not snapshot["complete"] else "AMBIGUOUS_SOURCE_LINK" if
+                sum(row["status"] == "CURRENT_SOURCE_LINK" for row in values) > 1 or
+                any(row["status"] == "AMBIGUOUS_SOURCE_LINK" for row in values) else
                 "FOUND" if values else "UNRESOLVED", matches=values, reason=snapshot.get("reason"),
                 snapshot_commit=snapshot.get("commit"), source_freshness=snapshot.get("source_freshness"))
 
@@ -361,8 +379,9 @@ def resolve_strategy(snapshot: Mapping[str, Any], strategy: Mapping[str, Any], *
         wire.require(len(dossier["candidate_record_refs"]) == 1, "NATIVE_CANDIDATE_RECORD_UNRESOLVED")
         found = find_native(snapshot, dossier["candidate_record_refs"][0])
         wire.require(found["status"] == "FOUND", found["status"] if found["status"] != "FOUND" else "SOURCE_LINK_UNRESOLVED")
-        match = found["matches"][0]
-        wire.require(match["status"] == "CURRENT_SOURCE_LINK", "RETRACTED_SOURCE_LINK")
+        active = [row for row in found["matches"] if row["status"] == "CURRENT_SOURCE_LINK"]
+        wire.require(len(active) == 1, "SOURCE_LINK_NOT_CURRENT")
+        match = active[0]
         adopted = resolve_item(snapshot, match["item_id"], git_read=git_read)
         wire.require(adopted["status"] == "RESOLVED", "ADOPTED_SOURCE_UNRESOLVED")
         result.update(status="COMPLETE_SOURCE_TRACE" if not dossier["gaps"] else "PARTIAL",

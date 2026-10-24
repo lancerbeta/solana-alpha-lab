@@ -42,3 +42,7 @@ source-head witness остаётся UNKNOWN; malformed source изолиров�
 содержит девять revisions и восемь literal projections, включая fork/reconcile.
 Exact disclosure проходит через actual CLI до writer; PARTIAL enrichment сохраняет
 принятый target. V5 переносит genuine prior, adverse count, UNKNOWN и exposure.
+
+Recovery vertical теперь сохраняет реальную PARTIAL связь до Critic, обогащает её
+после Critic и проходит inverse lookup до actual StrategyVersion resolver. Версии
+одной association сгруппированы; история отделена от действующих связей.

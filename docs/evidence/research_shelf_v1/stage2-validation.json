@@ -10,13 +10,13 @@
       "name": "entry_wire_semantic",
       "tests": 47,
       "result": "PASS",
-      "output_sha256": "b8681d4dbfae10d2f18b9a37cb2f89046fab1c32f3d0ef48f67f33cc4e8810ec"
+      "output_sha256": "5d940253603734df8b69a7d63e05d0cd2946c56b0c5476223b0e854d876cc021"
     },
     {
       "name": "native_strategy_vertical",
       "tests": 1,
       "result": "PASS",
-      "output_sha256": "dc0b8c04ce15f2c5dacaf077f7023de0de9a5fd69dcf10bc099f0f2694e8da17"
+      "output_sha256": "f581b48e7e2cf046ff26d052cc1430753c96e5623655f4ebb9a2985cd96c204b"
     },
     {
       "name": "prior_navigation",
@@ -34,10 +34,10 @@
   "overview_max_bytes": 16384,
   "source_bindings": {
     "src/solana_alpha_lab/factory/research_shelf_context.py": "48ae9a435502b21a5546677a56a75791afa8c29a7da312886c7eea2374a4e749",
-    "src/solana_alpha_lab/factory/research_shelf_native.py": "59995eab4c81a2ff0618bb86ca7903712d73fc5c0b56e7dc9fbc5a856cfa62cf",
+    "src/solana_alpha_lab/factory/research_shelf_native.py": "aa7ec9a2314b8fd172b256117114f40984bfcd0f7c0bdc6894061446e326345f",
     "tests/fixtures/research_shelf_v1/history.json": "041b2499e8c2a791d12ab1506a4e7cf8a65ef54e4c524ba501477f7f2fd0cf70",
-    "tests/test_research_shelf_entry_v1.py": "36b6c08e15b7f11af931cf2b4f788e809fd1b585037c428518802e28b67b346e",
-    "tests/test_research_shelf_native_v1.py": "6a20825aecf30c0f8c65e1a2b6a055688f5957f67d7aab1f1062d27aa0bef000"
+    "tests/test_research_shelf_entry_v1.py": "672784b031eef8796e4555dedc4377d93d59b0f715f32b5817fec0e1bb3d74e8",
+    "tests/test_research_shelf_native_v1.py": "227d511023322f31358b89d4c8403953dd1e459cd0b5bec1f8ee689455089c8e"
   },
   "reproduce": [
     "uv run --locked --managed-python python -B -m unittest tests.test_research_shelf_entry_v1 tests.test_research_shelf_v1.WireTests tests.test_factory_semantic_operability tests.test_hfic_scientific_disposition_navigation_v1 tests.test_research_shelf_native_v1 -v",
@@ -55,7 +55,8 @@
     "Actual cold Catalog search/resolve; reference-only shelf excluded from scientific prior visibility",
     "Current plan and monitoring CHECK independently change a derived metadata baseline; malformed Scout source remains per-item UNKNOWN; moving private ref without source-head witness remains UNKNOWN",
     "Actual CLI disclosure reaches mandatory scoped writer guard; PARTIAL association permits only monotonic same-candidate enrichment; unavailable snapshot retains recovery reason",
-    "Shelf intent and genuine existing RESEARCH_FRAGMENT prior before consumer saved draft/freeze/Critic; fixed E1800, negative_n=4, mean=-0.55/6, UNKNOWN_EXECUTION_COSTS and RESEARCH_ADVISORY/EXPLORATORY_REUSE survive source resolver"
+    "Shelf intent and genuine existing RESEARCH_FRAGMENT prior before consumer saved draft/freeze/Critic; fixed E1800, negative_n=4, mean=-0.55/6, UNKNOWN_EXECUTION_COSTS and RESEARCH_ADVISORY/EXPLORATORY_REUSE survive source resolver",
+    "Actual saved pre-Critic PARTIAL association -> post-Critic VERIFIED enrichment -> one current inverse association plus historical version -> actual exact StrategyVersion resolver; independent live associations remain ambiguous and explicitly retracted history cannot poison a unique current source."
   ],
   "non_claims": [
     "NO_CAPABILITY_DONE_OR_COMMISSIONING",

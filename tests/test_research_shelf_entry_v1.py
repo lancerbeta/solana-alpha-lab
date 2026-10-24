@@ -243,6 +243,22 @@ class ShelfEntryTests(unittest.TestCase):
         self.assertEqual(link["verification"], "VERIFIED")
         self.assertEqual(link["adopted_item_revision"]["commit"], "a" * 40)
         self.assertEqual(link["adoption_key"], first["adoption_key"])
+        files[wire.revision_path(wire.decode(enriched["prepared"]))] = enriched["prepared"]
+        final = wire.fold(files)
+        inverse = native.find_native(final, target)
+        self.assertEqual(inverse["status"], "FOUND")
+        self.assertEqual(inverse["matches"][0]["status"], "CURRENT_SOURCE_LINK")
+        self.assertEqual(len(inverse["matches"][0]["historical_relations"]), 1)
+        duplicate = wire.revise(final, ITEM, dict(native_links=[link, dict(link, adoption_key="independent-association")],
+            change_reason="Two genuinely independent synthetic associations."), now=NOW, mutation_id=str(uuid4()))
+        files[wire.revision_path(wire.decode(duplicate))] = duplicate
+        self.assertEqual(native.find_native(wire.fold(files), target)["status"], "AMBIGUOUS_SOURCE_LINK")
+        correction = wire.revise(wire.fold(files), ITEM, dict(native_links=[dict(link, adoption_key="independent-association")],
+            change_reason="Explicitly retract the first association; retain its audit history."), now=NOW, mutation_id=str(uuid4()))
+        files[wire.revision_path(wire.decode(correction))] = correction
+        corrected = native.find_native(wire.fold(files), target)
+        self.assertEqual(corrected["status"], "FOUND")
+        self.assertEqual(sum(row["status"] == "CURRENT_SOURCE_LINK" for row in corrected["matches"]), 1)
         with patch.object(native, "native_dossier", return_value=dict(complete, candidate_record_refs=[extra])):
             with self.assertRaisesRegex(wire.ShelfError, "ADOPTION_KEY_CONFLICT"):
                 native.prepare_link(linked, ITEM, wire.decode(RAW)["revision_sha256"], **args)

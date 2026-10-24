@@ -71,9 +71,14 @@ class NativeShelfTests(unittest.TestCase):
         draft["candidates"][0]["prior_work_refs"] = [wire.decode(raw)["origin_refs"][0]["entity_id"]]
         draft["candidates"][0]["execution_capacity_risks"] = ["UNKNOWN_EXECUTION_COSTS"]
         _, frozen = self.persist_and_freeze(draft, pre)
+        identity = dict(session_id=frozen["session_id"], candidate_id=frozen["selected_candidate_id"], definition_sha256=frozen["selected_definition_sha256"])
+        original = wire.decode(raw)
+        partial = native.prepare_link(shelf_snapshot(raw), original["item_id"], original["revision_sha256"],
+            store=ExistingResearchStoreReader(self.plane), identity=identity, request_id="ONE-SYNTHETIC-REQUEST",
+            now=NOW, mutation_id=str(uuid4()))
+        self.assertEqual(wire.decode(partial["prepared"])["native_links"][0]["verification"], "PARTIAL")
         critic = critic_result_from_packet_only(frozen["critic_input_packet"], terminal="KILL_STATISTICALLY_UNIDENTIFIABLE")
         self.cli("finalize", "--session-id", frozen["session_id"], "--critic-result", self.write("shelf-consumer-critic.json", critic))
-        identity = dict(session_id=frozen["session_id"], candidate_id=frozen["selected_candidate_id"], definition_sha256=frozen["selected_definition_sha256"])
         reader = ExistingResearchStoreReader(self.plane)
         before = self.store.diagnostics().committed_inventory_sha256
         dossier = native.native_dossier(reader, identity)
@@ -93,7 +98,7 @@ class NativeShelfTests(unittest.TestCase):
         self.assertAlmostEqual(dossier["grounded_result"]["mean_target"], -0.55 / 6, places=9)
         self.assertEqual(dossier["grounded_result"]["experiment_recipe"]["frozen_input"][0]["evidence_role"], "EXPLORATORY_REUSE")
         original = wire.decode(raw)
-        snapshot = shelf_snapshot(raw)
+        snapshot = shelf_snapshot(raw, partial["prepared"], commit="e" * 40)
         request = dict(store=reader, identity=identity, request_id="ONE-SYNTHETIC-REQUEST", now=NOW, mutation_id=str(uuid4()))
         first = native.prepare_link(snapshot, original["item_id"], original["revision_sha256"], **request)
         # Simulate failure after native result: discard publication only, then
@@ -101,19 +106,22 @@ class NativeShelfTests(unittest.TestCase):
         with patch("solana_alpha_lab.factory.research_fragments.run_due", side_effect=AssertionError("No repeat science")):
             recovered = native.prepare_link(snapshot, original["item_id"], original["revision_sha256"], **request)
         self.assertEqual(first["prepared"], recovered["prepared"])
-        linked = shelf_snapshot(raw, recovered["prepared"], commit="b" * 40)
+        versions = [raw, partial["prepared"], recovered["prepared"]]
+        linked = shelf_snapshot(*versions, commit="b" * 40)
         self.assertEqual(native.prepare_link(linked, original["item_id"], original["revision_sha256"], **request)["status"], "ALREADY_LINKED")
         pointed = native.resolve_item(linked, original["item_id"], git_read=lambda ref: raw)
         self.assertEqual(pointed["adopted_sources"][0]["revision"]["statement"], original["statement"])
         found = native.find_native(linked, dossier["candidate_record_refs"][0])
         self.assertEqual(found["status"], "FOUND")
+        self.assertEqual(len(found["matches"]), 1)
+        self.assertEqual(len(found["matches"][0]["historical_relations"]), 1)
         closed = wire.revise(linked, original["item_id"], dict(state="CLOSED", closure=dict(reason="HANDED_OFF", evidence_refs=[], successor=None),
             statement="Today's wording must not replace adopted content", change_reason="Administrative handoff."), now=NOW, mutation_id=str(uuid4()))
-        closed_snapshot = shelf_snapshot(raw, recovered["prepared"], closed, commit="c" * 40)
+        closed_snapshot = shelf_snapshot(*versions, closed, commit="c" * 40)
         self.assertEqual(native.resolve_item(closed_snapshot, original["item_id"], git_read=lambda ref: raw)["adopted_sources"][0]["revision"]["statement"], original["statement"])
         revoked = wire.revise(closed_snapshot, original["item_id"], dict(native_links=[], change_reason="Wrong association explicitly retracted.",
             last_decision=dict(at=NOW, disposition="RETRACT_LINK", reason="Exact synthetic correction", evidence_refs=[])), now=NOW, mutation_id=str(uuid4()))
-        history = shelf_snapshot(raw, recovered["prepared"], closed, revoked, commit="d" * 40)
+        history = shelf_snapshot(*versions, closed, revoked, commit="d" * 40)
         self.assertEqual(native.find_native(history, dossier["candidate_record_refs"][0])["matches"][0]["status"], "RETRACTED_SOURCE_LINK")
         self.assertEqual(before, self.store.diagnostics().committed_inventory_sha256)
         # Actual success-capable public Forge read, under the same code/native
