@@ -31,7 +31,7 @@
     "independent_review": {
       "path": "docs/evidence/research_shelf_v1/independent-review.json",
       "sha256": "572b23e8c2f2ba27cc25237a99961ef6295422a306e31ff4d6a94c274180469d",
-      "verdict": "PENDING"
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
@@ -39,7 +39,8 @@
       "PASS_NATIVE_STRATEGY_EXACT_DECISION_VERTICAL",
       "PASS_ENTRY_HASH_ISOLATION_AND_PRIVATE_SENTINEL",
       "PASS_14_ROUTES_WITH_OTHER_LIMITS_UNCHANGED",
-      "PASS_STATIC_FACTORY_VALIDATION"
+      "PASS_STATIC_FACTORY_VALIDATION",
+      "PASS_ACTUAL_PARTIAL_ENRICHMENT_TO_STRATEGY_AND_CONFLICT_INVALID_REFUSAL"
     ]
   },
   "non_claims": [
