@@ -4,8 +4,8 @@
   "review_id": "RESEARCH_SHELF_V1-EXTERNAL-REVISE-REVIEW",
   "as_of": "2026-10-25",
   "task_id": "RESEARCH_SHELF_V1",
-  "reviewed_bindings_sha256": "ecdba316ff3c9facadb1dbb6bdc1f9466276c43b72615e2d230be5358c39d549",
-  "reviewed_inventory_sha256": "00f608d9a2bfcd6bb0e19c33a20a9a2f6558b5a7766fa26dc43d0acdaca055ac",
+  "reviewed_bindings_sha256": "267ac2298cfb8ea61c9e38572f2a446ac9a104b0345d57eb8e4d6835b11af52d",
+  "reviewed_inventory_sha256": "87a22991d1a2b0e788628a2c9ad47a02a99f9783456538700430731f74efd473",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
