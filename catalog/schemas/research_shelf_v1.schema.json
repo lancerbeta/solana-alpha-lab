@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/research_shelf_v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "item_id", "product", "origin_key", "revision_sha256", "parents", "mutation_id", "created_at", "updated_at", "kind", "title", "statement", "state", "origin_refs", "review", "next_action", "native_links", "last_decision", "closure", "change_reason"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "item_id": {"type": "string", "pattern": "^RSI-(SMIAL|SCOUT)-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+    "product": {"enum": ["SMIAL", "SCOUT"]},
+    "origin_key": {"type": ["string", "null"], "minLength": 1, "maxLength": 1024},
+    "revision_sha256": {"$ref": "#/$defs/hash"},
+    "parents": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/hash"}},
+    "mutation_id": {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+    "created_at": {"$ref": "#/$defs/clock"},
+    "updated_at": {"$ref": "#/$defs/clock"},
+    "kind": {"enum": ["IDEA", "OBSERVATION", "FOLLOW_UP"]},
+    "title": {"type": "string", "minLength": 1, "maxLength": 240},
+    "statement": {"type": "string", "minLength": 1},
+    "state": {"enum": ["OPEN", "FOLLOWING", "CLOSED"]},
+    "origin_refs": {"$ref": "#/$defs/refs"},
+    "review": {
+      "type": "object", "additionalProperties": false,
+      "required": ["review_at", "review_by", "event"],
+      "properties": {
+        "review_at": {"anyOf": [{"$ref": "#/$defs/clock"}, {"type": "null"}]},
+        "review_by": {"anyOf": [{"$ref": "#/$defs/clock"}, {"type": "null"}]},
+        "event": {"anyOf": [{"$ref": "#/$defs/event"}, {"type": "null"}]}
+      }
+    },
+    "next_action": {
+      "anyOf": [{"type": "null"}, {
+        "type": "object", "additionalProperties": false,
+        "required": ["intent", "owner_route", "scope_ref"],
+        "properties": {
+          "intent": {"type": "string", "minLength": 1},
+          "owner_route": {"type": "string", "minLength": 1},
+          "scope_ref": {"anyOf": [{"$ref": "#/$defs/ref"}, {"type": "null"}]}
+        }
+      }]
+    },
+    "native_links": {"type": "array", "items": {"$ref": "#/$defs/link"}},
+    "last_decision": {
+      "anyOf": [{"type": "null"}, {
+        "type": "object", "additionalProperties": false,
+        "required": ["at", "disposition", "reason", "evidence_refs"],
+        "properties": {
+          "at": {"$ref": "#/$defs/clock"},
+          "disposition": {"type": "string", "minLength": 1},
+          "reason": {"type": "string", "minLength": 1},
+          "evidence_refs": {"$ref": "#/$defs/refs"}
+        }
+      }]
+    },
+    "closure": {
+      "anyOf": [{"type": "null"}, {
+        "type": "object", "additionalProperties": false,
+        "required": ["reason", "evidence_refs", "successor"],
+        "properties": {
+          "reason": {"type": "string", "minLength": 1},
+          "evidence_refs": {"$ref": "#/$defs/refs"},
+          "successor": {"anyOf": [{"$ref": "#/$defs/ref"}, {"type": "null"}]}
+        }
+      }]
+    },
+    "change_reason": {"type": "string", "minLength": 1}
+  },
+  "allOf": [{
+    "if": {"properties": {"state": {"const": "CLOSED"}}},
+    "then": {"properties": {"closure": {"type": "object"}}}
+  }],
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "clock": {"type": "string", "format": "date-time", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "git_ref": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "repository", "commit", "path", "sha256"],
+      "properties": {
+        "kind": {"const": "GIT"}, "repository": {"$ref": "#/$defs/repository"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "ref": {
+      "oneOf": [{"$ref": "#/$defs/git_ref"}, {
+        "type": "object", "additionalProperties": false,
+        "required": ["kind", "owner", "entity_kind", "entity_id", "payload_sha256", "locator"],
+        "properties": {
+          "kind": {"const": "NATIVE"}, "owner": {"type": "string", "minLength": 1},
+          "entity_kind": {"type": "string", "minLength": 1}, "entity_id": {"type": "string", "minLength": 1},
+          "payload_sha256": {"anyOf": [{"$ref": "#/$defs/hash"}, {"type": "null"}]},
+          "locator": {"type": "string", "minLength": 1}
+        }
+      }, {
+        "type": "object", "additionalProperties": false,
+        "required": ["kind", "locator", "description", "observed_at", "verification"],
+        "properties": {
+          "kind": {"const": "REFERENCE"}, "locator": {"type": "string", "minLength": 1},
+          "description": {"type": "string", "minLength": 1}, "observed_at": {"$ref": "#/$defs/clock"},
+          "verification": {"enum": ["UNVERIFIED", "VERIFIED"]}
+        }
+      }]
+    },
+    "refs": {"type": "array", "items": {"$ref": "#/$defs/ref"}},
+    "source": {
+      "oneOf": [{
+        "type": "object", "additionalProperties": false,
+        "required": ["kind", "repository", "ref", "path"],
+        "properties": {
+          "kind": {"const": "GIT_PATH"}, "repository": {"$ref": "#/$defs/repository"},
+          "ref": {"type": "string", "minLength": 1}, "path": {"type": "string", "minLength": 1}
+        }
+      }, {
+        "type": "object", "additionalProperties": false,
+        "required": ["kind", "owner", "entity_kind", "entity_id"],
+        "properties": {
+          "kind": {"const": "NATIVE_ENTITY"}, "owner": {"type": "string", "minLength": 1},
+          "entity_kind": {"type": "string", "minLength": 1}, "entity_id": {"type": "string", "minLength": 1}
+        }
+      }]
+    },
+    "event": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "source", "condition", "acknowledged_ref"],
+      "properties": {
+        "kind": {"enum": ["NATIVE_STATUS", "SOURCE_CHANGED", "MANUAL"]},
+        "source": {"anyOf": [{"$ref": "#/$defs/source"}, {"type": "null"}]},
+        "condition": {"type": ["string", "null"]},
+        "acknowledged_ref": {"anyOf": [{"$ref": "#/$defs/ref"}, {"type": "null"}]}
+      }
+    },
+    "link": {
+      "type": "object", "additionalProperties": false,
+      "required": ["relation", "adopted_item_revision", "destination_refs", "adoption_key", "verification", "gaps"],
+      "properties": {
+        "relation": {"enum": ["INSPIRED_BY", "CONTINUED_FROM", "RELATED", "SUPERSEDED_BY", "HANDED_OFF_TO"]},
+        "adopted_item_revision": {"$ref": "#/$defs/git_ref"},
+        "destination_refs": {"$ref": "#/$defs/refs", "minItems": 1},
+        "adoption_key": {"type": ["string", "null"], "minLength": 1},
+        "verification": {"enum": ["VERIFIED", "PARTIAL"]},
+        "gaps": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    }
+  }
+}
