@@ -1,8 +1,8 @@
 {
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
-  "review_id": "RESEARCH_SHELF_V1-STAGE2-FIT",
-  "as_of": "2026-10-24",
+  "review_id": "RESEARCH_SHELF_V1-EXTERNAL-REVISE-FIT",
+  "as_of": "2026-10-25",
   "task_id": "RESEARCH_SHELF_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
@@ -10,15 +10,15 @@
   "reviewed_inventory_sha256": "00f608d9a2bfcd6bb0e19c33a20a9a2f6558b5a7766fa26dc43d0acdaca055ac",
   "dimensions": {
     "mission": "Retain deferred intent and resolve exact saved research origin at entry; engineering scope only.",
-    "flexibility_and_history": "Append-only revisions; adopted exact commit/hash; CLOSED and explicit retraction retain history.",
+    "flexibility_and_history": "Append-only history retains negative identity reservations even for invalid rows; unknown identity blocks append, exact-byte retry and fork reconcile remain supported. Adopted source is immutable.",
     "context_efficiency": "One task/contract and one reference-only semantic route; bounded glance; no task archaeology.",
-    "research_truth": "Native evidence owners, negative Critic and unknown gaps preserved. Shelf timing/link grants no admission.",
-    "owner_operability": "Russian glance plus explicit refresh/review/find/resolve and retryable metadata-only linking.",
+    "research_truth": "Exact saved negative Critic findings/source non-claims survive native->StrategyVersion. Wrong/hashless baseline remains UNKNOWN. Metadata trace and event observations grant no scientific admission.",
+    "owner_operability": "Russian glance names nearest WAITING item/date, explains source UNKNOWN, and separates scoped postcommission and local-only refresh.",
     "execution_to_cashflow": "No alpha, promotion, strategy activation or cashflow claim.",
     "monitoring_and_recovery": "Invocation-based review; unknown unavailable/stale sources; original reminders remain. No scheduler.",
     "build_vs_buy": "WRAP installed Git and existing saved native/promotion validators; no dependency or database.",
     "red_team": "Freshness witnesses are integrity bindings, not signed remote attestations. Synthetic PROMOTE fixtures do not justify research promotion.",
-    "security": "Explicit accepted-code metadata scope and whole-payload public review; private language classification remains human-owned."
+    "security": "Every CAS attempt checks historical private provenance and exact owner-reviewed minimal public digest. Metadata edits cannot declassify history. Private language classification remains human-owned."
   },
   "capability_radar": {
     "now": "NONE",

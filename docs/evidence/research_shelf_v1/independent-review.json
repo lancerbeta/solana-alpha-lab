@@ -15,34 +15,36 @@
   "reviews": [
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Revised candidate requires new isolated exact-head review; previous PASS is historical."
+        "PASS exact head b815371ae915b9a5b05ce1c24a791ac96aa3e3b7. SEMANTIC_PREMISE PASS. Frozen packet, exact diff, task hash, three evidence bindings and all 14 source bindings verified. Independent in-memory falsifiers for reservations/retry, historical privacy, Critic transfer, typed baselines, WAITING/readout and transport selection; eight literal shared-fixture projections agree. MET/freshness/COMPLETE_SOURCE_TRACE remain metadata observations, never PIT-validity, replication or promotion. Git and immutable native Parquet/manifests retain truth; no new platform or cross-task private API.",
+        "packet_fingerprint_sha256=5cae43ceec99fe41be349fb8b7042127054ca2b11e1eac45d0fdaa30b9fbfa70",
+        "PACKET_INFORMATION_PATH only; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN."
       ]
     },
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Revised candidate requires new isolated exact-head review; previous PASS is historical."
+        "PASS exact head b815371ae915b9a5b05ce1c24a791ac96aa3e3b7. All 14 source bindings agree. Independent probes for invalid-history reservations, unreadable identity fail-closed scope, sticky private provenance, source-bound typed baseline, nearest displayed WAITING date and conditional RU UNKNOWN guidance. Per-CAS-attempt privacy check and exact verified saved Critic findings reviewed. No material defect found; no long suite repeated."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Revised candidate requires new isolated exact-head review; previous PASS is historical."
+        "PASS exact head b815371ae915b9a5b05ce1c24a791ac96aa3e3b7. Six named semantic outcomes and bounded CI fixture repairs satisfy engineering scope. Exact task/diff, 14 committed source bindings, assertions and independent in-memory falsifiers reviewed. Actual StrategyVersion retains negative Critic findings; nearest date is tied to the named item. Scientific owners, expiry control and frozen contracts retained; external revalidation, CI/readiness and commissioning explicitly pending."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Revised candidate requires new isolated exact-head review; previous PASS is historical."
+        "PASS exact head b815371ae915b9a5b05ce1c24a791ac96aa3e3b7. Both preliminary UX gaps closed: WAITING row renders the nearest date, including review_by-only and review_by before review_at; SOURCE_READBACK_REQUIRED gets RU UNKNOWN explanation and saved-source flags. Exact regression assertions, scoped/local routes and actionable boundaries reviewed. No remaining material UX gap."
       ]
     }
   ],
-  "verdict": "PENDING",
+  "verdict": "PASS",
   "non_claims": [
     "NO_MODEL_DIVERSITY_PROOF",
     "NO_SCIENTIFIC_ACCEPTANCE",
