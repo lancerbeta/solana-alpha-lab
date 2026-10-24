@@ -297,6 +297,7 @@ def attention(snapshot: Mapping[str, Any], *, now: str, limit: int | None = 5,
         rows.append(dict(item_id=item_id, status=state, title=current["title"] if current else None,
             revision_sha256=current["revision_sha256"] if current else None, heads=list(item["heads"]),
             review=copy.deepcopy(current["review"]) if current else None,
+            next_action=copy.deepcopy(current["next_action"]) if current else None,
             source_status=source_status if event else None,
             source_observation=copy.deepcopy(observed) if event else None))
     priority = {s: n for n, s in enumerate(("ITEM_INVALID", "ITEM_CONFLICT", "EXPIRED_REVIEW_REQUIRED", "OVERDUE_REVIEW", "DUE_REVIEW", "EVENT_REVIEW",

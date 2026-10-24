@@ -7,22 +7,16 @@
   "result": "PASS_FOR_ENGINEERING_SCOPE",
   "checks": [
     {
-      "name": "entry_and_wire",
-      "tests": 27,
+      "name": "entry_wire_semantic",
+      "tests": 47,
       "result": "PASS",
-      "output_sha256": "2a54a303b32aa29cceb07dd4fe7b80cb589bd3253264b0e5775e42f159a87153"
-    },
-    {
-      "name": "final_entry_and_semantic",
-      "tests": 28,
-      "result": "PASS",
-      "output_sha256": "0628b9fb5fe243cebd6023714d039d78d58fa652bde3d99f6339aa9c493e4aa3"
+      "output_sha256": "b8681d4dbfae10d2f18b9a37cb2f89046fab1c32f3d0ef48f67f33cc4e8810ec"
     },
     {
       "name": "native_strategy_vertical",
       "tests": 1,
       "result": "PASS",
-      "output_sha256": "990a30ea8df8483f5223eaad57dfbe4134c6d43cb3a309332ea69459bbbfb31a"
+      "output_sha256": "dc0b8c04ce15f2c5dacaf077f7023de0de9a5fd69dcf10bc099f0f2694e8da17"
     },
     {
       "name": "prior_navigation",
@@ -31,7 +25,7 @@
       "output_sha256": "fc24d45ea2823fa984168247b0054c4a9dffd8ff03b080cf98ee5c75ba14fa34"
     }
   ],
-  "unique_targeted_tests": 45,
+  "unique_targeted_tests": 50,
   "static_factory_validation": "PASS",
   "semantic_routes": 14,
   "semantic_routes_max": 14,
@@ -39,11 +33,11 @@
   "resolved_overview_bytes": 16228,
   "overview_max_bytes": 16384,
   "source_bindings": {
-    "src/solana_alpha_lab/factory/research_shelf_context.py": "0bf17e95729fbd3b791661b09d628f12f9b396426f3f6843a444d4ce66e85fa7",
-    "src/solana_alpha_lab/factory/research_shelf_native.py": "cc284bae031f29b41992ad0612c8fd17905dfabfb037f8b26200f5dc2da5c391",
-    "tests/fixtures/research_shelf_v1/history.json": "fd21d9fa7f4b07a8e28f6975014dd417877b0cbd71075e7d3fa363ddae5de2e3",
-    "tests/test_research_shelf_entry_v1.py": "7181e4b1e7fd1762c300c8e03d21b937d5d8d0f9711c148c048600ca7ba3cc97",
-    "tests/test_research_shelf_native_v1.py": "5cc6adf602601037ea8e89cf0d17af7e6d22697dfe49f5ad65e7a9df2745c272"
+    "src/solana_alpha_lab/factory/research_shelf_context.py": "48ae9a435502b21a5546677a56a75791afa8c29a7da312886c7eea2374a4e749",
+    "src/solana_alpha_lab/factory/research_shelf_native.py": "59995eab4c81a2ff0618bb86ca7903712d73fc5c0b56e7dc9fbc5a856cfa62cf",
+    "tests/fixtures/research_shelf_v1/history.json": "041b2499e8c2a791d12ab1506a4e7cf8a65ef54e4c524ba501477f7f2fd0cf70",
+    "tests/test_research_shelf_entry_v1.py": "36b6c08e15b7f11af931cf2b4f788e809fd1b585037c428518802e28b67b346e",
+    "tests/test_research_shelf_native_v1.py": "6a20825aecf30c0f8c65e1a2b6a055688f5957f67d7aab1f1062d27aa0bef000"
   },
   "reproduce": [
     "uv run --locked --managed-python python -B -m unittest tests.test_research_shelf_entry_v1 tests.test_research_shelf_v1.WireTests tests.test_factory_semantic_operability tests.test_hfic_scientific_disposition_navigation_v1 tests.test_research_shelf_native_v1 -v",
@@ -57,8 +51,11 @@
     "Native saved draft/freeze/Critic KILL plus genuine 1.4 REUSE_ONLY technical replay; two synthetic PROMOTE fixtures, exact original StrategyVersion decision",
     "Immutable adopted source survives CLOSED/edit; link recovery does not repeat native execution; retracted relation stays historical",
     "Private sentinel in every named free-text field and nested dossier invalidates exact minimal-public disclosure",
-    "Shared six-revision wire fixture with immutable adopted content and retracted link",
-    "Actual cold Catalog search/resolve; reference-only shelf excluded from scientific prior visibility"
+    "Shared nine-revision wire fixture with eight literal attention/conflict projections with immutable adopted content and retracted link",
+    "Actual cold Catalog search/resolve; reference-only shelf excluded from scientific prior visibility",
+    "Current plan and monitoring CHECK independently change a derived metadata baseline; malformed Scout source remains per-item UNKNOWN; moving private ref without source-head witness remains UNKNOWN",
+    "Actual CLI disclosure reaches mandatory scoped writer guard; PARTIAL association permits only monotonic same-candidate enrichment; unavailable snapshot retains recovery reason",
+    "Shelf intent and genuine existing RESEARCH_FRAGMENT prior before consumer saved draft/freeze/Critic; fixed E1800, negative_n=4, mean=-0.55/6, UNKNOWN_EXECUTION_COSTS and RESEARCH_ADVISORY/EXPLORATORY_REUSE survive source resolver"
   ],
   "non_claims": [
     "NO_CAPABILITY_DONE_OR_COMMISSIONING",

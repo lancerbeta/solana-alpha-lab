@@ -2,7 +2,7 @@
   "expected": {
     "adopted_revision": "ae788e0b1c47beef08fecf744d4895ee8598dbe53e400f08fc3bbd7f81402936",
     "adopted_statement": "Synthetic unmeasured idea for wire conformance; no market claim.",
-    "current_revision": "eed5797e8ac7c473e2fdb0b36d97d252e9658c6cb094d89ef5beb738a49c4699",
+    "current_revision": "7eb5c5a30eaa8f9c28813d5e48f1abaaf7c214cd881a2359fca1aa54229f2098",
     "current_state": "CLOSED",
     "historical_relation_status": "RETRACTED_SOURCE_LINK",
     "item_id": "RSI-SCOUT-00000000-0000-4000-8000-000000000001"
@@ -37,8 +37,215 @@
       "file_sha256": "af1b8753719b1f682f5b56e40dc4d3c0d6363f4385df75b476a78df4b89552a8",
       "raw": "{\"change_reason\":\"Synthetic conformance revision 5.\",\"closure\":{\"evidence_refs\":[{\"entity_id\":\"HFIC-HYP-SYNTHETIC\",\"entity_kind\":\"HYPOTHESIS_VERSION\",\"kind\":\"NATIVE\",\"locator\":\"smial-data://research/records/HFIC-HYP-SYNTHETIC\",\"owner\":\"SMIAL\",\"payload_sha256\":\"4444444444444444444444444444444444444444444444444444444444444444\"}],\"reason\":\"HANDED_OFF\",\"successor\":null},\"created_at\":\"2026-10-24T00:00:00Z\",\"item_id\":\"RSI-SCOUT-00000000-0000-4000-8000-000000000001\",\"kind\":\"IDEA\",\"last_decision\":{\"at\":\"2026-10-29T00:00:00Z\",\"disposition\":\"RETRACT_LINK\",\"evidence_refs\":[{\"entity_id\":\"HFIC-HYP-SYNTHETIC\",\"entity_kind\":\"HYPOTHESIS_VERSION\",\"kind\":\"NATIVE\",\"locator\":\"smial-data://research/records/HFIC-HYP-SYNTHETIC\",\"owner\":\"SMIAL\",\"payload_sha256\":\"4444444444444444444444444444444444444444444444444444444444444444\"}],\"reason\":\"Explicit synthetic association correction.\"},\"mutation_id\":\"00000000-0000-4000-8000-000000000007\",\"native_links\":[],\"next_action\":{\"intent\":\"Review relevance only.\",\"owner_route\":\"LIFECYCLE\",\"scope_ref\":null},\"origin_key\":null,\"origin_refs\":[],\"parents\":[\"8a19257525282acc43276e44148eb773831e3aa1dd2b189e5af39a7d0dd8ed48\"],\"product\":\"SCOUT\",\"review\":{\"event\":{\"acknowledged_ref\":{\"commit\":\"1111111111111111111111111111111111111111\",\"kind\":\"GIT\",\"path\":\"source-protocol.json\",\"repository\":\"lancerbeta/solana-alpha-lab\",\"sha256\":\"2222222222222222222222222222222222222222222222222222222222222222\"},\"condition\":null,\"kind\":\"SOURCE_CHANGED\",\"source\":{\"kind\":\"GIT_PATH\",\"path\":\"source-protocol.json\",\"ref\":\"research-log\",\"repository\":\"lancerbeta/solana-alpha-lab\"}},\"review_at\":\"2026-11-20T00:00:00Z\",\"review_by\":\"2026-11-23T00:00:00Z\"},\"revision_sha256\":\"eed5797e8ac7c473e2fdb0b36d97d252e9658c6cb094d89ef5beb738a49c4699\",\"schema_version\":\"1.0\",\"state\":\"CLOSED\",\"statement\":\"Later administrative wording; adopted source stays immutable.\",\"title\":\"Synthetic deferred observation\",\"updated_at\":\"2026-10-29T00:00:00Z\"}\n",
       "revision_sha256": "eed5797e8ac7c473e2fdb0b36d97d252e9658c6cb094d89ef5beb738a49c4699"
+    },
+    {
+      "raw": "{\"change_reason\":\"Independent synthetic same-item edit.\",\"closure\":{\"evidence_refs\":[{\"entity_id\":\"HFIC-HYP-SYNTHETIC\",\"entity_kind\":\"HYPOTHESIS_VERSION\",\"kind\":\"NATIVE\",\"locator\":\"smial-data://research/records/HFIC-HYP-SYNTHETIC\",\"owner\":\"SMIAL\",\"payload_sha256\":\"4444444444444444444444444444444444444444444444444444444444444444\"}],\"reason\":\"HANDED_OFF\",\"successor\":null},\"created_at\":\"2026-10-24T00:00:00Z\",\"item_id\":\"RSI-SCOUT-00000000-0000-4000-8000-000000000001\",\"kind\":\"IDEA\",\"last_decision\":{\"at\":\"2026-10-29T00:00:00Z\",\"disposition\":\"RETRACT_LINK\",\"evidence_refs\":[{\"entity_id\":\"HFIC-HYP-SYNTHETIC\",\"entity_kind\":\"HYPOTHESIS_VERSION\",\"kind\":\"NATIVE\",\"locator\":\"smial-data://research/records/HFIC-HYP-SYNTHETIC\",\"owner\":\"SMIAL\",\"payload_sha256\":\"4444444444444444444444444444444444444444444444444444444444444444\"}],\"reason\":\"Explicit synthetic association correction.\"},\"mutation_id\":\"00000000-0000-4000-8000-000000000008\",\"native_links\":[],\"next_action\":{\"intent\":\"Review relevance only.\",\"owner_route\":\"LIFECYCLE\",\"scope_ref\":null},\"origin_key\":null,\"origin_refs\":[],\"parents\":[\"eed5797e8ac7c473e2fdb0b36d97d252e9658c6cb094d89ef5beb738a49c4699\"],\"product\":\"SCOUT\",\"review\":{\"event\":{\"acknowledged_ref\":{\"commit\":\"1111111111111111111111111111111111111111\",\"kind\":\"GIT\",\"path\":\"source-protocol.json\",\"repository\":\"lancerbeta/solana-alpha-lab\",\"sha256\":\"2222222222222222222222222222222222222222222222222222222222222222\"},\"condition\":null,\"kind\":\"SOURCE_CHANGED\",\"source\":{\"kind\":\"GIT_PATH\",\"path\":\"source-protocol.json\",\"ref\":\"research-log\",\"repository\":\"lancerbeta/solana-alpha-lab\"}},\"review_at\":\"2026-11-20T00:00:00Z\",\"review_by\":\"2026-11-23T00:00:00Z\"},\"revision_sha256\":\"5f64edb17c970cf72c845599037fe6d38e7d474a67e59425d9a05fcff64b55c8\",\"schema_version\":\"1.0\",\"state\":\"CLOSED\",\"statement\":\"Left branch wording\",\"title\":\"Synthetic deferred observation\",\"updated_at\":\"2026-10-30T00:00:00Z\"}\n",
+      "revision_sha256": "5f64edb17c970cf72c845599037fe6d38e7d474a67e59425d9a05fcff64b55c8",
+      "file_sha256": "f27c4e449fdfdccd1d67c12582d27919d320546b83e83624dd867b6869ece7c4"
+    },
+    {
+      "raw": "{\"change_reason\":\"Independent synthetic same-item edit.\",\"closure\":{\"evidence_refs\":[{\"entity_id\":\"HFIC-HYP-SYNTHETIC\",\"entity_kind\":\"HYPOTHESIS_VERSION\",\"kind\":\"NATIVE\",\"locator\":\"smial-data://research/records/HFIC-HYP-SYNTHETIC\",\"owner\":\"SMIAL\",\"payload_sha256\":\"4444444444444444444444444444444444444444444444444444444444444444\"}],\"reason\":\"HANDED_OFF\",\"successor\":null},\"created_at\":\"2026-10-24T00:00:00Z\",\"item_id\":\"RSI-SCOUT-00000000-0000-4000-8000-000000000001\",\"kind\":\"IDEA\",\"last_decision\":{\"at\":\"2026-10-29T00:00:00Z\",\"disposition\":\"RETRACT_LINK\",\"evidence_refs\":[{\"entity_id\":\"HFIC-HYP-SYNTHETIC\",\"entity_kind\":\"HYPOTHESIS_VERSION\",\"kind\":\"NATIVE\",\"locator\":\"smial-data://research/records/HFIC-HYP-SYNTHETIC\",\"owner\":\"SMIAL\",\"payload_sha256\":\"4444444444444444444444444444444444444444444444444444444444444444\"}],\"reason\":\"Explicit synthetic association correction.\"},\"mutation_id\":\"00000000-0000-4000-8000-000000000009\",\"native_links\":[],\"next_action\":{\"intent\":\"Review relevance only.\",\"owner_route\":\"LIFECYCLE\",\"scope_ref\":null},\"origin_key\":null,\"origin_refs\":[],\"parents\":[\"eed5797e8ac7c473e2fdb0b36d97d252e9658c6cb094d89ef5beb738a49c4699\"],\"product\":\"SCOUT\",\"review\":{\"event\":{\"acknowledged_ref\":{\"commit\":\"1111111111111111111111111111111111111111\",\"kind\":\"GIT\",\"path\":\"source-protocol.json\",\"repository\":\"lancerbeta/solana-alpha-lab\",\"sha256\":\"2222222222222222222222222222222222222222222222222222222222222222\"},\"condition\":null,\"kind\":\"SOURCE_CHANGED\",\"source\":{\"kind\":\"GIT_PATH\",\"path\":\"source-protocol.json\",\"ref\":\"research-log\",\"repository\":\"lancerbeta/solana-alpha-lab\"}},\"review_at\":\"2026-11-20T00:00:00Z\",\"review_by\":\"2026-11-23T00:00:00Z\"},\"revision_sha256\":\"0357be8f38263aa9b4a9b4ecbb55f1659a375ff24fb5c8c3460c7e58b9358db1\",\"schema_version\":\"1.0\",\"state\":\"CLOSED\",\"statement\":\"Right branch wording\",\"title\":\"Synthetic deferred observation\",\"updated_at\":\"2026-10-30T00:00:00Z\"}\n",
+      "revision_sha256": "0357be8f38263aa9b4a9b4ecbb55f1659a375ff24fb5c8c3460c7e58b9358db1",
+      "file_sha256": "f50d2928406e63c6a7718cb1d410aae3260c09ba888918f521bb62eac496b8da"
+    },
+    {
+      "raw": "{\"change_reason\":\"Explicit synthetic reconciliation includes both parents.\",\"closure\":{\"evidence_refs\":[{\"entity_id\":\"HFIC-HYP-SYNTHETIC\",\"entity_kind\":\"HYPOTHESIS_VERSION\",\"kind\":\"NATIVE\",\"locator\":\"smial-data://research/records/HFIC-HYP-SYNTHETIC\",\"owner\":\"SMIAL\",\"payload_sha256\":\"4444444444444444444444444444444444444444444444444444444444444444\"}],\"reason\":\"HANDED_OFF\",\"successor\":null},\"created_at\":\"2026-10-24T00:00:00Z\",\"item_id\":\"RSI-SCOUT-00000000-0000-4000-8000-000000000001\",\"kind\":\"IDEA\",\"last_decision\":{\"at\":\"2026-10-29T00:00:00Z\",\"disposition\":\"RETRACT_LINK\",\"evidence_refs\":[{\"entity_id\":\"HFIC-HYP-SYNTHETIC\",\"entity_kind\":\"HYPOTHESIS_VERSION\",\"kind\":\"NATIVE\",\"locator\":\"smial-data://research/records/HFIC-HYP-SYNTHETIC\",\"owner\":\"SMIAL\",\"payload_sha256\":\"4444444444444444444444444444444444444444444444444444444444444444\"}],\"reason\":\"Explicit synthetic association correction.\"},\"mutation_id\":\"00000000-0000-4000-8000-000000000010\",\"native_links\":[],\"next_action\":{\"intent\":\"Review relevance only.\",\"owner_route\":\"LIFECYCLE\",\"scope_ref\":null},\"origin_key\":null,\"origin_refs\":[],\"parents\":[\"0357be8f38263aa9b4a9b4ecbb55f1659a375ff24fb5c8c3460c7e58b9358db1\",\"5f64edb17c970cf72c845599037fe6d38e7d474a67e59425d9a05fcff64b55c8\"],\"product\":\"SCOUT\",\"review\":{\"event\":{\"acknowledged_ref\":{\"commit\":\"1111111111111111111111111111111111111111\",\"kind\":\"GIT\",\"path\":\"source-protocol.json\",\"repository\":\"lancerbeta/solana-alpha-lab\",\"sha256\":\"2222222222222222222222222222222222222222222222222222222222222222\"},\"condition\":null,\"kind\":\"SOURCE_CHANGED\",\"source\":{\"kind\":\"GIT_PATH\",\"path\":\"source-protocol.json\",\"ref\":\"research-log\",\"repository\":\"lancerbeta/solana-alpha-lab\"}},\"review_at\":\"2026-11-20T00:00:00Z\",\"review_by\":\"2026-11-23T00:00:00Z\"},\"revision_sha256\":\"7eb5c5a30eaa8f9c28813d5e48f1abaaf7c214cd881a2359fca1aa54229f2098\",\"schema_version\":\"1.0\",\"state\":\"CLOSED\",\"statement\":\"Explicitly reconciled retained question.\",\"title\":\"Synthetic deferred observation\",\"updated_at\":\"2026-10-31T00:00:00Z\"}\n",
+      "revision_sha256": "7eb5c5a30eaa8f9c28813d5e48f1abaaf7c214cd881a2359fca1aa54229f2098",
+      "file_sha256": "c7f6dbe5661f6f415df29d720f4284daf7740f9378f8e49b858a78a298dcb90b"
     }
   ],
   "schema": "smial.research-shelf-conformance",
-  "schema_version": "1.0"
+  "schema_version": "1.0",
+  "projection_cases": [
+    {
+      "name": "genesis_waiting",
+      "revision_indices": [
+        0
+      ],
+      "now": "2026-10-24T00:00:00Z",
+      "source_states": {},
+      "expected": {
+        "item_status": "READY",
+        "heads": [
+          "264ecdb2f41c005e7766dc065ae52d2c845e338beb07418607e33f24bb168465"
+        ],
+        "attention_status": "WAITING",
+        "totals": {
+          "WAITING": 1
+        }
+      }
+    },
+    {
+      "name": "due_at_exact_boundary",
+      "revision_indices": [
+        0
+      ],
+      "now": "2026-10-31T00:00:00Z",
+      "source_states": {},
+      "expected": {
+        "item_status": "READY",
+        "heads": [
+          "264ecdb2f41c005e7766dc065ae52d2c845e338beb07418607e33f24bb168465"
+        ],
+        "attention_status": "DUE_REVIEW",
+        "totals": {
+          "DUE_REVIEW": 1
+        }
+      }
+    },
+    {
+      "name": "unknown_source_after_defer",
+      "revision_indices": [
+        0,
+        1
+      ],
+      "now": "2026-10-26T00:00:00Z",
+      "source_states": {},
+      "expected": {
+        "item_status": "READY",
+        "heads": [
+          "ae788e0b1c47beef08fecf744d4895ee8598dbe53e400f08fc3bbd7f81402936"
+        ],
+        "attention_status": "SOURCE_READBACK_REQUIRED",
+        "totals": {
+          "SOURCE_READBACK_REQUIRED": 1
+        }
+      }
+    },
+    {
+      "name": "same_acknowledged_event_waits",
+      "revision_indices": [
+        0,
+        1
+      ],
+      "now": "2026-10-26T00:00:00Z",
+      "source_states": {
+        "RSI-SCOUT-00000000-0000-4000-8000-000000000001": {
+          "status": "MET",
+          "evidence_ref": {
+            "commit": "1111111111111111111111111111111111111111",
+            "kind": "GIT",
+            "path": "source-protocol.json",
+            "repository": "lancerbeta/solana-alpha-lab",
+            "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+          }
+        }
+      },
+      "expected": {
+        "item_status": "READY",
+        "heads": [
+          "ae788e0b1c47beef08fecf744d4895ee8598dbe53e400f08fc3bbd7f81402936"
+        ],
+        "attention_status": "WAITING",
+        "totals": {
+          "WAITING": 1
+        }
+      }
+    },
+    {
+      "name": "new_event_requires_review",
+      "revision_indices": [
+        0,
+        1
+      ],
+      "now": "2026-10-26T00:00:00Z",
+      "source_states": {
+        "RSI-SCOUT-00000000-0000-4000-8000-000000000001": {
+          "status": "MET",
+          "evidence_ref": {
+            "commit": "9999999999999999999999999999999999999999",
+            "kind": "GIT",
+            "path": "source-protocol.json",
+            "repository": "lancerbeta/solana-alpha-lab",
+            "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+          }
+        }
+      },
+      "expected": {
+        "item_status": "READY",
+        "heads": [
+          "ae788e0b1c47beef08fecf744d4895ee8598dbe53e400f08fc3bbd7f81402936"
+        ],
+        "attention_status": "EVENT_REVIEW",
+        "totals": {
+          "EVENT_REVIEW": 1
+        }
+      }
+    },
+    {
+      "name": "closed_retains_history",
+      "revision_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "now": "2026-10-30T00:00:00Z",
+      "source_states": {},
+      "expected": {
+        "item_status": "READY",
+        "heads": [
+          "eed5797e8ac7c473e2fdb0b36d97d252e9658c6cb094d89ef5beb738a49c4699"
+        ],
+        "attention_status": null,
+        "totals": {
+          "CLOSED": 1
+        }
+      }
+    },
+    {
+      "name": "fork_is_not_last_writer_wins",
+      "revision_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "now": "2026-10-30T00:00:00Z",
+      "source_states": {},
+      "expected": {
+        "item_status": "ITEM_CONFLICT",
+        "heads": [
+          "0357be8f38263aa9b4a9b4ecbb55f1659a375ff24fb5c8c3460c7e58b9358db1",
+          "5f64edb17c970cf72c845599037fe6d38e7d474a67e59425d9a05fcff64b55c8"
+        ],
+        "attention_status": "ITEM_CONFLICT",
+        "totals": {
+          "ITEM_CONFLICT": 1
+        }
+      }
+    },
+    {
+      "name": "explicit_reconcile_closes_both_heads",
+      "revision_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "now": "2026-10-31T00:00:00Z",
+      "source_states": {},
+      "expected": {
+        "item_status": "READY",
+        "heads": [
+          "7eb5c5a30eaa8f9c28813d5e48f1abaaf7c214cd881a2359fca1aa54229f2098"
+        ],
+        "attention_status": null,
+        "totals": {
+          "CLOSED": 1
+        }
+      }
+    }
+  ]
 }

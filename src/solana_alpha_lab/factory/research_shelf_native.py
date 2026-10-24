@@ -79,26 +79,41 @@ def event_read(event: Mapping[str, Any], *, now: str, store: Any = None,
             if state["status"] == "BLOCKED":
                 return dict(unknown, reason=state.get("reason", "FRAGMENT_SOURCE_UNAVAILABLE"))
             plan = view.get("plan") or {}
-            basis = next((b.get("source_ref") for b in reversed(view["evidence_blocks"]) if b.get("source_ref")),
-                         plan.get("_record_id") or view["source_ref"])
-            record, _ = record_index(store)[basis]
-            evidence = record_ref(record)
+            # A CHECK alone is not the identity of a current PLAN projection.
+            # This rebuildable metadata reference covers every contributing
+            # saved ref and the native owner's derived state (including spend).
+            records = record_index(store)
+            ids = {view["source_ref"]} | {b["source_ref"] for b in view["evidence_blocks"] if b.get("source_ref")}
+            if plan.get("_record_id"):
+                ids.add(plan["_record_id"])
+            source_refs = sorted((record_ref(records[key][0]) for key in ids), key=wire.canonical)
+            basis = dict(source_refs=source_refs, native_check=state, execution_deadline=plan.get("execution_deadline"))
+            digest = wire.sha256(wire.canonical(basis))
+            observed_at = max(records[key][0].first_reliable_available_at for key in ids)
+            evidence = dict(kind="REFERENCE", locator="smial-shelf://fragment-state/" + digest,
+                description="Derived fragment/plan/check baseline; not a native artifact or scientific evidence.",
+                observed_at=_utc(observed_at.isoformat()), verification="VERIFIED")
             observed = dict(native_status=state["status"], native_reason=state.get("reason"),
-                execution_deadline=_utc(plan.get("execution_deadline")), native_next_action=copy.deepcopy(state.get("attempts_without_result", [])))
+                execution_deadline=_utc(plan.get("execution_deadline")), native_next_action=copy.deepcopy(state.get("attempts_without_result", [])),
+                source_refs=source_refs, source_state_sha256=digest)
             supported = {"DISABLED", "DUE", "FUTURE_WAIT", "COMPLETE", "EXPIRED"}
         elif source.get("kind") == "GIT_PATH" and source.get("repository") == "lancerbeta/marcopolo-scout":
             supplied = (saved_sources or {}).get(wire.canonical(source).decode("utf-8"))
             if not isinstance(supplied, dict):
                 return dict(unknown, reason="SCOUT_SAVED_SOURCE_UNAVAILABLE")
+            if not isinstance(source.get("ref"), str) or not re.fullmatch(r"[0-9a-f]{40}", source["ref"]):
+                return dict(unknown, reason="SCOUT_MOVING_REF_OBSERVATION_REQUIRED")
+            wire.require(isinstance(supplied.get("raw"), str) and isinstance(supplied.get("evidence_ref"), dict),
+                         "SCOUT_SOURCE_BUNDLE_INVALID")
             evidence, raw = supplied["evidence_ref"], supplied["raw"].encode("utf-8")
             wire.require(evidence["kind"] == "GIT" and evidence["repository"] == source["repository"]
                 and evidence["path"] == source["path"] and evidence["sha256"] == wire.sha256(raw)
                 and isinstance(evidence.get("commit"), str) and re.fullmatch(r"[0-9a-f]{40}", evidence["commit"]),
                 "SCOUT_SOURCE_BINDING_MISMATCH")
             # A source selector may move; only this immutable Git ref is evidence.
-            if len(source["ref"]) == 40:
-                wire.require(source["ref"] == evidence["commit"], "SCOUT_SOURCE_BINDING_MISMATCH")
+            wire.require(source["ref"] == evidence["commit"], "SCOUT_SOURCE_BINDING_MISMATCH")
             payload = json.loads(raw)
+            wire.require(isinstance(payload, dict), "SCOUT_SOURCE_PAYLOAD_INVALID")
             if payload.get("schema") != "marcopolo.concurrent-choice-feasibility":
                 return dict(unknown, reason="UNSUPPORTED_SCOUT_SAVED_STATUS")
             observed = dict(native_status=payload.get("status"), native_reason="SAVED_PREFIX_FEASIBILITY_ONLY",
@@ -180,6 +195,7 @@ def native_dossier(store: Any, identity: Mapping[str, Any]) -> dict[str, Any]:
     source_definition = copy.deepcopy(packet.get("selected_candidate"))
     return dict(status="COMPLETE_SOURCE_TRACE" if not gaps else "PARTIAL", identity=dict(identity),
         source_definition=source_definition, source_restrictions={k: copy.deepcopy((source_definition or {}).get(k)) for k in RISK_FIELDS},
+        prior_memory=copy.deepcopy(packet.get("prior_memory")), known_unknowns=copy.deepcopy(packet.get("known_unknowns")),
         artifacts=artifacts, destination_refs=sorted(refs, key=wire.canonical), candidate_record_refs=hypotheses,
         critic_terminal=bundle.get("critic_terminal"), critic_result_sha256=bundle.get("critic_result_sha256"),
         critic_input_packet_sha256=bundle.get("critic_input_packet_sha256"),
@@ -217,17 +233,26 @@ def prepare_link(snapshot: Mapping[str, Any], item_id: str, revision: str, *, st
         return dict(status="LINK_PENDING", adoption_key=key, prepared=None, missing_identity=dict(identity),
                     reason=getattr(error, "code", "NATIVE_TARGET_READBACK_UNAVAILABLE"), next_action="READ_EXACT_SAVED_NATIVE_TARGET")
     wire.require(bool(dossier["destination_refs"]), "LINK_PENDING_NATIVE_IDENTITY_UNAVAILABLE")
+    wire.require(len(dossier["candidate_record_refs"]) == 1, "LINK_PENDING_NATIVE_CANDIDATE_UNAVAILABLE")
     link = dict(relation="INSPIRED_BY", adopted_item_revision=adopted, destination_refs=dossier["destination_refs"],
                 adoption_key=key, verification="VERIFIED" if not dossier["gaps"] else "PARTIAL", gaps=dossier["gaps"])
     current = snapshot["items"][item_id]["current"]
     wire.require(current is not None, "ITEM_NOT_WRITABLE")
     existing = [l for l in current["native_links"] if l["adoption_key"] == key]
+    links = current["native_links"] + [link]
     if existing:
         # Commit in the original adopted ref stays fixed across later shelf commits.
         link["adopted_item_revision"] = existing[0]["adopted_item_revision"]
-        wire.require(len(existing) == 1 and existing[0] == link, "ADOPTION_KEY_CONFLICT")
-        return dict(status="ALREADY_LINKED", adoption_key=key, prepared=None, dossier=dossier)
-    raw = wire.revise(snapshot, item_id, dict(state="FOLLOWING", native_links=current["native_links"] + [link],
+        wire.require(len(existing) == 1, "ADOPTION_KEY_CONFLICT")
+        old = existing[0]
+        if old == link:
+            return dict(status="ALREADY_LINKED", adoption_key=key, prepared=None, dossier=dossier)
+        old_refs, new_refs = ({wire.canonical(r) for r in row["destination_refs"]} for row in (old, link))
+        wire.require(old["verification"] == "PARTIAL" and old_refs <= new_refs and
+            set(link["gaps"]) <= set(old["gaps"]) and
+            wire.canonical(dossier["candidate_record_refs"][0]) in old_refs, "ADOPTION_KEY_CONFLICT")
+        links = [link if row["adoption_key"] == key else row for row in current["native_links"]]
+    raw = wire.revise(snapshot, item_id, dict(state=current["state"] if existing else "FOLLOWING", native_links=links,
         change_reason="Link exact existing native evidence; no research execution."), now=now, mutation_id=mutation_id)
     return dict(status="PREPARED_LOCAL_ONLY", adoption_key=key, prepared=raw, dossier=dossier)
 
@@ -247,10 +272,15 @@ def find_native(snapshot: Mapping[str, Any], native_ref: Mapping[str, Any]) -> d
                     status="CURRENT_SOURCE_LINK" if active else "RETRACTED_SOURCE_LINK" if row["current"] else row["status"])
     values = [matches[k] for k in sorted(matches)]
     return dict(status="INCOMPLETE" if not snapshot["complete"] else "AMBIGUOUS_SOURCE_LINK" if len(values) > 1 else
-                "FOUND" if values else "UNRESOLVED", matches=values)
+                "FOUND" if values else "UNRESOLVED", matches=values, reason=snapshot.get("reason"),
+                snapshot_commit=snapshot.get("commit"), source_freshness=snapshot.get("source_freshness"))
 
 
 def resolve_item(snapshot: Mapping[str, Any], item_id: str, *, git_read: Callable[[dict], bytes] | None = None) -> dict[str, Any]:
+    if not snapshot["complete"]:
+        return dict(status=snapshot["status"] if snapshot["status"] in {"UNAVAILABLE", "NOT_INITIALIZED"} else "INCOMPLETE",
+            reason=snapshot.get("reason"), item_id=item_id, adopted_sources=[], gaps=["SHELF_SNAPSHOT_INCOMPLETE"],
+            next_action="REFRESH_SEPARATE_METADATA_CACHE_THEN_READ_PINNED_SNAPSHOT")
     row = snapshot["items"].get(item_id)
     wire.require(row is not None, "ITEM_NOT_FOUND")
     result = dict(status=row["status"], item_id=item_id, current=copy.deepcopy(row["current"]), adopted_sources=[], gaps=[])

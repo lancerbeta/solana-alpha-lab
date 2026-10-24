@@ -113,7 +113,9 @@ def main(argv: list[str] | None = None) -> int:
                 body = shelf.decode(raw)
                 if args.public:
                     context.public_payload_guard(body, disclosure=json.loads(_input(args.disclosure)) if args.disclosure else None)
-                result = git.publish({shelf.revision_path(body): raw}, expected_heads={body["item_id"]: body["parents"]})
+                approval = ({shelf.sha256(shelf.canonical(body)): json.loads(_input(args.disclosure))} if args.disclosure else {})
+                options = dict(disclosures=approval) if isinstance(git, ScopedShelfGit) else {}
+                result = git.publish({shelf.revision_path(body): raw}, expected_heads={body["item_id"]: body["parents"]}, **options)
                 print(json.dumps(result, ensure_ascii=False, sort_keys=True))
                 return 0 if result["status"] in {"PUBLISHED", "ALREADY_PUBLISHED"} else 2
             if args.action == "refresh":
@@ -167,7 +169,7 @@ def main(argv: list[str] | None = None) -> int:
                 if args.public:
                     context.public_payload_guard(result, disclosure=json.loads(_input(args.disclosure)) if args.disclosure else None)
                 print(json.dumps(result, ensure_ascii=False, sort_keys=True))
-                return 0 if result["status"] not in {"UNRESOLVED", "INCOMPLETE", "AMBIGUOUS_SOURCE_LINK", "LINK_PENDING"} else 2
+                return 0 if result["status"] not in {"UNRESOLVED", "INCOMPLETE", "AMBIGUOUS_SOURCE_LINK", "LINK_PENDING", "UNAVAILABLE", "NOT_INITIALIZED"} else 2
             shelf.require(args.item is not None, "ITEM_REQUIRED")
             if args.action == "show":
                 shelf.require(args.item in snapshot["items"], "ITEM_NOT_FOUND")

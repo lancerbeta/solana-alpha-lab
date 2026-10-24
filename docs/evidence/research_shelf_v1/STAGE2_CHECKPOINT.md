@@ -15,7 +15,7 @@ merge, operational publication, scientific execution или canonical DONE.
 | Privacy | Private origin требует exact owner-reviewed minimal public digest всего payload; sentinel в каждом указанном free-text поле или dossier аннулирует прежнее review |
 | Navigation | Один reference-only SEM-RESEARCH-SHELF; 14 routes при max 14; прочие лимиты неизменны, resolved overview 16228/16384 bytes |
 
-45 уникальных targeted tests PASS; повторные entry-проверки в агрегатах не
+50 уникальных targeted tests PASS; повторные entry-проверки в агрегатах не
 увеличивают этот счётчик. Static Factory validation PASS. Команды воспроизведения,
 hashes outputs и исходников: `stage2-validation.json`. Stage 1 сохранён в своих
 неизменных checkpoint files; его полный Git suite повторно не запускался.
@@ -36,3 +36,9 @@ Rollback до commissioning: обычный revert code/entry overlay. Посл�
 Factory Fit: engineering scope PASS, `FULL_REVIEW`. Product Horizon NOW=NONE;
 WATCH — измеренные пропуски due review либо рост active-set/read latency после
 commissioning. Нового инструмента, сервиса или scheduler не требуется.
+
+Remediation: derived baseline покрывает card/plan/check; moving Scout ref без
+source-head witness остаётся UNKNOWN; malformed source изолирован. Общий fixture
+содержит девять revisions и восемь literal projections, включая fork/reconcile.
+Exact disclosure проходит через actual CLI до writer; PARTIAL enrichment сохраняет
+принятый target. V5 переносит genuine prior, adverse count, UNKNOWN и exposure.

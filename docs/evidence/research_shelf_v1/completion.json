@@ -27,7 +27,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_45_UNIQUE_TARGETED_ENGINEERING_TESTS",
+    "targeted": "PASS_50_UNIQUE_TARGETED_ENGINEERING_TESTS",
     "independent_review": {
       "path": "docs/evidence/research_shelf_v1/independent-review.json",
       "sha256": "572b23e8c2f2ba27cc25237a99961ef6295422a306e31ff4d6a94c274180469d",

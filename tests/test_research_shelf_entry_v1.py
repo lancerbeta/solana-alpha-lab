@@ -12,6 +12,7 @@ import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from datetime import timedelta
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from solana_alpha_lab.factory import research_shelf as wire
@@ -160,6 +161,92 @@ class ShelfEntryTests(unittest.TestCase):
         sources[next(iter(sources))] = dict(evidence_ref=dict(ref, sha256=wire.sha256(raw)), raw=raw.decode())
         self.assertEqual(native.event_read(event, now=NOW, saved_sources=sources)["status"], "UNKNOWN")
 
+    def test_native_source_baseline_covers_plan_and_monitor_independently(self):
+        from solana_alpha_lab.factory import research_fragments
+        records = [SimpleNamespace(record_id=name, record_kind="RESEARCH_ARTIFACT", payload_json="{}",
+            payload_sha256=wire.sha256(b"{}"), first_reliable_available_at=wire.clock(NOW))
+            for name in ("CARD", "PLAN-1", "PLAN-2", "CHECK-1", "CHECK-2")]
+        class Store:
+            root = self.work
+            def iter_committed_records(self):
+                return iter(records)
+        view = dict(fragment_version_id="RFV-SYNTHETIC", source_ref="CARD", check=dict(status="COMPLETE"),
+            plan=dict(_record_id="PLAN-1", execution_deadline="2026-11-10T00:00:00Z"),
+            evidence_blocks=[dict(source_ref="CHECK-1")])
+        event = dict(kind="SOURCE_CHANGED", condition=None, acknowledged_ref=None, source=dict(kind="NATIVE_ENTITY",
+            owner="SMIAL", entity_kind="RESEARCH_FRAGMENT", entity_id="RFV-SYNTHETIC"))
+        with patch.object(research_fragments, "source_snapshot", side_effect=lambda *a, **k: [view]):
+            original = native.event_read(event, now=NOW, store=Store())
+            event["acknowledged_ref"] = original["evidence_ref"]
+            self.assertEqual(native.event_read(event, now=NOW, store=Store())["status"], "NOT_MET")
+            view["plan"] = dict(_record_id="PLAN-2", execution_deadline="2026-11-20T00:00:00Z")
+            changed_plan = native.event_read(event, now=NOW, store=Store())
+            self.assertEqual(changed_plan["status"], "MET")
+            event["acknowledged_ref"] = changed_plan["evidence_ref"]
+            view["evidence_blocks"] = [dict(source_ref="CHECK-2")]
+            changed_check = native.event_read(event, now=NOW, store=Store())
+            self.assertEqual(changed_check["status"], "MET")
+            self.assertEqual({r["entity_id"] for r in changed_check["source_refs"]}, {"CARD", "PLAN-2", "CHECK-2"})
+
+    def test_bad_scout_source_is_isolated_and_moving_ref_is_unknown(self):
+        files, sources, ids = {}, {}, []
+        for index, raw in enumerate((b"[]", wire.canonical(dict(schema="marcopolo.concurrent-choice-feasibility", status="PASS")))):
+            body = wire.decode(RAW)
+            body.pop("revision_sha256")
+            body["item_id"] = body["item_id"][:-1] + str(index + 3)
+            body["mutation_id"] = f"00000000-0000-4000-8000-{index + 30:012d}"
+            source = dict(kind="GIT_PATH", repository="lancerbeta/marcopolo-scout", ref="d" * 40, path=f"saved/status-{index}.json")
+            body["review"]["event"] = dict(kind="NATIVE_STATUS", source=source, condition="PASS", acknowledged_ref=None)
+            encoded = wire.prepare(body)
+            files[wire.revision_path(wire.decode(encoded))] = encoded
+            ids.append(body["item_id"])
+            sources[wire.canonical(source).decode()] = dict(raw=raw.decode(), evidence_ref=dict(kind="GIT", repository=source["repository"],
+                commit=source["ref"], path=source["path"], sha256=wire.sha256(raw)))
+        states = native.read_events(wire.fold(files), now=NOW, saved_sources=sources)
+        self.assertEqual([states[i]["status"] for i in ids], ["UNKNOWN", "MET"])
+        moving = dict(source, ref="research-log")
+        sources[wire.canonical(moving).decode()] = sources[wire.canonical(source).decode()]
+        event = dict(kind="SOURCE_CHANGED", source=moving, condition=None, acknowledged_ref=None)
+        self.assertEqual(native.event_read(event, now="2030-01-01T00:00:00Z", saved_sources=sources)["status"], "UNKNOWN")
+
+    def test_owner_glance_and_missing_snapshot_recovery_remain_actionable(self):
+        state = snapshot()
+        state.update(source_freshness="REMOTE_VERIFIED")
+        summary = wire.attention(state, now="2026-10-31T00:00:00Z")
+        summary.update(next_review_at="2026-11-20T00:00:00Z", omitted_count=2)
+        text = ctx.readout(summary)
+        for expected in ("Synthetic deferred observation", ITEM, "2026-11-20", "Ещё 2", "review --snapshot"):
+            self.assertIn(expected, text)
+        missing = ctx.load_snapshot(self.work / "missing.json", now=NOW)
+        result = native.resolve_item(missing, ITEM)
+        self.assertEqual(result["status"], "UNAVAILABLE")
+        self.assertIn("REFRESH", result["next_action"])
+        self.assertIsNotNone(native.find_native(missing, {})["reason"])
+
+    def test_partial_link_enriches_same_target_without_changing_adoption(self):
+        from uuid import uuid4
+        target = dict(kind="NATIVE", owner="SMIAL", entity_kind="HYPOTHESIS_VERSION", entity_id="CANDIDATE-ONE",
+            payload_sha256="a" * 64, locator="smial-data://research/records/CANDIDATE-ONE")
+        partial = dict(destination_refs=[target], candidate_record_refs=[target], gaps=["CRITIC_RESULT_UNAVAILABLE"])
+        extra = dict(target, entity_id="CRITIC-ONE", entity_kind="RESEARCH_ARTIFACT", locator="smial-data://research/records/CRITIC-ONE")
+        complete = dict(destination_refs=[target, extra], candidate_record_refs=[target], gaps=[])
+        args = dict(store=None, identity=dict(session_id="SESSION", candidate_id="CANDIDATE", definition_sha256="b" * 64),
+            request_id="EXACT-REQUEST", now=NOW, mutation_id=str(uuid4()))
+        with patch.object(native, "native_dossier", return_value=partial):
+            first = native.prepare_link(snapshot(), ITEM, wire.decode(RAW)["revision_sha256"], **args)
+        files = dict(snapshot()["files"])
+        files[wire.revision_path(wire.decode(first["prepared"]))] = first["prepared"]
+        linked = dict(wire.fold(files), files=files, commit="c" * 40)
+        with patch.object(native, "native_dossier", return_value=complete):
+            enriched = native.prepare_link(linked, ITEM, wire.decode(RAW)["revision_sha256"], **dict(args, mutation_id=str(uuid4())))
+        link = wire.decode(enriched["prepared"])["native_links"][0]
+        self.assertEqual(link["verification"], "VERIFIED")
+        self.assertEqual(link["adopted_item_revision"]["commit"], "a" * 40)
+        self.assertEqual(link["adoption_key"], first["adoption_key"])
+        with patch.object(native, "native_dossier", return_value=dict(complete, candidate_record_refs=[extra])):
+            with self.assertRaisesRegex(wire.ShelfError, "ADOPTION_KEY_CONFLICT"):
+                native.prepare_link(linked, ITEM, wire.decode(RAW)["revision_sha256"], **args)
+
     def test_private_sentinel_in_every_free_text_field_cannot_use_clean_disclosure(self):
         body = wire.decode(RAW)
         body["origin_refs"] = [dict(kind="GIT", repository="lancerbeta/marcopolo-scout", commit="a" * 40, path="saved/protocol.json", sha256="b" * 64)]
@@ -198,6 +285,17 @@ class ShelfEntryTests(unittest.TestCase):
         self.assertEqual(item["revisions"][fixture["expected"]["adopted_revision"]]["statement"], fixture["expected"]["adopted_statement"])
         target = next(link["destination_refs"][0] for row in item["revisions"].values() for link in row["native_links"])
         self.assertEqual(native.find_native(folded, target)["matches"][0]["status"], "RETRACTED_SOURCE_LINK")
+        for case in fixture["projection_cases"]:
+            selected = {wire.revision_path(wire.decode(fixture["revisions"][i]["raw"].encode())):
+                        fixture["revisions"][i]["raw"].encode() for i in case["revision_indices"]}
+            state = wire.fold(selected)
+            row = state["items"][fixture["expected"]["item_id"]]
+            review = wire.attention(state, now=case["now"], source_states=case["source_states"])
+            with self.subTest(projection=case["name"]):
+                self.assertEqual(row["status"], case["expected"]["item_status"])
+                self.assertEqual(row["heads"], case["expected"]["heads"])
+                self.assertEqual(review["totals"], case["expected"]["totals"])
+                self.assertEqual(review["items"][0]["status"] if review["items"] else None, case["expected"]["attention_status"])
 
     def test_real_semantic_route_exposes_cloud_recipe_without_workstation(self):
         env = dict(os.environ, PYTHONUTF8="1")
@@ -238,6 +336,33 @@ class ShelfEntryTests(unittest.TestCase):
         with patch.object(writer, "_accepted_policy"), patch.object(ShelfGit, "publish", side_effect=AssertionError("No append before public guard")):
             with self.assertRaisesRegex(wire.ShelfError, "PRIVATE_SOURCE_PUBLIC_DISCLOSURE_REQUIRED"):
                 writer.publish({wire.revision_path(wire.decode(raw)): raw}, expected_heads={body["item_id"]: []})
+        disclosure = dict(disposition="EXPLICIT_MINIMAL_PUBLIC_DISCLOSURE", payload_sha256=wire.sha256(wire.canonical(wire.decode(raw))))
+        with patch.object(writer, "_accepted_policy"), patch.object(ShelfGit, "publish", return_value=dict(status="PUBLISHED")) as kernel:
+            writer.publish({wire.revision_path(wire.decode(raw)): raw}, expected_heads={body["item_id"]: []},
+                disclosures={disclosure["payload_sha256"]: disclosure})
+            kernel.assert_called_once()
+
+    def test_cli_passes_exact_disclosure_to_the_mandatory_writer_guard(self):
+        spec = importlib.util.spec_from_file_location("shelf_cli_approval", ROOT / "scripts/research_shelf.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        body = wire.decode(RAW)
+        body.pop("revision_sha256")
+        body.update(product="SMIAL", item_id=body["item_id"].replace("SCOUT", "SMIAL"))
+        body["origin_refs"] = [dict(kind="GIT", repository="lancerbeta/marcopolo-scout", commit="a" * 40,
+            path="saved/source.json", sha256="b" * 64)]
+        raw = wire.prepare(body)
+        request, scope, approval = (self.work / name for name in ("prepared.json", "scope.json", "approval.json"))
+        request.write_bytes(raw)
+        scope.write_text("{}")
+        approval.write_text(json.dumps(dict(disposition="EXPLICIT_MINIMAL_PUBLIC_DISCLOSURE",
+            payload_sha256=wire.sha256(wire.canonical(wire.decode(raw))))))
+        args = ["apply", "--cache", str(self.work / "cache.git"), "--input", str(request), "--metadata-scope", str(scope)]
+        with patch.object(ScopedShelfGit, "__init__", return_value=None), patch.object(ScopedShelfGit, "_accepted_policy"), \
+             patch.object(ShelfGit, "publish", return_value=dict(status="PUBLISHED")) as kernel, redirect_stdout(io.StringIO()):
+            self.assertEqual(module.main(args + ["--disclosure", str(approval)]), 0)
+            self.assertEqual(module.main(args), 2)
+            kernel.assert_called_once()
 
 
 if __name__ == "__main__":

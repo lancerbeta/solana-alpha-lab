@@ -62,12 +62,19 @@ status. У Scout проверена существующая schema `marcopolo.c
 `source` — wire SourceLocator, `evidence_ref` — immutable GitRef, `raw` — exact
 UTF-8 JSON file bytes как строка. Hash/repository/path/explicit commit проверяются.
 Private body остаётся в разрешённом контексте; наружу adapter отдаёт только status/ref.
+Scout adapter принимает только exact 40-hex ref. Moving ref без отдельного
+source-head observation даёт `UNKNOWN / SCOUT_MOVING_REF_OBSERVATION_REQUIRED`;
+свежесть SMIAL shelf не доказывает свежесть private Scout head.
 
 MET/NOT_MET/UNKNOWN определяются сохранённым source status, не формулой из записи.
 SOURCE_CHANGED без acknowledged baseline — UNKNOWN. Содержательный defer может
 сохранить exact observed evidence в `acknowledged_ref`; тот же MET больше не будит,
 но новая review_at работает. MANUAL без review_at — NEEDS_TRIAGE. Native expiry
 выводится отдельно, без переноса сроков и запуска задним числом.
+SMIAL baseline — derived `REFERENCE` с hash полного native check и refs card,
+current plan и monitoring checks. `source_refs` перечислены в observation.
+Это не native artifact и не scientific prior: смена plan при прежнем check,
+либо check при прежнем plan меняет baseline. Он восстанавливается без registry.
 
 До native шага вычислить stable adoption key (`adoption-key --item ... --revision
 ... --request-id ...`). Он не содержит ещё не созданный native ID и сам ничего
@@ -116,6 +123,55 @@ scope, cache находится вне execution checkout, endpoint — толь
 Actual owner permission обязательно: файл scope сам по себе её не создаёт.
 Private-origin disclosure проверяется writer'ом перед каждым public batch.
 Этап 2 не вызывает этот transport и не выдаёт commissioning scope.
+
+## Рабочий путь после commissioning
+
+Команды ниже требуют уже разрешённого metadata scope; до него допустим только
+disposable local Git без `--metadata-scope`. Prepared файлы сохраняются при отказе;
+`apply` не меняет их. ID/hash брать из ответа `capture`/`show`.
+
+1. Создать `idea.json`: `{"title":"Проверить сохранённый контраст","statement":"Вернуться после source readback; без запуска науки."}`.
+
+```text
+uv run --locked --managed-python python -B scripts/research_shelf.py capture --input idea.json --output prepared.json
+uv run --locked --managed-python python -B scripts/research_shelf.py apply --cache <cache> --metadata-scope <scope.json> --input prepared.json
+uv run --locked --managed-python python -B scripts/research_shelf.py refresh --cache <cache> --metadata-scope <scope.json> --output snapshot.json
+uv run --locked --managed-python python -B scripts/research_shelf.py review --snapshot snapshot.json --all
+```
+
+2. Для defer создать `defer.json` с `review` целиком (сохранить event/baseline):
+`{"review":{"review_at":"2026-11-20T09:00:00Z","review_by":"2026-11-23T09:00:00Z","event":null},"change_reason":"Осмысленный перенос административного обзора."}`.
+
+```text
+uv run --locked --managed-python python -B scripts/research_shelf.py revise --cache <cache> --metadata-scope <scope.json> --commit <snapshot-commit> --item <item-id> --mutation-id <new-uuid> --input defer.json --output defer-prepared.json
+uv run --locked --managed-python python -B scripts/research_shelf.py apply --cache <cache> --metadata-scope <scope.json> --input defer-prepared.json
+```
+
+3. После отдельно разрешённого native шага записать exact native identity в
+`identity.json`. Перед шагом сохранить request-id и принятую revision.
+
+```text
+uv run --locked --managed-python python -B scripts/research_shelf.py link --snapshot snapshot.json --item <item-id> --revision <adopted-revision> --request-id <stable-request> --mutation-id <new-uuid> --data-root <existing-rdp> --input identity.json --output link-prepared.json
+uv run --locked --managed-python python -B scripts/research_shelf.py apply --cache <cache> --metadata-scope <scope.json> --input link-prepared.json
+uv run --locked --managed-python python -B scripts/research_shelf.py resolve --cache <cache> --metadata-scope <scope.json> --snapshot snapshot.json --item <item-id>
+```
+
+После apply сначала обновить snapshot для просмотра новой связи. При сбое apply
+повторять тот же prepared файл. При LINK_PENDING дочитать exact сохранённый
+target и повторить link с прежним request/adopted identity; native шаг не повторять.
+PARTIAL link можно обогатить тем же target: refs только добавляются, gaps только
+убывают; смена candidate или утрата прежних refs даёт ADOPTION_KEY_CONFLICT.
+
+Private-origin public payload: минимальный текст и refs сначала проверяет owner.
+Его exact approval JSON передать через тот же --disclosure до обязательного writer guard:
+
+```text
+uv run --locked --managed-python python -B scripts/research_shelf.py apply --cache <cache> --metadata-scope <scope.json> --input minimal-public-prepared.json --disclosure owner-disclosure.json
+```
+
+payload_sha256 — SHA-256 canonical JSON body включая revision_sha256, без
+завершающего newline файла. Scope разрешает transport; disclosure разрешает
+только этот public payload. Инструмент не генерирует owner approval.
 
 ## Cloud explicit-ref recipe
 

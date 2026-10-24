@@ -317,10 +317,11 @@ class ScopedShelfGit(ShelfGit):
         wire.require(remote in PUBLIC_ENDPOINTS and pushes == [remote], "PUBLIC_METADATA_ENDPOINT_REFUSED")
         return remote
 
-    def publish(self, files: Mapping[str, bytes], *, expected_heads: Mapping[str, list[str]]) -> dict[str, Any]:
+    def publish(self, files: Mapping[str, bytes], *, expected_heads: Mapping[str, list[str]],
+                disclosures: Mapping[str, Any] | None = None) -> dict[str, Any]:
         self._accepted_policy("APPEND")
         from .research_shelf_context import public_payload_guard
-        disclosures = self.scope.get("public_disclosures", {})
+        disclosures = disclosures or {}
         for raw in files.values():
             body = wire.decode(raw)
             wire.require(body["product"] == "SMIAL", "PUBLIC_PRODUCT_NAMESPACE_MISMATCH")

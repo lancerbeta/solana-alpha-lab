@@ -52,7 +52,28 @@ class NativeShelfTests(unittest.TestCase):
     plan = fragment_fixture.FragmentVerticalTests.plan
 
     def test_existing_native_candidate_link_and_metadata_only_recovery(self):
-        identity, evidence = self.seed()
+        # First an actual saved advisory prior, then capture intent BEFORE the
+        # consumer draft/freeze/Critic. Shelf refs never enter scientific priors.
+        self.seed()
+        prior_ref = self.card["_record_id"]
+        raw = wire.capture(product="SMIAL", title="Deferred native question",
+            statement="Reuse the saved B-or-C advisory contrast; E1800 to E14400, execution costs UNKNOWN.", now=NOW)
+        captured = wire.decode(raw)
+        captured.pop("revision_sha256")
+        captured["origin_refs"] = [native.record_ref(native.record_index(ExistingResearchStoreReader(self.plane))[prior_ref][0])]
+        raw = wire.prepare(captured)
+        from tests import test_hfic_list_aware_vertical_v1 as lav
+        from tests.test_hfic_cli import critic_result_from_packet_only
+        focus = "SHELF_MEASURED_PRIOR_CONSUMER"
+        evidence, scope, _, initial = self.look(focus, lav.draft("LIST_CONTRAST", list_condition={"clauses": [{"all_of": ["B"]}, {"all_of": ["C"]}]}))
+        draft, pre = self.authored_draft(evidence, scope, focus, preflight_receipt=initial)
+        draft["candidates"][0]["claim"] += " " + wire.decode(raw)["statement"]
+        draft["candidates"][0]["prior_work_refs"] = [wire.decode(raw)["origin_refs"][0]["entity_id"]]
+        draft["candidates"][0]["execution_capacity_risks"] = ["UNKNOWN_EXECUTION_COSTS"]
+        _, frozen = self.persist_and_freeze(draft, pre)
+        critic = critic_result_from_packet_only(frozen["critic_input_packet"], terminal="KILL_STATISTICALLY_UNIDENTIFIABLE")
+        self.cli("finalize", "--session-id", frozen["session_id"], "--critic-result", self.write("shelf-consumer-critic.json", critic))
+        identity = dict(session_id=frozen["session_id"], candidate_id=frozen["selected_candidate_id"], definition_sha256=frozen["selected_definition_sha256"])
         reader = ExistingResearchStoreReader(self.plane)
         before = self.store.diagnostics().committed_inventory_sha256
         dossier = native.native_dossier(reader, identity)
@@ -61,7 +82,16 @@ class NativeShelfTests(unittest.TestCase):
         self.assertEqual(dossier["grounded_evidence"]["result"], dossier["grounded_result"])
         self.assertEqual(dossier["critic_terminal"], "KILL_STATISTICALLY_UNIDENTIFIABLE")
         self.assertIn("missing_or_forward_only_data", dossier["source_restrictions"])
-        raw = wire.capture(product="SMIAL", title="Deferred native question", statement="Unmeasured source intent", now=NOW)
+        prior = next(source for cap in dossier["prior_memory"]["capsules"]
+            for source in cap.get("source_detail", {}).get("research_fragments", []) if source["source_ref"] == prior_ref)
+        self.assertEqual(prior["allowed_use"], "RESEARCH_ADVISORY")
+        self.assertEqual(prior["evidence_blocks"][0]["exposure"], "EXPLORATORY_REUSE")
+        self.assertIn("execution costs UNKNOWN", dossier["source_definition"]["claim"])
+        self.assertEqual(dossier["source_restrictions"]["execution_capacity_risks"], ["UNKNOWN_EXECUTION_COSTS"])
+        self.assertEqual(dossier["source_definition"]["decision_timestamp"], "E1800")
+        self.assertEqual(dossier["grounded_result"]["downside"]["negative_n"], 4)
+        self.assertAlmostEqual(dossier["grounded_result"]["mean_target"], -0.55 / 6, places=9)
+        self.assertEqual(dossier["grounded_result"]["experiment_recipe"]["frozen_input"][0]["evidence_role"], "EXPLORATORY_REUSE")
         original = wire.decode(raw)
         snapshot = shelf_snapshot(raw)
         request = dict(store=reader, identity=identity, request_id="ONE-SYNTHETIC-REQUEST", now=NOW, mutation_id=str(uuid4()))

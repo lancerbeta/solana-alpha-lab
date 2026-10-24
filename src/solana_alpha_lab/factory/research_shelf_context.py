@@ -158,7 +158,23 @@ def readout(summary: Mapping[str, Any]) -> str:
     totals = summary["totals"]
     due = sum(totals.get(key, 0) for key in ("DUE_REVIEW", "EVENT_REVIEW", "OVERDUE_REVIEW", "EXPIRED_REVIEW_REQUIRED", "NEEDS_TRIAGE"))
     unknown = sum(totals.get(key, 0) for key in ("SOURCE_READBACK_REQUIRED", "ITEM_INVALID", "ITEM_CONFLICT"))
-    return f"Полка: {due} требуют внимания, {unknown} ждут сверки; data commit {summary['snapshot_commit']}; это обзор, научный допуск не проверен."
+    rows = [f"Полка: {due} требуют внимания, {unknown} ждут сверки; data commit {summary['snapshot_commit']}; научный допуск не проверен."]
+    for item in summary.get("items", [])[:5]:
+        # Wire bounds the stored title; keep the owner glance compact and one-line.
+        title = " ".join(str(item.get("title") or item["item_id"]).split())[:100]
+        when = ((item.get("source_observation") or {}).get("execution_deadline") if item["status"] == "EXPIRED_REVIEW_REQUIRED"
+                else (item.get("review") or {}).get("review_by" if item["status"] == "OVERDUE_REVIEW" else "review_at"))
+        rows.append(f"  {item['status']}: {title} [{item['item_id']}]" + (f"; срок {when}" if when else ""))
+        if item.get("next_action"):
+            intent = " ".join(str(item["next_action"].get("intent") or "").split())[:100]
+            rows.append("    Намерение: " + intent)
+    if summary.get("next_review_at"):
+        rows.append("Ближайший обзор: " + summary["next_review_at"])
+    if summary.get("omitted_count"):
+        rows.append(f"Ещё {summary['omitted_count']}; полный обзор: research_shelf.py review --snapshot <snapshot.json> --all")
+    if due or unknown:
+        rows.append("Далее: review --snapshot <snapshot.json>; сверить exact source, затем решить defer/link/close.")
+    return "\n".join(rows)
 
 
 def private_origin(value: Any) -> bool:
