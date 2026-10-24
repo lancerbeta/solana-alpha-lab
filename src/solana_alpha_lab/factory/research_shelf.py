@@ -91,7 +91,7 @@ def _guard(value: Any, location: str = "") -> None:
         for i, child in enumerate(value):
             _guard(child, f"{location}[{i}]")
     elif isinstance(value, str):
-        require(not re.search(r"(?i)(?:(?<![a-z0-9+.-])[a-z]:[\\/]|\\\\|file://|/(?:home|Users|tmp|mnt|var)/)", value),
+        require(not re.search(r"(?i)(?:(?<![a-z0-9+.-])[a-z]:[\\/]|\\\\|file://|(?<![a-z0-9:/._-])/(?:home|Users|tmp|mnt|var)/)", value),
                 "PHYSICAL_PATH_REFUSED", location)
         require(not _scanner()(value), "SECRET_REFUSED", location)
 

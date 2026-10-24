@@ -83,11 +83,28 @@ class WireTests(unittest.TestCase):
         self.assertEqual(shelf.attention(snapshot, now=NOW)["totals"], {"NEEDS_TRIAGE": 1})
 
     def test_logical_https_and_native_refs_are_not_windows_paths(self):
-        refs = [dict(kind="REFERENCE", locator="https://example.invalid/source", description="Source hint",
+        refs = [dict(kind="REFERENCE", locator="https://example.invalid/home/research", description="Source hint",
                      observed_at=NOW, verification="UNVERIFIED"),
                 dict(kind="NATIVE", owner="SMIAL", entity_kind="FRAGMENT", entity_id="RFV-SYNTHETIC",
-                     payload_sha256=None, locator="smial-data://research/fragments/RFV-SYNTHETIC")]
+                     payload_sha256=None, locator="smial-data://research/var/result")]
         self.assertEqual(shelf.decode(genesis(origin_refs=refs))["origin_refs"], refs)
+
+    def test_local_path_checks_root_first_before_visiting_any_link_descendant(self):
+        from solana_alpha_lab.factory.research_shelf_git import _local_path
+        alias = ROOT / "local" / "synthetic-network-alias"
+        leaf = alias / "child" / "remote.git"
+        visited = []
+        def inspect(path):
+            visited.append(path)
+            if alias in path.parents:
+                raise AssertionError("Attempted descendant I/O before detecting indirect ancestor")
+            return path == alias
+        with patch.object(Path, "is_symlink", new=inspect), patch.object(Path, "is_junction", return_value=False):
+            with patch.object(Path, "resolve", side_effect=AssertionError("Link must be refused before resolution")):
+                with self.assertRaisesRegex(shelf.ShelfError, "INDIRECT_PATH_REFUSED"):
+                    _local_path(leaf)
+        self.assertEqual(visited[-1], alias)
+        self.assertNotIn(leaf, visited)
 
     def test_invalid_nested_clock_is_isolated_at_validation(self):
         body = json.loads(FIXTURE.read_bytes())

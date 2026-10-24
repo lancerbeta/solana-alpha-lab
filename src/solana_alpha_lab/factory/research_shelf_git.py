@@ -40,7 +40,8 @@ def _local_form(path: Path) -> None:
 def _local_path(path: Path) -> Path:
     _local_form(path)
     absolute = path.absolute()
-    for component in (absolute, *absolute.parents):
+    # Never query a child until every ancestor is known not to redirect I/O.
+    for component in reversed((absolute, *absolute.parents)):
         wire.require(not component.is_symlink() and not component.is_junction(), "INDIRECT_PATH_REFUSED")
     resolved = path.resolve()
     _local_form(resolved)
