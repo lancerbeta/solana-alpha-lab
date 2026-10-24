@@ -11,6 +11,7 @@ import os
 import re
 import subprocess
 import tempfile
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -22,6 +23,30 @@ HEX40 = re.compile(r"[0-9a-f]{40}")
 MAX_SNAPSHOT_BYTES = 16_777_216
 
 
+def _drive_type(anchor: str) -> int:
+    import ctypes
+    return ctypes.windll.kernel32.GetDriveTypeW(anchor)
+
+
+def _local_form(path: Path) -> None:
+    """Lexical and drive checks precede resolve/is_dir/Git, including UNC aliases."""
+    raw = str(path).replace("\\", "/")
+    wire.require(not raw.startswith("//"), "NETWORK_PATH_REFUSED")
+    wire.require(not re.match(r"^[A-Za-z][A-Za-z0-9+.-]*://", raw), "NETWORK_TRANSPORT_NOT_COMMISSIONED")
+    if os.name == "nt":
+        wire.require(_drive_type(path.absolute().anchor) in {2, 3, 5, 6}, "NETWORK_PATH_REFUSED")
+
+
+def _local_path(path: Path) -> Path:
+    _local_form(path)
+    absolute = path.absolute()
+    for component in (absolute, *absolute.parents):
+        wire.require(not component.is_symlink() and not component.is_junction(), "INDIRECT_PATH_REFUSED")
+    resolved = path.resolve()
+    _local_form(resolved)
+    return resolved
+
+
 class ShelfGit:
     """A bare metadata cache. Network publication needs the later accepted policy.
 
@@ -30,13 +55,16 @@ class ShelfGit:
     """
 
     def __init__(self, cache: Path):
-        self.cache = cache.resolve()
+        self.cache = _local_path(cache)
         wire.require(self.cache.is_dir(), "CACHE_NOT_INITIALIZED")
         wire.require(self._git("rev-parse", "--is-bare-repository").stdout.strip() == b"true", "BARE_CACHE_REQUIRED")
 
     @classmethod
     def init_local(cls, cache: Path, remote: Path) -> ShelfGit:
-        cache, remote = cache.resolve(), remote.resolve()
+        # Validate BOTH forms before any filesystem call on either argument.
+        _local_form(cache)
+        _local_form(remote)
+        cache, remote = _local_path(cache), _local_path(remote)
         wire.require(not cache.exists(), "CACHE_ALREADY_EXISTS")
         wire.require(remote.is_dir(), "LOCAL_REMOTE_REQUIRED")
         wire.require(not (cache == remote or remote in cache.parents or cache in remote.parents), "CACHE_REMOTE_OVERLAP")
@@ -72,14 +100,15 @@ class ShelfGit:
     def _local_remote(self) -> Path:
         raw = self._git("remote", "get-url", "origin").stdout.decode("utf-8").strip()
         remote = Path(raw)
+        _local_form(remote)
+        remote = _local_path(remote)
         wire.require(remote.is_absolute() and remote.is_dir(), "NETWORK_TRANSPORT_NOT_COMMISSIONED")
-        remote = remote.resolve()
         wire.require(remote != self.cache and remote not in self.cache.parents and self.cache not in remote.parents,
                      "CACHE_REMOTE_OVERLAP")
         wire.require(self._run(remote, "rev-parse", "--is-bare-repository").stdout.strip() == b"true", "BARE_REMOTE_REQUIRED")
         # Deny hidden push redirection even when the fetch URL is local.
         push = self._git("remote", "get-url", "--push", "--all", "origin").stdout.decode("utf-8").splitlines()
-        wire.require(len(push) == 1 and Path(push[0]).resolve() == remote, "PUSH_DESTINATION_MISMATCH")
+        wire.require(len(push) == 1 and _local_path(Path(push[0])) == remote, "PUSH_DESTINATION_MISMATCH")
         return remote
 
     def remote_head(self) -> str | None:
@@ -125,7 +154,7 @@ class ShelfGit:
             else:
                 files[path] = self._git("cat-file", "blob", oid).stdout
         result = wire.fold(files, complete=complete)
-        return dict(result, commit=commit, files=files)
+        return dict(result, commit=commit, files=files, source_freshness="UNVERIFIED_PINNED", source_checked_at=None)
 
     def refresh(self) -> dict[str, Any]:
         """Fetch explicitly. Pure read(commit) never refreshes implicitly."""
@@ -133,12 +162,13 @@ class ShelfGit:
             head = self.remote_head()
             if head is None:
                 return dict(status="NOT_INITIALIZED", complete=False, items={}, commit=None)
-            return self.read(head)
+            return dict(self.read(head), source_freshness="REMOTE_VERIFIED",
+                        source_checked_at=datetime.now(UTC).isoformat().replace("+00:00", "Z"))
         except wire.ShelfError as error:
             cached = self._git("rev-parse", "--verify", CACHE_REF, check=False)
             if cached.returncode == 0:
                 result = self.read(cached.stdout.decode().strip())
-                return dict(result, status="STALE_AS_OF", complete=False, reason=error.code)
+                return dict(result, status="STALE_AS_OF", source_freshness="STALE_AS_OF", complete=False, reason=error.code)
             return dict(status="UNAVAILABLE", complete=False, items={}, commit=None, reason=error.code)
 
     def _commit(self, parent: str | None, files: Mapping[str, bytes]) -> str:

@@ -82,6 +82,33 @@ class WireTests(unittest.TestCase):
         snapshot = shelf.fold(files(shelf.canonical(body) + b"\n"))
         self.assertEqual(shelf.attention(snapshot, now=NOW)["totals"], {"NEEDS_TRIAGE": 1})
 
+    def test_logical_https_and_native_refs_are_not_windows_paths(self):
+        refs = [dict(kind="REFERENCE", locator="https://example.invalid/source", description="Source hint",
+                     observed_at=NOW, verification="UNVERIFIED"),
+                dict(kind="NATIVE", owner="SMIAL", entity_kind="FRAGMENT", entity_id="RFV-SYNTHETIC",
+                     payload_sha256=None, locator="smial-data://research/fragments/RFV-SYNTHETIC")]
+        self.assertEqual(shelf.decode(genesis(origin_refs=refs))["origin_refs"], refs)
+
+    def test_invalid_nested_clock_is_isolated_at_validation(self):
+        body = json.loads(FIXTURE.read_bytes())
+        body.pop("revision_sha256")
+        body["review"]["review_at"] = "2026-13-31T00:00:00Z"
+        with self.assertRaisesRegex(shelf.ShelfError, "UTC_CLOCK_INVALID"):
+            shelf.prepare(body)
+        body["revision_sha256"] = shelf.sha256(shelf.canonical(body))
+        bad = shelf.canonical(body) + b"\n"
+        good = shelf.capture(product="SMIAL", title="Independent", statement="Unmeasured", now=NOW)
+        snapshot = shelf.fold({shelf.revision_path(body): bad} | files(good))
+        self.assertEqual(shelf.attention(snapshot, now=NOW)["totals"], {"ITEM_INVALID": 1, "NEEDS_TRIAGE": 1})
+
+    def test_invalid_change_reason_has_safe_typed_refusal(self):
+        snapshot = shelf.fold(files(FIXTURE.read_bytes()))
+        item = next(iter(snapshot["items"]))
+        for reason in (None, 7, [], {}, " "):
+            with self.subTest(reason_type=type(reason).__name__):
+                with self.assertRaisesRegex(shelf.ShelfError, "CHANGE_REASON_REQUIRED"):
+                    shelf.revise(snapshot, item, dict(change_reason=reason), now=NOW, mutation_id=str(uuid4()))
+
     def test_missing_parent_and_invalid_item_do_not_hide_independent_item(self):
         bad = genesis(parents=["a" * 64])
         good = shelf.capture(product="SMIAL", title="Independent", statement="Idea", now=NOW)
@@ -111,6 +138,10 @@ class WireTests(unittest.TestCase):
         self.assertEqual((row["status"], row["source_status"]), ("SOURCE_READBACK_REQUIRED", "UNKNOWN"))
         late = genesis(review={"review_at": "2026-12-01T00:00:00Z", "review_by": "2026-10-24T00:00:00Z", "event": event})
         self.assertEqual(shelf.attention(shelf.fold(files(late)), now=NOW)["items"][0]["status"], "OVERDUE_REVIEW")
+        manual = dict(kind="MANUAL", source=None, condition="Owner review required", acknowledged_ref=None)
+        last_date_only = genesis(review={"review_at": None, "review_by": "2026-11-20T00:00:00Z", "event": manual})
+        self.assertEqual(shelf.attention(shelf.fold(files(last_date_only)), now=NOW)["totals"], {"NEEDS_TRIAGE": 1})
+        self.assertEqual(shelf.attention(shelf.fold(files(last_date_only)), now="2026-11-20T00:00:00Z")["totals"], {"OVERDUE_REVIEW": 1})
 
     def test_fold_fork_reconcile_all_parents_and_preserve_old_content(self):
         raw = FIXTURE.read_bytes()
@@ -159,6 +190,17 @@ class WireTests(unittest.TestCase):
         closed = update(snapshot, item, state="CLOSED", closure={"reason": "Administrative", "evidence_refs": [], "successor": None})
         result = shelf.attention(shelf.fold(files(*revisions, closed)), now=NOW)
         self.assertEqual(result["totals"], {"CLOSED": 1, "NEEDS_TRIAGE": 6})
+
+    def test_attention_keeps_snapshot_pin_completeness_and_stale_reason(self):
+        snapshot = shelf.fold(files(FIXTURE.read_bytes()))
+        snapshot.update(commit="a" * 40, status="STALE_AS_OF", complete=False,
+                        source_freshness="STALE_AS_OF", reason="GIT_UNAVAILABLE")
+        result = shelf.attention(snapshot, now=NOW)
+        self.assertEqual(result["snapshot_commit"], "a" * 40)
+        self.assertFalse(result["snapshot_complete"])
+        self.assertEqual(result["source_freshness"], "STALE_AS_OF")
+        self.assertEqual(result["reason"], "GIT_UNAVAILABLE")
+        self.assertEqual(result["attention_as_of"], NOW)
 
 
 class GitVerticalTests(unittest.TestCase):
@@ -288,6 +330,18 @@ class GitVerticalTests(unittest.TestCase):
         with self.assertRaisesRegex(shelf.ShelfError, "BARE_CACHE_REQUIRED"):
             ShelfGit(ROOT)
 
+    def test_unc_is_refused_before_any_filesystem_resolution(self):
+        for remote in (Path(r"\\server\share\remote.git"), Path("//server/share/remote.git"), Path(r"\\?\UNC\server\share\remote.git")):
+            with self.subTest(remote_form=str(remote)[:8]):
+                with patch.object(Path, "resolve", side_effect=AssertionError("Must refuse before filesystem I/O")):
+                    with self.assertRaisesRegex(shelf.ShelfError, "NETWORK_PATH_REFUSED"):
+                        ShelfGit.init_local(self.root / "new-cache.git", remote)
+        if os.name == "nt":
+            with patch("solana_alpha_lab.factory.research_shelf_git._drive_type", return_value=4):
+                with patch.object(Path, "resolve", side_effect=AssertionError("Mapped drive must be refused before resolution")):
+                    with self.assertRaisesRegex(shelf.ShelfError, "NETWORK_PATH_REFUSED"):
+                        ShelfGit.init_local(self.root / "new-cache.git", Path("Z:/remote.git"))
+
     def test_cli_prepare_apply_pinned_review_and_truthful_draft_receipt(self):
         request = self.root / "request.json"
         request.write_text(json.dumps(dict(title="Отложенный вопрос", statement="Без измерения")), encoding="utf-8")
@@ -303,6 +357,31 @@ class GitVerticalTests(unittest.TestCase):
         review = cli("review", "--cache", self.a.cache, "--commit", result["commit"], "--now", NOW)
         self.assertEqual(review["totals"], {"NEEDS_TRIAGE": 1})
         self.assertEqual(review["scientific_admission"], "NOT_EVALUATED")
+
+    def test_cli_conflict_exposes_both_formulations_and_exact_revision(self):
+        publish(self.a, self.raw)
+        snapshot = self.a.refresh()
+        left, right = update(snapshot, self.item, title="Left"), update(snapshot, self.item, title="Right")
+        publish(self.a, left)
+        injected = self.a._commit(self.a.remote_head(), files(right))
+        self.assertEqual(self.a._push(injected).returncode, 0)
+        commit = self.a.remote_head()
+        command = [sys.executable, "-B", str(ROOT / "scripts/research_shelf.py"), "show", "--cache", str(self.a.cache),
+                   "--commit", commit, "--item", self.item]
+        result = subprocess.run(command, capture_output=True, check=False)
+        shown = json.loads(result.stdout)
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual({r["title"] for r in shown["competing_revisions"].values()}, {"Left", "Right"})
+        selected = subprocess.run(command + ["--revision", shelf.decode(left)["revision_sha256"]], capture_output=True, check=True)
+        self.assertEqual(json.loads(selected.stdout)["revision"]["title"], "Left")
+        fork = self.a.read(commit)
+        editable = {k: v for k, v in shelf.decode(left).items() if k not in
+                    {*shelf.IDENTITY, "schema_version", "revision_sha256", "parents", "mutation_id", "updated_at"}}
+        editable["change_reason"] = "Explicit choice after reading both competing versions."
+        merged = shelf.revise(fork, self.item, editable, now="2026-10-26T00:00:00Z", mutation_id=str(uuid4()), reconcile=True)
+        publish(self.a, merged)
+        final = self.a.refresh()["items"][self.item]
+        self.assertEqual((final["status"], len(final["revisions"])), ("READY", 4))
 
 
 if __name__ == "__main__":

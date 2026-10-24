@@ -38,6 +38,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", type=Path, help="Новый файл подготовленной ревизии; существующий файл не перезаписывается")
     parser.add_argument("--commit", help="Точный 40-hex commit snapshot; read не выполняет fetch")
     parser.add_argument("--item")
+    parser.add_argument("--revision", help="Точный hash исторической ревизии для show")
     parser.add_argument("--mutation-id")
     parser.add_argument("--now", default=datetime.now(UTC).isoformat().replace("+00:00", "Z"))
     parser.add_argument("--all", action="store_true")
@@ -85,7 +86,16 @@ def main(argv: list[str] | None = None) -> int:
             if args.action == "show":
                 shelf.require(args.item in snapshot["items"], "ITEM_NOT_FOUND")
                 item = snapshot["items"][args.item]
+                if args.revision is not None:
+                    shelf.require(args.revision in item["revisions"], "REVISION_NOT_FOUND")
+                    print(json.dumps(dict(commit=snapshot["commit"], item_id=args.item,
+                        source_freshness=snapshot["source_freshness"], complete=snapshot["complete"],
+                        revision=item["revisions"][args.revision]), ensure_ascii=False, sort_keys=True))
+                    return 0 if snapshot["complete"] else 2
                 print(json.dumps(dict(commit=snapshot["commit"], item_id=args.item,
+                    source_freshness=snapshot["source_freshness"], complete=snapshot["complete"],
+                    competing_revisions={head: item["revisions"][head] for head in item["heads"]}
+                        if item["status"] == "ITEM_CONFLICT" else {},
                     **{k: v for k, v in item.items() if k != "revisions"}), ensure_ascii=False, sort_keys=True))
                 return 0 if snapshot["complete"] and item["status"] == "READY" else 2
             shelf.require(args.mutation_id is not None, "MUTATION_ID_REQUIRED")

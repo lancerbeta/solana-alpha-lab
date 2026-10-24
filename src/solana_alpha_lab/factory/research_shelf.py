@@ -13,7 +13,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Mapping
 from uuid import uuid4
 
-from jsonschema import Draft202012Validator, FormatChecker
+from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[3]
 PREFIX = "capsules/research_shelf_v1"
@@ -67,7 +67,8 @@ def relative_path(value: str) -> bool:
 def _validator() -> Draft202012Validator:
     schema = json.loads((ROOT / "catalog/schemas/research_shelf_v1.schema.json").read_bytes())
     Draft202012Validator.check_schema(schema)
-    return Draft202012Validator(schema, format_checker=FormatChecker())
+    # Calendar validation below is mandatory, independent of optional extras.
+    return Draft202012Validator(schema)
 
 
 @lru_cache(maxsize=1)
@@ -81,6 +82,8 @@ def _scanner():
 def _guard(value: Any, location: str = "") -> None:
     if isinstance(value, dict):
         for key, child in value.items():
+            if key in {"created_at", "updated_at", "review_at", "review_by", "at", "observed_at"} and child is not None:
+                clock(child)
             if key == "path":
                 require(isinstance(child, str) and relative_path(child), "LOGICAL_PATH_REQUIRED", location + ".path")
             _guard(child, location + "." + key)
@@ -88,7 +91,7 @@ def _guard(value: Any, location: str = "") -> None:
         for i, child in enumerate(value):
             _guard(child, f"{location}[{i}]")
     elif isinstance(value, str):
-        require(not re.search(r"(?i)(?:[a-z]:[\\/]|\\\\|file://|/(?:home|Users|tmp|mnt|var)/)", value),
+        require(not re.search(r"(?i)(?:(?<![a-z0-9+.-])[a-z]:[\\/]|\\\\|file://|/(?:home|Users|tmp|mnt|var)/)", value),
                 "PHYSICAL_PATH_REFUSED", location)
         require(not _scanner()(value), "SECRET_REFUSED", location)
 
@@ -227,13 +230,15 @@ def fold(files: Mapping[str, bytes], *, complete: bool = True) -> dict[str, Any]
 def revise(snapshot: Mapping[str, Any], item_id: str, changes: Mapping[str, Any], *,
            now: str, mutation_id: str, reconcile: bool = False) -> bytes:
     require(snapshot.get("complete"), "INCOMPLETE")
+    require(isinstance(changes, dict), "CHANGES_OBJECT_REQUIRED")
     item = snapshot["items"].get(item_id)
     require(item is not None, "ITEM_NOT_FOUND")
     require(item["status"] == "READY" or (reconcile and item["status"] == "ITEM_CONFLICT"
             and not item["reasons"]), "ITEM_NOT_WRITABLE")
     require(not any(k in changes for k in (*IDENTITY, "revision_sha256", "parents", "mutation_id", "updated_at", "schema_version")),
             "IMMUTABLE_OR_TOOL_FIELD_UPDATE")
-    require("change_reason" in changes and bool(changes["change_reason"].strip()), "CHANGE_REASON_REQUIRED")
+    reason = changes.get("change_reason")
+    require(isinstance(reason, str) and bool(reason.strip()), "CHANGE_REASON_REQUIRED")
     # A conflict needs a complete explicit resolution; no automatic merge.
     base = item["current"]
     if reconcile:
@@ -270,8 +275,8 @@ def attention(snapshot: Mapping[str, Any], *, now: str, limit: int | None = 5) -
                 state = "OVERDUE_REVIEW"
             elif review["review_at"] and at >= clock(review["review_at"]):
                 state = "DUE_REVIEW"
-            elif (not review["review_at"] and not review["review_by"] and
-                  (event is None or event["kind"] == "MANUAL")):
+            elif not review["review_at"] and ((event is None and not review["review_by"]) or
+                                              (event is not None and event["kind"] == "MANUAL")):
                 state = "NEEDS_TRIAGE"
             elif event is not None and event["kind"] != "MANUAL":
                 state = "SOURCE_READBACK_REQUIRED"
@@ -279,6 +284,7 @@ def attention(snapshot: Mapping[str, Any], *, now: str, limit: int | None = 5) -
                 state = "WAITING"
         counts[state] += 1
         rows.append(dict(item_id=item_id, status=state, title=current["title"] if current else None,
+            revision_sha256=current["revision_sha256"] if current else None, heads=list(item["heads"]),
             review=copy.deepcopy(current["review"]) if current else None,
             source_status="UNKNOWN" if current and current["review"]["event"] else None))
     priority = {s: n for n, s in enumerate(("ITEM_INVALID", "ITEM_CONFLICT", "OVERDUE_REVIEW", "DUE_REVIEW",
@@ -287,7 +293,11 @@ def attention(snapshot: Mapping[str, Any], *, now: str, limit: int | None = 5) -
     visible = rows if limit is None else rows[:limit]
     dates = [value for row in rows if row["review"] for value in
              (row["review"]["review_at"], row["review"]["review_by"]) if value and clock(value) > at]
-    return dict(status=snapshot["status"], as_of=now, totals=dict(sorted(counts.items())),
+    return dict(status=snapshot["status"], attention_as_of=now,
+                snapshot_commit=snapshot.get("commit"), snapshot_complete=snapshot["complete"],
+                source_freshness=snapshot.get("source_freshness", "UNVERIFIED_PINNED"),
+                source_checked_at=snapshot.get("source_checked_at"), reason=snapshot.get("reason"),
+                totals=dict(sorted(counts.items())),
                 items=visible, omitted_count=len(rows) - len(visible),
                 next_review_at=min(dates, key=clock) if dates else None,
                 scientific_admission="NOT_EVALUATED")
