@@ -84,7 +84,7 @@ class DispositionNavigationTests(unittest.TestCase):
         limits = config["limits"]
         self.assertEqual(
             (limits["max_routes"], limits["max_root_bindings_per_route"], limits["max_root_assets_per_route"], limits["max_query_recipes_per_route"], limits["max_search_terms_per_route"]),
-            (13, 2, 3, 4, 16),
+            (14, 2, 3, 4, 16),
         )
         routes = {item["semantic_route_id"]: item for item in config["routes"]}
         prior = routes["SEM-PRIOR-WORK"]
@@ -99,9 +99,9 @@ class DispositionNavigationTests(unittest.TestCase):
         )
         self.assertEqual(len(prior["root_asset_ids"]), 3)
         self.assertEqual(prior["root_binding_ids"], [])
-        self.assertEqual(prior["related_route_ids"], ["SEM-EXPERIMENT-CAPABILITIES", "SEM-LIVE-EVIDENCE-TO-FORGE"])
+        self.assertEqual(prior["related_route_ids"], ["SEM-EXPERIMENT-CAPABILITIES", "SEM-LIVE-EVIDENCE-TO-FORGE", "SEM-RESEARCH-SHELF"])
         self.assertLessEqual(len(prior["search_terms"]), 16)
-        self.assertEqual(len(config["routes"]), 13)
+        self.assertEqual(len(config["routes"]), 14)
 
 
 if __name__ == "__main__":

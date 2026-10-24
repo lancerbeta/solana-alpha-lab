@@ -44,7 +44,7 @@ roles:
     missingness: EXPLICIT_GAP
     resolver:
       kind: EXACT_PATHS
-      paths: [registries]
+      paths: [registries, configs/research_shelf_v1.json, docs/operator/RESEARCH_SHELF_V1.md]
   - semantic_role: EXTERNAL_ROUTE_KNOWLEDGE
     lane: L2
     truth_owner: PROVIDER_ROUTE_REGISTRY

@@ -1,0 +1,64 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RESEARCH_SHELF_V1-STAGE2-ENGINEERING",
+  "as_of": "2026-10-24",
+  "task_id": "RESEARCH_SHELF_V1",
+  "state_change": "PINNED_RESEARCH_ENTRY_AND_EXACT_NATIVE_STRATEGY_PROVENANCE_IMPLEMENTED_COMMISSIONING_PENDING",
+  "base_main": "ab13b7efa7efaf9762b6d12eca52e2348d1fe759",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/contracts/research_shelf_v1.md": "9ec9947d1920c062ba7750f5a6af2ffa1fcb5d8ca4b91d42c2b1d4c28bb49e38"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/research_shelf_v1/factory-fit.json",
+    "sha256": "cf64007f2b43a2bf1f1c2823b86d940dc5375f48615d524841fb5a5bd8c9a8a6",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_45_UNIQUE_TARGETED_ENGINEERING_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/research_shelf_v1/independent-review.json",
+      "sha256": "572b23e8c2f2ba27cc25237a99961ef6295422a306e31ff4d6a94c274180469d",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_NATIVE_STRATEGY_EXACT_DECISION_VERTICAL",
+      "PASS_ENTRY_HASH_ISOLATION_AND_PRIVATE_SENTINEL",
+      "PASS_14_ROUTES_WITH_OTHER_LIMITS_UNCHANGED",
+      "PASS_STATIC_FACTORY_VALIDATION"
+    ]
+  },
+  "non_claims": [
+    "NO_CAPABILITY_DONE_OR_COMMISSIONING",
+    "NO_REAL_DATA_BRANCH_BOOTSTRAP_OR_SEEDS",
+    "NO_REMINDER_CUTOVER",
+    "NO_REAL_SCIENTIFIC_LOOK_OR_PROVIDER_CALL",
+    "NO_SCIENTIFIC_PROMOTION_OR_TRADING_AUTHORITY",
+    "NO_MERGE_AUTHORITY",
+    "SCOUT_IMPLEMENTATION_HAS_NOT_RUN_THE_SHARED_FIXTURE",
+    "CLOUD_EXPLICIT_REF_RECIPE_NOT_LIVE_COMMISSIONED"
+  ],
+  "side_effects": {
+    "real_scientific_writes": 0,
+    "real_new_looks": 0,
+    "metadata_publication": 0,
+    "bootstrap": 0,
+    "reminder_changes": 0,
+    "synthetic_local_researchstore_writes": true,
+    "scope": "BOUNDED_ENGINEERING_EXCLUDING_ROUTINE_GIT_GITHUB_DELIVERY"
+  }
+}

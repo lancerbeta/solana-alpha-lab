@@ -16,6 +16,7 @@ if str(SRC) not in sys.path:
 from solana_alpha_lab.factory.application import FactoryApplication  # noqa: E402
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec  # noqa: E402
 from solana_alpha_lab.factory.operational_store import OperationalStore  # noqa: E402
+from solana_alpha_lab.factory.research_shelf_context import glance, readout
 
 DEFAULT_SPEC = "configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml"
 NOT_A_PROMOTION_STOP = "NOT_AN_ORDINARY_PROMOTION_STOP"
@@ -48,6 +49,8 @@ def main() -> int:
     parser.add_argument("--spec", default=DEFAULT_SPEC)
     args = parser.parse_args()
     root = args.root.resolve()
+    shelf_summary = glance(root)
+    print(readout(shelf_summary), file=sys.stderr)
     spec_relative = args.spec
     spec = load_experiment_spec(root, spec_relative)
     store = OperationalStore(root / "local/factory_v1/ordinary_hypothesis_ops.sqlite")
@@ -56,6 +59,7 @@ def main() -> int:
         model = app.start()
         classified = product_terminal(spec, model)
         payload = {
+            "shelf_summary": shelf_summary,
             "spec": spec_relative,
             "experiment_id": spec["experiment_id"],
             "hypothesis_version": model.get("hypothesis"),

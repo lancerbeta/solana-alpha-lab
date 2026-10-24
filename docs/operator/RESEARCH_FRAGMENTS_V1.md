@@ -1,5 +1,10 @@
 # Исследовательские фрагменты V1
 
+Намерение вернуться хранится отдельно: `SEM-RESEARCH-SHELF`,
+`docs/operator/RESEARCH_SHELF_V1.md`. Перед fresh research — один metadata review;
+frozen import/run-due продолжает exact native scope без обновления code/refs.
+Полка не запускает этот runner и не переопределяет окна, protection или бюджет.
+
 Карточка сохраняет роль и exact ссылки на native candidate/definition/result.
 Формула остаётся у исходного query owner. Это research advisory, не стратегия.
 Полка: `/research?kind=fragments`; detail открывается по locator карточки.

@@ -256,13 +256,20 @@ def revise(snapshot: Mapping[str, Any], item_id: str, changes: Mapping[str, Any]
     return raw
 
 
-def attention(snapshot: Mapping[str, Any], *, now: str, limit: int | None = 5) -> dict[str, Any]:
-    """Local date review only. Native/event adapters are a separate integration stage."""
+def attention(snapshot: Mapping[str, Any], *, now: str, limit: int | None = 5,
+              source_states: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """Date/event attention over explicit saved readbacks; never execute a source."""
     at = clock(now)
     require(limit is None or (isinstance(limit, int) and limit >= 0), "LIMIT_INVALID")
     rows, counts = [], Counter()
     for item_id, item in sorted(snapshot.get("items", {}).items()):
         current = item["current"]
+        observed = (source_states or {}).get(item_id, {})
+        source_status = observed.get("status", "UNKNOWN")
+        event = (current or {}).get("review", {}).get("event")
+        acknowledged = event.get("acknowledged_ref") if event else None
+        new_event = (source_status == "MET" and observed.get("evidence_ref") is not None
+                     and observed["evidence_ref"] != acknowledged)
         if current is None:
             state = item["status"]
         elif current["state"] == "CLOSED":
@@ -271,14 +278,18 @@ def attention(snapshot: Mapping[str, Any], *, now: str, limit: int | None = 5) -
         else:
             review = current["review"]
             event = review["event"]
-            if review["review_by"] and at >= clock(review["review_by"]):
+            if observed.get("execution_deadline") and at > clock(observed["execution_deadline"]):
+                state = "EXPIRED_REVIEW_REQUIRED"
+            elif review["review_by"] and at >= clock(review["review_by"]):
                 state = "OVERDUE_REVIEW"
             elif review["review_at"] and at >= clock(review["review_at"]):
                 state = "DUE_REVIEW"
+            elif new_event:
+                state = "EVENT_REVIEW"
             elif not review["review_at"] and ((event is None and not review["review_by"]) or
                                               (event is not None and event["kind"] == "MANUAL")):
                 state = "NEEDS_TRIAGE"
-            elif event is not None and event["kind"] != "MANUAL":
+            elif event is not None and event["kind"] != "MANUAL" and source_status == "UNKNOWN":
                 state = "SOURCE_READBACK_REQUIRED"
             else:
                 state = "WAITING"
@@ -286,8 +297,9 @@ def attention(snapshot: Mapping[str, Any], *, now: str, limit: int | None = 5) -
         rows.append(dict(item_id=item_id, status=state, title=current["title"] if current else None,
             revision_sha256=current["revision_sha256"] if current else None, heads=list(item["heads"]),
             review=copy.deepcopy(current["review"]) if current else None,
-            source_status="UNKNOWN" if current and current["review"]["event"] else None))
-    priority = {s: n for n, s in enumerate(("ITEM_INVALID", "ITEM_CONFLICT", "OVERDUE_REVIEW", "DUE_REVIEW",
+            source_status=source_status if event else None,
+            source_observation=copy.deepcopy(observed) if event else None))
+    priority = {s: n for n, s in enumerate(("ITEM_INVALID", "ITEM_CONFLICT", "EXPIRED_REVIEW_REQUIRED", "OVERDUE_REVIEW", "DUE_REVIEW", "EVENT_REVIEW",
                                            "NEEDS_TRIAGE", "SOURCE_READBACK_REQUIRED", "WAITING"))}
     rows.sort(key=lambda row: (priority[row["status"]], (row["review"] or {}).get("review_at") or "", row["item_id"]))
     visible = rows if limit is None else rows[:limit]

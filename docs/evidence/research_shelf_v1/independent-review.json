@@ -1,0 +1,51 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "RESEARCH_SHELF_V1-STAGE2-REVIEW",
+  "as_of": "2026-10-24",
+  "task_id": "RESEARCH_SHELF_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_ISOLATED_REVIEW"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_ISOLATED_REVIEW"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_ISOLATED_REVIEW"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_ISOLATED_REVIEW"
+      ]
+    }
+  ],
+  "verdict": "PENDING",
+  "non_claims": [
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_COMMISSIONING_OR_MERGE_AUTHORITY"
+  ]
+}

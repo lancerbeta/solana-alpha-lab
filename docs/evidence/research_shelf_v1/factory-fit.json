@@ -1,0 +1,38 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "RESEARCH_SHELF_V1-STAGE2-FIT",
+  "as_of": "2026-10-24",
+  "task_id": "RESEARCH_SHELF_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "dimensions": {
+    "mission": "Retain deferred intent and resolve exact saved research origin at entry; engineering scope only.",
+    "flexibility_and_history": "Append-only revisions; adopted exact commit/hash; CLOSED and explicit retraction retain history.",
+    "context_efficiency": "One task/contract and one reference-only semantic route; bounded glance; no task archaeology.",
+    "research_truth": "Native evidence owners, negative Critic and unknown gaps preserved. Shelf timing/link grants no admission.",
+    "owner_operability": "Russian glance plus explicit refresh/review/find/resolve and retryable metadata-only linking.",
+    "execution_to_cashflow": "No alpha, promotion, strategy activation or cashflow claim.",
+    "monitoring_and_recovery": "Invocation-based review; unknown unavailable/stale sources; original reminders remain. No scheduler.",
+    "build_vs_buy": "WRAP installed Git and existing saved native/promotion validators; no dependency or database.",
+    "red_team": "Freshness witnesses are integrity bindings, not signed remote attestations. Synthetic PROMOTE fixtures do not justify research promotion.",
+    "security": "Explicit accepted-code metadata scope and whole-payload public review; private language classification remains human-owned."
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "After commissioning, measured missed due attention or growing active-set/read latency; no automatic new tooling."
+  },
+  "limits": [
+    "NO_CAPABILITY_DONE_OR_COMMISSIONING",
+    "NO_REAL_DATA_BRANCH_BOOTSTRAP_OR_SEEDS",
+    "NO_REMINDER_CUTOVER",
+    "NO_REAL_SCIENTIFIC_LOOK_OR_PROVIDER_CALL",
+    "NO_SCIENTIFIC_PROMOTION_OR_TRADING_AUTHORITY",
+    "NO_MERGE_AUTHORITY",
+    "SCOUT_IMPLEMENTATION_HAS_NOT_RUN_THE_SHARED_FIXTURE",
+    "CLOUD_EXPLICIT_REF_RECIPE_NOT_LIVE_COMMISSIONED"
+  ],
+  "recovery": "Ordinary code revert/disable entry overlay before commissioning. Preserve all metadata/native history; correct later metadata with a new revision."
+}

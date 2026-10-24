@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "repository": "lancerbeta/solana-alpha-lab",
+  "branch": "research-log",
+  "prefix": "capsules/research_shelf_v1",
+  "product": "SMIAL",
+  "snapshot_relative": "local/research_shelf_v1/snapshot.json",
+  "max_observation_age_seconds": 86400,
+  "production_publication_enabled_by_default": false,
+  "metadata_scope_required": true,
+  "private_repositories": ["lancerbeta/marcopolo-scout"],
+  "entry_commands": [
+    "scripts/hypothesis_forge.py forge-run",
+    "scripts/run_factory_experiment.py",
+    "scripts/run_factory_ordinary_market_hypothesis.py"
+  ],
+  "frozen_entry": "Separate metadata review only; preserve frozen executable and scientific inputs."
+}
