@@ -222,6 +222,7 @@ class WireTests(unittest.TestCase):
 
 class GitVerticalTests(unittest.TestCase):
     def setUp(self):
+        (ROOT / "local").mkdir(exist_ok=True)
         self.temporary = tempfile.TemporaryDirectory(prefix="research-shelf-", dir=ROOT / "local")
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
@@ -231,6 +232,71 @@ class GitVerticalTests(unittest.TestCase):
         self.b = ShelfGit.init_local(self.root / "b.git", self.remote)
         self.raw = FIXTURE.read_bytes()
         self.item = shelf.decode(self.raw)["item_id"]
+
+    def test_invalid_history_keeps_identity_reservations_and_exact_retry(self):
+        from uuid import uuid4
+        original = json.loads(genesis(origin_key="reserved-invalid-history"))
+        bad = dict(original, title=17)  # Invalid body, readable negative identity claims.
+        bad_raw = shelf.canonical(bad) + b"\n"
+        head = self.a._commit(None, {shelf.revision_path(original): bad_raw})
+        self.assertEqual(self.a._push(head).returncode, 0)
+        self.assertEqual(self.a.refresh()["items"][self.item]["status"], "ITEM_INVALID")
+        for changes in (dict(origin_key=original["origin_key"], mutation_id=str(uuid4())),
+                        dict(origin_key=None, mutation_id=original["mutation_id"])):
+            new = genesis(item_id="RSI-SCOUT-" + str(uuid4()), **changes)
+            with self.subTest(reservation=changes):
+                with self.assertRaisesRegex(shelf.ShelfError, "BATCH_LINEAGE_INVALID"):
+                    publish(self.a, new)
+                self.assertEqual(self.a.remote_head(), head)
+        independent = genesis(item_id="RSI-SCOUT-" + str(uuid4()), mutation_id=str(uuid4()), origin_key="independent")
+        landed = publish(self.a, independent)
+        self.assertEqual(landed["status"], "PUBLISHED")
+        # Unparseable bytes leave the reservation domain unknown, not empty.
+        unknown_item = "RSI-SCOUT-" + str(uuid4())
+        unknown = self.a._commit(landed["commit"], {f"{shelf.PREFIX}/{unknown_item}/{'f'*64}.json": b"not-json"})
+        self.assertEqual(self.a._push(unknown).returncode, 0)
+        self.assertEqual(publish(self.a, independent)["status"], "ALREADY_PUBLISHED")
+        with self.assertRaisesRegex(shelf.ShelfError, "IDENTITY_HISTORY_UNRESOLVED"):
+            publish(self.a, genesis(item_id="RSI-SCOUT-" + str(uuid4()), mutation_id=str(uuid4())))
+
+    def test_public_writer_keeps_private_origin_after_metadata_removes_refs(self):
+        from solana_alpha_lab.factory import research_shelf_context as context
+        from solana_alpha_lab.factory.research_shelf_git import ScopedShelfGit
+        from uuid import uuid4
+        class LocalScoped(ScopedShelfGit):
+            # Exercise the production guard/CAS on a disposable local remote.
+            # Code acceptance and network gates are tested separately; no network.
+            def __init__(self, cache):
+                self.scope = {}
+                ShelfGit.__init__(self, cache)
+            def _accepted_policy(self, action):
+                pass
+            def _local_remote(self):
+                return ShelfGit._local_remote(self)
+        writer = LocalScoped(self.a.cache)
+        body = shelf.decode(self.raw)
+        body.pop("revision_sha256")
+        body.update(product="SMIAL", item_id=body["item_id"].replace("SCOUT", "SMIAL"),
+            origin_refs=[dict(kind="GIT", repository="lancerbeta/marcopolo-scout", commit="a"*40, path="saved/source.json", sha256="b"*64)])
+        first = shelf.prepare(body)
+        def approval(raw):
+            digest = shelf.sha256(shelf.canonical(shelf.decode(raw)))
+            return {digest: dict(disposition="EXPLICIT_MINIMAL_PUBLIC_DISCLOSURE", payload_sha256=digest)}
+        first_body = shelf.decode(first)
+        result = writer.publish(files(first), expected_heads={first_body["item_id"]: []}, disclosures=approval(first))
+        state = writer.read(result["commit"])
+        stripped = shelf.revise(state, first_body["item_id"], dict(origin_refs=[], statement="PRIVATE_SENTINEL",
+            change_reason="Ordinary edit cannot declassify history."), now=NOW, mutation_id=str(uuid4()))
+        with self.assertRaisesRegex(shelf.ShelfError, "PRIVATE_SOURCE_PUBLIC_DISCLOSURE_REQUIRED"):
+            publish(writer, stripped)
+        self.assertEqual(writer.remote_head(), result["commit"])
+        clean = shelf.revise(state, first_body["item_id"], dict(origin_refs=[], statement="Minimal approved public wording.",
+            change_reason="Explicit minimal public payload review, no declassification."), now=NOW, mutation_id=str(uuid4()))
+        body = shelf.decode(clean)
+        confirmed = writer.publish(files(clean), expected_heads={body["item_id"]: body["parents"]}, disclosures=approval(clean))
+        self.assertEqual(confirmed["status"], "PUBLISHED")
+        self.assertTrue(context.historically_private(writer.read(confirmed["commit"]), body["item_id"]))
+        context.public_payload_guard(dict(statement="Independent public SMIAL text"))
 
     def test_capture_git_cold_read_and_no_code_checkout_effects(self):
         before = subprocess.run(["git", "status", "--porcelain=v1"], cwd=ROOT, capture_output=True, check=True).stdout

@@ -1,8 +1,8 @@
 {
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
-  "review_id": "RESEARCH_SHELF_V1-STAGE2-REVIEW",
-  "as_of": "2026-10-24",
+  "review_id": "RESEARCH_SHELF_V1-EXTERNAL-REVISE-REVIEW",
+  "as_of": "2026-10-25",
   "task_id": "RESEARCH_SHELF_V1",
   "reviewed_bindings_sha256": "ecdba316ff3c9facadb1dbb6bdc1f9466276c43b72615e2d230be5358c39d549",
   "reviewed_inventory_sha256": "00f608d9a2bfcd6bb0e19c33a20a9a2f6558b5a7766fa26dc43d0acdaca055ac",
@@ -15,36 +15,34 @@
   "reviews": [
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "PASS exact head ad2367ab5e05668916fd5c8196eb4444d59856fd. SEMANTIC_PREMISE PASS; seven independent in-memory falsifiers, validate-launch and packet/evidence/five source bindings checked. Unresolved matching associations cannot become unique; only proven retractions excluded. Metadata freshness/lifecycle/trace never grants scientific admission. Git revisions and immutable native Parquet/manifests remain truth owners; no new platform/private cross-task API.",
-        "packet_fingerprint_sha256=434daa5df8bd7ff34a7da176f21fbc047ae2db1c325a12d2a195a8dbeb9e8a3d",
-        "PACKET_INFORMATION_PATH only; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN."
+        "Revised candidate requires new isolated exact-head review; previous PASS is historical."
       ]
     },
     {
       "role": "CODE_REVIEWER",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "PASS exact head ad2367ab5e05668916fd5c8196eb4444d59856fd. Independent cheap probes: CURRENT plus matching conflict/invalid is ambiguous; CURRENT plus proven retracted history is found. Stable enrichment preserves one current association; distinct active associations remain ambiguous. No mutations or full-suite claim."
+        "Revised candidate requires new isolated exact-head review; previous PASS is historical."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "PASS exact head ad2367ab5e05668916fd5c8196eb4444d59856fd. Original stage2 gaps closed: genuine source prior before actual consumer draft/freeze/Critic, literal adverse/UNKNOWN/exposure, shared due/unknown/ack/fork/reconcile oracle and actionable glance. Final actual StrategyVersion rejects competing conflict/invalid. Five source bindings checked; no repeat full/native suite."
+        "Revised candidate requires new isolated exact-head review; previous PASS is historical."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "PASS exact head ad2367ab5e05668916fd5c8196eb4444d59856fd. Disclosure reaches mandatory writer guard, missing snapshot retains recovery reason, glance shows names/IDs/dates/intent/omissions, operator path and metadata-only recovery are usable. Enrichment history retained, conflict/invalid explicitly blocks unique trace; no authority widening."
+        "Revised candidate requires new isolated exact-head review; previous PASS is historical."
       ]
     }
   ],
-  "verdict": "PASS",
+  "verdict": "PENDING",
   "non_claims": [
     "NO_MODEL_DIVERSITY_PROOF",
     "NO_SCIENTIFIC_ACCEPTANCE",

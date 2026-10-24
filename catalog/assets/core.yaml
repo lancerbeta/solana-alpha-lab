@@ -27680,7 +27680,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 4b8d7ce813b6cbd2735ae56708bf88418eb91d502da7c3affa728df8572a9326}
+  integrity: {kind: sha256, sha256: 5ef96263537bae485e553366844f4e77dd80f5149c635cb93f2e6db2e4f44cc9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -36947,7 +36947,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: RISK_AND_ECONOMICS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_risk_and_economics_v1.py', repository_path: tests/test_risk_and_economics_v1.py}
-  integrity: {kind: sha256, sha256: 6d0742193f5fd20ec9a660074a826561b9f0b27e443b09efee11c880c9681a2e}
+  integrity: {kind: sha256, sha256: aac19db636988f99cbe22c0f70e102e888b881737584683b10a2e129886475d1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RISK-AND-ECONOMICS-001}
@@ -43389,7 +43389,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_research_fragments_v1.py', repository_path: tests/test_research_fragments_v1.py}
-  integrity: {kind: sha256, sha256: 4f168e9da4e37eb306fad7a3a9bcd67ad1a25f62741f8783fd42b25b6622ca5a}
+  integrity: {kind: sha256, sha256: 98200fefdf8766fa0425700419186a88699ee0ef2556e113bfafce1ba2bac0cb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43539,7 +43539,7 @@ records:
     repository_path: docs/operator/RESEARCH_SHELF_V1.md
   integrity:
     kind: sha256
-    sha256: c09eb2e7d01a44b83eb873d1b9f314968077740d2983b036ed16368466074a13
+    sha256: d7f2f92db04060f8227de02b56334a5a80a030d660856a8fc579c208fa6f3ea6
   access:
     mode: read_only
     method: file
@@ -43616,7 +43616,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/research_shelf.py
   integrity:
     kind: sha256
-    sha256: 25478e3e182db1ac31cff17065056bd8efa78b1b54c0fd1d723149d259f7de65
+    sha256: be327ac37d5720fcb82e2d7d636552e0b858fa46abee13decfd46c93db8f94b8
   access:
     mode: read_only
     method: file
@@ -43655,7 +43655,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/research_shelf_context.py
   integrity:
     kind: sha256
-    sha256: 48ae9a435502b21a5546677a56a75791afa8c29a7da312886c7eea2374a4e749
+    sha256: 795937d5b07d444d362e5338d9c8e15e14bccff1ec01b4c0a58f0047702c682b
   access:
     mode: read_only
     method: file
@@ -43694,7 +43694,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/research_shelf_native.py
   integrity:
     kind: sha256
-    sha256: 10627647ef5653eeb5ef82d2155f71911b3bbd70ef02cd7014315069402371e6
+    sha256: 39e6f11dde08d73cc49ac4644cb1b17e03a28d2103608c7369e7a6a90f62021b
   access:
     mode: read_only
     method: file
@@ -43733,7 +43733,7 @@ records:
     repository_path: src/solana_alpha_lab/factory/research_shelf_git.py
   integrity:
     kind: sha256
-    sha256: ea669d52c4f17bd7bfdab5f0c66cb9233afbc54cc2ac0458fa66aaf61e32fd5e
+    sha256: 64b95026b890604de0741083b42ae5e7ff4b5c3c3453b5fb6f7b4cd53ef67c8c
   access:
     mode: read_only
     method: file
@@ -43772,7 +43772,7 @@ records:
     repository_path: scripts/research_shelf.py
   integrity:
     kind: sha256
-    sha256: d06fb95ab6417cf09b4d26314d96a251055ccdcec79a2364ba8b0654bf82787b
+    sha256: ea6e02758c2a4aa47a77b9716936a6b086a3418c22e12fd1de28734c992ca7f9
   access:
     mode: read_only
     method: file
@@ -43848,7 +43848,7 @@ records:
     repository_path: tests/test_research_shelf_entry_v1.py
   integrity:
     kind: sha256
-    sha256: 22f311fc48bdc8bdc030e5d1af85b31d9a55429c84f910f9638838e2cd5d6f97
+    sha256: 09d92aa18b8250cf487c485bdf5d5ce734238fc4b3685da5a27041f2020ff1af
   access:
     mode: read_only
     method: file
@@ -43886,7 +43886,7 @@ records:
     repository_path: tests/test_research_shelf_native_v1.py
   integrity:
     kind: sha256
-    sha256: 1d241ad658c338827be731fbe50e09f4b6df70f95b1545a7e9731aa33219996a
+    sha256: 6a7ab892e764ccf9ca2b21f34796e4cedf6cdd2a8b61ef235b1f5dcf292d6917
   access:
     mode: read_only
     method: file
@@ -43924,7 +43924,7 @@ records:
     repository_path: tests/test_research_shelf_v1.py
   integrity:
     kind: sha256
-    sha256: 1684a6b518fcfc4a4e492ce2e7ff39962cbacabf37eab73baae009423bdeb50d
+    sha256: 45bf3b7a5b829d7fb282ab4b0ca7d1a3f2254ad2a15ec218bb43fa2c37d720e7
   access:
     mode: read_only
     method: file

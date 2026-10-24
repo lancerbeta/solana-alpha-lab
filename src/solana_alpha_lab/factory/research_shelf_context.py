@@ -19,7 +19,8 @@ from . import research_shelf as wire
 REPOSITORY = "lancerbeta/solana-alpha-lab"
 MAX_EXPORT_BYTES = 33_554_432
 MAX_OBSERVATION_AGE_SECONDS = 86_400
-REFRESH_RECIPE = "scripts/research_shelf.py refresh --cache <separate-bare-cache> --output <snapshot.json>"
+REFRESH_RECIPE = "uv run --locked --managed-python python -B scripts/research_shelf.py refresh --cache <separate-bare-cache> --metadata-scope <owner-scope.json> --output <snapshot.json>"
+LOCAL_REFRESH_RECIPE = "uv run --locked --managed-python python -B scripts/research_shelf.py refresh --cache <local-only-bare-cache> --output <snapshot.json>"
 
 
 def utc_now() -> str:
@@ -147,14 +148,16 @@ def glance(repo_root: Path, *, snapshot_path: Path | None = None, now: str | Non
         summary = wire.attention(snapshot, now=at, source_states=snapshot.get("event_states"))
     except (ValueError, TypeError, KeyError, AttributeError):
         summary = wire.attention(dict(status="UNAVAILABLE", complete=False, items={}, reason="SNAPSHOT_PROJECTION_INVALID"), now=at)
-    summary.update(receipt_hash_domain="EXCLUDED_DERIVED_OVERLAY", refresh_recipe=REFRESH_RECIPE)
+    summary.update(receipt_hash_domain="EXCLUDED_DERIVED_OVERLAY", refresh_recipe=REFRESH_RECIPE,
+        local_refresh_recipe=LOCAL_REFRESH_RECIPE,
+        source_readback_hint="Without --data-root / --source-bundle, refresh exports UNKNOWN source observations; add only permitted saved-source inputs.")
     return summary
 
 
 def readout(summary: Mapping[str, Any]) -> str:
     if summary["status"] != "READY" or summary["source_freshness"] != "REMOTE_VERIFIED":
         state = summary["status"] if summary["status"] != "READY" else summary["source_freshness"]
-        return f"Полка: {state}; {summary.get('reason') or 'нужна проверка data head'}. Refresh: {REFRESH_RECIPE}"
+        return f"Полка: {state}; {summary.get('reason') or 'нужна проверка data head'}. После commissioning с owner scope: {REFRESH_RECIPE}. Local-only: {LOCAL_REFRESH_RECIPE}"
     totals = summary["totals"]
     due = sum(totals.get(key, 0) for key in ("DUE_REVIEW", "EVENT_REVIEW", "OVERDUE_REVIEW", "EXPIRED_REVIEW_REQUIRED", "NEEDS_TRIAGE"))
     unknown = sum(totals.get(key, 0) for key in ("SOURCE_READBACK_REQUIRED", "ITEM_INVALID", "ITEM_CONFLICT"))
@@ -164,6 +167,9 @@ def readout(summary: Mapping[str, Any]) -> str:
         title = " ".join(str(item.get("title") or item["item_id"]).split())[:100]
         when = ((item.get("source_observation") or {}).get("execution_deadline") if item["status"] == "EXPIRED_REVIEW_REQUIRED"
                 else (item.get("review") or {}).get("review_by" if item["status"] == "OVERDUE_REVIEW" else "review_at"))
+        if item["status"] == "WAITING":
+            when = min((value for key, value in (item.get("review") or {}).items() if key in {"review_at", "review_by"} and value),
+                       key=wire.clock, default=None)
         rows.append(f"  {item['status']}: {title} [{item['item_id']}]" + (f"; срок {when}" if when else ""))
         if item.get("next_action"):
             intent = " ".join(str(item["next_action"].get("intent") or "").split())[:100]
@@ -172,6 +178,8 @@ def readout(summary: Mapping[str, Any]) -> str:
         rows.append("Ближайший обзор: " + summary["next_review_at"])
     if summary.get("omitted_count"):
         rows.append(f"Ещё {summary['omitted_count']}; полный обзор: research_shelf.py review --snapshot <snapshot.json> --all")
+    if totals.get("SOURCE_READBACK_REQUIRED"):
+        rows.append("Источники: refresh без --data-root / --source-bundle даёт UNKNOWN. Для сверки повторить refresh с разрешёнными сохранёнными источниками.")
     if due or unknown:
         rows.append("Далее: review --snapshot <snapshot.json>; сверить exact source, затем решить defer/link/close.")
     return "\n".join(rows)
@@ -187,7 +195,22 @@ def private_origin(value: Any) -> bool:
     return isinstance(value, str) and "lancerbeta/marcopolo-scout" in value
 
 
-def public_payload_guard(value: Mapping[str, Any], *, disclosure: Mapping[str, Any] | None = None) -> None:
+def historically_private(snapshot: Mapping[str, Any], item_id: str) -> bool:
+    """Private origin is monotonic history, not an editable current-field flag."""
+    prefix = wire.PREFIX + "/" + item_id + "/"
+    for path, raw in snapshot.get("files", {}).items():
+        if not path.startswith(prefix):
+            continue
+        try:
+            if private_origin(json.loads(raw)):
+                return True
+        except (ValueError, UnicodeError, TypeError, RecursionError):
+            return True  # Unreadable provenance cannot establish public origin.
+    return False
+
+
+def public_payload_guard(value: Mapping[str, Any], *, disclosure: Mapping[str, Any] | None = None,
+                         known_private_origin: bool = False) -> None:
     """No confidentiality classifier. Private-origin bytes need exact explicit review.
 
     The caller supplies an owner-reviewed minimal public payload digest. This
@@ -195,7 +218,7 @@ def public_payload_guard(value: Mapping[str, Any], *, disclosure: Mapping[str, A
     Any changed text/ref anywhere invalidates that approval, including nested text.
     """
     wire._guard(value)  # Same narrow secret/path guard over every outgoing value.
-    if private_origin(value):
+    if known_private_origin or private_origin(value):
         wire.require(isinstance(disclosure, dict) and
                      disclosure.get("disposition") == "EXPLICIT_MINIMAL_PUBLIC_DISCLOSURE" and
                      disclosure.get("payload_sha256") == _digest(value), "PRIVATE_SOURCE_PUBLIC_DISCLOSURE_REQUIRED")

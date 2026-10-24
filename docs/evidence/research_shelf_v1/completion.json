@@ -2,7 +2,7 @@
   "schema": "smial.delivery-completion-evidence",
   "schema_version": "1.0",
   "acceptance_id": "RESEARCH_SHELF_V1-STAGE2-ENGINEERING",
-  "as_of": "2026-10-24",
+  "as_of": "2026-10-25",
   "task_id": "RESEARCH_SHELF_V1",
   "state_change": "PINNED_RESEARCH_ENTRY_AND_EXACT_NATIVE_STRATEGY_PROVENANCE_IMPLEMENTED_COMMISSIONING_PENDING",
   "base_main": "ab13b7efa7efaf9762b6d12eca52e2348d1fe759",
@@ -63,11 +63,11 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_50_UNIQUE_TARGETED_ENGINEERING_TESTS",
+    "targeted": "PASS_81_UNIQUE_TARGETED_ENGINEERING_TESTS",
     "independent_review": {
       "path": "docs/evidence/research_shelf_v1/independent-review.json",
       "sha256": "675a5937fb84a65bcb4f10345ac5d2a38a9336b45a6c159f525d7782c47e65c0",
-      "verdict": "PASS"
+      "verdict": "PENDING"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
@@ -76,7 +76,8 @@
       "PASS_ENTRY_HASH_ISOLATION_AND_PRIVATE_SENTINEL",
       "PASS_14_ROUTES_WITH_OTHER_LIMITS_UNCHANGED",
       "PASS_STATIC_FACTORY_VALIDATION",
-      "PASS_ACTUAL_PARTIAL_ENRICHMENT_TO_STRATEGY_AND_CONFLICT_INVALID_REFUSAL"
+      "PASS_ACTUAL_PARTIAL_ENRICHMENT_TO_STRATEGY_AND_CONFLICT_INVALID_REFUSAL",
+      "PASS_SIX_EXTERNAL_SEMANTIC_CORRECTIONS_AND_CI_TEST_REPAIRS"
     ]
   },
   "non_claims": [

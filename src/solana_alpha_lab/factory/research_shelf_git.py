@@ -14,7 +14,7 @@ import subprocess
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 from . import research_shelf as wire
 
@@ -198,7 +198,8 @@ class ShelfGit:
         remote = self._local_remote()
         return self._git("push", "--no-verify", str(remote), commit + ":" + BRANCH, check=False)
 
-    def publish(self, files: Mapping[str, bytes], *, expected_heads: Mapping[str, list[str]]) -> dict[str, Any]:
+    def publish(self, files: Mapping[str, bytes], *, expected_heads: Mapping[str, list[str]],
+                _check_snapshot: Callable[[dict], None] | None = None) -> dict[str, Any]:
         """Retry the same prepared batch at most three times; no last-writer-wins."""
         wire.require(bool(files) and sum(map(len, files.values())) <= wire.MAX_BATCH_BYTES, "BATCH_SIZE_LIMIT")
         prepared = {}
@@ -230,7 +231,10 @@ class ShelfGit:
                         for row in other["revisions"].values()):
                         raise wire.ShelfError("ORIGIN_ALREADY_EXISTS", other_id)
             prospective = wire.fold(existing | dict(files))
+            wire.require(prospective["identity_scope_complete"], "IDENTITY_HISTORY_UNRESOLVED")
             wire.require(all(prospective["items"][i]["status"] == "READY" for i in prepared), "BATCH_LINEAGE_INVALID")
+            if _check_snapshot is not None:
+                _check_snapshot(snapshot)  # Exact fetched parent, on every retry, before writing objects.
             pending = {path: raw for path, raw in files.items() if path not in existing}
             wire.require(all(path not in existing or existing[path] == raw for path, raw in files.items()), "IMMUTABLE_CAPSULE_CONFLICT")
             commit = self._commit(head, pending)
@@ -320,11 +324,17 @@ class ScopedShelfGit(ShelfGit):
     def publish(self, files: Mapping[str, bytes], *, expected_heads: Mapping[str, list[str]],
                 disclosures: Mapping[str, Any] | None = None) -> dict[str, Any]:
         self._accepted_policy("APPEND")
-        from .research_shelf_context import public_payload_guard
+        from .research_shelf_context import historically_private, public_payload_guard
         disclosures = disclosures or {}
+        bodies = []
         for raw in files.values():
             body = wire.decode(raw)
             wire.require(body["product"] == "SMIAL", "PUBLIC_PRODUCT_NAMESPACE_MISMATCH")
             digest = wire.sha256(wire.canonical(body))
             public_payload_guard(body, disclosure=disclosures.get(digest))
-        return super().publish(files, expected_heads=expected_heads)
+            bodies.append((body, digest))
+        def check(snapshot):
+            for body, digest in bodies:
+                public_payload_guard(body, disclosure=disclosures.get(digest),
+                    known_private_origin=historically_private(snapshot, body["item_id"]))
+        return super().publish(files, expected_heads=expected_heads, _check_snapshot=check)

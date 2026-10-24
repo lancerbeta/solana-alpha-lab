@@ -159,13 +159,41 @@ def revision_path(body: Mapping[str, Any]) -> str:
     return f"{PREFIX}/{body['item_id']}/{body['revision_sha256']}.json"
 
 
+@lru_cache(maxsize=1)
+def _identity_validator() -> Draft202012Validator:
+    """Negative reservations only; this never admits an invalid revision."""
+    schema = _validator().schema
+    keys = ("item_id", "product", "origin_key", "mutation_id")
+    return Draft202012Validator(dict(type="object", required=list(keys),
+        properties={key: schema["properties"][key] for key in keys}, **{"$defs": schema["$defs"]}))
+
+
+def _identity_claim(raw: bytes, item: str) -> tuple[dict | None, bool]:
+    try:
+        require(len(raw) <= MAX_REVISION_BYTES, "REVISION_SIZE_LIMIT")
+        body = json.loads(raw.decode("utf-8"), object_pairs_hook=_pairs)
+        require(isinstance(body, dict) and _identity_validator().is_valid(body), "IDENTITY_UNREADABLE")
+        require(body["item_id"] == item and item.startswith("RSI-" + body["product"] + "-"), "IDENTITY_PATH_MISMATCH")
+        return {key: body[key] for key in ("item_id", "product", "origin_key", "mutation_id")}, body.get("schema_version") == "1.0"
+    except (ValueError, UnicodeError, TypeError, RecursionError):
+        return None, False
+
+
 def fold(files: Mapping[str, bytes], *, complete: bool = True) -> dict[str, Any]:
     """Fold one pinned tree; never select a head by timestamp, path order or title."""
     grouped = defaultdict(dict)
     errors = defaultdict(list)
+    origins, mutations = defaultdict(set), defaultdict(list)
+    identity_scope_complete = True
     for path, raw in sorted(files.items()):
         parts = PurePosixPath(path).parts
         item = parts[2] if len(parts) >= 3 else "INVALID_NAMESPACE"
+        claim, known = _identity_claim(raw, item)
+        identity_scope_complete = identity_scope_complete and known
+        if claim is not None:
+            mutations[claim["mutation_id"]].append((item, sha256(raw)))
+            if claim["origin_key"] is not None:
+                origins[(claim["product"], claim["origin_key"])].add(item)
         try:
             require(relative_path(path) and len(parts) == 4 and path.startswith(PREFIX + "/"), "REVISION_PATH_INVALID")
             body = decode(raw)
@@ -174,16 +202,12 @@ def fold(files: Mapping[str, bytes], *, complete: bool = True) -> dict[str, Any]
         except ShelfError as error:
             errors[item].append(error.code)
     items = {}
-    origins, mutations = defaultdict(set), defaultdict(list)
     for item in sorted(set(grouped) | set(errors)):
         rows = grouped[item]
         problems = list(errors[item])
         referenced = set()
         roots = []
         for digest, row in rows.items():
-            mutations[row["mutation_id"]].append((item, digest))
-            if row["origin_key"]:
-                origins[(row["product"], row["origin_key"])].add(item)
             if not row["parents"]:
                 roots.append(row)
             for parent in row["parents"]:
@@ -216,7 +240,7 @@ def fold(files: Mapping[str, bytes], *, complete: bool = True) -> dict[str, Any]
     for members in origins.values():
         if len(members) > 1:
             for item in members:
-                items[item].update(status="ITEM_CONFLICT", current=None)
+                items[item].update(status="ITEM_INVALID" if items[item]["status"] == "ITEM_INVALID" else "ITEM_CONFLICT", current=None)
                 items[item]["reasons"].append("DUPLICATE_ORIGIN_KEY")
     for entries in mutations.values():
         if len(entries) > 1:
@@ -224,7 +248,7 @@ def fold(files: Mapping[str, bytes], *, complete: bool = True) -> dict[str, Any]
                 items[item].update(status="ITEM_INVALID", current=None)
                 items[item]["reasons"].append("MUTATION_ID_CONFLICT")
     return dict(status="READY" if complete else "INCOMPLETE", items=items,
-                complete=complete)
+                complete=complete, identity_scope_complete=identity_scope_complete)
 
 
 def revise(snapshot: Mapping[str, Any], item_id: str, changes: Mapping[str, Any], *,
@@ -302,7 +326,11 @@ def attention(snapshot: Mapping[str, Any], *, now: str, limit: int | None = 5,
             source_observation=copy.deepcopy(observed) if event else None))
     priority = {s: n for n, s in enumerate(("ITEM_INVALID", "ITEM_CONFLICT", "EXPIRED_REVIEW_REQUIRED", "OVERDUE_REVIEW", "DUE_REVIEW", "EVENT_REVIEW",
                                            "NEEDS_TRIAGE", "SOURCE_READBACK_REQUIRED", "WAITING"))}
-    rows.sort(key=lambda row: (priority[row["status"]], (row["review"] or {}).get("review_at") or "", row["item_id"]))
+    def order(row):
+        review = row["review"] or {}
+        dates = [clock(value) for value in (review.get("review_at"), review.get("review_by")) if value]
+        return priority[row["status"]], min(dates) if dates else datetime.max.replace(tzinfo=UTC), row["item_id"]
+    rows.sort(key=order)
     visible = rows if limit is None else rows[:limit]
     dates = [value for row in rows if row["review"] for value in
              (row["review"]["review_at"], row["review"]["review_by"]) if value and clock(value) > at]

@@ -55,3 +55,18 @@ exemptions и historical evidence не менялись; cold route провер
 Uniqueness invariant: ровно одна CURRENT_SOURCE_LINK, все остальные matching
 associations только доказанно RETRACTED_SOURCE_LINK. Конфликт/invalid не означает
 отзыв. Actual StrategyVersion consumer подтверждает UNRESOLVED в обоих случаях.
+
+
+External semantic REVISE, 2026-10-25: прежние 50 checks относятся к исходному
+checkpoint; корректирующий receipt — `semantic-revise-validation.json`.
+81 уникальная targeted проверка PASS; повторные entry runs не увеличивают счётчик.
+Закрыты шесть замечаний: identity reservations при invalid/unreadable history;
+историческая private provenance; exact Critic findings/source non-claims до
+StrategyVersion; ближайшие датированные WAITING с правильным сроком в строке;
+совместимый hash-bound SOURCE_CHANGED baseline; scoped/local refresh и RU UNKNOWN
+подсказка. Дополнительная UX перепроверка исправила два недостатка renderer.
+Старый CI выявил четыре тестовые причины: route count, disposable parent, текущий
+engineering CLI pin и календарь fixed-window fixture. Production expiry и
+scientific/frozen contracts сохранены; explicit expiry negative control проходит.
+Новые независимые verdict и exact-head CI обязательны; прежний PASS их не заменяет.
+Внешняя повторная semantic acceptance и commissioning остаются PENDING.

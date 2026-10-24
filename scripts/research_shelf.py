@@ -167,7 +167,12 @@ def main(argv: list[str] | None = None) -> int:
                     else:
                         result.pop("prepared")
                 if args.public:
-                    context.public_payload_guard(result, disclosure=json.loads(_input(args.disclosure)) if args.disclosure else None)
+                    linked_ids = {row["item_id"] for row in result.get("matches", [])}
+                    linked_ids.update(i for i in (args.item, (result.get("shelf") or {}).get("item_id")) if i)
+                    for ref in result.get("candidate_record_refs", []):
+                        linked_ids.update(row["item_id"] for row in native.find_native(snapshot, ref)["matches"])
+                    context.public_payload_guard(result, disclosure=json.loads(_input(args.disclosure)) if args.disclosure else None,
+                        known_private_origin=any(context.historically_private(snapshot, item) for item in linked_ids))
                 print(json.dumps(result, ensure_ascii=False, sort_keys=True))
                 return 0 if result["status"] not in {"UNRESOLVED", "INCOMPLETE", "AMBIGUOUS_SOURCE_LINK", "LINK_PENDING", "UNAVAILABLE", "NOT_INITIALIZED"} else 2
             shelf.require(args.item is not None, "ITEM_REQUIRED")

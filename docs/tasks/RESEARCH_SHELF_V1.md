@@ -1,6 +1,6 @@
 ---
 task_id: RESEARCH_SHELF_V1
-task_version: '1.1'
+task_version: '1.2'
 status: IN_PROGRESS
 as_of: '2026-10-24'
 owner: GOAL_OWNER
@@ -50,6 +50,9 @@ managed_write_set:
 - tests/test_research_shelf_native_v1.py
 - tests/test_factory_semantic_operability.py
 - tests/test_hfic_scientific_disposition_navigation_v1.py
+- tests/test_risk_and_economics_v1.py
+- tests/test_factory_ordinary_market_hypothesis.py
+- tests/test_research_fragments_v1.py
 - src/solana_alpha_lab/factory_semantic_operability.py
 external_caps:
   network: false
@@ -248,3 +251,18 @@ and context-map.yaml in TASK21/TASK30 acceptance evidence. Preserve those root
 control bytes and pins. The existing semantic front door resolves the new route;
 Forge skill/command, actual machine CLI glances and native operator links carry
 the shelf entry. No guard exemptions, historical retagging or new registry.
+
+## External semantic REVISE on PR 422
+
+Owner requests six bounded corrections on published head 55e7835b: fail-closed
+identity reservations across unreadable history; historical private provenance;
+exact saved Critic findings/non-claims in dossier; dated WAITING priority;
+compatible hash-bound SOURCE_CHANGED baseline; scoped post-commission refresh
+recipe with a separate local-only route. Keep one PR and architecture/authority.
+Also propagate approved route count 14 to the execution-domain test consumer
+identified by CI. Do not merge or request owner phrase before the new exact-head
+checks and semantic review PASS. No real science, data/seeds or reminder writes.
+CI repairs also create the owned disposable test parent in a clean checkout,
+pin fragment-test administrative clock inside its synthetic fixed plan, and
+update the explicitly current engineering CLI pin for the derived entry overlay.
+Production expiry gates, scientific schemas and frozen historical pins remain.

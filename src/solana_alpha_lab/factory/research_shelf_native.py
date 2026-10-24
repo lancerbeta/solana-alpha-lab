@@ -11,9 +11,32 @@ import re
 from datetime import UTC, datetime
 from typing import Any, Callable, Mapping
 
+from jsonschema import Draft202012Validator
+
 from . import research_shelf as wire
 
 RISK_FIELDS = ("confounders", "pit_leakage_survivorship_risks", "execution_capacity_risks", "missing_or_forward_only_data")
+FRAGMENT_BASELINE = "smial-shelf://fragment-state/"
+
+
+def _change_token(source: Mapping[str, Any], evidence: Any) -> tuple | None:
+    """Comparable immutable evidence only; a non-null ref is not a baseline."""
+    if not isinstance(evidence, dict):
+        return None
+    schema = wire._validator().schema
+    validator = Draft202012Validator({"$ref": "#/$defs/ref", "$defs": schema["$defs"]})
+    if not validator.is_valid(evidence):
+        return None
+    wire._guard(evidence)
+    if source.get("kind") == "GIT_PATH" and evidence.get("kind") == "GIT":
+        if (evidence["repository"], evidence["path"]) == (source["repository"], source["path"]):
+            return ("GIT", evidence["repository"], evidence["path"], evidence["commit"], evidence["sha256"])
+    elif source.get("kind") == "NATIVE_ENTITY" and evidence.get("kind") == "REFERENCE":
+        prefix = FRAGMENT_BASELINE + wire.sha256(wire.canonical(source)) + "/"
+        locator = evidence["locator"]
+        if evidence["verification"] == "VERIFIED" and locator.startswith(prefix) and re.fullmatch(r"[0-9a-f]{64}", locator[len(prefix):]):
+            return ("FRAGMENT_STATE", locator)
+    return None
 
 
 class _SavedRead:
@@ -90,7 +113,7 @@ def event_read(event: Mapping[str, Any], *, now: str, store: Any = None,
             basis = dict(source_refs=source_refs, native_check=state, execution_deadline=plan.get("execution_deadline"))
             digest = wire.sha256(wire.canonical(basis))
             observed_at = max(records[key][0].first_reliable_available_at for key in ids)
-            evidence = dict(kind="REFERENCE", locator="smial-shelf://fragment-state/" + digest,
+            evidence = dict(kind="REFERENCE", locator=FRAGMENT_BASELINE + wire.sha256(wire.canonical(source)) + "/" + digest,
                 description="Derived fragment/plan/check baseline; not a native artifact or scientific evidence.",
                 observed_at=_utc(observed_at.isoformat()), verification="VERIFIED")
             observed = dict(native_status=state["status"], native_reason=state.get("reason"),
@@ -127,7 +150,12 @@ def event_read(event: Mapping[str, Any], *, now: str, store: Any = None,
             baseline = event.get("acknowledged_ref")
             if baseline is None:
                 return dict(unknown, **observed, evidence_ref=evidence, reason="SOURCE_BASELINE_REQUIRED")
-            met = evidence != baseline
+            current_key, previous_key = _change_token(source, evidence), _change_token(source, baseline)
+            if previous_key is None or current_key is None:
+                return dict(unknown, **observed, evidence_ref=evidence, reason="SOURCE_BASELINE_INCOMPATIBLE")
+            if current_key[0] == "GIT" and current_key[:4] == previous_key[:4] and current_key != previous_key:
+                return dict(unknown, **observed, evidence_ref=evidence, reason="SOURCE_BASELINE_IMMUTABLE_CONFLICT")
+            met = current_key != previous_key
         elif event["kind"] == "NATIVE_STATUS" and event.get("condition") in supported:
             met = observed["native_status"] == event["condition"]
         else:
@@ -160,7 +188,8 @@ def native_dossier(store: Any, identity: Mapping[str, Any]) -> dict[str, Any]:
                  "NATIVE_IDENTITY_MISMATCH")
     packet = bundle.get("critic_input_packet") or {}
     grounded = packet.get("grounded_evidence") or {}
-    refs, gaps, artifacts = [], [], []
+    refs, gaps, artifacts, draft_non_claims = [], [], [], []
+    critic = None
     records = record_index(store)
     hypotheses = [record_ref(r) for r, p in records.values() if str(getattr(r.record_kind, "value", r.record_kind)) == "HYPOTHESIS_VERSION"
                   and p.get("session_id") == session and p.get("hypothesis_version_id") == candidate and p.get("definition_sha256") == definition]
@@ -177,6 +206,16 @@ def native_dossier(store: Any, identity: Mapping[str, Any]) -> dict[str, Any]:
             ref = record_ref(record)
             refs.append(ref)
             artifacts.append(dict(artifact_kind=kind, artifact_sha256=payload["payload_sha256"], record_ref=ref))
+            if kind in {"FORGE_DRAFT", "CRITIC_RESULT"}:
+                content = json.loads(payload["payload_canonical"])
+                wire.require(isinstance(content, dict), "NATIVE_ARTIFACT_CONTENT_INVALID")
+                if kind == "CRITIC_RESULT":
+                    wire.require((content.get("selected_candidate_id"), content.get("selected_definition_sha256"),
+                        content.get("critic_input_packet_sha256")) == (candidate, definition, bundle.get("critic_input_packet_sha256")),
+                        "NATIVE_CRITIC_IDENTITY_MISMATCH")
+                    critic = content
+                else:
+                    draft_non_claims.append(dict(artifact_sha256=payload["payload_sha256"], non_claims=copy.deepcopy(content.get("non_claims"))))
     for kind in ("FORGE_DRAFT", "CRITIC_INPUT_PACKET", "CRITIC_RESULT"):
         if not any(a["artifact_kind"] == kind for a in artifacts):
             gaps.append(kind + "_UNAVAILABLE")
@@ -196,6 +235,10 @@ def native_dossier(store: Any, identity: Mapping[str, Any]) -> dict[str, Any]:
     return dict(status="COMPLETE_SOURCE_TRACE" if not gaps else "PARTIAL", identity=dict(identity),
         source_definition=source_definition, source_restrictions={k: copy.deepcopy((source_definition or {}).get(k)) for k in RISK_FIELDS},
         prior_memory=copy.deepcopy(packet.get("prior_memory")), known_unknowns=copy.deepcopy(packet.get("known_unknowns")),
+        critic_findings={key: copy.deepcopy((critic or {}).get(key)) for key in ("material_defects", "attack_matrix", "non_claims")},
+        critic_findings_unavailable=[key for key in ("material_defects", "attack_matrix", "non_claims") if critic is None or key not in critic],
+        source_non_claims=dict(packet=copy.deepcopy(packet.get("non_claims")), drafts=sorted(draft_non_claims, key=wire.canonical),
+            critic=copy.deepcopy((critic or {}).get("non_claims"))),
         artifacts=artifacts, destination_refs=sorted(refs, key=wire.canonical), candidate_record_refs=hypotheses,
         critic_terminal=bundle.get("critic_terminal"), critic_result_sha256=bundle.get("critic_result_sha256"),
         critic_input_packet_sha256=bundle.get("critic_input_packet_sha256"),

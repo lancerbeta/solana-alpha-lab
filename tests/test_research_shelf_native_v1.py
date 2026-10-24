@@ -70,6 +70,7 @@ class NativeShelfTests(unittest.TestCase):
         draft["candidates"][0]["claim"] += " " + wire.decode(raw)["statement"]
         draft["candidates"][0]["prior_work_refs"] = [wire.decode(raw)["origin_refs"][0]["entity_id"]]
         draft["candidates"][0]["execution_capacity_risks"] = ["UNKNOWN_EXECUTION_COSTS"]
+        draft["non_claims"].append("SHELF_SOURCE_NONCLAIM_LITERAL")
         _, frozen = self.persist_and_freeze(draft, pre)
         identity = dict(session_id=frozen["session_id"], candidate_id=frozen["selected_candidate_id"], definition_sha256=frozen["selected_definition_sha256"])
         original = wire.decode(raw)
@@ -78,6 +79,9 @@ class NativeShelfTests(unittest.TestCase):
             now=NOW, mutation_id=str(uuid4()))
         self.assertEqual(wire.decode(partial["prepared"])["native_links"][0]["verification"], "PARTIAL")
         critic = critic_result_from_packet_only(frozen["critic_input_packet"], terminal="KILL_STATISTICALLY_UNIDENTIFIABLE")
+        critic["material_defects"] = ["SHELF_LITERAL_DEFECT: insufficient independent observations."]
+        critic["attack_matrix"] = {"statistical_identifiability": {"verdict": "FAIL", "reason": "ONE_SYNTHETIC_DAY_IS_NOT_REPLICATION"}}
+        critic["non_claims"].append("NO_STRATEGY_PROMOTION_FROM_SYNTHETIC_CRITIC")
         self.cli("finalize", "--session-id", frozen["session_id"], "--critic-result", self.write("shelf-consumer-critic.json", critic))
         reader = ExistingResearchStoreReader(self.plane)
         before = self.store.diagnostics().committed_inventory_sha256
@@ -86,6 +90,10 @@ class NativeShelfTests(unittest.TestCase):
         self.assertEqual(dossier["grounded_result_sha256"], evidence["result_sha256"])
         self.assertEqual(dossier["grounded_evidence"]["result"], dossier["grounded_result"])
         self.assertEqual(dossier["critic_terminal"], "KILL_STATISTICALLY_UNIDENTIFIABLE")
+        self.assertEqual(dossier["critic_findings"]["material_defects"], critic["material_defects"])
+        self.assertEqual(dossier["critic_findings"]["attack_matrix"], critic["attack_matrix"])
+        self.assertEqual(dossier["source_non_claims"]["critic"], critic["non_claims"])
+        self.assertTrue(any("SHELF_SOURCE_NONCLAIM_LITERAL" in source["non_claims"] for source in dossier["source_non_claims"]["drafts"]))
         self.assertIn("missing_or_forward_only_data", dossier["source_restrictions"])
         prior = next(source for cap in dossier["prior_memory"]["capsules"]
             for source in cap.get("source_detail", {}).get("research_fragments", []) if source["source_ref"] == prior_ref)
@@ -226,6 +234,8 @@ class NativeShelfTests(unittest.TestCase):
         self.assertEqual(resolved["manifest_sha256"], manifests[0]["manifest_sha256"])
         self.assertNotEqual(resolved["manifest_sha256"], manifests[1]["manifest_sha256"])
         self.assertEqual(resolved["native"]["critic_terminal"], "KILL_STATISTICALLY_UNIDENTIFIABLE")
+        self.assertEqual(resolved["native"]["critic_findings"], dossier["critic_findings"])
+        self.assertEqual(resolved["native"]["source_non_claims"], dossier["source_non_claims"])
         self.assertEqual(resolved["native"]["source_restrictions"]["missing_or_forward_only_data"], dossier["source_restrictions"]["missing_or_forward_only_data"])
         self.assertEqual(resolved["shelf"]["adopted_sources"][0]["revision"]["statement"], wire.decode(raw)["statement"])
         # Matching conflict/invalid is not retraction. The actual downstream

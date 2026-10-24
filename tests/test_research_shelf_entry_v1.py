@@ -34,6 +34,7 @@ def snapshot(raw=RAW):
 
 class ShelfEntryTests(unittest.TestCase):
     def setUp(self):
+        (ROOT / "local").mkdir(exist_ok=True)
         self.temp = tempfile.TemporaryDirectory(dir=ROOT / "local", prefix="shelf-entry-")
         self.addCleanup(self.temp.cleanup)
         self.work = Path(self.temp.name)
@@ -132,7 +133,11 @@ class ShelfEntryTests(unittest.TestCase):
         snap = snapshot(wire.prepare(body))
         unknown = native.read_events(snap, now=NOW)
         self.assertEqual(unknown[ITEM]["status"], "UNKNOWN")
-        self.assertEqual(wire.attention(snap, now=NOW, source_states=unknown)["totals"], {"SOURCE_READBACK_REQUIRED": 1})
+        unknown_summary = wire.attention(snap, now=NOW, source_states=unknown)
+        self.assertEqual(unknown_summary["totals"], {"SOURCE_READBACK_REQUIRED": 1})
+        unknown_summary["source_freshness"] = "REMOTE_VERIFIED"
+        for expected in ("refresh без", "--data-root / --source-bundle", "даёт UNKNOWN"):
+            self.assertIn(expected, ctx.readout(unknown_summary))
         evidence = dict(kind="NATIVE", owner="SMIAL", entity_kind="RESEARCH_ARTIFACT", entity_id="RF-ART-SYNTHETIC", payload_sha256="c" * 64, locator="smial-data://research/records/RF-ART-SYNTHETIC")
         met = {ITEM: dict(status="MET", evidence_ref=evidence, as_of=NOW)}
         self.assertEqual(wire.attention(snap, now=NOW, source_states=met)["totals"], {"EVENT_REVIEW": 1})
@@ -155,6 +160,12 @@ class ShelfEntryTests(unittest.TestCase):
         self.assertEqual(native.event_read(event, now=NOW, saved_sources=sources)["status"], "UNKNOWN")
         event["acknowledged_ref"] = ref
         self.assertEqual(native.event_read(event, now=NOW, saved_sources=sources)["status"], "NOT_MET")
+        for baseline in (dict(ref, repository="lancerbeta/another-source"), dict(ref, sha256=None), dict(ref, sha256="0" * 64)):
+            event["acknowledged_ref"] = baseline
+            self.assertEqual(native.event_read(event, now=NOW, saved_sources=sources)["status"], "UNKNOWN")
+        event["acknowledged_ref"] = dict(ref, commit="e" * 40)
+        self.assertEqual(native.event_read(event, now=NOW, saved_sources=sources)["status"], "MET")
+        event["acknowledged_ref"] = ref
         sources[next(iter(sources))]["raw"] += " "
         self.assertEqual(native.event_read(event, now=NOW, saved_sources=sources)["status"], "UNKNOWN")
         raw = wire.canonical(dict(schema="marcopolo.concurrent-choice-feasibility", status="FUTURE_UNKNOWN"))
@@ -187,6 +198,74 @@ class ShelfEntryTests(unittest.TestCase):
             changed_check = native.event_read(event, now=NOW, store=Store())
             self.assertEqual(changed_check["status"], "MET")
             self.assertEqual({r["entity_id"] for r in changed_check["source_refs"]}, {"CARD", "PLAN-2", "CHECK-2"})
+            valid = changed_check["evidence_ref"]
+            other_source = dict(event["source"], entity_id="RFV-OTHER")
+            for baseline in (dict(kind="NATIVE", owner="SMIAL", entity_kind="RESEARCH_FRAGMENT", entity_id="RFV-SYNTHETIC",
+                                 payload_sha256=None, locator="smial-data://research/RFV-SYNTHETIC"),
+                             dict(valid, locator=native.FRAGMENT_BASELINE + wire.sha256(wire.canonical(other_source)) + "/" + "a"*64),
+                             dict(valid, locator=native.FRAGMENT_BASELINE + wire.sha256(wire.canonical(event["source"])) + "/")):
+                event["acknowledged_ref"] = baseline
+                self.assertEqual(native.event_read(event, now=NOW, store=Store())["status"], "UNKNOWN")
+            event["acknowledged_ref"] = dict(valid, description="Same immutable observation, incidental description.", observed_at="2026-10-23T00:00:00Z")
+            self.assertEqual(native.event_read(event, now=NOW, store=Store())["status"], "NOT_MET")
+
+    def test_waiting_prioritizes_nearest_dated_item_before_undated_events(self):
+        from uuid import uuid4
+        files, states = {}, {}
+        for index in range(5):
+            body = wire.decode(RAW)
+            body.pop("revision_sha256")
+            body.update(item_id="RSI-SCOUT-" + str(uuid4()), mutation_id=str(uuid4()),
+                review=dict(review_at=None, review_by=None, event=dict(kind="NATIVE_STATUS", condition="DUE", acknowledged_ref=None,
+                    source=dict(kind="NATIVE_ENTITY", owner="SMIAL", entity_kind="RESEARCH_FRAGMENT", entity_id=f"RFV-WAIT-{index}"))))
+            raw = wire.prepare(body)
+            files[wire.revision_path(wire.decode(raw))] = raw
+            states[body["item_id"]] = dict(status="NOT_MET")
+        for dates in (dict(review_at="2026-10-25T00:00:00Z"), dict(review_by="2026-10-25T00:00:00Z"),
+                      dict(review_at="2026-10-28T00:00:00Z", review_by="2026-10-25T00:00:00Z")):
+            dated = wire.decode(RAW)
+            dated.pop("revision_sha256")
+            dated.update(item_id="RSI-SCOUT-" + str(uuid4()), mutation_id=str(uuid4()), title="Nearest scheduled question",
+                review=dict(review_at=None, review_by=None, event=None))
+            dated["review"].update(dates)
+            raw = wire.prepare(dated)
+            state = dict(wire.fold(files | {wire.revision_path(wire.decode(raw)): raw}), commit="a"*40, source_freshness="REMOTE_VERIFIED")
+            summary = wire.attention(state, now=NOW, source_states=states)
+            self.assertEqual(summary["items"][0]["item_id"], dated["item_id"])
+            self.assertEqual(summary["next_review_at"], "2026-10-25T00:00:00Z")
+            self.assertEqual(summary["omitted_count"], 1)
+            self.assertIn("Nearest scheduled question", ctx.readout(summary))
+            line = next(line for line in ctx.readout(summary).splitlines() if "Nearest scheduled question" in line)
+            self.assertIn("; срок 2026-10-25T00:00:00Z", line)
+            self.assertNotIn("2026-10-28", line)
+            self.assertNotIn("refresh без", ctx.readout(summary))
+        due = dict(dated, review=dict(review_at=NOW, review_by=None, event=None), mutation_id=str(uuid4()))
+        due_raw = wire.prepare(due)
+        review = wire.attention(wire.fold(files | {wire.revision_path(wire.decode(due_raw)): due_raw}), now=NOW, source_states=states)
+        self.assertEqual(review["items"][0]["status"], "DUE_REVIEW")
+
+    def test_refresh_recipe_selects_scoped_transport_and_explicit_local_route(self):
+        import shlex
+        spec = importlib.util.spec_from_file_location("shelf_recipe_cli", ROOT / "scripts/research_shelf.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        scope = self.work / "scope.json"
+        scope.write_text('{"owner_scope_ref":"SYNTHETIC_ONLY"}')
+        output = self.work / "snapshot.json"
+        replacements = {"<separate-bare-cache>": str(self.work / "github.git"), "<owner-scope.json>": str(scope),
+            "<local-only-bare-cache>": str(self.work / "local.git"), "<snapshot.json>": str(output)}
+        def arguments(recipe):
+            words = shlex.split(recipe)
+            return [replacements.get(word, word) for word in words[words.index("refresh"):]] + ["--now", NOW]
+        with patch.object(module, "ScopedShelfGit") as scoped, patch.object(module, "ShelfGit", side_effect=AssertionError("No local fallback")), redirect_stdout(io.StringIO()):
+            scoped.return_value.refresh.return_value = snapshot()
+            self.assertEqual(module.main(arguments(ctx.REFRESH_RECIPE)), 0)
+            scoped.assert_called_once()
+        with patch.object(module, "ShelfGit") as local, patch.object(module, "ScopedShelfGit", side_effect=AssertionError("Local-only stays local")), redirect_stdout(io.StringIO()):
+            local.return_value.refresh.return_value = snapshot()
+            self.assertEqual(module.main(arguments(ctx.LOCAL_REFRESH_RECIPE)), 0)
+            local.assert_called_once()
+        self.assertIn("--data-root", ctx.glance(ROOT, snapshot_path=output, now=NOW)["source_readback_hint"])
 
     def test_bad_scout_source_is_isolated_and_moving_ref_is_unknown(self):
         files, sources, ids = {}, {}, []

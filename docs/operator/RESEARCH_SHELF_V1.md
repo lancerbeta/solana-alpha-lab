@@ -21,7 +21,7 @@ fetch/push, не вызывают runner и не создают reservation. С�
 или следующая tool invocation не начинают новую top-level research session.
 
 ```text
-uv run --locked --managed-python python -B scripts/research_shelf.py refresh --cache <separate-bare-cache> --output <snapshot.json>
+uv run --locked --managed-python python -B scripts/research_shelf.py refresh --cache <separate-bare-cache> --metadata-scope <owner-scope.json> --output <snapshot.json>
 uv run --locked --managed-python python -B scripts/research_shelf.py review --snapshot <snapshot.json>
 ```
 
@@ -34,6 +34,12 @@ TTL 86400 секунд относится только к cached head observatio
 snapshot — `UNVERIFIED_PINNED`, старый — `STALE_AS_OF`; отсутствующий/повреждённый —
 `UNAVAILABLE`, missing data branch — `NOT_INITIALIZED`, неполный — `INCOMPLETE`.
 Возраст карточки, cached observation и native hard deadline — разные величины.
+
+После commissioning refresh использует owner scope и отдельный GitHub-cache.
+Для отдельного local-only маршрута убрать `--metadata-scope` и указать cache
+локального bare Git. Refresh без `--data-root` / `--source-bundle` заново
+выводит native observations как `UNKNOWN`; прежнее наблюдение не переносится
+автоматически. Для source readback явно добавить только разрешённые источники.
 
 Default machine snapshot: `local/research_shelf_v1/snapshot.json`. Явный локальный
 snapshot можно передать через process-local `SMIAL_RESEARCH_SHELF_SNAPSHOT`.
@@ -75,6 +81,9 @@ SMIAL baseline — derived `REFERENCE` с hash полного native check и re
 current plan и monitoring checks. `source_refs` перечислены в observation.
 Это не native artifact и не scientific prior: смена plan при прежнем check,
 либо check при прежнем plan меняет baseline. Он восстанавливается без registry.
+Baseline также связывает exact native identity и тип evidence. Hashless,
+несовместимый или относящийся к другому source baseline даёт `UNKNOWN`.
+Старый opaque baseline требует явного нового acknowledgement.
 
 До native шага вычислить stable adoption key (`adoption-key --item ... --revision
 ... --request-id ...`). Он не содержит ещё не созданный native ID и сам ничего
@@ -99,6 +108,9 @@ direct RUN_COMPLETED passport, ExperimentSpec bytes и saved `source_lineage`,
 используется. Legacy/non-replay или missing source — UNRESOLVED. Никаких новых
 StrategyVersion/promotion schemas. Dossier возвращает сохранённые параметры,
 риски, adverse/negative evidence, exposure и gaps; link не даёт scientific admission.
+`critic_findings` сохраняет точные проверенные `material_defects`, `attack_matrix`
+и `non_claims`; `source_non_claims` передаёт ограничения packet/draft/Critic.
+Отсутствующее поле остаётся `null` с причиной unavailable, без реконструкции.
 
 ## Public/private и commissioning
 
@@ -111,6 +123,11 @@ public payload: `{disposition:EXPLICIT_MINIMAL_PUBLIC_DISCLOSURE,payload_sha256:
 аннулирует digest. Без обоснованного раскрытия сохранить local draft и отказать
 в public publication; rich Scout packet не копировать. Это узкая граница review,
 не новый ACL engine и не обещание автоматической классификации конфиденциальности.
+Известное приватное происхождение сохраняется по всей истории item: удаление
+`origin_refs` не отменяет отдельное одобрение раскрытия. Обычное редактирование
+metadata не выполняет деклассификацию. Нечитаемая старая ревизия также не
+освобождает identity reservations: если идентичность нельзя установить, новые
+публикации блокируются; exact retry уже сохранённых bytes остаётся возможен.
 
 Real `research-log`, metadata grant и bounded seeds принимаются отдельно после
 code capability. До cutover текущие календарные напоминания сохраняются.
