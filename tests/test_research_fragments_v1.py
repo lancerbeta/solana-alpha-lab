@@ -48,6 +48,16 @@ class FragmentVerticalTests(unittest.TestCase):
         return request, evidence
 
     def plan(self):
+        # This fixture has fixed October windows. Exercise their intended live
+        # interval rather than letting the workstation calendar expire the test.
+        # Explicit timestamps (including the expiry negative control) still win.
+        if not getattr(self, "_plan_clock_installed", False):
+            actual_now = f._now
+            fixture_now = lav.DAY_B + timedelta(days=5, hours=1)
+            clock_patch = patch.object(f, "_now", side_effect=lambda now=None: actual_now(now if now is not None else fixture_now))
+            clock_patch.start()
+            self.addCleanup(clock_patch.stop)
+            self._plan_clock_installed = True
         start = lav.DAY_A
         request = {"fragment_version_id": self.card["fragment_version_id"],
             "data_root_identity_sha256": f.root_identity(self.store), "enabled": True,
@@ -173,7 +183,7 @@ class FragmentVerticalTests(unittest.TestCase):
         self.assertEqual(imported["_exit_code"], 0, imported)
         blocked = f.run_due(self.store, repo_root=ROOT, git_sha=GIT_SHA)
         self.assertEqual(blocked["fragments"][0]["reason"], "HOLDOUT_UNRESOLVED")
-        blocked_projection = build_lifecycle_projection(ROOT, research_store=self.store)
+        blocked_projection = build_lifecycle_projection(ROOT, research_store=self.store, projected_at=f._now().isoformat())
         blocked_shelf = compose_research_overview(blocked_projection, kind="fragments")
         self.assertIn("Нет актуального полного protection inventory", _research_overview_html(blocked_shelf))
         blocked_view = f.source_snapshot(self.store)[0]

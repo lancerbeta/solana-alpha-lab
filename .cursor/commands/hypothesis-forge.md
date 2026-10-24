@@ -1,5 +1,9 @@
 # Hypothesis Forge
 
+Fresh top-level research first reviews `SEM-RESEARCH-SHELF` via
+`docs/operator/RESEARCH_SHELF_V1.md`. One separate metadata refresh, then pinned
+read; no transport in frozen execution. The shelf is advisory attention only.
+
 Explicit owner invoke only. Runs `MANUAL_FALLBACK_UNTIL_GENERATOR` synthesis
 through executable `preflight` → `forge-run` → FORGE_DRAFT (PROMPT A only when
 next is `START_BASE`) → optional Prompt C after

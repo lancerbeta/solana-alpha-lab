@@ -31,7 +31,10 @@ LIQUIDITY_SPEC = "configs/experiment_specs/ordinary_liquidity_quote_pressure_v1.
 LIQUIDITY_ARCHETYPE = "configs/experiment_specs/market_feature_liquidity_archetype_v1.yaml"
 SCHEMA = ROOT / "catalog/schemas/experiment_spec.schema.json"
 SCRIPT = ROOT / "scripts/run_factory_ordinary_market_hypothesis.py"
-CLI_SHA256 = "72d479df06067bc4afae4b4a105e88825963b45b08a57747e64aa1e741a0df72"
+# Current engineering pin: RESEARCH_SHELF_V1 adds a derived, read-only glance
+# before start and in returned output. Native inputs/core and old frozen commits
+# retain their identities; the behavioral composition checks below still apply.
+CLI_SHA256 = "94b811fecf40f5f8c506bb0a2d7f58a99fc4fedc364a09b00b4e30ec942893a4"
 FEATURE_CATALOG = ROOT / "registries/feature_catalog.yaml"
 HYPOTHESES = ROOT / "registries/hypotheses.yaml"
 RESEARCH_CYCLES = ROOT / "registries/research_cycles.yaml"

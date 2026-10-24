@@ -1,0 +1,73 @@
+{
+  "schema": "smial.research-shelf-stage-validation",
+  "schema_version": "1.0",
+  "stage": 2,
+  "as_of": "2026-10-24",
+  "task_id": "RESEARCH_SHELF_V1",
+  "result": "PASS_FOR_ENGINEERING_SCOPE",
+  "checks": [
+    {
+      "name": "entry_wire_semantic",
+      "tests": 47,
+      "result": "PASS",
+      "output_sha256": "00d435045296ae097a478cdf4772bc89e37feed743bd277972c4434fc618ba44"
+    },
+    {
+      "name": "native_strategy_vertical",
+      "tests": 1,
+      "result": "PASS",
+      "output_sha256": "ef99e3a571a492c927ec722ecaec241546df7bb4999c37985795db3b0878c1b7"
+    },
+    {
+      "name": "prior_navigation",
+      "tests": 2,
+      "result": "PASS",
+      "output_sha256": "fc24d45ea2823fa984168247b0054c4a9dffd8ff03b080cf98ee5c75ba14fa34"
+    }
+  ],
+  "unique_targeted_tests": 50,
+  "static_factory_validation": "PASS",
+  "semantic_routes": 14,
+  "semantic_routes_max": 14,
+  "other_semantic_limits": "UNCHANGED",
+  "resolved_overview_bytes": 16228,
+  "overview_max_bytes": 16384,
+  "source_bindings": {
+    "src/solana_alpha_lab/factory/research_shelf_context.py": "48ae9a435502b21a5546677a56a75791afa8c29a7da312886c7eea2374a4e749",
+    "src/solana_alpha_lab/factory/research_shelf_native.py": "10627647ef5653eeb5ef82d2155f71911b3bbd70ef02cd7014315069402371e6",
+    "tests/fixtures/research_shelf_v1/history.json": "041b2499e8c2a791d12ab1506a4e7cf8a65ef54e4c524ba501477f7f2fd0cf70",
+    "tests/test_research_shelf_entry_v1.py": "22f311fc48bdc8bdc030e5d1af85b31d9a55429c84f910f9638838e2cd5d6f97",
+    "tests/test_research_shelf_native_v1.py": "1d241ad658c338827be731fbe50e09f4b6df70f95b1545a7e9731aa33219996a"
+  },
+  "reproduce": [
+    "uv run --locked --managed-python python -B -m unittest tests.test_research_shelf_entry_v1 tests.test_research_shelf_v1.WireTests tests.test_factory_semantic_operability tests.test_hfic_scientific_disposition_navigation_v1 tests.test_research_shelf_native_v1 -v",
+    "uv run --locked --managed-python python -B scripts/validate_factory_static.py"
+  ],
+  "test_environment": "Python 3.13.14; PYTHONPATH=src; temporary synthetic stores/local bare remotes only",
+  "oracles": [
+    "PRD canonical genesis digest and literal UTC table",
+    "Real local Git refresh-export-pinned read without Git at entry",
+    "Actual public Forge success/blocked/missing RDP; metadata-only change preserves receipt, archive fingerprint, native inventory and frozen session packet",
+    "Native saved draft/freeze/Critic KILL plus genuine 1.4 REUSE_ONLY technical replay; two synthetic PROMOTE fixtures, exact original StrategyVersion decision",
+    "Immutable adopted source survives CLOSED/edit; link recovery does not repeat native execution; retracted relation stays historical",
+    "Private sentinel in every named free-text field and nested dossier invalidates exact minimal-public disclosure",
+    "Shared nine-revision wire fixture with eight literal attention/conflict projections with immutable adopted content and retracted link",
+    "Actual cold Catalog search/resolve; reference-only shelf excluded from scientific prior visibility",
+    "Current plan and monitoring CHECK independently change a derived metadata baseline; malformed Scout source remains per-item UNKNOWN; moving private ref without source-head witness remains UNKNOWN",
+    "Actual CLI disclosure reaches mandatory scoped writer guard; PARTIAL association permits only monotonic same-candidate enrichment; unavailable snapshot retains recovery reason",
+    "Shelf intent and genuine existing RESEARCH_FRAGMENT prior before consumer saved draft/freeze/Critic; fixed E1800, negative_n=4, mean=-0.55/6, UNKNOWN_EXECUTION_COSTS and RESEARCH_ADVISORY/EXPLORATORY_REUSE survive source resolver",
+    "Actual saved pre-Critic PARTIAL association -> post-Critic VERIFIED enrichment -> one current inverse association plus historical version -> actual exact StrategyVersion resolver; independent live associations remain ambiguous and explicitly retracted history cannot poison a unique current source.",
+    "Historical control pins preserved: AGENTS/context-map base bytes retained; existing semantic front door, Forge skill/command, actual CLI overlays and native operator link carry entry; 47 entry/wire/semantic checks revalidated after placement replan.",
+    "One CURRENT plus matching ITEM_CONFLICT/ITEM_INVALID never becomes unique. Actual StrategyVersion resolver returns UNRESOLVED / AMBIGUOUS_SOURCE_LINK; only proven RETRACTED matches can be excluded."
+  ],
+  "non_claims": [
+    "NO_CAPABILITY_DONE_OR_COMMISSIONING",
+    "NO_REAL_DATA_BRANCH_BOOTSTRAP_OR_SEEDS",
+    "NO_REMINDER_CUTOVER",
+    "NO_REAL_SCIENTIFIC_LOOK_OR_PROVIDER_CALL",
+    "NO_SCIENTIFIC_PROMOTION_OR_TRADING_AUTHORITY",
+    "NO_MERGE_AUTHORITY",
+    "SCOUT_IMPLEMENTATION_HAS_NOT_RUN_THE_SHARED_FIXTURE",
+    "CLOUD_EXPLICIT_REF_RECIPE_NOT_LIVE_COMMISSIONED"
+  ]
+}

@@ -1268,6 +1268,11 @@
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
     },
     {
+      "source_asset_id": "CONFIG-RESEARCH-SHELF-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-RESEARCH-SHELF-001"
+    },
+    {
       "source_asset_id": "CONFIG-SCIENTIFIC-ELIGIBILITY-PROJECTION-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001"
@@ -6386,6 +6391,11 @@
       "source_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001"
+    },
+    {
+      "source_asset_id": "DOC-RESEARCH-SHELF-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-RESEARCH-SHELF-001"
     },
     {
       "source_asset_id": "DOC-RESEARCH-WRITE-LOOKUP-V1-001",
@@ -13093,6 +13103,26 @@
       "target_asset_id": "CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001"
     },
     {
+      "source_asset_id": "MODULE-RESEARCH-SHELF-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-RESEARCH-SHELF-001"
+    },
+    {
+      "source_asset_id": "MODULE-RESEARCH-SHELF-CONTEXT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-RESEARCH-SHELF-001"
+    },
+    {
+      "source_asset_id": "MODULE-RESEARCH-SHELF-GIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-RESEARCH-SHELF-001"
+    },
+    {
+      "source_asset_id": "MODULE-RESEARCH-SHELF-NATIVE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-RESEARCH-SHELF-001"
+    },
+    {
       "source_asset_id": "MODULE-RESEARCH-WRITE-LOOKUP-V1-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
@@ -15578,6 +15608,11 @@
       "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
+      "source_asset_id": "SCHEMA-RESEARCH-SHELF-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-RESEARCH-SHELF-001"
+    },
+    {
       "source_asset_id": "SCHEMA-RUN-PASSPORT-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
@@ -16646,6 +16681,11 @@
       "source_asset_id": "SCRIPT-RESEARCH-FRAGMENTS-V1-001",
       "relation": "governed_by",
       "target_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-RESEARCH-SHELF-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-RESEARCH-SHELF-001"
     },
     {
       "source_asset_id": "SCRIPT-SEMANTIC-PREMISE-REVIEW-CLI-001",
@@ -19051,6 +19091,21 @@
       "source_asset_id": "TEST-RESEARCH-LIFECYCLE-WORKBENCH-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "TEST-RESEARCH-SHELF-ENTRY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-RESEARCH-SHELF-001"
+    },
+    {
+      "source_asset_id": "TEST-RESEARCH-SHELF-NATIVE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-RESEARCH-SHELF-001"
+    },
+    {
+      "source_asset_id": "TEST-RESEARCH-SHELF-STORAGE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-RESEARCH-SHELF-001"
     },
     {
       "source_asset_id": "TEST-RISK-AND-ECONOMICS-001",

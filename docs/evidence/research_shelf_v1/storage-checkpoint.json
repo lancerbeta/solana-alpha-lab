@@ -1,0 +1,133 @@
+{
+  "base": "ab13b7efa7efaf9762b6d12eca52e2348d1fe759",
+  "branch": "codex/research-shelf-v1",
+  "capability_radar_now": "NONE",
+  "closed_findings": [
+    "UNC and mapped network paths refused before filesystem access",
+    "Indirect path ancestors inspected root-first before descendants",
+    "Mandatory calendar validation isolates impossible dates",
+    "Invalid change_reason receives safe typed refusal",
+    "Permitted HTTPS/native URI paths preserved",
+    "Attention retains pinned commit/revisions/completeness/freshness",
+    "Competing and historical contents available before reconcile",
+    "MANUAL without review_at needs triage even with future review_by"
+  ],
+  "code_head": "49038879eccc2443621f68cf9dfe933fff1a2f48",
+  "factory_fit": {
+    "mode": "FULL_REVIEW",
+    "reason": "One metadata owner and mature Git plumbing; scientific authority remains source-owned",
+    "verdict": "PASS_FOR_STAGE_ONLY"
+  },
+  "independent_reviews": [
+    {
+      "agent": "/root/shelf_code_review",
+      "independent_checks": "14 WireTests and adverse guard probes passed",
+      "reviewed_head": "49038879eccc2443621f68cf9dfe933fff1a2f48",
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "agent": "/root/shelf_goal_review",
+      "independent_checks": "4 targeted immutable-code regressions passed",
+      "reviewed_head": "49038879eccc2443621f68cf9dfe933fff1a2f48",
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "agent": "/root/shelf_arch_review",
+      "independent_checks": "Packet/diff/log hashes and in-memory guards checked",
+      "packet_fingerprint_sha256": "cb202410cc80845ad85eb5c77253527088412d32c7c98b8190b23aa4416e0dec",
+      "profile": "SEMANTIC_PREMISE",
+      "reviewed_head": "49038879eccc2443621f68cf9dfe933fff1a2f48",
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "agent": "/root/shelf_ux_review",
+      "independent_checks": "Provenance/conflict regressions and final unchanged CLI inventory checked",
+      "reviewed_head": "49038879eccc2443621f68cf9dfe933fff1a2f48",
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "inventory": [
+    {
+      "git_blob_sha256": "94d4762f556fd8ce28dc048644c87ccff6b6640b681cf0ba399101d673a6dc70",
+      "path": "catalog/schemas/research_shelf_v1.schema.json"
+    },
+    {
+      "git_blob_sha256": "9ec9947d1920c062ba7750f5a6af2ffa1fcb5d8ca4b91d42c2b1d4c28bb49e38",
+      "path": "docs/contracts/research_shelf_v1.md"
+    },
+    {
+      "git_blob_sha256": "71ca4097d98946207a96ff97576c4ba6c50a9d5c6e0d270d36c28d65794759f3",
+      "path": "docs/tasks/RESEARCH_SHELF_V1.md"
+    },
+    {
+      "git_blob_sha256": "3adf07fa24bc8c7fd54d49b9b0f8a7341de319061e66bab747dcec794223b0f8",
+      "path": "scripts/research_shelf.py"
+    },
+    {
+      "git_blob_sha256": "ad5d23998b23ff49cd92897dc66bbeb7ece1ab42be212970e72cba4b34f413e2",
+      "path": "src/solana_alpha_lab/factory/research_shelf.py"
+    },
+    {
+      "git_blob_sha256": "6f50156ff8129e93b5cf4b716b1a45f4d547b077e0ac149e358163b9de5fb158",
+      "path": "src/solana_alpha_lab/factory/research_shelf_git.py"
+    },
+    {
+      "git_blob_sha256": "dd7dde379c136e401e2647a6e1f022f689e14c0d18036bd8a98a38c7d82224e9",
+      "path": "tests/fixtures/research_shelf_v1/genesis.json"
+    },
+    {
+      "git_blob_sha256": "1684a6b518fcfc4a4e492ce2e7ff39962cbacabf37eab73baae009423bdeb50d",
+      "path": "tests/test_research_shelf_v1.py"
+    }
+  ],
+  "model_diversity": "UNPROVEN",
+  "next": {
+    "action": "Continue this exact task with native/Forge entry, provenance and semantic integration",
+    "model_effort": "SOL_XHIGH",
+    "requires_owner_checkpoint_ok": true,
+    "stage": 2
+  },
+  "non_claims": [
+    "FULL_CAPABILITY_DONE",
+    "MERGE_READINESS",
+    "SCIENTIFIC_ACCEPTANCE",
+    "PRODUCTION_NO_PR_PUBLICATION",
+    "CLOUD_READER_ACCEPTANCE",
+    "NATIVE_ADAPTERS_OR_STRATEGY_TRACE",
+    "FROZEN_SCIENTIFIC_IDENTITY_PROOF",
+    "ARBITRARY_PROSE_PRIVACY",
+    "SEED_MIGRATION_COMPLETE"
+  ],
+  "product_horizon": {
+    "now": "Complete RESEARCH_SHELF_V1",
+    "watch": "Measured active-set growth or slow read"
+  },
+  "production_data_commit": null,
+  "remote_code_published": false,
+  "review_isolation": "FORK_TURNS_NONE_NO_IMPLEMENTATION_TRANSCRIPT",
+  "rollback": "Ordinary product-code revert; no production data/native artifacts were changed",
+  "schema": "smial.research-shelf-storage-checkpoint",
+  "schema_version": "1.0",
+  "stage": "STAGE_1_LOCAL_ONLY",
+  "stage_verdict": "PASS",
+  "task_id": "RESEARCH_SHELF_V1",
+  "task_state": "IN_PROGRESS",
+  "verification": {
+    "command": "uv run --locked --managed-python python -B -m unittest discover -s tests -p test_research_shelf_v1.py -v",
+    "elapsed_seconds": 39.524,
+    "environment": {
+      "PYTHONPATH": "src"
+    },
+    "factory_static": "PASS",
+    "pre_commit": "PASS",
+    "schema_fixture_file_sha256": "dd7dde379c136e401e2647a6e1f022f689e14c0d18036bd8a98a38c7d82224e9",
+    "schema_fixture_revision_sha256": "264ecdb2f41c005e7766dc065ae52d2c845e338beb07418607e33f24bb168465",
+    "secret_scan": "PASS",
+    "test_log_sha256": "b6c79be97ea8ab0cc5e16cdbef50e35c41792efc4445cc99e572df280004f7d2",
+    "tests_passed": 25
+  }
+}

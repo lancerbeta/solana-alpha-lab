@@ -1,0 +1,135 @@
+{
+  "schema": "smial.research-shelf-semantic-revise-validation",
+  "schema_version": "1.0",
+  "as_of": "2026-10-25",
+  "task_id": "RESEARCH_SHELF_V1",
+  "published_reviewed_head": "55e7835ba901e0d86f7d3e5889ef20e22bfaa8e1",
+  "external_verdict_received": "REVISE",
+  "external_revalidation": "PENDING",
+  "engineering_targeted_result": "PASS",
+  "unique_targeted_tests": 81,
+  "checks": [
+    {
+      "name": "targeted",
+      "tests": 65,
+      "result": "PASS",
+      "output_sha256": "c5bd5ab93c8bd3266962ce02ac8fbe941cba3c909ad3072228185171a27996c8"
+    },
+    {
+      "name": "git",
+      "tests": 13,
+      "result": "PASS",
+      "output_sha256": "629f54fc223d6190f07f66317969cc3d9d20de13b8589f31dbc271316208329d"
+    },
+    {
+      "name": "native",
+      "tests": 1,
+      "result": "PASS",
+      "output_sha256": "32971172711a8d483bd17786f79bd06bac51874d69baad5728ef9393cc4c49d9"
+    },
+    {
+      "name": "fragment_retry",
+      "tests": 1,
+      "result": "PASS",
+      "output_sha256": "e570b13b978afff05b54619218dd512c3a4367a63730f6f59d234396c99a762f"
+    },
+    {
+      "name": "entry_final",
+      "tests": 20,
+      "result": "PASS",
+      "output_sha256": "dc689f42979278fe3a1faf5a24f7c9ee24f6be0017ad21a5d8d3d22be7bd7c97"
+    },
+    {
+      "name": "fragment_late_deny",
+      "tests": 1,
+      "result": "PASS_SELECTED_CASE_ONLY",
+      "test": "tests.test_research_fragments_v1.FragmentVerticalTests.test_late_deny_after_native_reservation_stops_before_loader_and_pause_survives_unknown",
+      "output_sha256": "312f1268fa03112ca36d6369f6d270401b379b8f6ad6cdfb19cc31a48e4aebcd",
+      "other_case": "FAILED_THEN_CORRECTED_AND_PASSED_IN_fragment_retry"
+    }
+  ],
+  "static_factory_validation": "PASS",
+  "static_output_sha256": "1ba9e8aac6cc98c0f4a118b59c3fbefde4b25906959a6f782245ced5b166520d",
+  "source_bindings": {
+    "catalog/assets/core.yaml": "9dbdfa24d9c40199783a45c998d986670e5bd40f0305b2d37d24a8814113dbe7",
+    "docs/operator/RESEARCH_SHELF_V1.md": "d7f2f92db04060f8227de02b56334a5a80a030d660856a8fc579c208fa6f3ea6",
+    "docs/tasks/RESEARCH_SHELF_V1.md": "4c938fce2568e1724be105355e6207bd6ec2eaf221535bb7386ae5f3f0f1f067",
+    "scripts/research_shelf.py": "ea6e02758c2a4aa47a77b9716936a6b086a3418c22e12fd1de28734c992ca7f9",
+    "src/solana_alpha_lab/factory/research_shelf.py": "be327ac37d5720fcb82e2d7d636552e0b858fa46abee13decfd46c93db8f94b8",
+    "src/solana_alpha_lab/factory/research_shelf_context.py": "795937d5b07d444d362e5338d9c8e15e14bccff1ec01b4c0a58f0047702c682b",
+    "src/solana_alpha_lab/factory/research_shelf_git.py": "64b95026b890604de0741083b42ae5e7ff4b5c3c3453b5fb6f7b4cd53ef67c8c",
+    "src/solana_alpha_lab/factory/research_shelf_native.py": "39e6f11dde08d73cc49ac4644cb1b17e03a28d2103608c7369e7a6a90f62021b",
+    "tests/test_factory_ordinary_market_hypothesis.py": "5ef96263537bae485e553366844f4e77dd80f5149c635cb93f2e6db2e4f44cc9",
+    "tests/test_research_fragments_v1.py": "98200fefdf8766fa0425700419186a88699ee0ef2556e113bfafce1ba2bac0cb",
+    "tests/test_research_shelf_entry_v1.py": "09d92aa18b8250cf487c485bdf5d5ce734238fc4b3685da5a27041f2020ff1af",
+    "tests/test_research_shelf_native_v1.py": "6a7ab892e764ccf9ca2b21f34796e4cedf6cdd2a8b61ef235b1f5dcf292d6917",
+    "tests/test_research_shelf_v1.py": "45bf3b7a5b829d7fb282ab4b0ca7d1a3f2254ad2a15ec218bb43fa2c37d720e7",
+    "tests/test_risk_and_economics_v1.py": "aac19db636988f99cbe22c0f70e102e888b881737584683b10a2e129886475d1"
+  },
+  "corrections": [
+    {
+      "id": "R1",
+      "result": "PASS",
+      "behavior": "Invalid history retains minimal identity reservations without admitting the item; unreadable identity blocks new publication. Exact saved-byte retry and reconcile stay supported.",
+      "negative_controls": "Unrelated publication with readable invalid history succeeds; duplicate origin/mutation and unknown-identity appends refuse; exact historical retry remains ALREADY_PUBLISHED."
+    },
+    {
+      "id": "R2",
+      "result": "PASS",
+      "behavior": "Scoped writer checks private provenance across the exact fetched item history on every CAS attempt.",
+      "negative_controls": "Removing refs cannot publish PRIVATE_SENTINEL without disclosure; exact minimal approved digest succeeds; independent public SMIAL payload needs no private disclosure."
+    },
+    {
+      "id": "R3",
+      "result": "PASS",
+      "behavior": "Exact verified saved material_defects, attack_matrix and non_claims reach native dossier and actual StrategyVersion resolver; draft/packet/source non-claims remain source-tagged.",
+      "negative_controls": "Literal statistical defect and ONE_SYNTHETIC_DAY_IS_NOT_REPLICATION survive native KILL and two synthetic PROMOTE transport fixtures; missing content remains null/unavailable, never inferred."
+    },
+    {
+      "id": "R4",
+      "result": "PASS",
+      "behavior": "WAITING sorts nearest review_at/review_by before undated events, and its RU row shows that same nearest date with item identity.",
+      "negative_controls": "Five calm undated events cannot hide a sixth dated item; review_by-only and review_by before review_at work; DUE retains higher priority."
+    },
+    {
+      "id": "R5",
+      "result": "PASS",
+      "behavior": "SOURCE_CHANGED compares compatible typed, source-bound immutable tokens.",
+      "negative_controls": "Hashless/wrong type/wrong source and same-Git-object hash contradiction stay UNKNOWN; incidental description/time is NOT_MET; actual compatible changed source is MET."
+    },
+    {
+      "id": "R6",
+      "result": "PASS",
+      "behavior": "Postcommission recipe includes metadata-scope; explicit local-only recipe remains separate. RU overview explains UNKNOWN without saved-source arguments.",
+      "negative_controls": "CLI recipe selects ScopedShelfGit without local fallback; local recipe selects ShelfGit; normal WAITING does not display an irrelevant UNKNOWN hint."
+    }
+  ],
+  "ci_repairs": [
+    "Create owned disposable test parent on clean checkout.",
+    "Propagate accepted route count 14 to execution-domain consumer.",
+    "Update explicitly CURRENT ENGINEERING CLI hash for derived shelf entry overlay; historical/scientific pins and core hashes unchanged.",
+    "Freeze fragment test administrative clock within fixed synthetic grant; projection uses same explicit clock, and expiry negative control remains."
+  ],
+  "preliminary_internal_ux_recheck": "Two working-tree gaps (displayed nearest date and RU UNKNOWN hint) corrected; 20 entry tests revalidated afterward.",
+  "reproduce": [
+    "uv run --locked --managed-python python -B -m unittest tests.test_research_shelf_entry_v1 tests.test_research_shelf_v1 tests.test_factory_semantic_operability tests.test_hfic_scientific_disposition_navigation_v1 tests.test_risk_and_economics_v1.RiskAndEconomicsV1Tests.test_semantic_route_reused tests.test_factory_ordinary_market_hypothesis tests.test_research_shelf_native_v1 -v",
+    "uv run --locked --managed-python python -B -m unittest tests.test_research_fragments_v1.FragmentVerticalTests.test_registration_projection_prior_actual_import_and_cold_resume tests.test_research_fragments_v1.FragmentVerticalTests.test_late_deny_after_native_reservation_stops_before_loader_and_pause_survives_unknown -v",
+    "uv run --locked --managed-python python -B scripts/validate_factory_static.py"
+  ],
+  "non_claims": [
+    "NO_CAPABILITY_DONE_OR_COMMISSIONING",
+    "NO_REAL_DATA_BRANCH_BOOTSTRAP_OR_SEEDS",
+    "NO_REMINDER_CUTOVER",
+    "NO_REAL_SCIENTIFIC_LOOK_OR_PROVIDER_CALL",
+    "NO_SCIENTIFIC_PROMOTION_OR_TRADING_AUTHORITY",
+    "NO_MERGE_AUTHORITY",
+    "SCOUT_IMPLEMENTATION_HAS_NOT_RUN_THE_SHARED_FIXTURE",
+    "CLOUD_EXPLICIT_REF_RECIPE_NOT_LIVE_COMMISSIONED"
+  ],
+  "additional_negative_probe": {
+    "name": "missing_dossier_source_fields",
+    "result": "PASS",
+    "output_sha256": "605814770ef7c9fecffc08200d4a677ac53895300d003f1559794db4ae407c57",
+    "scope": "Mock absent saved bundle content via existing read interface; no persisted writes; excluded from unique test count."
+  }
+}

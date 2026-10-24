@@ -967,6 +967,11 @@ def cmd_forge_run(
             payload["owner_readout"] = (
                 str(payload.get("owner_readout") or "").rstrip() + "\n" + "\n".join(context_lines)
             )
+        # Derived after receipt hashing, including every blocked/missing-root exit.
+        # Pure pinned read only: no Git transport, native plan, evaluator or writes.
+        from solana_alpha_lab.factory.research_shelf_context import glance, readout
+        payload["shelf_summary"] = glance(repo_root)
+        payload["owner_readout"] = str(payload.get("owner_readout") or "").rstrip() + "\n" + readout(payload["shelf_summary"])
         _assert_no_path_leak(payload, str(repo_root))
         readout = payload.get("owner_readout")
         if isinstance(readout, str) and readout.strip():

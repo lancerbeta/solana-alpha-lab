@@ -5,7 +5,7 @@ projection_kind: DERIVED_REFERENCE_ONLY
 truth_owner: CATALOG_REFERENCES
 authority_granted: false
 limits:
-  max_routes: 13
+  max_routes: 14
   max_root_bindings_per_route: 2
   max_root_assets_per_route: 3
   max_query_recipes_per_route: 4
@@ -125,7 +125,7 @@ routes:
     status_plane: SCIENTIFIC
     runtime_resolution: {mode: NONE, operator_asset_ids: []}
     forge_visibility: INCLUDE
-    related_route_ids: [SEM-EXPERIMENT-CAPABILITIES, SEM-LIVE-EVIDENCE-TO-FORGE]
+    related_route_ids: [SEM-EXPERIMENT-CAPABILITIES, SEM-LIVE-EVIDENCE-TO-FORGE, SEM-RESEARCH-SHELF]
 
   - semantic_route_id: SEM-EXPERIMENT-CAPABILITIES
     purpose: Accepted reusable Experiment Capability registry for compose-or-gap decisions.
@@ -486,4 +486,24 @@ routes:
     status_plane: MIXED
     runtime_resolution: {mode: NONE, operator_asset_ids: []}
     forge_visibility: EXCLUDE
-    related_route_ids: [SEM-OWNER-LIFECYCLE, SEM-AUTHORITY-BOUNDARIES, SEM-VISUAL-OPERATING-SYSTEM]
+    related_route_ids: [SEM-OWNER-LIFECYCLE, SEM-AUTHORITY-BOUNDARIES, SEM-VISUAL-OPERATING-SYSTEM, SEM-RESEARCH-SHELF]
+
+  # One new metadata owner; retain all other limits and the 14 existing bindings.
+  - semantic_route_id: SEM-RESEARCH-SHELF
+    purpose: >-
+      Deferred intent, reference-only. lancerbeta/solana-alpha-lab:
+      research-log / capsules/research_shelf_v1/. Explicit-ref recipe: operator root.
+    owner_questions:
+      - What research questions did we defer?
+      - When should we revisit this observation?
+      - Где полка отложенных исследований?
+      - К каким вопросам пора вернуться?
+    search_terms: [research shelf, deferred research, research intent, revisit, отложенные вопросы, полка исследований, полка, отложенное исследование, вернуться к наблюдению]
+    consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, DIRECT-CODEX-DELIVERY, DIRECT-CURSOR-DELIVERY]
+    root_binding_ids: []
+    root_asset_ids: [DOC-RESEARCH-SHELF-001]
+    query_recipe_ids: []
+    status_plane: CAPABILITY
+    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    forge_visibility: EXCLUDE
+    related_route_ids: [SEM-PRIOR-WORK, SEM-OWNER-DAILY-ATTENTION, SEM-HYPOTHESIS-FORGE]

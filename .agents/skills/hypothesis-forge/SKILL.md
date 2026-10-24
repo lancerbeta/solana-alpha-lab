@@ -29,6 +29,17 @@ mechanical passage; it grants no real-data, provider or experiment authority.
 
 ## Ordinary operation
 
+Before the first native preflight of a fresh top-level research session, resolve
+`SEM-RESEARCH-SHELF` and follow `docs/operator/RESEARCH_SHELF_V1.md`: one explicit
+metadata refresh in the separate bare cache, then review the pinned export.
+Do not fetch/push from the execution checkout or repeat refresh per tool call.
+`forge-run` emits a read-only derived glance outside its receipt hash; missing
+shelf evidence never replaces native `next_action`. Frozen resume and approved
+RFV import/run-due use a separate metadata review; keep frozen executable/inputs.
+After a result, link the exact saved target for an explicitly retained question.
+If publication fails, recover only that metadata link with its stable adoption
+key; never repeat MAIN, candidate creation or Critic to repair the shelf.
+
 For fresh episode context, read `generation_context` and
 `prior_memory_working_view` first. Snapshot 1.1 is a bounded working set;
 `archive_complete_in_packet=false` means some history is omitted, while the

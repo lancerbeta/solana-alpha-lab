@@ -25763,7 +25763,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/run_factory_experiment.py', repository_path: scripts/run_factory_experiment.py}
-  integrity: {kind: sha256, sha256: e3f963dd3b27b34fcfa801a4bc406eccde854842508f3be19ad62b82f31da548}
+  integrity: {kind: sha256, sha256: b9fe19abbeef661987af3c932afbb1559634b7d607f0b454f852b9f02f977282}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -27680,7 +27680,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 4b8d7ce813b6cbd2735ae56708bf88418eb91d502da7c3affa728df8572a9326}
+  integrity: {kind: sha256, sha256: 5ef96263537bae485e553366844f4e77dd80f5149c635cb93f2e6db2e4f44cc9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -27698,7 +27698,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/run_factory_ordinary_market_hypothesis.py', repository_path: scripts/run_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 72d479df06067bc4afae4b4a105e88825963b45b08a57747e64aa1e741a0df72}
+  integrity: {kind: sha256, sha256: 94b811fecf40f5f8c506bb0a2d7f58a99fc4fedc364a09b00b4e30ec942893a4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -32368,7 +32368,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: d975327d5cbe1be048950b07379b679efad40a6608f15c825d94737e55e7fbcf}
+  integrity: {kind: sha256, sha256: 299ef53b9db7b7732fd9cf7aa2d21e94448299de6a5caa785494785d29ea605a}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34657,7 +34657,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: fad949f339a8623c6d0e2cdab4e515faed86a597039ea687700d5e21ac0ec6ba}
+  integrity: {kind: sha256, sha256: b4d7b7170f49008b611311544580451bcb464a4290cfd6d08bd35e4793f55469}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34675,7 +34675,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_semantic_operability.schema.json', repository_path: catalog/schemas/factory_semantic_operability.schema.json}
-  integrity: {kind: sha256, sha256: 5a4feae9260e569ed60ee623584c172f46ac5fda0711b95a02e68676dd6bbb57}
+  integrity: {kind: sha256, sha256: c55f35929e39c76398b00268d05335836bd18ea6aa0516002daf63da9284a2be}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34732,7 +34732,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: c26ab0ae64686e91ccb3a29c6cdc1a6b81ef5f3f295bc4381583150a3e6a8e27}
+  integrity: {kind: sha256, sha256: 78ee75a44ca0cfcafd5d149aa94a99ccf2a0206bcefa7fdf461c4e9ca67881b0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-NATIVE-LIFECYCLE-CLOSURE-001}
@@ -34752,7 +34752,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_semantic_operability.py', repository_path: tests/test_factory_semantic_operability.py}
-  integrity: {kind: sha256, sha256: efe9eeb816ca02e19b7abb5e286f75520ea2d05e74cadb1e181681e02c74768c}
+  integrity: {kind: sha256, sha256: aad130c89045d5e77cf61a8ce0c902e676456cf4743b32e90b543ab41052d79d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34770,7 +34770,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: 2fbf4e7edce8c53b83ccec0f837ff49eef706d72448b9fe89ea8e4ab11ae35a6}
+  integrity: {kind: sha256, sha256: 3bb37d4abe58a3bc71142304a4c4b7d61a002256bf60a385eadf173d0bc6e860}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -36947,7 +36947,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: RISK_AND_ECONOMICS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_risk_and_economics_v1.py', repository_path: tests/test_risk_and_economics_v1.py}
-  integrity: {kind: sha256, sha256: 6d0742193f5fd20ec9a660074a826561b9f0b27e443b09efee11c880c9681a2e}
+  integrity: {kind: sha256, sha256: aac19db636988f99cbe22c0f70e102e888b881737584683b10a2e129886475d1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RISK-AND-ECONOMICS-001}
@@ -43372,7 +43372,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/RESEARCH_FRAGMENTS_V1.md', repository_path: docs/operator/RESEARCH_FRAGMENTS_V1.md}
-  integrity: {kind: sha256, sha256: f95ce5f11eead41306d83274e9946ec841c9d433671fea6f75e11f8910d65fae}
+  integrity: {kind: sha256, sha256: 9744f185f39b7e2c5c0c34928c5ccebfa456bc3ca17c81dbbc484867856a929a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43389,7 +43389,7 @@ records:
   as_of: '2026-10-18'
   truth_owner: SMIAL_RESEARCH_FRAGMENTS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_research_fragments_v1.py', repository_path: tests/test_research_fragments_v1.py}
-  integrity: {kind: sha256, sha256: 4f168e9da4e37eb306fad7a3a9bcd67ad1a25f62741f8783fd42b25b6622ca5a}
+  integrity: {kind: sha256, sha256: 98200fefdf8766fa0425700419186a88699ee0ef2556e113bfafce1ba2bac0cb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}]
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
@@ -43519,6 +43519,467 @@ records:
   - source completeness
   - TASK-22
   - current vs frozen
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: DOC-RESEARCH-SHELF-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Research intent shelf entry, exact-ref cloud recipe, privacy and recovery;
+    no scientific authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-24'
+  truth_owner: RESEARCH_SHELF_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/operator/RESEARCH_SHELF_V1.md
+    repository_path: docs/operator/RESEARCH_SHELF_V1.md
+  integrity:
+    kind: sha256
+    sha256: d7f2f92db04060f8227de02b56334a5a80a030d660856a8fc579c208fa6f3ea6
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-RESEARCH-SHELF-001
+  consumers:
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  - DIRECT-CODEX-DELIVERY
+  evidence: []
+  search_terms:
+  - RESEARCH_SHELF_V1
+  - SEM-RESEARCH-SHELF
+  - research intent
+  - полка исследований
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: CONFIG-RESEARCH-SHELF-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Exact SMIAL shelf namespace and bounded head-observation TTL; production
+    publication disabled.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-24'
+  truth_owner: RESEARCH_SHELF_V1
+  location:
+    kind: git_path
+    logical_uri: repo://configs/research_shelf_v1.json
+    repository_path: configs/research_shelf_v1.json
+  integrity:
+    kind: sha256
+    sha256: 41a0db5b459e194bb914ebd06fd3890809bc4b7d1ee01e01d602dbfd1dc47049
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-RESEARCH-SHELF-001
+  consumers:
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  - DIRECT-CODEX-DELIVERY
+  evidence: []
+  search_terms:
+  - RESEARCH_SHELF_V1
+  - SEM-RESEARCH-SHELF
+  - research intent
+  - полка исследований
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: MODULE-RESEARCH-SHELF-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Canonical immutable V1 wire, history fold and administrative attention.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-24'
+  truth_owner: RESEARCH_SHELF_V1
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/factory/research_shelf.py
+    repository_path: src/solana_alpha_lab/factory/research_shelf.py
+  integrity:
+    kind: sha256
+    sha256: be327ac37d5720fcb82e2d7d636552e0b858fa46abee13decfd46c93db8f94b8
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-RESEARCH-SHELF-001
+  consumers:
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  - DIRECT-CODEX-DELIVERY
+  evidence: []
+  search_terms:
+  - RESEARCH_SHELF_V1
+  - SEM-RESEARCH-SHELF
+  - research intent
+  - полка исследований
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: MODULE-RESEARCH-SHELF-CONTEXT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Derived pinned snapshot freshness witness and read-only entry glance; excluded
+    from scientific receipts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-24'
+  truth_owner: RESEARCH_SHELF_V1
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/factory/research_shelf_context.py
+    repository_path: src/solana_alpha_lab/factory/research_shelf_context.py
+  integrity:
+    kind: sha256
+    sha256: 795937d5b07d444d362e5338d9c8e15e14bccff1ec01b4c0a58f0047702c682b
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-RESEARCH-SHELF-001
+  consumers:
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  - DIRECT-CODEX-DELIVERY
+  evidence: []
+  search_terms:
+  - RESEARCH_SHELF_V1
+  - SEM-RESEARCH-SHELF
+  - research intent
+  - полка исследований
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: MODULE-RESEARCH-SHELF-NATIVE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Existing saved source adapters, exact adoption/inverse links and StrategyVersion
+    decision-bound reader.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-24'
+  truth_owner: RESEARCH_SHELF_V1
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/factory/research_shelf_native.py
+    repository_path: src/solana_alpha_lab/factory/research_shelf_native.py
+  integrity:
+    kind: sha256
+    sha256: 39e6f11dde08d73cc49ac4644cb1b17e03a28d2103608c7369e7a6a90f62021b
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-RESEARCH-SHELF-001
+  consumers:
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  - DIRECT-CODEX-DELIVERY
+  evidence: []
+  search_terms:
+  - RESEARCH_SHELF_V1
+  - SEM-RESEARCH-SHELF
+  - research intent
+  - полка исследований
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: MODULE-RESEARCH-SHELF-GIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Isolated append-only metadata Git transport; local-only until accepted
+    commissioning.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-24'
+  truth_owner: RESEARCH_SHELF_V1
+  location:
+    kind: git_path
+    logical_uri: repo://src/solana_alpha_lab/factory/research_shelf_git.py
+    repository_path: src/solana_alpha_lab/factory/research_shelf_git.py
+  integrity:
+    kind: sha256
+    sha256: 64b95026b890604de0741083b42ae5e7ff4b5c3c3453b5fb6f7b4cd53ef67c8c
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-RESEARCH-SHELF-001
+  consumers:
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  - DIRECT-CODEX-DELIVERY
+  evidence: []
+  search_terms:
+  - RESEARCH_SHELF_V1
+  - SEM-RESEARCH-SHELF
+  - research intent
+  - полка исследований
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: SCRIPT-RESEARCH-SHELF-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Single metadata CLI for prepare, review, exact readback, links and public-payload
+    refusal.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-24'
+  truth_owner: RESEARCH_SHELF_V1
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/research_shelf.py
+    repository_path: scripts/research_shelf.py
+  integrity:
+    kind: sha256
+    sha256: ea6e02758c2a4aa47a77b9716936a6b086a3418c22e12fd1de28734c992ca7f9
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-RESEARCH-SHELF-001
+  consumers:
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  - DIRECT-CODEX-DELIVERY
+  evidence: []
+  search_terms:
+  - RESEARCH_SHELF_V1
+  - SEM-RESEARCH-SHELF
+  - research intent
+  - полка исследований
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: SCHEMA-RESEARCH-SHELF-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Strict cross-product Research Shelf V1 wire schema; no scientific status.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-24'
+  truth_owner: RESEARCH_SHELF_V1
+  location:
+    kind: git_path
+    logical_uri: repo://catalog/schemas/research_shelf_v1.schema.json
+    repository_path: catalog/schemas/research_shelf_v1.schema.json
+  integrity:
+    kind: sha256
+    sha256: 94d4762f556fd8ce28dc048644c87ccff6b6640b681cf0ba399101d673a6dc70
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-RESEARCH-SHELF-001
+  consumers:
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  - DIRECT-CODEX-DELIVERY
+  evidence: []
+  search_terms:
+  - RESEARCH_SHELF_V1
+  - SEM-RESEARCH-SHELF
+  - research intent
+  - полка исследований
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: TEST-RESEARCH-SHELF-ENTRY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Synthetic actual entry/freshness/privacy tests; no real research or publication.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-24'
+  truth_owner: RESEARCH_SHELF_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_research_shelf_entry_v1.py
+    repository_path: tests/test_research_shelf_entry_v1.py
+  integrity:
+    kind: sha256
+    sha256: 09d92aa18b8250cf487c485bdf5d5ce734238fc4b3685da5a27041f2020ff1af
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-RESEARCH-SHELF-001
+  consumers:
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  - DIRECT-CODEX-DELIVERY
+  evidence: []
+  search_terms:
+  - RESEARCH_SHELF_V1
+  - SEM-RESEARCH-SHELF
+  - research intent
+  - полка исследований
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: TEST-RESEARCH-SHELF-NATIVE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Synthetic existing native lineage and metadata-only recovery vertical.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-24'
+  truth_owner: RESEARCH_SHELF_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_research_shelf_native_v1.py
+    repository_path: tests/test_research_shelf_native_v1.py
+  integrity:
+    kind: sha256
+    sha256: 6a7ab892e764ccf9ca2b21f34796e4cedf6cdd2a8b61ef235b1f5dcf292d6917
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-RESEARCH-SHELF-001
+  consumers:
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  - DIRECT-CODEX-DELIVERY
+  evidence: []
+  search_terms:
+  - RESEARCH_SHELF_V1
+  - SEM-RESEARCH-SHELF
+  - research intent
+  - полка исследований
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: TEST-RESEARCH-SHELF-STORAGE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: V1 independent wire and real disposable Git concurrency/recovery oracles.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-24'
+  truth_owner: RESEARCH_SHELF_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_research_shelf_v1.py
+    repository_path: tests/test_research_shelf_v1.py
+  integrity:
+    kind: sha256
+    sha256: 45bf3b7a5b829d7fb282ab4b0ca7d1a3f2254ad2a15ec218bb43fa2c37d720e7
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CONTRACT-RESEARCH-SHELF-001
+  consumers:
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  - DIRECT-CODEX-DELIVERY
+  evidence: []
+  search_terms:
+  - RESEARCH_SHELF_V1
+  - SEM-RESEARCH-SHELF
+  - research intent
+  - полка исследований
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: CONTRACT-RESEARCH-SHELF-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Canonical owner-supplied Research Shelf V1 wire, ownership and commissioning
+    contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-24'
+  truth_owner: RESEARCH_SHELF_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/contracts/research_shelf_v1.md
+    repository_path: docs/contracts/research_shelf_v1.md
+  integrity:
+    kind: sha256
+    sha256: 9ec9947d1920c062ba7750f5a6af2ffa1fcb5d8ca4b91d42c2b1d4c28bb49e38
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations: []
+  consumers:
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  - DIRECT-CODEX-DELIVERY
+  evidence: []
+  search_terms:
+  - RESEARCH_SHELF_V1
+  - SEM-RESEARCH-SHELF
+  - research intent
+  - полка исследований
   classification:
     contains_secrets: false
     contains_raw_data: false

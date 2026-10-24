@@ -657,7 +657,7 @@ class RiskAndEconomicsV1Tests(unittest.TestCase):
     def test_semantic_route_reused(self) -> None:
         assets, bindings, _queries = load_semantic_catalog_views(ROOT)
         projection = load_semantic_projection(ROOT)
-        self.assertEqual(len(projection["routes"]), 13)
+        self.assertEqual(len(projection["routes"]), 14)
         lifecycle = next(
             item
             for item in projection["routes"]

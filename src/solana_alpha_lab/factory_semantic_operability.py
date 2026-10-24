@@ -347,8 +347,7 @@ def _resolved_roots(
                 "path": asset_path(record) if record else None,
                 "catalog_record_status": (record or {}).get("status"),
                 "catalog_record_status_note": (
-                    "Catalog asset lifecycle only; not product DONE, runtime health, "
-                    "or authority"
+                    "Catalog only; not DONE/runtime health/authority."
                 ),
             }
         )
@@ -361,8 +360,7 @@ def _resolved_roots(
                 "path": asset_path(record) if record else None,
                 "catalog_record_status": (record or {}).get("status"),
                 "catalog_record_status_note": (
-                    "Catalog asset lifecycle only; not product DONE, runtime health, "
-                    "or authority"
+                    "Catalog only; not DONE/runtime health/authority."
                 ),
             }
         )
