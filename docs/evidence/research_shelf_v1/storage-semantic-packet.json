@@ -1,0 +1,69 @@
+{
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "task": {
+    "task_id": "RESEARCH_SHELF_V1",
+    "task_contract_sha256": "71ca4097d98946207a96ff97576c4ba6c50a9d5c6e0d270d36c28d65794759f3"
+  },
+  "candidate": {
+    "base": "ab13b7efa7efaf9762b6d12eca52e2348d1fe759",
+    "head": "49038879eccc2443621f68cf9dfe933fff1a2f48",
+    "diff_sha256": "995960aa389a66224cf43d69b0381ed7d5b28762483b9a9b5516c5950360674f"
+  },
+  "review": {
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "RESEARCH_TRUTH_OWNERSHIP",
+      "UNKNOWN_VS_NEGATIVE_EVIDENCE",
+      "OWNER_AUTHORITY_SEMANTICS"
+    ],
+    "architecture_owner": "ARCHITECTURE_CRITIC"
+  },
+  "semantic_claims": [
+    {
+      "claim_id": "SHELF-STORAGE-001",
+      "claim": "The local-only storage vertical preserves immutable revision history and refuses same-item lost updates; unavailable evidence remains unknown.",
+      "scope": "Stage 1 local bare remotes, strict V1 wire, UTC date attention; not the complete PRD."
+    }
+  ],
+  "non_claims": [
+    "No production/cloud publication or bootstrap is commissioned.",
+    "No native adapters, entry hook, scientific admission, private-prose guarantee or StrategyVersion trace is delivered yet.",
+    "A local stage checkpoint is not merge readiness or full RESEARCH_SHELF_V1 DONE."
+  ],
+  "evidence": [
+    {
+      "asset_id": null,
+      "logical_ref": "tests/fixtures/research_shelf_v1/genesis.json",
+      "sha256_or_fingerprint": "dd7dde379c136e401e2647a6e1f022f689e14c0d18036bd8a98a38c7d82224e9"
+    },
+    {
+      "asset_id": null,
+      "logical_ref": "local/research_shelf_v1_tests.log",
+      "sha256_or_fingerprint": "b6c79be97ea8ab0cc5e16cdbef50e35c41792efc4445cc99e572df280004f7d2"
+    }
+  ],
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "packet_bound": true,
+    "readonly": true,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null
+  },
+  "packet_fingerprint_sha256": "cb202410cc80845ad85eb5c77253527088412d32c7c98b8190b23aa4416e0dec"
+}

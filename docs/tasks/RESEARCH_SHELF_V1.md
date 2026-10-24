@@ -130,11 +130,23 @@ the next checkpoint, within this same task.
   readback against real disposable bare remotes.
 - [x] CLI capture/prepare/apply/show/review and explicit refresh, with prepared
   draft distinguished from confirmed Git publication. Local-only transport.
-- [ ] Focused vertical passes; isolated review and fix material findings.
-- [ ] Evidence/checkpoint, local commit, then stop before stage 2.
+- [x] Focused vertical passes; isolated review and fix material findings.
+- [x] Evidence/checkpoint, local commit, then stop before stage 2.
 
 Review focus: unrelated invalid items; same-item lost update; concurrent genesis
 with identical origin_key; an ambiguous push reply; stale/incomplete snapshot
 and machine-safe Russian output on Windows. No passing local-only test claims
 cloud/production publication, native admission, privacy of arbitrary prose,
 frozen scientific identity or downstream strategy trace.
+
+## Stage 1 checkpoint
+
+Validated/reviewed code: `49038879eccc2443621f68cf9dfe933fff1a2f48`.
+25/25 focused synthetic tests PASS; all four required isolated reviewers PASS
+for this local-only stage. Evidence and exact limitations:
+`docs/evidence/research_shelf_v1/storage-checkpoint.json` and
+`docs/evidence/research_shelf_v1/STORAGE_CHECKPOINT.md`.
+
+Full task remains IN_PROGRESS. Stage 2 requires the owner's checkpoint OK;
+do not infer production publication, native adapter, entry, provenance or
+scientific authority from the passing storage vertical.
