@@ -6,8 +6,8 @@
   "task_id": "RESEARCH_SHELF_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "ecdba316ff3c9facadb1dbb6bdc1f9466276c43b72615e2d230be5358c39d549",
+  "reviewed_inventory_sha256": "00f608d9a2bfcd6bb0e19c33a20a9a2f6558b5a7766fa26dc43d0acdaca055ac",
   "dimensions": {
     "mission": "Retain deferred intent and resolve exact saved research origin at entry; engineering scope only.",
     "flexibility_and_history": "Append-only revisions; adopted exact commit/hash; CLOSED and explicit retraction retain history.",
