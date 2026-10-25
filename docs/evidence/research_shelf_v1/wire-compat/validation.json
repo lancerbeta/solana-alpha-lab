@@ -5,7 +5,7 @@
   "source_sha256": {
     "smial_schema": "c2b47579351cdb2c2d929dddfdb4612da068744655ec48bf3f5c1de2bc164661",
     "smial_wire": "be327ac37d5720fcb82e2d7d636552e0b858fa46abee13decfd46c93db8f94b8",
-    "scout_wire": "0f5e950a7a8c8be3577a69c1fb8b98db8edd0e061669a178cb852fd419718ab4"
+    "scout_wire": "c0c51577ee82f0fe2fe397db1c7f22f22b87d8cb262503e76abbd9b37ef94ac6"
   },
   "groups": [
     {
@@ -52,7 +52,8 @@
   "literal_projection_cases": 8,
   "controls": {
     "duplicate_opaque_mutation": "REFUSED_BOTH",
-    "physical_locators": "REFUSED_BOTH"
+    "physical_locators": "REFUSED_BOTH",
+    "legacy_relative_percent": "EXACT_BOTH_TWO_CASES"
   },
   "focused_smial_checks": {
     "count": 16,
