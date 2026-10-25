@@ -1,1 +1,68 @@
-{"schema": "smial.delivery-completion-evidence", "schema_version": "1.0", "task_id": "RESEARCH_SHELF_V1", "verdict": "NOT_READY"}
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RESEARCH_SHELF_V1-WIRE-COMPAT-ENGINEERING",
+  "as_of": "2026-10-25",
+  "task_id": "RESEARCH_SHELF_V1",
+  "state_change": "OPAQUE_MUTATION_AND_NATIVE_URI_INTEROPERABILITY_VERIFIED_WITH_UNCHANGED_PUBLISHED_BYTES",
+  "base_main": "9adc2f4b5a57ac10db7102a7766ae42a3103fc5f",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "be48fc0936c1f0acc0cf1c9ec5aac51167df11810449ebb073f37b9e5012e01d",
+    "catalog/schemas/research_shelf_v1.schema.json": "c2b47579351cdb2c2d929dddfdb4612da068744655ec48bf3f5c1de2bc164661",
+    "docs/contracts/research_shelf_v1.md": "c6c6c47579768e5704e5745c7b02f22ec6c0171a27794f8bf0f3b0099cc5e346",
+    "docs/evidence/research_shelf_v1/wire-compat/READOUT.md": "ad39fb221b5a78219bb9de6712159e70909511b5e53ddc836a082f782b2d246c",
+    "docs/evidence/research_shelf_v1/wire-compat/validation.json": "79b61ad3f869e2c5ed60fe8b0ec41ed662ffc7a0886c3bac7372890ea354990c",
+    "docs/tasks/RESEARCH_SHELF_V1.md": "1d3aad1767d6f7731015d8be90439447ccebf00a6654c222f45a5f10639c2b7a",
+    "tests/fixtures/research_shelf_v1/compatibility.json": "0c65d74ff818372912bbbaea519c975e4f37ae1c0249e975b09e76b451bebec6",
+    "tests/test_research_shelf_v1.py": "1d11fac8c1e20de37409af120a446df7ffbaa4dbe4c2a9ca5f64c6ac183580a3"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/research_shelf_v1/wire-compat/factory-fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_16_FOCUSED_SMIAL_AND_BIDIRECTIONAL_SAVED_BYTES",
+    "independent_review": {
+      "path": "docs/evidence/research_shelf_v1/wire-compat/independent-review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_2_SMIAL_5_SCOUT_UNCHANGED_BYTES",
+      "PASS_BOTH_HISTORIES_AND_8_PROJECTIONS",
+      "PASS_OPAQUE_RESERVATION_AND_EXACT_RETRY",
+      "PASS_LEGACY_PERCENT_AND_UNSAFE_URI_CONTROLS",
+      "PASS_PRIVATE_SOURCE_EXCLUSION"
+    ]
+  },
+  "non_claims": [
+    "NO_DATA_PUBLICATION_OR_HISTORY_REWRITE",
+    "NO_SCIENTIFIC_RUN_OR_NATIVE_REBIND",
+    "NO_REMINDER_SCHEDULER_OR_RUNTIME_CHANGE",
+    "NO_FULL_COMMISSIONING_OR_MERGE_AUTHORITY"
+  ],
+  "side_effects": {
+    "data_publications": 0,
+    "scientific_runs": 0,
+    "native_writes": 0,
+    "reminder_changes": 0,
+    "runtime_changes": 0,
+    "synthetic_local_git_only": true,
+    "scope": "BOUNDED_ENGINEERING_EXCLUDING_ROUTINE_GIT_GITHUB_DELIVERY"
+  }
+}
