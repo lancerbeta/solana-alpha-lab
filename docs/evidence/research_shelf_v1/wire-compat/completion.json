@@ -30,14 +30,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/research_shelf_v1/wire-compat/factory-fit.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "9441b4445d0f98c62f50036cdca0f6049001ee2e7479a791458dc001a62f6bbd",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_16_FOCUSED_SMIAL_AND_BIDIRECTIONAL_SAVED_BYTES",
     "independent_review": {
       "path": "docs/evidence/research_shelf_v1/wire-compat/independent-review.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "485f981516ae073d99a36b0926411e8d54a533bab941c0740b0bbeb374339672",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
