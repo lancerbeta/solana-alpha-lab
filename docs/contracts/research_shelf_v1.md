@@ -100,9 +100,19 @@ Canonical JSON: UTF-8, sorted keys, компактные separators, ensure_asci
 
 Неполную мысль можно сохранить: OPEN с отсутствующим trigger показывается NEEDS_TRIAGE на ближайшем research entry. Не выдумывать protocol, parameters, effect size, source timestamp или «положительный результат» ради заполнения формы. До предметного обсуждения такая запись не является поручением на исследование.
 
+mutation_id — непустая, не состоящая только из whitespace opaque строка клиента.
+UUID — допустимый способ генерации, не обязательный формат. Reader/writer не
+обрезают, не нормализуют и не переиздают этот ID: retry и conflict сравнивают
+точную строку. Опубликованные текстовые IDs Scout читаются без миграции истории.
+
 Logical reference:
 - Git: kind=GIT, repository, commit (40 hex), path, sha256 (проверенных file bytes).
 - Native: kind=NATIVE, owner, entity_kind, entity_id, payload_sha256 при наличии, logical locator; физические workstation paths не публиковать.
+
+Native locator сохраняет точные bytes логической ссылки: прежний относительный
+locator или поддержанный URI `smial-data://research/records/...`. Reader не
+обращается к URI и не превращает ссылку в разрешение доступа/научный допуск.
+Физические пути, file URI и control/path traversal не становятся допустимыми.
 - External/source hint: kind=REFERENCE, locator/description, observed_at, verification=UNVERIFIED или проверенный класс. Не все источники имеют durable hash; это отражается честно.
 - Связь: relation + exact source/destination refs + adopted_item_revision. relation имеет понятный смысл: INSPIRED_BY, CONTINUED_FROM, RELATED, SUPERSEDED_BY, HANDED_OFF_TO.
 - Ветка используется только для получения актуального head. Evidence ссылка закрепляется за commit и bytes, а не за moving branch URL.

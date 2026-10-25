@@ -54,9 +54,9 @@ context_requirements:
     - docs/contracts/research_shelf_v1.md
     - docs/decisions/ADR-006-hypothesis-fast-lane-research-data-plane.md
     DELIVERY_EVIDENCE:
-    - docs/evidence/research_shelf_v1/completion.json
-    - docs/evidence/research_shelf_v1/independent-review.json
-    - docs/evidence/research_shelf_v1/factory-fit.json
+    - docs/evidence/research_shelf_v1/wire-compat/completion.json
+    - docs/evidence/research_shelf_v1/wire-compat/independent-review.json
+    - docs/evidence/research_shelf_v1/wire-compat/factory-fit.json
     HISTORICAL_CONTEXT: []
 ---
 

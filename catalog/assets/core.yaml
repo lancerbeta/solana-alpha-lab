@@ -43810,7 +43810,7 @@ records:
     repository_path: catalog/schemas/research_shelf_v1.schema.json
   integrity:
     kind: sha256
-    sha256: 94d4762f556fd8ce28dc048644c87ccff6b6640b681cf0ba399101d673a6dc70
+    sha256: c2b47579351cdb2c2d929dddfdb4612da068744655ec48bf3f5c1de2bc164661
   access:
     mode: read_only
     method: file
@@ -43924,7 +43924,7 @@ records:
     repository_path: tests/test_research_shelf_v1.py
   integrity:
     kind: sha256
-    sha256: 45bf3b7a5b829d7fb282ab4b0ca7d1a3f2254ad2a15ec218bb43fa2c37d720e7
+    sha256: 1d11fac8c1e20de37409af120a446df7ffbaa4dbe4c2a9ca5f64c6ac183580a3
   access:
     mode: read_only
     method: file
@@ -43963,7 +43963,7 @@ records:
     repository_path: docs/contracts/research_shelf_v1.md
   integrity:
     kind: sha256
-    sha256: 9ec9947d1920c062ba7750f5a6af2ffa1fcb5d8ca4b91d42c2b1d4c28bb49e38
+    sha256: c6c6c47579768e5704e5745c7b02f22ec6c0171a27794f8bf0f3b0099cc5e346
   access:
     mode: read_only
     method: file

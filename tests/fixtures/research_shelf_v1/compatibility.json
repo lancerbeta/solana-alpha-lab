@@ -1,0 +1,15 @@
+{
+  "schema": "research-shelf-cross-product-compatibility-1",
+  "revisions": [
+    {
+      "raw": "{\"change_reason\":\"Synthetic capture.\",\"closure\":null,\"created_at\":\"2026-10-24T00:00:00Z\",\"item_id\":\"RSI-SMIAL-00000000-0000-4000-8000-000000000001\",\"kind\":\"IDEA\",\"last_decision\":null,\"mutation_id\":\"compatibility:SMIAL:opaque-mutation-1\",\"native_links\":[],\"next_action\":{\"intent\":\"Review relevance only.\",\"owner_route\":\"LIFECYCLE\",\"scope_ref\":null},\"origin_key\":null,\"origin_refs\":[{\"entity_id\":\"SYNTHETIC-SOURCE\",\"entity_kind\":\"RESEARCH_ARTIFACT\",\"kind\":\"NATIVE\",\"locator\":\"smial-data://research/records/SYNTHETIC-SOURCE\",\"owner\":\"SMIAL\",\"payload_sha256\":\"4444444444444444444444444444444444444444444444444444444444444444\"}],\"parents\":[],\"product\":\"SMIAL\",\"review\":{\"event\":{\"acknowledged_ref\":null,\"condition\":\"A future consumer asks for this context.\",\"kind\":\"MANUAL\",\"source\":null},\"review_at\":\"2026-10-31T00:00:00Z\",\"review_by\":null},\"revision_sha256\":\"bc66b52a8dfacfe11724c5849abd4136552390daff6be9d43bcf7ce21cca11f0\",\"schema_version\":\"1.0\",\"state\":\"OPEN\",\"statement\":\"Synthetic unmeasured idea for wire conformance; no market claim.\",\"title\":\"Synthetic deferred observation\",\"updated_at\":\"2026-10-24T00:00:00Z\"}\n",
+      "file_sha256": "aad23a2b37d7a2a486e047be99e8ea10c042ab86d9677bd41ab8daa9a6ee528a",
+      "mutation_id": "compatibility:SMIAL:opaque-mutation-1"
+    },
+    {
+      "raw": "{\"change_reason\":\"Synthetic capture.\",\"closure\":null,\"created_at\":\"2026-10-24T00:00:00Z\",\"item_id\":\"RSI-SCOUT-00000000-0000-4000-8000-000000000001\",\"kind\":\"IDEA\",\"last_decision\":null,\"mutation_id\":\"compatibility:SCOUT:opaque-mutation-1\",\"native_links\":[],\"next_action\":{\"intent\":\"Review relevance only.\",\"owner_route\":\"LIFECYCLE\",\"scope_ref\":null},\"origin_key\":null,\"origin_refs\":[{\"entity_id\":\"SYNTHETIC-SOURCE\",\"entity_kind\":\"RESEARCH_ARTIFACT\",\"kind\":\"NATIVE\",\"locator\":\"smial-data://research/records/SYNTHETIC-SOURCE\",\"owner\":\"SMIAL\",\"payload_sha256\":\"4444444444444444444444444444444444444444444444444444444444444444\"}],\"parents\":[],\"product\":\"SCOUT\",\"review\":{\"event\":{\"acknowledged_ref\":null,\"condition\":\"A future consumer asks for this context.\",\"kind\":\"MANUAL\",\"source\":null},\"review_at\":\"2026-10-31T00:00:00Z\",\"review_by\":null},\"revision_sha256\":\"886065d03792f9f5cc0c4e92555605c5676f6b009f0bd38381329e88af37c57a\",\"schema_version\":\"1.0\",\"state\":\"OPEN\",\"statement\":\"Synthetic unmeasured idea for wire conformance; no market claim.\",\"title\":\"Synthetic deferred observation\",\"updated_at\":\"2026-10-24T00:00:00Z\"}\n",
+      "file_sha256": "d2f9849f7bba4e415c9cc261376eb7f40e7c41cb9a5539db71296aa66fc4358b",
+      "mutation_id": "compatibility:SCOUT:opaque-mutation-1"
+    }
+  ]
+}

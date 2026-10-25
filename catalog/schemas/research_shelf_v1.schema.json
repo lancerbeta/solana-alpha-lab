@@ -11,7 +11,7 @@
     "origin_key": {"type": ["string", "null"], "minLength": 1, "maxLength": 1024},
     "revision_sha256": {"$ref": "#/$defs/hash"},
     "parents": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/hash"}},
-    "mutation_id": {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+    "mutation_id": {"type": "string", "minLength": 1, "pattern": "\\S"},
     "created_at": {"$ref": "#/$defs/clock"},
     "updated_at": {"$ref": "#/$defs/clock"},
     "kind": {"enum": ["IDEA", "OBSERVATION", "FOLLOW_UP"]},

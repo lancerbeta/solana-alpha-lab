@@ -44,6 +44,33 @@ def update(snapshot, item, **changes):
 
 
 class WireTests(unittest.TestCase):
+    def test_shared_opaque_mutation_and_native_uri_vertical(self):
+        fixture = json.loads((FIXTURE.parent / "compatibility.json").read_bytes())
+        revisions = []
+        for row in fixture["revisions"]:
+            raw = row["raw"].encode("utf-8")
+            body = shelf.decode(raw)
+            self.assertEqual(shelf.sha256(raw), row["file_sha256"])
+            self.assertEqual(body["mutation_id"], row["mutation_id"])
+            self.assertEqual(shelf.prepare(body), raw)
+            revisions.append(raw)
+        snapshot = shelf.fold(files(*revisions))
+        self.assertTrue(snapshot["identity_scope_complete"])
+        self.assertEqual({r["status"] for r in snapshot["items"].values()}, {"READY"})
+        self.assertEqual(shelf.attention(snapshot, now=NOW)["totals"], {"WAITING": 2})
+        for invalid in ("", " \t", None, 1):
+            with self.subTest(invalid_type=type(invalid).__name__):
+                with self.assertRaises(shelf.ShelfError):
+                    genesis(mutation_id=invalid)
+        # Exact-string reservations also apply when the old body is invalid.
+        first = shelf.decode(revisions[0])
+        invalid = shelf.canonical(dict(first, title=17)) + b"\n"
+        other = genesis(item_id="RSI-SCOUT-00000000-0000-4000-8000-000000000099",
+                        mutation_id=first["mutation_id"])
+        conflict = shelf.fold({shelf.revision_path(first): invalid} | files(other))
+        self.assertTrue(conflict["identity_scope_complete"])
+        self.assertTrue(all("MUTATION_ID_CONFLICT" in r["reasons"] for r in conflict["items"].values()))
+
     def test_prd_independent_hash_oracle(self):
         raw = FIXTURE.read_bytes()
         body = shelf.decode(raw)
@@ -235,7 +262,7 @@ class GitVerticalTests(unittest.TestCase):
 
     def test_invalid_history_keeps_identity_reservations_and_exact_retry(self):
         from uuid import uuid4
-        original = json.loads(genesis(origin_key="reserved-invalid-history"))
+        original = json.loads(genesis(origin_key="reserved-invalid-history", mutation_id="synthetic:opaque:reserved"))
         bad = dict(original, title=17)  # Invalid body, readable negative identity claims.
         bad_raw = shelf.canonical(bad) + b"\n"
         head = self.a._commit(None, {shelf.revision_path(original): bad_raw})
