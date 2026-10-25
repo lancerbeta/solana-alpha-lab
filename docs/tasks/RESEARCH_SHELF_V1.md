@@ -1,59 +1,33 @@
 ---
 task_id: RESEARCH_SHELF_V1
-task_version: '1.2'
+task_version: '1.5'
 status: IN_PROGRESS
-as_of: '2026-10-24'
+as_of: '2026-10-25'
 owner: GOAL_OWNER
 allowed_routes: [DIRECT_CODEX_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: ab13b7efa7efaf9762b6d12eca52e2348d1fe759
+  expected_base: 9adc2f4b5a57ac10db7102a7766ae42a3103fc5f
   expected_upstream: origin/main
-  expected_upstream_oid: ab13b7efa7efaf9762b6d12eca52e2348d1fe759
-  expected_branch: codex/research-shelf-v1
+  expected_upstream_oid: 9adc2f4b5a57ac10db7102a7766ae42a3103fc5f
+  expected_branch: codex/shelf-wire-compat
   dirty_mode: ALLOW_REPORTED
-objective: Implement the owner-supplied Research Shelf V1 specification, preserving append-only metadata history, exact native provenance, frozen research identity and all existing scientific authority boundaries.
+objective: Repair Research Shelf V1 native URI and opaque mutation identity compatibility with Scout, preserving all published bytes, IDs, history and scientific authority.
 managed_write_set:
 - docs/tasks/RESEARCH_SHELF_V1.md
 - docs/contracts/research_shelf_v1.md
-- src/solana_alpha_lab/factory/research_shelf.py
-- src/solana_alpha_lab/factory/research_shelf_git.py
-- scripts/research_shelf.py
 - catalog/schemas/research_shelf_v1.schema.json
 - tests/test_research_shelf_v1.py
 - tests/fixtures/research_shelf_v1/**
-- docs/evidence/research_shelf_v1/**
-- src/solana_alpha_lab/factory/research_shelf_context.py
-- src/solana_alpha_lab/factory/research_shelf_native.py
-- configs/research_shelf_v1.json
-- scripts/hypothesis_forge.py
-- scripts/run_factory_experiment.py
-- scripts/run_factory_ordinary_market_hypothesis.py
-- .agents/skills/hypothesis-forge/SKILL.md
-- .cursor/commands/hypothesis-forge.md
-- AGENTS.md
-- configs/factory_semantic_operability_v1.yaml
-- catalog/schemas/factory_semantic_operability.schema.json
+- docs/evidence/research_shelf_v1/wire-compat/**
 - catalog/assets/core.yaml
-- catalog/assets/lifecycle.yaml
 - catalog/catalog_manifest.yaml
 - catalog/generated/**
 - docs/generated/**
 - docs/PROJECT_MAP.md
 - docs/OPERATOR_NAVIGATION.md
 - docs/FACTORY_SEMANTIC_MAP.md
-- delivery-harness/context-map.yaml
-- docs/operator/RESEARCH_SHELF_V1.md
-- docs/operator/RESEARCH_FRAGMENTS_V1.md
-- tests/test_research_shelf_entry_v1.py
-- tests/test_research_shelf_native_v1.py
-- tests/test_factory_semantic_operability.py
-- tests/test_hfic_scientific_disposition_navigation_v1.py
-- tests/test_risk_and_economics_v1.py
-- tests/test_factory_ordinary_market_hypothesis.py
-- tests/test_research_fragments_v1.py
-- src/solana_alpha_lab/factory_semantic_operability.py
 external_caps:
   network: false
   credentials: false
@@ -62,7 +36,7 @@ external_caps:
   cash_spend: false
   deployment: false
 stop_conditions:
-- STAGED_OWNER_CHECKPOINT_AFTER_STAGE_2_AND_ENGINEERING_PR_BEFORE_CAPABILITY_COMMISSIONING
+- STOP_AFTER_EXACT_HEAD_CI_AND_MERGE_READINESS_BEFORE_OWNER_PHRASE
 - NO_REAL_SHELF_PUBLICATION_OR_BOOTSTRAP_BEFORE_ACCEPTED_CODE_AND_EXACT_METADATA_SCOPE
 - NO_MARKET_LOOK_PROVIDER_CALL_OR_RESEARCHSTORE_WRITE
 - NO_MERGE_BEFORE_EXACT_HEAD_CI_READINESS_AND_OWNER_PHRASE
@@ -80,9 +54,9 @@ context_requirements:
     - docs/contracts/research_shelf_v1.md
     - docs/decisions/ADR-006-hypothesis-fast-lane-research-data-plane.md
     DELIVERY_EVIDENCE:
-    - docs/evidence/research_shelf_v1/completion.json
-    - docs/evidence/research_shelf_v1/independent-review.json
-    - docs/evidence/research_shelf_v1/factory-fit.json
+    - docs/evidence/research_shelf_v1/wire-compat/completion.json
+    - docs/evidence/research_shelf_v1/wire-compat/independent-review.json
+    - docs/evidence/research_shelf_v1/wire-compat/factory-fit.json
     HISTORICAL_CONTEXT: []
 ---
 
@@ -266,3 +240,43 @@ CI repairs also create the owned disposable test parent in a clean checkout,
 pin fragment-test administrative clock inside its synthetic fixed plan, and
 update the explicitly current engineering CLI pin for the derived entry overlay.
 Production expiry gates, scientific schemas and frozen historical pins remain.
+
+## Current bounded repair: cross-product wire compatibility
+
+Owner request, 2026-10-25: repair native URI and mutation_id compatibility
+between Scout and SMIAL; preserve published IDs/history; prove both directions.
+No data publication, scientific run or reminder change. Analysis and execution
+are authorized in one bounded chain, with minimal sufficient vertical evidence.
+Earlier implementation/commissioning stages above are historical context.
+
+SPEC_ROUTE=NONE: clarify two existing wire fields in the canonical contract.
+DECISION_DELTA: both readers accept already-published valid records unchanged.
+UNCERTAINTY_REMOVED: separate green fixtures conceal real reader incompatibility.
+CAPABILITY_OR_EVIDENCE: opaque stable mutation IDs in SMIAL; logical smial-data URI
+support in Scout; bidirectional saved-byte decode/fold/attention and negatives.
+STOP: reviewed engineering changes and exact-head CI/merge readiness; no merge
+without a new exact owner phrase, no data pushes, native rebind or full DONE claim.
+NEXT: owner reviews concrete code candidates; remaining native UNKNOWN stays.
+REPLAN: any need for rewriting IDs/history, new dependencies, scientific schema,
+runtime/scheduler changes or broader scientific execution is out of scope.
+
+Design choice: extend readers rather than migrate immutable records. mutation_id
+is a nonblank opaque string compared exactly; no trim/reformat and no new length
+limit beyond the existing revision budget. Existing UUID generation stays.
+Scout accepts the actually emitted smial-data logical URI plus prior relative
+locators, retains physical/control/path refusal and never dereferences the URI.
+No shared package, adapter service, registry, URI resolver or schema-version bump.
+
+Plan: (1) freeze existing code/data pins and task contracts; (2) one focused
+SMIAL schema/test change plus independent Scout helper/test change; (3) run both
+readers on the same synthetic vertical and locally saved 2 SMIAL + 5 Scout records,
+checking unchanged bytes/IDs, invalid-history reservations, conflicts and physical
+path negatives; (4) proportional reviews and existing engineering delivery gates.
+No TDD order/new broad suite requirement; no scientific fixtures/evaluators needed.
+
+Pinned data remains SMIAL a6f03eb9d81adc93f828b994eea7525814dfa12b and
+Scout d440b1444741b09e6ed3575bdeba1701b8785e70. Private Scout bodies stay local;
+only synthetic portable fixtures and sanitized hashes/counts enter this public PR.
+Source audit: local/research_shelf_v1/commissioning/acceptance/acceptance-receipt.json
+in the original checkout, hash 6ed0c4b29216809e928743a19d0434c230b0dac31ddb609867cc260b82b0d83c.
+New tooling=NONE; existing validators, CLI, Git/gh and independent critics suffice.

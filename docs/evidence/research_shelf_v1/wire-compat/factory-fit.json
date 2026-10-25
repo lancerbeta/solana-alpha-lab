@@ -1,0 +1,34 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "RESEARCH_SHELF_V1-WIRE-COMPAT-FIT",
+  "as_of": "2026-10-25",
+  "task_id": "RESEARCH_SHELF_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "b2f924b0b4876c6ae3d034b5ebb528d9240b21f18c832c4d6d775cc0f4a48ccd",
+  "reviewed_inventory_sha256": "12e23b66d0b675b7e502ec8fcb5f9ff348a521a1e128c47ee243439a29263c4e",
+  "dimensions": {
+    "mission": "Read existing cross-product research intent metadata unchanged.",
+    "flexibility_and_history": "Expand readers; preserve exact published IDs/bytes, UUID generation, retries and negative identity reservations.",
+    "context_efficiency": "One shared synthetic fixture and saved-byte vertical, no broad scientific suite.",
+    "research_truth": "URI and opaque ID acceptance do not admit source evidence; UNKNOWN retained.",
+    "owner_operability": "No migration; same prepared bytes/IDs; both reader versions must be accepted.",
+    "execution_to_cashflow": "Engineering reliability only; no alpha/trading claim.",
+    "monitoring_and_recovery": "No scheduler/reminders; code revert preserves data history.",
+    "build_vs_buy": "Existing JSON Schema, Git and stdlib only.",
+    "security": "Opaque URI never dereferenced; physical/unsafe URI refused; private Scout bodies excluded from public evidence.",
+    "red_team": "Actual records exposed fixture blindspots; independent review caught and closed legacy-percent regression."
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "New measured cross-product mismatch after accepted versions."
+  },
+  "limits": [
+    "NO_DATA_PUBLICATION",
+    "NO_SCIENTIFIC_RUN_OR_REBIND",
+    "NO_RUNTIME_ACTIVATION",
+    "NO_FULL_COMMISSIONING_OR_MERGE_AUTHORITY"
+  ],
+  "recovery": "Ordinary code revert; preserve all published IDs/revisions and native evidence. An older reader can report typed invalid; do not rewrite data to hide it."
+}

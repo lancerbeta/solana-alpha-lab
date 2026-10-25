@@ -1,0 +1,72 @@
+{
+  "schema": "research-shelf-wire-compatibility-validation-1",
+  "result": "PASS_BIDIRECTIONAL_UNCHANGED_BYTES",
+  "shared_fixture_sha256": "0c65d74ff818372912bbbaea519c975e4f37ae1c0249e975b09e76b451bebec6",
+  "source_sha256": {
+    "smial_schema": "c2b47579351cdb2c2d929dddfdb4612da068744655ec48bf3f5c1de2bc164661",
+    "smial_wire": "be327ac37d5720fcb82e2d7d636552e0b858fa46abee13decfd46c93db8f94b8",
+    "scout_wire": "c0c51577ee82f0fe2fe397db1c7f22f22b87d8cb262503e76abbd9b37ef94ac6"
+  },
+  "groups": [
+    {
+      "group": "SMIAL_PUBLISHED",
+      "revisions": 2,
+      "items": 2,
+      "bytes_roundtrip": "EXACT_BOTH",
+      "item_mutation_revision_ids": "EXACT_BOTH",
+      "fold_heads": "EXACT_BOTH"
+    },
+    {
+      "group": "SCOUT_PUBLISHED",
+      "revisions": 5,
+      "items": 5,
+      "bytes_roundtrip": "EXACT_BOTH",
+      "item_mutation_revision_ids": "EXACT_BOTH",
+      "fold_heads": "EXACT_BOTH"
+    },
+    {
+      "group": "SMIAL_HISTORY",
+      "revisions": 9,
+      "items": 1,
+      "bytes_roundtrip": "EXACT_BOTH",
+      "item_mutation_revision_ids": "EXACT_BOTH",
+      "fold_heads": "EXACT_BOTH"
+    },
+    {
+      "group": "SCOUT_HISTORY",
+      "revisions": 9,
+      "items": 1,
+      "bytes_roundtrip": "EXACT_BOTH",
+      "item_mutation_revision_ids": "EXACT_BOTH",
+      "fold_heads": "EXACT_BOTH"
+    },
+    {
+      "group": "SHARED_VERTICAL",
+      "revisions": 2,
+      "items": 2,
+      "bytes_roundtrip": "EXACT_BOTH",
+      "item_mutation_revision_ids": "EXACT_BOTH",
+      "fold_heads": "EXACT_BOTH"
+    }
+  ],
+  "literal_projection_cases": 8,
+  "controls": {
+    "duplicate_opaque_mutation": "REFUSED_BOTH",
+    "physical_locators": "REFUSED_BOTH",
+    "legacy_relative_percent": "EXACT_BOTH_TWO_CASES"
+  },
+  "focused_smial_checks": {
+    "count": 16,
+    "result": "PASS",
+    "command": "python -B -m unittest tests.test_research_shelf_v1.WireTests tests.test_research_shelf_v1.GitVerticalTests.test_invalid_history_keeps_identity_reservations_and_exact_retry -q"
+  },
+  "scientific_runs": 0,
+  "data_publications": 0,
+  "native_writes": 0,
+  "reminder_mutations": 0,
+  "private_source_policy": "Actual private Scout payloads and per-record IDs/hashes remain local; only synthetic fixture and aggregate technical results are exported.",
+  "limits": [
+    "Pure saved-byte interoperability; no scientific admission, runtime activation, publication or full commissioning claim.",
+    "Attention names are product-specific; only explicit known aliases are compared."
+  ]
+}

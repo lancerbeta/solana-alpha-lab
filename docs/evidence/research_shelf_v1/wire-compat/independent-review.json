@@ -1,0 +1,54 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "RESEARCH_SHELF_V1-WIRE-COMPAT-REVIEW",
+  "as_of": "2026-10-25",
+  "task_id": "RESEARCH_SHELF_V1",
+  "reviewed_bindings_sha256": "b2f924b0b4876c6ae3d034b5ebb528d9240b21f18c832c4d6d775cc0f4a48ccd",
+  "reviewed_inventory_sha256": "12e23b66d0b675b7e502ec8fcb5f9ff348a521a1e128c47ee243439a29263c4e",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SEMANTIC_PREMISE PASS on both corrected frozen inventories. Exact packet/task/diff/evidence and counterpart bindings verified; independent percent-name and unsafe-URI probes confirm old relative domain preserved, URI-only validation grants no source/science authority. Git revisions and native immutable manifests remain truth; DuckDB derived.",
+        "packet_fingerprint_sha256=b0b4751ae44545d1caae4831c34a6a45cf79f31170b200b404815a95acdb7947",
+        "PACKET_INFORMATION_PATH only; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN."
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS both corrected inventories. Pure probes verify both percent cases preserve exact bytes/decode/fold, valid URI and ten physical/unsafe URI refusals. Opaque exact identity/reservations/retry preserved; initial Scout percent regression corrected before acceptance."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS bounded interoperable reading of existing 2+5 records, both histories and common fixture, eight literal projections. Updated source bindings and corrected receipt verified. No migration, data/publication/runtime/scientific authority."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS exact eight-source SMIAL inventory and counterpart handback. Prepared-byte retry, two-version rollout, no operator migration and code-revert recovery clear; scientific UNKNOWN and no full commissioning/merge claim retained."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_SCIENTIFIC_RUNTIME_OR_MERGE_AUTHORITY",
+    "NO_FULL_COMMISSIONING"
+  ]
+}
