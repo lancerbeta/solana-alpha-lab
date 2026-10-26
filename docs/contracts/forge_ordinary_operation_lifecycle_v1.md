@@ -21,11 +21,14 @@ research-universe policy gate all read it.
 `COMPLETED` applies only to `requested_completion=SCIENTIFIC_TERMINAL`. It is
 proven by the run's own persisted `FORGE_RUN_RECEIPT` and nothing else:
 
-- same focus, market epoch and scientific slot as the operation;
+- same focus and market epoch as the operation; the aggregate's active slot names an included stage;
 - recorded at or after the operation was opened;
 - `owner_class=OWNER_FINAL` and `owner_final` in `OWNER_CANDIDATE`,
   `SEARCH_EXHAUSTED_CURRENT_EVIDENCE` or `NON_SCIENTIFIC_STOP`;
-- its BASE stage session carries the operation's journal.
+- the operation's own stage carries its scientific slot and journal. A BASE
+  operation retains legacy missing-stage-slot compatibility. A representation
+  operation requires an exact slot, version, payload, completed session and its
+  declared BASE parent among the same aggregate's stages.
 
 The earliest such bound receipt is the proof. Completion is monotone: a later
 in-progress or blocked receipt of the same slot does not reopen the operation.
@@ -40,6 +43,29 @@ When the run is owner-final but its receipt is not saved,
 reconcile is `forge-run --persist --owner-focus <FOCUS>`; it writes nothing
 when the same receipt already exists. An unfinished run writes no
 owner-final, so it stays `OPEN`.
+
+## Ordinary representation readback
+
+Ordinary BASE is the parent of episode representation stages without becoming
+CONTROL. Discovery checks exact parent, focus, market and slot; a saved BASE
+draft cannot stand in for an unstarted child. A validated child draft resumes
+its own stage, and a pending child cannot authorize an owner-final.
+
+A capability-epoch change does not rewrite or reopen completed science. The
+aggregate may historically read back a wholly completed ordinary chain only
+when its stages retain one source capability epoch, their market/slot/parent
+bindings are valid, their representation versions still agree, and the existing
+transition owner derives a final. Missing or pending children do not qualify.
+The source epochs/results remain frozen; current readback provenance is not a
+new scientific execution, readiness attestation, look or budget reset.
+
+The same persisted owner-final can complete BASE and its bound representation
+operations even if its active slot points to a later candidate. Completion
+remains derived and monotone; no status append, artificial owner-stop, history
+rewrite, new look or quota refund is introduced. A repeat native persist is
+idempotent. Code acceptance alone does not append a real owner-final: use the
+existing authorized forge-run --persist only after merge and exact-state
+revalidation, then cold-read both operations and the universe gate.
 
 ## Owner stop
 

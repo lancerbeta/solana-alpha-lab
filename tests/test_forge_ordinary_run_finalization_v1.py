@@ -1,0 +1,190 @@
+"""Ordinary episode run closes from its own saved stages, never new science."""
+from __future__ import annotations
+
+import copy
+import json
+import sys
+import unittest
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
+from unittest import mock
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+from solana_alpha_lab.factory.hfic_ordinary_operation import _run_completion
+from solana_alpha_lab.factory.hfic_representation_ladder import resolve_next_action
+
+REP = "NORMALIZED_TRAJECTORY_EPISODES_V1"
+MARKET = "a" * 64
+BASE_SLOT, CHILD_SLOT = "b" * 64, "c" * 64
+BASE, CHILD = "HFIC-SESS-BASE", "HFIC-SESS-CHILD"
+JOURNAL = "d" * 64
+OPENED = datetime(2026, 10, 26, tzinfo=UTC)
+
+
+def completion_case():
+    operation = {"owner_focus": "OPPORTUNITY_EPISODES:AUTO",
+                 "market_evidence_epoch_sha256": MARKET,
+                 "scientific_slot_sha256": CHILD_SLOT, "journal_scope": JOURNAL,
+                 "representation": {"representation_id": REP,
+                    "representation_semantic_version": "1.0", "parent_session_id": BASE,
+                    "representation_payload_sha256": "e" * 64, "scope_applied_sha256": "f" * 64}}
+    body = {"owner_focus": operation["owner_focus"], "market_evidence_epoch_sha256": MARKET,
+            "scientific_slot_sha256": BASE_SLOT, "owner_class": "OWNER_FINAL",
+            "owner_final": "SEARCH_EXHAUSTED_CURRENT_EVIDENCE", "stages": [
+                {"representation_id": "BASE", "session_id": BASE, "scientific_slot_sha256": BASE_SLOT},
+                {"representation_id": REP, "representation_semantic_version": "1.0",
+                 "session_id": CHILD, "session_state": "SYNTHESIS_COMPLETE", "scientific_slot_sha256": CHILD_SLOT,
+                 "representation_payload_sha256": "e" * 64}]}
+    receipt = {"body": body, "record_id": "SAVED_RUN", "recorded_at": OPENED + timedelta(seconds=1)}
+    return operation, receipt, {BASE: {"base-journal"}, CHILD: {JOURNAL}}
+
+
+class CompletionBindingTests(unittest.TestCase):
+    def test_representation_operation_uses_own_stage_in_parent_run(self):
+        operation, receipt, keys = completion_case()
+        proof, reason = _run_completion(operation, opened_at=OPENED, receipts=[receipt], session_keys=keys)
+        self.assertEqual(reason, "")
+        self.assertEqual(proof["session_id"], CHILD)
+        # OWNER_CANDIDATE can point at the child slot; both operations still
+        # bind their own stage, not the aggregate's currently active slot.
+        receipt["body"]["scientific_slot_sha256"] = CHILD_SLOT
+        receipt["body"]["owner_final"] = "OWNER_CANDIDATE"
+        self.assertIsNotNone(_run_completion(operation, opened_at=OPENED, receipts=[receipt], session_keys=keys)[0])
+        base_operation = {**operation, "scientific_slot_sha256": BASE_SLOT, "journal_scope": "base-journal"}
+        base_operation.pop("representation")
+        self.assertIsNotNone(_run_completion(base_operation, opened_at=OPENED, receipts=[receipt], session_keys=keys)[0])
+
+    def test_foreign_stage_or_run_cannot_complete_representation(self):
+        operation, receipt, keys = completion_case()
+        mutations = {
+            "parent": lambda b: b["stages"][0].update(session_id="OTHER_BASE"),
+            "market": lambda b: b.update(market_evidence_epoch_sha256="0" * 64),
+            "root-slot": lambda b: b.update(scientific_slot_sha256="0" * 64),
+            "stage-slot": lambda b: b["stages"][1].update(scientific_slot_sha256=BASE_SLOT),
+            "payload": lambda b: b["stages"][1].update(representation_payload_sha256="0" * 64),
+            "version": lambda b: b["stages"][1].update(representation_semantic_version="2.0"),
+            "pending-child": lambda b: b["stages"][1].update(session_state="AWAITING_CLASSIFICATION"),
+            "not-final": lambda b: b.update(owner_class="FORGE_RUN_IN_PROGRESS", owner_final=None),
+        }
+        for name, mutate in mutations.items():
+            with self.subTest(name=name):
+                changed = copy.deepcopy(receipt); mutate(changed["body"])
+                self.assertIsNone(_run_completion(operation, opened_at=OPENED, receipts=[changed], session_keys=keys)[0])
+        self.assertIsNone(_run_completion(operation, opened_at=OPENED, receipts=[receipt], session_keys={CHILD: {"foreign"}})[0])
+        receipt["recorded_at"] = OPENED - timedelta(seconds=1)
+        self.assertIsNone(_run_completion(operation, opened_at=OPENED, receipts=[receipt], session_keys=keys)[0])
+
+    def test_saved_base_draft_does_not_resume_an_unstarted_child(self):
+        result = resolve_next_action([{"representation_id": "BASE", "execution_status": "REUSED_VALID",
+            "session_state": "SYNTHESIS_COMPLETE", "effective_terminal": "NO_WORTHY_HYPOTHESIS",
+            "draft_sha256": "9" * 64}], population="OPPORTUNITY_EPISODES", saved_draft_sha256="9" * 64)
+        self.assertEqual(result["next_action"], "START_NORMALIZED_TRAJECTORY_EPISODES_V1")
+
+
+class OrdinaryFinalizationVertical(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from tests import test_hfic_list_aware_vertical_v1 as fixture
+        cls.fixture = fixture
+        fixture.ListAwareVerticalTests.setUpClass.__func__(cls)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._tmp.cleanup()
+
+    def call(self, *args):
+        return self.fixture._forge_call(*args, data_root=self.plane)
+
+    def save(self, name, body):
+        p = self.work / name; p.write_text(json.dumps(body), encoding="utf-8"); return str(p)
+
+    def test_existing_zero_candidate_stages_close_both_operations_without_new_looks(self):
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from solana_alpha_lab.factory.hfic_ordinary_operation import get_operation, operation_lifecycle
+        from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
+        from tests.test_hfic_cli import bind_draft
+        from tests.test_hfic_ordinary_operation_acceptance_v1 import _operation
+        f = self.fixture
+        canonical = self.call("research-scope-resolve", "--spec", self.save("q.json", f.draft("LIST_CONTRAST", list_condition=f.AC)))["canonical_query"]
+        pre = self.call("preflight", "--discovery-contract", "--collection", "OPPORTUNITY_EPISODES", "--owner-focus", "FINALIZE")
+        op = _operation(canonical, focus=pre["owner_focus"], journal=pre["search_key_sha256"], market=pre["market_evidence_epoch_sha256"],
+                        text="One synthetic ordinary run to its terminal", cap={"main": None, "adaptive": None, "preview": None}, completion="SCIENTIFIC_TERMINAL")
+        scope = {"estimand": "price_relative_proxy", "explanatory_condition": "LIST_CONTRAST"}
+        first = f._discovery(self.plane, self.work, tag="base", spec=canonical, scope=scope, operation=op)
+        self.assertEqual(first["_exit_code"], 0, first)
+        fresh = self.call("preflight", "--discovery-contract", "--owner-focus", pre["owner_focus"])
+        template = json.loads((ROOT/"tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json").read_text())
+        template["candidates"] = []
+        for field in ("runner_up_candidate_ref", "strongest_rejected_alternative", "selected_candidate_ref"):
+            template.pop(field, None)
+        base_draft = bind_draft({**template, "owner_focus": pre["owner_focus"]}, fresh)
+        base_draft["grounded_evidence"] = {k:v for k,v in first.items() if not k.startswith("_")}
+        draft_path = self.save("base-draft.json", base_draft)
+        self.call("persist-draft", "--draft", draft_path, "--preflight-receipt", self.save("pre.json", fresh), "--representation-id", "BASE")
+        resume = self.call("preflight", "--discovery-contract", "--owner-focus", pre["owner_focus"])
+        base = self.call("freeze", "--draft", draft_path, "--preflight-receipt", self.save("resume.json", resume))
+        started = self.call("forge-run", "--owner-focus", pre["owner_focus"], "--no-write")
+        self.assertEqual(started["next_action"], "START_NORMALIZED_TRAJECTORY_EPISODES_V1")
+        view = self.call("episode-normalized-view", "--spec", self.save("view.json", canonical), "--parent-session-id", base["session_id"], "--operation-sha256", first["operation_sha256"])
+        child_pre = view["ladder_freeze_preflight"]
+        child_op = {**op, "journal_scope": child_pre["search_key_sha256"], "representation": {
+            "representation_id": REP, "representation_semantic_version": "1.0", "parent_session_id": base["session_id"],
+            "representation_payload_sha256": view["representation_payload"]["representation_payload_sha256"],
+            "scope_applied_sha256": view["representation_payload"]["scope_applied_sha256"]}}
+        child_scope = {**scope, "representation_scope": REP}
+        second = f._discovery(self.plane, self.work, tag="child", spec=canonical, scope=child_scope, operation=child_op)
+        self.assertEqual(second["_exit_code"], 0, second)
+        child_draft = bind_draft({**template, "owner_focus": pre["owner_focus"]}, child_pre)
+        child_draft["grounded_evidence"] = {k:v for k,v in second.items() if not k.startswith("_")}
+        child_path = self.save("child-draft.json", child_draft)
+        child_pre_path = self.save("child-pre.json", child_pre)
+        self.call("persist-draft", "--draft", child_path, "--preflight-receipt", child_pre_path, "--representation-id", REP)
+        pending = self.call("forge-run", "--owner-focus", pre["owner_focus"], "--no-write")
+        self.assertEqual(pending["next_action"], "RESUME_NORMALIZED_TRAJECTORY_EPISODES_V1")
+        self.assertIsNone(pending["owner_final"])
+        from solana_alpha_lab.factory import hfic_representation_ladder as ladder
+        actual_input = ladder.build_forge_input_receipt
+        def changed_capability(*args, **kwargs):
+            body = actual_input(*args, **kwargs)
+            body["capability_epoch_sha256"] = "0" * 64
+            return body
+        with mock.patch.object(ladder, "build_forge_input_receipt", side_effect=changed_capability):
+            drifted_pending = ladder.evaluate_forge_run(ROOT, self.plane, owner_focus=pre["owner_focus"])
+        self.assertNotIn(drifted_pending["owner_final"], {"OWNER_CANDIDATE", "SEARCH_EXHAUSTED_CURRENT_EVIDENCE", "NON_SCIENTIFIC_STOP"})
+        child = self.call("freeze", "--draft", child_path, "--preflight-receipt", child_pre_path)
+        self.assertEqual(child["session_state"], "SYNTHESIS_COMPLETE")
+        store = ResearchStore(self.plane)
+        ids = [first["operation_sha256"], second["operation_sha256"]]
+        before = store.diagnostics().committed_inventory_sha256
+        looks = {p["search_key_sha256"]: list_discovery_looks(store, p["search_key_sha256"]) for p in (pre, child_pre)}
+        original_parent = ladder._parent_control_id
+        def foreign_parent(bundle, packet):
+            return "FOREIGN_BASE" if bundle.get("session_id") == child["session_id"] else original_parent(bundle, packet)
+        with mock.patch.object(ladder, "build_forge_input_receipt", side_effect=changed_capability):
+            with mock.patch.object(ladder, "_parent_control_id", side_effect=foreign_parent):
+                foreign = ladder.evaluate_forge_run(ROOT, self.plane, owner_focus=pre["owner_focus"])
+            self.assertNotIn(foreign["owner_final"], {"OWNER_CANDIDATE", "SEARCH_EXHAUSTED_CURRENT_EVIDENCE", "NON_SCIENTIFIC_STOP"})
+            result = ladder.evaluate_forge_run(ROOT, self.plane, owner_focus=pre["owner_focus"])
+        self.assertEqual(result["owner_final"], "SEARCH_EXHAUSTED_CURRENT_EVIDENCE", result)
+        self.assertIsNone(result["control_session_id"])
+        self.assertEqual([s["session_id"] for s in result["stages"]], [base["session_id"], child["session_id"]])
+        self.assertEqual(before, ResearchStore(self.plane).diagnostics().committed_inventory_sha256)
+        for identity in ids:
+            self.assertEqual(operation_lifecycle(store, get_operation(store, identity))["effective_state"], "OPEN")
+        persisted = self.call("forge-run", "--owner-focus", pre["owner_focus"], "--persist")
+        self.assertEqual(persisted["owner_final"], "SEARCH_EXHAUSTED_CURRENT_EVIDENCE")
+        saved = ResearchStore(self.plane).diagnostics().committed_inventory_sha256
+        again = self.call("forge-run", "--owner-focus", pre["owner_focus"], "--persist")
+        self.assertEqual(saved, ResearchStore(self.plane).diagnostics().committed_inventory_sha256, again)
+        for identity in ids:
+            cold = ResearchStore(self.plane)
+            self.assertEqual(operation_lifecycle(cold, get_operation(cold, identity))["effective_state"], "COMPLETED")
+        for journal, rows in looks.items():
+            self.assertEqual(rows, list_discovery_looks(ResearchStore(self.plane), journal))
+        gate = self.call("universe-policy-status")
+        self.assertFalse(gate["blocking_operations"], gate)
+
+
+if __name__ == "__main__":
+    unittest.main()

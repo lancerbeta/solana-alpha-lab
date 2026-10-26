@@ -1,0 +1,48 @@
+{
+  "task_id": "FORGE_ORDINARY_RUN_FINALIZATION_V1",
+  "as_of": "2026-10-27",
+  "verdict": "PASS",
+  "oracle": "One native synthetic published-episode zero-candidate BASE + normalized vertical; exact state and hash comparisons, not test count.",
+  "checks": [
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_ordinary_run_finalization_v1 tests.test_forge_ordinary_operation_lifecycle_v1.OperationCompletionBindingTests -v",
+      "tests": 7,
+      "verdict": "PASS",
+      "proves": [
+        "ordinary parent/child discovery and own generated-draft resume",
+        "source capability drift permits only complete chain historical readback",
+        "wrong parent/market/slot/version/payload/journal/time and pending child do not complete",
+        "native no-write preserves inventory; one persist completes both operations",
+        "repeat persist adds no record; look-ledgers unchanged; universe gate released",
+        "legacy BASE completion reasons and monotonicity retained"
+      ]
+    },
+    {
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_representation_ladder_v1.ResolveNextActionTests tests.test_forge_representation_ladder_v1.RegistryLoadTests tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_g1_ordinary_no_worthy_does_not_demand_control tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_f3_foreign_parent_v2_is_not_consumed tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_n1_fresh_normal_entry_is_ordinary_discovery -v",
+      "tests": 49,
+      "verdict": "PASS",
+      "proves": [
+        "existing raw CONTROL and ordinary routes",
+        "foreign-parent refusal and population boundary"
+      ]
+    },
+    {
+      "command": "uv run --locked --managed-python python -B scripts/validate_factory_static.py",
+      "verdict": "PASS"
+    }
+  ],
+  "pre_fix": {
+    "representation_operation": "NO_OWNER_FINAL_RECEIPT",
+    "unstarted_child_with_saved_BASE_draft": "RESUME_NORMALIZED_TRAJECTORY_EPISODES_V1",
+    "real_run": "FORGE_RUN_IN_PROGRESS despite two completed source sessions"
+  },
+  "limits": [
+    "Synthetic calculations are engineering fixtures, not new real-data science.",
+    "Real owner-final append and operation completion intentionally deferred until accepted merge.",
+    "Exact-head CI and merge authority remain machine gated."
+  ],
+  "real_scientific_looks": 0,
+  "real_researchstore_writes": 0,
+  "publications": 0,
+  "reminder_changes": 0
+}

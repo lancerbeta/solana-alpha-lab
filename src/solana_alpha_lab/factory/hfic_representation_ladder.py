@@ -381,6 +381,7 @@ def resolve_next_action(
     input_owner_class: str | None = None,
     existing_completed: bool = False,
     saved_draft_sha256: str | None = None,
+    saved_draft_representation_id: str | None = None,
     population: str = POPULATION_LIVE_COHORT,
 ) -> dict[str, Any]:
     """Pure transition: one next action or owner-final from stage receipts."""
@@ -483,6 +484,10 @@ def resolve_next_action(
             "owner_final": ACTION_NON_SCIENTIFIC_STOP,
             "reason_code": base_terminal,
         }
+
+    # A completed BASE draft cannot stand in for a missing representation draft.
+    if saved_draft_representation_id == "BASE" or saved_draft_sha256 == base.get("draft_sha256"):
+        saved_draft_sha256 = None
 
     episode_row = by_id.get(HANDLER_EPISODES_V1)
     if (
@@ -2621,6 +2626,7 @@ def _discover_ladder_stages(
     current_market_epoch: str | None = None,
     current_capability_epoch: str | None = None,
     requested_surface: str | None = None,
+    registry: Mapping[str, Any] | None = None,
 ) -> tuple[list[dict[str, Any]], str | None, str | None]:
     grouped: dict[str, list[tuple[str, dict[str, Any], Mapping[str, Any]]]] = {}
     skipped: list[dict[str, str]] = []
@@ -2686,6 +2692,73 @@ def _discover_ladder_stages(
             stage["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
             stage["input_scope"] = CURRENT_REPRESENTATION_CONTROL_V1
         grouped.setdefault(rep_id, []).append((sid, stage, bundle))
+
+    active_registry = load_ladder_registry() if registry is None else registry
+    historical_children: dict[str, list[dict[str, Any]]] = {}
+
+    def ordinary_children(parent: str, capability: str | None) -> list[dict[str, Any]]:
+        children = []
+        from solana_alpha_lab.factory.hfic_evidence_identity import scientific_slot_sha256
+        from solana_alpha_lab.factory.opportunity_episodes import collection_for_focus
+
+        population = POPULATION_EPISODES if collection_for_focus(owner_focus) else POPULATION_LIVE_COHORT
+        for definition in active_registry["representations"]:
+            rep_id = definition["id"]
+            if (rep_id in {"BASE", "NORMALIZED_TRAJECTORY_V1"}
+                or definition["status"] != "ACTIVE" or not _serves(definition, population)):
+                continue
+            matching = [row for row in grouped.get(rep_id, [])
+                if _parent_control_id(row[2], _packet_for_bundle(data_root, row[2], store)) == parent
+                and _focus_matches(row[2], _packet_for_bundle(data_root, row[2], store), owner_focus)
+                and _session_applicable_to_current_market(row[2],
+                    current_market_epoch=current_market_epoch,
+                    current_capability_epoch=capability, visible=visible,
+                    bound_cohort_ids=row[1].get("used_cohort_ids") or [],
+                    allow_missing_cohort_scope=True)]
+            if matching:
+                picked = pick_session([{"session_id": sid, "session_state": stage.get("session_state")}
+                                       for sid, stage, _ in matching])
+                children.append(next(stage for sid, stage, _ in matching if sid == picked["session_id"]))
+                continue
+            slot = scientific_slot_sha256(market_evidence_epoch_sha256=str(current_market_epoch),
+                representation_id=rep_id, representation_semantic_version=definition["version"], owner_focus=owner_focus)
+            generated = find_generated_draft(store, market_evidence_epoch_sha256=str(current_market_epoch),
+                owner_focus=owner_focus, representation_id=rep_id,
+                representation_semantic_version=definition["version"], scientific_slot_sha256=slot)
+            if (generated and generated.get("control_session_id") == parent
+                and generated.get("capability_epoch_sha256") == capability):
+                children.append({"representation_id": rep_id, "semantic_version": definition["version"],
+                    "execution_status": EXEC_EXECUTED, "session_state": "DRAFT_VALIDATED",
+                    "session_id": generated["session_id"], "draft_sha256": generated["payload_sha256"],
+                    "scientific_slot_sha256": slot, "capability_epoch_sha256": capability,
+                    "input_scope": "REPRESENTATION_RELEASE_LOCAL", "reason_code": "SAVED_DRAFT_PRESENT"})
+        return children
+
+    def completed_historical_chain(sid: str, stage: dict[str, Any], bundle: Mapping[str, Any]) -> bool:
+        # Code evolution changes capability provenance, not a saved scientific result.
+        # Historical reuse here may only finish a wholly completed frozen chain;
+        # it must never start/resume synthesis under a different capability epoch.
+        source_capability = stage.get("capability_epoch_sha256")
+        if (stage.get("session_state") != "SYNTHESIS_COMPLETE"
+            or not isinstance(source_capability, str) or len(source_capability) != 64
+            or not _session_applicable_to_current_market(bundle,
+                current_market_epoch=current_market_epoch, visible=visible,
+                bound_cohort_ids=stage.get("used_cohort_ids") or [], allow_missing_cohort_scope=True)):
+            return False
+        children = ordinary_children(sid, source_capability)
+        chain = [stage, *children]
+        versions = {row["id"]: str(row["version"]) for row in active_registry["representations"]}
+        if any(row.get("session_state") != "SYNTHESIS_COMPLETE"
+               or row.get("capability_epoch_sha256") != source_capability
+               or row.get("semantic_version") != versions.get(row["representation_id"])
+               for row in chain):
+            return False
+        decision = resolve_next_action(chain, registry=active_registry,
+            population=POPULATION_EPISODES if owner_focus.startswith("OPPORTUNITY_EPISODES:") else POPULATION_LIVE_COHORT)
+        if decision.get("owner_final") not in {ACTION_OWNER_CANDIDATE, ACTION_SEARCH_EXHAUSTED, ACTION_NON_SCIENTIFIC_STOP}:
+            return False
+        historical_children[sid] = children
+        return True
 
     chosen: tuple[str, dict[str, Any], Mapping[str, Any]] | None = None
     if preferred_control_session_id:
@@ -2775,7 +2848,7 @@ def _discover_ladder_stages(
                 visible=visible,
                 bound_cohort_ids=stage.get("used_cohort_ids") or [],
                 allow_missing_cohort_scope=True,
-            ):
+            ) and not completed_historical_chain(sid, stage, bundle):
                 # Stale ordinary PASS/pending on a prior market remains
                 # historical; do not present as CURRENT REUSED_VALID.
                 continue
@@ -2817,6 +2890,9 @@ def _discover_ladder_stages(
                 base_stage["execution_status"] = EXEC_REUSED
             base_stage["input_scope"] = "ORDINARY_BASE"
             resolved.append(base_stage)
+            # Ordinary episodes have a BASE parent, without CONTROL authority.
+            children = historical_children.get(_sid)
+            resolved.extend(children if children is not None else ordinary_children(_sid, current_capability_epoch))
         else:
             explicit_control = requested_surface == CURRENT_REPRESENTATION_CONTROL_V1
             fresh_base = {
@@ -3122,6 +3198,7 @@ def evaluate_forge_run(
                 else None
             ),
             requested_surface=requested_surface,
+            registry=registry_doc,
         )
         for row in resolved_stages:
             used_cohorts.extend(list(row.get("used_cohort_ids") or []))
@@ -3290,6 +3367,7 @@ def evaluate_forge_run(
         } else None,
         existing_completed=existing_completed or existing_owner_final,
         saved_draft_sha256=saved_draft_sha256,
+        saved_draft_representation_id=saved_draft_representation_id,
         population=run_population,
     )
 
