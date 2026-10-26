@@ -3482,11 +3482,11 @@ def evaluate_forge_run(
             representation_id=active_rep,
             representation_semantic_version=active_version,
             owner_focus=owner_focus,
-            control_session_id=control_session_id or next(
+            control_session_id=(control_session_id or next(
                 (str(row["session_id"]) for row in resolved_stages
                  if row.get("representation_id") == "BASE" and row.get("session_id")),
                 None,
-            ),
+            )) if active_rep != "BASE" else None,
             capability_epoch_sha256=(
                 str(admission_execution_context.get("capability_epoch_sha256"))
                 if isinstance(
