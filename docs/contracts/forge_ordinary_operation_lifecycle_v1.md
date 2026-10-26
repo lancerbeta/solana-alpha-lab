@@ -67,6 +67,13 @@ idempotent. Code acceptance alone does not append a real owner-final: use the
 existing authorized forge-run --persist only after merge and exact-state
 revalidation, then cold-read both operations and the universe gate.
 
+Every ACTIVE representation's START/RESUME action selects its own slot and
+passes the existing scientific-admission owner. A pending child with a different
+source capability is blocked, never replaced by a fresh START or BASE resume.
+A computed owner-final is displayed as NEXT / PERSIST_OWNER_FINAL until native
+append. Only the writer or committed readback supplies persisted_receipt; a
+computed receipt hash alone is not persistence or operational DONE.
+
 ## Owner stop
 
 ```text

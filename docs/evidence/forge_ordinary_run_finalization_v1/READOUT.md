@@ -12,7 +12,11 @@ chains need an explicitly limited historical readback path.
 
 The existing ladder now discovers ordinary children by frozen parent, focus,
 market and slot, distinguishes their own saved draft, and retains CONTROL as a
-separate protocol. Historical aggregation requires a wholly completed chain,
+separate protocol. Every ACTIVE representation action selects its own slot and
+passes existing scientific admission. Incompatible pending source capabilities
+block; a BASE draft cannot conceal a child or turn it into a fresh START.
+The existing orphan-draft validator receives the child's frozen parent/payload,
+rather than a controller-side recovery exception. Historical aggregation requires a wholly completed chain,
 consistent source capability and unchanged representation versions. The existing
 transition owner still decides the final; no new state machine or storage.
 
@@ -26,8 +30,12 @@ Proof: validation.json describes one native synthetic published-episode vertical
 and short negative controls. The vertical checks no-write inventory equality,
 both operations OPEN before persistence, one native persisted owner-final,
 COMPLETED for both, repeated persist with no append, unchanged scientific
-look-ledgers and released universe-policy gate. Existing direct-consumer tests
-cover ordinary/CONTROL and foreign-parent routes. No real-data scientific call,
+look-ledgers and released universe-policy gate. It checks actual child-slot and
+admission calls, and top-level NEXT/PERSIST before append versus native DONE and
+committed READBACK afterwards; a computed receipt hash is never labelled saved. Existing direct-consumer tests
+cover ordinary/CONTROL, saved-scope and prefreeze recovery routes. A foreign-parent
+occupied slot stays blocked rather than issuing another START; its source
+session is never consumed as this run's stage. No real-data scientific call,
 publication, reminder change, provider call or dependency was introduced.
 
 ## Operational handback after merge

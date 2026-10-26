@@ -1109,12 +1109,14 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         or stage_has_unknown_provenance
     )
     writes = receipt.get("writes") if isinstance(receipt.get("writes"), Mapping) else {}
-    persist_note = (
-        "RESEARCH_ARTIFACT FORGE_RUN_RECEIPT"
-        if int(writes.get("forge_run") or 0) > 0
-        else "NONE"
-    )
-    persisted_sha = receipt.get("persisted_receipt_sha256") or receipt.get("receipt_sha256")
+    # A computed hash is not proof of persistence. The writer's successful
+    # append or the committed-receipt readback supplies that fact.
+    appended = int(writes.get("forge_run") or 0) > 0
+    persisted_sha = receipt.get("persisted_receipt_sha256")
+    if not persisted_sha and appended:
+        persisted_sha = receipt.get("receipt_sha256")
+    persist_note = ("RESEARCH_ARTIFACT FORGE_RUN_RECEIPT" if appended else
+                    "READBACK RESEARCH_ARTIFACT FORGE_RUN_RECEIPT" if persisted_sha else "NONE")
     next_action = receipt.get("next_action")
     owner_class = str(receipt.get("owner_class") or "")
     owner_final = receipt.get("owner_final")
@@ -1241,7 +1243,8 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     elif owner_final == "OPERATION_PAUSED_SEARCH_OPEN" or next_action == "AUTHORIZE_ADDITIONAL_LOOKS":
         status = "NEXT — saved result stays; authorize another look on this journal, or stop"
     elif owner_final:
-        status = "DONE — bounded-run owner-final; do not continue"
+        status = ("DONE — bounded-run owner-final; do not continue" if persisted_sha else
+                  "NEXT — PERSIST_OWNER_FINAL; bounded-run decision ready, not yet recorded")
         if provenance_unknown:
             status += "; execution provenance UNKNOWN — not a readiness receipt"
     elif next_action == ACTION_FINISH_RUNNER_UP:
@@ -2718,20 +2721,26 @@ def _discover_ladder_stages(
             if matching:
                 picked = pick_session([{"session_id": sid, "session_state": stage.get("session_state")}
                                        for sid, stage, _ in matching])
-                children.append(next(stage for sid, stage, _ in matching if sid == picked["session_id"]))
+                selected = dict(next(stage for sid, stage, _ in matching if sid == picked["session_id"]))
+                if (selected.get("session_state") != "SYNTHESIS_COMPLETE"
+                    and selected.get("capability_epoch_sha256") != capability):
+                    selected.update(execution_status=EXEC_BLOCKED,
+                        reason_code="SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING")
+                children.append(selected)
                 continue
             slot = scientific_slot_sha256(market_evidence_epoch_sha256=str(current_market_epoch),
                 representation_id=rep_id, representation_semantic_version=definition["version"], owner_focus=owner_focus)
             generated = find_generated_draft(store, market_evidence_epoch_sha256=str(current_market_epoch),
                 owner_focus=owner_focus, representation_id=rep_id,
                 representation_semantic_version=definition["version"], scientific_slot_sha256=slot)
-            if (generated and generated.get("control_session_id") == parent
-                and generated.get("capability_epoch_sha256") == capability):
+            if generated and generated.get("control_session_id") == parent:
+                compatible = generated.get("capability_epoch_sha256") == capability
                 children.append({"representation_id": rep_id, "semantic_version": definition["version"],
-                    "execution_status": EXEC_EXECUTED, "session_state": "DRAFT_VALIDATED",
+                    "execution_status": EXEC_EXECUTED if compatible else EXEC_BLOCKED, "session_state": "DRAFT_VALIDATED",
                     "session_id": generated["session_id"], "draft_sha256": generated["payload_sha256"],
-                    "scientific_slot_sha256": slot, "capability_epoch_sha256": capability,
-                    "input_scope": "REPRESENTATION_RELEASE_LOCAL", "reason_code": "SAVED_DRAFT_PRESENT"})
+                    "scientific_slot_sha256": slot, "capability_epoch_sha256": generated.get("capability_epoch_sha256"),
+                    "input_scope": "REPRESENTATION_RELEASE_LOCAL",
+                    "reason_code": "SAVED_DRAFT_PRESENT" if compatible else "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"})
         return children
 
     def completed_historical_chain(sid: str, stage: dict[str, Any], bundle: Mapping[str, Any]) -> bool:
@@ -3375,17 +3384,19 @@ def evaluate_forge_run(
     next_action = str(decision.get("next_action"))
     active_rep = "BASE"
     active_version = representation_semantic_version(registry_doc, active_rep)
-    if next_action in {ACTION_START_V1, ACTION_RESUME_V1}:
-        for row in resolved_stages:
-            if isinstance(row, Mapping) and str(row.get("representation_id") or "").startswith(
-                "NORMALIZED"
-            ):
-                active_rep = str(row["representation_id"])
-                active_version = str(
-                    row.get("semantic_version")
-                    or representation_semantic_version(registry_doc, active_rep)
-                )
-                break
+    representation_actions = {
+        action: row["id"]
+        for row in registry_doc["representations"]
+        if row["status"] == "ACTIVE" and _serves(row, run_population)
+        for action in (_start_action(row["id"]), _resume_action(row["id"]))
+    }
+    if next_action in representation_actions:
+        active_rep = representation_actions[next_action]
+        active_version = next(
+            (str(row["semantic_version"]) for row in resolved_stages
+             if row.get("representation_id") == active_rep and row.get("semantic_version")),
+            representation_semantic_version(registry_doc, active_rep),
+        )
     elif next_action in {
         ACTION_OWNER_CANDIDATE,
         ACTION_FINISH_RUNNER_UP,
@@ -3431,29 +3442,13 @@ def evaluate_forge_run(
                         or representation_semantic_version(registry_doc, active_rep)
                     )
                     break
-    elif next_action in {ACTION_START_BASE, ACTION_RESUME_BASE}:
-        for row in resolved_stages:
-            rid = str(row.get("representation_id") or "") if isinstance(row, Mapping) else ""
-            if rid in {"BASE", "CURRENT_REPRESENTATION_CONTROL_V1", "ORDINARY_BASE"} or rid == "BASE":
-                active_rep = rid or "BASE"
-                active_version = str(
-                    row.get("semantic_version")
-                    or representation_semantic_version(registry_doc, active_rep)
-                )
-                break
 
     cap_epoch = input_receipt.get("capability_epoch_sha256")
     admission_execution_context = dict(execution_context or {})
     if isinstance(cap_epoch, str) and len(cap_epoch) == 64:
         admission_execution_context.setdefault("capability_epoch_sha256", cap_epoch)
-    if next_action in {
-        ACTION_START_BASE,
-        ACTION_START_V1,
-        ACTION_RESUME_BASE,
-        ACTION_RESUME_V1,
-        ACTION_FINISH_RUNNER_UP,
-        ACTION_OWNER_CANDIDATE,
-        ACTION_RETURN_EXISTING,
+    if next_action in set(representation_actions) | {
+        ACTION_FINISH_RUNNER_UP, ACTION_OWNER_CANDIDATE, ACTION_RETURN_EXISTING,
     }:
         admission = resolve_scientific_admission(
             list_hfic_sessions(store),

@@ -82,6 +82,25 @@ class CompletionBindingTests(unittest.TestCase):
         self.assertEqual(result["next_action"], "START_NORMALIZED_TRAJECTORY_EPISODES_V1")
 
 
+class PersistenceReadoutTests(unittest.TestCase):
+    def test_computed_final_is_not_a_persisted_receipt(self):
+        from solana_alpha_lab.factory.hfic_representation_ladder import format_forge_run_owner_readout
+        body = {"owner_class": "OWNER_FINAL", "owner_final": "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
+                "next_action": "SEARCH_EXHAUSTED_CURRENT_EVIDENCE", "receipt_sha256": "8" * 64,
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0}}
+        text = format_forge_run_owner_readout(body)
+        self.assertIn("status: NEXT — PERSIST_OWNER_FINAL", text)
+        self.assertIn("persisted: NONE", text)
+        self.assertNotIn("persisted_receipt:", text)
+        self.assertNotIn("status: DONE", text)
+        body["persisted_receipt_sha256"] = "9" * 64
+        text = format_forge_run_owner_readout(body)
+        self.assertIn("status: READBACK", text)
+        self.assertIn("persisted: READBACK", text)
+        self.assertIn("persisted_receipt: " + "9" * 64, text)
+        self.assertNotIn("persisted_receipt: " + "8" * 64, text)
+
+
 class OrdinaryFinalizationVertical(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -139,10 +158,23 @@ class OrdinaryFinalizationVertical(unittest.TestCase):
         child_draft["grounded_evidence"] = {k:v for k,v in second.items() if not k.startswith("_")}
         child_path = self.save("child-draft.json", child_draft)
         child_pre_path = self.save("child-pre.json", child_pre)
-        self.call("persist-draft", "--draft", child_path, "--preflight-receipt", child_pre_path, "--representation-id", REP)
-        pending = self.call("forge-run", "--owner-focus", pre["owner_focus"], "--no-write")
+        generated = self.call("persist-draft", "--draft", child_path, "--preflight-receipt", child_pre_path, "--representation-id", REP)
+        from solana_alpha_lab.factory import hfic_evidence_identity as identity_owner
+        from solana_alpha_lab.factory import hfic_representation_ladder as ladder
+        with mock.patch.object(identity_owner, "resolve_scientific_admission", wraps=identity_owner.resolve_scientific_admission) as admission:
+            pending = ladder.evaluate_forge_run(ROOT, self.plane, owner_focus=pre["owner_focus"])
+        self.assertTrue(any(call.kwargs.get("representation_id") == REP for call in admission.call_args_list))
+        self.assertEqual(pending["scientific_slot_sha256"], generated["scientific_slot_sha256"])
         self.assertEqual(pending["next_action"], "RESUME_NORMALIZED_TRAJECTORY_EPISODES_V1")
         self.assertIsNone(pending["owner_final"])
+        actual_draft = ladder.find_generated_draft
+        def incompatible_child(*args, **kwargs):
+            found = actual_draft(*args, **kwargs)
+            return {**found, "capability_epoch_sha256": "e" * 64} if found and found.get("ladder_representation_id") == REP else found
+        with mock.patch.object(ladder, "find_generated_draft", side_effect=incompatible_child):
+            refused = ladder.evaluate_forge_run(ROOT, self.plane, owner_focus=pre["owner_focus"])
+        self.assertEqual(refused["next_action"], "OBSERVABILITY_BLOCKED")
+        self.assertIn("SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING", refused["blocking_reason_codes"])
         from solana_alpha_lab.factory import hfic_representation_ladder as ladder
         actual_input = ladder.build_forge_input_receipt
         def changed_capability(*args, **kwargs):
@@ -168,6 +200,8 @@ class OrdinaryFinalizationVertical(unittest.TestCase):
             result = ladder.evaluate_forge_run(ROOT, self.plane, owner_focus=pre["owner_focus"])
         self.assertEqual(result["owner_final"], "SEARCH_EXHAUSTED_CURRENT_EVIDENCE", result)
         self.assertIsNone(result["control_session_id"])
+        self.assertIn("status: NEXT — PERSIST_OWNER_FINAL", result["owner_readout"])
+        self.assertNotIn("persisted_receipt:", result["owner_readout"])
         self.assertEqual([s["session_id"] for s in result["stages"]], [base["session_id"], child["session_id"]])
         self.assertEqual(before, ResearchStore(self.plane).diagnostics().committed_inventory_sha256)
         for identity in ids:
@@ -177,6 +211,10 @@ class OrdinaryFinalizationVertical(unittest.TestCase):
         saved = ResearchStore(self.plane).diagnostics().committed_inventory_sha256
         again = self.call("forge-run", "--owner-focus", pre["owner_focus"], "--persist")
         self.assertEqual(saved, ResearchStore(self.plane).diagnostics().committed_inventory_sha256, again)
+        self.assertIn("status: DONE", persisted["owner_readout"])
+        self.assertIn("status: READBACK", again["owner_readout"])
+        self.assertIn("state=COMPLETED", again["owner_readout"])
+        self.assertIn("persisted_receipt:", again["owner_readout"])
         for identity in ids:
             cold = ResearchStore(self.plane)
             self.assertEqual(operation_lifecycle(cold, get_operation(cold, identity))["effective_state"], "COMPLETED")

@@ -6,7 +6,7 @@
   "checks": [
     {
       "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_ordinary_run_finalization_v1 tests.test_forge_ordinary_operation_lifecycle_v1.OperationCompletionBindingTests -v",
-      "tests": 7,
+      "tests": 8,
       "verdict": "PASS",
       "proves": [
         "ordinary parent/child discovery and own generated-draft resume",
@@ -14,17 +14,23 @@
         "wrong parent/market/slot/version/payload/journal/time and pending child do not complete",
         "native no-write preserves inventory; one persist completes both operations",
         "repeat persist adds no record; look-ledgers unchanged; universe gate released",
-        "legacy BASE completion reasons and monotonicity retained"
+        "legacy BASE completion reasons and monotonicity retained",
+        "compatible child resume selects its own slot and calls scientific admission",
+        "incompatible pending source capability is blocked instead of restarted",
+        "computed final displays NEXT/PERSIST; native persisted/readback displays real persistence only"
       ]
     },
     {
-      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_representation_ladder_v1.ResolveNextActionTests tests.test_forge_representation_ladder_v1.RegistryLoadTests tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_g1_ordinary_no_worthy_does_not_demand_control tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_f3_foreign_parent_v2_is_not_consumed tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_n1_fresh_normal_entry_is_ordinary_discovery -v",
-      "tests": 49,
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_representation_ladder_v1.ResolveNextActionTests tests.test_forge_representation_ladder_v1.RegistryLoadTests tests.test_forge_representation_ladder_v1.ScopeAndPersistenceTests tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_g1_ordinary_no_worthy_does_not_demand_control tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_f3_foreign_parent_v2_is_not_consumed tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_n1_fresh_normal_entry_is_ordinary_discovery tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_f2_orphan_v1_without_parent_is_not_bound tests.test_hfic_prefreeze_draft_recovery_v1 -v",
+      "tests": 59,
       "verdict": "PASS",
       "proves": [
         "existing raw CONTROL and ordinary routes",
-        "foreign-parent refusal and population boundary"
-      ]
+        "foreign-parent refusal and population boundary",
+        "existing prefreeze recovery and own parent/payload binding",
+        "foreign-parent occupied slot cannot start another scientific attempt"
+      ],
+      "execution": "58 passed in initial consumer run; occupied foreign-parent slot expectation corrected to fail-closed BLOCKED, that exact test rerun PASS. Product sources unchanged between these checks."
     },
     {
       "command": "uv run --locked --managed-python python -B scripts/validate_factory_static.py",

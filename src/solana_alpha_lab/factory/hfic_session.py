@@ -4747,6 +4747,8 @@ def orphan_prefreeze_draft_resumable(
         memory_eligibility_sha256=memory_eligibility_sha256,
         evidence_surface_mode=None,
         model_provenance_sha256=model_provenance_sha256,
+        control_session_id=draft.get("control_session_id"),
+        representation_payload_sha256=draft.get("representation_payload_sha256"),
         assert_evidence_surface=False,
     )
 

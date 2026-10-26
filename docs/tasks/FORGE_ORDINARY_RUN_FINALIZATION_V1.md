@@ -18,7 +18,9 @@ managed_write_set:
 - docs/tasks/FORGE_ORDINARY_RUN_FINALIZATION_V1.md
 - src/solana_alpha_lab/factory/hfic_representation_ladder.py
 - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
+- src/solana_alpha_lab/factory/hfic_session.py
 - tests/test_forge_ordinary_run_finalization_v1.py
+- tests/test_forge_representation_ladder_v1.py
 - docs/contracts/forge_ordinary_operation_lifecycle_v1.md
 - docs/evidence/forge_ordinary_run_finalization_v1/**
 - catalog/assets/core.yaml
@@ -69,6 +71,8 @@ DECISION_DELTA: a completed ordinary two-stage run reads its genuine owner-final
 and releases the research-universe profile without an artificial owner stop.
 UNCERTAINTY_REMOVED: ordinary parent discovery and per-stage completion binding
 can preserve ordinary/CONTROL separation and prevent foreign-stage completion.
+The existing orphan-draft owner retains its own frozen parent/payload binding;
+no controller-side bypass or new scientific recovery authority is introduced.
 CAPABILITY_OR_EVIDENCE: an exact synthetic native vertical plus metadata-only
 readback of the unchanged saved v12 run; after merge one native owner-final append.
 Consumers: ordinary Forge entry/resume, operation_lifecycle and universe-policy gate.

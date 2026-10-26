@@ -2774,7 +2774,11 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 finished = evaluate_forge_run(
                     ROOT, data_root, persist=False, registry=registry
                 )
-        self.assertEqual(finished["next_action"], "START_SYNTHETIC_LATER_V2")
+        # A foreign parent cannot supply this stage, but its occupied scientific
+        # slot also cannot authorize a second START on the same evidence.
+        self.assertEqual(finished["next_action"], ACTION_OBSERVABILITY_BLOCKED)
+        self.assertIn("SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING", finished["blocking_reason_codes"])
+        self.assertNotIn(str(v2_frozen["session_id"]), [row.get("session_id") for row in finished["stages"]])
         self.assertNotEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
 
     def test_n1_fresh_normal_entry_is_ordinary_discovery(self) -> None:
