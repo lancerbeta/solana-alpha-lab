@@ -21,7 +21,7 @@
         "orphan selected parent is external to its own draft; foreign/missing parent cannot clear admission STOP",
         "episode resume uses own stage draft; computed owner-final prints native persist route",
         "same-slot cap stays owner gated; foreign-slot projection cannot override child START",
-        "saved review rejection stops non-scientifically; UNKNOWN/missing reference/pending remain blocked",
+        "previously unmatched KILL_STATISTICALLY_UNIDENTIFIABLE stops non-scientifically; legacy known-negative routing unchanged; UNKNOWN/missing reference/pending remain blocked",
         "existing literal transition and CONTROL restrictions"
       ]
     },

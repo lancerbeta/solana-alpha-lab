@@ -141,7 +141,9 @@ or workflow limit change. Verify the three exact failed scenarios and a short
 foreign-slot negative, then rebind independent review and exact-head CI.
 
 The same CI vertical then reached a formerly invisible selected-child review
-rejection. Reuse interpret_critic_terminal exactly as BASE does: review/technical
-rejection is NON_SCIENTIFIC_STOP, never scientific exhaustion or family closure;
-require the saved stage reference, keep unknown/pending/missing blocked. This
+rejection. For previously unmatched child review/technical terminals, reuse
+interpret_critic_terminal as BASE does: the fallback is NON_SCIENTIFIC_STOP,
+never scientific exhaustion or family closure. Preserve legacy registered
+known-negative routing; require the saved stage reference and keep unknown,
+pending and missing blocked. This
 preserves Critic ownership and adds no new terminal/schema/authority.

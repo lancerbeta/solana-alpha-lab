@@ -114,7 +114,9 @@ same-slot caps and global blocking inventory are unchanged. The three original
 failing consumer tests keep their literal expectations.
 
 The complete selected-child vertical also exposed STAGE_TERMINAL_UNMATCHED for
-KILL_STATISTICALLY_UNIDENTIFIABLE. Child now reuses BASE's existing Critic
-semantic owner: a saved review/technical rejection stops NON_SCIENTIFICALLY,
-not as search exhaustion or family falsification. Unknown terminal, pending
-state or absent stage reference remains blocked. No source verdict is rewritten.
+KILL_STATISTICALLY_UNIDENTIFIABLE. For previously unmatched child review/technical
+terminals, the fallback now reuses BASE's existing Critic semantic owner and
+stops NON_SCIENTIFICALLY with a saved stage reference. It does not infer scientific
+exhaustion or family falsification. Legacy registered known-negative routing is
+unchanged. Unknown terminal, pending state or absent stage reference remains
+blocked. No source verdict is rewritten.

@@ -131,6 +131,8 @@ The public run's operation readout is narrowed to its active scientific slot.
 A paused BASE journal cannot replace a child-slot START with additional BASE
 look authority. Same-slot caps and the universe gate remain enforced by their
 existing owners; display selection never closes, refunds or hides an operation
-from effective_open_operations. A completed child review rejection uses the
-same semantic owner as BASE and ends non-scientifically with a saved stage
-reference. UNKNOWN/pending or missing reference cannot establish that final.
+from effective_open_operations. A previously unmatched completed-child
+review/technical terminal (including KILL_STATISTICALLY_UNIDENTIFIABLE) uses
+BASE's existing semantic owner and ends non-scientifically with a saved stage
+reference. Legacy registered known-negative routing stays unchanged. Unknown
+terminal, pending state or missing reference cannot establish the new fallback final.
