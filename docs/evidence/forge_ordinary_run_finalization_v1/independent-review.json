@@ -4,8 +4,8 @@
   "review_id": "FORGE-ORDINARY-RUN-FINALIZATION-REVIEW",
   "as_of": "2026-10-27",
   "task_id": "FORGE_ORDINARY_RUN_FINALIZATION_V1",
-  "reviewed_bindings_sha256": "d99f01c73c39dc7b8717516c80ac453b0fad33963b994f5c539ff2fe49e9d41f",
-  "reviewed_inventory_sha256": "1db03ec713df2ebc724302c297921b4efe0d0c25f0af7a5edcec1ed6968a86d4",
+  "reviewed_bindings_sha256": "74c8ac12c75acc5e3cde4cde88f1e2dd9abdde7b187e01c226d2e45897d61f26",
+  "reviewed_inventory_sha256": "e86833f79c270b3905509b6ca5eba5137d568bf0d079b57d95a3d848ffb276b7",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,30 +17,30 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "SEMANTIC_PREMISE PASS on exact head 27d0923bc6e820eca145194643c3dfd081d5cce4. Packet/diff, five evidence hashes and three source blobs verified. Independent pure discovery+transition probe accepts the complete source-epoch-consistent chain and refuses missing/pending child, mixed capability, foreign parent, changed version and UNKNOWN market. Selected orphan parent remains external to its own draft; ACTIVE actions use scientific admission; completion owns each operation stage/slot/journal.",
-        "packet_fingerprint_sha256=bcbe8ba8f1b0af31387f15e017b3b01fd3a53a25d8fa27718a9395389451ab1d",
-        "Committed manifests/partitions and receipts remain truth; DuckDB is derived. Correct operational completion cannot establish PIT, research completeness, family closure or scientific acceptance. Premerge real readback is pinned to 7145b179, not proof of current real completion. PACKET_INFORMATION_PATH only; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN."
+        "SEMANTIC_PREMISE PASS exact final inventory 8a512b4564dc4db0ebe81eede2aadca56cd90f4e. HEAD/diff SHA, six evidence hashes and unchanged source/test blobs from the tested e34 source verified. C1-C6 bounded: selected orphan parent, complete historical chain, own-stage completion, own-slot display projection and same-slot authority preserved.",
+        "packet_fingerprint_sha256=3e59be819a7bee4ce691e0e7e2c3bd4751fcdbbf3a6a9e769c9334260e60246d",
+        "C6 corrected to previously unmatched child review/technical terminals only. KILL_STATISTICALLY_UNIDENTIFIABLE uses NON_SCIENTIFIC_STOP; legacy registered known-negative routing unchanged. Operational completion is not PIT, research truth, family closure or science acceptance. PACKET_INFORMATION_PATH; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN."
       ]
     },
     {
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "PASS exact final source inventory 27d0923bc6e820eca145194643c3dfd081d5cce4. Independent actual-validator orphan probe 5/5: selected parent required, foreign/missing parent cannot clear STOP, BASE remains parentless. Completion binding, historical chain, admission, persistence/readback/retry and direct consumers reviewed; required review roles complete. No actionable finding remains."
+        "PASS final inventory 8a512b4564dc4db0ebe81eede2aadca56cd90f4e. Source/test/UI blobs match tested e34; four document claims narrowed exactly to unmatched terminals. Existing foreign-parent orphan actual-validator probe and independent new slot/terminal controls PASS. Public projection cannot borrow another slot cap; global effective-open ownership and same-slot caps unchanged. No actionable finding; role-set complete."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS exact final source inventory 27d0923bc6e820eca145194643c3dfd081d5cce4. One native synthetic vertical and bounded negative controls prove the intended engineering outcome. Explicit older-head premerge proof shows OPEN/zero writes/invariant inventory, never current operational DONE. Exact post-merge recipe requires original IDs/hashes, one native append, cold COMPLETED for both, unchanged source records/exposure and idempotency. Real append pending accepted merge."
+        "PASS final inventory 8a512b4564dc4db0ebe81eede2aadca56cd90f4e. Outcome/DoD remains exact existing-run native owner-final, own-slot/journal completion, immutable history/exposure. 56 root/transition checks and three original failed consumers pass without altered expectations. New fallback is limited to previously unmatched child review/technical terminals; known-negative routing unchanged. Real append remains pending accepted merge and exact-state cold readback."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS exact final source inventory 27d0923bc6e820eca145194643c3dfd081d5cce4. Five pure formatter cases: episode resume selects its own draft, computed final NEXT/persisted NONE, native append DONE, cold READBACK uses saved hash. Persist command, exact focus, metadata snapshots, both operation readbacks, universe gate and mismatch stop/recovery are actionable."
+        "PASS final inventory 8a512b4564dc4db0ebe81eede2aadca56cd90f4e. Source/UI/test blobs unchanged from reviewed e34. Episode resume chooses own draft; native NEXT/PERSIST/NONE -> DONE -> READBACK retains saved hash. Another slot BASE pause cannot override child START; same-slot cap is owner gated. Previously unmatched review/technical fallback wording does not imply scientific exhaustion or family closure. Exact postmerge recipe unchanged."
       ]
     }
   ],
@@ -92,6 +92,14 @@
       "finding": "Episode resume omitted the saved-draft native route and post-merge handback lacked exact commands/focus; now explicit and own-stage bound.",
       "observed_head": "7145b1799a426f9ecb646769139ff5e8520615d0",
       "resolved_by_head": "27d0923bc6e820eca145194643c3dfd081d5cce4"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "C6 overclaimed all REVIEW_REJECTION terminals; narrowed packet/contract/readout to previously unmatched terminals while preserving legacy known-negative routing. Implementation change was not required for this finding.",
+      "observed_head": "e34a0d65d4662a29fd16a269ba27b057fb8e8d62",
+      "resolved_by_head": "8a512b4564dc4db0ebe81eede2aadca56cd90f4e"
     }
   ],
   "verdict": "PASS",

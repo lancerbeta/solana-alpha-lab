@@ -11,16 +11,18 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "661afbae7b20d1ab7a72941d1109af633284a60dc9404a17ae9b2682d0998500",
-    "docs/contracts/forge_ordinary_operation_lifecycle_v1.md": "3a680f84ee4eced04492505f2d1d44c73e7dbc733eebb4f7192d51f749964868",
-    "docs/evidence/forge_ordinary_run_finalization_v1/READOUT.md": "054d9f86141b32aa4a49ccc62bd930ae1fe5d0e6fddafcde1b8fb34c43fc5d98",
+    "catalog/assets/core.yaml": "d99d14fd976f702e6330a705bdb257d42579322593a299038086ee515e962ec8",
+    "docs/contracts/forge_ordinary_operation_lifecycle_v1.md": "ef16faf4bac20b8fd7296df8110efde599a63f7784be3fe46de75e8fd0dcbe0d",
+    "docs/evidence/forge_ordinary_run_finalization_v1/READOUT.md": "c12c37fa089c9f5937cadccc5f231d50faabd4c3cdb7f85ffaccff6e9ea32515",
+    "docs/evidence/forge_ordinary_run_finalization_v1/ci-reconciliation.json": "21be6a03df843c47925e4008fcc281b74f613877227f92545111e3555871834e",
     "docs/evidence/forge_ordinary_run_finalization_v1/premerge-readback.json": "7885f706ad696b76b981fb42718591f744553ee742482f3bec53d06c0da9da32",
-    "docs/evidence/forge_ordinary_run_finalization_v1/validation.json": "b92d8d8804d2af0c927e15fcaa34485670fefac79938f8971e1235ac61e627c0",
-    "docs/tasks/FORGE_ORDINARY_RUN_FINALIZATION_V1.md": "b97e48b79ff3391ceb9645ea5a9160da9d84ca01346da34669daf0511865b675",
-    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "76d04f1be1912cc6909ffc9c8f258241d64ef6c4196cee0796da354eb9479ada",
-    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "6a5ee75b830a3188797141824a16d87222236ebcf88d382ca98a5780e8e3e551",
+    "docs/evidence/forge_ordinary_run_finalization_v1/validation.json": "cfe78bbe06c5ca9061e822311cdc31056cb28097054ddc0569fd9013d7d9ac70",
+    "docs/tasks/FORGE_ORDINARY_RUN_FINALIZATION_V1.md": "ec8eb068113daad34176ef9a5bbf70362ef1e6cff0dfd76ae859fec35d725939",
+    "scripts/hypothesis_forge.py": "dce0b99f093b4bfcd70710d74370d3c4dd6e843938ada95e3aefcbd7d9a1ae60",
+    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "b1ce9cf2201220104c93fff440d47d1e3b451569e0460b7810379a5108030320",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "406972d18f3d46fc16082a280fa5c96d5bc4f460fc213139d6aa3277fcec7c37",
     "src/solana_alpha_lab/factory/hfic_session.py": "2902f7f86c8ad4f82aaa30ef2bffbbfa4337264e9127507b4f3898594f0562d2",
-    "tests/test_forge_ordinary_run_finalization_v1.py": "4e3921c2665780e9f9930f0ada8b50ba4a4a474b36610b77ac82ddafc6644e81",
+    "tests/test_forge_ordinary_run_finalization_v1.py": "f83c45bae2d8abae7ec73c80393e85ebbac6b74b6ca4ea37da5d1716fd83d6e6",
     "tests/test_forge_representation_ladder_v1.py": "2582419a1839998ac48312740df318c72c558fe589d980b36629f227d6211b54"
   },
   "active_stop_conditions": [],
@@ -33,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_ordinary_run_finalization_v1/factory-fit.json",
-    "sha256": "eb1ca550decc5a1b701b8526027f015f75a42a5ea0acdb3e137033b0527ac6c3",
+    "sha256": "a28d66066d0a1c81a2e448bf7172ddee6bcfb58fb94e066164813e3492396e56",
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_69_FOCUSED_AND_6_POST_BASE_SELECTOR_UNIT_CHECKS",
+    "targeted": "PASS_56_CURRENT_ROOT_TRANSITION_AND_3_ORIGINAL_CI_CONSUMER_CASES",
     "independent_review": {
       "path": "docs/evidence/forge_ordinary_run_finalization_v1/independent-review.json",
-      "sha256": "05000abec3eaa079ddce5479089d4c90c6562df6a5af51a694cb6a9a7e65c8b2",
+      "sha256": "8e1abed662052160f76402421db6a0086a19843f66eb860d819cae04c494103f",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
@@ -52,7 +54,10 @@
       "PASS_WRONG_PARENT_MARKET_SLOT_VERSION_PAYLOAD_JOURNAL_TIME_PENDING_REFUSALS",
       "PASS_ORPHAN_EXPECTED_PARENT_AND_OWN_RESUME_HASH",
       "PASS_REAL_RUN_READ_ONLY_INVENTORY_AND_EXPOSURE_UNCHANGED",
-      "PASS_FACTORY_STATIC"
+      "PASS_FACTORY_STATIC",
+      "PASS_ACTIVE_SLOT_PROJECTION_WITH_SAME_SLOT_CAP_AUTHORITY",
+      "PASS_PREVIOUSLY_UNMATCHED_REVIEW_STOP_WITHOUT_CHANGING_LEGACY_NEGATIVES",
+      "PASS_THREE_ORIGINAL_CI_FAILURES_WITHOUT_EXPECTATION_RELAXATION"
     ]
   },
   "non_claims": [
