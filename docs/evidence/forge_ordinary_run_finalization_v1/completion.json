@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-ORDINARY-RUN-FINALIZATION-ENGINEERING",
+  "as_of": "2026-10-27",
+  "task_id": "FORGE_ORDINARY_RUN_FINALIZATION_V1",
+  "state_change": "EXISTING_ORDINARY_RUN_OWNER_FINAL_AND_TWO_OPERATION_COMPLETION_ENGINEERING_VERIFIED; REAL_APPEND_PENDING_ACCEPTED_MERGE",
+  "base_main": "3bb9da411b085084d6da45af761378257c050479",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_ordinary_run_finalization_v1/factory-fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_69_FOCUSED_AND_6_POST_BASE_SELECTOR_UNIT_CHECKS",
+    "independent_review": {
+      "path": "docs/evidence/forge_ordinary_run_finalization_v1/independent-review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_NATIVE_ZERO_CANDIDATE_BASE_AND_EPISODE_VERTICAL",
+      "PASS_ONE_APPEND_TWO_COMPLETED_IDEMPOTENT_RETRY",
+      "PASS_SCIENTIFIC_LOOKS_AND_SOURCE_RECORD_INVARIANCE",
+      "PASS_WRONG_PARENT_MARKET_SLOT_VERSION_PAYLOAD_JOURNAL_TIME_PENDING_REFUSALS",
+      "PASS_ORPHAN_EXPECTED_PARENT_AND_OWN_RESUME_HASH",
+      "PASS_REAL_RUN_READ_ONLY_INVENTORY_AND_EXPOSURE_UNCHANGED",
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_NEW_REAL_SCIENCE_LOOK_PROVIDER_PUBLICATION_OR_REMINDER_CHANGE",
+    "NO_SOURCE_ID_HISTORY_RESULT_DRAFT_ASSESSMENT_RESERVATION_OR_BUDGET_REWRITE",
+    "NO_ALPHA_FAMILY_CLOSE_OR_STRATEGY_ACCEPTANCE",
+    "REAL_OWNER_FINAL_APPEND_ONLY_AFTER_ACCEPTED_MERGE_AND_EXACT_STATE_REVALIDATION",
+    "NO_MERGE_AUTHORITY"
+  ],
+  "side_effects": {
+    "real_researchstore_writes": 0,
+    "real_scientific_looks": 0,
+    "publications": 0,
+    "reminder_changes": 0,
+    "synthetic_local_fixture_only": true,
+    "scope": "BOUNDED_ENGINEERING_EXCLUDING_ROUTINE_GIT_GITHUB_DELIVERY"
+  }
+}

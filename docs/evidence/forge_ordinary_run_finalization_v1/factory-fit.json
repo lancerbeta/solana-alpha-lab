@@ -18,7 +18,7 @@
     "monitoring_and_recovery": "Before real receipt append, code revert is ordinary. After append prefer forward repair; an older reader can again fail to derive child completion, so preserve receipt and revalidate instead of rewriting history.",
     "build_vs_buy": "Reuse ResearchStore, ladder transitions, source slots/journals and native lifecycle owner. No dependency, schema, scheduler, provider or service.",
     "security": "No credentials or market/provider access; foreign parent/focus/market/slot/journal/time do not prove completion.",
-    "red_team": "An owner-final word or cap change alone cannot complete a pending child or erase spend. Native persist repeat and scientific-ledger equality are checked."
+    "red_team": "An owner-final word or cap change alone cannot complete a pending child or erase spend. Native persist repeat and scientific-ledger equality are checked. Orphan recovery requires the parent selected by the aggregate; a draft cannot attest its own lineage."
   },
   "capability_radar": {
     "now": "NONE",
