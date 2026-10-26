@@ -47,7 +47,7 @@ stop_conditions:
 - REPLAN_ON_UNRESOLVED_IDENTITY_CONFLICT_OR_NEW_SCIENTIFIC_STATE_REQUIREMENT
 context_requirements:
   catalog_asset_ids: [MODULE-HFIC-REPRESENTATION-LADDER-001]
-  l2_roles: [ARCHITECTURE_DECISIONS]
+  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
