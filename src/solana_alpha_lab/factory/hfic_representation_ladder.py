@@ -347,14 +347,22 @@ def _consume_representation_chain(
         if next_rep is not None:
             current_id = next_rep
             continue
+        review_stop = False
         if not isinstance(terminal, str) or terminal not in (
             KNOWN_SCIENTIFIC_NEGATIVES | CASE_C_KILL_TERMINALS | PASS_TERMINALS
         ):
-            return {
-                "next_action": ACTION_OBSERVABILITY_BLOCKED,
-                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
-                "reason_code": unmatched,
+            # Same semantic owner as BASE: a review/technical rejection is not
+            # a scientific negative or family suppression authority.
+            from solana_alpha_lab.factory.hfic_suppression_semantics import interpret_critic_terminal
+            review_stop = isinstance(terminal, str) and interpret_critic_terminal(terminal)["outcome_class"] in {
+                "REVIEW_REJECTION", "REVIEW_REJECTION_UNKNOWN_APPLICABILITY", "TECHNICAL_REFUSAL"
             }
+            if not review_stop:
+                return {
+                    "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                    "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                    "reason_code": unmatched,
+                }
         stage_ref = stage.get("stage_ref_sha256")
         if not isinstance(stage_ref, str) or len(stage_ref) != 64:
             return {
@@ -362,9 +370,10 @@ def _consume_representation_chain(
                 "owner_final": ACTION_OBSERVABILITY_BLOCKED,
                 "reason_code": ref_missing,
             }
+        final_action = ACTION_NON_SCIENTIFIC_STOP if review_stop else ACTION_SEARCH_EXHAUSTED
         return {
-            "next_action": ACTION_SEARCH_EXHAUSTED,
-            "owner_final": ACTION_SEARCH_EXHAUSTED,
+            "next_action": final_action,
+            "owner_final": final_action,
             "reason_code": terminal,
         }
     return {

@@ -2279,12 +2279,17 @@ def project_ordinary_operation(
     *,
     owner_focus: str,
     market_evidence_epoch_sha256: str | None = None,
+    scientific_slot_sha256: str | None = None,
 ) -> dict[str, Any] | None:
     """Derived readout. Not a second persisted DONE."""
 
     rows = [item for item in list_operations(store) if item.get("owner_focus") == owner_focus]
     if isinstance(market_evidence_epoch_sha256, str) and len(market_evidence_epoch_sha256) == 64:
         rows = [item for item in rows if item.get("market_evidence_epoch_sha256") == market_evidence_epoch_sha256]
+    # The active representation owns its operation. A completed/paused BASE
+    # journal cannot impose a cap on a child slot that has not opened yet.
+    if scientific_slot_sha256 is not None:
+        rows = [item for item in rows if item.get("scientific_slot_sha256") == scientific_slot_sha256]
     if not rows:
         return None
     # The newest operation is the one opened last; a later stop row of an older
@@ -2349,6 +2354,7 @@ def project_ordinary_operation(
         "market_evidence_epoch_sha256": current.get("market_evidence_epoch_sha256"),
         "question_text": current.get("question_text"),
         "journal_scope": journal,
+        "scientific_slot_sha256": current.get("scientific_slot_sha256"),
         "decision_point": decision,
         "decision_age_seconds": age,
         "hold_seconds": hold,

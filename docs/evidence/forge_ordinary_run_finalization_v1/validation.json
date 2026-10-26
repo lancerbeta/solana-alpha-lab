@@ -5,8 +5,8 @@
   "oracle": "One native synthetic published-episode zero-candidate BASE + normalized vertical; exact state and hash comparisons, not test count.",
   "checks": [
     {
-      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_ordinary_run_finalization_v1 tests.test_forge_ordinary_operation_lifecycle_v1.OperationCompletionBindingTests -v",
-      "tests": 10,
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_ordinary_run_finalization_v1 tests.test_forge_ordinary_operation_lifecycle_v1.OperationCompletionBindingTests tests.test_forge_representation_ladder_v1.ResolveNextActionTests -v",
+      "tests": 56,
       "verdict": "PASS",
       "proves": [
         "ordinary parent/child discovery and own generated-draft resume",
@@ -19,18 +19,20 @@
         "incompatible pending source capability is blocked instead of restarted",
         "computed final displays NEXT/PERSIST; native persisted/readback displays real persistence only",
         "orphan selected parent is external to its own draft; foreign/missing parent cannot clear admission STOP",
-        "episode resume uses own stage draft; computed owner-final prints native persist route"
+        "episode resume uses own stage draft; computed owner-final prints native persist route",
+        "same-slot cap stays owner gated; foreign-slot projection cannot override child START",
+        "saved review rejection stops non-scientifically; UNKNOWN/missing reference/pending remain blocked",
+        "existing literal transition and CONTROL restrictions"
       ]
     },
     {
-      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_representation_ladder_v1.ResolveNextActionTests tests.test_forge_representation_ladder_v1.RegistryLoadTests tests.test_forge_representation_ladder_v1.ScopeAndPersistenceTests tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_g1_ordinary_no_worthy_does_not_demand_control tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_f3_foreign_parent_v2_is_not_consumed tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_n1_fresh_normal_entry_is_ordinary_discovery tests.test_forge_representation_ladder_v1.ProductionPathAcceptanceTests.test_f2_orphan_v1_without_parent_is_not_bound tests.test_hfic_prefreeze_draft_recovery_v1 -v",
-      "tests": 59,
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_public_prefix_is_invariant_to_produced_future_poison_but_authorized_numeric_changes tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_real_normalized_prefix_reader_does_not_access_future_values tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_d_episode_profile_through_the_dispatcher_and_ordinary_lifecycle -v",
+      "tests": 3,
       "verdict": "PASS",
       "proves": [
-        "existing raw CONTROL and ordinary routes",
-        "foreign-parent refusal and population boundary",
-        "existing prefreeze recovery and own parent/payload binding",
-        "foreign-parent occupied slot cannot start another scientific attempt"
+        "three original CI failures pass without changing their literal expectations",
+        "public prefix reads no future values; repeat prefix is not another preview",
+        "native selected-child negative Critic reaches aggregate persistence; no new real science"
       ]
     },
     {
@@ -51,5 +53,11 @@
   "real_scientific_looks": 0,
   "real_researchstore_writes": 0,
   "publications": 0,
-  "reminder_changes": 0
+  "reminder_changes": 0,
+  "historical_baseline": {
+    "head": "27d0923bc6e820eca145194643c3dfd081d5cce4",
+    "focused_checks": 69,
+    "verdict": "PASS",
+    "scope": "Pre-CI source inventory; later exact-head CI exposed the separate public operation-projection and selected-child terminal seams recorded in ci-reconciliation.json."
+  }
 }

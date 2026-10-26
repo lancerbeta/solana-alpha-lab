@@ -82,6 +82,40 @@ class CompletionBindingTests(unittest.TestCase):
         self.assertEqual(result["next_action"], "START_NORMALIZED_TRAJECTORY_EPISODES_V1")
 
 
+class ChildReviewTerminalTests(unittest.TestCase):
+    def test_review_rejection_stops_without_scientific_exhaustion(self):
+        stages = [{"representation_id": "BASE", "session_state": "SYNTHESIS_COMPLETE",
+                   "execution_status": "EXECUTED", "effective_terminal": "NO_WORTHY_HYPOTHESIS",
+                   "input_scope": "ORDINARY_BASE", "stage_ref_sha256": "5" * 64},
+                  {"representation_id": REP, "session_state": "SYNTHESIS_COMPLETE",
+                   "execution_status": "EXECUTED", "effective_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+                   "stage_ref_sha256": "6" * 64}]
+        result = resolve_next_action(stages, population="OPPORTUNITY_EPISODES")
+        self.assertEqual(result["owner_final"], "NON_SCIENTIFIC_STOP")
+        self.assertEqual(result["reason_code"], "KILL_STATISTICALLY_UNIDENTIFIABLE")
+        for change in ({"stage_ref_sha256": None}, {"effective_terminal": "ALIEN_TERMINAL"}):
+            changed = [stages[0], {**stages[1], **change}]
+            self.assertEqual(resolve_next_action(changed, population="OPPORTUNITY_EPISODES")["owner_final"], "OBSERVABILITY_BLOCKED")
+        pending = [stages[0], {**stages[1], "session_state": "FROZEN_AWAITING_CRITIC"}]
+        self.assertIsNone(resolve_next_action(pending, population="OPPORTUNITY_EPISODES")["owner_final"])
+
+
+class OperationProjectionBindingTests(unittest.TestCase):
+    def test_paused_other_slot_cannot_override_active_child(self):
+        from solana_alpha_lab.factory import hfic_ordinary_operation as owner
+        with mock.patch.object(owner, "list_operations", return_value=[{
+            "owner_focus": "OPPORTUNITY_EPISODES:AUTO", "market_evidence_epoch_sha256": MARKET,
+            "scientific_slot_sha256": BASE_SLOT, "status": "PAUSED_CAP",
+        }]):
+            self.assertIsNone(owner.project_ordinary_operation(object(),
+                owner_focus="OPPORTUNITY_EPISODES:AUTO", market_evidence_epoch_sha256=MARKET,
+                scientific_slot_sha256=CHILD_SLOT))
+        # A pause on this same slot still requires owner authority; no refund.
+        merged = owner.merge_ordinary_readout({"next_action": "START_BASE"}, {
+            "status": "PAUSED_CAP", "effective_state": "PAUSED_CAP", "owner_main_remaining": 0})
+        self.assertEqual(merged["next_action"], "AUTHORIZE_ADDITIONAL_LOOKS")
+
+
 class OrphanParentBindingTests(unittest.TestCase):
     def test_orphan_parent_is_selected_by_run_not_self_attested(self):
         from solana_alpha_lab.factory import hfic_session as owner

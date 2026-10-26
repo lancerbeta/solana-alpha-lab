@@ -104,3 +104,17 @@ zero unresolved reservations and empty universe `blocking_operations`. One
 repeat of the same `forge-run --persist` must add no record. Preserve the saved
 receipt and unrelated historical UNKNOWN; stop on mismatch rather than rerun
 science, rewrite source history or use owner-stop. No reminder/publication step.
+
+## CI consumer reconciliation
+
+The first exact-head CI exposed a display-owner seam: newest focus/market BASE
+operation projection could override a different child-slot START with the
+BASE's PAUSED_CAP. The existing projector now accepts the active slot selector;
+same-slot caps and global blocking inventory are unchanged. The three original
+failing consumer tests keep their literal expectations.
+
+The complete selected-child vertical also exposed STAGE_TERMINAL_UNMATCHED for
+KILL_STATISTICALLY_UNIDENTIFIABLE. Child now reuses BASE's existing Critic
+semantic owner: a saved review/technical rejection stops NON_SCIENTIFICALLY,
+not as search exhaustion or family falsification. Unknown terminal, pending
+state or absent stage reference remains blocked. No source verdict is rewritten.

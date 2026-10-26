@@ -126,3 +126,11 @@ Before any live stop record, an ordinary revert. After a live stop record,
 forward-fix only: the previous code treats `STOPPED` as not `OPEN` for the gate
 but does not refuse admission, so reverting would re-admit looks on stopped
 operations. Never delete data-plane history.
+
+The public run's operation readout is narrowed to its active scientific slot.
+A paused BASE journal cannot replace a child-slot START with additional BASE
+look authority. Same-slot caps and the universe gate remain enforced by their
+existing owners; display selection never closes, refunds or hides an operation
+from effective_open_operations. A completed child review rejection uses the
+same semantic owner as BASE and ends non-scientifically with a saved stage
+reference. UNKNOWN/pending or missing reference cannot establish that final.

@@ -1169,7 +1169,8 @@ def cmd_forge_run(
     projection = project_ordinary_operation(
         store,
         owner_focus=owner_focus if owner_focus.strip() else "AUTO",
-        # An older-market operation of the same focus does not speak for this run.
+        # A different stage/market operation cannot override this run's next.
+        scientific_slot_sha256=payload.get("scientific_slot_sha256"),
         market_evidence_epoch_sha256=current_market
         if isinstance(current_market, str) and len(current_market) == 64
         else None,

@@ -19,6 +19,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_representation_ladder.py
 - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
 - src/solana_alpha_lab/factory/hfic_session.py
+- scripts/hypothesis_forge.py
 - tests/test_forge_ordinary_run_finalization_v1.py
 - tests/test_forge_representation_ladder_v1.py
 - docs/contracts/forge_ordinary_operation_lifecycle_v1.md
@@ -130,3 +131,17 @@ STOP: exact-head CI + merge-readiness, then one owner phrase. NEXT after accepte
 merge: the already-authorized operational finalization above. No scientific rerun.
 PRODUCT_HORIZON_NOW=NONE beyond this closure; WATCH only a reproducible wrong
 parent/journal association. Model effort recommendation: SOL_XHIGH.
+
+CI REPLAN (same outcome, no added science): full exact-head CI exposed three
+existing finite-cap prefix scenarios. The public CLI projected the newest
+operation by focus/market only: a paused BASE journal overrode START on a distinct
+child slot. Narrow the existing projection by the aggregate's active scientific
+slot; keep same-slot cap/authority behavior intact. No state, budget, new command
+or workflow limit change. Verify the three exact failed scenarios and a short
+foreign-slot negative, then rebind independent review and exact-head CI.
+
+The same CI vertical then reached a formerly invisible selected-child review
+rejection. Reuse interpret_critic_terminal exactly as BASE does: review/technical
+rejection is NON_SCIENTIFIC_STOP, never scientific exhaustion or family closure;
+require the saved stage reference, keep unknown/pending/missing blocked. This
+preserves Critic ownership and adds no new terminal/schema/authority.
