@@ -82,7 +82,37 @@ class CompletionBindingTests(unittest.TestCase):
         self.assertEqual(result["next_action"], "START_NORMALIZED_TRAJECTORY_EPISODES_V1")
 
 
+class OrphanParentBindingTests(unittest.TestCase):
+    def test_orphan_parent_is_selected_by_run_not_self_attested(self):
+        from solana_alpha_lab.factory import hfic_session as owner
+        kwargs = dict(market_evidence_epoch_sha256=MARKET, representation_id=REP,
+                      representation_semantic_version="1.0", owner_focus="OPPORTUNITY_EPISODES:AUTO",
+                      capability_epoch_sha256="1" * 64, memory_eligibility_sha256=None)
+        with mock.patch.object(owner, "find_generated_draft", return_value={
+            "control_session_id": "FOREIGN_BASE", "representation_payload_sha256": "2" * 64
+        }), mock.patch.object(owner, "prefreeze_generated_draft_recovery", return_value=True) as validated:
+            self.assertFalse(owner.orphan_prefreeze_draft_resumable(object(), **kwargs, control_session_id=BASE))
+            self.assertFalse(owner.orphan_prefreeze_draft_resumable(object(), **kwargs))
+            validated.assert_not_called()
+            with mock.patch.object(owner, "list_hfic_sessions", return_value=[]), mock.patch.object(owner, "list_scientific_slot_admissions", return_value=[]):
+                self.assertTrue(owner.orphan_prefreeze_draft_resumable(object(), **kwargs, control_session_id="FOREIGN_BASE"))
+            self.assertEqual(validated.call_args.kwargs["control_session_id"], "FOREIGN_BASE")
+
+
 class PersistenceReadoutTests(unittest.TestCase):
+    def test_episode_resume_uses_own_saved_draft_and_native_instruction(self):
+        from solana_alpha_lab.factory.hfic_representation_ladder import format_forge_run_owner_readout
+        body = {"next_action": "RESUME_" + REP, "owner_focus": "OPPORTUNITY_EPISODES:AUTO",
+                "stages": [{"representation_id": "BASE", "draft_sha256": "3" * 64},
+                           {"representation_id": REP, "draft_sha256": "4" * 64}]}
+        text = format_forge_run_owner_readout(body)
+        self.assertIn("status: NEXT — RESUME " + REP, text)
+        self.assertIn("next: RESUME_EXISTING_SESSION", text)
+        self.assertIn("--saved-draft-sha256 " + "4" * 64, text)
+        self.assertNotIn("--saved-draft-sha256 " + "3" * 64, text)
+        body["next_action"] = "RESUME_UNKNOWN_REPRESENTATION"
+        self.assertNotIn("RESUME_EXISTING_SESSION", format_forge_run_owner_readout(body))
+
     def test_computed_final_is_not_a_persisted_receipt(self):
         from solana_alpha_lab.factory.hfic_representation_ladder import format_forge_run_owner_readout
         body = {"owner_class": "OWNER_FINAL", "owner_final": "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
@@ -91,6 +121,7 @@ class PersistenceReadoutTests(unittest.TestCase):
         text = format_forge_run_owner_readout(body)
         self.assertIn("status: NEXT — PERSIST_OWNER_FINAL", text)
         self.assertIn("persisted: NONE", text)
+        self.assertIn("forge-run --persist --owner-focus", text)
         self.assertNotIn("persisted_receipt:", text)
         self.assertNotIn("status: DONE", text)
         body["persisted_receipt_sha256"] = "9" * 64
@@ -161,12 +192,16 @@ class OrdinaryFinalizationVertical(unittest.TestCase):
         generated = self.call("persist-draft", "--draft", child_path, "--preflight-receipt", child_pre_path, "--representation-id", REP)
         from solana_alpha_lab.factory import hfic_evidence_identity as identity_owner
         from solana_alpha_lab.factory import hfic_representation_ladder as ladder
-        with mock.patch.object(identity_owner, "resolve_scientific_admission", wraps=identity_owner.resolve_scientific_admission) as admission:
+        from solana_alpha_lab.factory import hfic_session as session_owner
+        with mock.patch.object(identity_owner, "resolve_scientific_admission", wraps=identity_owner.resolve_scientific_admission) as admission, mock.patch.object(session_owner, "orphan_prefreeze_draft_resumable", wraps=session_owner.orphan_prefreeze_draft_resumable) as orphan:
             pending = ladder.evaluate_forge_run(ROOT, self.plane, owner_focus=pre["owner_focus"])
         self.assertTrue(any(call.kwargs.get("representation_id") == REP for call in admission.call_args_list))
+        self.assertEqual(orphan.call_args.kwargs["control_session_id"], base["session_id"])
         self.assertEqual(pending["scientific_slot_sha256"], generated["scientific_slot_sha256"])
         self.assertEqual(pending["next_action"], "RESUME_NORMALIZED_TRAJECTORY_EPISODES_V1")
         self.assertIsNone(pending["owner_final"])
+        self.assertIn("next: RESUME_EXISTING_SESSION", pending["owner_readout"])
+        self.assertIn("--saved-draft-sha256 " + generated["payload_sha256"], pending["owner_readout"])
         actual_draft = ladder.find_generated_draft
         def incompatible_child(*args, **kwargs):
             found = actual_draft(*args, **kwargs)

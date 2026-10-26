@@ -53,7 +53,10 @@ context_requirements:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: [docs/contracts/forge_ordinary_operation_lifecycle_v1.md]
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/forge_ordinary_run_finalization_v1/completion.json
+    - docs/evidence/forge_ordinary_run_finalization_v1/independent-review.json
+    - docs/evidence/forge_ordinary_run_finalization_v1/factory-fit.json
     HISTORICAL_CONTEXT: []
 ---
 

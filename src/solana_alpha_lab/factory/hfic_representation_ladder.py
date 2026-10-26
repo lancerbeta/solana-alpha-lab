@@ -1118,6 +1118,13 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     persist_note = ("RESEARCH_ARTIFACT FORGE_RUN_RECEIPT" if appended else
                     "READBACK RESEARCH_ARTIFACT FORGE_RUN_RECEIPT" if persisted_sha else "NONE")
     next_action = receipt.get("next_action")
+    resume_representations = {
+        _resume_action(str(stage["representation_id"])): str(stage["representation_id"])
+        for stage in stages
+        if isinstance(stage, Mapping) and stage.get("representation_id")
+    }
+    resume_representations.update({ACTION_RESUME_BASE: "BASE", ACTION_RESUME_V1: "NORMALIZED_TRAJECTORY_V1"})
+    resume_representation = resume_representations.get(next_action)
     owner_class = str(receipt.get("owner_class") or "")
     owner_final = receipt.get("owner_final")
     blocking = [str(item) for item in (receipt.get("blocking_reason_codes") or []) if item]
@@ -1182,7 +1189,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "NEXT — CONTROL-compatible BASE required for V1; "
             "not evening DONE; use CONTROL surface inside this slash"
         )
-    elif next_action == ACTION_RESUME_BASE or next_action == ACTION_RESUME_V1:
+    elif resume_representation:
         reasons = {str(item) for item in (receipt.get("blocking_reason_codes") or [])}
         stage_reasons = {
             str(stage.get("reason_code") or "")
@@ -1200,7 +1207,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         elif next_action == ACTION_RESUME_BASE:
             status = "NEXT — RESUME BASE from saved artifacts; not a new trial"
         else:
-            status = "NEXT — RESUME V1 from saved artifacts; not a new trial"
+            status = f"NEXT — RESUME {'V1' if next_action == ACTION_RESUME_V1 else resume_representation} from saved artifacts; not a new trial"
     elif next_action == ACTION_START_BASE and "CONTROL_SURFACE_REQUIRED" in {
         str(item) for item in (receipt.get("blocking_reason_codes") or [])
     }:
@@ -1532,12 +1539,8 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "next: RESOLVE_TYPED_BLOCK — resolve the stated input/readback blocker, "
             "then retry; do not treat this as scientific exhaustion"
         )
-    if next_action in {ACTION_RESUME_BASE, ACTION_RESUME_V1}:
-        target_representation = (
-            "NORMALIZED_TRAJECTORY_V1"
-            if next_action == ACTION_RESUME_V1
-            else "BASE"
-        )
+    if resume_representation:
+        target_representation = resume_representation
         candidate_stages = [
             stage
             for stage in stages
@@ -1585,6 +1588,10 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             + draft_arg
             + recovery_note
         )
+    if owner_class == OWNER_CLASS_FINAL and owner_final and not persisted_sha and not appended:
+        lines.append("next: PERSIST_OWNER_FINAL — inside this already-authorized run, use `"
+                     + CANONICAL_HFIC_CLI + " forge-run --persist --owner-focus "
+                     + shlex.quote(owner_focus) + "`; then cold-read both operations; no new scientific trial")
     lines.append(
         "writes: store={store} forge_run={forge} session={session} "
         "forge_context=0".format(
@@ -3475,6 +3482,11 @@ def evaluate_forge_run(
             representation_id=active_rep,
             representation_semantic_version=active_version,
             owner_focus=owner_focus,
+            control_session_id=control_session_id or next(
+                (str(row["session_id"]) for row in resolved_stages
+                 if row.get("representation_id") == "BASE" and row.get("session_id")),
+                None,
+            ),
             capability_epoch_sha256=(
                 str(admission_execution_context.get("capability_epoch_sha256"))
                 if isinstance(
