@@ -9,14 +9,16 @@
   "look_accounting_unchanged_by_immutable_records": true,
   "ids_history_drafts_results_assessments_reservations_unchanged": true,
   "entry_and_repeat_writes": {
-    "research_store": 0,
     "forge_run": 0,
+    "research_store": 0,
     "session": 0
   },
   "provenance": "HISTORICAL_READBACK_UNKNOWN",
   "ordinary_operation": "COMPLETED",
   "actual_scientific_looks": 0,
-  "scope": "CANDIDATE_NATIVE_ENTRY_WITH_EXPLICIT_COMMISSIONED_DATA_ROOT; ACCEPTED_RUNTIME_DEFAULT_ENTRY_PENDING_MERGE",
+  "scope": "CANDIDATE_NATIVE_COMMAND_OWNER; EXISTING_DEFAULT_RUNTIME_PREFERENCES; TWO_FRESH_PROCESSES",
+  "runtime_installation": "PENDING_ACCEPTED_MERGE",
   "post_merge_default_entry_required": true,
-  "receipt_sha256": "e7760699fbd4634a00a8037e12d90df83585736a3698f0bf337810c0cb23d7fc"
+  "source_sha256": "6ab66145e3914f1521aa42d960c6e1bcfc938a3de061d44366825beff0df880e",
+  "receipt_sha256": "9c74ba066a18f5c25bd83bc3edfcdb297739dddaf91732fbdb7ec731f6e0e5fd"
 }

@@ -71,11 +71,15 @@ Readback returns the existing receipt SHA and appends nothing, including when
 the aggregate producer and source stages used different capability epochs.
 
 An implicit current execution-compatibility refusal does not reopen a saved
-owner-final when every stage is completed, retains historical UNKNOWN and
-matches its saved source reference and shared source capability. This exception
-is readback only: explicit execution-context requests and other admission stops
-(including missing readback) still block. The provenance validator must accept
-the source identities independently before returning the saved result.
+owner-final when every independently discovered stage is completed, retains
+historical UNKNOWN, has no known model or execution binding, and matches its
+saved source reference and shared source capability. The proof uses discovery
+before saved-stage fallback/merging; a saved row cannot attest its own source.
+Current source-load errors block even a completed readback. This exception is
+readback only: known model/binding requirements, explicit execution-context
+requests and other admission stops (including missing readback) still block.
+The provenance validator rejects malformed hashes or explicit conflicts in
+every saved stage, including nonactive ones, before returning the saved result.
 
 The same persisted owner-final can complete BASE and its bound representation
 operations even if its active slot points to a later candidate. Completion

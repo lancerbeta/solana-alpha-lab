@@ -14,7 +14,10 @@ PR #424 уже создал настоящий owner-final
 научного слота и сохранённой ссылки на стадию. Формат всех хешей проверяется,
 противоречия между источниками остаются конфликтами. Отказ текущей неявной
 execution compatibility допускает только историческое чтение точной завершённой
-цепочки с единым frozen source capability и UNKNOWN. Явный запрос другого
+цепочки с единым frozen source capability и UNKNOWN, без известной source model
+или execution binding. Доказательство берётся из discovery до слияния с историей;
+сохранённая копия не подтверждает сама себя. Ошибка чтения источника, конфликт
+любой сохранённой стадии, известные model/binding требования, явный запрос другого
 контекста исполнения, незавершённая работа и другие admission STOP остаются
 заблокированы. Проверка происхождения должна независимо принять источники.
 
@@ -24,9 +27,9 @@ SEARCH_EXHAUSTED_CURRENT_EVIDENCE, READBACK, HISTORICAL_READBACK_UNKNOWN.
 результаты, drafts, assessments, reservations и учёт просмотров сохранены.
 Новых научных запусков, публикаций, изменений напоминаний и зависимостей нет.
 
-Проверка кандидата использует native CLI с явно указанным commissioned data root;
-штатная рабочая копия пока остаётся на принятом main. Её обычный вход без
-переопределения пути проверяется после нового guarded merge. Это ограничение
+Native command owner кандидата проверен в двух новых процессах с действующими
+обычными настройками, без переопределения пути к данным. Штатная рабочая копия
+пока остаётся на принятом main; её полный CLI проверяется после guarded merge. Это ограничение
 доказательства, не разрешение на публикацию или новый trial.
 
 ## Доказательства
@@ -51,6 +54,12 @@ UNKNOWN не превращается в VERIFIED, научный отрицат
 ```powershell
 $env:PYTHONUTF8='1'
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --owner-focus OPPORTUNITY_EPISODES:AUTO
+```
+
+Сначала сверить первый ответ: READBACK, точный run и persisted_receipt SHA выше,
+все writes равны нулю. При несовпадении остановиться. Только затем повтор:
+
+```powershell
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --persist --owner-focus OPPORTUNITY_EPISODES:AUTO
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py universe-policy-status
 ```

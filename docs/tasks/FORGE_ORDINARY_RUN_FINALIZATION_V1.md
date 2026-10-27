@@ -92,6 +92,13 @@ UNKNOWN, both operations COMPLETED and zero further records/looks. Add small
 negative controls for contradictory/malformed source identity and binding.
 Never replace missing provenance with VERIFIED or disable identity checks.
 
+Review refinement: implicit-context readback is limited to independently
+discovered legacy stages without a known source model or execution binding.
+Use pre-merge discovery, never saved fallback as its own proof. Source-load
+errors, nonactive saved-source conflicts and malformed capability stay blocked;
+the existing known-model G11 oracle is unchanged. This narrows the same outcome
+without a new route, schema, authority or write set.
+
 Use the existing ladder validator and tests; no dependency, new schema, CLI,
 state machine, cache, migration or parallel truth owner. CAPABILITY_RADAR_NOW=NONE.
 PRODUCT_HORIZON_NOW=NONE; WATCH only failure to retain source-scoped conflicts.
