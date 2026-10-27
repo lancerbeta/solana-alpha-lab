@@ -6,8 +6,8 @@
   "task_id": "FORGE_ORDINARY_RUN_FINALIZATION_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "d801e6ffdbde0a50a52d2aadbf4c1ec0389aa1517e01aa57e120a319d4ca24ae",
+  "reviewed_inventory_sha256": "050a084ad02f022f52031d2b847ce04c5905dd7589e421f24e0d0ced7869b0d8",
   "dimensions": {
     "mission": "Read the already completed research run honestly without redoing research or manufacturing closure.",
     "flexibility_and_history": "Keep the existing owner-final receipt, source identities, results, drafts, assessments, reservations and full event history. All 536 real record hashes unchanged.",
