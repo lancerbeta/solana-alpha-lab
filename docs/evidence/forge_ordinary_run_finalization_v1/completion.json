@@ -17,7 +17,7 @@
     "docs/evidence/forge_ordinary_run_finalization_v1/ci-reconciliation.json": "21be6a03df843c47925e4008fcc281b74f613877227f92545111e3555871834e",
     "docs/evidence/forge_ordinary_run_finalization_v1/premerge-readback.json": "7885f706ad696b76b981fb42718591f744553ee742482f3bec53d06c0da9da32",
     "docs/evidence/forge_ordinary_run_finalization_v1/validation.json": "cfe78bbe06c5ca9061e822311cdc31056cb28097054ddc0569fd9013d7d9ac70",
-    "docs/tasks/FORGE_ORDINARY_RUN_FINALIZATION_V1.md": "ec8eb068113daad34176ef9a5bbf70362ef1e6cff0dfd76ae859fec35d725939",
+    "docs/tasks/FORGE_ORDINARY_RUN_FINALIZATION_V1.md": "e4b0ae7e38025ce3e764150ccdc9e50cfc0c15380bcaff8917d23286298ab5fc",
     "scripts/hypothesis_forge.py": "dce0b99f093b4bfcd70710d74370d3c4dd6e843938ada95e3aefcbd7d9a1ae60",
     "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "b1ce9cf2201220104c93fff440d47d1e3b451569e0460b7810379a5108030320",
     "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "406972d18f3d46fc16082a280fa5c96d5bc4f460fc213139d6aa3277fcec7c37",
@@ -35,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_ordinary_run_finalization_v1/factory-fit.json",
-    "sha256": "a28d66066d0a1c81a2e448bf7172ddee6bcfb58fb94e066164813e3492396e56",
+    "sha256": "9631c79118631391e7f985b17a728be576a6345d8a00adfca859c7b040eed260",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_56_CURRENT_ROOT_TRANSITION_AND_3_ORIGINAL_CI_CONSUMER_CASES",
     "independent_review": {
       "path": "docs/evidence/forge_ordinary_run_finalization_v1/independent-review.json",
-      "sha256": "8e1abed662052160f76402421db6a0086a19843f66eb860d819cae04c494103f",
+      "sha256": "fae68c4a616630d18f8530242649a8cbb4b74e4bce2d3d7d91f8eb500a9315ad",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

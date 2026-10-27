@@ -4,8 +4,8 @@
   "review_id": "FORGE-ORDINARY-RUN-FINALIZATION-REVIEW",
   "as_of": "2026-10-27",
   "task_id": "FORGE_ORDINARY_RUN_FINALIZATION_V1",
-  "reviewed_bindings_sha256": "74c8ac12c75acc5e3cde4cde88f1e2dd9abdde7b187e01c226d2e45897d61f26",
-  "reviewed_inventory_sha256": "e86833f79c270b3905509b6ca5eba5137d568bf0d079b57d95a3d848ffb276b7",
+  "reviewed_bindings_sha256": "354d6d181f25b8fc4f11b32e145c1b5736b070f0f79a4eebf0d1ca32c0b86ddb",
+  "reviewed_inventory_sha256": "d1bfe4a37c1e43c4beb5f80dba12d08ac656dc15ab52c47d8b01644b2d97d225",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,30 +17,34 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "SEMANTIC_PREMISE PASS exact final inventory 8a512b4564dc4db0ebe81eede2aadca56cd90f4e. HEAD/diff SHA, six evidence hashes and unchanged source/test blobs from the tested e34 source verified. C1-C6 bounded: selected orphan parent, complete historical chain, own-stage completion, own-slot display projection and same-slot authority preserved.",
-        "packet_fingerprint_sha256=3e59be819a7bee4ce691e0e7e2c3bd4751fcdbbf3a6a9e769c9334260e60246d",
-        "C6 corrected to previously unmatched child review/technical terminals only. KILL_STATISTICALLY_UNIDENTIFIABLE uses NON_SCIENTIFIC_STOP; legacy registered known-negative routing unchanged. Operational completion is not PIT, research truth, family closure or science acceptance. PACKET_INFORMATION_PATH; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN."
+        "SEMANTIC_PREMISE PASS exact final inventory 6e6227365e806d3f878fc17d92a444eb64363c64. HEAD/diff SHA, six evidence hashes and unchanged source/test blobs from the tested e34 source verified. C1-C6 bounded: selected orphan parent, complete historical chain, own-stage completion, own-slot display projection and same-slot authority preserved.",
+        "packet_fingerprint_sha256=01fdad8c26596fe66a2ee34f594a66828d77b71e73ffc7bd919e2c12c5ba45ea",
+        "C6 corrected to previously unmatched child review/technical terminals only. KILL_STATISTICALLY_UNIDENTIFIABLE uses NON_SCIENTIFIC_STOP; legacy registered known-negative routing unchanged. Operational completion is not PIT, research truth, family closure or science acceptance. PACKET_INFORMATION_PATH; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN.",
+        "V6 PASS: task L2 now selects the three previously declared DELIVERY_EVIDENCE paths. Only this context line changed from the CI-passed cfbc source inventory; source/test/UI/policy/grants unchanged. No authority widening. Native rebind/grounding remains machine verified."
       ]
     },
     {
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "PASS final inventory 8a512b4564dc4db0ebe81eede2aadca56cd90f4e. Source/test/UI blobs match tested e34; four document claims narrowed exactly to unmatched terminals. Existing foreign-parent orphan actual-validator probe and independent new slot/terminal controls PASS. Public projection cannot borrow another slot cap; global effective-open ownership and same-slot caps unchanged. No actionable finding; role-set complete."
+        "PASS final inventory 6e6227365e806d3f878fc17d92a444eb64363c64. Source/test/UI blobs match tested e34; four document claims narrowed exactly to unmatched terminals. Existing foreign-parent orphan actual-validator probe and independent new slot/terminal controls PASS. Public projection cannot borrow another slot cap; global effective-open ownership and same-slot caps unchanged. No actionable finding; role-set complete.",
+        "V6 PASS: task L2 now selects the three previously declared DELIVERY_EVIDENCE paths. Only this context line changed from the CI-passed cfbc source inventory; source/test/UI/policy/grants unchanged. No authority widening. Native rebind/grounding remains machine verified."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS final inventory 8a512b4564dc4db0ebe81eede2aadca56cd90f4e. Outcome/DoD remains exact existing-run native owner-final, own-slot/journal completion, immutable history/exposure. 56 root/transition checks and three original failed consumers pass without altered expectations. New fallback is limited to previously unmatched child review/technical terminals; known-negative routing unchanged. Real append remains pending accepted merge and exact-state cold readback."
+        "PASS final inventory 6e6227365e806d3f878fc17d92a444eb64363c64. Outcome/DoD remains exact existing-run native owner-final, own-slot/journal completion, immutable history/exposure. 56 root/transition checks and three original failed consumers pass without altered expectations. New fallback is limited to previously unmatched child review/technical terminals; known-negative routing unchanged. Real append remains pending accepted merge and exact-state cold readback.",
+        "V6 PASS: task L2 now selects the three previously declared DELIVERY_EVIDENCE paths. Only this context line changed from the CI-passed cfbc source inventory; source/test/UI/policy/grants unchanged. No authority widening. Native rebind/grounding remains machine verified."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS final inventory 8a512b4564dc4db0ebe81eede2aadca56cd90f4e. Source/UI/test blobs unchanged from reviewed e34. Episode resume chooses own draft; native NEXT/PERSIST/NONE -> DONE -> READBACK retains saved hash. Another slot BASE pause cannot override child START; same-slot cap is owner gated. Previously unmatched review/technical fallback wording does not imply scientific exhaustion or family closure. Exact postmerge recipe unchanged."
+        "PASS final inventory 6e6227365e806d3f878fc17d92a444eb64363c64. Source/UI/test blobs unchanged from reviewed e34. Episode resume chooses own draft; native NEXT/PERSIST/NONE -> DONE -> READBACK retains saved hash. Another slot BASE pause cannot override child START; same-slot cap is owner gated. Previously unmatched review/technical fallback wording does not imply scientific exhaustion or family closure. Exact postmerge recipe unchanged.",
+        "V6 PASS: task L2 now selects the three previously declared DELIVERY_EVIDENCE paths. Only this context line changed from the CI-passed cfbc source inventory; source/test/UI/policy/grants unchanged. No authority widening. Native rebind/grounding remains machine verified."
       ]
     }
   ],
