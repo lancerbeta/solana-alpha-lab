@@ -2,62 +2,66 @@
   "task_id": "FORGE_ORDINARY_RUN_FINALIZATION_V1",
   "as_of": "2026-10-27",
   "verdict": "PASS",
-  "oracle": "One native synthetic published-episode zero-candidate BASE + normalized vertical; exact state and hash comparisons, not test count.",
+  "oracle": "Existing production owners; literal source/aggregate epoch distinction, exact saved receipt, immutable full-record hashes and look ledgers; no test-count acceptance.",
   "checks": [
     {
-      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_ordinary_run_finalization_v1 tests.test_forge_ordinary_operation_lifecycle_v1.OperationCompletionBindingTests tests.test_forge_representation_ladder_v1.ResolveNextActionTests -v",
-      "tests": 56,
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_ordinary_run_finalization_v1 tests.test_forge_evidence_identity_and_owner_gold_v1.OwnerGoldSequentialTests.test_g11_completed_replay_checks_known_model_context tests.test_forge_evidence_identity_and_owner_gold_v1.OwnerGoldSequentialTests.test_g11_completed_replay_checks_persisted_binding_before_readback tests.test_hfic_temporal_operability_repair_v1.MetadataStopAndPostCloseReadbackTests.test_ordinary_completed_observability_block_is_non_writing_readback -v",
+      "cases": 15,
       "verdict": "PASS",
+      "seconds": 241.165,
       "proves": [
-        "ordinary parent/child discovery and own generated-draft resume",
-        "source capability drift permits only complete chain historical readback",
-        "wrong parent/market/slot/version/payload/journal/time and pending child do not complete",
-        "native no-write preserves inventory; one persist completes both operations",
-        "repeat persist adds no record; look-ledgers unchanged; universe gate released",
-        "legacy BASE completion reasons and monotonicity retained",
-        "compatible child resume selects its own slot and calls scientific admission",
-        "incompatible pending source capability is blocked instead of restarted",
-        "computed final displays NEXT/PERSIST; native persisted/readback displays real persistence only",
-        "orphan selected parent is external to its own draft; foreign/missing parent cannot clear admission STOP",
-        "episode resume uses own stage draft; computed owner-final prints native persist route",
-        "same-slot cap stays owner gated; foreign-slot projection cannot override child START",
-        "previously unmatched KILL_STATISTICALLY_UNIDENTIFIABLE stops non-scientifically; legacy known-negative routing unchanged; UNKNOWN/missing reference/pending remain blocked",
-        "existing literal transition and CONTROL restrictions"
-      ]
-    },
-    {
-      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_public_prefix_is_invariant_to_produced_future_poison_but_authorized_numeric_changes tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_real_normalized_prefix_reader_does_not_access_future_values tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_d_episode_profile_through_the_dispatcher_and_ordinary_lifecycle -v",
-      "tests": 3,
-      "verdict": "PASS",
-      "proves": [
-        "three original CI failures pass without changing their literal expectations",
-        "public prefix reads no future values; repeat prefix is not another preview",
-        "native selected-child negative Critic reaches aggregate persistence; no new real science"
+        "Production persist/cold-read/repeat across different aggregate/source capability epochs; separate native CLI subprocess.",
+        "Source/capability malformed values, nonactive saved conflicts, independently missing sources and source-load errors remain blocked with no write.",
+        "Three unchanged G11 oracles: known-model context, tampered persisted binding and missing-readback admission STOP.",
+        "Same receipt SHA, historical UNKNOWN, both operations COMPLETED, no new look/record and empty universe gate.",
+        "Full saved-to-discovered source coverage and active admission session identity; partial healthy discovery at equal producer/source epochs cannot borrow a missing child from saved fallback."
       ]
     },
     {
       "command": "uv run --locked --managed-python python -B scripts/validate_factory_static.py",
       "verdict": "PASS"
+    },
+    {
+      "proof": "cold-readback-proof.json",
+      "verdict": "PASS",
+      "proves": [
+        "Candidate native command owner, existing default preferences, two fresh processes; no explicit data-root override.",
+        "Same actual owner-final, zero writes, identical full hashes for all 536 records.",
+        "Code is not installed in the ordinary checkout until accepted merge; full CLI default entry follows merge."
+      ]
     }
   ],
-  "pre_fix": {
-    "representation_operation": "NO_OWNER_FINAL_RECEIPT",
-    "unstarted_child_with_saved_BASE_draft": "RESUME_NORMALIZED_TRAJECTORY_EPISODES_V1",
-    "real_run": "FORGE_RUN_IN_PROGRESS despite two completed source sessions"
-  },
-  "limits": [
-    "Synthetic calculations are engineering fixtures, not new real-data science.",
-    "Real owner-final append and operation completion intentionally deferred until accepted merge.",
-    "Exact-head CI and merge authority remain machine gated."
+  "negative_controls": [
+    "Known source model or execution binding keeps its existing compatibility requirements; explicit context remains blocked.",
+    "Malformed or explicit conflict in any saved stage, including nonactive BASE, blocks readback.",
+    "Source capability list/dict becomes a typed blocked result, not TypeError.",
+    "Independently discovered source rows before saved fallback own the proof; missing source and source-load error cannot be healed by its saved copy.",
+    "Existing pending-child, wrong parent/market/slot/payload/journal/time, CONTROL and same-slot cap expectations unchanged.",
+    "Completed BASE-only discovery with missing saved child at equal producer/source epochs, and a foreign admission session with otherwise healthy stages, both remain blocked with the original receipt and zero writes."
   ],
+  "failure_history": [
+    "Pre-fix focused regression returned EXECUTION_BINDING_CONFLICT instead of HISTORICAL_READBACK_UNKNOWN.",
+    "The first provenance-only correction exposed the second boundary: implicit current admission refused the completed historical readback. Narrowed only that specific refusal for an exact completed UNKNOWN chain; explicit contexts and other stops remain unchanged.",
+    "First cross-epoch test assertion incorrectly assumed a parent mock changed subprocess input; corrected the fixture to use production persist/cold owners under the epoch fixture seam and a separate native subprocess.",
+    "Final helper assertion correction removed a nonexistent _exit_code lookup; existing _forge_call already rejects any nonzero subprocess exit. No scientific or negative-control expectation was relaxed.",
+    "Independent c7 review found waiver could remove known-model requirements, trust saved fallback as current source proof, ignore nonactive saved conflict, and hash malformed unhashable capability. These were NOT_READY findings, not owner reassurance.",
+    "The unchanged known-model G11 case reproduced RED on c7. Waiver now requires independently discovered unbound legacy stages, rejects current source-load errors, checks all stored stage hash formats/conflicts, and validates capability types before set construction. Final 15-case run above passes without relaxing prior oracles.",
+    "Architecture re-review of 6e377c71 found partial independently discovered coverage still relied on saved fallback at equal epochs. Both new subcases reproduced RED; the waiver now requires every saved source and the independently bound active admission session. Final 15-case command passed again."
+  ],
+  "local_full_gate_runs": 0,
   "real_scientific_looks": 0,
   "real_researchstore_writes": 0,
   "publications": 0,
   "reminder_changes": 0,
-  "historical_baseline": {
-    "head": "27d0923bc6e820eca145194643c3dfd081d5cce4",
-    "focused_checks": 69,
-    "verdict": "PASS",
-    "scope": "Pre-CI source inventory; later exact-head CI exposed the separate public operation-projection and selected-child terminal seams recorded in ci-reconciliation.json."
-  }
+  "logs_sha256": {
+    "forge-cold-readback-targeted-final.log": "fdccad9c7f8b8360832838a40047d3e383845a5a8797515815c335fae7f797c5",
+    "forge-cold-readback-review-fixes.log": "7a980a3a36b91194d18d0cbccdacd218c238c46a398aa41f459bf08cc8ea10df",
+    "forge-cold-readback-known-model-red.log": "4f346eba8ad064ce07601739be32b839b87e67309cf5ae28932edf431c7b03ec",
+    "forge-cold-readback-complete-chain-final.log": "dabda94c2ce9379664d45f5afa89b2b1d098400bc0fca96bc79fb380152000ed"
+  },
+  "limits": [
+    "No new scientific qualification or execution provenance was inferred.",
+    "Full suite and merge authority remain owned by exact-head CI and the guard.",
+    "Accepted default runtime remains unchanged until merge."
+  ]
 }

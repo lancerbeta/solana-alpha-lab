@@ -59,6 +59,32 @@ transition owner derives a final. Missing or pending children do not qualify.
 The source epochs/results remain frozen; current readback provenance is not a
 new scientific execution, readiness attestation, look or budget reset.
 
+A persisted aggregate's root capability epoch identifies the protocol that
+produced the aggregate, while each stage's capability identifies its scientific
+execution. Cold readback separates these scopes only when the current stage
+and saved stage agree on representation, session, scientific slot and saved
+stage reference. It validates the aggregate hash format and retains all source
+capability/binding contradiction checks. Without that exact stage proof the
+legacy provenance checks remain unchanged. Missing execution provenance stays
+`HISTORICAL_READBACK_UNKNOWN`, never becomes `VERIFIED` merely by replay.
+Readback returns the existing receipt SHA and appends nothing, including when
+the aggregate producer and source stages used different capability epochs.
+
+An implicit current execution-compatibility refusal does not reopen a saved
+owner-final when every independently discovered stage is completed, retains
+historical UNKNOWN, has no known model or execution binding, and matches its
+saved source reference and shared source capability. The proof uses discovery
+before saved-stage fallback/merging; a saved row cannot attest its own source.
+Coverage must include every saved source stage, including the active one; the
+admission session must be that same independently bound active session. Partial
+healthy discovery cannot borrow an absent child from the saved aggregate, even
+when producer and source capability epochs happen to match.
+Current source-load errors block even a completed readback. This exception is
+readback only: known model/binding requirements, explicit execution-context
+requests and other admission stops (including missing readback) still block.
+The provenance validator rejects malformed hashes or explicit conflicts in
+every saved stage, including nonactive ones, before returning the saved result.
+
 The same persisted owner-final can complete BASE and its bound representation
 operations even if its active slot points to a later candidate. Completion
 remains derived and monotone; no status append, artificial owner-stop, history

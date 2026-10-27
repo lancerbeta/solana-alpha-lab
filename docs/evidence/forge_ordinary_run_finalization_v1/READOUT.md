@@ -1,122 +1,74 @@
-# Ordinary Forge-run finalization
+# Холодное чтение сохранённого owner-final
 
-Engineering outcome: the existing ordinary BASE and normalized sessions can be
-folded into their genuine owner-final without another scientific attempt. This
-is operational completion, not scientific acceptance or family closure.
+Кандидат устраняет ложную блокировку уже завершённого Forge-run. Новый запуск,
+новый результат и новая итоговая запись для этого не нужны.
 
-The defect had three connected parts: ordinary BASE did not provide the parent
-for representation discovery; a saved BASE draft falsely implied a child resume;
-and completion assumed every operation shared the aggregate's active BASE slot.
-Code evolution also changes capability provenance, so fully completed frozen
-chains need an explicitly limited historical readback path.
+PR #424 уже создал настоящий owner-final
+`11976dcb7fe1a86234492e6ad1628f3f6e6dcddd3a083b5ee35cb67534442893`
+для `FORGE-RUN-174FEA4EFD507581`; обе операции получили COMPLETED.
+Холодное чтение ошибочно сравнивало версию текущего агрегатора с версиями
+его научных стадий. После разделения этих двух смыслов admission дополнительно
+требовал доказать совместимость нового исполнения при чтении готовой истории.
 
-The existing ladder now discovers ordinary children by frozen parent, focus,
-market and slot, distinguishes their own saved draft, and retains CONTROL as a
-separate protocol. Every ACTIVE representation action selects its own slot and
-passes existing scientific admission. Incompatible pending source capabilities
-block; a BASE draft cannot conceal a child or turn it into a fresh START.
-The existing orphan-draft validator receives the child's frozen parent/payload,
-rather than a controller-side recovery exception. Orphan recovery additionally
-requires the BASE/control parent selected by this aggregate; the draft cannot
-attest its own parent. Episode resume prints its own saved-draft instruction. Historical aggregation requires a wholly completed chain,
-consistent source capability and unchanged representation versions. The existing
-transition owner still decides the final; no new state machine or storage.
+Теперь различие версий допустимо только при совпадении представления, сессии,
+научного слота и сохранённой ссылки на стадию. Формат всех хешей проверяется,
+противоречия между источниками остаются конфликтами. Отказ текущей неявной
+execution compatibility допускает только историческое чтение точной завершённой
+цепочки с единым frozen source capability и UNKNOWN, без известной source model
+или execution binding. Доказательство берётся из discovery до слияния с историей;
+сохранённая копия не подтверждает сама себя. Независимо прочитаны должны быть
+все сохранённые стадии, а admission.session_id должен совпасть с той же активной
+стадией. Даже при совпадающих версиях здоровый BASE не заменяет отсутствующий child. Ошибка чтения источника, конфликт
+любой сохранённой стадии, известные model/binding требования, явный запрос другого
+контекста исполнения, незавершённая работа и другие admission STOP остаются
+заблокированы. Проверка происхождения должна независимо принять источники.
 
-The completion owner verifies each operation's own stage, scientific slot and
-journal, plus exact parent/version/payload for a representation. One aggregate
-can therefore complete both operations regardless of which included stage is
-active. Foreign bindings, pending child, stale receipt and missing evidence fail
-closed. Legacy BASE and completion monotonicity stay supported.
+Реальный кандидат прочитал тот же итог и повторил обращение без записи:
+SEARCH_EXHAUSTED_CURRENT_EVIDENCE, READBACK, HISTORICAL_READBACK_UNKNOWN.
+Все 536 существующих записей совпали целиком по хешам. IDs, receipt, история,
+результаты, drafts, assessments, reservations и учёт просмотров сохранены.
+Новых научных запусков, публикаций, изменений напоминаний и зависимостей нет.
 
-Proof: validation.json describes one native synthetic published-episode vertical
-and short negative controls. The vertical checks no-write inventory equality,
-both operations OPEN before persistence, one native persisted owner-final,
-COMPLETED for both, repeated persist with no append, unchanged scientific
-look-ledgers and released universe-policy gate. It checks actual child-slot and
-admission calls, and top-level NEXT/PERSIST before append versus native DONE and
-committed READBACK afterwards; a computed receipt hash is never labelled saved. Existing direct-consumer tests
-cover ordinary/CONTROL, saved-scope and prefreeze recovery routes. A foreign-parent
-occupied slot stays blocked rather than issuing another START; its source
-session is never consumed as this run's stage. No real-data scientific call,
-publication, reminder change, provider call or dependency was introduced.
+Native command owner кандидата проверен в двух новых процессах с действующими
+обычными настройками, без переопределения пути к данным. Штатная рабочая копия
+пока остаётся на принятом main; её полный CLI проверяется после guarded merge. Это ограничение
+доказательства, не разрешение на публикацию или новый trial.
 
-## Operational handback after merge
+## Доказательства
 
-Revalidate the exact run and saved IDs/hashes in the task contract. On accepted
-code run the normal read-only entry, require its two original completed stages
-and owner-final, capture scientific inventory and look accounting, then perform
-only native forge-run --persist. Cold-read both operations and universe status;
-require both COMPLETED, no unresolved reservations, no scientific byte or spend
-change. Repeat persist must add nothing. Owner-stop is not this recovery.
+`validation.json` — native-вертикаль, прежние G11-контроли, отрицательные проверки
+и история исправлений проверочной обвязки. `cold-readback-proof.json` — точный
+реальный receipt, равенство всех full-record hashes и нулевые записи. Синтетика
+использует только подмену входной capability epoch, а store, writer, lookup,
+холодные production evaluations и отдельный native subprocess остаются настоящими.
 
-At engineering review this real append is intentionally still pending. Code/CI
-or merge never substitutes for the operational receipt. The already authorized
-post-merge action needs no new science/publication/reminder approval; merge
-itself retains the repository's exact-head owner gate. Before operational append
-ordinary code revert is available; afterwards preserve the receipt and prefer
-forward repair, because an older reader may again fail to derive child completion.
+UNKNOWN не превращается в VERIFIED, научный отрицательный вывод или разрешение
+на новые действия. Отдельная старая история с identity conflict не изменяется.
+Ни CI, ни этот документ не дают merge authority.
 
-## Exact post-merge recipe
+## После принятого merge
 
-Run from the accepted canonical checkout; `local/` outputs stay local. Stop on
-any mismatch with the exact sessions/results in the task. Focus is fixed:
-`OPPORTUNITY_EPISODES:AUTO`. Capture the native read-only inventory/lifecycle
-snapshot before append, then repeat after append with only the output filename
-changed to `local/forge-finalization-after.json`:
+Обновить только чистую обычную рабочую копию до exact merge commit. Сначала
+снять полные metadata hashes существующего store (ResearchStore требует
+абсолютный путь: `Path('local/factory_v1/data_plane').resolve()`).
+Ожидаемый run, source IDs и hashes закреплены в текущем task contract.
 
 ```powershell
 $env:PYTHONUTF8='1'
-@'
-import sys,json
-from pathlib import Path
-sys.path.insert(0, 'src')
-from solana_alpha_lab.factory.research_store import ResearchStore
-from solana_alpha_lab.factory.hfic_ordinary_operation import get_operation,operation_lifecycle,journal_occupancy
-store=ResearchStore(Path('local/factory_v1/data_plane'),create_if_missing=False)
-ops=['dd17712c78eab047fa7e5cf8977e0940f99291211b31ada000fbe14e044c5050','868bc7e50e1adced93a024380b0e00680775f2c8843b3903561a2cfe3e7e40f8']
-rows={r.record_id:r.payload_sha256 for r in store.iter_committed_records()}
-state={o:operation_lifecycle(store,get_operation(store,o)) for o in ops}
-looks={get_operation(store,o)['journal_scope']:journal_occupancy(store,get_operation(store,o)['journal_scope']) for o in ops}
-print(json.dumps({'records':rows,'lifecycle':state,'occupancy':looks},default=str,sort_keys=True))
-'@ | uv run --locked --managed-python python -B - > local/forge-finalization-before.json
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --owner-focus OPPORTUNITY_EPISODES:AUTO > local/forge-finalization-preview.json
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-show --result-ref HFIC-ART-DISCOVERY-100FCD16C57B5FC2E5113EDEC62D15D8D6BEB622
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-show --result-ref HFIC-ART-DISCOVERY-CDF6AA01A92047EA6ED5F37C4C661E0882797797
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --owner-focus OPPORTUNITY_EPISODES:AUTO
 ```
 
-Require run `FORGE-RUN-174FEA4EFD507581`, its two exact source sessions,
-`SEARCH_EXHAUSTED_CURRENT_EVIDENCE`, source capability preserved, writes zero,
-NEXT/PERSIST and both operations OPEN. Verify both result hashes against the
-task. Only then append once and cold-read:
+Сначала сверить первый ответ: READBACK, точный run и persisted_receipt SHA выше,
+все writes равны нулю. При несовпадении остановиться. Только затем повтор:
 
 ```powershell
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --persist --owner-focus OPPORTUNITY_EPISODES:AUTO > local/forge-finalization-persist.json
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --owner-focus OPPORTUNITY_EPISODES:AUTO > local/forge-finalization-cold.json
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-status --for-operation dd17712c78eab047fa7e5cf8977e0940f99291211b31ada000fbe14e044c5050
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-status --for-operation 868bc7e50e1adced93a024380b0e00680775f2c8843b3903561a2cfe3e7e40f8
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --persist --owner-focus OPPORTUNITY_EPISODES:AUTO
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py universe-policy-status
 ```
 
-Repeat the snapshot as `local/forge-finalization-after.json`. Require both native
-lifecycle states COMPLETED, original record ID-to-payload-hash map a complete
-unchanged subset, exactly one new FORGE_RUN_RECEIPT artifact, identical occupancy,
-zero unresolved reservations and empty universe `blocking_operations`. One
-repeat of the same `forge-run --persist` must add no record. Preserve the saved
-receipt and unrelated historical UNKNOWN; stop on mismatch rather than rerun
-science, rewrite source history or use owner-stop. No reminder/publication step.
-
-## CI consumer reconciliation
-
-The first exact-head CI exposed a display-owner seam: newest focus/market BASE
-operation projection could override a different child-slot START with the
-BASE's PAUSED_CAP. The existing projector now accepts the active slot selector;
-same-slot caps and global blocking inventory are unchanged. The three original
-failing consumer tests keep their literal expectations.
-
-The complete selected-child vertical also exposed STAGE_TERMINAL_UNMATCHED for
-KILL_STATISTICALLY_UNIDENTIFIABLE. For previously unmatched child review/technical
-terminals, the fallback now reuses BASE's existing Critic semantic owner and
-stops NON_SCIENTIFICALLY with a saved stage reference. It does not infer scientific
-exhaustion or family falsification. Legacy registered known-negative routing is
-unchanged. Unknown terminal, pending state or absent stage reference remains
-blocked. No source verdict is rewritten.
+Оба обращения должны вернуть READBACK, тот же persisted_receipt SHA и нулевые
+research_store/forge_run/session writes. Обе исходные операции должны остаться
+COMPLETED, blocking_operations — пустым, pending_operation — false. Сверить все
+существующие записи целиком по хешам и учёт просмотров; новая запись не нужна.
+При несовпадении остановиться: не использовать owner-stop, не редактировать
+историю и не запускать науку для восстановления readback.

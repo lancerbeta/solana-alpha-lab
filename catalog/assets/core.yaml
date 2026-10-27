@@ -38527,7 +38527,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_ladder.py}
-  integrity: {kind: sha256, sha256: 406972d18f3d46fc16082a280fa5c96d5bc4f460fc213139d6aa3277fcec7c37}
+  integrity: {kind: sha256, sha256: 5af9f4eb18ac86bd2c9bfcb5ce1ff6ae26f71531fa736237885e9828563e3dab}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}

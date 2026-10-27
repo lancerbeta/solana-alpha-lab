@@ -166,6 +166,127 @@ class PersistenceReadoutTests(unittest.TestCase):
         self.assertNotIn("persisted_receipt: " + "8" * 64, text)
 
 
+class CompletedProvenanceScopeTests(unittest.TestCase):
+    def test_aggregate_epoch_does_not_rebind_its_exact_saved_source_stage(self):
+        from solana_alpha_lab.factory.hfic_representation_ladder import _completed_readback_provenance_status
+
+        stage = {"representation_id": "BASE", "session_id": BASE,
+                 "scientific_slot_sha256": BASE_SLOT, "stage_ref_sha256": "1" * 64,
+                 "capability_epoch_sha256": "2" * 64,
+                 "execution_status": "REUSED_VALID",
+                 "execution_provenance_status": "HISTORICAL_READBACK_UNKNOWN"}
+        saved = {"capability_epoch_sha256": "3" * 64,
+                 "scientific_slot_sha256": BASE_SLOT,
+                 "execution_binding_sha256": None,
+                 "execution_provenance_status": "NOT_APPLICABLE",
+                 "stages": [copy.deepcopy(stage)]}
+        original = copy.deepcopy(saved)
+        def read(body):
+            return _completed_readback_provenance_status(
+                body, active_row=stage, scientific_slot_sha256=BASE_SLOT)
+
+        self.assertEqual(read(saved), "HISTORICAL_READBACK_UNKNOWN")
+        self.assertEqual(saved, original)
+        changes = {
+            "source-conflict": lambda b: b["stages"][0].update(capability_epoch_sha256="4" * 64),
+            "malformed-aggregate": lambda b: b.update(capability_epoch_sha256="broken"),
+            "malformed-binding": lambda b: b.update(execution_binding_sha256="broken"),
+            "unbound-source": lambda b: b["stages"][0].update(session_id="FOREIGN"),
+        }
+        for name, mutate in changes.items():
+            with self.subTest(name=name):
+                changed = copy.deepcopy(saved)
+                mutate(changed)
+                self.assertEqual(read(changed), "EXECUTION_BINDING_CONFLICT")
+
+    def test_nonactive_source_conflicts_are_not_hidden_by_active_child(self):
+        from solana_alpha_lab.factory.hfic_representation_ladder import _completed_readback_provenance_status
+        base = {"representation_id": "BASE", "session_id": BASE,
+                "scientific_slot_sha256": BASE_SLOT, "stage_ref_sha256": "1" * 64,
+                "capability_epoch_sha256": "2" * 64,
+                "execution_provenance_status": "HISTORICAL_READBACK_UNKNOWN"}
+        child = {**base, "representation_id": REP, "session_id": CHILD,
+                 "scientific_slot_sha256": CHILD_SLOT, "stage_ref_sha256": "3" * 64}
+        saved = {"capability_epoch_sha256": "4" * 64, "scientific_slot_sha256": CHILD_SLOT,
+                 "stages": [base, child]}
+        for field, value in (("execution_binding_sha256", "broken"),
+                             ("execution_provenance_status", "EXECUTION_BINDING_CONFLICT"),
+                             ("capability_epoch_sha256", []), ("capability_epoch_sha256", {})):
+            with self.subTest(field=field, value=value):
+                bad = copy.deepcopy(saved)
+                bad["stages"][0][field] = value
+                self.assertEqual(_completed_readback_provenance_status(
+                    bad, active_row=child, scientific_slot_sha256=CHILD_SLOT), "EXECUTION_BINDING_CONFLICT")
+
+    def test_saved_stage_cannot_replace_independent_source_or_hide_load_error(self):
+        from solana_alpha_lab.factory import hfic_representation_ladder as owner
+        from solana_alpha_lab.factory.hfic_evidence_identity import scientific_slot_sha256
+        focus = "OPPORTUNITY_EPISODES:READBACK-FAULT"
+        registry = owner.load_ladder_registry(ROOT / owner.LADDER_CONFIG_RELATIVE)
+        stages = []
+        for rep, session, ref in (("BASE", BASE, "1"), (REP, CHILD, "2")):
+            version = owner.representation_semantic_version(registry, rep)
+            stages.append({"representation_id": rep, "semantic_version": version,
+                "scientific_slot_sha256": scientific_slot_sha256(market_evidence_epoch_sha256=MARKET,
+                    representation_id=rep, representation_semantic_version=version, owner_focus=focus),
+                "session_id": session, "stage_ref_sha256": ref * 64,
+                "capability_epoch_sha256": "3" * 64, "session_state": "SYNTHESIS_COMPLETE",
+                "execution_status": "REUSED_VALID", "effective_terminal": "NO_WORTHY_HYPOTHESIS",
+                "execution_provenance_status": "HISTORICAL_READBACK_UNKNOWN"})
+        saved = {"schema": owner.SCHEMA, "schema_version": owner.SCHEMA_VERSION,
+                 "run_id": "SAVED-RUN", "run_identity_sha256": "4" * 64,
+                 "receipt_sha256": "5" * 64, "owner_focus": focus, "owner_class": "OWNER_FINAL",
+                 "owner_final": "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
+                 "next_action": "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
+                 "capability_epoch_sha256": "6" * 64,
+                 "scientific_slot_sha256": stages[0]["scientific_slot_sha256"], "stages": stages}
+        store = mock.Mock()
+        store.iter_committed_records.side_effect = lambda: iter(())
+        store.append.side_effect = AssertionError("readback must not write")
+        def read(rows, unreadable=False, same_epoch=False, admitted_session=CHILD):
+            loaded = copy.deepcopy(saved)
+            if same_epoch:
+                loaded["capability_epoch_sha256"] = "3" * 64
+            with mock.patch.object(owner, "ResearchStore", return_value=store), \
+                 mock.patch.object(owner, "build_forge_input_receipt", return_value={
+                     "owner_class": "SEARCH", "market_evidence_epoch_sha256": MARKET,
+                     "capability_epoch_sha256": "6" * 64, "active_evidence_set": {"visible_cohort_ids": []}}), \
+                 mock.patch.object(owner, "_discover_ladder_stages", return_value=(
+                     rows, None, None, [], unreadable, "ARTIFACT_HASH_MISMATCH")), \
+                 mock.patch.object(owner, "_lookup_run_artifact", return_value=loaded), \
+                 mock.patch("solana_alpha_lab.factory.hfic_memory_policy.effective_policy",
+                     return_value={"memory_eligibility_sha256": "7" * 64}), \
+                 mock.patch("solana_alpha_lab.factory.hfic_evidence_identity.resolve_scientific_admission",
+                     return_value={"action": "STOP", "reason_code": "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+                                   "session_id": admitted_session}), \
+                 mock.patch("solana_alpha_lab.factory.hfic_session.orphan_prefreeze_draft_resumable", return_value=False):
+                return owner.evaluate_forge_run(ROOT, ROOT / "unused-test-store", owner_focus=focus, persist=True)
+        self.assertEqual(read(copy.deepcopy(stages))["next_action"], "RETURN_EXISTING_RUN")
+        missing = [{"representation_id": "BASE", "execution_status": "NOT_RUN"}]
+        bad_inputs = [(missing, False), (copy.deepcopy(stages), True)]
+        for value in ([], {}):
+            malformed = copy.deepcopy(stages)
+            malformed[-1]["capability_epoch_sha256"] = value
+            bad_inputs.append((malformed, False))
+        for rows, unreadable in bad_inputs:
+            with self.subTest(rows=rows, unreadable=unreadable):
+                refused = read(rows, unreadable)
+                self.assertEqual(refused["owner_class"], "OBSERVABILITY_BLOCKED")
+                if unreadable:
+                    self.assertIn("ARTIFACT_HASH_MISMATCH", refused["blocking_reason_codes"])
+                self.assertEqual(refused["persisted_receipt_sha256"], saved["receipt_sha256"])
+                self.assertEqual(refused["writes"], {"research_store": 0, "forge_run": 0, "session": 0})
+        for name, refused in (
+            ("partial-source-same-epoch", read([copy.deepcopy(stages[0])], same_epoch=True)),
+            ("foreign-admission-session", read(copy.deepcopy(stages), admitted_session="FOREIGN")),
+        ):
+            with self.subTest(name=name):
+                self.assertEqual(refused["owner_class"], "OBSERVABILITY_BLOCKED")
+                self.assertEqual(refused["persisted_receipt_sha256"], saved["receipt_sha256"])
+                self.assertEqual(refused["writes"], {"research_store": 0, "forge_run": 0, "session": 0})
+        store.append.assert_not_called()
+
+
 class OrdinaryFinalizationVertical(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -275,10 +396,28 @@ class OrdinaryFinalizationVertical(unittest.TestCase):
         self.assertEqual(before, ResearchStore(self.plane).diagnostics().committed_inventory_sha256)
         for identity in ids:
             self.assertEqual(operation_lifecycle(store, get_operation(store, identity))["effective_state"], "OPEN")
-        persisted = self.call("forge-run", "--owner-focus", pre["owner_focus"], "--persist")
-        self.assertEqual(persisted["owner_final"], "SEARCH_EXHAUSTED_CURRENT_EVIDENCE")
-        saved = ResearchStore(self.plane).diagnostics().committed_inventory_sha256
+        # Only the input epoch is a fixture seam. Persistence and each cold
+        # evaluation use production owners with a fresh ResearchStore; the CLI
+        # is a separate process and keeps its own actual current input epoch.
+        with mock.patch.object(ladder, "build_forge_input_receipt", side_effect=changed_capability):
+            persisted = ladder.evaluate_forge_run(ROOT, self.plane, owner_focus=pre["owner_focus"], persist=True)
+            self.assertEqual(persisted["owner_final"], "SEARCH_EXHAUSTED_CURRENT_EVIDENCE")
+            self.assertEqual(persisted["capability_epoch_sha256"], "0" * 64)
+            self.assertNotEqual(persisted["stages"][0]["capability_epoch_sha256"], "0" * 64)
+            saved = ResearchStore(self.plane).diagnostics().committed_inventory_sha256
+            readback = ladder.evaluate_forge_run(ROOT, self.plane, owner_focus=pre["owner_focus"])
+            repeated = ladder.evaluate_forge_run(ROOT, self.plane, owner_focus=pre["owner_focus"], persist=True)
+            explicit_context = ladder.evaluate_forge_run(ROOT, self.plane, owner_focus=pre["owner_focus"],
+                execution_context={"model_provenance_sha256": "f" * 64}, persist=True)
+        self.assertEqual(explicit_context["owner_class"], "OBSERVABILITY_BLOCKED")
+        self.assertEqual(explicit_context["writes"], {"research_store": 0, "forge_run": 0, "session": 0})
+        # _forge_call already refuses every nonzero subprocess exit.
         again = self.call("forge-run", "--owner-focus", pre["owner_focus"], "--persist")
+        for replay in (readback, repeated, again):
+            self.assertEqual(replay["owner_final"], "SEARCH_EXHAUSTED_CURRENT_EVIDENCE")
+            self.assertEqual(replay["persisted_receipt_sha256"], persisted["receipt_sha256"])
+            self.assertEqual(replay["execution_provenance_status"], "HISTORICAL_READBACK_UNKNOWN")
+            self.assertEqual(replay["writes"], {"research_store": 0, "forge_run": 0, "session": 0})
         self.assertEqual(saved, ResearchStore(self.plane).diagnostics().committed_inventory_sha256, again)
         self.assertIn("status: DONE", persisted["owner_readout"])
         self.assertIn("status: READBACK", again["owner_readout"])

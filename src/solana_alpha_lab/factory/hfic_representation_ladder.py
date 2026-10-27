@@ -1875,6 +1875,20 @@ def _execution_provenance_status(
     return EXEC_PROVENANCE_VERIFIED if expected == binding else EXEC_PROVENANCE_CONFLICT
 
 
+def _same_saved_stage_reference(
+    current: Mapping[str, Any], saved: Mapping[str, Any]
+) -> bool:
+    return all(
+        isinstance(current.get(key), str)
+        and bool(current.get(key))
+        and saved.get(key) == current.get(key)
+        for key in (
+            "representation_id", "session_id",
+            "scientific_slot_sha256", "stage_ref_sha256",
+        )
+    )
+
+
 def _completed_readback_provenance_status(
     existing: Mapping[str, Any],
     *,
@@ -1889,9 +1903,15 @@ def _completed_readback_provenance_status(
     or mismatched binding as a valid owner result.
     """
 
+    hash_keys = (
+        "scientific_slot_sha256", "execution_binding_sha256",
+        "capability_epoch_sha256", "representation_payload_sha256",
+        "memory_eligibility_sha256", "model_provenance_sha256",
+    )
     sources: list[Mapping[str, Any]] = [existing]
     if isinstance(active_row, Mapping):
         sources.append(active_row)
+    source_stage_bound = False
     persisted_stages = existing.get("stages")
     if isinstance(persisted_stages, Sequence) and not isinstance(
         persisted_stages, (str, bytes, bytearray)
@@ -1904,12 +1924,26 @@ def _completed_readback_provenance_status(
         for row in persisted_stages:
             if not isinstance(row, Mapping):
                 continue
+            # Other stages own different bindings/slots, so do not compare
+            # their hashes with the active stage. Their malformed hashes or
+            # explicit conflicts still invalidate the aggregate readback.
+            if row.get("execution_provenance_status") == EXEC_PROVENANCE_CONFLICT:
+                return EXEC_PROVENANCE_CONFLICT
+            for key in hash_keys:
+                value = row.get(key)
+                if value not in (None, "") and (
+                    not isinstance(value, str)
+                    or re.fullmatch(r"[0-9a-f]{64}", value) is None
+                ):
+                    return EXEC_PROVENANCE_CONFLICT
             if (
                 active_representation
                 and str(row.get("representation_id") or "") != active_representation
             ):
                 continue
             sources.append(row)
+            if isinstance(active_row, Mapping) and _same_saved_stage_reference(active_row, row):
+                source_stage_bound = True
 
     packet = existing.get("critic_input_packet")
     if isinstance(packet, Mapping):
@@ -1918,14 +1952,6 @@ def _completed_readback_provenance_status(
     if isinstance(session_receipt, Mapping):
         sources.append(session_receipt)
 
-    hash_keys = (
-        "scientific_slot_sha256",
-        "execution_binding_sha256",
-        "capability_epoch_sha256",
-        "representation_payload_sha256",
-        "memory_eligibility_sha256",
-        "model_provenance_sha256",
-    )
     observed: dict[str, set[str]] = {key: set() for key in hash_keys}
     for source in sources:
         for key in hash_keys:
@@ -1939,6 +1965,16 @@ def _completed_readback_provenance_status(
                 or re.fullmatch(r"[0-9a-f]{64}", value) is None
             ):
                 return EXEC_PROVENANCE_CONFLICT
+            if (
+                source is existing
+                and key == "capability_epoch_sha256"
+                and source_stage_bound
+            ):
+                # The aggregate records its producer's current protocol epoch.
+                # A bound stage owns the frozen scientific execution epoch;
+                # still validate the producer hash, never compare the two as
+                # competing claims about the same execution.
+                continue
             observed[key].add(value)
         # A persisted conflict is already a terminal integrity signal. Do not
         # let the replay overlay turn it back into a completed readback.
@@ -1971,9 +2007,13 @@ def _completed_readback_provenance_status(
     )
     if execution_status in {EXEC_NOT_RUN, EXEC_BLOCKED}:
         execution_status = EXEC_REUSED
+    execution_receipt = (
+        {key: value for key, value in existing.items() if key != "capability_epoch_sha256"}
+        if source_stage_bound else existing
+    )
     return _execution_provenance_status(
         provenance_bundle,
-        receipt=existing,
+        receipt=execution_receipt,
         packet=packet if isinstance(packet, Mapping) else None,
         scientific_slot_sha256=expected_slot,
         stored_binding=stored_binding,
@@ -3359,6 +3399,9 @@ def evaluate_forge_run(
             existing = corrected_receipt
         else:
             existing_owner_final = False
+    # Preserve independent discovery before historical rows can fill gaps.
+    # A saved row must never attest its own current source readability.
+    discovered_stages = [dict(row) for row in resolved_stages]
     if existing is not None:
         if not saved_draft_sha256:
             for row in existing.get("stages") or []:
@@ -3463,6 +3506,7 @@ def evaluate_forge_run(
     admission_execution_context = dict(execution_context or {})
     if isinstance(cap_epoch, str) and len(cap_epoch) == 64:
         admission_execution_context.setdefault("capability_epoch_sha256", cap_epoch)
+    admission: Mapping[str, Any] | None = None
     if next_action in set(representation_actions) | {
         ACTION_FINISH_RUNNER_UP, ACTION_OWNER_CANDIDATE, ACTION_RETURN_EXISTING,
     }:
@@ -3625,6 +3669,10 @@ def evaluate_forge_run(
         None,
     )
     if existing_owner_final:
+        readback_active_row = next(
+            (row for row in discovered_stages if row.get("representation_id") == active_rep),
+            None,
+        )
         # A completed run is a durable readback, not a new forge-run write.
         # Ordinary completed receipts still respect OBSERVABILITY_BLOCKED from
         # execution-binding / model-context gates (G11). A repair-marked
@@ -3637,13 +3685,50 @@ def evaluate_forge_run(
         repair_marked = isinstance(
             existing.get("repair_continuation_disposition_sha256"), str
         ) and bool(existing.get("repair_continuation_disposition_sha256"))
-        if next_action == ACTION_OBSERVABILITY_BLOCKED and not repair_marked:
+        # A frozen UNKNOWN chain can be read without claiming compatibility
+        # with today's implicit execution context. Only this admission reason
+        # may be narrowed; explicit model requests and real readback gaps still
+        # block. Provenance below must independently accept the saved sources.
+        historical_stage_readback = (
+            not execution_context
+            and decision.get("reason_code") == "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+            and not current_market_unreadable
+            and bool(discovered_stages)
+            and isinstance(readback_active_row, Mapping)
+            and isinstance(admission, Mapping)
+            and admission.get("session_id") == readback_active_row.get("session_id")
+            and all(
+                isinstance(saved, Mapping)
+                and any(_same_saved_stage_reference(row, saved) for row in discovered_stages)
+                for saved in existing.get("stages") or []
+            )
+            and all(
+                row.get("session_state") == "SYNTHESIS_COMPLETE"
+                and row.get("execution_provenance_status") == EXEC_PROVENANCE_HISTORICAL_UNKNOWN
+                and row.get("execution_binding_sha256") in (None, "")
+                and row.get("model_provenance_sha256") in (None, "")
+                and isinstance(row.get("capability_epoch_sha256"), str)
+                and re.fullmatch(r"[0-9a-f]{64}", row["capability_epoch_sha256"])
+                and any(
+                    isinstance(saved, Mapping)
+                    and _same_saved_stage_reference(row, saved)
+                    and saved.get("capability_epoch_sha256") == row.get("capability_epoch_sha256")
+                    and saved.get("execution_provenance_status") == EXEC_PROVENANCE_HISTORICAL_UNKNOWN
+                    and saved.get("execution_binding_sha256") in (None, "")
+                    and saved.get("model_provenance_sha256") in (None, "")
+                    for saved in existing.get("stages") or []
+                )
+                for row in discovered_stages
+            )
+            and len({row["capability_epoch_sha256"] for row in discovered_stages}) == 1
+        )
+        if next_action == ACTION_OBSERVABILITY_BLOCKED and not repair_marked and not historical_stage_readback:
             # Ordinary completed receipt: surface the admission/observability
             # block as a non-writing overlay. Never fall through into a new
             # forge-run rebuild that could persist over the durable terminal.
             replay_provenance = _completed_readback_provenance_status(
                 existing,
-                active_row=active_row,
+                active_row=readback_active_row,
                 scientific_slot_sha256=scientific_slot,
             )
             if replay_provenance == EXEC_PROVENANCE_CONFLICT:
@@ -3655,7 +3740,8 @@ def evaluate_forge_run(
             return _readback_existing_run(
                 existing,
                 block_reason=str(
-                    decision.get("reason_code") or ACTION_OBSERVABILITY_BLOCKED
+                    current_market_block_code if current_market_unreadable
+                    else decision.get("reason_code") or ACTION_OBSERVABILITY_BLOCKED
                 ),
                 provenance_status=replay_provenance,
             )
@@ -3669,13 +3755,19 @@ def evaluate_forge_run(
         ):
             replay_provenance = _completed_readback_provenance_status(
                 existing,
-                active_row=active_row,
+                active_row=readback_active_row,
                 scientific_slot_sha256=scientific_slot,
             )
             if replay_provenance == EXEC_PROVENANCE_CONFLICT:
                 return _readback_existing_run(
                     existing,
                     block_reason="SCIENTIFIC_IDENTITY_CONFLICT",
+                    provenance_status=replay_provenance,
+                )
+            if current_market_unreadable:
+                return _readback_existing_run(
+                    existing,
+                    block_reason=current_market_block_code,
                     provenance_status=replay_provenance,
                 )
             return _readback_existing_run(existing, provenance_status=replay_provenance)

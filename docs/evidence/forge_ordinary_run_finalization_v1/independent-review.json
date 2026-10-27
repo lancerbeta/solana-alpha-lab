@@ -1,11 +1,11 @@
 {
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
-  "review_id": "FORGE-ORDINARY-RUN-FINALIZATION-REVIEW",
+  "review_id": "FORGE-OWNER-FINAL-COLD-READBACK-REVIEW",
   "as_of": "2026-10-27",
   "task_id": "FORGE_ORDINARY_RUN_FINALIZATION_V1",
-  "reviewed_bindings_sha256": "354d6d181f25b8fc4f11b32e145c1b5736b070f0f79a4eebf0d1ca32c0b86ddb",
-  "reviewed_inventory_sha256": "d1bfe4a37c1e43c4beb5f80dba12d08ac656dc15ab52c47d8b01644b2d97d225",
+  "reviewed_bindings_sha256": "d801e6ffdbde0a50a52d2aadbf4c1ec0389aa1517e01aa57e120a319d4ca24ae",
+  "reviewed_inventory_sha256": "050a084ad02f022f52031d2b847ce04c5905dd7589e421f24e0d0ced7869b0d8",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,100 +17,71 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "SEMANTIC_PREMISE PASS exact final inventory 6e6227365e806d3f878fc17d92a444eb64363c64. HEAD/diff SHA, six evidence hashes and unchanged source/test blobs from the tested e34 source verified. C1-C6 bounded: selected orphan parent, complete historical chain, own-stage completion, own-slot display projection and same-slot authority preserved.",
-        "packet_fingerprint_sha256=01fdad8c26596fe66a2ee34f594a66828d77b71e73ffc7bd919e2c12c5ba45ea",
-        "C6 corrected to previously unmatched child review/technical terminals only. KILL_STATISTICALLY_UNIDENTIFIABLE uses NON_SCIENTIFIC_STOP; legacy registered known-negative routing unchanged. Operational completion is not PIT, research truth, family closure or science acceptance. PACKET_INFORMATION_PATH; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN.",
-        "V6 PASS: task L2 now selects the three previously declared DELIVERY_EVIDENCE paths. Only this context line changed from the CI-passed cfbc source inventory; source/test/UI/policy/grants unchanged. No authority widening. Native rebind/grounding remains machine verified."
+        "PASS exact inventory f8df54ae562adfd7cc720498dee5fc5b87738e89. Independent true discovery/admission/evaluation falsifier now blocks partial equal-epoch source coverage and foreign admission session; original receipt and zero writes retained. No material open finding.",
+        "packet_fingerprint_sha256=c0c110e910c6febbcdb91930e6519160d57656c62887683345cffd405f4aedc0",
+        "All saved references require independent pre-merge discovery and matching active admission session. Source-load errors, known/explicit contexts, malformed hashes and nonactive conflicts remain blocked. UNKNOWN stays UNKNOWN; no new scientific authority, cache or owner. PACKET_INFORMATION_PATH; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN."
       ]
     },
     {
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "PASS final inventory 6e6227365e806d3f878fc17d92a444eb64363c64. Source/test/UI blobs match tested e34; four document claims narrowed exactly to unmatched terminals. Existing foreign-parent orphan actual-validator probe and independent new slot/terminal controls PASS. Public projection cannot borrow another slot cap; global effective-open ownership and same-slot caps unchanged. No actionable finding; role-set complete.",
-        "V6 PASS: task L2 now selects the three previously declared DELIVERY_EVIDENCE paths. Only this context line changed from the CI-passed cfbc source inventory; source/test/UI/policy/grants unchanged. No authority widening. Native rebind/grounding remains machine verified."
+        "PASS exact inventory f8df54ae562adfd7cc720498dee5fc5b87738e89. Full source coverage and active admission identity verified. G11 known/explicit context, malformed capability and stored-source controls retained; three narrow metadata checks passed. No actionable finding; required role-set complete, no REVIEW_PLAN_UNDERSCOPED. Source hash matches Catalog and real cold-readback proof."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS final inventory 6e6227365e806d3f878fc17d92a444eb64363c64. Outcome/DoD remains exact existing-run native owner-final, own-slot/journal completion, immutable history/exposure. 56 root/transition checks and three original failed consumers pass without altered expectations. New fallback is limited to previously unmatched child review/technical terminals; known-negative routing unchanged. Real append remains pending accepted merge and exact-state cold readback.",
-        "V6 PASS: task L2 now selects the three previously declared DELIVERY_EVIDENCE paths. Only this context line changed from the CI-passed cfbc source inventory; source/test/UI/policy/grants unchanged. No authority widening. Native rebind/grounding remains machine verified."
+        "PASS exact inventory f8df54ae562adfd7cc720498dee5fc5b87738e89. Full independently discovered chain and active session are mandatory; partial equal-epoch chain, foreign admission and nonactive conflict are blocked. 15-case log and two default-preferences readbacks preserve actual receipt, UNKNOWN, all 536 records and zero writes. No bounded engineering DoD gap."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS final inventory 6e6227365e806d3f878fc17d92a444eb64363c64. Source/UI/test blobs unchanged from reviewed e34. Episode resume chooses own draft; native NEXT/PERSIST/NONE -> DONE -> READBACK retains saved hash. Another slot BASE pause cannot override child START; same-slot cap is owner gated. Previously unmatched review/technical fallback wording does not imply scientific exhaustion or family closure. Exact postmerge recipe unchanged.",
-        "V6 PASS: task L2 now selects the three previously declared DELIVERY_EVIDENCE paths. Only this context line changed from the CI-passed cfbc source inventory; source/test/UI/policy/grants unchanged. No authority widening. Native rebind/grounding remains machine verified."
+        "PASS exact inventory f8df54ae562adfd7cc720498dee5fc5b87738e89. READBACK/UNKNOWN and same receipt are clear; incomplete/foreign sources remain BLOCKED with zero writes. Default-preferences candidate proof and accepted-runtime boundary are explicit. Safe post-merge recipe checks no-write response before repeat; no actionable operability finding."
       ]
-    }
-  ],
-  "remediation_history": [
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "finding": "Generic ACTIVE episode actions bypassed their own admission/active slot; now routed through the existing owner.",
-      "observed_head": "1af2701b5e461170f5a37d673a8ec05747940503",
-      "resolved_by_head": "27d0923bc6e820eca145194643c3dfd081d5cce4"
-    },
-    {
-      "role": "CODE_REVIEWER",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "finding": "Pending child capability/admission and own scientific slot were not proven; fixed with direct native assertions.",
-      "observed_head": "1af2701b5e461170f5a37d673a8ec05747940503",
-      "resolved_by_head": "27d0923bc6e820eca145194643c3dfd081d5cce4"
-    },
-    {
-      "role": "OWNER_UX_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "finding": "Computed final displayed DONE and a computed hash as persisted; now NEXT/PERSIST until native persistence.",
-      "observed_head": "1af2701b5e461170f5a37d673a8ec05747940503",
-      "resolved_by_head": "27d0923bc6e820eca145194643c3dfd081d5cce4"
-    },
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "finding": "Valid orphan self-attested its parent and could clear STOP despite selected BASE mismatch; now expected aggregate parent is mandatory.",
-      "observed_head": "7145b1799a426f9ecb646769139ff5e8520615d0",
-      "resolved_by_head": "27d0923bc6e820eca145194643c3dfd081d5cce4"
-    },
-    {
-      "role": "CODE_REVIEWER",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "finding": "Foreign orphan could resume outside the selected BASE chain; now the existing validator enforces selected parent.",
-      "observed_head": "7145b1799a426f9ecb646769139ff5e8520615d0",
-      "resolved_by_head": "27d0923bc6e820eca145194643c3dfd081d5cce4"
-    },
-    {
-      "role": "OWNER_UX_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "finding": "Episode resume omitted the saved-draft native route and post-merge handback lacked exact commands/focus; now explicit and own-stage bound.",
-      "observed_head": "7145b1799a426f9ecb646769139ff5e8520615d0",
-      "resolved_by_head": "27d0923bc6e820eca145194643c3dfd081d5cce4"
-    },
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "finding": "C6 overclaimed all REVIEW_REJECTION terminals; narrowed packet/contract/readout to previously unmatched terminals while preserving legacy known-negative routing. Implementation change was not required for this finding.",
-      "observed_head": "e34a0d65d4662a29fd16a269ba27b057fb8e8d62",
-      "resolved_by_head": "8a512b4564dc4db0ebe81eede2aadca56cd90f4e"
     }
   ],
   "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "NO_MODEL_DIVERSITY_PROOF",
-    "NO_SCIENTIFIC_OR_MERGE_AUTHORITY",
-    "REAL_OPERATIONAL_FINALIZATION_PENDING_ACCEPTED_MERGE"
+    "NO_SCIENTIFIC_OR_MERGE_AUTHORITY"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Known-model context could be waived; malformed list/dict capability could crash. Exact old G11 and malformed cases now pass.",
+      "observed_head": "c7f46eeb38fd7f3bc1e64ce8df0f908474f74397",
+      "resolved_by_head": "f8df54ae562adfd7cc720498dee5fc5b87738e89"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Nonactive saved source conflict could disappear into UNKNOWN; every stored-stage hash format/explicit conflict is now checked.",
+      "observed_head": "c7f46eeb38fd7f3bc1e64ce8df0f908474f74397",
+      "resolved_by_head": "f8df54ae562adfd7cc720498dee5fc5b87738e89"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Saved fallback could self-attest source readability after source-load error; proof now uses pre-merge independent discovery and preserves load-error block.",
+      "observed_head": "c7f46eeb38fd7f3bc1e64ce8df0f908474f74397",
+      "resolved_by_head": "f8df54ae562adfd7cc720498dee5fc5b87738e89"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Partial healthy discovery at equal epochs could borrow absent saved child and foreign admission; complete saved-source coverage and same active admission session are now required. Independent original falsifier is blocked.",
+      "observed_head": "6e377c71c31755ed99fe9da9edaef79ab379dca2",
+      "resolved_by_head": "f8df54ae562adfd7cc720498dee5fc5b87738e89"
+    }
   ]
 }
