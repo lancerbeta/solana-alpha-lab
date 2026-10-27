@@ -59,6 +59,24 @@ transition owner derives a final. Missing or pending children do not qualify.
 The source epochs/results remain frozen; current readback provenance is not a
 new scientific execution, readiness attestation, look or budget reset.
 
+A persisted aggregate's root capability epoch identifies the protocol that
+produced the aggregate, while each stage's capability identifies its scientific
+execution. Cold readback separates these scopes only when the current stage
+and saved stage agree on representation, session, scientific slot and saved
+stage reference. It validates the aggregate hash format and retains all source
+capability/binding contradiction checks. Without that exact stage proof the
+legacy provenance checks remain unchanged. Missing execution provenance stays
+`HISTORICAL_READBACK_UNKNOWN`, never becomes `VERIFIED` merely by replay.
+Readback returns the existing receipt SHA and appends nothing, including when
+the aggregate producer and source stages used different capability epochs.
+
+An implicit current execution-compatibility refusal does not reopen a saved
+owner-final when every stage is completed, retains historical UNKNOWN and
+matches its saved source reference and shared source capability. This exception
+is readback only: explicit execution-context requests and other admission stops
+(including missing readback) still block. The provenance validator must accept
+the source identities independently before returning the saved result.
+
 The same persisted owner-final can complete BASE and its bound representation
 operations even if its active slot points to a later candidate. Completion
 remains derived and monotone; no status append, artificial owner-stop, history

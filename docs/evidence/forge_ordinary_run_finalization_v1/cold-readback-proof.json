@@ -1,0 +1,22 @@
+{
+  "schema": "smial.forge-owner-final-candidate-cold-readback-proof",
+  "run_id": "FORGE-RUN-174FEA4EFD507581",
+  "persisted_receipt_sha256": "11976dcb7fe1a86234492e6ad1628f3f6e6dcddd3a083b5ee35cb67534442893",
+  "record_count": 536,
+  "inventory_before": "8ceee29f1816d5072a4682fbc8e1c7cca5fa342570da771dd990e4277ad3d70a",
+  "inventory_after": "8ceee29f1816d5072a4682fbc8e1c7cca5fa342570da771dd990e4277ad3d70a",
+  "full_record_hashes_unchanged": true,
+  "look_accounting_unchanged_by_immutable_records": true,
+  "ids_history_drafts_results_assessments_reservations_unchanged": true,
+  "entry_and_repeat_writes": {
+    "research_store": 0,
+    "forge_run": 0,
+    "session": 0
+  },
+  "provenance": "HISTORICAL_READBACK_UNKNOWN",
+  "ordinary_operation": "COMPLETED",
+  "actual_scientific_looks": 0,
+  "scope": "CANDIDATE_NATIVE_ENTRY_WITH_EXPLICIT_COMMISSIONED_DATA_ROOT; ACCEPTED_RUNTIME_DEFAULT_ENTRY_PENDING_MERGE",
+  "post_merge_default_entry_required": true,
+  "receipt_sha256": "e7760699fbd4634a00a8037e12d90df83585736a3698f0bf337810c0cb23d7fc"
+}

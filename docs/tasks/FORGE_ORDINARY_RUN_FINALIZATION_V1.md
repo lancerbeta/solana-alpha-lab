@@ -1,25 +1,22 @@
 ---
 task_id: FORGE_ORDINARY_RUN_FINALIZATION_V1
-task_version: '1.0'
+task_version: '1.1'
 status: IN_PROGRESS
-as_of: '2026-10-26'
+as_of: '2026-10-27'
 owner: GOAL_OWNER
 allowed_routes: [DIRECT_CODEX_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 3bb9da411b085084d6da45af761378257c050479
+  expected_base: ec8c728df198d2dc80e7cbb50e9a4231b7b1f187
   expected_upstream: origin/main
-  expected_upstream_oid: 3bb9da411b085084d6da45af761378257c050479
-  expected_branch: codex/forge-run-ordinary-finalization
+  expected_upstream_oid: ec8c728df198d2dc80e7cbb50e9a4231b7b1f187
+  expected_branch: codex/forge-owner-final-cold-readback
   dirty_mode: ALLOW_REPORTED
-objective: Repair aggregate ordinary Forge-run finalization over existing BASE and episode representation sessions, preserving scientific identity/history/exposure and deriving completion of both bound operations from one genuine persisted owner-final.
+objective: Repair ordinary cold readback of the already-persisted Forge owner-final across aggregate and source capability epochs, preserving the exact existing receipt, IDs, history, look accounting and historical UNKNOWN; ordinary entry and repeat must write nothing.
 managed_write_set:
 - docs/tasks/FORGE_ORDINARY_RUN_FINALIZATION_V1.md
 - src/solana_alpha_lab/factory/hfic_representation_ladder.py
-- src/solana_alpha_lab/factory/hfic_ordinary_operation.py
-- src/solana_alpha_lab/factory/hfic_session.py
-- scripts/hypothesis_forge.py
 - tests/test_forge_ordinary_run_finalization_v1.py
 - tests/test_forge_representation_ladder_v1.py
 - docs/contracts/forge_ordinary_operation_lifecycle_v1.md
@@ -41,8 +38,8 @@ external_caps:
 stop_conditions:
 - STOP_AFTER_EXACT_HEAD_CI_AND_MERGE_READINESS_BEFORE_OWNER_PHRASE
 - NO_REAL_SCIENTIFIC_LOOK_PROVIDER_EXPERIMENT_PUBLICATION_OR_REMINDER_CHANGE
-- NO_REAL_RESEARCHSTORE_WRITE_BEFORE_MERGE_AND_POST_MERGE_READBACK
-- AFTER_MERGE_ONLY_NATIVE_FORGE_RUN_OWNER_FINAL_APPEND_ON_THE_EXACT_EXISTING_RUN
+- NO_REAL_RESEARCHSTORE_WRITE_OR_NEW_OWNER_FINAL_RECEIPT
+- AFTER_ACCEPTED_MERGE_ONLY_CLEAN_RUNTIME_UPDATE_AND_NATIVE_READBACK_WITH_ZERO_WRITES
 - NEVER_REWRITE_IDS_HISTORY_RESULTS_DRAFTS_ASSESSMENTS_RESERVATIONS_OR_BUDGETS
 - REPLAN_ON_UNRESOLVED_IDENTITY_CONFLICT_OR_NEW_SCIENTIFIC_STATE_REQUIREMENT
 context_requirements:
@@ -62,6 +59,53 @@ context_requirements:
 ---
 
 # Ordinary Forge-run finalization
+
+## Current replan: existing owner-final cold readback
+
+Explicit owner authorization on 2026-10-27: repair cold reading of owner-final;
+preserve its existing receipt, IDs, history, look accounting and UNKNOWN. No
+new scientific runs, publications or reminder changes. Verify ordinary entry
+and repeat without a write. This replan supersedes the operational append
+phase below; the earlier implementation and its evidence remain historical.
+
+SPEC_ROUTE=BOTH: this bounded outcome and the existing lifecycle contract.
+START_WITH_PATCH. DECISION_DELTA: ordinary entry returns the actual saved
+owner-final instead of a false execution-binding conflict. UNCERTAINTY_REMOVED:
+aggregate producer capability and source-stage capability have distinct scopes;
+the source's frozen identity and any real contradiction remain authoritative.
+CAPABILITY_OR_EVIDENCE: one production persist/cold-read/repeat vertical across
+different capability epochs and metadata-only readback of the exact real run.
+Consumers: ordinary forge-run, its operation projection and universe gate.
+
+The true existing receipt is
+11976dcb7fe1a86234492e6ad1628f3f6e6dcddd3a083b5ee35cb67534442893,
+record HFIC-ART-FORGE-RUN-11976DCB7FE1A862. Both operations already derive
+COMPLETED from it. The real store has 536 records at the accepted checkpoint;
+revalidate live truth before readback and compare full-record hashes afterward.
+Do not append another receipt or repair the stored scientific metadata.
+
+Cheapest falsifier: extend the existing native ordinary fixture so its completed
+source stages precede the aggregate producer capability, persist once in the
+synthetic store, cold-read and repeat through production owners. Literal oracle:
+same persisted receipt SHA, SEARCH_EXHAUSTED_CURRENT_EVIDENCE, historical
+UNKNOWN, both operations COMPLETED and zero further records/looks. Add small
+negative controls for contradictory/malformed source identity and binding.
+Never replace missing provenance with VERIFIED or disable identity checks.
+
+Use the existing ladder validator and tests; no dependency, new schema, CLI,
+state machine, cache, migration or parallel truth owner. CAPABILITY_RADAR_NOW=NONE.
+PRODUCT_HORIZON_NOW=NONE; WATCH only failure to retain source-scoped conflicts.
+Budget: changed validator and direct-consumer tests, metadata-only actual entry,
+independent code/goal/architecture/owner-UX review, exact-head CI. No local full
+gate before PR. REPLAN_TRIGGER: broader identity/schema repair, any real-store
+write requirement or unresolved source contradiction.
+
+STOP: exact-head CI and merge-readiness before a new exact owner phrase.
+NEXT after accepted merge: update the clean ordinary checkout and verify native
+entry/repeat read the same receipt with zero writes and unchanged history.
+MODEL_EFFORT_RECOMMENDATION=SOL_XHIGH.
+
+## Prior delivery (historical; current replan above owns execution)
 
 Explicit owner authorization: repair completion on the existing sessions, preserve
 IDs/history/look accounting, prove owner-final and completion of both OPEN

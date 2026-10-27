@@ -2,62 +2,62 @@
   "task_id": "FORGE_ORDINARY_RUN_FINALIZATION_V1",
   "as_of": "2026-10-27",
   "verdict": "PASS",
-  "oracle": "One native synthetic published-episode zero-candidate BASE + normalized vertical; exact state and hash comparisons, not test count.",
+  "oracle": "Existing production owners; literal source/aggregate epoch distinction, exact saved receipt, immutable full-record hashes and look ledgers; no test-count acceptance.",
   "checks": [
     {
-      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_ordinary_run_finalization_v1 tests.test_forge_ordinary_operation_lifecycle_v1.OperationCompletionBindingTests tests.test_forge_representation_ladder_v1.ResolveNextActionTests -v",
-      "tests": 56,
-      "verdict": "PASS",
-      "proves": [
-        "ordinary parent/child discovery and own generated-draft resume",
-        "source capability drift permits only complete chain historical readback",
-        "wrong parent/market/slot/version/payload/journal/time and pending child do not complete",
-        "native no-write preserves inventory; one persist completes both operations",
-        "repeat persist adds no record; look-ledgers unchanged; universe gate released",
-        "legacy BASE completion reasons and monotonicity retained",
-        "compatible child resume selects its own slot and calls scientific admission",
-        "incompatible pending source capability is blocked instead of restarted",
-        "computed final displays NEXT/PERSIST; native persisted/readback displays real persistence only",
-        "orphan selected parent is external to its own draft; foreign/missing parent cannot clear admission STOP",
-        "episode resume uses own stage draft; computed owner-final prints native persist route",
-        "same-slot cap stays owner gated; foreign-slot projection cannot override child START",
-        "previously unmatched KILL_STATISTICALLY_UNIDENTIFIABLE stops non-scientifically; legacy known-negative routing unchanged; UNKNOWN/missing reference/pending remain blocked",
-        "existing literal transition and CONTROL restrictions"
-      ]
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_ordinary_run_finalization_v1 tests.test_forge_evidence_identity_and_owner_gold_v1.OwnerGoldSequentialTests.test_g11_completed_replay_checks_persisted_binding_before_readback tests.test_hfic_temporal_operability_repair_v1.MetadataStopAndPostCloseReadbackTests.test_ordinary_completed_observability_block_is_non_writing_readback -v",
+      "unchanged_cases_passed": 11,
+      "verdict": "PASS_FOR_11_UNCHANGED_CASES",
+      "note": "The native case reached a fixture KeyError after its successful subprocess call; the helper raises on nonzero exit and does not return _exit_code. The exact native case was corrected and rerun separately below. Production implementation did not change between these runs."
     },
     {
-      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_public_prefix_is_invariant_to_produced_future_poison_but_authorized_numeric_changes tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_real_normalized_prefix_reader_does_not_access_future_values tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_d_episode_profile_through_the_dispatcher_and_ordinary_lifecycle -v",
-      "tests": 3,
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_ordinary_run_finalization_v1.OrdinaryFinalizationVertical -v",
+      "cases": 1,
       "verdict": "PASS",
       "proves": [
-        "three original CI failures pass without changing their literal expectations",
-        "public prefix reads no future values; repeat prefix is not another preview",
-        "native selected-child negative Critic reaches aggregate persistence; no new real science"
+        "Production persist and cold evaluations across different aggregate/source epochs. Only the input capability epoch is a fixture seam; writer, lookup, store and native subprocess readback are production owners.",
+        "Same saved receipt SHA, SEARCH_EXHAUSTED_CURRENT_EVIDENCE and historical UNKNOWN.",
+        "Both operations COMPLETED, look rows identical, universe gate released, repeated persist writes zero.",
+        "Explicit model/execution-context request is still refused without writes."
       ]
     },
     {
       "command": "uv run --locked --managed-python python -B scripts/validate_factory_static.py",
       "verdict": "PASS"
+    },
+    {
+      "proof": "cold-readback-proof.json",
+      "verdict": "PASS",
+      "proves": [
+        "Real existing receipt unchanged, 536 full-record hashes identical before/after candidate native entry and repeat.",
+        "Zero real store/session/run writes and zero new scientific looks; source IDs, drafts, results, assessments, reservations and look accounting unchanged.",
+        "Candidate explicit-data-root entry and repeat return READBACK; accepted runtime default entry remains post-merge."
+      ]
     }
   ],
-  "pre_fix": {
-    "representation_operation": "NO_OWNER_FINAL_RECEIPT",
-    "unstarted_child_with_saved_BASE_draft": "RESUME_NORMALIZED_TRAJECTORY_EPISODES_V1",
-    "real_run": "FORGE_RUN_IN_PROGRESS despite two completed source sessions"
-  },
-  "limits": [
-    "Synthetic calculations are engineering fixtures, not new real-data science.",
-    "Real owner-final append and operation completion intentionally deferred until accepted merge.",
-    "Exact-head CI and merge authority remain machine gated."
+  "negative_controls": [
+    "Saved source capability contradiction, malformed producer hash, malformed execution binding and unbound source reference remain conflicts.",
+    "Existing G11 tampered persisted binding and missing-readback admission STOP remain blocked and non-writing.",
+    "Existing pending-child, foreign parent/market/slot/payload/journal/time, CONTROL and same-slot cap checks retained."
   ],
+  "failure_history": [
+    "Pre-fix focused regression returned EXECUTION_BINDING_CONFLICT instead of HISTORICAL_READBACK_UNKNOWN.",
+    "The first provenance-only correction exposed the second boundary: implicit current admission refused the completed historical readback. Narrowed only that specific refusal for an exact completed UNKNOWN chain; explicit contexts and other stops remain unchanged.",
+    "First cross-epoch test assertion incorrectly assumed a parent mock changed subprocess input; corrected the fixture to use production persist/cold owners under the epoch fixture seam and a separate native subprocess.",
+    "Final helper assertion correction removed a nonexistent _exit_code lookup; existing _forge_call already rejects any nonzero subprocess exit. No scientific or negative-control expectation was relaxed."
+  ],
+  "local_full_gate_runs": 0,
   "real_scientific_looks": 0,
   "real_researchstore_writes": 0,
   "publications": 0,
   "reminder_changes": 0,
-  "historical_baseline": {
-    "head": "27d0923bc6e820eca145194643c3dfd081d5cce4",
-    "focused_checks": 69,
-    "verdict": "PASS",
-    "scope": "Pre-CI source inventory; later exact-head CI exposed the separate public operation-projection and selected-child terminal seams recorded in ci-reconciliation.json."
-  }
+  "logs_sha256": {
+    "forge-cold-readback-targeted-v2.log": "88813d990c5db932006f71e5d6ab08d04c3f2ff3b06c49e894b9ab3bae501430",
+    "forge-cold-readback-native-final.log": "e90f9743cb03623597ccc5ba099f65dae041ee2abff8ecce0abd70710241fa61"
+  },
+  "limits": [
+    "No new scientific qualification or execution provenance was inferred.",
+    "Full suite and merge authority remain owned by exact-head CI and the guard.",
+    "Accepted default runtime remains unchanged until merge."
+  ]
 }
