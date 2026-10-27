@@ -4703,6 +4703,7 @@ def orphan_prefreeze_draft_resumable(
     capability_epoch_sha256: str | None,
     memory_eligibility_sha256: str | None,
     model_provenance_sha256: str | None = None,
+    control_session_id: str | None = None,
 ) -> bool:
     """Forge-run readback: an orphan generated draft is resumable, not missing.
 
@@ -4734,6 +4735,10 @@ def orphan_prefreeze_draft_resumable(
     )
     if draft is None:
         return False
+    if representation != "BASE" and (
+        not control_session_id or draft.get("control_session_id") != control_session_id
+    ):
+        return False
     return prefreeze_generated_draft_recovery(
         draft,
         sessions=list_hfic_sessions(store),
@@ -4747,6 +4752,8 @@ def orphan_prefreeze_draft_resumable(
         memory_eligibility_sha256=memory_eligibility_sha256,
         evidence_surface_mode=None,
         model_provenance_sha256=model_provenance_sha256,
+        control_session_id=control_session_id,
+        representation_payload_sha256=draft.get("representation_payload_sha256"),
         assert_evidence_surface=False,
     )
 

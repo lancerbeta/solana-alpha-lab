@@ -1,0 +1,78 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-ORDINARY-RUN-FINALIZATION-ENGINEERING",
+  "as_of": "2026-10-27",
+  "task_id": "FORGE_ORDINARY_RUN_FINALIZATION_V1",
+  "state_change": "EXISTING_ORDINARY_RUN_OWNER_FINAL_AND_TWO_OPERATION_COMPLETION_ENGINEERING_VERIFIED; REAL_APPEND_PENDING_ACCEPTED_MERGE",
+  "base_main": "3bb9da411b085084d6da45af761378257c050479",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "d99d14fd976f702e6330a705bdb257d42579322593a299038086ee515e962ec8",
+    "docs/contracts/forge_ordinary_operation_lifecycle_v1.md": "ef16faf4bac20b8fd7296df8110efde599a63f7784be3fe46de75e8fd0dcbe0d",
+    "docs/evidence/forge_ordinary_run_finalization_v1/READOUT.md": "c12c37fa089c9f5937cadccc5f231d50faabd4c3cdb7f85ffaccff6e9ea32515",
+    "docs/evidence/forge_ordinary_run_finalization_v1/ci-reconciliation.json": "21be6a03df843c47925e4008fcc281b74f613877227f92545111e3555871834e",
+    "docs/evidence/forge_ordinary_run_finalization_v1/premerge-readback.json": "7885f706ad696b76b981fb42718591f744553ee742482f3bec53d06c0da9da32",
+    "docs/evidence/forge_ordinary_run_finalization_v1/validation.json": "cfe78bbe06c5ca9061e822311cdc31056cb28097054ddc0569fd9013d7d9ac70",
+    "docs/tasks/FORGE_ORDINARY_RUN_FINALIZATION_V1.md": "e4b0ae7e38025ce3e764150ccdc9e50cfc0c15380bcaff8917d23286298ab5fc",
+    "scripts/hypothesis_forge.py": "dce0b99f093b4bfcd70710d74370d3c4dd6e843938ada95e3aefcbd7d9a1ae60",
+    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "b1ce9cf2201220104c93fff440d47d1e3b451569e0460b7810379a5108030320",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "406972d18f3d46fc16082a280fa5c96d5bc4f460fc213139d6aa3277fcec7c37",
+    "src/solana_alpha_lab/factory/hfic_session.py": "2902f7f86c8ad4f82aaa30ef2bffbbfa4337264e9127507b4f3898594f0562d2",
+    "tests/test_forge_ordinary_run_finalization_v1.py": "f83c45bae2d8abae7ec73c80393e85ebbac6b74b6ca4ea37da5d1716fd83d6e6",
+    "tests/test_forge_representation_ladder_v1.py": "2582419a1839998ac48312740df318c72c558fe589d980b36629f227d6211b54"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_ordinary_run_finalization_v1/factory-fit.json",
+    "sha256": "9631c79118631391e7f985b17a728be576a6345d8a00adfca859c7b040eed260",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_56_CURRENT_ROOT_TRANSITION_AND_3_ORIGINAL_CI_CONSUMER_CASES",
+    "independent_review": {
+      "path": "docs/evidence/forge_ordinary_run_finalization_v1/independent-review.json",
+      "sha256": "fae68c4a616630d18f8530242649a8cbb4b74e4bce2d3d7d91f8eb500a9315ad",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_NATIVE_ZERO_CANDIDATE_BASE_AND_EPISODE_VERTICAL",
+      "PASS_ONE_APPEND_TWO_COMPLETED_IDEMPOTENT_RETRY",
+      "PASS_SCIENTIFIC_LOOKS_AND_SOURCE_RECORD_INVARIANCE",
+      "PASS_WRONG_PARENT_MARKET_SLOT_VERSION_PAYLOAD_JOURNAL_TIME_PENDING_REFUSALS",
+      "PASS_ORPHAN_EXPECTED_PARENT_AND_OWN_RESUME_HASH",
+      "PASS_REAL_RUN_READ_ONLY_INVENTORY_AND_EXPOSURE_UNCHANGED",
+      "PASS_FACTORY_STATIC",
+      "PASS_ACTIVE_SLOT_PROJECTION_WITH_SAME_SLOT_CAP_AUTHORITY",
+      "PASS_PREVIOUSLY_UNMATCHED_REVIEW_STOP_WITHOUT_CHANGING_LEGACY_NEGATIVES",
+      "PASS_THREE_ORIGINAL_CI_FAILURES_WITHOUT_EXPECTATION_RELAXATION"
+    ]
+  },
+  "non_claims": [
+    "NO_NEW_REAL_SCIENCE_LOOK_PROVIDER_PUBLICATION_OR_REMINDER_CHANGE",
+    "NO_SOURCE_ID_HISTORY_RESULT_DRAFT_ASSESSMENT_RESERVATION_OR_BUDGET_REWRITE",
+    "NO_ALPHA_FAMILY_CLOSE_OR_STRATEGY_ACCEPTANCE",
+    "REAL_OWNER_FINAL_APPEND_ONLY_AFTER_ACCEPTED_MERGE_AND_EXACT_STATE_REVALIDATION",
+    "NO_MERGE_AUTHORITY"
+  ],
+  "side_effects": {
+    "real_researchstore_writes": 0,
+    "real_scientific_looks": 0,
+    "publications": 0,
+    "reminder_changes": 0,
+    "synthetic_local_fixture_only": true,
+    "scope": "BOUNDED_ENGINEERING_EXCLUDING_ROUTINE_GIT_GITHUB_DELIVERY"
+  }
+}

@@ -1891,9 +1891,9 @@ def _run_completion(
 ) -> tuple[dict[str, Any] | None, str]:
     """The bound run's owner-final, or the exact reason it is not proven.
 
-    Bound means: same focus, market epoch and scientific slot; recorded at or
-    after this operation; OWNER_FINAL; and its BASE stage session carries this
-    operation's journal. A name match is not enough. Completion is monotone:
+    Bound means: same focus/market, recorded after this operation, OWNER_FINAL,
+    and this operation's own stage carries its scientific slot and journal.
+    A representation additionally binds its exact BASE parent and payload. A name match is not enough. Completion is monotone:
     the earliest bound owner-final stays the proof, so a later in-progress or
     blocked receipt for the same slot cannot reopen the operation.
     """
@@ -1910,12 +1910,22 @@ def _run_completion(
     slot = str(operation.get("scientific_slot_sha256") or "")
     journal = str(operation.get("journal_scope") or "")
     finals = {ACTION_OWNER_CANDIDATE, ACTION_SEARCH_EXHAUSTED, ACTION_NON_SCIENTIFIC_STOP}
+    def _contains_operation_slot(body: Mapping[str, Any]) -> bool:
+        active_slot = body.get("scientific_slot_sha256")
+        if not isinstance(active_slot, str):
+            return False
+        if active_slot == slot:
+            return True
+        slots = {stage.get("scientific_slot_sha256") for stage in body.get("stages") or []
+                 if isinstance(stage, Mapping) and isinstance(stage.get("scientific_slot_sha256"), str)}
+        return active_slot in slots and slot in slots
+
     same_run = [
         item
         for item in receipts
         if item["body"].get("owner_focus") == focus
         and item["body"].get("market_evidence_epoch_sha256") == market
-        and item["body"].get("scientific_slot_sha256") == slot
+        and _contains_operation_slot(item["body"])
         and item.get("recorded_at") is not None
     ]
     if opened_at is None:
@@ -1927,16 +1937,32 @@ def _run_completion(
         )
 
     def _bound_session(body: Mapping[str, Any]) -> str | None:
-        for stage in body.get("stages") or []:
-            if not isinstance(stage, Mapping) or stage.get("representation_id") != "BASE":
+        stages = [stage for stage in body.get("stages") or [] if isinstance(stage, Mapping)]
+        representation = operation.get("representation")
+        representation = representation if isinstance(representation, Mapping) else None
+        rep_id = str(representation.get("representation_id") or "") if representation else "BASE"
+        if representation and not any(
+            stage.get("representation_id") == "BASE"
+            and stage.get("session_id") == representation.get("parent_session_id")
+            for stage in stages
+        ):
+            return None
+        for stage in stages:
+            if stage.get("representation_id") != rep_id:
                 continue
             session_id = str(stage.get("session_id") or "")
-            if (
-                session_id
-                and journal in session_keys.get(session_id, set())
-                and stage.get("scientific_slot_sha256") in (None, slot)
-            ):
-                return session_id
+            if not session_id or journal not in session_keys.get(session_id, set()):
+                continue
+            if representation:
+                if (stage.get("session_state") != "SYNTHESIS_COMPLETE"
+                    or stage.get("scientific_slot_sha256") != slot
+                    or stage.get("representation_semantic_version") != representation.get("representation_semantic_version")
+                    or stage.get("representation_payload_sha256") != representation.get("representation_payload_sha256")):
+                    continue
+            elif (stage.get("scientific_slot_sha256") not in (None, slot)
+                  or stage.get("session_state") not in (None, "SYNTHESIS_COMPLETE")):
+                continue
+            return session_id
         return None
 
     after = sorted(
@@ -2253,12 +2279,17 @@ def project_ordinary_operation(
     *,
     owner_focus: str,
     market_evidence_epoch_sha256: str | None = None,
+    scientific_slot_sha256: str | None = None,
 ) -> dict[str, Any] | None:
     """Derived readout. Not a second persisted DONE."""
 
     rows = [item for item in list_operations(store) if item.get("owner_focus") == owner_focus]
     if isinstance(market_evidence_epoch_sha256, str) and len(market_evidence_epoch_sha256) == 64:
         rows = [item for item in rows if item.get("market_evidence_epoch_sha256") == market_evidence_epoch_sha256]
+    # The active representation owns its operation. A completed/paused BASE
+    # journal cannot impose a cap on a child slot that has not opened yet.
+    if scientific_slot_sha256 is not None:
+        rows = [item for item in rows if item.get("scientific_slot_sha256") == scientific_slot_sha256]
     if not rows:
         return None
     # The newest operation is the one opened last; a later stop row of an older
@@ -2323,6 +2354,7 @@ def project_ordinary_operation(
         "market_evidence_epoch_sha256": current.get("market_evidence_epoch_sha256"),
         "question_text": current.get("question_text"),
         "journal_scope": journal,
+        "scientific_slot_sha256": current.get("scientific_slot_sha256"),
         "decision_point": decision,
         "decision_age_seconds": age,
         "hold_seconds": hold,

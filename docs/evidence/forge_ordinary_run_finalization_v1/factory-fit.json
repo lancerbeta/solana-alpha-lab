@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-ORDINARY-RUN-FINALIZATION-FIT",
+  "as_of": "2026-10-27",
+  "task_id": "FORGE_ORDINARY_RUN_FINALIZATION_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "354d6d181f25b8fc4f11b32e145c1b5736b070f0f79a4eebf0d1ca32c0b86ddb",
+  "reviewed_inventory_sha256": "d1bfe4a37c1e43c4beb5f80dba12d08ac656dc15ab52c47d8b01644b2d97d225",
+  "dimensions": {
+    "mission": "Make an existing research run durably finish and release its operational profile; no alpha or new research.",
+    "flexibility_and_history": "Preserve source IDs, scientific slots, epochs, result/draft/assessment bytes and exposure. Completion remains derived from the native aggregate.",
+    "context_efficiency": "One native synthetic vertical, short adversarial controls and existing direct-consumer checks; no new framework or local full CI.",
+    "research_truth": "Historical source-epoch agreement permits aggregation of a fully completed chain only; not current scientific qualification. UNKNOWN remains explicit. Previously unmatched child review/technical terminals reuse the existing semantic owner for NON_SCIENTIFIC_STOP; legacy registered known-negative routing is unchanged.",
+    "owner_operability": "Same forge-run entry/persist; missing child starts, saved own draft resumes, bound completed child finishes. No artificial owner-stop.",
+    "execution_to_cashflow": "Avoid false operational OPEN and repeated work without promoting a hypothesis or creating execution authority.",
+    "monitoring_and_recovery": "Before real receipt append, code revert is ordinary. After append prefer forward repair; an older reader can again fail to derive child completion, so preserve receipt and revalidate instead of rewriting history.",
+    "build_vs_buy": "Reuse ResearchStore, ladder transitions, source slots/journals and native lifecycle owner. No dependency, schema, scheduler, provider or service.",
+    "security": "No credentials or market/provider access; foreign parent/focus/market/slot/journal/time do not prove completion.",
+    "red_team": "An owner-final word or cap change alone cannot complete a pending child or erase spend. Native persist repeat and scientific-ledger equality are checked. Orphan recovery requires the parent selected by the aggregate; a draft cannot attest its own lineage. Another slot pause cannot override active-child START; same-slot caps and global operation inventory retain their original owners. A general REVIEW_REJECTION claim was rejected and narrowed before acceptance."
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Only an evidenced missing or conflicting frozen lineage; no automatic repair, new science or platform work."
+  },
+  "limits": [
+    "NO_REAL_SCIENTIFIC_LOOKS",
+    "NO_PUBLICATIONS_OR_REMINDER_CHANGES",
+    "REAL_FINALIZATION_ONLY_AFTER_MERGE",
+    "NO_ALPHA_OR_FAMILY_CLOSE",
+    "NO_MERGE_AUTHORITY"
+  ],
+  "recovery": "Keep every scientific artifact and receipt. Revert code before operational append; after append use forward repair and exact cold readback. Never owner-stop or edit history to simulate completion."
+}

@@ -1,0 +1,116 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-ORDINARY-RUN-FINALIZATION-REVIEW",
+  "as_of": "2026-10-27",
+  "task_id": "FORGE_ORDINARY_RUN_FINALIZATION_V1",
+  "reviewed_bindings_sha256": "354d6d181f25b8fc4f11b32e145c1b5736b070f0f79a4eebf0d1ca32c0b86ddb",
+  "reviewed_inventory_sha256": "d1bfe4a37c1e43c4beb5f80dba12d08ac656dc15ab52c47d8b01644b2d97d225",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SEMANTIC_PREMISE PASS exact final inventory 6e6227365e806d3f878fc17d92a444eb64363c64. HEAD/diff SHA, six evidence hashes and unchanged source/test blobs from the tested e34 source verified. C1-C6 bounded: selected orphan parent, complete historical chain, own-stage completion, own-slot display projection and same-slot authority preserved.",
+        "packet_fingerprint_sha256=01fdad8c26596fe66a2ee34f594a66828d77b71e73ffc7bd919e2c12c5ba45ea",
+        "C6 corrected to previously unmatched child review/technical terminals only. KILL_STATISTICALLY_UNIDENTIFIABLE uses NON_SCIENTIFIC_STOP; legacy registered known-negative routing unchanged. Operational completion is not PIT, research truth, family closure or science acceptance. PACKET_INFORMATION_PATH; launch isolation PROCESS_OBLIGATION; model diversity UNPROVEN.",
+        "V6 PASS: task L2 now selects the three previously declared DELIVERY_EVIDENCE paths. Only this context line changed from the CI-passed cfbc source inventory; source/test/UI/policy/grants unchanged. No authority widening. Native rebind/grounding remains machine verified."
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS final inventory 6e6227365e806d3f878fc17d92a444eb64363c64. Source/test/UI blobs match tested e34; four document claims narrowed exactly to unmatched terminals. Existing foreign-parent orphan actual-validator probe and independent new slot/terminal controls PASS. Public projection cannot borrow another slot cap; global effective-open ownership and same-slot caps unchanged. No actionable finding; role-set complete.",
+        "V6 PASS: task L2 now selects the three previously declared DELIVERY_EVIDENCE paths. Only this context line changed from the CI-passed cfbc source inventory; source/test/UI/policy/grants unchanged. No authority widening. Native rebind/grounding remains machine verified."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS final inventory 6e6227365e806d3f878fc17d92a444eb64363c64. Outcome/DoD remains exact existing-run native owner-final, own-slot/journal completion, immutable history/exposure. 56 root/transition checks and three original failed consumers pass without altered expectations. New fallback is limited to previously unmatched child review/technical terminals; known-negative routing unchanged. Real append remains pending accepted merge and exact-state cold readback.",
+        "V6 PASS: task L2 now selects the three previously declared DELIVERY_EVIDENCE paths. Only this context line changed from the CI-passed cfbc source inventory; source/test/UI/policy/grants unchanged. No authority widening. Native rebind/grounding remains machine verified."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS final inventory 6e6227365e806d3f878fc17d92a444eb64363c64. Source/UI/test blobs unchanged from reviewed e34. Episode resume chooses own draft; native NEXT/PERSIST/NONE -> DONE -> READBACK retains saved hash. Another slot BASE pause cannot override child START; same-slot cap is owner gated. Previously unmatched review/technical fallback wording does not imply scientific exhaustion or family closure. Exact postmerge recipe unchanged.",
+        "V6 PASS: task L2 now selects the three previously declared DELIVERY_EVIDENCE paths. Only this context line changed from the CI-passed cfbc source inventory; source/test/UI/policy/grants unchanged. No authority widening. Native rebind/grounding remains machine verified."
+      ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Generic ACTIVE episode actions bypassed their own admission/active slot; now routed through the existing owner.",
+      "observed_head": "1af2701b5e461170f5a37d673a8ec05747940503",
+      "resolved_by_head": "27d0923bc6e820eca145194643c3dfd081d5cce4"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Pending child capability/admission and own scientific slot were not proven; fixed with direct native assertions.",
+      "observed_head": "1af2701b5e461170f5a37d673a8ec05747940503",
+      "resolved_by_head": "27d0923bc6e820eca145194643c3dfd081d5cce4"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Computed final displayed DONE and a computed hash as persisted; now NEXT/PERSIST until native persistence.",
+      "observed_head": "1af2701b5e461170f5a37d673a8ec05747940503",
+      "resolved_by_head": "27d0923bc6e820eca145194643c3dfd081d5cce4"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Valid orphan self-attested its parent and could clear STOP despite selected BASE mismatch; now expected aggregate parent is mandatory.",
+      "observed_head": "7145b1799a426f9ecb646769139ff5e8520615d0",
+      "resolved_by_head": "27d0923bc6e820eca145194643c3dfd081d5cce4"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Foreign orphan could resume outside the selected BASE chain; now the existing validator enforces selected parent.",
+      "observed_head": "7145b1799a426f9ecb646769139ff5e8520615d0",
+      "resolved_by_head": "27d0923bc6e820eca145194643c3dfd081d5cce4"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Episode resume omitted the saved-draft native route and post-merge handback lacked exact commands/focus; now explicit and own-stage bound.",
+      "observed_head": "7145b1799a426f9ecb646769139ff5e8520615d0",
+      "resolved_by_head": "27d0923bc6e820eca145194643c3dfd081d5cce4"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "C6 overclaimed all REVIEW_REJECTION terminals; narrowed packet/contract/readout to previously unmatched terminals while preserving legacy known-negative routing. Implementation change was not required for this finding.",
+      "observed_head": "e34a0d65d4662a29fd16a269ba27b057fb8e8d62",
+      "resolved_by_head": "8a512b4564dc4db0ebe81eede2aadca56cd90f4e"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_SCIENTIFIC_OR_MERGE_AUTHORITY",
+    "REAL_OPERATIONAL_FINALIZATION_PENDING_ACCEPTED_MERGE"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "head": "a4a26bf82c418855286fc7a16460eb24da0e6d4b",
+  "run_id": 40411649620,
+  "ci_conclusion": "failure",
+  "failed_consumers": [
+    "test_public_prefix_is_invariant_to_produced_future_poison_but_authorized_numeric_changes",
+    "test_real_normalized_prefix_reader_does_not_access_future_values",
+    "test_d_episode_profile_through_the_dispatcher_and_ordinary_lifecycle"
+  ],
+  "first_failure": "paused BASE focus/market projection replaced child-slot START; same-slot scientific authority was not transferable",
+  "late_exposed_failure": "STAGE_TERMINAL_UNMATCHED for an existing selected-child REVIEW_REJECTION",
+  "no_test_expectation_relaxation": true,
+  "workflow_or_timeout_change": false,
+  "real_researchstore_writes": 0,
+  "targeted_root_checks": 56,
+  "targeted_original_failed_consumers": 3,
+  "targeted_verdict": "PASS",
+  "same_slot_cap_control": "AUTHORIZE_ADDITIONAL_LOOKS retained",
+  "negative_controls": "unknown/pending/missing-ref remain blocked; review rejection has no family suppression authority"
+}

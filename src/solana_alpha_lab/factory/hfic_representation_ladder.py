@@ -347,14 +347,22 @@ def _consume_representation_chain(
         if next_rep is not None:
             current_id = next_rep
             continue
+        review_stop = False
         if not isinstance(terminal, str) or terminal not in (
             KNOWN_SCIENTIFIC_NEGATIVES | CASE_C_KILL_TERMINALS | PASS_TERMINALS
         ):
-            return {
-                "next_action": ACTION_OBSERVABILITY_BLOCKED,
-                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
-                "reason_code": unmatched,
+            # Same semantic owner as BASE: a review/technical rejection is not
+            # a scientific negative or family suppression authority.
+            from solana_alpha_lab.factory.hfic_suppression_semantics import interpret_critic_terminal
+            review_stop = isinstance(terminal, str) and interpret_critic_terminal(terminal)["outcome_class"] in {
+                "REVIEW_REJECTION", "REVIEW_REJECTION_UNKNOWN_APPLICABILITY", "TECHNICAL_REFUSAL"
             }
+            if not review_stop:
+                return {
+                    "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                    "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                    "reason_code": unmatched,
+                }
         stage_ref = stage.get("stage_ref_sha256")
         if not isinstance(stage_ref, str) or len(stage_ref) != 64:
             return {
@@ -362,9 +370,10 @@ def _consume_representation_chain(
                 "owner_final": ACTION_OBSERVABILITY_BLOCKED,
                 "reason_code": ref_missing,
             }
+        final_action = ACTION_NON_SCIENTIFIC_STOP if review_stop else ACTION_SEARCH_EXHAUSTED
         return {
-            "next_action": ACTION_SEARCH_EXHAUSTED,
-            "owner_final": ACTION_SEARCH_EXHAUSTED,
+            "next_action": final_action,
+            "owner_final": final_action,
             "reason_code": terminal,
         }
     return {
@@ -381,6 +390,7 @@ def resolve_next_action(
     input_owner_class: str | None = None,
     existing_completed: bool = False,
     saved_draft_sha256: str | None = None,
+    saved_draft_representation_id: str | None = None,
     population: str = POPULATION_LIVE_COHORT,
 ) -> dict[str, Any]:
     """Pure transition: one next action or owner-final from stage receipts."""
@@ -483,6 +493,10 @@ def resolve_next_action(
             "owner_final": ACTION_NON_SCIENTIFIC_STOP,
             "reason_code": base_terminal,
         }
+
+    # A completed BASE draft cannot stand in for a missing representation draft.
+    if saved_draft_representation_id == "BASE" or saved_draft_sha256 == base.get("draft_sha256"):
+        saved_draft_sha256 = None
 
     episode_row = by_id.get(HANDLER_EPISODES_V1)
     if (
@@ -1104,13 +1118,22 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         or stage_has_unknown_provenance
     )
     writes = receipt.get("writes") if isinstance(receipt.get("writes"), Mapping) else {}
-    persist_note = (
-        "RESEARCH_ARTIFACT FORGE_RUN_RECEIPT"
-        if int(writes.get("forge_run") or 0) > 0
-        else "NONE"
-    )
-    persisted_sha = receipt.get("persisted_receipt_sha256") or receipt.get("receipt_sha256")
+    # A computed hash is not proof of persistence. The writer's successful
+    # append or the committed-receipt readback supplies that fact.
+    appended = int(writes.get("forge_run") or 0) > 0
+    persisted_sha = receipt.get("persisted_receipt_sha256")
+    if not persisted_sha and appended:
+        persisted_sha = receipt.get("receipt_sha256")
+    persist_note = ("RESEARCH_ARTIFACT FORGE_RUN_RECEIPT" if appended else
+                    "READBACK RESEARCH_ARTIFACT FORGE_RUN_RECEIPT" if persisted_sha else "NONE")
     next_action = receipt.get("next_action")
+    resume_representations = {
+        _resume_action(str(stage["representation_id"])): str(stage["representation_id"])
+        for stage in stages
+        if isinstance(stage, Mapping) and stage.get("representation_id")
+    }
+    resume_representations.update({ACTION_RESUME_BASE: "BASE", ACTION_RESUME_V1: "NORMALIZED_TRAJECTORY_V1"})
+    resume_representation = resume_representations.get(next_action)
     owner_class = str(receipt.get("owner_class") or "")
     owner_final = receipt.get("owner_final")
     blocking = [str(item) for item in (receipt.get("blocking_reason_codes") or []) if item]
@@ -1175,7 +1198,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "NEXT — CONTROL-compatible BASE required for V1; "
             "not evening DONE; use CONTROL surface inside this slash"
         )
-    elif next_action == ACTION_RESUME_BASE or next_action == ACTION_RESUME_V1:
+    elif resume_representation:
         reasons = {str(item) for item in (receipt.get("blocking_reason_codes") or [])}
         stage_reasons = {
             str(stage.get("reason_code") or "")
@@ -1193,7 +1216,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         elif next_action == ACTION_RESUME_BASE:
             status = "NEXT — RESUME BASE from saved artifacts; not a new trial"
         else:
-            status = "NEXT — RESUME V1 from saved artifacts; not a new trial"
+            status = f"NEXT — RESUME {'V1' if next_action == ACTION_RESUME_V1 else resume_representation} from saved artifacts; not a new trial"
     elif next_action == ACTION_START_BASE and "CONTROL_SURFACE_REQUIRED" in {
         str(item) for item in (receipt.get("blocking_reason_codes") or [])
     }:
@@ -1236,7 +1259,8 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     elif owner_final == "OPERATION_PAUSED_SEARCH_OPEN" or next_action == "AUTHORIZE_ADDITIONAL_LOOKS":
         status = "NEXT — saved result stays; authorize another look on this journal, or stop"
     elif owner_final:
-        status = "DONE — bounded-run owner-final; do not continue"
+        status = ("DONE — bounded-run owner-final; do not continue" if persisted_sha else
+                  "NEXT — PERSIST_OWNER_FINAL; bounded-run decision ready, not yet recorded")
         if provenance_unknown:
             status += "; execution provenance UNKNOWN — not a readiness receipt"
     elif next_action == ACTION_FINISH_RUNNER_UP:
@@ -1524,12 +1548,8 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "next: RESOLVE_TYPED_BLOCK — resolve the stated input/readback blocker, "
             "then retry; do not treat this as scientific exhaustion"
         )
-    if next_action in {ACTION_RESUME_BASE, ACTION_RESUME_V1}:
-        target_representation = (
-            "NORMALIZED_TRAJECTORY_V1"
-            if next_action == ACTION_RESUME_V1
-            else "BASE"
-        )
+    if resume_representation:
+        target_representation = resume_representation
         candidate_stages = [
             stage
             for stage in stages
@@ -1577,6 +1597,10 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             + draft_arg
             + recovery_note
         )
+    if owner_class == OWNER_CLASS_FINAL and owner_final and not persisted_sha and not appended:
+        lines.append("next: PERSIST_OWNER_FINAL — inside this already-authorized run, use `"
+                     + CANONICAL_HFIC_CLI + " forge-run --persist --owner-focus "
+                     + shlex.quote(owner_focus) + "`; then cold-read both operations; no new scientific trial")
     lines.append(
         "writes: store={store} forge_run={forge} session={session} "
         "forge_context=0".format(
@@ -2621,6 +2645,7 @@ def _discover_ladder_stages(
     current_market_epoch: str | None = None,
     current_capability_epoch: str | None = None,
     requested_surface: str | None = None,
+    registry: Mapping[str, Any] | None = None,
 ) -> tuple[list[dict[str, Any]], str | None, str | None]:
     grouped: dict[str, list[tuple[str, dict[str, Any], Mapping[str, Any]]]] = {}
     skipped: list[dict[str, str]] = []
@@ -2686,6 +2711,79 @@ def _discover_ladder_stages(
             stage["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
             stage["input_scope"] = CURRENT_REPRESENTATION_CONTROL_V1
         grouped.setdefault(rep_id, []).append((sid, stage, bundle))
+
+    active_registry = load_ladder_registry() if registry is None else registry
+    historical_children: dict[str, list[dict[str, Any]]] = {}
+
+    def ordinary_children(parent: str, capability: str | None) -> list[dict[str, Any]]:
+        children = []
+        from solana_alpha_lab.factory.hfic_evidence_identity import scientific_slot_sha256
+        from solana_alpha_lab.factory.opportunity_episodes import collection_for_focus
+
+        population = POPULATION_EPISODES if collection_for_focus(owner_focus) else POPULATION_LIVE_COHORT
+        for definition in active_registry["representations"]:
+            rep_id = definition["id"]
+            if (rep_id in {"BASE", "NORMALIZED_TRAJECTORY_V1"}
+                or definition["status"] != "ACTIVE" or not _serves(definition, population)):
+                continue
+            matching = [row for row in grouped.get(rep_id, [])
+                if _parent_control_id(row[2], _packet_for_bundle(data_root, row[2], store)) == parent
+                and _focus_matches(row[2], _packet_for_bundle(data_root, row[2], store), owner_focus)
+                and _session_applicable_to_current_market(row[2],
+                    current_market_epoch=current_market_epoch,
+                    current_capability_epoch=capability, visible=visible,
+                    bound_cohort_ids=row[1].get("used_cohort_ids") or [],
+                    allow_missing_cohort_scope=True)]
+            if matching:
+                picked = pick_session([{"session_id": sid, "session_state": stage.get("session_state")}
+                                       for sid, stage, _ in matching])
+                selected = dict(next(stage for sid, stage, _ in matching if sid == picked["session_id"]))
+                if (selected.get("session_state") != "SYNTHESIS_COMPLETE"
+                    and selected.get("capability_epoch_sha256") != capability):
+                    selected.update(execution_status=EXEC_BLOCKED,
+                        reason_code="SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING")
+                children.append(selected)
+                continue
+            slot = scientific_slot_sha256(market_evidence_epoch_sha256=str(current_market_epoch),
+                representation_id=rep_id, representation_semantic_version=definition["version"], owner_focus=owner_focus)
+            generated = find_generated_draft(store, market_evidence_epoch_sha256=str(current_market_epoch),
+                owner_focus=owner_focus, representation_id=rep_id,
+                representation_semantic_version=definition["version"], scientific_slot_sha256=slot)
+            if generated and generated.get("control_session_id") == parent:
+                compatible = generated.get("capability_epoch_sha256") == capability
+                children.append({"representation_id": rep_id, "semantic_version": definition["version"],
+                    "execution_status": EXEC_EXECUTED if compatible else EXEC_BLOCKED, "session_state": "DRAFT_VALIDATED",
+                    "session_id": generated["session_id"], "draft_sha256": generated["payload_sha256"],
+                    "scientific_slot_sha256": slot, "capability_epoch_sha256": generated.get("capability_epoch_sha256"),
+                    "input_scope": "REPRESENTATION_RELEASE_LOCAL",
+                    "reason_code": "SAVED_DRAFT_PRESENT" if compatible else "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"})
+        return children
+
+    def completed_historical_chain(sid: str, stage: dict[str, Any], bundle: Mapping[str, Any]) -> bool:
+        # Code evolution changes capability provenance, not a saved scientific result.
+        # Historical reuse here may only finish a wholly completed frozen chain;
+        # it must never start/resume synthesis under a different capability epoch.
+        source_capability = stage.get("capability_epoch_sha256")
+        if (stage.get("session_state") != "SYNTHESIS_COMPLETE"
+            or not isinstance(source_capability, str) or len(source_capability) != 64
+            or not _session_applicable_to_current_market(bundle,
+                current_market_epoch=current_market_epoch, visible=visible,
+                bound_cohort_ids=stage.get("used_cohort_ids") or [], allow_missing_cohort_scope=True)):
+            return False
+        children = ordinary_children(sid, source_capability)
+        chain = [stage, *children]
+        versions = {row["id"]: str(row["version"]) for row in active_registry["representations"]}
+        if any(row.get("session_state") != "SYNTHESIS_COMPLETE"
+               or row.get("capability_epoch_sha256") != source_capability
+               or row.get("semantic_version") != versions.get(row["representation_id"])
+               for row in chain):
+            return False
+        decision = resolve_next_action(chain, registry=active_registry,
+            population=POPULATION_EPISODES if owner_focus.startswith("OPPORTUNITY_EPISODES:") else POPULATION_LIVE_COHORT)
+        if decision.get("owner_final") not in {ACTION_OWNER_CANDIDATE, ACTION_SEARCH_EXHAUSTED, ACTION_NON_SCIENTIFIC_STOP}:
+            return False
+        historical_children[sid] = children
+        return True
 
     chosen: tuple[str, dict[str, Any], Mapping[str, Any]] | None = None
     if preferred_control_session_id:
@@ -2775,7 +2873,7 @@ def _discover_ladder_stages(
                 visible=visible,
                 bound_cohort_ids=stage.get("used_cohort_ids") or [],
                 allow_missing_cohort_scope=True,
-            ):
+            ) and not completed_historical_chain(sid, stage, bundle):
                 # Stale ordinary PASS/pending on a prior market remains
                 # historical; do not present as CURRENT REUSED_VALID.
                 continue
@@ -2817,6 +2915,9 @@ def _discover_ladder_stages(
                 base_stage["execution_status"] = EXEC_REUSED
             base_stage["input_scope"] = "ORDINARY_BASE"
             resolved.append(base_stage)
+            # Ordinary episodes have a BASE parent, without CONTROL authority.
+            children = historical_children.get(_sid)
+            resolved.extend(children if children is not None else ordinary_children(_sid, current_capability_epoch))
         else:
             explicit_control = requested_surface == CURRENT_REPRESENTATION_CONTROL_V1
             fresh_base = {
@@ -3122,6 +3223,7 @@ def evaluate_forge_run(
                 else None
             ),
             requested_surface=requested_surface,
+            registry=registry_doc,
         )
         for row in resolved_stages:
             used_cohorts.extend(list(row.get("used_cohort_ids") or []))
@@ -3290,6 +3392,7 @@ def evaluate_forge_run(
         } else None,
         existing_completed=existing_completed or existing_owner_final,
         saved_draft_sha256=saved_draft_sha256,
+        saved_draft_representation_id=saved_draft_representation_id,
         population=run_population,
     )
 
@@ -3297,17 +3400,19 @@ def evaluate_forge_run(
     next_action = str(decision.get("next_action"))
     active_rep = "BASE"
     active_version = representation_semantic_version(registry_doc, active_rep)
-    if next_action in {ACTION_START_V1, ACTION_RESUME_V1}:
-        for row in resolved_stages:
-            if isinstance(row, Mapping) and str(row.get("representation_id") or "").startswith(
-                "NORMALIZED"
-            ):
-                active_rep = str(row["representation_id"])
-                active_version = str(
-                    row.get("semantic_version")
-                    or representation_semantic_version(registry_doc, active_rep)
-                )
-                break
+    representation_actions = {
+        action: row["id"]
+        for row in registry_doc["representations"]
+        if row["status"] == "ACTIVE" and _serves(row, run_population)
+        for action in (_start_action(row["id"]), _resume_action(row["id"]))
+    }
+    if next_action in representation_actions:
+        active_rep = representation_actions[next_action]
+        active_version = next(
+            (str(row["semantic_version"]) for row in resolved_stages
+             if row.get("representation_id") == active_rep and row.get("semantic_version")),
+            representation_semantic_version(registry_doc, active_rep),
+        )
     elif next_action in {
         ACTION_OWNER_CANDIDATE,
         ACTION_FINISH_RUNNER_UP,
@@ -3353,29 +3458,13 @@ def evaluate_forge_run(
                         or representation_semantic_version(registry_doc, active_rep)
                     )
                     break
-    elif next_action in {ACTION_START_BASE, ACTION_RESUME_BASE}:
-        for row in resolved_stages:
-            rid = str(row.get("representation_id") or "") if isinstance(row, Mapping) else ""
-            if rid in {"BASE", "CURRENT_REPRESENTATION_CONTROL_V1", "ORDINARY_BASE"} or rid == "BASE":
-                active_rep = rid or "BASE"
-                active_version = str(
-                    row.get("semantic_version")
-                    or representation_semantic_version(registry_doc, active_rep)
-                )
-                break
 
     cap_epoch = input_receipt.get("capability_epoch_sha256")
     admission_execution_context = dict(execution_context or {})
     if isinstance(cap_epoch, str) and len(cap_epoch) == 64:
         admission_execution_context.setdefault("capability_epoch_sha256", cap_epoch)
-    if next_action in {
-        ACTION_START_BASE,
-        ACTION_START_V1,
-        ACTION_RESUME_BASE,
-        ACTION_RESUME_V1,
-        ACTION_FINISH_RUNNER_UP,
-        ACTION_OWNER_CANDIDATE,
-        ACTION_RETURN_EXISTING,
+    if next_action in set(representation_actions) | {
+        ACTION_FINISH_RUNNER_UP, ACTION_OWNER_CANDIDATE, ACTION_RETURN_EXISTING,
     }:
         admission = resolve_scientific_admission(
             list_hfic_sessions(store),
@@ -3402,6 +3491,11 @@ def evaluate_forge_run(
             representation_id=active_rep,
             representation_semantic_version=active_version,
             owner_focus=owner_focus,
+            control_session_id=(control_session_id or next(
+                (str(row["session_id"]) for row in resolved_stages
+                 if row.get("representation_id") == "BASE" and row.get("session_id")),
+                None,
+            )) if active_rep != "BASE" else None,
             capability_epoch_sha256=(
                 str(admission_execution_context.get("capability_epoch_sha256"))
                 if isinstance(
