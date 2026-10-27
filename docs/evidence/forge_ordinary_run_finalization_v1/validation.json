@@ -8,12 +8,13 @@
       "command": "uv run --locked --managed-python python -B -m unittest tests.test_forge_ordinary_run_finalization_v1 tests.test_forge_evidence_identity_and_owner_gold_v1.OwnerGoldSequentialTests.test_g11_completed_replay_checks_known_model_context tests.test_forge_evidence_identity_and_owner_gold_v1.OwnerGoldSequentialTests.test_g11_completed_replay_checks_persisted_binding_before_readback tests.test_hfic_temporal_operability_repair_v1.MetadataStopAndPostCloseReadbackTests.test_ordinary_completed_observability_block_is_non_writing_readback -v",
       "cases": 15,
       "verdict": "PASS",
-      "seconds": 226.428,
+      "seconds": 241.165,
       "proves": [
         "Production persist/cold-read/repeat across different aggregate/source capability epochs; separate native CLI subprocess.",
         "Source/capability malformed values, nonactive saved conflicts, independently missing sources and source-load errors remain blocked with no write.",
         "Three unchanged G11 oracles: known-model context, tampered persisted binding and missing-readback admission STOP.",
-        "Same receipt SHA, historical UNKNOWN, both operations COMPLETED, no new look/record and empty universe gate."
+        "Same receipt SHA, historical UNKNOWN, both operations COMPLETED, no new look/record and empty universe gate.",
+        "Full saved-to-discovered source coverage and active admission session identity; partial healthy discovery at equal producer/source epochs cannot borrow a missing child from saved fallback."
       ]
     },
     {
@@ -35,7 +36,8 @@
     "Malformed or explicit conflict in any saved stage, including nonactive BASE, blocks readback.",
     "Source capability list/dict becomes a typed blocked result, not TypeError.",
     "Independently discovered source rows before saved fallback own the proof; missing source and source-load error cannot be healed by its saved copy.",
-    "Existing pending-child, wrong parent/market/slot/payload/journal/time, CONTROL and same-slot cap expectations unchanged."
+    "Existing pending-child, wrong parent/market/slot/payload/journal/time, CONTROL and same-slot cap expectations unchanged.",
+    "Completed BASE-only discovery with missing saved child at equal producer/source epochs, and a foreign admission session with otherwise healthy stages, both remain blocked with the original receipt and zero writes."
   ],
   "failure_history": [
     "Pre-fix focused regression returned EXECUTION_BINDING_CONFLICT instead of HISTORICAL_READBACK_UNKNOWN.",
@@ -43,7 +45,8 @@
     "First cross-epoch test assertion incorrectly assumed a parent mock changed subprocess input; corrected the fixture to use production persist/cold owners under the epoch fixture seam and a separate native subprocess.",
     "Final helper assertion correction removed a nonexistent _exit_code lookup; existing _forge_call already rejects any nonzero subprocess exit. No scientific or negative-control expectation was relaxed.",
     "Independent c7 review found waiver could remove known-model requirements, trust saved fallback as current source proof, ignore nonactive saved conflict, and hash malformed unhashable capability. These were NOT_READY findings, not owner reassurance.",
-    "The unchanged known-model G11 case reproduced RED on c7. Waiver now requires independently discovered unbound legacy stages, rejects current source-load errors, checks all stored stage hash formats/conflicts, and validates capability types before set construction. Final 15-case run above passes without relaxing prior oracles."
+    "The unchanged known-model G11 case reproduced RED on c7. Waiver now requires independently discovered unbound legacy stages, rejects current source-load errors, checks all stored stage hash formats/conflicts, and validates capability types before set construction. Final 15-case run above passes without relaxing prior oracles.",
+    "Architecture re-review of 6e377c71 found partial independently discovered coverage still relied on saved fallback at equal epochs. Both new subcases reproduced RED; the waiver now requires every saved source and the independently bound active admission session. Final 15-case command passed again."
   ],
   "local_full_gate_runs": 0,
   "real_scientific_looks": 0,
@@ -53,7 +56,8 @@
   "logs_sha256": {
     "forge-cold-readback-targeted-final.log": "fdccad9c7f8b8360832838a40047d3e383845a5a8797515815c335fae7f797c5",
     "forge-cold-readback-review-fixes.log": "7a980a3a36b91194d18d0cbccdacd218c238c46a398aa41f459bf08cc8ea10df",
-    "forge-cold-readback-known-model-red.log": "4f346eba8ad064ce07601739be32b839b87e67309cf5ae28932edf431c7b03ec"
+    "forge-cold-readback-known-model-red.log": "4f346eba8ad064ce07601739be32b839b87e67309cf5ae28932edf431c7b03ec",
+    "forge-cold-readback-complete-chain-final.log": "dabda94c2ce9379664d45f5afa89b2b1d098400bc0fca96bc79fb380152000ed"
   },
   "limits": [
     "No new scientific qualification or execution provenance was inferred.",

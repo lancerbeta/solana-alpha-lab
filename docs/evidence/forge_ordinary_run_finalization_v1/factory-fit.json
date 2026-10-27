@@ -12,13 +12,13 @@
     "mission": "Read the already completed research run honestly without redoing research or manufacturing closure.",
     "flexibility_and_history": "Keep the existing owner-final receipt, source identities, results, drafts, assessments, reservations and full event history. All 536 real record hashes unchanged.",
     "context_efficiency": "Reuse exact task, one source module, existing native fixture and two G11 cases; no local full gate or new framework.",
-    "research_truth": "Only independently discovered completed legacy UNKNOWN stages without a known model/binding may bypass the implicit current-context refusal; known/explicit context rules remain. Discovery is captured before saved fallback; source-load errors and every stored-stage explicit conflict/malformed hash remain blocking.",
+    "research_truth": "Only independently discovered completed legacy UNKNOWN stages without a known model/binding may bypass the implicit current-context refusal; known/explicit context rules remain. Discovery is captured before saved fallback; source-load errors and every stored-stage explicit conflict/malformed hash remain blocking. Coverage is bidirectional over all saved stages and admission session must equal the independently discovered active source session, including at equal producer/source epochs.",
     "owner_operability": "Same native command owner reads existing default preferences in two cold processes; same receipt and zero writes. Accepted installed CLI default entry remains post-merge.",
     "execution_to_cashflow": "Reduce misleading BLOCKED/retry work while granting no strategy, market or execution authority.",
     "monitoring_and_recovery": "Immutable original receipt remains the recovery truth. Default accepted runtime check follows guarded merge; no stop, rewrite, budget refund or second receipt.",
     "build_vs_buy": "Narrow project-owned provenance semantics in existing ladder and validator; no dependency, provider, schema, cache, service or scheduler.",
     "security": "No credentials, source-data publication or external/scientific calls. Malformed hashes, source conflicts and G11 missing-readback/tampered-binding controls retained.",
-    "red_team": "Independent NOT_READY review exposed known-model loss, saved-stage self-proof, nonactive conflict and malformed unhashable capability. Exact old G11 and new cheap fault-injection controls now pass; a copied completed claim cannot attest source recovery."
+    "red_team": "Independent NOT_READY review exposed known-model loss, saved-stage self-proof, nonactive conflict and malformed unhashable capability. Exact old G11 and new cheap fault-injection controls now pass; a copied completed claim cannot attest source recovery. A second architecture probe exposed partial healthy discovery at equal epochs and foreign admission identity; both now have explicit blocked controls."
   },
   "capability_radar": {
     "now": "NONE",

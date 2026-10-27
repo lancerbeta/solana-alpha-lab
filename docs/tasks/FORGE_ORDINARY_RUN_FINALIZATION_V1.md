@@ -98,6 +98,8 @@ Use pre-merge discovery, never saved fallback as its own proof. Source-load
 errors, nonactive saved-source conflicts and malformed capability stay blocked;
 the existing known-model G11 oracle is unchanged. This narrows the same outcome
 without a new route, schema, authority or write set.
+The independent proof covers every saved stage and the active admission session;
+partial healthy discovery plus a saved child is insufficient even at equal epochs.
 
 Use the existing ladder validator and tests; no dependency, new schema, CLI,
 state machine, cache, migration or parallel truth owner. CAPABILITY_RADAR_NOW=NONE.

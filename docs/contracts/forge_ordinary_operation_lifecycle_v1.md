@@ -75,6 +75,10 @@ owner-final when every independently discovered stage is completed, retains
 historical UNKNOWN, has no known model or execution binding, and matches its
 saved source reference and shared source capability. The proof uses discovery
 before saved-stage fallback/merging; a saved row cannot attest its own source.
+Coverage must include every saved source stage, including the active one; the
+admission session must be that same independently bound active session. Partial
+healthy discovery cannot borrow an absent child from the saved aggregate, even
+when producer and source capability epochs happen to match.
 Current source-load errors block even a completed readback. This exception is
 readback only: known model/binding requirements, explicit execution-context
 requests and other admission stops (including missing readback) still block.

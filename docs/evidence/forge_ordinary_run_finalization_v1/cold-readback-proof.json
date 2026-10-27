@@ -19,6 +19,6 @@
   "scope": "CANDIDATE_NATIVE_COMMAND_OWNER; EXISTING_DEFAULT_RUNTIME_PREFERENCES; TWO_FRESH_PROCESSES",
   "runtime_installation": "PENDING_ACCEPTED_MERGE",
   "post_merge_default_entry_required": true,
-  "source_sha256": "6ab66145e3914f1521aa42d960c6e1bcfc938a3de061d44366825beff0df880e",
-  "receipt_sha256": "9c74ba066a18f5c25bd83bc3edfcdb297739dddaf91732fbdb7ec731f6e0e5fd"
+  "source_sha256": "5af9f4eb18ac86bd2c9bfcb5ce1ff6ae26f71531fa736237885e9828563e3dab",
+  "receipt_sha256": "857f9530af2685451d3caa2587c4fbc7d6cf8ebcb2fbc3b187ce008bc5f3605d"
 }

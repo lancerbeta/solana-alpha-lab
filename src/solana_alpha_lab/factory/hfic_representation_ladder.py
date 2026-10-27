@@ -3506,6 +3506,7 @@ def evaluate_forge_run(
     admission_execution_context = dict(execution_context or {})
     if isinstance(cap_epoch, str) and len(cap_epoch) == 64:
         admission_execution_context.setdefault("capability_epoch_sha256", cap_epoch)
+    admission: Mapping[str, Any] | None = None
     if next_action in set(representation_actions) | {
         ACTION_FINISH_RUNNER_UP, ACTION_OWNER_CANDIDATE, ACTION_RETURN_EXISTING,
     }:
@@ -3693,6 +3694,14 @@ def evaluate_forge_run(
             and decision.get("reason_code") == "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
             and not current_market_unreadable
             and bool(discovered_stages)
+            and isinstance(readback_active_row, Mapping)
+            and isinstance(admission, Mapping)
+            and admission.get("session_id") == readback_active_row.get("session_id")
+            and all(
+                isinstance(saved, Mapping)
+                and any(_same_saved_stage_reference(row, saved) for row in discovered_stages)
+                for saved in existing.get("stages") or []
+            )
             and all(
                 row.get("session_state") == "SYNTHESIS_COMPLETE"
                 and row.get("execution_provenance_status") == EXEC_PROVENANCE_HISTORICAL_UNKNOWN

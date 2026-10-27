@@ -243,18 +243,22 @@ class CompletedProvenanceScopeTests(unittest.TestCase):
         store = mock.Mock()
         store.iter_committed_records.side_effect = lambda: iter(())
         store.append.side_effect = AssertionError("readback must not write")
-        def read(rows, unreadable=False):
+        def read(rows, unreadable=False, same_epoch=False, admitted_session=CHILD):
+            loaded = copy.deepcopy(saved)
+            if same_epoch:
+                loaded["capability_epoch_sha256"] = "3" * 64
             with mock.patch.object(owner, "ResearchStore", return_value=store), \
                  mock.patch.object(owner, "build_forge_input_receipt", return_value={
                      "owner_class": "SEARCH", "market_evidence_epoch_sha256": MARKET,
                      "capability_epoch_sha256": "6" * 64, "active_evidence_set": {"visible_cohort_ids": []}}), \
                  mock.patch.object(owner, "_discover_ladder_stages", return_value=(
                      rows, None, None, [], unreadable, "ARTIFACT_HASH_MISMATCH")), \
-                 mock.patch.object(owner, "_lookup_run_artifact", return_value=copy.deepcopy(saved)), \
+                 mock.patch.object(owner, "_lookup_run_artifact", return_value=loaded), \
                  mock.patch("solana_alpha_lab.factory.hfic_memory_policy.effective_policy",
                      return_value={"memory_eligibility_sha256": "7" * 64}), \
                  mock.patch("solana_alpha_lab.factory.hfic_evidence_identity.resolve_scientific_admission",
-                     return_value={"action": "STOP", "reason_code": "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"}), \
+                     return_value={"action": "STOP", "reason_code": "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+                                   "session_id": admitted_session}), \
                  mock.patch("solana_alpha_lab.factory.hfic_session.orphan_prefreeze_draft_resumable", return_value=False):
                 return owner.evaluate_forge_run(ROOT, ROOT / "unused-test-store", owner_focus=focus, persist=True)
         self.assertEqual(read(copy.deepcopy(stages))["next_action"], "RETURN_EXISTING_RUN")
@@ -270,6 +274,14 @@ class CompletedProvenanceScopeTests(unittest.TestCase):
                 self.assertEqual(refused["owner_class"], "OBSERVABILITY_BLOCKED")
                 if unreadable:
                     self.assertIn("ARTIFACT_HASH_MISMATCH", refused["blocking_reason_codes"])
+                self.assertEqual(refused["persisted_receipt_sha256"], saved["receipt_sha256"])
+                self.assertEqual(refused["writes"], {"research_store": 0, "forge_run": 0, "session": 0})
+        for name, refused in (
+            ("partial-source-same-epoch", read([copy.deepcopy(stages[0])], same_epoch=True)),
+            ("foreign-admission-session", read(copy.deepcopy(stages), admitted_session="FOREIGN")),
+        ):
+            with self.subTest(name=name):
+                self.assertEqual(refused["owner_class"], "OBSERVABILITY_BLOCKED")
                 self.assertEqual(refused["persisted_receipt_sha256"], saved["receipt_sha256"])
                 self.assertEqual(refused["writes"], {"research_store": 0, "forge_run": 0, "session": 0})
         store.append.assert_not_called()
