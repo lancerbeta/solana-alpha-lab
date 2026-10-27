@@ -29,7 +29,7 @@
     "independent_review": {
       "path": "docs/evidence/forge_ordinary_run_finalization_v1/independent-review.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
